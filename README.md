@@ -35,8 +35,10 @@ Python 3.12 + FastAPI + Pydantic v2 + SQLAlchemy 2 + Alembic + MySQL 8 + Redis +
 
 ## Day 1 前置条件（Stage 0.5 不执行）
 
-1. 本机 Python 必须安装并切换到 **3.12.11**；版本不匹配时 Task 1 不得判定 PASS。
+1. Windows Host 使用 **Python 3.12.10**，并通过 `python -m venv .venv` 创建同版本项目环境；禁止混用全局包与 `.venv`。
 2. 复制 `.env.example` 为 `.env`。
 3. 重新生成并确认 Day 1 Task 1~8 计划后，从 Task 1 开始逐项实施，不得一次执行全部 Task。
+
+项目兼容范围为 Python `>=3.12,<3.13`。Production Docker Runtime 的具体 Python 3.12 Patch Version 在 Deployment 阶段独立验证并固定明确 tag/digest，不要求与 Windows Host Patch 完全一致。
 
 新的 Day 1 覆盖基础设施、组织房产、Development Auth/RBAC、住户绑定、员工多小区关系、签到、小程序最小纵向链路及完整集成验收。Milvus、RAG、AI、WorkOrder、Incident、SLA、正式微信/短信/实名和 Production Nginx 不属于 Day 1。

@@ -12,13 +12,13 @@
 6. V1 明确不做的能力未出现在目录规划里（无 payment/iot/k8s 包）。
 7. 所有核心表主键统一为 BIGINT AUTO_INCREMENT、外键同型；不存在 UUID/CHAR(36) 的现行主键规则。
 8. Unit、ResidentHouseRelation、EmployeeProperty、Attendance、组织 Scope、同步 Session 与新 Day 1 Task 1~8 在所有冻结文档中语义一致。
-9. `.python-version` 与 Production Runtime 保持 3.12.11；本机版本不匹配时不能通过 Task 1。
+9. `.python-version` 与 Windows Host Development Runtime 为 3.12.10，项目兼容范围为 `>=3.12,<3.13`；Production Docker Runtime 在 Deployment 阶段独立验证并冻结明确 tag/digest。
 10. Stage 0.5 不创建 Route、ORM、Service、Repository、Migration 或小程序业务页面；完成后重新生成 Day 1 计划并等待确认。
 
 ## A2. Day 1 验收（Task 8 汇总）
 
 - `healthz` 成功；`readyz` 分别报告 MySQL、Redis、RabbitMQ，Critical/Degraded 语义符合非功能规格。
-- 本机 Python 为 3.12.11；依赖、Docker Compose 和 pytest baseline 可复现。
+- Windows Host 与项目 `.venv` 均为 Python 3.12.10；metadata 允许该版本，依赖可安装，pytest 与 FastAPI 可运行，且不混用全局包。
 - Development Auth 成功；未认证请求拒绝；角色与 Scope 从数据库读取。
 - `APP_ENV=production` 且启用 Development Auth 时被安全保护阻止；production 执行 Dev Seed 被拒绝。
 - Resident 无法调用 Manager API；Cross Tenant、Cross Property、IDOR 与篡改 `property_id` 均被拒绝。

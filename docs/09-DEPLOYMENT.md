@@ -30,7 +30,8 @@ Production V1：**单机或单台云主机 + Docker Compose + Nginx**。
 
 | 组件 | 版本 | 用途 |
 | --- | --- | --- |
-| Python | 3.12.11 | 运行时 |
+| Python Compatibility | `>=3.12,<3.13` | 项目语言兼容范围 |
+| Windows Host Python | 3.12.10 | 本地开发与 Day 1 `.venv` |
 | FastAPI | 0.115.12 | API |
 | Starlette | 0.41.3 | FastAPI 依赖锁定 |
 | Pydantic | 2.10.6 | Schema |
@@ -63,7 +64,7 @@ Production V1 本周不使用 aiomysql 或 AsyncSession，禁止同步/异步 Se
 
 | 服务 | 镜像标签 |
 | --- | --- |
-| API / Worker | `python:3.12.11-slim-bookworm` |
+| API / Worker | Deployment 阶段从可信 Python 3.12 镜像中冻结明确完整 tag，必要时记录 digest；禁止最终使用浮动 `python:3.12` |
 | MySQL | `mysql:8.0.41` |
 | Redis | `redis:7.4.2-alpine` |
 | RabbitMQ | `rabbitmq:3.13.7-management-alpine` |
@@ -92,7 +93,9 @@ Development 实现不得调用真实商用端点。
 | staging | 脱敏样本 | 可接沙箱微信/短信 |
 | production | 真实 | Production，密钥由部署注入 |
 
-本地 Python 必须与冻结运行时 **3.12.11** 一致，才能判定 Day 1 Task 1 PASS。当前机器若仍为其他 3.12 补丁版本，须在 Task 1 开始前由负责人完成安装/切换；不得因此降低项目冻结版本。
+Windows 本地开发解释器冻结为 **Python 3.12.10**。Day 1 Task 1 只有在 Host 与项目 `.venv` 均报告 Python 3.12.10、metadata 允许该版本、依赖可安装且 pytest/FastAPI 可运行时才能 PASS。`.venv` 必须由当前 Host 解释器通过 `python -m venv .venv` 创建，禁止混用全局与项目包。
+
+Production Docker Runtime 与 Windows Host Runtime 分离，不要求 Patch Version 完全相同。Production 的具体 Python 3.12 Security Patch Version 在 Deployment 阶段依据可信镜像可用性、依赖兼容性、安全状态及完整测试结果单独冻结；交付时必须固定明确 image tag，必要时进一步固定 digest。
 
 Development `DATABASE_URL` 与 Integration Test `TEST_DATABASE_URL` 必须指向不同数据库。测试数据库必须是明确可销毁的 MySQL 8 实例或独立 schema；Migration downgrade、破坏性测试和测试数据清理禁止指向 Development 或 Production 数据库。
 
