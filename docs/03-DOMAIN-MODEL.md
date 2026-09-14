@@ -32,15 +32,17 @@
 | `UserPhone` | 手机绑定 | user_id, phone_e164, verified_at, unique(phone) |
 | `UserWechat` | 微信绑定 | user_id, appid, openid, unionid, unique(appid,openid), unique(unionid) where not null |
 | `UserPassword` | 密码凭证 | user_id, password_hash, password_algo, updated_at |
-| `Role` | 角色字典 | code, name |
+| `Role` | 角色字典 | id BIGINT PK, code VARCHAR NOT NULL UNIQUE, name, created_at, updated_at |
 | `Permission` | 权限字典 | code, name |
-| `RolePermission` | 角色权限 | role_id, permission_id |
-| `UserRole` | 用户角色 | user_id, role_code, scope_type, tenant_id, property_id |
+| `RolePermission` | 角色权限 | role_id BIGINT FK -> roles.id, permission_id BIGINT FK -> permissions.id |
+| `UserRole` | 用户角色 | user_id BIGINT FK -> users.id, role_id BIGINT FK -> roles.id, scope_type, tenant_id, property_id |
 | `SmsChallenge` | 验证码挑战 | phone, purpose, code_hash, expires_at, attempts, client_fingerprint |
 | `IdentityRecoveryRequest` | 高风险恢复 | user_id?, real_name, id_number_cipher, provider_ref, liveness_ref, status, reviewer_id |
 | `AccountMerge` | 账号合并 | source_user_id, target_user_id, status, operator_id |
 
 说明：身份证号加密存储；人脸只存 Provider 流水与结果。`SmsChallenge` 存哈希，不存明文验证码。
+
+`Role.code` 是稳定且唯一的业务代码，可供 API 展示以及 Service / Seed 查找角色，但不作为关系表的外键。`UserRole` 与 `RolePermission` 均通过 `role_id` 引用 `roles.id`；业务判断通过关联 Role 后读取 `Role.code`。禁止把 `Role.id` 数字硬编码为角色含义；Seed 必须按 `Role.code` 查询 Role、取得其 `id`，再写入 `UserRole.role_id`。
 
 ### 2.3 住户关系
 
@@ -117,7 +119,8 @@ Tenant 1 ── * Property 1 ── * Building 1 ── * Unit 1 ── * House
 User 1 ── 0..1 UserPassword
 User 1 ── * UserPhone          （V1 当前有效手机号唯一）
 User 1 ── * UserWechat
-User 1 ── * UserRole
+User 1 ── * UserRole * ── 1 Role
+Role 1 ── * RolePermission * ── 1 Permission
 User 1 ── 0..1 Employee
 User 1 ── * ResidentBindRequest
 User 1 ── * ResidentHouseRelation * ── 1 House
