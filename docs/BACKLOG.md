@@ -20,6 +20,7 @@
 - 多 Agent 协作的“物业操作系统”
 - Kubernetes 编排、服务网格
 - 按领域拆微服务
+- 如未来外部接口确需不可预测标识，增加独立 opaque/public ID；不改变 Production V1 内部 BIGINT 主键，也不阻塞 Day 1
 - 独立管理后台 Web（若需要，单独立项）
 - 自建人脸识别比对库
 

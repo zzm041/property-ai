@@ -15,7 +15,7 @@
 | 手机号 + 短信验证码 | 发送频控、验证码一次性、过期作废 | 验证失败计数、锁定窗口 |
 | 手机号 + 密码 | 密码哈希校验 | 失败计数、锁定；提示走忘记密码 |
 
-内部永久 `user_id`（UUID）才是真实身份。手机号、微信号、密码都不是业务主键。
+内部永久 `User.id`（BIGINT）才是真实身份，其他表通过同型 BIGINT `user_id` 外键关联。手机号、微信号、密码、身份证都不是业务主键。
 
 ### 1.2 一个自然人一个账户
 
@@ -92,6 +92,10 @@
 - 工作历史、平均响应时间、服务评价
 
 **签到和当天人员状态必须直接参与 AI/规则派单。** 未签到人员不得进入自动派单候选。
+
+Employee 归属于 Tenant，通过 `EmployeeProperty` 关联一个或多个 Property。该关系保留 `status`、`valid_from`、`valid_to` 历史；`valid_to` 为空表示当前有效，变更服务范围不得覆盖旧记录。
+
+签到时间 `check_in_at` / `check_out_at` 保存 UTC；“今日”使用 Property 业务时区下的 `business_date`，默认 `Asia/Shanghai`，禁止直接以 UTC date 判断。
 
 ---
 

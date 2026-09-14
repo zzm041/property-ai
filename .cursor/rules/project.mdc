@@ -11,7 +11,11 @@ alwaysApply: true
 
 - 修改前先说明计划；小步提交；每完成一个模块就写失败路径测试。
 - 保持模块化单体 + Worker；外部系统只通过 Provider，并保留 Development 实现。
-- `user_id` 是唯一身份主键。手机号 / 微信 / 密码不得作为业务主键。
+- 核心主键使用 BIGINT AUTO_INCREMENT，外键同型；`users.id` 是永久用户身份，关联列使用 `user_id`。
+- 使用同步 SQLAlchemy Session + PyMySQL；Service 管事务，Repository 不自行提交完整业务流程。
+- 数据库时间戳存 UTC；自然日业务使用 Property 时区下的 `business_date`，默认 Asia/Shanghai。
+- 组织 Scope 仅 `SYSTEM / TENANT / PROPERTY`；SELF 通过 Ownership / Relationship Policy 判断。
+- Employee 通过带生命周期的 `EmployeeProperty` 服务一个或多个小区。
 - 工单状态变化写 `WorkOrderLog`，管理与安全操作写 `AuditLog`。
 - AI 失败时业务仍可用：工单创建成功并进入人工队列。
 - 派单走规则过滤 + 评分，禁止 LLM 直接点名员工。
@@ -24,3 +28,4 @@ alwaysApply: true
 - 不保存原始人脸特征，不让 AI 自动发公告，不让业主自行联系第三方。
 - 不把 `owner_name` 写死在 House 表；不用覆盖历史住户关系。
 - 不硬编码 SLA；不跨 tenant/property 查询知识或工单。
+- Stage 0.5 只统一规格与元数据；完成后不得自动进入 Day 1。

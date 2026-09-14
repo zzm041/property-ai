@@ -1,8 +1,8 @@
 # 10 — 验收标准
 
-验收分两层：**阶段 0/1 文档验收**（当前）与 **Production V1 产品验收**（后续模块累计）。未完成前者不得宣称 V1 可交付。
+验收分为：**Stage 0.5 规格统一验收**、**Day 1 纵向链路验收**与 **Production V1 产品验收**。未完成前置层不得宣称后续层可交付。
 
-## A. 阶段 0 / 阶段 1 验收（当前必须满足）
+## A. Stage 0.5 规格统一验收
 
 1. 仓库具备 Git 忽略规则、README、AGENTS.md、`.cursor/rules/project.mdc`。
 2. `docs/00` 至 `docs/10` 与 `BACKLOG.md` 存在且覆盖需求原文中的范围、角色、状态机、AI 派单、安全、技术栈冻结。
@@ -10,7 +10,28 @@
 4. 未实现完整业务模块；无假登录、无连真实外部 API 的硬编码密钥。
 5. 版本冻结表与 `backend/pyproject.toml` 一致。
 6. V1 明确不做的能力未出现在目录规划里（无 payment/iot/k8s 包）。
-7. 给出架构、ER、Day 1 计划、风险，并等待负责人确认。
+7. 所有核心表主键统一为 BIGINT AUTO_INCREMENT、外键同型；不存在 UUID/CHAR(36) 的现行主键规则。
+8. Unit、ResidentHouseRelation、EmployeeProperty、Attendance、组织 Scope、同步 Session 与新 Day 1 Task 1~8 在所有冻结文档中语义一致。
+9. `.python-version` 与 Production Runtime 保持 3.12.11；本机版本不匹配时不能通过 Task 1。
+10. Stage 0.5 不创建 Route、ORM、Service、Repository、Migration 或小程序业务页面；完成后重新生成 Day 1 计划并等待确认。
+
+## A2. Day 1 验收（Task 8 汇总）
+
+- `healthz` 成功；`readyz` 分别报告 MySQL、Redis、RabbitMQ，Critical/Degraded 语义符合非功能规格。
+- 本机 Python 为 3.12.11；依赖、Docker Compose 和 pytest baseline 可复现。
+- Development Auth 成功；未认证请求拒绝；角色与 Scope 从数据库读取。
+- `APP_ENV=production` 且启用 Development Auth 时被安全保护阻止；production 执行 Dev Seed 被拒绝。
+- Resident 无法调用 Manager API；Cross Tenant、Cross Property、IDOR 与篡改 `property_id` 均被拒绝。
+- Property 层级校验真实落在 MySQL 8；非法 Building/Unit/House 组合被约束或 Service 拒绝。
+- ResidentBindRequest 提交、批准、拒绝成功；重复批准、重复有效关系和未授权批准被拒绝；批准/拒绝产生 AuditLog。
+- Employee 与 User 正确关联；一个 Employee 支持多个带生命周期的 EmployeeProperty。
+- 无当前有效 EmployeeProperty 时不能向目标 Property 签到。
+- 签到使用 `business_date`；`check_in_at/check_out_at` 存 UTC；同日冲突签到被阻止。
+- AttendanceRecord 与 EmployeeDailyStatus 在同一事务原子成功或回滚。
+- Integration Test 使用与 Development DB 隔离的 MySQL 8 Test DB，不使用 SQLite。
+- Migration 在明确可销毁的 Test DB 完成 upgrade → downgrade → re-upgrade；禁止对 Development DB 做 downgrade。
+- Validation Error 使用统一 Error Contract。
+- Task 3/5/6 分阶段 Seed 不提前引用未建立实体；Task 8 验证完整 Seed。
 
 ## B. Production V1 分模块验收（后续执行时使用）
 
@@ -31,6 +52,7 @@
 ### B3 员工与派单
 
 - 未签到、离岗、错小区、错职责、满负载人员不会被自动派单。
+- 派单按目标时点有效的 `EmployeeProperty` + `EmployeeDailyStatus` + Duty + Skill 筛选；历史失效关系不得命中。
 - LLM 不直接指定员工。
 - 支持人工派单、改派、拒单、超时重派。
 - 派单理由可追溯。

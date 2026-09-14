@@ -11,8 +11,8 @@ property-ai/
   docs/                          # 规格，先于代码
   backend/
     pyproject.toml               # 冻结依赖
-    alembic.ini                  # Day 1 再填真实 URL
-    alembic/versions/            # 空，待首个迁移
+    alembic.ini                  # Day 1 Task 2 初始化
+    alembic/versions/            # Stage 0.5 为空，Task 2 创建首个真实迁移
     app/
       api/                       # FastAPI 路由
       domain/                    # 状态机、派单规则
@@ -26,9 +26,9 @@ property-ai/
     tests/
       unit/
       integration/
-  miniprogram/                   # 微信原生小程序，阶段 0 仅占位
-  deploy/                        # Compose / Nginx，Day 1 再写可运行文件
+  miniprogram/                   # Stage 0.5 占位，Day 1 Task 7 最小纵向链路
+  deploy/                        # Day 1 Task 1 开发 Compose；Production Nginx 后续
   scripts/
 ```
 
-阶段 0 只建目录与说明文件。**不要**在此时生成完整 CRUD、状态机实现或假数据迁移。
+Stage 0.5 只统一规格、依赖元数据与占位说明。**不要**在此时生成 Route、ORM、Service、Repository、Migration 或小程序业务页面。

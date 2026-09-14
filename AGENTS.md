@@ -35,17 +35,23 @@
 - 模块化单体 + Worker，禁止提前拆微服务。
 - 禁止 Kubernetes、GraphRAG、多 Agent 编排。
 - 目录分层：`api / domain / service / repository / model / schema / provider / worker / core / tests`。
+- Production V1 使用同步 SQLAlchemy Session + PyMySQL；数据库主导的 FastAPI Endpoint 优先使用普通 `def`，禁止在 `async def` 中直接执行同步数据库 IO。
+- 事务边界属于 Service；Repository 只负责数据访问，不得在一个完整业务流程中各自随意 commit。
 - 外部系统必须走 Provider：Sms / RealName / LLM / Vision / ASR / Storage / Notification。
 - 每个 Provider 必须有 Development 实现，保证无企业凭证也能本地开发测试。
 - 禁止把 API Key、密码、Secret 写入代码。只允许环境变量 / secret 文件。
 
 ## 4. 身份与数据铁律
 
-- 内部永久 `user_id` 才是用户身份。手机号、微信、密码都不是业务主键。
+- 核心表内部主键统一为 `BIGINT AUTO_INCREMENT`，外键使用与目标主键一致的 BIGINT；`users.id` 是内部永久用户身份，关联列命名为 `user_id`。
+- 手机号、微信、密码、身份证都不是业务主键；安全不得依赖 ID 不可猜，必须依赖 RBAC、组织 Scope、Ownership Policy 与 Anti-IDOR。
 - 一个自然人不得重复建号；支持绑定变更与账号合并。
 - User 与 Employee 分离但关联。
 - House 不得写死 `owner_name`。User 与 House 通过 `ResidentHouseRelation` 多对多，并保留历史。
 - 所有租户数据必须带 `tenant_id`；小区级数据必须可按 `property_id` 隔离。
+- 组织 Scope 仅为 `SYSTEM / TENANT / PROPERTY`；SELF 是资源所有权策略，不是 Scope Enum。
+- `Employee` 归属 Tenant；通过带 `status / valid_from / valid_to` 的 `EmployeeProperty` 历史关系服务一个或多个 Property。
+- 数据库时间戳保存 UTC；自然日业务使用按 Property 时区计算的 `business_date`，默认时区 `Asia/Shanghai`。
 - 不得自行保存和比对原始人脸特征。实名/活体走第三方 Provider。
 
 ## 5. 业务铁律
@@ -74,4 +80,6 @@
 
 ## 8. 当前阶段
 
-只执行已批准的阶段。阶段 0/1 产出是规格、目录骨架、架构方案，**不是**完整业务实现。
+一次性 **Stage 0.5 — Frozen Specification Reconciliation** 已完成：规格、规则、依赖元数据和占位说明已统一，未实现业务。
+
+当前 Gate 仅允许重新生成并确认 Day 1 Task 1~8 计划。未经负责人明确批准，不得执行 Day 1 Task 1，更不得进入后续 Task 或 Day 2+。

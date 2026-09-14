@@ -7,6 +7,8 @@
 
 本文是契约初稿，不是代码。实现前如需改路径，先改本文并经负责人确认。
 
+资源 ID 是正 BIGINT。ID 可枚举性不能作为安全边界；路径、Header 或 Body 中的 `tenant_id` / `property_id` 仅用于定位上下文，后端必须依据认证用户、组织 Scope、目标资源与数据库关系重新授权并防止 IDOR。
+
 ## 1. 统一响应
 
 成功：
@@ -108,7 +110,13 @@
 | POST | `/admin/employees` |
 | PATCH | `/admin/employees/{id}` |
 
-签到失败（不在服务小区、重复签到）返回 `EMP.CHECKIN_DENIED`。
+签到请求携带目标 `property_id`，服务端须校验 Employee 在该 Property 当前存在有效 `EmployeeProperty`，不能信任客户端声明。成功响应至少包含：
+
+- `business_date`：Property 业务时区下的自然日，默认 `Asia/Shanghai`
+- `check_in_at` / `check_out_at`：UTC Timestamp
+- 当天 `EmployeeDailyStatus`
+
+签到失败（不在有效服务范围、篡改 property_id、重复签到）返回 `EMP.CHECKIN_DENIED`。签到写入 `AttendanceRecord` 与更新 `EmployeeDailyStatus` 必须处于同一 Service 事务。
 
 ## 6. 工单
 
@@ -153,7 +161,7 @@
 | POST | `/notifications/{id}/read` |
 | POST | `/files` | multipart 上传 |
 | GET | `/healthz` | 进程存活 |
-| GET | `/readyz` | MySQL/Redis 依赖 |
+| GET | `/readyz` | 报告 MySQL、Redis、RabbitMQ；非关键依赖可显示 degraded |
 
 ## 8. 上传校验
 

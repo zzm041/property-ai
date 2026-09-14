@@ -36,6 +36,9 @@
 
 - 每个查询在 repository 层强制 `tenant_id`（及需要时 `property_id`）。
 - 禁止把隔离过滤只写在前端。
+- 客户端提交的 tenant/property 只是请求上下文，不是权限事实；授权必须由认证用户、角色 Scope、目标资源与数据库关系共同决定。
+- 核心表使用顺序 BIGINT ID，安全不能依赖 ID 不可猜。每个按 ID 访问资源的路径都必须覆盖 Cross Tenant、Cross Property 与 IDOR 测试。
+- 组织 Scope 仅 `SYSTEM / TENANT / PROPERTY`；SELF 类访问通过资源所有权或有效关系判断。
 - 系统管理员默认看元数据；看业务明文需单独权限。
 
 ## 5. 文件上传
@@ -48,6 +51,13 @@
 - 所有 Secret 来自环境变量或部署侧 secret 文件。
 - `.env` 不入库。`.env.example` 只有空值和假数据。
 - 不同环境不同 `APP_SECRET_KEY`。
+
+## 6.1 Development 能力保护
+
+- Development Auth 与 Dev Seed 仅允许 `APP_ENV=development` 或 `test`。
+- `APP_ENV=production` 且开启 Development Auth 时必须在启动或调用前触发安全保护并拒绝运行。
+- production 必须拒绝 Dev Seed；企业初始化未来走独立 Import / Admin Operation / Production Bootstrap。
+- Development Auth 的角色和 Scope 从真实数据库读取，客户端不得通过提交角色名获得权限，也不得绕过 RBAC 或租户隔离。
 
 ## 7. 并发与幂等
 
@@ -65,6 +75,7 @@
 
 - [ ] 未授权 / 错误范围返回 401/403
 - [ ] 跨小区 IDOR 测试
+- [ ] 跨 Tenant、跨 Property 与篡改 `property_id` 测试
 - [ ] 错误信息无栈、无 SQL
 - [ ] 速率限制
 - [ ] 审计字段齐全

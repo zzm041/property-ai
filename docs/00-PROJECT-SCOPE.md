@@ -2,7 +2,8 @@
 
 **产品名称：** 智慧物业 AI 运营与工单调度平台  
 **产品类型：** 真实物业企业 Production V1  
-**文档状态：** 阶段 0 第一版，待负责人确认后冻结  
+**文档状态：** Stage 0.5 冻结规格统一已完成，等待 Day 1 计划
+
 **主客户端：** 一个微信原生小程序，按角色展示不同功能
 
 ## 1. 一句话定位
@@ -57,10 +58,23 @@
 
 | 阶段 | 目标 | 状态 |
 | --- | --- | --- |
-| 0 | 扫描仓库、建立 Git 结构、规格文档、Agent 规则 | 进行中 |
-| 1 | 架构方案、目录骨架、实体/ER、Day 1 计划、风险与验收 | 进行中 |
-| Day 1 | 可运行骨架：配置、日志、健康检查、Compose、空迁移 | **未批准，禁止开始** |
-| Day 2+ | 身份、房产、工单等业务模块 | 禁止自行进入 |
+| 0 / 1 | 范围、规格、架构、目录骨架 | 已完成 |
+| 0.5 | Frozen Specification Reconciliation：统一旧规格与最新工程决策 | 已完成 |
+| Day 1 | 按 Task 1~8 完成基础设施到小程序纵向链路及完整验收 | **尚未开始，须另行确认计划** |
+| Day 2+ | 后续 Production V1 模块 | 禁止自行进入 |
+
+旧的“Day 1 仅做基础设施、身份/房产留到 Day 2+”节奏正式废弃。新的 Day 1 固定拆分：
+
+1. Task 1：Environment / FastAPI Core / Docker / Health / Test Baseline
+2. Task 2：Database Foundation + Tenant / Property / Building / Unit / House
+3. Task 3：User / UserRole / Development Auth / RBAC / AuditLog Foundation / 基础 Dev Seed
+4. Task 4：ResidentBindRequest / ResidentHouseRelation / Approval / Reject / Audit
+5. Task 5：Employee / Department / Duty / Skill / EmployeeProperty / 多 Property / Dev Seed
+6. Task 6：AttendanceRecord / EmployeeDailyStatus / business_date / Attendance Seed
+7. Task 7：微信原生小程序最小纵向业务链路
+8. Task 8：完整 Integration / Security / Migration / Acceptance
+
+Day 1 不启动 Milvus、RAG、LLM、VLM、ASR，不实现 WorkOrder、AI 派单、Incident、SLA、正式微信/短信/实名或 Production Nginx。每个 Task 仍须单独经过 PLAN → WAIT → IMPLEMENT → TEST → REPORT → STOP。
 
 ## 7. 成功标准（产品层）
 

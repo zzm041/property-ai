@@ -1,13 +1,15 @@
 # 03 — 领域模型
 
-本文定义 Production V1 的核心实体。实现时以本文件为准；表名使用 snake_case 复数，主键除特别说明外为 UUID `CHAR(36)`。
+本文定义 Production V1 的核心实体。实现时以本文件为准；表名使用 snake_case 复数，核心表主键统一为 `id BIGINT AUTO_INCREMENT`，所有外键使用与目标主键一致的 BIGINT。
 
 ## 1. 建模原则
 
-- `user_id` 是人的主键。手机号、微信、密码哈希都不是外键目标。
+- `users.id` 是人的内部永久主键；其他表用 `user_id` BIGINT 外键关联。手机号、微信、密码哈希、身份证都不是外键目标或业务主键。
+- BIGINT ID 是否可猜不构成安全边界；资源访问必须执行 RBAC、Tenant/Property Scope、Ownership Policy 与 Anti-IDOR。
 - 物理房屋与人分离。House 不存 `owner_name`。
 - 住户关系、工单处理、回执都是追加历史，不覆盖。
 - 凡跨企业数据必须有 `tenant_id`；小区业务必须有 `property_id`。
+- 数据库时间戳统一保存 UTC；自然日业务使用按 Property 时区计算的 `business_date`，默认 `Asia/Shanghai`。
 - 软删除仅用于配置类主数据（员工停用、房屋作废）。交易类（工单、关系、审计）不物理覆盖。
 
 ## 2. 核心实体列表
@@ -26,7 +28,7 @@
 
 | 实体 | 说明 | 关键字段 |
 | --- | --- | --- |
-| `User` | 登录主体 | user_id PK, status, display_name, created_at |
+| `User` | 登录主体 | id BIGINT PK, status, display_name, created_at |
 | `UserPhone` | 手机绑定 | user_id, phone_e164, verified_at, unique(phone) |
 | `UserWechat` | 微信绑定 | user_id, appid, openid, unionid, unique(appid,openid), unique(unionid) where not null |
 | `UserPassword` | 密码凭证 | user_id, password_hash, password_algo, updated_at |
@@ -60,14 +62,16 @@
 | `Duty` | 职责 | tenant_id, code, name（如水电维修、保洁） |
 | `Skill` | 技能 | tenant_id, code, name |
 | `Employee` | 员工档案 | user_id unique, tenant_id, department_id, status, max_capacity |
-| `EmployeeProperty` | 员工可服务小区 | employee_id, property_id |
+| `EmployeeProperty` | 员工对小区的有效工作范围历史 | employee_id, property_id, status, valid_from, valid_to |
 | `EmployeeDuty` | 员工职责 | employee_id, duty_id |
 | `EmployeeSkill` | 员工技能 | employee_id, skill_id |
-| `AttendanceRecord` | 签到/签退 | employee_id, property_id, work_date, checkin_at, checkout_at, source |
-| `EmployeeDailyStatus` | 当天状态快照 | employee_id, property_id, work_date, on_duty, leave_type, current_load |
+| `AttendanceRecord` | 签到/签退历史事件 | employee_id, property_id, business_date, check_in_at, check_out_at, source |
+| `EmployeeDailyStatus` | 当天运营状态快照 | employee_id, property_id, business_date, on_duty, leave_type, current_load |
 | `EmployeeMetric` | 滚动绩效 | employee_id, avg_response_seconds, complete_rate, rating_avg, window |
 
-派单读取 **当天** `AttendanceRecord` + `EmployeeDailyStatus`，不是只读 Employee 静态表。
+`Employee` 归属于 Tenant，通过一个或多个 `EmployeeProperty` 服务 Property。关系历史不得覆盖；`valid_to IS NULL` 且状态有效表示当前工作范围。派单读取业务日期当天有效的 `EmployeeProperty` + `EmployeeDailyStatus` + Duty + Skill，不是只读 Employee 静态表。
+
+`check_in_at` / `check_out_at` 保存 UTC Timestamp；`business_date` 是 Property 业务时区下的自然日。签到 Service 必须在同一事务写 `AttendanceRecord` 并更新 `EmployeeDailyStatus`。
 
 ### 2.5 工单
 
@@ -101,7 +105,7 @@
 | `NotificationDelivery` | 渠道投递、重试次数、失败原因、下次重试 |
 | `FileObject` | 上传文件元数据：hash, mime, size, storage_key, scanner_status |
 | `AiCallLog` | 模型调用：prompt_version, model_version, latency, tokens, error |
-| `AuditLog` | 安全与管理审计 |
+| `AuditLog` | 安全与管理审计：actor_user_id, tenant_id, property_id, action, resource_type, resource_id, request_id, created_at |
 | `IdempotencyRecord` | 幂等键 |
 | `RequestOutbox` 可选 | V1 可用通知表代替完整 outbox |
 
@@ -139,10 +143,13 @@ SlaPolicy 1 ── * WorkOrder
 
 1. `ResidentHouseRelation` 是 User–House 唯一正式关联。不能把业主姓名冗余成房屋主数据。
 2. `Employee.user_id` 唯一。停用员工不断开历史工单外键。
-3. `WorkOrder.property_id` 必须等于 `House` 所属小区。
-4. `WorkOrderAssignment.employee_id` 必须能服务该 `property_id`。
-5. `Incident` 与成员工单同 `property_id`。
-6. 账号合并：身份绑定迁到 target user；工单 reporter / 关系 user_id 一并迁移；源账户冻结并留合并审计。
+3. `EmployeeProperty` 保留工作范围历史；签到与未来派单只接受目标时点有效的关系。
+4. 同一 `(employee_id, property_id, business_date)` 只能有一个有效 `EmployeeDailyStatus`。
+5. `WorkOrder.property_id` 必须等于 `House` 所属小区。
+6. `WorkOrderAssignment.employee_id` 必须能通过有效 `EmployeeProperty` 服务该 `property_id`。
+7. `Incident` 与成员工单同 `property_id`。
+8. 账号合并：身份绑定迁到 target user；工单 reporter / 关系 user_id 一并迁移；源账户冻结并留合并审计。
+9. `AuditLog.actor_user_id` 引用 `users.id`，因此 AuditLog Foundation 与 User 同在 Day 1 Task 3；Task 2 不创建 AuditLog。
 
 ## 4. 枚举（稳定值）
 
@@ -150,22 +157,26 @@ SlaPolicy 1 ── * WorkOrder
 
 | 枚举 | 值 |
 | --- | --- |
+| `OrganizationScope` | `SYSTEM` `TENANT` `PROPERTY`（不含 SELF） |
 | `WorkOrderStatus` | 见 `04-WORKORDER-STATE-MACHINE.md` |
 | `ProcessReason` | `NONE` `WAITING_OWNER` `WAITING_PARTS` `INTERNAL_UNRESOLVED` `ESCALATED` `EXTERNAL_COORDINATION` `REASSIGN_REQUIRED` |
 | `AttendanceOnDuty` | `ON_DUTY` `OFF_DUTY` `LEAVE` |
+| `EmployeePropertyStatus` | `ACTIVE` `ENDED` `REVOKED` |
 | `AnnouncementStatus` | `DRAFT` `PENDING_REVIEW` `PUBLISHED` `ARCHIVED` `REJECTED` |
 | `Visibility` | `SYSTEM` `TENANT` `PROPERTY` `STAFF_ONLY` `RESIDENT` |
 
 ## 5. 索引建议（V1）
 
-- `user_phone.phone_e164` UNIQUE
-- `user_wechat(appid, openid)` UNIQUE
-- `resident_house_relation(house_id, status, valid_to)`
-- `work_order(property_id, status, created_at)`
-- `work_order(incident_id)`
-- `employee_daily_status(property_id, work_date, on_duty)`
-- `audit_log(tenant_id, created_at)`
-- `idempotency(key)` UNIQUE
+- `user_phones.phone_e164` UNIQUE
+- `user_wechats(appid, openid)` UNIQUE
+- `resident_house_relations(house_id, status, valid_to)`
+- `employee_properties(employee_id, property_id, status, valid_to)`
+- `employee_daily_statuses(employee_id, property_id, business_date)` UNIQUE
+- `employee_daily_statuses(property_id, business_date, on_duty)`
+- `work_orders(property_id, status, created_at)`
+- `work_orders(incident_id)`
+- `audit_logs(tenant_id, created_at)`
+- `idempotency_records(key)` UNIQUE
 
 ## 6. 明确不建的表（V1）
 

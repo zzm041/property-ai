@@ -38,8 +38,7 @@ Production V1：**单机或单台云主机 + Docker Compose + Nginx**。
 | Uvicorn | 0.32.1 | ASGI |
 | SQLAlchemy | 2.0.36 | ORM 2.x |
 | Alembic | 1.14.0 | 迁移 |
-| PyMySQL | 1.1.1 | 同步驱动（迁移/脚本） |
-| aiomysql | 0.2.0 | 异步驱动 |
+| PyMySQL | 1.1.1 | 应用同步 SQLAlchemy Session + Alembic |
 | cryptography | 44.0.0 | MySQL 8 caching_sha2 |
 | Redis (redis-py) | 5.2.1 | 缓存/锁 |
 | Celery | 5.5.3 | Worker |
@@ -57,6 +56,8 @@ Production V1：**单机或单台云主机 + Docker Compose + Nginx**。
 | pytest-cov | 6.0.0 | 覆盖率 |
 
 若安装解析与 FastAPI 0.115.12 的依赖范围冲突，允许在 **不更换框架** 的前提下把 Starlette 调整到 FastAPI 声明的兼容范围，并回写本文。
+
+Production V1 本周不使用 aiomysql 或 AsyncSession，禁止同步/异步 Session 混用。数据库主导 Endpoint 优先使用普通 `def`；不得在 `async def` 路径直接执行同步数据库 IO。
 
 ### 2.2 基础设施镜像
 
@@ -91,6 +92,10 @@ Development 实现不得调用真实商用端点。
 | staging | 脱敏样本 | 可接沙箱微信/短信 |
 | production | 真实 | Production，密钥由部署注入 |
 
+本地 Python 必须与冻结运行时 **3.12.11** 一致，才能判定 Day 1 Task 1 PASS。当前机器若仍为其他 3.12 补丁版本，须在 Task 1 开始前由负责人完成安装/切换；不得因此降低项目冻结版本。
+
+Development `DATABASE_URL` 与 Integration Test `TEST_DATABASE_URL` 必须指向不同数据库。测试数据库必须是明确可销毁的 MySQL 8 实例或独立 schema；Migration downgrade、破坏性测试和测试数据清理禁止指向 Development 或 Production 数据库。
+
 ## 4. 配置
 
 - 仅环境变量，见仓库根目录 `.env.example`
@@ -99,6 +104,8 @@ Development 实现不得调用真实商用端点。
 ## 5. 迁移与备份
 
 - 发布流程：备份 → `alembic upgrade head` → 启动 API/Worker → 健康检查
+- 应用与 Alembic 统一使用 PyMySQL；所有 Schema 变化必须通过历史可追踪的 Alembic Migration
+- 禁止 `create_all` 代替 Migration，禁止删除历史 Migration 解决冲突
 - MySQL：每日 `mysqldump` 或 xtrabackup（生产选定一种写入运行手册）+ binlog 至少 7 天
 - 文件存储：对象存储版本或每日同步
 - 恢复：在 staging 用备份演练，阶段 1 只要求文档化，Day 1 不做真实恢复演练

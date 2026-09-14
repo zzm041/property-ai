@@ -1,7 +1,7 @@
 # 智慧物业 AI 运营与工单调度平台
 
 真实物业企业 **Production V1** 后端 + 微信小程序。  
-当前状态：**阶段 0 / 阶段 1（规格与骨架）**。业务代码尚未开始，待负责人确认后进入 Day 1。
+当前状态：**Stage 0.5 已完成，等待重新生成并确认 Day 1 Task 1~8 计划**。规格与元数据已统一，业务代码尚未开始。
 
 ## 当前不要期望什么
 
@@ -33,8 +33,10 @@ Python 3.12 + FastAPI + Pydantic v2 + SQLAlchemy 2 + Alembic + MySQL 8 + Redis +
 
 版本见 `backend/pyproject.toml` 与 `docs/09-DEPLOYMENT.md`。
 
-## 本地下一步（需负责人确认后才执行）
+## Day 1 前置条件（Stage 0.5 不执行）
 
-1. 安装 Git / Python 3.12 / Docker Desktop。
+1. 本机 Python 必须安装并切换到 **3.12.11**；版本不匹配时 Task 1 不得判定 PASS。
 2. 复制 `.env.example` 为 `.env`。
-3. 按 Day 1 计划启动健康检查级后端，而不是一次生成全业务。
+3. 重新生成并确认 Day 1 Task 1~8 计划后，从 Task 1 开始逐项实施，不得一次执行全部 Task。
+
+新的 Day 1 覆盖基础设施、组织房产、Development Auth/RBAC、住户绑定、员工多小区关系、签到、小程序最小纵向链路及完整集成验收。Milvus、RAG、AI、WorkOrder、Incident、SLA、正式微信/短信/实名和 Production Nginx 不属于 Day 1。

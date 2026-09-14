@@ -75,15 +75,15 @@ AI/人工得到 category, required_duty/skill, severity
 
 必须全部通过：
 
-1. 今日已签到
-2. 当天状态为在岗（非请假/离岗）
-3. `EmployeeProperty` 包含本小区
+1. Property 业务时区的 `business_date` 当天已签到
+2. 当天 `EmployeeDailyStatus` 为在岗（非请假/离岗）
+3. 目标时点存在覆盖本小区的有效 `EmployeeProperty`（`status=ACTIVE`，`valid_from` 已生效，`valid_to` 为空或尚未失效）
 4. 职责匹配（`required_duty`；若 AI 只给 skill 则 skill 匹配）
 5. 技能匹配（有 required_skill 时）
 6. `current_load < max_capacity`
 7. 员工 User 状态正常、角色含 STAFF 或以上
 
-**禁止**把未签到人员因“历史上是维修工”而派单。
+一个 Employee 可有多个有效 `EmployeeProperty`，但候选筛选必须针对工单所属 Property。**禁止**把未签到、关系已失效或仅属于其他 Property 的人员因“历史上是维修工”而派单。
 
 ### 4.2 评分（可配置权重，默认如下）
 

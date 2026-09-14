@@ -14,7 +14,6 @@ dependencies = [
   "sqlalchemy==2.0.36",
   "alembic==1.14.0",
   "pymysql==1.1.1",
-  "aiomysql==0.2.0",
   "cryptography==44.0.0",
   "redis==5.2.1",
   "celery==5.5.3",
@@ -48,4 +47,4 @@ include = ["app*"]
 asyncio_mode = "auto"
 testpaths = ["tests"]
 
-# 阶段 0：仅冻结版本。不要在未确认前添加业务依赖（ORM 之外的 SDK 等）。
+# Stage 0.5：仅统一冻结依赖元数据。未经 Task 计划确认，不添加业务依赖。

@@ -4,20 +4,21 @@
 
 - **User 是登录主体**，角色是授权，Employee 是用工身份。
 - 一个 User 可同时拥有多个角色，例如既是某房业主，又是物业维修工。
-- 角色授权必须带范围：`system` / `tenant` / `property`。
+- 组织角色授权必须带范围：`SYSTEM` / `TENANT` / `PROPERTY`。`SELF` 不是组织 Scope Enum。
 - 住户能力主要来自有效的 `ResidentHouseRelation`，而不是“在 House 上写了名字”。
+- 当前用户访问自己的资源属于 Ownership / Relationship Policy：例如 BindRequest 校验 `resource.user_id == authenticated_user.id`，House 校验有效 `ResidentHouseRelation`。
 - 所有鉴权失败返回统一 Error Code，并记录 `request_id`。禁止仅靠前端藏按钮。
 
 ## 2. 角色定义
 
 | 角色代码 | 名称 | 授权范围 | 说明 |
 | --- | --- | --- | --- |
-| `RESIDENT` | 住户/业主 | 其有效房屋 | 报修、看自己的工单、收公告、知识问答。业主与租户、家属的数据范围相同，部分敏感操作可按关系类型收紧 |
-| `STAFF` | 物业工作人员 | property | 处理分配给自己的工单、签到、填写回执 |
-| `SUPERVISOR` | 主管 | property | 改派、升级决策、审核异常工单、看本小区工单与人员负载 |
-| `PROPERTY_ADMIN` | 小区物业管理员 | property | 房屋档案、住户审核、员工排班、公告审核发布、SLA、Incident |
-| `TENANT_ADMIN` | 企业管理员 | tenant | 管理该企业下所有小区、企业级角色、跨小区报表 |
-| `SYSTEM_ADMIN` | 系统管理员 | system | 租户开通、系统配置、Provider 开关、审计检索。不默认看见业务详情中的业主隐私明文 |
+| `RESIDENT` | 住户/业主 | 有效房屋关系 | 报修、看自己的工单、收公告、知识问答。业主与租户、家属的数据范围相同，部分敏感操作可按关系类型收紧 |
+| `STAFF` | 物业工作人员 | `PROPERTY` | 处理分配给自己的工单、签到、填写回执 |
+| `SUPERVISOR` | 主管 | `PROPERTY` 或 `TENANT` | 小区主管管理单 Property；Tenant 级主管按角色范围管理多个 Property |
+| `PROPERTY_ADMIN` | 小区物业管理员 | `PROPERTY` | 房屋档案、住户审核、员工排班、公告审核发布、SLA、Incident |
+| `TENANT_ADMIN` | 企业管理员 | `TENANT` | 管理该企业下所有小区、企业级角色、跨小区报表 |
+| `SYSTEM_ADMIN` | 系统管理员 | `SYSTEM` | 租户开通、系统配置、Provider 开关、审计检索。不默认看见业务详情中的业主隐私明文 |
 
 `RESIDENT` 不是“必须单独建号的一种人”，而是登录用户在某房屋上的有效关系所派生的能力。后台仍可写入 `user_role` 便于统一鉴权。
 
@@ -28,6 +29,8 @@
 3. 收集有效 `ResidentHouseRelation`。
 4. 请求必须声明当前操作上下文（header 或路径中的 `property_id`/`tenant_id`）。
 5. 无匹配范围则拒绝。禁止“有任意小区管理员角色就能改另一个小区”。
+6. 客户端声明的 tenant/property 只用于定位上下文，不能成为权限事实；后端须从用户角色、目标资源及数据库关系重新验证。
+7. SELF 类访问不写入 `scope_type`；必须通过资源所有权、有效住户关系或任务分配关系判断。
 
 ## 4. 权限点（V1）
 
@@ -61,6 +64,8 @@
 | 查看本小区人员状态 | N | Y | Y | Y |
 | 维护员工档案/技能/容量 | N | N | Y | Y |
 | 调整他人在岗（请假代录） | N | Y | Y | Y |
+
+签到还必须满足：Employee 归属当前 Tenant，且在目标 Property 存在当前有效的 `EmployeeProperty(status, valid_from, valid_to)`。角色本身不能替代该工作范围关系；篡改 `property_id` 必须被拒绝。
 
 ### 4.4 工单
 
@@ -97,6 +102,8 @@
 | 系统审计、租户清单 | system 角色 |
 
 默认查询必须带隔离条件。禁止“先全表再内存过滤”作为唯一防护。
+
+顺序 BIGINT ID 可被猜测，因此任何按 ID 读取或修改资源的 API 都必须同时执行 Scope 与 Ownership/Relationship 校验，防止 IDOR。
 
 ## 6. 小程序信息架构（同一应用）
 

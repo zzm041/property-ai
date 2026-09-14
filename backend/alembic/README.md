@@ -1,3 +1,3 @@
-# 本目录在 Day 1 初始化 Alembic。
+# 本目录在 Day 1 Task 2 初始化 Alembic。
 
-阶段 0 不生成 env.py / 首个迁移，避免无模型时空跑 autogenerate。
+Stage 0.5 不生成 `env.py` 或 Migration。Task 2 建立组织/房产 Model 后创建并验证首个真实 Migration；禁止用 `create_all` 代替 Migration。
