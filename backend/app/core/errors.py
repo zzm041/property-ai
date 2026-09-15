@@ -27,6 +27,12 @@ class IamErrorCode:
     INVALID_SCOPE = "IAM.INVALID_SCOPE"
 
 
+class AuditErrorCode:
+    INVALID_EVENT = "IAM.AUDIT_INVALID_EVENT"
+    INVALID_SCOPE = "IAM.AUDIT_INVALID_SCOPE"
+    INVALID_DETAILS = "IAM.AUDIT_INVALID_DETAILS"
+
+
 class AppError(Exception):
     """Expected business/application error with a stable public code."""
 
