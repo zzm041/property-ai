@@ -2,7 +2,7 @@
 name = "property-ai"
 version = "0.1.0"
 description = "智慧物业 AI 运营与工单调度平台 — Production V1"
-readme = "../README.md"
+readme = "README.md"
 requires-python = ">=3.12,<3.13"
 authors = [{ name = "Property AI Team" }]
 dependencies = [
