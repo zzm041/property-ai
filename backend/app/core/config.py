@@ -7,6 +7,8 @@ from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import make_url
 
+DEFAULT_APP_SECRET_KEY = "change-me-to-a-long-random-string"
+
 
 class Settings(BaseSettings):
     """Validated settings shared by the API and infrastructure probes."""
@@ -21,8 +23,12 @@ class Settings(BaseSettings):
     app_name: str = "Property AI"
     app_env: Literal["development", "test", "staging", "production"] = "development"
     app_debug: bool = False
-    app_secret_key: SecretStr = SecretStr("change-me-to-a-long-random-string")
+    app_secret_key: SecretStr = SecretStr(DEFAULT_APP_SECRET_KEY)
     app_tz: str = "Asia/Shanghai"
+    dev_auth_enabled: bool = False
+    jwt_issuer: str = "property-ai"
+    jwt_audience: str = "property-ai-api"
+    jwt_access_token_ttl_seconds: int = Field(default=900, ge=60, le=3600)
 
     api_host: str = "0.0.0.0"
     api_port: int = Field(default=8000, ge=1, le=65535)
@@ -65,6 +71,19 @@ class Settings(BaseSettings):
             raise ValueError(
                 "TEST_DATABASE_URL must target a different MySQL database or instance"
             )
+        return self
+
+    @model_validator(mode="after")
+    def validate_security_configuration(self) -> "Settings":
+        if self.dev_auth_enabled and self.app_env not in {"development", "test"}:
+            raise ValueError(
+                "Development Auth is allowed only in development or test"
+            )
+        if (
+            self.app_env == "production"
+            and self.app_secret_key.get_secret_value() == DEFAULT_APP_SECRET_KEY
+        ):
+            raise ValueError("Production requires a non-default APP_SECRET_KEY")
         return self
 
     @property

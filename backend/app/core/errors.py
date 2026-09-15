@@ -13,6 +13,20 @@ class ErrorCode:
     INTERNAL_ERROR = "SYS.INTERNAL_ERROR"
 
 
+class AuthErrorCode:
+    MISSING_TOKEN = "AUTH.MISSING_TOKEN"
+    INVALID_TOKEN = "AUTH.INVALID_TOKEN"
+    TOKEN_EXPIRED = "AUTH.TOKEN_EXPIRED"
+    INVALID_USER = "AUTH.INVALID_USER"
+    USER_DISABLED = "AUTH.USER_DISABLED"
+    DEV_AUTH_DISABLED = "AUTH.DEV_AUTH_DISABLED"
+
+
+class IamErrorCode:
+    FORBIDDEN = "IAM.FORBIDDEN"
+    INVALID_SCOPE = "IAM.INVALID_SCOPE"
+
+
 class AppError(Exception):
     """Expected business/application error with a stable public code."""
 
