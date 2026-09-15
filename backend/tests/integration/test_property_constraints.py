@@ -48,12 +48,12 @@ def _hierarchy(
     return tenant.id, property_record.id, building.id, unit.id, house.id
 
 
-def test_schema_has_only_task_2_business_tables(test_engine: Engine) -> None:
+def test_task_2_business_tables_remain_present(test_engine: Engine) -> None:
     inspector = inspect(test_engine)
     tables = set(inspector.get_table_names())
 
     assert BUSINESS_TABLES <= tables
-    assert tables - BUSINESS_TABLES == {"alembic_version"}
+    assert "alembic_version" in tables
     assert "property_units" not in tables
     assert "owner_name" not in {
         column["name"] for column in inspector.get_columns("houses")

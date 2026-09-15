@@ -15,6 +15,14 @@ from app.core.database import (
 )
 
 TASK_2_TABLES = ("tenants", "properties", "buildings", "units", "houses")
+TASK_3_TABLES = (
+    "users",
+    "roles",
+    "permissions",
+    "role_permissions",
+    "user_roles",
+    "audit_logs",
+)
 
 
 @pytest.fixture(scope="session")
@@ -70,6 +78,46 @@ def db_session(
     clean_property_tables: None,
 ) -> Iterator[Session]:
     del clean_property_tables
+    session = get_session_factory(integration_settings.test_database_url)()
+    try:
+        yield session
+    finally:
+        session.close()
+
+
+@pytest.fixture
+def clean_identity_tables(
+    test_engine: Engine,
+    clean_property_tables: None,
+) -> Iterator[None]:
+    del clean_property_tables
+    missing = [
+        table for table in TASK_3_TABLES if not inspect(test_engine).has_table(table)
+    ]
+    if missing:
+        raise RuntimeError(
+            "Gate A migration must be upgraded before integration tests: "
+            + ", ".join(missing)
+        )
+
+    def clean() -> None:
+        with test_engine.begin() as connection:
+            for table in reversed(TASK_3_TABLES):
+                connection.execute(text(f"DELETE FROM `{table}`"))
+
+    clean()
+    try:
+        yield
+    finally:
+        clean()
+
+
+@pytest.fixture
+def identity_session(
+    integration_settings: Settings,
+    clean_identity_tables: None,
+) -> Iterator[Session]:
+    del clean_identity_tables
     session = get_session_factory(integration_settings.test_database_url)()
     try:
         yield session
