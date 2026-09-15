@@ -36,6 +36,7 @@ class Settings(BaseSettings):
         "mysql+pymysql://property_test:change-me-test@127.0.0.1:3307/"
         "property_ai_test?charset=utf8mb4"
     )
+    allow_destructive_test_database: bool = False
     redis_url: str = "redis://127.0.0.1:6379/0"
     celery_broker_url: str = (
         "amqp://property:change-me@127.0.0.1:5672/property_ai"

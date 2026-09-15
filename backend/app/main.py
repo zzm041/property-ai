@@ -8,6 +8,7 @@ from fastapi.responses import ORJSONResponse
 
 from app.api.v1.router import api_router
 from app.core.config import Settings, get_settings
+from app.core.database import dispose_database_engines
 from app.core.exception_handlers import install_exception_handlers
 from app.core.logging import configure_logging, get_logger
 from app.core.request_context import RequestContextMiddleware
@@ -26,8 +27,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "application_started",
             app_env=resolved_settings.app_env,
         )
-        yield
-        logger.info("application_stopped")
+        try:
+            yield
+        finally:
+            dispose_database_engines()
+            logger.info("application_stopped")
 
     application = FastAPI(
         title=resolved_settings.app_name,

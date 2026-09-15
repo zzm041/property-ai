@@ -5,12 +5,12 @@ from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
-import pymysql
 import redis
 from kombu import Connection
-from sqlalchemy.engine import make_url
+from sqlalchemy import text
 
 from app.core.config import Settings
+from app.core.database import get_engine, verify_utc_session
 from app.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -19,25 +19,11 @@ Probe = Callable[[Settings], None]
 
 
 def probe_mysql(settings: Settings) -> None:
-    url = make_url(settings.active_database_url)
     timeout = max(1, round(settings.readiness_timeout_seconds))
-    connection = pymysql.connect(
-        host=url.host or "127.0.0.1",
-        port=url.port or 3306,
-        user=url.username,
-        password=url.password,
-        database=url.database,
-        charset=url.query.get("charset", "utf8mb4"),
-        connect_timeout=timeout,
-        read_timeout=timeout,
-        write_timeout=timeout,
-    )
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT 1")
-            cursor.fetchone()
-    finally:
-        connection.close()
+    engine = get_engine(settings.active_database_url, timeout)
+    with engine.connect() as connection:
+        verify_utc_session(connection)
+        connection.execute(text("SELECT 1")).scalar_one()
 
 
 def probe_redis(settings: Settings) -> None:

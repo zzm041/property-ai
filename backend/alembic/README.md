@@ -1,3 +1,9 @@
-# 本目录在 Day 1 Task 2 初始化 Alembic。
+# Alembic migrations
 
-Stage 0.5 不生成 `env.py` 或 Migration。Task 2 建立组织/房产 Model 后创建并验证首个真实 Migration；禁止用 `create_all` 代替 Migration。
+Task 2 initializes Alembic for the Tenant/Property/Building/Unit/House
+foundation. The migration environment uses the same synchronous PyMySQL engine
+factory and explicit UTC MySQL session setup as the FastAPI application.
+
+Schema changes must use revision files. Never replace migrations with
+`create_all`. Downgrade and destructive migration checks are allowed only
+against the guarded disposable Test database.
