@@ -52,6 +52,17 @@ TASK_6_TABLES = (
     "file_objects",
     "idempotency_records",
 )
+TASK_7_TABLES = (
+    "notifications",
+    "announcement_reviews",
+    "announcement_scopes",
+    "announcements",
+    "dispatch_recommendations",
+    "ai_call_logs",
+    "work_order_analyses",
+    "incident_work_orders",
+)
+TASK_7_PARENT_TABLES = ("incidents",)
 
 
 def _delete_tables(engine: Engine, tables: tuple[str, ...]) -> None:
@@ -100,7 +111,13 @@ def clean_property_tables(test_engine: Engine) -> Iterator[None]:
     def clean() -> None:
         _delete_tables(
             test_engine,
-            TASK_6_TABLES + TASK_5_TABLES + TASK_4_TABLES + tuple(reversed(TASK_2_TABLES)),
+            TASK_7_TABLES
+            + TASK_6_TABLES
+            + TASK_7_PARENT_TABLES
+            + TASK_5_TABLES
+            + TASK_4_TABLES
+            + tuple(reversed(TASK_3_TABLES))
+            + tuple(reversed(TASK_2_TABLES)),
         )
 
     clean()
@@ -141,7 +158,12 @@ def clean_identity_tables(
     def clean() -> None:
         _delete_tables(
             test_engine,
-            TASK_6_TABLES + TASK_5_TABLES + TASK_4_TABLES + tuple(reversed(TASK_3_TABLES)),
+            TASK_7_TABLES
+            + TASK_6_TABLES
+            + TASK_7_PARENT_TABLES
+            + TASK_5_TABLES
+            + TASK_4_TABLES
+            + tuple(reversed(TASK_3_TABLES)),
         )
 
     clean()

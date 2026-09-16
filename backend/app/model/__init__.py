@@ -36,6 +36,17 @@ from app.model.work_order import (
     WorkOrderProcess,
     WorkOrderReceipt,
 )
+from app.model.ai import (
+    AiCallLog,
+    Announcement,
+    AnnouncementReview,
+    AnnouncementScope,
+    DispatchRecommendation,
+    Incident,
+    IncidentWorkOrder,
+    Notification,
+    WorkOrderAnalysis,
+)
 
 __all__ = [
     "AttendanceRecord",
@@ -73,4 +84,13 @@ __all__ = [
     "WorkOrderMedia",
     "WorkOrderProcess",
     "WorkOrderReceipt",
+    "AiCallLog",
+    "Announcement",
+    "AnnouncementReview",
+    "AnnouncementScope",
+    "DispatchRecommendation",
+    "Incident",
+    "IncidentWorkOrder",
+    "Notification",
+    "WorkOrderAnalysis",
 ]

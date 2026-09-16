@@ -252,8 +252,12 @@ class AuditService:
                 "employee_id",
                 "property_id",
                 "work_order_id",
+                "analysis_id",
+                "incident_id",
+                "announcement_id",
+                "recommended_employee_id",
             }:
-                if not cls._is_positive_id(value):
+                if value is not None and not cls._is_positive_id(value):
                     cls._raise_invalid_details(f"{key} is invalid")
             elif key == "relation_type":
                 if value not in {
@@ -284,8 +288,36 @@ class AuditService:
                     "COMPLETED",
                     "CANCELLED",
                     "CLOSED",
+                    "FAILED",
+                    "STALE",
+                    "LOW_CONFIDENCE",
+                    "DRAFT",
+                    "PENDING_REVIEW",
+                    "PUBLISHED",
+                    "ARCHIVED",
+                    "REJECTED",
+                    "OPEN",
+                    "MONITORING",
+                    "RESOLVED",
                 }:
                     cls._raise_invalid_details("status is invalid")
+            elif key == "error_code":
+                if (
+                    not isinstance(value, str)
+                    or not value.strip()
+                    or value != value.strip()
+                    or len(value) > 64
+                ):
+                    cls._raise_invalid_details("error_code is invalid")
+            elif key == "confidence":
+                if not isinstance(value, (int, float)) or value < 0 or value > 1:
+                    cls._raise_invalid_details("confidence is invalid")
+            elif key in {"overridden", "ai_draft"}:
+                if not isinstance(value, bool):
+                    cls._raise_invalid_details(f"{key} is invalid")
+            elif key == "work_order_count":
+                if not isinstance(value, int) or value < 0:
+                    cls._raise_invalid_details("work_order_count is invalid")
             elif key == "on_duty":
                 if value not in {"ON_DUTY", "OFF_DUTY", "LEAVE"}:
                     cls._raise_invalid_details("on_duty is invalid")

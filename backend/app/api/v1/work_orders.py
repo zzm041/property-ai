@@ -113,6 +113,7 @@ def get_work_order(
     detail = WorkOrderDetailData(
         work_order=work_order_data(record, overdue=service.is_overdue(record)),
         text=None if content is None else content.text,
+        asr_text=None if content is None else content.asr_text,
         extra_notes=None if content is None else content.extra_notes,
         media=[
             WorkOrderMediaData(

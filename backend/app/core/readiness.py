@@ -85,6 +85,9 @@ def check_readiness(
         "mysql": (True, probe_mysql),
         "redis": (False, probe_redis),
         "rabbitmq": (False, probe_rabbitmq),
+        "llm": (False, lambda _settings: None),
+        "vlm": (False, lambda _settings: None),
+        "asr": (False, lambda _settings: None),
     }
 
     with ThreadPoolExecutor(max_workers=len(selected_probes)) as executor:

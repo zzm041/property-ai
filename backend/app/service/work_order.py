@@ -18,6 +18,7 @@ from app.core.errors import (
     IamErrorCode,
     WorkOrderErrorCode,
 )
+from app.core.logging import get_logger
 from app.core.time import current_business_date, utc_now
 from app.domain.audit import AuditAction, AuditResourceType
 from app.domain.employee import AttendanceOnDuty, EmployeeStatus
@@ -75,6 +76,7 @@ from app.service.auth import AuthService
 from app.service.rbac import RbacService
 
 T = TypeVar("T")
+logger = get_logger(__name__)
 _ALLOWED_MIME = {
     "image/jpeg": MediaKind.IMAGE,
     "image/png": MediaKind.IMAGE,
@@ -231,7 +233,7 @@ class WorkOrderService:
         self._require_positive_id(house_id, "house_id")
         self._validate_request_id(request_id)
         self._validate_idempotency_key(idempotency_key)
-        return self._execute(
+        record = self._execute(
             lambda: self._create_work_order(
                 actor=actor,
                 house_id=house_id,
@@ -246,6 +248,18 @@ class WorkOrderService:
                 claimed_property_id=claimed_property_id,
             )
         )
+        self._enqueue_analysis(record.id, request_id)
+        return record
+
+    def _enqueue_analysis(self, work_order_id: int, request_id: str) -> None:
+        if not self._settings.should_enqueue_ai_on_create:
+            return
+        try:
+            from app.worker.tasks import analyze_work_order_task
+
+            analyze_work_order_task.delay(work_order_id, request_id)
+        except Exception:
+            logger.warning("ai_enqueue_failed", work_order_id=work_order_id)
 
     def get_work_order(self, *, actor: Principal, work_order_id: int) -> WorkOrder:
         self._require_positive_id(work_order_id, "work_order_id")
@@ -1304,6 +1318,14 @@ class WorkOrderService:
             tenant_id=record.tenant_id,
             property_id=record.property_id,
             details=details,
+        )
+        from app.service.analysis import AnalysisService
+
+        AnalysisService(self._session, settings=self._settings).mark_assignment_choice(
+            work_order=record,
+            employee_id=employee.id,
+            actor_user_id=current.user_id,
+            request_id=request_id,
         )
         return record
 

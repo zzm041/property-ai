@@ -1,0 +1,396 @@
+"""Persistence helpers for AI analysis, incidents, and announcements."""
+
+from datetime import datetime
+
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app.model.ai import (
+    AiCallLog,
+    Announcement,
+    AnnouncementReview,
+    AnnouncementScope,
+    DispatchRecommendation,
+    Incident,
+    IncidentWorkOrder,
+    Notification,
+    WorkOrderAnalysis,
+)
+from app.model.employee import (
+    Duty,
+    Employee,
+    EmployeeDailyStatus,
+    EmployeeDuty,
+    EmployeeProperty,
+    EmployeeSkill,
+    Skill,
+)
+from app.model.identity import Role, UserRole
+from app.model.property import House, Unit
+from app.model.work_order import FileObject, WorkOrder, WorkOrderMedia
+
+
+class AiRepository:
+    def __init__(self, session: Session) -> None:
+        self._session = session
+
+    def get_analysis(self, analysis_id: int) -> WorkOrderAnalysis | None:
+        return self._session.get(WorkOrderAnalysis, analysis_id)
+
+    def get_current_analysis(self, work_order_id: int) -> WorkOrderAnalysis | None:
+        return self._session.scalar(
+            select(WorkOrderAnalysis)
+            .where(WorkOrderAnalysis.work_order_id == work_order_id)
+            .order_by(WorkOrderAnalysis.analysis_version.desc())
+            .limit(1)
+        )
+
+    def get_current_analysis_for_update(
+        self,
+        work_order_id: int,
+    ) -> WorkOrderAnalysis | None:
+        return self._session.scalar(
+            select(WorkOrderAnalysis)
+            .where(WorkOrderAnalysis.work_order_id == work_order_id)
+            .order_by(WorkOrderAnalysis.analysis_version.desc())
+            .limit(1)
+            .with_for_update()
+        )
+
+    def add_analysis(self, record: WorkOrderAnalysis) -> WorkOrderAnalysis:
+        self._session.add(record)
+        self._session.flush()
+        return record
+
+    def add_call_log(self, record: AiCallLog) -> AiCallLog:
+        self._session.add(record)
+        self._session.flush()
+        return record
+
+    def delete_recommendations(self, analysis_id: int) -> None:
+        existing = self._session.scalars(
+            select(DispatchRecommendation).where(
+                DispatchRecommendation.analysis_id == analysis_id
+            )
+        ).all()
+        for item in existing:
+            self._session.delete(item)
+        self._session.flush()
+
+    def add_recommendation(
+        self,
+        record: DispatchRecommendation,
+    ) -> DispatchRecommendation:
+        self._session.add(record)
+        self._session.flush()
+        return record
+
+    def list_recommendations(
+        self,
+        work_order_id: int,
+    ) -> tuple[DispatchRecommendation, ...]:
+        return tuple(
+            self._session.scalars(
+                select(DispatchRecommendation)
+                .where(DispatchRecommendation.work_order_id == work_order_id)
+                .order_by(
+                    DispatchRecommendation.eligible.desc(),
+                    DispatchRecommendation.rank_no,
+                    DispatchRecommendation.id,
+                )
+            ).all()
+        )
+
+    def get_file(self, file_id: int) -> FileObject | None:
+        return self._session.get(FileObject, file_id)
+
+    def get_building_id(self, house_id: int) -> int | None:
+        house = self._session.get(House, house_id)
+        if house is None:
+            return None
+        unit = self._session.get(Unit, house.unit_id)
+        return None if unit is None else unit.building_id
+
+    def list_property_employees(self, *, tenant_id: int, property_id: int) -> tuple[Employee, ...]:
+        return tuple(
+            self._session.scalars(
+                select(Employee)
+                .join(
+                    EmployeeProperty,
+                    EmployeeProperty.employee_id == Employee.id,
+                )
+                .where(
+                    Employee.tenant_id == tenant_id,
+                    EmployeeProperty.tenant_id == tenant_id,
+                    EmployeeProperty.property_id == property_id,
+                )
+                .distinct()
+                .order_by(Employee.id)
+            ).all()
+        )
+
+    def list_employee_duties(self, employee_id: int) -> frozenset[str]:
+        rows = self._session.execute(
+            select(Duty.code)
+            .join(EmployeeDuty, EmployeeDuty.duty_id == Duty.id)
+            .where(EmployeeDuty.employee_id == employee_id)
+        ).all()
+        return frozenset(row[0] for row in rows)
+
+    def list_employee_skills(self, employee_id: int) -> frozenset[str]:
+        rows = self._session.execute(
+            select(Skill.code)
+            .join(EmployeeSkill, EmployeeSkill.skill_id == Skill.id)
+            .where(EmployeeSkill.employee_id == employee_id)
+        ).all()
+        return frozenset(row[0] for row in rows)
+
+    def list_employee_role_codes(self, user_id: int) -> frozenset[str]:
+        rows = self._session.execute(
+            select(Role.code)
+            .join(UserRole, UserRole.role_id == Role.id)
+            .where(UserRole.user_id == user_id)
+        ).all()
+        return frozenset(row[0] for row in rows)
+
+    def get_effective_property(
+        self,
+        *,
+        employee_id: int,
+        property_id: int,
+        now: datetime,
+    ) -> EmployeeProperty | None:
+        return self._session.scalar(
+            select(EmployeeProperty).where(
+                EmployeeProperty.employee_id == employee_id,
+                EmployeeProperty.property_id == property_id,
+                EmployeeProperty.status == "ACTIVE",
+                EmployeeProperty.valid_from <= now,
+                (EmployeeProperty.valid_to.is_(None))
+                | (EmployeeProperty.valid_to > now),
+            )
+        )
+
+    def get_daily_status(
+        self,
+        *,
+        employee_id: int,
+        property_id: int,
+        business_date,
+    ) -> EmployeeDailyStatus | None:
+        return self._session.scalar(
+            select(EmployeeDailyStatus).where(
+                EmployeeDailyStatus.employee_id == employee_id,
+                EmployeeDailyStatus.property_id == property_id,
+                EmployeeDailyStatus.business_date == business_date,
+            )
+        )
+
+    def count_same_building_history(
+        self,
+        *,
+        employee_id: int,
+        building_id: int | None,
+        tenant_id: int,
+        property_id: int,
+    ) -> int:
+        if building_id is None:
+            return 0
+        rows = self._session.execute(
+            select(WorkOrder.id)
+            .join(House, House.id == WorkOrder.house_id)
+            .join(Unit, Unit.id == House.unit_id)
+            .where(
+                WorkOrder.tenant_id == tenant_id,
+                WorkOrder.property_id == property_id,
+                Unit.building_id == building_id,
+                WorkOrder.current_assignment_id.is_not(None),
+            )
+        ).all()
+        del employee_id
+        return len(rows)
+
+    def list_cluster_work_orders(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int,
+        building_id: int | None,
+        category: str,
+        since: datetime,
+        until: datetime,
+    ) -> tuple[WorkOrder, ...]:
+        query = select(WorkOrder).where(
+            WorkOrder.tenant_id == tenant_id,
+            WorkOrder.property_id == property_id,
+            WorkOrder.category == category,
+            WorkOrder.created_at >= since,
+            WorkOrder.created_at <= until,
+            WorkOrder.status.notin_(("CANCELLED", "CLOSED")),
+        )
+        records = tuple(self._session.scalars(query.order_by(WorkOrder.id)).all())
+        if building_id is None:
+            return records
+        matched: list[WorkOrder] = []
+        for record in records:
+            if self.get_building_id(record.house_id) == building_id:
+                matched.append(record)
+        return tuple(matched)
+
+    def find_open_incident(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int,
+        building_id: int | None,
+        category: str,
+    ) -> Incident | None:
+        return self._session.scalar(
+            select(Incident)
+            .where(
+                Incident.tenant_id == tenant_id,
+                Incident.property_id == property_id,
+                Incident.building_id == building_id,
+                Incident.category == category,
+                Incident.status.in_(("OPEN", "MONITORING")),
+            )
+            .order_by(Incident.id)
+            .limit(1)
+        )
+
+    def get_incident(self, incident_id: int) -> Incident | None:
+        return self._session.get(Incident, incident_id)
+
+    def get_incident_for_update(self, incident_id: int) -> Incident | None:
+        return self._session.scalar(
+            select(Incident).where(Incident.id == incident_id).with_for_update()
+        )
+
+    def add_incident(self, record: Incident) -> Incident:
+        self._session.add(record)
+        self._session.flush()
+        return record
+
+    def get_incident_link(self, work_order_id: int) -> IncidentWorkOrder | None:
+        return self._session.scalar(
+            select(IncidentWorkOrder).where(
+                IncidentWorkOrder.work_order_id == work_order_id
+            )
+        )
+
+    def add_incident_link(self, record: IncidentWorkOrder) -> IncidentWorkOrder:
+        self._session.add(record)
+        self._session.flush()
+        return record
+
+    def list_incident_work_orders(self, incident_id: int) -> tuple[IncidentWorkOrder, ...]:
+        return tuple(
+            self._session.scalars(
+                select(IncidentWorkOrder)
+                .where(IncidentWorkOrder.incident_id == incident_id)
+                .order_by(IncidentWorkOrder.id)
+            ).all()
+        )
+
+    def list_incidents(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int,
+        after_id: int = 0,
+        limit: int = 50,
+    ) -> tuple[Incident, ...]:
+        return tuple(
+            self._session.scalars(
+                select(Incident)
+                .where(
+                    Incident.tenant_id == tenant_id,
+                    Incident.property_id == property_id,
+                    Incident.id > after_id,
+                )
+                .order_by(Incident.id)
+                .limit(limit)
+            ).all()
+        )
+
+    def add_announcement(self, record: Announcement) -> Announcement:
+        self._session.add(record)
+        self._session.flush()
+        return record
+
+    def get_announcement(self, announcement_id: int) -> Announcement | None:
+        return self._session.get(Announcement, announcement_id)
+
+    def get_announcement_for_update(
+        self,
+        announcement_id: int,
+    ) -> Announcement | None:
+        return self._session.scalar(
+            select(Announcement)
+            .where(Announcement.id == announcement_id)
+            .with_for_update()
+        )
+
+    def add_announcement_scope(self, record: AnnouncementScope) -> AnnouncementScope:
+        self._session.add(record)
+        self._session.flush()
+        return record
+
+    def list_announcement_scopes(
+        self,
+        announcement_id: int,
+    ) -> tuple[AnnouncementScope, ...]:
+        return tuple(
+            self._session.scalars(
+                select(AnnouncementScope)
+                .where(AnnouncementScope.announcement_id == announcement_id)
+                .order_by(AnnouncementScope.id)
+            ).all()
+        )
+
+    def add_announcement_review(
+        self,
+        record: AnnouncementReview,
+    ) -> AnnouncementReview:
+        self._session.add(record)
+        self._session.flush()
+        return record
+
+    def list_published_announcements(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int,
+        after_id: int = 0,
+        limit: int = 50,
+    ) -> tuple[Announcement, ...]:
+        return tuple(
+            self._session.scalars(
+                select(Announcement)
+                .where(
+                    Announcement.tenant_id == tenant_id,
+                    Announcement.property_id == property_id,
+                    Announcement.status == "PUBLISHED",
+                    Announcement.id > after_id,
+                )
+                .order_by(Announcement.id)
+                .limit(limit)
+            ).all()
+        )
+
+    def add_notification(self, record: Notification) -> Notification:
+        self._session.add(record)
+        self._session.flush()
+        return record
+
+    def list_media_with_files(
+        self,
+        work_order_id: int,
+    ) -> tuple[tuple[WorkOrderMedia, FileObject], ...]:
+        rows = self._session.execute(
+            select(WorkOrderMedia, FileObject)
+            .join(FileObject, FileObject.id == WorkOrderMedia.file_id)
+            .where(WorkOrderMedia.work_order_id == work_order_id)
+            .order_by(WorkOrderMedia.id)
+        ).all()
+        return tuple((media, file_object) for media, file_object in rows)

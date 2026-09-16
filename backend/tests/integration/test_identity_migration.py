@@ -15,6 +15,7 @@ TASK_3_REVISION = "20260915_0002"
 TASK_4_REVISION = "20260916_0003"
 TASK_5_REVISION = "20260916_0004"
 TASK_6_REVISION = "20260917_0005"
+TASK_7_REVISION = "20260917_0006"
 
 
 def test_task_3_revision_is_independent_head(
@@ -26,7 +27,7 @@ def test_task_3_revision_is_independent_head(
     scripts = ScriptDirectory.from_config(config)
     revision = scripts.get_revision(TASK_3_REVISION)
 
-    assert scripts.get_current_head() == TASK_6_REVISION
+    assert scripts.get_current_head() == TASK_7_REVISION
     assert revision is not None
     assert revision.down_revision == TASK_2_REVISION
 
@@ -42,6 +43,10 @@ def test_task_3_revision_is_independent_head(
     assert task_6 is not None
     assert task_6.down_revision == TASK_5_REVISION
 
+    task_7 = scripts.get_revision(TASK_7_REVISION)
+    assert task_7 is not None
+    assert task_7.down_revision == TASK_6_REVISION
+
     with test_engine.connect() as connection:
         current = MigrationContext.configure(connection).get_current_revision()
-    assert current == TASK_6_REVISION
+    assert current == TASK_7_REVISION

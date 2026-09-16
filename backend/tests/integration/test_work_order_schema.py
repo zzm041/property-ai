@@ -21,13 +21,11 @@ TASK_6_TABLES = {
 }
 
 
-def test_task_6_tables_exist_without_task_7(test_engine: Engine) -> None:
+def test_task_6_tables_exist_without_task_8(test_engine: Engine) -> None:
     tables = set(inspect(test_engine).get_table_names())
     assert TASK_6_TABLES <= tables
-    assert "incidents" not in tables
-    assert "announcements" not in tables
     assert "knowledge_documents" not in tables
-    assert "ai_call_logs" not in tables
+    assert "knowledge_chunks" not in tables
 
 
 def test_task_6_primary_keys_are_bigint(test_engine: Engine) -> None:

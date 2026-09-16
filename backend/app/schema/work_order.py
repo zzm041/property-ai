@@ -198,6 +198,7 @@ class WorkOrderData(BaseModel):
 class WorkOrderDetailData(BaseModel):
     work_order: WorkOrderData
     text: str | None = None
+    asr_text: str | None = None
     extra_notes: str | None = None
     media: list[WorkOrderMediaData] = Field(default_factory=list)
     assignments: list[WorkOrderAssignmentData] = Field(default_factory=list)

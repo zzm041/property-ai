@@ -7,6 +7,16 @@ from sqlalchemy.orm import Session
 
 from app.core.time import utc_now
 from app.domain.resident import ResidentRelationStatus, ResidentRelationType
+from app.domain.ai import (
+    AI_ANALYSIS_READ,
+    AI_ANALYSIS_REVIEW,
+    ANNOUNCEMENT_DRAFT,
+    ANNOUNCEMENT_PUBLISH,
+    ANNOUNCEMENT_READ,
+    DISPATCH_RECOMMENDATION_READ,
+    INCIDENT_MANAGE,
+    INCIDENT_READ,
+)
 from app.domain.work_order import (
     DEFAULT_SLA_COMPLETE_MINUTES,
     DEFAULT_SLA_RESPOND_MINUTES,
@@ -125,6 +135,14 @@ def create_work_order_graph(session: Session) -> WorkOrderGraph:
             (WORK_ORDER_RESOLVE, "Resolve work orders"),
             (WORK_ORDER_DECIDE, "Decide work orders"),
             (WORK_ORDER_CANCEL, "Cancel work orders"),
+            (AI_ANALYSIS_READ, "Read AI analysis"),
+            (AI_ANALYSIS_REVIEW, "Review AI analysis"),
+            (DISPATCH_RECOMMENDATION_READ, "Read dispatch recommendations"),
+            (INCIDENT_READ, "Read incidents"),
+            (INCIDENT_MANAGE, "Manage incidents"),
+            (ANNOUNCEMENT_READ, "Read announcements"),
+            (ANNOUNCEMENT_DRAFT, "Draft announcements"),
+            (ANNOUNCEMENT_PUBLISH, "Publish announcements"),
         )
         permissions: dict[str, Permission] = {}
         for code, name in permission_defs:
@@ -133,10 +151,16 @@ def create_work_order_graph(session: Session) -> WorkOrderGraph:
             permissions[code] = permission
         session.flush()
         grants = (
-            ("RESIDENT", (WORK_ORDER_CREATE, WORK_ORDER_READ, WORK_ORDER_CANCEL)),
+            ("RESIDENT", (WORK_ORDER_CREATE, WORK_ORDER_READ, WORK_ORDER_CANCEL, ANNOUNCEMENT_READ)),
             (
                 "STAFF",
-                (WORK_ORDER_READ, WORK_ORDER_PROCESS, WORK_ORDER_RESOLVE),
+                (
+                    WORK_ORDER_READ,
+                    WORK_ORDER_PROCESS,
+                    WORK_ORDER_RESOLVE,
+                    INCIDENT_READ,
+                    ANNOUNCEMENT_READ,
+                ),
             ),
             (
                 "SUPERVISOR",
@@ -147,6 +171,13 @@ def create_work_order_graph(session: Session) -> WorkOrderGraph:
                     WORK_ORDER_RESOLVE,
                     WORK_ORDER_DECIDE,
                     WORK_ORDER_CANCEL,
+                    AI_ANALYSIS_READ,
+                    AI_ANALYSIS_REVIEW,
+                    DISPATCH_RECOMMENDATION_READ,
+                    INCIDENT_READ,
+                    INCIDENT_MANAGE,
+                    ANNOUNCEMENT_READ,
+                    ANNOUNCEMENT_DRAFT,
                 ),
             ),
             (
@@ -158,6 +189,14 @@ def create_work_order_graph(session: Session) -> WorkOrderGraph:
                     WORK_ORDER_RESOLVE,
                     WORK_ORDER_DECIDE,
                     WORK_ORDER_CANCEL,
+                    AI_ANALYSIS_READ,
+                    AI_ANALYSIS_REVIEW,
+                    DISPATCH_RECOMMENDATION_READ,
+                    INCIDENT_READ,
+                    INCIDENT_MANAGE,
+                    ANNOUNCEMENT_READ,
+                    ANNOUNCEMENT_DRAFT,
+                    ANNOUNCEMENT_PUBLISH,
                 ),
             ),
             (
@@ -169,6 +208,14 @@ def create_work_order_graph(session: Session) -> WorkOrderGraph:
                     WORK_ORDER_RESOLVE,
                     WORK_ORDER_DECIDE,
                     WORK_ORDER_CANCEL,
+                    AI_ANALYSIS_READ,
+                    AI_ANALYSIS_REVIEW,
+                    DISPATCH_RECOMMENDATION_READ,
+                    INCIDENT_READ,
+                    INCIDENT_MANAGE,
+                    ANNOUNCEMENT_READ,
+                    ANNOUNCEMENT_DRAFT,
+                    ANNOUNCEMENT_PUBLISH,
                 ),
             ),
         )

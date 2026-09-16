@@ -42,6 +42,14 @@ class AuditAction(StrEnum):
     WORK_ORDER_ACCEPTED = "WORK_ORDER_ACCEPTED"
     WORK_ORDER_REJECTED = "WORK_ORDER_REJECTED"
     WORK_ORDER_DECIDED = "WORK_ORDER_DECIDED"
+    WORK_ORDER_AI_ANALYSIS_COMPLETED = "WORK_ORDER_AI_ANALYSIS_COMPLETED"
+    WORK_ORDER_AI_ANALYSIS_FAILED = "WORK_ORDER_AI_ANALYSIS_FAILED"
+    AI_RECOMMENDATION_REVIEWED = "AI_RECOMMENDATION_REVIEWED"
+    INCIDENT_CREATED = "INCIDENT_CREATED"
+    INCIDENT_UPDATED = "INCIDENT_UPDATED"
+    WORK_ORDER_LINKED_TO_INCIDENT = "WORK_ORDER_LINKED_TO_INCIDENT"
+    ANNOUNCEMENT_DRAFT_CREATED = "ANNOUNCEMENT_DRAFT_CREATED"
+    ANNOUNCEMENT_PUBLISHED = "ANNOUNCEMENT_PUBLISHED"
 
 
 class AuditResourceType(StrEnum):
@@ -60,6 +68,10 @@ class AuditResourceType(StrEnum):
     EMPLOYEE_DAILY_STATUS = "EMPLOYEE_DAILY_STATUS"
     WORK_ORDER = "WORK_ORDER"
     WORK_ORDER_ASSIGNMENT = "WORK_ORDER_ASSIGNMENT"
+    WORK_ORDER_ANALYSIS = "WORK_ORDER_ANALYSIS"
+    DISPATCH_RECOMMENDATION = "DISPATCH_RECOMMENDATION"
+    INCIDENT = "INCIDENT"
+    ANNOUNCEMENT = "ANNOUNCEMENT"
 
 
 class AuditSource(StrEnum):
@@ -323,6 +335,83 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             resource_type=AuditResourceType.WORK_ORDER,
             allowed_detail_keys=_WORK_ORDER_DECIDED_DETAIL_KEYS,
             required_detail_keys=_WORK_ORDER_DECIDED_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.WORK_ORDER_AI_ANALYSIS_COMPLETED: AuditActionPolicy(
+            resource_type=AuditResourceType.WORK_ORDER_ANALYSIS,
+            allowed_detail_keys=frozenset(
+                {"work_order_id", "analysis_id", "status", "confidence"}
+            ),
+            required_detail_keys=frozenset(
+                {"work_order_id", "analysis_id", "status"}
+            ),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.WORK_ORDER_AI_ANALYSIS_FAILED: AuditActionPolicy(
+            resource_type=AuditResourceType.WORK_ORDER_ANALYSIS,
+            allowed_detail_keys=frozenset(
+                {"work_order_id", "analysis_id", "status", "error_code"}
+            ),
+            required_detail_keys=frozenset(
+                {"work_order_id", "analysis_id", "status", "error_code"}
+            ),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.AI_RECOMMENDATION_REVIEWED: AuditActionPolicy(
+            resource_type=AuditResourceType.DISPATCH_RECOMMENDATION,
+            allowed_detail_keys=frozenset(
+                {
+                    "work_order_id",
+                    "employee_id",
+                    "recommended_employee_id",
+                    "overridden",
+                }
+            ),
+            required_detail_keys=frozenset(
+                {"work_order_id", "employee_id", "overridden"}
+            ),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.INCIDENT_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.INCIDENT,
+            allowed_detail_keys=frozenset(
+                {"incident_id", "category", "work_order_count"}
+            ),
+            required_detail_keys=frozenset(
+                {"incident_id", "category", "work_order_count"}
+            ),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.INCIDENT_UPDATED: AuditActionPolicy(
+            resource_type=AuditResourceType.INCIDENT,
+            allowed_detail_keys=frozenset(
+                {"incident_id", "category", "work_order_count"}
+            ),
+            required_detail_keys=frozenset(
+                {"incident_id", "category", "work_order_count"}
+            ),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.WORK_ORDER_LINKED_TO_INCIDENT: AuditActionPolicy(
+            resource_type=AuditResourceType.INCIDENT,
+            allowed_detail_keys=frozenset({"incident_id", "work_order_id"}),
+            required_detail_keys=frozenset({"incident_id", "work_order_id"}),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.ANNOUNCEMENT_DRAFT_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.ANNOUNCEMENT,
+            allowed_detail_keys=frozenset(
+                {"announcement_id", "status", "ai_draft"}
+            ),
+            required_detail_keys=frozenset(
+                {"announcement_id", "status", "ai_draft"}
+            ),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.ANNOUNCEMENT_PUBLISHED: AuditActionPolicy(
+            resource_type=AuditResourceType.ANNOUNCEMENT,
+            allowed_detail_keys=frozenset({"announcement_id", "status"}),
+            required_detail_keys=frozenset({"announcement_id", "status"}),
             allowed_scope_types=frozenset({ScopeType.PROPERTY}),
         ),
     }

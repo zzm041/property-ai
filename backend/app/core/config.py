@@ -51,6 +51,30 @@ class Settings(BaseSettings):
 
     readiness_timeout_seconds: float = Field(default=2.0, ge=0.1, le=10.0)
     upload_max_mb: int = Field(default=10, ge=1, le=50)
+    llm_provider_behavior: Literal[
+        "success", "timeout", "invalid", "low_confidence", "unavailable"
+    ] = "success"
+    vlm_provider_behavior: Literal["success", "timeout", "failure", "unavailable"] = (
+        "success"
+    )
+    asr_provider_behavior: Literal["success", "timeout", "failure", "unavailable"] = (
+        "success"
+    )
+    ai_confidence_threshold: float = Field(default=0.70, ge=0, le=1)
+    ai_llm_timeout_seconds: float = Field(default=8.0, ge=0.1, le=60.0)
+    ai_vlm_timeout_seconds: float = Field(default=12.0, ge=0.1, le=60.0)
+    ai_asr_timeout_seconds: float = Field(default=20.0, ge=0.1, le=120.0)
+    ai_max_attempts: int = Field(default=2, ge=1, le=5)
+    ai_enqueue_on_create: bool = False
+    ai_auto_assign: bool = False
+    incident_window_minutes: int = Field(default=10, ge=1, le=1440)
+    incident_threshold: int = Field(default=5, ge=2, le=100)
+
+    @property
+    def should_enqueue_ai_on_create(self) -> bool:
+        if self.app_env == "test":
+            return False
+        return self.ai_enqueue_on_create or self.app_env == "development"
 
     @model_validator(mode="after")
     def validate_database_isolation(self) -> "Settings":

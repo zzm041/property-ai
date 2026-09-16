@@ -202,6 +202,13 @@ class WorkOrder(BigIntPrimaryKeyMixin, TimestampMixin, Base):
             ondelete="RESTRICT",
             onupdate="RESTRICT",
         ),
+        ForeignKeyConstraint(
+            ["incident_id", "property_id", "tenant_id"],
+            ["incidents.id", "incidents.property_id", "incidents.tenant_id"],
+            name="fk_work_orders_incident_scope_incidents",
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+        ),
         Index(
             "ix_work_orders_property_status_created",
             "property_id",
@@ -210,6 +217,12 @@ class WorkOrder(BigIntPrimaryKeyMixin, TimestampMixin, Base):
             "id",
         ),
         Index("ix_work_orders_incident_id", "incident_id"),
+        Index(
+            "ix_work_orders_incident_property_tenant",
+            "incident_id",
+            "property_id",
+            "tenant_id",
+        ),
         Index(
             "ix_work_orders_reporter_created",
             "reporter_user_id",

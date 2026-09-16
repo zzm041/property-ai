@@ -15,6 +15,7 @@ BACKEND_ROOT = Path(__file__).resolve().parents[2]
 TASK_4_REVISION = "20260916_0003"
 TASK_5_REVISION = "20260916_0004"
 TASK_6_REVISION = "20260917_0005"
+TASK_7_REVISION = "20260917_0006"
 TASK_5_TABLES = {
     "departments",
     "duties",
@@ -61,10 +62,10 @@ def test_task_6_revision_chain_and_head(
         _alembic_config(integration_settings.test_database_url)
     )
     task_6 = scripts.get_revision(TASK_6_REVISION)
-    assert scripts.get_current_head() == TASK_6_REVISION
+    assert scripts.get_current_head() == TASK_7_REVISION
     assert task_6 is not None
     assert task_6.down_revision == TASK_5_REVISION
-    assert _current_revision(test_engine) == TASK_6_REVISION
+    assert _current_revision(test_engine) == TASK_7_REVISION
 
 
 def test_task_6_alembic_has_no_model_drift(
@@ -81,7 +82,7 @@ def test_task_6_migration_cycle_preserves_task_1_to_5(
 ) -> None:
     assert_disposable_test_database(integration_settings)
     config = _alembic_config(integration_settings.test_database_url)
-    assert _current_revision(test_engine) == TASK_6_REVISION
+    assert _current_revision(test_engine) == TASK_7_REVISION
 
     command.downgrade(config, TASK_5_REVISION)
     assert _current_revision(test_engine) == TASK_5_REVISION
@@ -108,8 +109,8 @@ def test_task_6_migration_cycle_preserves_task_1_to_5(
         ).all()
     assert remaining == []
 
-    command.upgrade(config, TASK_6_REVISION)
-    assert _current_revision(test_engine) == TASK_6_REVISION
+    command.upgrade(config, TASK_7_REVISION)
+    assert _current_revision(test_engine) == TASK_7_REVISION
     tables = set(inspect(test_engine).get_table_names())
     assert TASK_6_TABLES <= tables
     command.check(config)

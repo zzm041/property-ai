@@ -44,13 +44,24 @@ TASK_6_TABLES = {
     "sla_clocks",
     "idempotency_records",
 }
+TASK_7_TABLES = {
+    "work_order_analyses",
+    "ai_call_logs",
+    "dispatch_recommendations",
+    "incidents",
+    "incident_work_orders",
+    "announcements",
+    "announcement_scopes",
+    "announcement_reviews",
+    "notifications",
+}
 
 
 def test_gate_a_metadata_contains_exact_task_3_tables() -> None:
     task_2_tables = {"tenants", "properties", "buildings", "units", "houses"}
 
     assert set(Base.metadata.tables) == (
-        task_2_tables | TASK_3_TABLES | TASK_4_TABLES | TASK_5_TABLES | TASK_6_TABLES
+        task_2_tables | TASK_3_TABLES | TASK_4_TABLES | TASK_5_TABLES | TASK_6_TABLES | TASK_7_TABLES
     )
 
 

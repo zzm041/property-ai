@@ -27,6 +27,24 @@ def test_noncritical_failure_is_degraded() -> None:
     assert "credential-bearing" not in str(result)
 
 
+def test_llm_down_is_degraded_not_critical() -> None:
+    result, status_code = check_readiness(
+        Settings(_env_file=None),
+        probes={
+            "mysql": (True, _up),
+            "redis": (False, _up),
+            "rabbitmq": (False, _up),
+            "llm": (False, _down),
+            "vlm": (False, _down),
+            "asr": (False, _down),
+        },
+    )
+
+    assert status_code == 200
+    assert result["status"] == "degraded"
+    assert result["dependencies"]["llm"]["critical"] is False
+
+
 def test_critical_failure_is_not_ready() -> None:
     result, status_code = check_readiness(
         Settings(_env_file=None),
