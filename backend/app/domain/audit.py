@@ -14,12 +14,26 @@ class AuditAction(StrEnum):
     IAM_USER_ROLE_REVOKED = "IAM_USER_ROLE_REVOKED"
     IAM_ROLE_PERMISSION_GRANTED = "IAM_ROLE_PERMISSION_GRANTED"
     IAM_ROLE_PERMISSION_REVOKED = "IAM_ROLE_PERMISSION_REVOKED"
+    DEV_SEED_TENANT_CREATED = "DEV_SEED_TENANT_CREATED"
+    DEV_SEED_PROPERTY_CREATED = "DEV_SEED_PROPERTY_CREATED"
+    DEV_SEED_USER_CREATED = "DEV_SEED_USER_CREATED"
+    DEV_SEED_ROLE_CREATED = "DEV_SEED_ROLE_CREATED"
+    DEV_SEED_PERMISSION_CREATED = "DEV_SEED_PERMISSION_CREATED"
 
 
 class AuditResourceType(StrEnum):
     USER = "USER"
     USER_ROLE = "USER_ROLE"
     ROLE_PERMISSION = "ROLE_PERMISSION"
+    TENANT = "TENANT"
+    PROPERTY = "PROPERTY"
+    ROLE = "ROLE"
+    PERMISSION = "PERMISSION"
+
+
+class AuditSource(StrEnum):
+    INTERNAL = "INTERNAL"
+    DEVELOPMENT_SEED = "DEVELOPMENT_SEED"
 
 
 @dataclass(frozen=True, slots=True)
@@ -78,6 +92,36 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             resource_type=AuditResourceType.ROLE_PERMISSION,
             allowed_detail_keys=_ROLE_PERMISSION_DETAIL_KEYS,
             required_detail_keys=_ROLE_PERMISSION_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.SYSTEM}),
+        ),
+        AuditAction.DEV_SEED_TENANT_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.TENANT,
+            allowed_detail_keys=frozenset({"seed_key", "source"}),
+            required_detail_keys=frozenset({"seed_key", "source"}),
+            allowed_scope_types=frozenset({ScopeType.TENANT}),
+        ),
+        AuditAction.DEV_SEED_PROPERTY_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.PROPERTY,
+            allowed_detail_keys=frozenset({"seed_key", "source"}),
+            required_detail_keys=frozenset({"seed_key", "source"}),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.DEV_SEED_USER_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.USER,
+            allowed_detail_keys=frozenset({"seed_key", "source"}),
+            required_detail_keys=frozenset({"seed_key", "source"}),
+            allowed_scope_types=frozenset({ScopeType.SYSTEM}),
+        ),
+        AuditAction.DEV_SEED_ROLE_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.ROLE,
+            allowed_detail_keys=frozenset({"role_code", "source"}),
+            required_detail_keys=frozenset({"role_code", "source"}),
+            allowed_scope_types=frozenset({ScopeType.SYSTEM}),
+        ),
+        AuditAction.DEV_SEED_PERMISSION_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.PERMISSION,
+            allowed_detail_keys=frozenset({"permission_code", "source"}),
+            required_detail_keys=frozenset({"permission_code", "source"}),
             allowed_scope_types=frozenset({ScopeType.SYSTEM}),
         ),
     }

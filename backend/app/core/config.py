@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     jwt_issuer: str = "property-ai"
     jwt_audience: str = "property-ai-api"
     jwt_access_token_ttl_seconds: int = Field(default=900, ge=60, le=3600)
+    dev_seed_lock_timeout_seconds: int = Field(default=5, ge=0, le=30)
 
     api_host: str = "0.0.0.0"
     api_port: int = Field(default=8000, ge=1, le=65535)

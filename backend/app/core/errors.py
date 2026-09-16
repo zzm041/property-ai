@@ -39,6 +39,13 @@ class AuditErrorCode:
     INVALID_DETAILS = "IAM.AUDIT_INVALID_DETAILS"
 
 
+class DevSeedErrorCode:
+    ENVIRONMENT_FORBIDDEN = "DEV_SEED.ENVIRONMENT_FORBIDDEN"
+    LOCK_UNAVAILABLE = "DEV_SEED.LOCK_UNAVAILABLE"
+    DATA_CONFLICT = "DEV_SEED.DATA_CONFLICT"
+    FAILED = "DEV_SEED.FAILED"
+
+
 class AppError(Exception):
     """Expected business/application error with a stable public code."""
 

@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, Request
 from app.api.dependencies.auth import get_auth_service
 from app.core.config import Settings, get_settings
 from app.schema.auth import AccessTokenData, DevelopmentTokenRequest
-from app.schema.common import success_envelope
+from app.schema.common import request_id_for, success_envelope
 from app.service.auth import AuthService
 
 router = APIRouter(prefix="/auth/dev", tags=["development-auth"])
@@ -20,7 +20,11 @@ def issue_development_token(
     service: Annotated[AuthService, Depends(get_auth_service)],
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> dict[str, object]:
-    token = service.issue_development_token(body.user_id, settings)
+    token = service.issue_development_token(
+        body.user_id,
+        settings,
+        request_id=request_id_for(request),
+    )
     data = AccessTokenData(
         access_token=token.access_token,
         token_type="bearer",

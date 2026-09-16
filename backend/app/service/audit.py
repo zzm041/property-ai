@@ -11,6 +11,7 @@ from app.domain.audit import (
     AuditAction,
     AuditEvent,
     AuditResourceType,
+    AuditSource,
 )
 from app.domain.iam import OrganizationScope, ScopeType
 from app.model.identity import AuditLog
@@ -20,16 +21,19 @@ _ROLE_CODE_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]{0,63}$")
 _PERMISSION_CODE_PATTERN = re.compile(
     r"^[a-z][a-z0-9_]*:[a-z][a-z0-9_]*$"
 )
-_ALLOWED_SOURCES = frozenset({"INTERNAL", "DEVELOPMENT_SEED"})
+_ALLOWED_SOURCES = frozenset(source.value for source in AuditSource)
+_SEED_KEY_PATTERN = re.compile(r"^__[A-Z0-9_]+__$")
 _SENSITIVE_KEY_MARKERS = frozenset(
     {
         "jwt",
         "jwttoken",
+        "jti",
         "token",
         "accesstoken",
         "refreshtoken",
         "authorization",
         "authorizationheader",
+        "cookie",
         "appsecretkey",
         "secret",
         "apikey",
@@ -234,6 +238,13 @@ class AuditService:
                     cls._raise_invalid_details("scope_type is invalid")
             elif key == "source" and value not in _ALLOWED_SOURCES:
                 cls._raise_invalid_details("source is invalid")
+            elif key == "seed_key":
+                if (
+                    not isinstance(value, str)
+                    or len(value) > 200
+                    or not _SEED_KEY_PATTERN.fullmatch(value)
+                ):
+                    cls._raise_invalid_details("seed_key is invalid")
 
     @classmethod
     def _reject_sensitive_keys(cls, value: object) -> None:

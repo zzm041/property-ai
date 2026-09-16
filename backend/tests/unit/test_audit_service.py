@@ -251,3 +251,66 @@ def test_details_scope_type_must_match_event_scope() -> None:
 
     assert captured.value.code == AuditErrorCode.INVALID_DETAILS
     repository.append.assert_not_called()
+
+
+def test_seed_audit_allows_null_actor_and_rejects_invalid_seed_key() -> None:
+    service, _, repository = _service()
+
+    result = service.append(
+        action=AuditAction.DEV_SEED_TENANT_CREATED,
+        resource_type=AuditResourceType.TENANT,
+        actor_user_id=None,
+        resource_id=11,
+        request_id="c4-seed-tenant",
+        scope_type=ScopeType.TENANT,
+        tenant_id=11,
+        details={"seed_key": "__DEV_TENANT__", "source": "DEVELOPMENT_SEED"},
+    )
+
+    assert result.actor_user_id is None
+    assert result.details_json == {
+        "seed_key": "__DEV_TENANT__",
+        "source": "DEVELOPMENT_SEED",
+    }
+    repository.append.assert_called_once()
+
+    with pytest.raises(AppError) as captured:
+        service.append(
+            action=AuditAction.DEV_SEED_TENANT_CREATED,
+            resource_type=AuditResourceType.TENANT,
+            resource_id=11,
+            request_id="c4-bad-seed-key",
+            scope_type=ScopeType.TENANT,
+            tenant_id=11,
+            details={"seed_key": "not-a-marker", "source": "DEVELOPMENT_SEED"},
+        )
+    assert captured.value.code == AuditErrorCode.INVALID_DETAILS
+
+
+def test_jti_and_cookie_keys_are_rejected() -> None:
+    service, _, repository = _service()
+
+    for details in (
+        {
+            "auth_method": "development",
+            "token_type": "access",
+            "jti": "must-not-be-audited",
+        },
+        {
+            "auth_method": "development",
+            "token_type": "access",
+            "cookie": "session=secret",
+        },
+    ):
+        with pytest.raises(AppError) as captured:
+            service.append(
+                action=AuditAction.DEV_AUTH_TOKEN_ISSUED,
+                resource_type=AuditResourceType.USER,
+                actor_user_id=1,
+                resource_id=1,
+                request_id="c3-forbidden-key",
+                scope_type=ScopeType.SYSTEM,
+                details=details,
+            )
+        assert captured.value.code == AuditErrorCode.INVALID_DETAILS
+    repository.append.assert_not_called()

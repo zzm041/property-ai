@@ -9,6 +9,7 @@ from app.core.errors import AppError, AuthErrorCode
 from app.domain.iam import ScopeType
 from app.model.identity import User
 from app.repository.identity import GrantPermissionRecord, IdentityRepository
+from app.service.audit import AuditService
 from app.service.auth import AuthService
 
 
@@ -21,41 +22,67 @@ def _settings() -> Settings:
     )
 
 
-def _service() -> tuple[AuthService, MagicMock, MagicMock]:
+def _service() -> tuple[AuthService, MagicMock, MagicMock, MagicMock]:
     session = MagicMock()
     repository = MagicMock(spec=IdentityRepository)
-    return AuthService(session, repository), session, repository
+    audit_service = MagicMock(spec=AuditService)
+    return (
+        AuthService(session, repository, audit_service),
+        session,
+        repository,
+        audit_service,
+    )
 
 
 def test_development_token_requires_real_active_user() -> None:
-    service, session, repository = _service()
+    service, session, repository, audit_service = _service()
     repository.get_user.return_value = User(
         id=7,
         status="ACTIVE",
         display_name="Active User",
     )
 
-    result = service.issue_development_token(7, _settings())
+    result = service.issue_development_token(
+        7,
+        _settings(),
+        request_id="unit-token-issue",
+    )
 
     assert result.token_type == "bearer"
     assert result.expires_in == 900
+    audit = audit_service.append.call_args.kwargs
+    assert audit["actor_user_id"] == 7
+    assert audit["resource_id"] == 7
+    assert audit["request_id"] == "unit-token-issue"
+    assert audit["tenant_id"] is None
+    assert audit["property_id"] is None
+    assert audit["details"] == {
+        "auth_method": "development",
+        "token_type": "access",
+    }
+    session.begin.assert_called_once_with()
     session.commit.assert_not_called()
     session.rollback.assert_not_called()
 
 
 def test_nonexistent_development_user_is_rejected() -> None:
-    service, _, repository = _service()
+    service, _, repository, audit_service = _service()
     repository.get_user.return_value = None
 
     with pytest.raises(AppError) as captured:
-        service.issue_development_token(999, _settings())
+        service.issue_development_token(
+            999,
+            _settings(),
+            request_id="missing-user",
+        )
 
     assert captured.value.code == AuthErrorCode.INVALID_USER
     assert captured.value.status_code == 401
+    audit_service.append.assert_not_called()
 
 
 def test_disabled_development_user_is_rejected() -> None:
-    service, _, repository = _service()
+    service, _, repository, audit_service = _service()
     repository.get_user.return_value = User(
         id=7,
         status="DISABLED",
@@ -63,13 +90,18 @@ def test_disabled_development_user_is_rejected() -> None:
     )
 
     with pytest.raises(AppError) as captured:
-        service.issue_development_token(7, _settings())
+        service.issue_development_token(
+            7,
+            _settings(),
+            request_id="disabled-user",
+        )
 
     assert captured.value.code == AuthErrorCode.USER_DISABLED
+    audit_service.append.assert_not_called()
 
 
 def test_principal_groups_permissions_by_role_grant() -> None:
-    service, _, repository = _service()
+    service, _, repository, _ = _service()
     repository.get_user.return_value = User(
         id=7,
         status="ACTIVE",
@@ -112,14 +144,18 @@ def test_principal_groups_permissions_by_role_grant() -> None:
 
 
 def test_token_authentication_reloads_user_status() -> None:
-    service, _, repository = _service()
+    service, _, repository, _ = _service()
     repository.get_user.return_value = User(
         id=7,
         status="ACTIVE",
         display_name="User",
     )
     repository.list_grant_permissions.return_value = ()
-    token = service.issue_development_token(7, _settings()).access_token
+    token = service.issue_development_token(
+        7,
+        _settings(),
+        request_id="reload-status",
+    ).access_token
     repository.get_user.return_value = User(
         id=7,
         status="DISABLED",
@@ -130,3 +166,41 @@ def test_token_authentication_reloads_user_status() -> None:
         service.authenticate_access_token(token, _settings())
 
     assert captured.value.code == AuthErrorCode.USER_DISABLED
+
+
+def test_audit_failure_prevents_token_result() -> None:
+    service, _, repository, audit_service = _service()
+    repository.get_user.return_value = User(
+        id=7,
+        status="ACTIVE",
+        display_name="Active User",
+    )
+    audit_service.append.side_effect = RuntimeError("forced audit failure")
+
+    with pytest.raises(RuntimeError, match="forced audit failure"):
+        service.issue_development_token(
+            7,
+            _settings(),
+            request_id="audit-failure",
+        )
+
+
+def test_commit_failure_prevents_token_result() -> None:
+    service, session, repository, audit_service = _service()
+    repository.get_user.return_value = User(
+        id=7,
+        status="ACTIVE",
+        display_name="Active User",
+    )
+    session.begin.return_value.__exit__.side_effect = RuntimeError(
+        "forced commit failure"
+    )
+
+    with pytest.raises(RuntimeError, match="forced commit failure"):
+        service.issue_development_token(
+            7,
+            _settings(),
+            request_id="commit-failure",
+        )
+
+    audit_service.append.assert_called_once()

@@ -7,7 +7,7 @@ import pytest
 from sqlalchemy.exc import IntegrityError
 
 from app.core.errors import AppError, IamErrorCode
-from app.domain.audit import AuditAction, AuditResourceType
+from app.domain.audit import AuditAction, AuditResourceType, AuditSource
 from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.model.identity import Permission, Role, RolePermission, User, UserRole
 from app.repository.property import PropertyRepository
@@ -157,6 +157,8 @@ def test_public_methods_do_not_accept_forgeable_audit_or_actor_fields() -> None:
         RbacMutationService.revoke_user_role,
         RbacMutationService.grant_role_permission,
         RbacMutationService.revoke_role_permission,
+        RbacMutationService.grant_user_role_for_development_seed,
+        RbacMutationService.grant_role_permission_for_development_seed,
     ):
         parameters = set(signature(method).parameters)
         assert "actor_user_id" not in parameters
@@ -510,6 +512,17 @@ def test_all_internal_helpers_require_existing_transaction() -> None:
             permission_code="property:read",
             request_id="c2-no-transaction",
         ),
+        lambda: service.grant_user_role_for_development_seed(
+            target_user_id=20,
+            role_code="PROPERTY_ADMIN",
+            scope=OrganizationScope(ScopeType.SYSTEM),
+            request_id="c4-no-transaction",
+        ),
+        lambda: service.grant_role_permission_for_development_seed(
+            role_code="PROPERTY_ADMIN",
+            permission_code="property:read",
+            request_id="c4-no-transaction",
+        ),
     )
     for operation in operations:
         with pytest.raises(RuntimeError, match="active transaction"):
@@ -553,3 +566,39 @@ def test_final_transaction_commit_failure_prevents_success_return() -> None:
 
     repository.add_user_role.assert_called_once()
     audit_service.append.assert_called_once()
+
+
+def test_development_seed_grant_uses_fixed_source_without_transaction_control() -> None:
+    service, session, _, _, audit_service, _ = _build_service()
+
+    result = service.grant_user_role_for_development_seed(
+        target_user_id=20,
+        role_code="PROPERTY_ADMIN",
+        scope=OrganizationScope(ScopeType.SYSTEM),
+        request_id="c4-seed-grant",
+    )
+
+    assert result.action is AuditAction.IAM_USER_ROLE_GRANTED
+    audit = audit_service.append.call_args.kwargs
+    assert audit["actor_user_id"] is None
+    assert audit["details"]["source"] == AuditSource.DEVELOPMENT_SEED.value
+    session.begin.assert_not_called()
+    session.commit.assert_not_called()
+    session.rollback.assert_not_called()
+
+
+def test_development_seed_role_permission_uses_fixed_source() -> None:
+    service, session, _, _, audit_service, _ = _build_service()
+
+    service.grant_role_permission_for_development_seed(
+        role_code="PROPERTY_ADMIN",
+        permission_code="property:read",
+        request_id="c4-seed-permission",
+    )
+
+    audit = audit_service.append.call_args.kwargs
+    assert audit["actor_user_id"] is None
+    assert audit["details"]["source"] == AuditSource.DEVELOPMENT_SEED.value
+    session.begin.assert_not_called()
+    session.commit.assert_not_called()
+    session.rollback.assert_not_called()

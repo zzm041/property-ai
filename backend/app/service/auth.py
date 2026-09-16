@@ -12,8 +12,10 @@ from app.core.security import (
     decode_development_access_token,
     issue_development_access_token,
 )
+from app.domain.audit import AuditAction, AuditResourceType
 from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.repository.identity import GrantPermissionRecord, IdentityRepository
+from app.service.audit import AuditService
 
 
 @dataclass(frozen=True, slots=True)
@@ -30,13 +32,18 @@ class AuthService:
         self,
         session: Session,
         repository: IdentityRepository | None = None,
+        audit_service: AuditService | None = None,
     ) -> None:
+        self._session = session
         self._repository = repository or IdentityRepository(session)
+        self._audit_service = audit_service or AuditService(session)
 
     def issue_development_token(
         self,
         user_id: int,
         settings: Settings,
+        *,
+        request_id: str,
     ) -> IssuedAccessToken:
         if (
             not settings.dev_auth_enabled
@@ -47,20 +54,35 @@ class AuthService:
                 message="Development Auth is unavailable",
                 status_code=404,
             )
-        user = self._repository.get_user(user_id)
-        if user is None:
-            raise AppError(
-                code=AuthErrorCode.INVALID_USER,
-                message="Development user is invalid",
-                status_code=401,
+        with self._session.begin():
+            user = self._repository.get_user(user_id)
+            if user is None:
+                raise AppError(
+                    code=AuthErrorCode.INVALID_USER,
+                    message="Development user is invalid",
+                    status_code=401,
+                )
+            self._require_active(user.status)
+            token = issue_development_access_token(user.id, settings)
+            self._audit_service.append(
+                action=AuditAction.DEV_AUTH_TOKEN_ISSUED,
+                resource_type=AuditResourceType.USER,
+                actor_user_id=user.id,
+                resource_id=user.id,
+                request_id=request_id,
+                scope_type=ScopeType.SYSTEM,
+                tenant_id=None,
+                property_id=None,
+                details={
+                    "auth_method": "development",
+                    "token_type": "access",
+                },
             )
-        self._require_active(user.status)
-        token = issue_development_access_token(user.id, settings)
-        return IssuedAccessToken(
-            access_token=token,
-            token_type="bearer",
-            expires_in=settings.jwt_access_token_ttl_seconds,
-        )
+            return IssuedAccessToken(
+                access_token=token,
+                token_type="bearer",
+                expires_in=settings.jwt_access_token_ttl_seconds,
+            )
 
     def authenticate_access_token(
         self,

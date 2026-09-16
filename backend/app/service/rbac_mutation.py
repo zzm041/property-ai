@@ -9,7 +9,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.core.errors import AppError, ErrorCode, IamErrorCode
-from app.domain.audit import AuditAction, AuditResourceType
+from app.domain.audit import AuditAction, AuditResourceType, AuditSource
 from app.domain.iam import OrganizationScope, Principal, ScopeType
 from app.model.identity import Permission, Role, RolePermission, User, UserRole
 from app.repository.identity import IdentityRepository
@@ -180,14 +180,47 @@ class RbacMutationService:
             ),
         )
 
-    def _grant_user_role_in_current_transaction(
+    def grant_user_role_for_development_seed(
         self,
         *,
-        actor_user_id: int,
         target_user_id: int,
         role_code: str,
         scope: OrganizationScope,
         request_id: str,
+    ) -> RbacMutationResult:
+        return self._grant_user_role_in_current_transaction(
+            actor_user_id=None,
+            target_user_id=target_user_id,
+            role_code=role_code,
+            scope=scope,
+            request_id=request_id,
+            source=AuditSource.DEVELOPMENT_SEED,
+        )
+
+    def grant_role_permission_for_development_seed(
+        self,
+        *,
+        role_code: str,
+        permission_code: str,
+        request_id: str,
+    ) -> RbacMutationResult:
+        return self._grant_role_permission_in_current_transaction(
+            actor_user_id=None,
+            role_code=role_code,
+            permission_code=permission_code,
+            request_id=request_id,
+            source=AuditSource.DEVELOPMENT_SEED,
+        )
+
+    def _grant_user_role_in_current_transaction(
+        self,
+        *,
+        actor_user_id: int | None,
+        target_user_id: int,
+        role_code: str,
+        scope: OrganizationScope,
+        request_id: str,
+        source: AuditSource = AuditSource.INTERNAL,
     ) -> RbacMutationResult:
         self._require_active_transaction()
         self._validate_internal_inputs(
@@ -195,6 +228,7 @@ class RbacMutationService:
             request_id=request_id,
             role_code=role_code,
             target_user_id=target_user_id,
+            source=source,
         )
         validated_scope = self._validate_scope(scope)
         target_user = self._require_user(target_user_id)
@@ -230,6 +264,7 @@ class RbacMutationService:
             scope=validated_scope,
             relation_id=user_role.id,
             request_id=request_id,
+            source=source,
         )
         return RbacMutationResult(
             action=AuditAction.IAM_USER_ROLE_GRANTED,
@@ -240,11 +275,12 @@ class RbacMutationService:
     def _revoke_user_role_in_current_transaction(
         self,
         *,
-        actor_user_id: int,
+        actor_user_id: int | None,
         target_user_id: int,
         role_code: str,
         scope: OrganizationScope,
         request_id: str,
+        source: AuditSource = AuditSource.INTERNAL,
     ) -> RbacMutationResult:
         self._require_active_transaction()
         self._validate_internal_inputs(
@@ -252,6 +288,7 @@ class RbacMutationService:
             request_id=request_id,
             role_code=role_code,
             target_user_id=target_user_id,
+            source=source,
         )
         validated_scope = self._validate_scope(scope)
         target_user = self._require_user(target_user_id)
@@ -277,6 +314,7 @@ class RbacMutationService:
             scope=validated_scope,
             relation_id=relation_id,
             request_id=request_id,
+            source=source,
         )
         return RbacMutationResult(
             action=AuditAction.IAM_USER_ROLE_REVOKED,
@@ -287,10 +325,11 @@ class RbacMutationService:
     def _grant_role_permission_in_current_transaction(
         self,
         *,
-        actor_user_id: int,
+        actor_user_id: int | None,
         role_code: str,
         permission_code: str,
         request_id: str,
+        source: AuditSource = AuditSource.INTERNAL,
     ) -> RbacMutationResult:
         self._require_active_transaction()
         self._validate_internal_inputs(
@@ -298,6 +337,7 @@ class RbacMutationService:
             request_id=request_id,
             role_code=role_code,
             permission_code=permission_code,
+            source=source,
         )
         role = self._require_role(role_code)
         permission = self._require_permission(permission_code)
@@ -326,6 +366,7 @@ class RbacMutationService:
             permission_code=permission.code,
             relation_id=role_permission.id,
             request_id=request_id,
+            source=source,
         )
         return RbacMutationResult(
             action=AuditAction.IAM_ROLE_PERMISSION_GRANTED,
@@ -336,10 +377,11 @@ class RbacMutationService:
     def _revoke_role_permission_in_current_transaction(
         self,
         *,
-        actor_user_id: int,
+        actor_user_id: int | None,
         role_code: str,
         permission_code: str,
         request_id: str,
+        source: AuditSource = AuditSource.INTERNAL,
     ) -> RbacMutationResult:
         self._require_active_transaction()
         self._validate_internal_inputs(
@@ -347,6 +389,7 @@ class RbacMutationService:
             request_id=request_id,
             role_code=role_code,
             permission_code=permission_code,
+            source=source,
         )
         role = self._require_role(role_code)
         permission = self._require_permission(permission_code)
@@ -368,6 +411,7 @@ class RbacMutationService:
             permission_code=permission.code,
             relation_id=relation_id,
             request_id=request_id,
+            source=source,
         )
         return RbacMutationResult(
             action=AuditAction.IAM_ROLE_PERMISSION_REVOKED,
@@ -475,12 +519,13 @@ class RbacMutationService:
         self,
         *,
         action: AuditAction,
-        actor_user_id: int,
+        actor_user_id: int | None,
         target_user_id: int,
         role_code: str,
         scope: OrganizationScope,
         relation_id: int,
         request_id: str,
+        source: AuditSource,
     ) -> None:
         self._append_audit(
             action=action,
@@ -495,7 +540,7 @@ class RbacMutationService:
                 "target_user_id": target_user_id,
                 "role_code": role_code,
                 "scope_type": scope.scope_type.value,
-                "source": "INTERNAL",
+                "source": source.value,
             },
         )
 
@@ -503,11 +548,12 @@ class RbacMutationService:
         self,
         *,
         action: AuditAction,
-        actor_user_id: int,
+        actor_user_id: int | None,
         role_code: str,
         permission_code: str,
         relation_id: int,
         request_id: str,
+        source: AuditSource,
     ) -> None:
         self._append_audit(
             action=action,
@@ -521,7 +567,7 @@ class RbacMutationService:
             details={
                 "role_code": role_code,
                 "permission_code": permission_code,
-                "source": "INTERNAL",
+                "source": source.value,
             },
         )
 
@@ -589,19 +635,30 @@ class RbacMutationService:
             role_code=role_code,
             target_user_id=target_user_id,
             permission_code=permission_code,
+            source=AuditSource.INTERNAL,
         )
 
     @classmethod
     def _validate_internal_inputs(
         cls,
         *,
-        actor_user_id: int,
+        actor_user_id: int | None,
         request_id: str,
         role_code: str,
         target_user_id: int | None = None,
         permission_code: str | None = None,
+        source: AuditSource,
     ) -> None:
-        if not cls._is_positive_id(actor_user_id):
+        if not isinstance(source, AuditSource):
+            cls._raise_mutation_conflict()
+        if source is AuditSource.INTERNAL and not cls._is_positive_id(
+            actor_user_id
+        ):
+            cls._raise_mutation_conflict()
+        if (
+            source is AuditSource.DEVELOPMENT_SEED
+            and actor_user_id is not None
+        ):
             cls._raise_mutation_conflict()
         if target_user_id is not None and not cls._is_positive_id(
             target_user_id
