@@ -26,6 +26,7 @@ from app.model.identity import (
     UserRole,
 )
 from app.model.property import Building, House, Property, Tenant, Unit
+from app.model.resident import ResidentBindRequest, ResidentHouseRelation
 from app.repository.dev_seed import DevSeedRepository
 from app.service.dev_seed import run_development_seed
 
@@ -337,7 +338,7 @@ def test_extra_role_permission_is_kept_and_missing_mappings_are_filled(
     assert extra is not None
 
 
-def test_seed_does_not_create_task_4_tables_or_models(
+def test_seed_does_not_write_task_4_rows_or_later_models(
     identity_session: Session,
     integration_settings: Settings,
     test_engine: Engine,
@@ -346,11 +347,12 @@ def test_seed_does_not_create_task_4_tables_or_models(
     tables = set(inspect(test_engine).get_table_names())
     assert "employees" not in tables
     assert "employee_properties" not in tables
-    assert "resident_house_relations" not in tables
     assert "attendances" not in tables
     assert "work_orders" not in tables
     assert _count(identity_session, Building) == 0
     assert _count(identity_session, House) == 0
+    assert _count(identity_session, ResidentBindRequest) == 0
+    assert _count(identity_session, ResidentHouseRelation) == 0
     source = (BACKEND_ROOT / "app" / "service" / "dev_seed.py").read_text(
         encoding="utf-8"
     )

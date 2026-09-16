@@ -23,6 +23,18 @@ TASK_3_TABLES = (
     "user_roles",
     "audit_logs",
 )
+TASK_4_TABLES = (
+    "resident_house_relations",
+    "resident_bind_requests",
+)
+
+
+def _delete_tables(engine: Engine, tables: tuple[str, ...]) -> None:
+    inspector = inspect(engine)
+    with engine.begin() as connection:
+        for table in tables:
+            if inspector.has_table(table):
+                connection.execute(text(f"DELETE FROM `{table}`"))
 
 
 @pytest.fixture(scope="session")
@@ -61,9 +73,7 @@ def clean_property_tables(test_engine: Engine) -> Iterator[None]:
         )
 
     def clean() -> None:
-        with test_engine.begin() as connection:
-            for table in reversed(TASK_2_TABLES):
-                connection.execute(text(f"DELETE FROM `{table}`"))
+        _delete_tables(test_engine, TASK_4_TABLES + tuple(reversed(TASK_2_TABLES)))
 
     clean()
     try:
@@ -101,9 +111,7 @@ def clean_identity_tables(
         )
 
     def clean() -> None:
-        with test_engine.begin() as connection:
-            for table in reversed(TASK_3_TABLES):
-                connection.execute(text(f"DELETE FROM `{table}`"))
+        _delete_tables(test_engine, TASK_4_TABLES + tuple(reversed(TASK_3_TABLES)))
 
     clean()
     try:

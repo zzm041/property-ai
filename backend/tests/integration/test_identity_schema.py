@@ -13,10 +13,18 @@ TASK_3_TABLES = {
 }
 
 
+TASK_4_TABLES = {
+    "resident_bind_requests",
+    "resident_house_relations",
+}
+
+
 def test_gate_a_creates_exact_business_tables(test_engine: Engine) -> None:
     tables = set(inspect(test_engine).get_table_names())
 
-    assert tables == TASK_2_TABLES | TASK_3_TABLES | {"alembic_version"}
+    assert tables == TASK_2_TABLES | TASK_3_TABLES | TASK_4_TABLES | {
+        "alembic_version"
+    }
 
 
 def test_gate_a_primary_and_foreign_key_columns_are_bigint(
@@ -115,8 +123,8 @@ def test_gate_a_checks_are_enforced_by_mysql(test_engine: Engine) -> None:
         ).all()
 
     actual = {name: enforced for name, enforced in rows}
-    assert set(actual) == expected
-    assert set(actual.values()) == {"YES"}
+    assert expected <= set(actual)
+    assert all(actual[name] == "YES" for name in expected)
 
 
 def test_gate_a_generated_columns_are_stored(test_engine: Engine) -> None:

@@ -314,3 +314,54 @@ def test_jti_and_cookie_keys_are_rejected() -> None:
             )
         assert captured.value.code == AuditErrorCode.INVALID_DETAILS
     repository.append.assert_not_called()
+
+
+def test_resident_bind_audit_allowlist_and_scope() -> None:
+    service, _, repository = _service()
+
+    created = service.append(
+        action=AuditAction.RESIDENT_BIND_REQUEST_CREATED,
+        resource_type=AuditResourceType.RESIDENT_BIND_REQUEST,
+        actor_user_id=11,
+        resource_id=44,
+        request_id="t4-audit-create",
+        scope_type=ScopeType.PROPERTY,
+        tenant_id=1,
+        property_id=2,
+        details={"house_id": 9, "relation_type": "OWNER"},
+    )
+    assert created.details_json == {"house_id": 9, "relation_type": "OWNER"}
+
+    with pytest.raises(AppError) as reason_error:
+        service.append(
+            action=AuditAction.RESIDENT_BIND_REQUEST_REJECTED,
+            resource_type=AuditResourceType.RESIDENT_BIND_REQUEST,
+            actor_user_id=11,
+            resource_id=44,
+            request_id="t4-audit-reason",
+            scope_type=ScopeType.PROPERTY,
+            tenant_id=1,
+            property_id=2,
+            details={
+                "house_id": 9,
+                "relation_type": "OWNER",
+                "review_reason": "must not be audited",
+            },
+        )
+    with pytest.raises(AppError) as scope_error:
+        service.append(
+            action=AuditAction.RESIDENT_BIND_REQUEST_APPROVED,
+            resource_type=AuditResourceType.RESIDENT_BIND_REQUEST,
+            actor_user_id=11,
+            resource_id=44,
+            request_id="t4-audit-system",
+            scope_type=ScopeType.SYSTEM,
+            details={
+                "house_id": 9,
+                "relation_type": "OWNER",
+                "relation_id": 12,
+            },
+        )
+    assert reason_error.value.code == AuditErrorCode.INVALID_DETAILS
+    assert scope_error.value.code == AuditErrorCode.INVALID_SCOPE
+    assert repository.append.call_count == 1

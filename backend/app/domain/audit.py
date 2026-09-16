@@ -19,6 +19,10 @@ class AuditAction(StrEnum):
     DEV_SEED_USER_CREATED = "DEV_SEED_USER_CREATED"
     DEV_SEED_ROLE_CREATED = "DEV_SEED_ROLE_CREATED"
     DEV_SEED_PERMISSION_CREATED = "DEV_SEED_PERMISSION_CREATED"
+    RESIDENT_BIND_REQUEST_CREATED = "RESIDENT_BIND_REQUEST_CREATED"
+    RESIDENT_BIND_REQUEST_APPROVED = "RESIDENT_BIND_REQUEST_APPROVED"
+    RESIDENT_BIND_REQUEST_REJECTED = "RESIDENT_BIND_REQUEST_REJECTED"
+    RESIDENT_HOUSE_RELATION_ENDED = "RESIDENT_HOUSE_RELATION_ENDED"
 
 
 class AuditResourceType(StrEnum):
@@ -29,6 +33,8 @@ class AuditResourceType(StrEnum):
     PROPERTY = "PROPERTY"
     ROLE = "ROLE"
     PERMISSION = "PERMISSION"
+    RESIDENT_BIND_REQUEST = "RESIDENT_BIND_REQUEST"
+    RESIDENT_HOUSE_RELATION = "RESIDENT_HOUSE_RELATION"
 
 
 class AuditSource(StrEnum):
@@ -61,6 +67,11 @@ _USER_ROLE_DETAIL_KEYS = frozenset(
 _ROLE_PERMISSION_DETAIL_KEYS = frozenset(
     {"role_code", "permission_code", "source"}
 )
+_RESIDENT_BIND_DETAIL_KEYS = frozenset({"house_id", "relation_type"})
+_RESIDENT_APPROVE_DETAIL_KEYS = frozenset(
+    {"house_id", "relation_type", "relation_id"}
+)
+_RESIDENT_RELATION_DETAIL_KEYS = frozenset({"house_id", "relation_type"})
 
 AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyType(
     {
@@ -123,6 +134,30 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             allowed_detail_keys=frozenset({"permission_code", "source"}),
             required_detail_keys=frozenset({"permission_code", "source"}),
             allowed_scope_types=frozenset({ScopeType.SYSTEM}),
+        ),
+        AuditAction.RESIDENT_BIND_REQUEST_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.RESIDENT_BIND_REQUEST,
+            allowed_detail_keys=_RESIDENT_BIND_DETAIL_KEYS,
+            required_detail_keys=_RESIDENT_BIND_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.RESIDENT_BIND_REQUEST_APPROVED: AuditActionPolicy(
+            resource_type=AuditResourceType.RESIDENT_BIND_REQUEST,
+            allowed_detail_keys=_RESIDENT_APPROVE_DETAIL_KEYS,
+            required_detail_keys=_RESIDENT_APPROVE_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.RESIDENT_BIND_REQUEST_REJECTED: AuditActionPolicy(
+            resource_type=AuditResourceType.RESIDENT_BIND_REQUEST,
+            allowed_detail_keys=_RESIDENT_BIND_DETAIL_KEYS,
+            required_detail_keys=_RESIDENT_BIND_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.RESIDENT_HOUSE_RELATION_ENDED: AuditActionPolicy(
+            resource_type=AuditResourceType.RESIDENT_HOUSE_RELATION,
+            allowed_detail_keys=_RESIDENT_RELATION_DETAIL_KEYS,
+            required_detail_keys=_RESIDENT_RELATION_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
         ),
     }
 )

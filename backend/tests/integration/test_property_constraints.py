@@ -122,7 +122,10 @@ def test_unique_constraints_and_indexes_are_present(test_engine: Engine) -> None
             "uq_units_tenant_property_building_code",
             "uq_units_id_property_tenant",
         },
-        "houses": {"uq_houses_tenant_property_unit_room"},
+        "houses": {
+            "uq_houses_tenant_property_unit_room",
+            "uq_houses_id_property_tenant",
+        },
     }
     expected_indexes = {
         "tenants": {"ix_tenants_status_id"},

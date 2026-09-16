@@ -245,6 +245,17 @@ class AuditService:
                     or not _SEED_KEY_PATTERN.fullmatch(value)
                 ):
                     cls._raise_invalid_details("seed_key is invalid")
+            elif key in {"house_id", "relation_id"}:
+                if not cls._is_positive_id(value):
+                    cls._raise_invalid_details(f"{key} is invalid")
+            elif key == "relation_type":
+                if value not in {
+                    "OWNER",
+                    "TENANT",
+                    "FAMILY",
+                    "AUTHORIZED_OTHER",
+                }:
+                    cls._raise_invalid_details("relation_type is invalid")
 
     @classmethod
     def _reject_sensitive_keys(cls, value: object) -> None:

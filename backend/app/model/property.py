@@ -181,6 +181,12 @@ class House(BigIntPrimaryKeyMixin, TimestampMixin, Base):
             "room_no",
             name="uq_houses_tenant_property_unit_room",
         ),
+        UniqueConstraint(
+            "id",
+            "property_id",
+            "tenant_id",
+            name="uq_houses_id_property_tenant",
+        ),
         Index(
             "ix_houses_unit_property_tenant",
             "unit_id",

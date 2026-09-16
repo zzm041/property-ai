@@ -10,6 +10,7 @@ from app.model.identity import (
     UserRole,
 )
 from app.model.property import Building, House, Property, Tenant, Unit
+from app.model.resident import ResidentBindRequest, ResidentHouseRelation
 
 __all__ = [
     "AuditLog",
@@ -18,6 +19,8 @@ __all__ = [
     "House",
     "Permission",
     "Property",
+    "ResidentBindRequest",
+    "ResidentHouseRelation",
     "Role",
     "RolePermission",
     "Tenant",
