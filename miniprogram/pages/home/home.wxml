@@ -1,0 +1,24 @@
+<view class="card" wx:if="{{me}}">
+  <view>{{me.display_name}}</view>
+  <view>角色：{{me.roles}}</view>
+</view>
+<view class="card" wx:if="{{canResident}}">
+  <button class="btn" data-url="/pages/work-orders/create" bindtap="go">报修</button>
+  <button class="btn" data-url="/pages/work-orders/list" bindtap="go">我的工单</button>
+  <button class="btn" data-url="/pages/houses/houses" bindtap="go">我的房屋</button>
+  <button class="btn" data-url="/pages/announcements/list" bindtap="go">公告</button>
+  <button class="btn" data-url="/pages/assistant/assistant" bindtap="go">知识助手</button>
+</view>
+<view class="card" wx:if="{{canStaff}}">
+  <button class="btn" data-url="/pages/attendance/attendance" bindtap="go">今日考勤</button>
+  <button class="btn" data-url="/pages/staff-orders/list" bindtap="go">我的任务</button>
+</view>
+<view class="card" wx:if="{{canManage}}">
+  <button class="btn" data-url="/pages/supervisor/queue" bindtap="go">待派工单</button>
+  <button class="btn" data-url="/pages/supervisor/incidents" bindtap="go">事件</button>
+  <button class="btn" data-url="/pages/supervisor/announcements" bindtap="go">公告审核</button>
+  <button class="btn" data-url="/pages/supervisor/bindings" bindtap="go">绑定审核</button>
+  <button class="btn" data-url="/pages/supervisor/staff" bindtap="go">员工状态</button>
+</view>
+<button class="btn" data-url="/pages/notifications/list" bindtap="go">通知</button>
+<view class="error" wx:if="{{error}}">{{error}}</view>

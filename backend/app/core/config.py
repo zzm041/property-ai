@@ -69,6 +69,27 @@ class Settings(BaseSettings):
     ai_auto_assign: bool = False
     incident_window_minutes: int = Field(default=10, ge=1, le=1440)
     incident_threshold: int = Field(default=5, ge=2, le=100)
+    milvus_uri: str = "http://127.0.0.1:19530"
+    milvus_collection: str = "knowledge_chunks_v1"
+    milvus_timeout_seconds: float = Field(default=3.0, ge=0.1, le=30.0)
+    embedding_provider: Literal["development", "production"] = "development"
+    embedding_provider_behavior: Literal["success", "timeout", "unavailable"] = (
+        "success"
+    )
+    embedding_endpoint: str = ""
+    embedding_dimensions: int = Field(default=8, ge=2, le=1024)
+    reranker_provider: Literal["development", "production"] = "development"
+    reranker_provider_behavior: Literal["success", "unavailable"] = "success"
+    reranker_endpoint: str = ""
+    wechat_login_enabled: bool = True
+    wechat_provider: Literal["development", "production"] = "development"
+    wechat_app_id: str = "wx-dev-app"
+    wechat_app_secret: SecretStr = SecretStr("")
+    notification_provider: Literal["development", "production"] = "development"
+    notification_provider_behavior: Literal["success", "unavailable"] = "success"
+    storage_provider: Literal["development", "production"] = "development"
+    storage_endpoint: str = ""
+    storage_bucket: str = ""
 
     @property
     def should_enqueue_ai_on_create(self) -> bool:
@@ -110,6 +131,11 @@ class Settings(BaseSettings):
             and self.app_secret_key.get_secret_value() == DEFAULT_APP_SECRET_KEY
         ):
             raise ValueError("Production requires a non-default APP_SECRET_KEY")
+        if self.app_env == "production" and self.wechat_login_enabled:
+            if not self.wechat_app_id or self.wechat_app_id == "wx-dev-app":
+                raise ValueError("Production WeChat login requires WECHAT_APP_ID")
+            if not self.wechat_app_secret.get_secret_value():
+                raise ValueError("Production WeChat login requires WECHAT_APP_SECRET")
         return self
 
     @property

@@ -55,12 +55,20 @@ TASK_7_TABLES = {
     "announcement_reviews",
     "notifications",
 }
+TASK_8_TABLES = {
+    "user_wechats",
+    "knowledge_documents",
+    "knowledge_document_versions",
+    "knowledge_chunks",
+    "knowledge_ingestion_jobs",
+    "notification_deliveries",
+}
 
 
 def test_gate_a_creates_exact_business_tables(test_engine: Engine) -> None:
     tables = set(inspect(test_engine).get_table_names())
 
-    assert tables == TASK_2_TABLES | TASK_3_TABLES | TASK_4_TABLES | TASK_5_TABLES | TASK_6_TABLES | TASK_7_TABLES | {
+    assert tables == TASK_2_TABLES | TASK_3_TABLES | TASK_4_TABLES | TASK_5_TABLES | TASK_6_TABLES | TASK_7_TABLES | TASK_8_TABLES | {
         "alembic_version"
     }
 

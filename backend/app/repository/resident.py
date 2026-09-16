@@ -178,6 +178,29 @@ class ResidentBindingRepository:
         ).all()
         return tuple((relation, house) for relation, house in rows)
 
+    def list_active_resident_user_ids(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int,
+        now: datetime,
+    ) -> tuple[int, ...]:
+        rows = self._session.scalars(
+            select(ResidentHouseRelation.user_id)
+            .where(
+                ResidentHouseRelation.tenant_id == tenant_id,
+                ResidentHouseRelation.property_id == property_id,
+                ResidentHouseRelation.status == "ACTIVE",
+                ResidentHouseRelation.valid_from <= now,
+                or_(
+                    ResidentHouseRelation.valid_to.is_(None),
+                    ResidentHouseRelation.valid_to > now,
+                ),
+            )
+            .distinct()
+        ).all()
+        return tuple(int(item) for item in rows)
+
     def add_bind_request(
         self,
         request: ResidentBindRequest,

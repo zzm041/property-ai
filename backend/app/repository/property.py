@@ -52,6 +52,9 @@ class PropertyRepository:
             )
         )
 
+    def get_property_by_id(self, property_id: int) -> Property | None:
+        return self._session.get(Property, property_id)
+
     def get_building(
         self,
         *,

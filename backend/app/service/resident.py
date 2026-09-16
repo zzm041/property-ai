@@ -367,6 +367,17 @@ class ResidentBindingService:
                 "relation_id": relation.id,
             },
         )
+        from app.service.notification import NotificationService
+
+        NotificationService(self._session).enqueue(
+            tenant_id=house.tenant_id,
+            property_id=house.property_id,
+            user_id=request.user_id,
+            title="房屋绑定已通过",
+            body="Your house binding request was approved",
+            resource_type="RESIDENT_BIND_REQUEST",
+            resource_id=request.id,
+        )
         return request, relation
 
     def _review_reject(
@@ -407,6 +418,17 @@ class ResidentBindingService:
                 "house_id": house.id,
                 "relation_type": request.relation_type,
             },
+        )
+        from app.service.notification import NotificationService
+
+        NotificationService(self._session).enqueue(
+            tenant_id=house.tenant_id,
+            property_id=house.property_id,
+            user_id=request.user_id,
+            title="房屋绑定未通过",
+            body="Your house binding request was rejected",
+            resource_type="RESIDENT_BIND_REQUEST",
+            resource_id=request.id,
         )
         return request
 

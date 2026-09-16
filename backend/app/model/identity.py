@@ -251,6 +251,29 @@ class UserRole(BigIntPrimaryKeyMixin, Base):
     created_at: Mapped[datetime] = _created_at_column()
 
 
+class UserWechat(BigIntPrimaryKeyMixin, TimestampMixin, Base):
+    __tablename__ = "user_wechats"
+    __table_args__ = (
+        UniqueConstraint("appid", "openid", name="uq_user_wechats_appid_openid"),
+        UniqueConstraint("unionid", name="uq_user_wechats_unionid"),
+        UniqueConstraint("id", "user_id", name="uq_user_wechats_id_user"),
+        ForeignKeyConstraint(
+            ["user_id"],
+            ["users.id"],
+            name="fk_user_wechats_user_id_users",
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+        ),
+        Index("ix_user_wechats_user_id", "user_id", "id"),
+        MYSQL_TABLE_OPTIONS,
+    )
+
+    user_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    appid: Mapped[str] = mapped_column(String(64), nullable=False)
+    openid: Mapped[str] = mapped_column(String(64), nullable=False)
+    unionid: Mapped[str | None] = mapped_column(String(64), nullable=True)
+
+
 class AuditLog(BigIntPrimaryKeyMixin, Base):
     __tablename__ = "audit_logs"
     __table_args__ = (

@@ -17,6 +17,7 @@ from app.domain.ai import (
     INCIDENT_MANAGE,
     INCIDENT_READ,
 )
+from app.domain.knowledge import KNOWLEDGE_MANAGE, KNOWLEDGE_READ
 from app.domain.work_order import (
     DEFAULT_SLA_COMPLETE_MINUTES,
     DEFAULT_SLA_RESPOND_MINUTES,
@@ -143,6 +144,8 @@ def create_work_order_graph(session: Session) -> WorkOrderGraph:
             (ANNOUNCEMENT_READ, "Read announcements"),
             (ANNOUNCEMENT_DRAFT, "Draft announcements"),
             (ANNOUNCEMENT_PUBLISH, "Publish announcements"),
+            (KNOWLEDGE_READ, "Read knowledge"),
+            (KNOWLEDGE_MANAGE, "Manage knowledge"),
         )
         permissions: dict[str, Permission] = {}
         for code, name in permission_defs:
@@ -151,7 +154,7 @@ def create_work_order_graph(session: Session) -> WorkOrderGraph:
             permissions[code] = permission
         session.flush()
         grants = (
-            ("RESIDENT", (WORK_ORDER_CREATE, WORK_ORDER_READ, WORK_ORDER_CANCEL, ANNOUNCEMENT_READ)),
+            ("RESIDENT", (WORK_ORDER_CREATE, WORK_ORDER_READ, WORK_ORDER_CANCEL, ANNOUNCEMENT_READ, KNOWLEDGE_READ)),
             (
                 "STAFF",
                 (
@@ -160,6 +163,7 @@ def create_work_order_graph(session: Session) -> WorkOrderGraph:
                     WORK_ORDER_RESOLVE,
                     INCIDENT_READ,
                     ANNOUNCEMENT_READ,
+                    KNOWLEDGE_READ,
                 ),
             ),
             (
@@ -178,6 +182,7 @@ def create_work_order_graph(session: Session) -> WorkOrderGraph:
                     INCIDENT_MANAGE,
                     ANNOUNCEMENT_READ,
                     ANNOUNCEMENT_DRAFT,
+                    KNOWLEDGE_READ,
                 ),
             ),
             (
@@ -197,6 +202,8 @@ def create_work_order_graph(session: Session) -> WorkOrderGraph:
                     ANNOUNCEMENT_READ,
                     ANNOUNCEMENT_DRAFT,
                     ANNOUNCEMENT_PUBLISH,
+                    KNOWLEDGE_READ,
+                    KNOWLEDGE_MANAGE,
                 ),
             ),
             (
@@ -216,6 +223,8 @@ def create_work_order_graph(session: Session) -> WorkOrderGraph:
                     ANNOUNCEMENT_READ,
                     ANNOUNCEMENT_DRAFT,
                     ANNOUNCEMENT_PUBLISH,
+                    KNOWLEDGE_READ,
+                    KNOWLEDGE_MANAGE,
                 ),
             ),
         )

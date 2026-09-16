@@ -1,0 +1,21 @@
+page {
+  background: #f4f6f8;
+  font-size: 28rpx;
+  color: #1b1f24;
+}
+
+.card {
+  background: #fff;
+  margin: 24rpx;
+  padding: 24rpx;
+  border-radius: 12rpx;
+}
+
+.btn {
+  margin: 16rpx 24rpx;
+}
+
+.error {
+  color: #b42318;
+  margin: 16rpx 24rpx;
+}

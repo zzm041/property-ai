@@ -10,6 +10,7 @@ from app.domain.iam import OrganizationScope, ScopeType
 
 class AuditAction(StrEnum):
     DEV_AUTH_TOKEN_ISSUED = "DEV_AUTH_TOKEN_ISSUED"
+    WECHAT_AUTH_TOKEN_ISSUED = "WECHAT_AUTH_TOKEN_ISSUED"
     IAM_USER_ROLE_GRANTED = "IAM_USER_ROLE_GRANTED"
     IAM_USER_ROLE_REVOKED = "IAM_USER_ROLE_REVOKED"
     IAM_ROLE_PERMISSION_GRANTED = "IAM_ROLE_PERMISSION_GRANTED"
@@ -50,6 +51,8 @@ class AuditAction(StrEnum):
     WORK_ORDER_LINKED_TO_INCIDENT = "WORK_ORDER_LINKED_TO_INCIDENT"
     ANNOUNCEMENT_DRAFT_CREATED = "ANNOUNCEMENT_DRAFT_CREATED"
     ANNOUNCEMENT_PUBLISHED = "ANNOUNCEMENT_PUBLISHED"
+    KNOWLEDGE_DOCUMENT_CREATED = "KNOWLEDGE_DOCUMENT_CREATED"
+    KNOWLEDGE_DOCUMENT_ARCHIVED = "KNOWLEDGE_DOCUMENT_ARCHIVED"
 
 
 class AuditResourceType(StrEnum):
@@ -72,6 +75,8 @@ class AuditResourceType(StrEnum):
     DISPATCH_RECOMMENDATION = "DISPATCH_RECOMMENDATION"
     INCIDENT = "INCIDENT"
     ANNOUNCEMENT = "ANNOUNCEMENT"
+    KNOWLEDGE_DOCUMENT = "KNOWLEDGE_DOCUMENT"
+    USER_WECHAT = "USER_WECHAT"
 
 
 class AuditSource(StrEnum):
@@ -140,6 +145,12 @@ _WORK_ORDER_DECIDED_DETAIL_KEYS = frozenset(
 AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyType(
     {
         AuditAction.DEV_AUTH_TOKEN_ISSUED: AuditActionPolicy(
+            resource_type=AuditResourceType.USER,
+            allowed_detail_keys=frozenset({"auth_method", "token_type"}),
+            required_detail_keys=frozenset({"auth_method", "token_type"}),
+            allowed_scope_types=frozenset({ScopeType.SYSTEM}),
+        ),
+        AuditAction.WECHAT_AUTH_TOKEN_ISSUED: AuditActionPolicy(
             resource_type=AuditResourceType.USER,
             allowed_detail_keys=frozenset({"auth_method", "token_type"}),
             required_detail_keys=frozenset({"auth_method", "token_type"}),
@@ -413,6 +424,22 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             allowed_detail_keys=frozenset({"announcement_id", "status"}),
             required_detail_keys=frozenset({"announcement_id", "status"}),
             allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.KNOWLEDGE_DOCUMENT_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.KNOWLEDGE_DOCUMENT,
+            allowed_detail_keys=frozenset(
+                {"document_id", "visibility", "document_type"}
+            ),
+            required_detail_keys=frozenset(
+                {"document_id", "visibility", "document_type"}
+            ),
+            allowed_scope_types=frozenset({ScopeType.TENANT, ScopeType.PROPERTY}),
+        ),
+        AuditAction.KNOWLEDGE_DOCUMENT_ARCHIVED: AuditActionPolicy(
+            resource_type=AuditResourceType.KNOWLEDGE_DOCUMENT,
+            allowed_detail_keys=frozenset({"document_id", "status"}),
+            required_detail_keys=frozenset({"document_id", "status"}),
+            allowed_scope_types=frozenset({ScopeType.TENANT, ScopeType.PROPERTY}),
         ),
     }
 )

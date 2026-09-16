@@ -14,6 +14,7 @@ from app.core.database import assert_disposable_test_database
 BACKEND_ROOT = Path(__file__).resolve().parents[2]
 TASK_6_REVISION = "20260917_0005"
 TASK_7_REVISION = "20260917_0006"
+TASK_8_REVISION = "20260917_0007"
 TASK_6_TABLES = {
     "work_orders",
     "work_order_assignments",
@@ -52,10 +53,10 @@ def test_task_7_revision_chain_and_head(
         _alembic_config(integration_settings.test_database_url)
     )
     task_7 = scripts.get_revision(TASK_7_REVISION)
-    assert scripts.get_current_head() == TASK_7_REVISION
+    assert scripts.get_current_head() == TASK_8_REVISION
     assert task_7 is not None
     assert task_7.down_revision == TASK_6_REVISION
-    assert _current_revision(test_engine) == TASK_7_REVISION
+    assert _current_revision(test_engine) == TASK_8_REVISION
 
 
 def test_task_7_alembic_has_no_model_drift(
@@ -72,7 +73,7 @@ def test_task_7_migration_cycle_preserves_task_1_to_6(
 ) -> None:
     assert_disposable_test_database(integration_settings)
     config = _alembic_config(integration_settings.test_database_url)
-    assert _current_revision(test_engine) == TASK_7_REVISION
+    assert _current_revision(test_engine) == TASK_8_REVISION
 
     command.downgrade(config, TASK_6_REVISION)
     assert _current_revision(test_engine) == TASK_6_REVISION
@@ -98,8 +99,8 @@ def test_task_7_migration_cycle_preserves_task_1_to_6(
         ).all()
     assert remaining == []
 
-    command.upgrade(config, TASK_7_REVISION)
-    assert _current_revision(test_engine) == TASK_7_REVISION
+    command.upgrade(config, TASK_8_REVISION)
+    assert _current_revision(test_engine) == TASK_8_REVISION
     tables = set(inspect(test_engine).get_table_names())
     assert TASK_7_TABLES <= tables
     command.check(config)

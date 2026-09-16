@@ -62,6 +62,7 @@ def test_ai_fixture_production_guard_does_not_create_engine() -> None:
         app_env="production",
         app_secret_key="non-default-production-secret-key",
         dev_auth_enabled=False,
+        wechat_login_enabled=False,
     )
     with pytest.raises(AppError) as captured:
         run_development_ai_fixture(settings, engine_factory=factory)

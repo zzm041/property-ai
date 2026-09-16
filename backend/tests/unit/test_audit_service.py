@@ -58,6 +58,24 @@ def test_valid_audit_event_is_constructed_and_flushed() -> None:
     session.rollback.assert_not_called()
 
 
+def test_wechat_auth_audit_allows_wechat_method() -> None:
+    service, session, repository = _service()
+
+    result = service.append(
+        action=AuditAction.WECHAT_AUTH_TOKEN_ISSUED,
+        resource_type=AuditResourceType.USER,
+        actor_user_id=11,
+        resource_id=11,
+        request_id="wx-audit-request",
+        scope_type=ScopeType.SYSTEM,
+        details={"auth_method": "wechat", "token_type": "access"},
+    )
+
+    assert result.details_json == {"auth_method": "wechat", "token_type": "access"}
+    repository.append.assert_called_once_with(result)
+    session.commit.assert_not_called()
+
+
 @pytest.mark.parametrize("request_id", ["", " ", "\n", "x" * 129])
 def test_request_id_is_required_and_bounded(request_id: str) -> None:
     service, _, repository = _service()

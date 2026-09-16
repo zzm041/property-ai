@@ -1,0 +1,4 @@
+<input placeholder="小区 ID" bindinput="onProperty" />
+<button class="btn" bindtap="load">加载员工状态</button>
+<view class="card" wx:for="{{items}}" wx:key="employee_id">{{item.employee_id}} {{item.on_duty}}</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>

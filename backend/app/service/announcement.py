@@ -25,12 +25,7 @@ from app.domain.announcement import (
 )
 from app.domain.audit import AuditAction, AuditResourceType
 from app.domain.iam import OrganizationScope, Principal, ScopeType
-from app.model.ai import (
-    Announcement,
-    AnnouncementReview,
-    AnnouncementScope,
-    Notification,
-)
+from app.model.ai import Announcement, AnnouncementReview, AnnouncementScope
 from app.provider.factory import build_llm_provider
 from app.provider.llm import LLMProvider
 from app.repository.ai import AiRepository
@@ -238,17 +233,23 @@ class AnnouncementService:
             self._transition(record, AnnouncementStatus.PUBLISHED.value)
             record.published_by_user_id = actor.user_id
             record.published_at = self._clock()
-            self._ai.add_notification(
-                Notification(
+            from app.service.notification import NotificationService
+
+            notifier = NotificationService(self._session)
+            for user_id in self._residents.list_active_resident_user_ids(
+                tenant_id=record.tenant_id,
+                property_id=record.property_id,
+                now=self._clock(),
+            ):
+                notifier.enqueue(
                     tenant_id=record.tenant_id,
                     property_id=record.property_id,
-                    user_id=actor.user_id,
+                    user_id=user_id,
                     title=record.title[:200],
                     body="Announcement published",
                     resource_type="ANNOUNCEMENT",
                     resource_id=record.id,
                 )
-            )
             self._audit.append(
                 action=AuditAction.ANNOUNCEMENT_PUBLISHED,
                 resource_type=AuditResourceType.ANNOUNCEMENT,

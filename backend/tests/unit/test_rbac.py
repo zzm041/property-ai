@@ -175,6 +175,7 @@ def test_production_rejects_default_secret() -> None:
             _env_file=None,
             app_env="production",
             dev_auth_enabled=False,
+            wechat_login_enabled=False,
         )
 
 

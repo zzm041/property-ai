@@ -8,6 +8,7 @@ from app.model.identity import (
     RolePermission,
     User,
     UserRole,
+    UserWechat,
 )
 from app.model.employee import (
     AttendanceRecord,
@@ -47,6 +48,13 @@ from app.model.ai import (
     Notification,
     WorkOrderAnalysis,
 )
+from app.model.knowledge import (
+    KnowledgeChunk,
+    KnowledgeDocument,
+    KnowledgeDocumentVersion,
+    KnowledgeIngestionJob,
+    NotificationDelivery,
+)
 
 __all__ = [
     "AttendanceRecord",
@@ -76,6 +84,7 @@ __all__ = [
     "Unit",
     "User",
     "UserRole",
+    "UserWechat",
     "WorkOrder",
     "WorkOrderAssignment",
     "WorkOrderContent",
@@ -93,4 +102,9 @@ __all__ = [
     "IncidentWorkOrder",
     "Notification",
     "WorkOrderAnalysis",
+    "KnowledgeChunk",
+    "KnowledgeDocument",
+    "KnowledgeDocumentVersion",
+    "KnowledgeIngestionJob",
+    "NotificationDelivery",
 ]

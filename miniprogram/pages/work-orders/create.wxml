@@ -1,0 +1,8 @@
+<view class="card">
+  <input placeholder="房屋 ID" bindinput="onHouse" />
+  <textarea placeholder="报修说明" bindinput="onText"></textarea>
+  <button class="btn" bindtap="chooseImage">选择图片</button>
+  <button class="btn" bindtap="chooseAudio">选择音频</button>
+  <button class="btn" bindtap="submit">提交报修</button>
+  <view class="error" wx:if="{{error}}">{{error}}</view>
+</view>

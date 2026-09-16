@@ -45,6 +45,22 @@ def test_llm_down_is_degraded_not_critical() -> None:
     assert result["dependencies"]["llm"]["critical"] is False
 
 
+def test_milvus_and_embedding_down_are_degraded() -> None:
+    result, status_code = check_readiness(
+        Settings(_env_file=None),
+        probes={
+            "mysql": (True, _up),
+            "redis": (False, _up),
+            "rabbitmq": (False, _up),
+            "embedding": (False, _down),
+            "milvus": (False, _down),
+        },
+    )
+    assert status_code == 200
+    assert result["status"] == "degraded"
+    assert result["dependencies"]["milvus"]["critical"] is False
+
+
 def test_critical_failure_is_not_ready() -> None:
     result, status_code = check_readiness(
         Settings(_env_file=None),

@@ -48,6 +48,14 @@ _SENSITIVE_KEY_MARKERS = frozenset(
         "requestbody",
         "rawrequestbody",
         "rawpayload",
+        "sessionkey",
+        "session_key",
+        "js_code",
+        "jscode",
+        "wechatcode",
+        "wxcode",
+        "appsecret",
+        "wechatsecret",
     }
 )
 
@@ -215,7 +223,7 @@ class AuditService:
     @classmethod
     def _validate_detail_values(cls, details: dict[str, object]) -> None:
         for key, value in details.items():
-            if key == "auth_method" and value != "development":
+            if key == "auth_method" and value not in {"development", "wechat"}:
                 cls._raise_invalid_details("auth_method is invalid")
             elif key == "token_type" and value != "access":
                 cls._raise_invalid_details("token_type is invalid")
@@ -255,6 +263,7 @@ class AuditService:
                 "analysis_id",
                 "incident_id",
                 "announcement_id",
+                "document_id",
                 "recommended_employee_id",
             }:
                 if value is not None and not cls._is_positive_id(value):
@@ -356,6 +365,18 @@ class AuditService:
                     or len(value) > 64
                 ):
                     cls._raise_invalid_details("reason_code is invalid")
+            elif key == "visibility":
+                if value not in {
+                    "SYSTEM",
+                    "TENANT",
+                    "PROPERTY",
+                    "STAFF_ONLY",
+                    "RESIDENT",
+                }:
+                    cls._raise_invalid_details("visibility is invalid")
+            elif key == "document_type":
+                if value not in {"FAQ", "GUIDE", "RULE", "SOP", "NOTICE"}:
+                    cls._raise_invalid_details("document_type is invalid")
 
     @classmethod
     def _reject_sensitive_keys(cls, value: object) -> None:

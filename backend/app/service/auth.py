@@ -9,6 +9,7 @@ from app.core.errors import AppError, AuthErrorCode, IamErrorCode
 from app.core.security import (
     AccessTokenExpiredError,
     InvalidAccessTokenError,
+    decode_access_token,
     decode_development_access_token,
     issue_development_access_token,
 )
@@ -90,7 +91,7 @@ class AuthService:
         settings: Settings,
     ) -> Principal:
         try:
-            claims = decode_development_access_token(token, settings)
+            claims = decode_access_token(token, settings)
         except AccessTokenExpiredError as exc:
             raise AppError(
                 code=AuthErrorCode.TOKEN_EXPIRED,

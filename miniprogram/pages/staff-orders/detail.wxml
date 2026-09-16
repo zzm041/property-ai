@@ -1,0 +1,6 @@
+<view class="card" wx:if="{{item}}">
+  <view>{{item.id}} {{item.status}}</view>
+  <button class="btn" bindtap="accept">接单</button>
+  <button class="btn" bindtap="start">开始处理</button>
+</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>

@@ -38,6 +38,24 @@ def probe_redis(settings: Settings) -> None:
         client.close()
 
 
+def probe_milvus(settings: Settings) -> None:
+    from pymilvus import connections, utility
+
+    alias = "readiness"
+    try:
+        connections.connect(
+            alias=alias,
+            uri=settings.milvus_uri,
+            timeout=settings.readiness_timeout_seconds,
+        )
+        utility.list_collections(using=alias)
+    finally:
+        try:
+            connections.disconnect(alias)
+        except Exception:  # noqa: BLE001 - probe cleanup
+            pass
+
+
 def probe_rabbitmq(settings: Settings) -> None:
     with Connection(
         settings.celery_broker_url,
@@ -88,6 +106,8 @@ def check_readiness(
         "llm": (False, lambda _settings: None),
         "vlm": (False, lambda _settings: None),
         "asr": (False, lambda _settings: None),
+        "embedding": (False, lambda _settings: None),
+        "milvus": (False, probe_milvus),
     }
 
     with ThreadPoolExecutor(max_workers=len(selected_probes)) as executor:

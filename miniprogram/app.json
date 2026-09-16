@@ -1,0 +1,30 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/home/home",
+    "pages/work-orders/create",
+    "pages/work-orders/list",
+    "pages/work-orders/detail",
+    "pages/houses/houses",
+    "pages/announcements/list",
+    "pages/announcements/detail",
+    "pages/assistant/assistant",
+    "pages/attendance/attendance",
+    "pages/staff-orders/list",
+    "pages/staff-orders/detail",
+    "pages/supervisor/queue",
+    "pages/supervisor/incidents",
+    "pages/supervisor/announcements",
+    "pages/supervisor/bindings",
+    "pages/supervisor/staff",
+    "pages/notifications/list"
+  ],
+  "window": {
+    "navigationBarTitleText": "智慧物业",
+    "navigationBarBackgroundColor": "#1f4b99",
+    "navigationBarTextStyle": "white",
+    "backgroundTextStyle": "light"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

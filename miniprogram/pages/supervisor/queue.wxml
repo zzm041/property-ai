@@ -1,0 +1,4 @@
+<input placeholder="小区 ID" bindinput="onProperty" />
+<button class="btn" bindtap="load">加载队列</button>
+<view class="card" wx:for="{{items}}" wx:key="id">{{item.id}} {{item.status}}</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>

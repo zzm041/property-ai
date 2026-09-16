@@ -67,6 +67,8 @@ SEED_PERMISSIONS = (
     SeedCodeDefinition("announcement:read", "Read announcements"),
     SeedCodeDefinition("announcement:draft", "Draft announcements"),
     SeedCodeDefinition("announcement:publish", "Publish announcements"),
+    SeedCodeDefinition("knowledge:read", "Read property knowledge"),
+    SeedCodeDefinition("knowledge:manage", "Manage property knowledge"),
 )
 
 SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
@@ -99,6 +101,8 @@ SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
             "announcement:read",
             "announcement:draft",
             "announcement:publish",
+            "knowledge:read",
+            "knowledge:manage",
         ),
         "PROPERTY_ADMIN": (
             "role:read",
@@ -126,6 +130,8 @@ SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
             "announcement:read",
             "announcement:draft",
             "announcement:publish",
+            "knowledge:read",
+            "knowledge:manage",
         ),
         "SUPERVISOR": (
             "property:read",
@@ -148,6 +154,7 @@ SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
             "incident:manage",
             "announcement:read",
             "announcement:draft",
+            "knowledge:read",
         ),
         "STAFF": (
             "attendance:check_in",
@@ -157,6 +164,7 @@ SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
             "work_order:resolve",
             "incident:read",
             "announcement:read",
+            "knowledge:read",
         ),
         "RESIDENT": (
             "resident_binding:create",
@@ -166,6 +174,7 @@ SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
             "work_order:read",
             "work_order:cancel",
             "announcement:read",
+            "knowledge:read",
         ),
     }
 )

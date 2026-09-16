@@ -33,3 +33,17 @@ def test_non_pymysql_database_driver_is_rejected() -> None:
             _env_file=None,
             database_url="sqlite:///development.db",
         )
+
+
+def test_production_wechat_login_requires_real_config() -> None:
+    with pytest.raises(ValidationError, match="WeChat"):
+        Settings(
+            _env_file=None,
+            app_env="production",
+            app_secret_key="production-secret-that-is-long-enough",
+            dev_auth_enabled=False,
+            wechat_login_enabled=True,
+            wechat_provider="production",
+            wechat_app_id="wx-dev-app",
+            wechat_app_secret="",
+        )

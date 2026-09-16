@@ -1,0 +1,5 @@
+<input placeholder="小区 ID" bindinput="onProperty" />
+<button class="btn" bindtap="checkIn">签到</button>
+<button class="btn" bindtap="checkOut">签退</button>
+<view class="card" wx:if="{{snapshot}}">日期 {{snapshot.business_date}}</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>

@@ -18,8 +18,8 @@ TASK_7_TABLES = {
 def test_task_7_tables_exist_without_rag(test_engine: Engine) -> None:
     tables = set(inspect(test_engine).get_table_names())
     assert TASK_7_TABLES <= tables
-    assert "knowledge_documents" not in tables
-    assert "knowledge_chunks" not in tables
+    assert "knowledge_documents" in tables
+    assert "knowledge_chunks" in tables
 
 
 def test_task_7_primary_keys_are_bigint(test_engine: Engine) -> None:

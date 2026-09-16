@@ -1,9 +1,15 @@
-# 微信原生小程序（占位）
+# 微信原生小程序
 
-Production V1 唯一客户端：微信原生小程序，不使用 uni-app / Taro（除非负责人另行批准）。
+Production V1 唯一客户端。同一应用按 `/me` 返回的 Role / Permission / Scope 展示菜单。
 
-同一小程序按角色展示不同功能，不拆成多个 App。
+前端隐藏不是安全边界。Backend RBAC 始终生效。
 
-**Stage 0.5 不实现页面。** 新 Day 1 的 Task 7 才初始化功能优先的最小纵向链路：Development Login、住户绑定申请、管理员审批、员工按 Property 签到。
+## 配置
 
-Task 7 禁止投入动画、主题、复杂视觉和首页装修；API Base URL 必须按 development / production 环境配置，不能在页面中散落硬编码地址。
+复制 `config/env.local.example.js` 为 `config/env.local.js`，按小程序环境填写 API origin。
+
+不要在客户端保存 App Secret、数据库凭证或 Provider Secret。不要把生产域名或密钥提交进仓库。
+
+Access Token 仅存微信 `wx.setStorageSync`。
+
+401 会清除 Token 并回到登录页。403 只提示无权限。

@@ -1,0 +1,5 @@
+<input placeholder="小区 ID" data-field="propertyId" bindinput="onField" />
+<input placeholder="标题" data-field="title" bindinput="onField" />
+<textarea placeholder="内容" data-field="content" bindinput="onField"></textarea>
+<button class="btn" bindtap="create">保存草稿</button>
+<view class="error" wx:if="{{error}}">{{error}}</view>

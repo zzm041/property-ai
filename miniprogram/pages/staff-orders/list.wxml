@@ -1,0 +1,2 @@
+<view class="card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="open">{{item.id}} {{item.status}}</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>

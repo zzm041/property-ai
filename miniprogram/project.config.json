@@ -1,0 +1,10 @@
+{
+  "miniprogramRoot": "./",
+  "projectname": "property-ai",
+  "appid": "touristappid",
+  "compileType": "miniprogram",
+  "setting": {
+    "es6": true,
+    "minified": true
+  }
+}

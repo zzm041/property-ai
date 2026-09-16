@@ -66,7 +66,8 @@ from app.model.work_order import (
     WorkOrderProcess,
     WorkOrderReceipt,
 )
-from app.provider.storage import DevelopmentStorageProvider, StorageProvider
+from app.provider.factory import build_storage_provider
+from app.provider.storage import StorageProvider
 from app.repository.employee import EmployeeRepository
 from app.repository.identity import IdentityRepository
 from app.repository.resident import ResidentBindingRepository
@@ -129,8 +130,8 @@ class WorkOrderService:
             session,
             IdentityRepository(session),
         ).load_principal
-        self._storage = storage or DevelopmentStorageProvider()
         self._settings = settings or get_settings()
+        self._storage = storage or build_storage_provider(self._settings)
         self._clock = clock
 
     def register_file(
@@ -1327,6 +1328,15 @@ class WorkOrderService:
             actor_user_id=current.user_id,
             request_id=request_id,
         )
+        self._notify(
+            tenant_id=record.tenant_id,
+            property_id=record.property_id,
+            user_id=employee.user_id,
+            title="工单已派单",
+            body="You have a new assigned work order",
+            resource_type="WORK_ORDER",
+            resource_id=record.id,
+        )
         return record
 
     def _decide(
@@ -1728,6 +1738,15 @@ class WorkOrderService:
                 tenant_id=record.tenant_id,
                 property_id=record.property_id,
                 details={"work_order_id": record.id, "status": record.status},
+            )
+            self._notify(
+                tenant_id=record.tenant_id,
+                property_id=record.property_id,
+                user_id=record.reporter_user_id,
+                title="工单待确认",
+                body="Please confirm the work order result",
+                resource_type="WORK_ORDER",
+                resource_id=record.id,
             )
         else:
             if unresolved_reason is None or not unresolved_reason.strip():
@@ -2202,6 +2221,29 @@ class WorkOrderService:
         if actor.has_permission(WORK_ORDER_DECIDE, scope):
             return WorkOrderActorType.SUPERVISOR
         return WorkOrderActorType.STAFF
+
+    def _notify(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int,
+        user_id: int,
+        title: str,
+        body: str,
+        resource_type: str,
+        resource_id: int,
+    ) -> None:
+        from app.service.notification import NotificationService
+
+        NotificationService(self._session).enqueue(
+            tenant_id=tenant_id,
+            property_id=property_id,
+            user_id=user_id,
+            title=title,
+            body=body,
+            resource_type=resource_type,
+            resource_id=resource_id,
+        )
 
     def _reload_actor(self, actor: Principal) -> Principal:
         self._require_active_actor(actor)

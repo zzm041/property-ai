@@ -1,0 +1,7 @@
+<view class="card" wx:if="{{item}}">
+  <view>工单 {{item.id}}</view>
+  <view>状态 {{item.status}}</view>
+  <button class="btn" bindtap="confirm">确认解决</button>
+  <button class="btn" bindtap="reopen">未解决重开</button>
+</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>

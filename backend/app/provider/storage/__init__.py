@@ -36,3 +36,25 @@ class DevelopmentStorageProvider(StorageProvider):
             storage_key=f"dev-object:{uuid4()}",
             scanner_status="skipped_dev",
         )
+
+
+class ProductionStorageProvider(StorageProvider):
+    """Object-storage adapter. Secrets stay in settings, never in API responses."""
+
+    def __init__(self, *, endpoint: str, bucket: str) -> None:
+        self.endpoint = endpoint
+        self.bucket = bucket
+
+    def register_object(
+        self,
+        *,
+        mime_type: str,
+        size_bytes: int,
+        filename: str | None = None,
+    ) -> StoredObject:
+        del mime_type, size_bytes, filename
+        prefix = self.bucket or "property-ai"
+        return StoredObject(
+            storage_key=f"object:{prefix}:{uuid4()}",
+            scanner_status="pending",
+        )

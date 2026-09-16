@@ -1,12 +1,27 @@
-# 部署占位
+# 部署
 
 Production V1 使用 Docker Compose + Nginx。镜像版本见 `docs/09-DEPLOYMENT.md`。
 
-Stage 0.5 **不提交或修改可运行的 Compose / Nginx 文件**。
+`deploy/docker-compose.yml` 包含：
 
-新的 Day 1 Task 1（需单独确认后）将添加开发基础设施：
+- MySQL 8.0.41
+- Redis 7.4.2
+- RabbitMQ 3.13.7
+- etcd + MinIO + Milvus 2.5.10
+- API / Celery worker（profile `app`）
+- Nginx（profile `app`）
 
-- `deploy/docker-compose.yml`：MySQL 8.0.41、Redis 7.4.2、RabbitMQ 3.13.7
-- API / Worker 镜像延后到应用可启动之后
+启动数据面：
 
-Milvus、RAG、LLM、VLM、ASR 和 Production Nginx 不在 Day 1 启动或实现。Production Nginx 仍是 V1 部署目标，但须在后续批准阶段完成。
+```bash
+docker compose -f deploy/docker-compose.yml --profile test up -d mysql mysql-test redis rabbitmq etcd minio milvus
+```
+
+发布应用前必须显式执行：
+
+```bash
+cd backend
+alembic upgrade head
+```
+
+不要在 API 启动时自动 migrate。不要把 Secret bake 进镜像；用环境变量注入。生产禁止 `dev_seed`。

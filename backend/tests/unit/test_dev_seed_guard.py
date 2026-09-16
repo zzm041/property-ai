@@ -16,6 +16,7 @@ def _production_settings() -> Settings:
         app_env="production",
         app_secret_key="non-default-production-secret-key",
         dev_auth_enabled=False,
+        wechat_login_enabled=False,
     )
 
 

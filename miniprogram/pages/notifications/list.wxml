@@ -1,0 +1,5 @@
+<view class="card">未读 {{unread}}</view>
+<view class="card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="read">
+  {{item.title}} {{item.read_at ? "已读" : "未读"}}
+</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>

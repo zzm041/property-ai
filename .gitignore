@@ -50,6 +50,7 @@ backend/alembic/versions/*.pyc
 miniprogram/node_modules/
 miniprogram/miniprogram_npm/
 miniprogram/project.private.config.json
+miniprogram/config/env.local.js
 
 # Docker volumes / local compose overrides
 docker-compose.override.yml

@@ -130,6 +130,25 @@ class EmployeeRepository:
             )
         )
 
+    def list_active_property_ids_for_employee(
+        self,
+        *,
+        employee_id: int,
+        now: datetime,
+    ) -> tuple[int, ...]:
+        rows = self._session.scalars(
+            select(EmployeeProperty.property_id).where(
+                EmployeeProperty.employee_id == employee_id,
+                EmployeeProperty.status == "ACTIVE",
+                EmployeeProperty.valid_from <= now,
+                or_(
+                    EmployeeProperty.valid_to.is_(None),
+                    EmployeeProperty.valid_to > now,
+                ),
+            )
+        ).all()
+        return tuple(int(item) for item in rows)
+
     def get_assignment_for_update(
         self,
         assignment_id: int,
