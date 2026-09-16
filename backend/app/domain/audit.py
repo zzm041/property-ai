@@ -30,6 +30,18 @@ class AuditAction(StrEnum):
     ATTENDANCE_CHECKED_IN = "ATTENDANCE_CHECKED_IN"
     ATTENDANCE_CHECKED_OUT = "ATTENDANCE_CHECKED_OUT"
     ATTENDANCE_STATUS_UPDATED = "ATTENDANCE_STATUS_UPDATED"
+    WORK_ORDER_CREATED = "WORK_ORDER_CREATED"
+    WORK_ORDER_ASSIGNED = "WORK_ORDER_ASSIGNED"
+    WORK_ORDER_REASSIGNED = "WORK_ORDER_REASSIGNED"
+    WORK_ORDER_PROCESS_STARTED = "WORK_ORDER_PROCESS_STARTED"
+    WORK_ORDER_PROCESS_UPDATED = "WORK_ORDER_PROCESS_UPDATED"
+    WORK_ORDER_RESOLVED = "WORK_ORDER_RESOLVED"
+    WORK_ORDER_CLOSED = "WORK_ORDER_CLOSED"
+    WORK_ORDER_REOPENED = "WORK_ORDER_REOPENED"
+    WORK_ORDER_CANCELLED = "WORK_ORDER_CANCELLED"
+    WORK_ORDER_ACCEPTED = "WORK_ORDER_ACCEPTED"
+    WORK_ORDER_REJECTED = "WORK_ORDER_REJECTED"
+    WORK_ORDER_DECIDED = "WORK_ORDER_DECIDED"
 
 
 class AuditResourceType(StrEnum):
@@ -46,6 +58,8 @@ class AuditResourceType(StrEnum):
     EMPLOYEE_PROPERTY = "EMPLOYEE_PROPERTY"
     ATTENDANCE_RECORD = "ATTENDANCE_RECORD"
     EMPLOYEE_DAILY_STATUS = "EMPLOYEE_DAILY_STATUS"
+    WORK_ORDER = "WORK_ORDER"
+    WORK_ORDER_ASSIGNMENT = "WORK_ORDER_ASSIGNMENT"
 
 
 class AuditSource(StrEnum):
@@ -91,6 +105,24 @@ _ATTENDANCE_DETAIL_KEYS = frozenset(
 )
 _ATTENDANCE_STATUS_DETAIL_KEYS = frozenset(
     {"employee_id", "property_id", "business_date", "on_duty"}
+)
+_WORK_ORDER_CREATED_DETAIL_KEYS = frozenset(
+    {"work_order_id", "status", "priority", "category"}
+)
+_WORK_ORDER_ASSIGNED_DETAIL_KEYS = frozenset(
+    {"work_order_id", "employee_id", "status"}
+)
+_WORK_ORDER_REASSIGNED_DETAIL_KEYS = frozenset(
+    {"work_order_id", "employee_id", "status", "reason_code"}
+)
+_WORK_ORDER_STATUS_DETAIL_KEYS = frozenset(
+    {"work_order_id", "status", "reason_code"}
+)
+_WORK_ORDER_PROCESS_DETAIL_KEYS = frozenset(
+    {"work_order_id", "status", "process_reason"}
+)
+_WORK_ORDER_DECIDED_DETAIL_KEYS = frozenset(
+    {"work_order_id", "status", "process_reason", "reason_code"}
 )
 
 AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyType(
@@ -219,6 +251,78 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             resource_type=AuditResourceType.EMPLOYEE_DAILY_STATUS,
             allowed_detail_keys=_ATTENDANCE_STATUS_DETAIL_KEYS,
             required_detail_keys=_ATTENDANCE_STATUS_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.WORK_ORDER_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.WORK_ORDER,
+            allowed_detail_keys=_WORK_ORDER_CREATED_DETAIL_KEYS,
+            required_detail_keys=_WORK_ORDER_CREATED_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.WORK_ORDER_ASSIGNED: AuditActionPolicy(
+            resource_type=AuditResourceType.WORK_ORDER_ASSIGNMENT,
+            allowed_detail_keys=_WORK_ORDER_ASSIGNED_DETAIL_KEYS,
+            required_detail_keys=_WORK_ORDER_ASSIGNED_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.WORK_ORDER_REASSIGNED: AuditActionPolicy(
+            resource_type=AuditResourceType.WORK_ORDER_ASSIGNMENT,
+            allowed_detail_keys=_WORK_ORDER_REASSIGNED_DETAIL_KEYS,
+            required_detail_keys=_WORK_ORDER_REASSIGNED_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.WORK_ORDER_PROCESS_STARTED: AuditActionPolicy(
+            resource_type=AuditResourceType.WORK_ORDER,
+            allowed_detail_keys=_WORK_ORDER_STATUS_DETAIL_KEYS,
+            required_detail_keys=frozenset({"work_order_id", "status"}),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.WORK_ORDER_PROCESS_UPDATED: AuditActionPolicy(
+            resource_type=AuditResourceType.WORK_ORDER,
+            allowed_detail_keys=_WORK_ORDER_PROCESS_DETAIL_KEYS,
+            required_detail_keys=_WORK_ORDER_PROCESS_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.WORK_ORDER_RESOLVED: AuditActionPolicy(
+            resource_type=AuditResourceType.WORK_ORDER,
+            allowed_detail_keys=_WORK_ORDER_STATUS_DETAIL_KEYS,
+            required_detail_keys=frozenset({"work_order_id", "status"}),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.WORK_ORDER_CLOSED: AuditActionPolicy(
+            resource_type=AuditResourceType.WORK_ORDER,
+            allowed_detail_keys=_WORK_ORDER_STATUS_DETAIL_KEYS,
+            required_detail_keys=frozenset({"work_order_id", "status"}),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.WORK_ORDER_REOPENED: AuditActionPolicy(
+            resource_type=AuditResourceType.WORK_ORDER,
+            allowed_detail_keys=_WORK_ORDER_STATUS_DETAIL_KEYS,
+            required_detail_keys=_WORK_ORDER_STATUS_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.WORK_ORDER_CANCELLED: AuditActionPolicy(
+            resource_type=AuditResourceType.WORK_ORDER,
+            allowed_detail_keys=_WORK_ORDER_STATUS_DETAIL_KEYS,
+            required_detail_keys=frozenset({"work_order_id", "status"}),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.WORK_ORDER_ACCEPTED: AuditActionPolicy(
+            resource_type=AuditResourceType.WORK_ORDER,
+            allowed_detail_keys=_WORK_ORDER_ASSIGNED_DETAIL_KEYS,
+            required_detail_keys=_WORK_ORDER_ASSIGNED_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.WORK_ORDER_REJECTED: AuditActionPolicy(
+            resource_type=AuditResourceType.WORK_ORDER,
+            allowed_detail_keys=_WORK_ORDER_REASSIGNED_DETAIL_KEYS,
+            required_detail_keys=_WORK_ORDER_REASSIGNED_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.WORK_ORDER_DECIDED: AuditActionPolicy(
+            resource_type=AuditResourceType.WORK_ORDER,
+            allowed_detail_keys=_WORK_ORDER_DECIDED_DETAIL_KEYS,
+            required_detail_keys=_WORK_ORDER_DECIDED_DETAIL_KEYS,
             allowed_scope_types=frozenset({ScopeType.PROPERTY}),
         ),
     }

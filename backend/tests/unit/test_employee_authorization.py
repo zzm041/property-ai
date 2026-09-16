@@ -77,11 +77,10 @@ def test_seed_employee_permissions_follow_frozen_matrix() -> None:
     assert "attendance:read" not in SEED_ROLE_PERMISSIONS["STAFF"]
     assert "attendance:read" in SEED_ROLE_PERMISSIONS["SUPERVISOR"]
     assert "employee:read" in SEED_ROLE_PERMISSIONS["SUPERVISOR"]
-    assert "work_order:create" not in {
-        code
-        for codes in SEED_ROLE_PERMISSIONS.values()
-        for code in codes
-    }
+    assert "work_order:create" in SEED_ROLE_PERMISSIONS["RESIDENT"]
+    assert "work_order:create" not in SEED_ROLE_PERMISSIONS["SYSTEM_ADMIN"]
+    assert "work_order:dispatch" not in SEED_ROLE_PERMISSIONS["STAFF"]
+    assert "work_order:dispatch" in SEED_ROLE_PERMISSIONS["SUPERVISOR"]
     assert "dispatch:assign" not in {
         code
         for codes in SEED_ROLE_PERMISSIONS.values()

@@ -30,10 +30,26 @@ TASK_5_TABLES = {
 }
 
 
+TASK_6_TABLES = {
+    "file_objects",
+    "sla_policies",
+    "work_orders",
+    "work_order_contents",
+    "work_order_media",
+    "work_order_assignments",
+    "work_order_logs",
+    "work_order_processes",
+    "work_order_receipts",
+    "work_order_feedbacks",
+    "sla_clocks",
+    "idempotency_records",
+}
+
+
 def test_gate_a_creates_exact_business_tables(test_engine: Engine) -> None:
     tables = set(inspect(test_engine).get_table_names())
 
-    assert tables == TASK_2_TABLES | TASK_3_TABLES | TASK_4_TABLES | TASK_5_TABLES | {
+    assert tables == TASK_2_TABLES | TASK_3_TABLES | TASK_4_TABLES | TASK_5_TABLES | TASK_6_TABLES | {
         "alembic_version"
     }
 

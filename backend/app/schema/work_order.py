@@ -1,0 +1,209 @@
+"""WorkOrder API request/response schemas. extra=forbid on writes."""
+
+from datetime import datetime
+from decimal import Decimal
+
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class CreateWorkOrderRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    house_id: int = Field(gt=0)
+    text: str | None = Field(default=None, max_length=4000)
+    file_ids: tuple[int, ...] = ()
+    category: str | None = Field(default=None, max_length=32)
+    priority: str | None = Field(default=None, max_length=16)
+    severity: str | None = Field(default=None, max_length=16)
+    tenant_id: int | None = Field(default=None, gt=0)
+    property_id: int | None = Field(default=None, gt=0)
+
+
+class AppendWorkOrderRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    text: str | None = Field(default=None, max_length=4000)
+    file_ids: tuple[int, ...] = ()
+    taken_phase: str | None = Field(default=None, max_length=16)
+
+
+class CancelWorkOrderRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    reason: str | None = Field(default=None, max_length=255)
+    version: int | None = Field(default=None, ge=1)
+
+
+class ReopenWorkOrderRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    reason: str = Field(min_length=1, max_length=255)
+    version: int | None = Field(default=None, ge=1)
+
+
+class ConfirmWorkOrderRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    version: int | None = Field(default=None, ge=1)
+
+
+class RateWorkOrderRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    rating: int = Field(ge=1, le=5)
+    comment: str | None = Field(default=None, max_length=500)
+
+
+class AssignWorkOrderRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    employee_id: int = Field(gt=0)
+    reason: str | None = Field(default=None, max_length=255)
+    version: int | None = Field(default=None, ge=1)
+    tenant_id: int | None = Field(default=None, gt=0)
+    property_id: int | None = Field(default=None, gt=0)
+
+
+class DecideWorkOrderRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    decision: str = Field(min_length=1, max_length=32)
+    employee_id: int | None = Field(default=None, gt=0)
+    reason: str | None = Field(default=None, max_length=255)
+    version: int | None = Field(default=None, ge=1)
+
+
+class RejectWorkOrderRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    reason: str = Field(min_length=1, max_length=255)
+    version: int | None = Field(default=None, ge=1)
+
+
+class StaffVersionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    version: int | None = Field(default=None, ge=1)
+
+
+class StaffFeedbackRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    text: str | None = Field(default=None, max_length=4000)
+    process_reason: str | None = Field(default=None, max_length=32)
+    file_ids: tuple[int, ...] = ()
+    taken_phase: str | None = Field(default=None, max_length=16)
+    version: int | None = Field(default=None, ge=1)
+
+
+class StaffReceiptRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    problem_type: str = Field(min_length=1, max_length=64)
+    method: str = Field(min_length=1, max_length=255)
+    materials: str | None = Field(default=None, max_length=255)
+    fee_amount: Decimal | None = None
+    fee_flag: str = Field(default="NONE", max_length=32)
+    resolved: bool
+    unresolved_reason: str | None = Field(default=None, max_length=255)
+    follow_up: str | None = Field(default=None, max_length=255)
+    file_ids: tuple[int, ...] = ()
+    version: int | None = Field(default=None, ge=1)
+
+
+class StaffEscalateRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    process_reason: str = Field(min_length=1, max_length=32)
+    reason: str = Field(min_length=1, max_length=255)
+    version: int | None = Field(default=None, ge=1)
+
+
+class RegisterFileRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    mime_type: str = Field(min_length=1, max_length=128)
+    size_bytes: int = Field(ge=0)
+    original_name: str | None = Field(default=None, max_length=255)
+    tenant_id: int | None = Field(default=None, gt=0)
+    property_id: int | None = Field(default=None, gt=0)
+
+
+class FileObjectData(BaseModel):
+    id: int
+    tenant_id: int
+    property_id: int | None
+    uploader_user_id: int
+    mime_type: str
+    size_bytes: int
+    storage_key: str
+    scanner_status: str
+    created_at: datetime
+
+
+class WorkOrderMediaData(BaseModel):
+    id: int
+    file_id: int
+    kind: str
+    taken_phase: str
+    uploader_user_id: int
+
+
+class WorkOrderLogData(BaseModel):
+    id: int
+    actor_user_id: int | None
+    actor_type: str
+    from_status: str | None
+    to_status: str
+    process_reason: str
+    event_code: str
+    created_at: datetime
+
+
+class WorkOrderAssignmentData(BaseModel):
+    id: int
+    employee_id: int
+    assigned_by_user_id: int
+    status: str
+    assigned_at: datetime
+    accept_at: datetime | None
+    ended_at: datetime | None
+    reason: str | None
+
+
+class WorkOrderData(BaseModel):
+    id: int
+    tenant_id: int
+    property_id: int
+    house_id: int
+    reporter_user_id: int
+    status: str
+    process_reason: str
+    category: str
+    severity: str
+    priority: str
+    version: int
+    current_assignment_id: int | None
+    sla_due_at: datetime | None
+    assigned_at: datetime | None
+    accepted_at: datetime | None
+    started_at: datetime | None
+    resolved_at: datetime | None
+    closed_at: datetime | None
+    created_at: datetime
+    updated_at: datetime
+    sla_overdue: bool = False
+
+
+class WorkOrderDetailData(BaseModel):
+    work_order: WorkOrderData
+    text: str | None = None
+    extra_notes: str | None = None
+    media: list[WorkOrderMediaData] = Field(default_factory=list)
+    assignments: list[WorkOrderAssignmentData] = Field(default_factory=list)
+    logs: list[WorkOrderLogData] = Field(default_factory=list)
+
+
+class WorkOrderListData(BaseModel):
+    items: list[WorkOrderData]
+    next_cursor: int | None = None

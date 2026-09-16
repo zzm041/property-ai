@@ -643,12 +643,43 @@ class EmployeeService:
             property_id=property_record.id,
             business_date=business_date,
         )
-        if existing is not None:
+        if existing is not None and existing.check_out_at is None:
             raise AppError(
                 code=EmployeeErrorCode.CHECKIN_DENIED,
                 message="Check-in was denied",
                 status_code=409,
             )
+        if existing is not None:
+            daily = self._repository.get_daily_status_for_update(
+                employee_id=employee.id,
+                property_id=property_record.id,
+                business_date=business_date,
+            )
+            if daily is None:
+                raise AppError(
+                    code=EmployeeErrorCode.CHECKIN_DENIED,
+                    message="Check-in was denied",
+                    status_code=409,
+                )
+            existing.check_out_at = None
+            daily.on_duty = AttendanceOnDuty.ON_DUTY.value
+            daily.leave_type = None
+            self._append_audit(
+                action=AuditAction.ATTENDANCE_CHECKED_IN,
+                resource_type=AuditResourceType.ATTENDANCE_RECORD,
+                actor_user_id=current.user_id,
+                resource_id=existing.id,
+                request_id=request_id,
+                scope_type=ScopeType.PROPERTY,
+                tenant_id=employee.tenant_id,
+                property_id=property_record.id,
+                details={
+                    "employee_id": employee.id,
+                    "property_id": property_record.id,
+                    "business_date": business_date.isoformat(),
+                },
+            )
+            return existing, daily
         attendance = AttendanceRecord(
             employee_id=employee.id,
             tenant_id=employee.tenant_id,

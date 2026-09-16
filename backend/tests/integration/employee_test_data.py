@@ -2,9 +2,10 @@
 
 from dataclasses import dataclass
 
+from datetime import UTC, datetime
+
 from sqlalchemy.orm import Session
 
-from app.core.time import utc_now
 from app.domain.employee import EmployeePropertyStatus, EmployeeStatus
 from app.model.employee import (
     Department,
@@ -322,7 +323,7 @@ def create_employee_attendance_graph(session: Session) -> EmployeeAttendanceGrap
             )
         )
         session.flush()
-        now = utc_now()
+        now = datetime(2020, 1, 1, tzinfo=UTC)
         employee_a = Employee(
             user_id=users["a"].id,
             tenant_id=tenant_1.id,

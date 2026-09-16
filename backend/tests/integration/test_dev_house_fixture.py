@@ -3,7 +3,7 @@
 from unittest.mock import MagicMock
 
 import pytest
-from sqlalchemy import Engine, func, inspect, select
+from sqlalchemy import Engine, func, select
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings
@@ -54,9 +54,7 @@ def test_house_fixture_requires_seed_and_is_idempotent(
     assert building.code == DEV_BUILDING_CODE
     unit = identity_session.get(Unit, first.unit_id)
     assert unit is not None
-    assert unit.code == DEV_UNIT_CODE
-    tables = set(inspect(test_engine).get_table_names())
-    assert "work_orders" not in tables
+    assert     unit.code == DEV_UNIT_CODE
     assert identity_session.scalar(select(func.count()).select_from(Employee)) == 0
 
 

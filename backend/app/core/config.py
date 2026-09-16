@@ -50,6 +50,7 @@ class Settings(BaseSettings):
     )
 
     readiness_timeout_seconds: float = Field(default=2.0, ge=0.1, le=10.0)
+    upload_max_mb: int = Field(default=10, ge=1, le=50)
 
     @model_validator(mode="after")
     def validate_database_isolation(self) -> "Settings":

@@ -22,6 +22,20 @@ from app.model.employee import (
 )
 from app.model.property import Building, House, Property, Tenant, Unit
 from app.model.resident import ResidentBindRequest, ResidentHouseRelation
+from app.model.work_order import (
+    FileObject,
+    IdempotencyRecord,
+    SlaClock,
+    SlaPolicy,
+    WorkOrder,
+    WorkOrderAssignment,
+    WorkOrderContent,
+    WorkOrderFeedback,
+    WorkOrderLog,
+    WorkOrderMedia,
+    WorkOrderProcess,
+    WorkOrderReceipt,
+)
 
 __all__ = [
     "AttendanceRecord",
@@ -35,7 +49,9 @@ __all__ = [
     "EmployeeDuty",
     "EmployeeProperty",
     "EmployeeSkill",
+    "FileObject",
     "House",
+    "IdempotencyRecord",
     "Permission",
     "Property",
     "ResidentBindRequest",
@@ -43,8 +59,18 @@ __all__ = [
     "Role",
     "RolePermission",
     "Skill",
+    "SlaClock",
+    "SlaPolicy",
     "Tenant",
     "Unit",
     "User",
     "UserRole",
+    "WorkOrder",
+    "WorkOrderAssignment",
+    "WorkOrderContent",
+    "WorkOrderFeedback",
+    "WorkOrderLog",
+    "WorkOrderMedia",
+    "WorkOrderProcess",
+    "WorkOrderReceipt",
 ]

@@ -423,3 +423,66 @@ def test_employee_attendance_audit_allowlist_and_scope() -> None:
     assert phone_error.value.code == AuditErrorCode.INVALID_DETAILS
     assert scope_error.value.code == AuditErrorCode.INVALID_SCOPE
     assert repository.append.call_count == 1
+
+
+def test_work_order_audit_allowlist_and_scope() -> None:
+    service, _, repository = _service()
+
+    created = service.append(
+        action=AuditAction.WORK_ORDER_CREATED,
+        resource_type=AuditResourceType.WORK_ORDER,
+        actor_user_id=11,
+        resource_id=88,
+        request_id="t6-audit-create",
+        scope_type=ScopeType.PROPERTY,
+        tenant_id=1,
+        property_id=2,
+        details={
+            "work_order_id": 88,
+            "status": "PENDING_ANALYSIS",
+            "priority": "HIGH",
+            "category": "PLUMBING",
+        },
+    )
+    assert created.details_json == {
+        "work_order_id": 88,
+        "status": "PENDING_ANALYSIS",
+        "priority": "HIGH",
+        "category": "PLUMBING",
+    }
+
+    with pytest.raises(AppError) as description_error:
+        service.append(
+            action=AuditAction.WORK_ORDER_CREATED,
+            resource_type=AuditResourceType.WORK_ORDER,
+            actor_user_id=11,
+            resource_id=88,
+            request_id="t6-audit-description",
+            scope_type=ScopeType.PROPERTY,
+            tenant_id=1,
+            property_id=2,
+            details={
+                "work_order_id": 88,
+                "status": "PENDING_ANALYSIS",
+                "priority": "HIGH",
+                "category": "PLUMBING",
+                "description": "raw resident text",
+            },
+        )
+    with pytest.raises(AppError) as scope_error:
+        service.append(
+            action=AuditAction.WORK_ORDER_ASSIGNED,
+            resource_type=AuditResourceType.WORK_ORDER_ASSIGNMENT,
+            actor_user_id=11,
+            resource_id=99,
+            request_id="t6-audit-system",
+            scope_type=ScopeType.SYSTEM,
+            details={
+                "work_order_id": 88,
+                "employee_id": 7,
+                "status": "ASSIGNED",
+            },
+        )
+    assert description_error.value.code == AuditErrorCode.INVALID_DETAILS
+    assert scope_error.value.code == AuditErrorCode.INVALID_SCOPE
+    assert repository.append.call_count == 1

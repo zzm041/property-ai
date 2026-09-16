@@ -3,7 +3,7 @@
 from unittest.mock import MagicMock
 
 import pytest
-from sqlalchemy import Engine, func, inspect, select
+from sqlalchemy import Engine, func, select
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings
@@ -23,6 +23,7 @@ from app.service.dev_employee_fixture import (
     run_development_employee_fixture,
 )
 from app.service.dev_seed import run_development_seed
+from app.model.work_order import WorkOrder
 
 
 def test_employee_fixture_requires_seed_and_is_idempotent(
@@ -71,8 +72,7 @@ def test_employee_fixture_requires_seed_and_is_idempotent(
     department = identity_session.get(Department, first.department_id)
     assert department is not None
     assert department.code == DEV_DEPARTMENT_CODE
-    tables = set(inspect(test_engine).get_table_names())
-    assert "work_orders" not in tables
+    assert identity_session.scalar(select(func.count()).select_from(WorkOrder)) == 0
 
 
 def test_employee_fixture_production_guard_does_not_create_engine() -> None:

@@ -28,6 +28,7 @@ from app.model.identity import (
 )
 from app.model.property import Building, House, Property, Tenant, Unit
 from app.model.resident import ResidentBindRequest, ResidentHouseRelation
+from app.model.work_order import WorkOrder
 from app.repository.dev_seed import DevSeedRepository
 from app.service.dev_seed import run_development_seed
 
@@ -345,8 +346,7 @@ def test_seed_does_not_write_task_4_rows_or_later_models(
     test_engine: Engine,
 ) -> None:
     run_development_seed(integration_settings, request_id="c4-no-task4")
-    tables = set(inspect(test_engine).get_table_names())
-    assert "work_orders" not in tables
+    assert _count(identity_session, WorkOrder) == 0
     assert _count(identity_session, Employee) == 0
     assert _count(identity_session, Building) == 0
     assert _count(identity_session, House) == 0

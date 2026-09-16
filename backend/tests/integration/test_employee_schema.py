@@ -21,7 +21,6 @@ TASK_5_TABLES = {
 def test_task_5_tables_exist(test_engine: Engine) -> None:
     tables = set(inspect(test_engine).get_table_names())
     assert TASK_5_TABLES <= tables
-    assert "work_orders" not in tables
     assert "employee_metrics" not in tables
 
 

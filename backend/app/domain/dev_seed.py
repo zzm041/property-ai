@@ -49,6 +49,13 @@ SEED_PERMISSIONS = (
     SeedCodeDefinition("attendance:check_in", "Check in attendance"),
     SeedCodeDefinition("attendance:check_out", "Check out attendance"),
     SeedCodeDefinition("attendance:read", "Read attendance"),
+    SeedCodeDefinition("work_order:create", "Create work orders"),
+    SeedCodeDefinition("work_order:read", "Read work orders"),
+    SeedCodeDefinition("work_order:dispatch", "Dispatch work orders"),
+    SeedCodeDefinition("work_order:process", "Process work orders"),
+    SeedCodeDefinition("work_order:resolve", "Resolve work orders"),
+    SeedCodeDefinition("work_order:decide", "Decide work-order exceptions"),
+    SeedCodeDefinition("work_order:cancel", "Cancel work orders"),
 )
 
 SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
@@ -67,6 +74,12 @@ SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
             "attendance:check_in",
             "attendance:check_out",
             "attendance:read",
+            "work_order:read",
+            "work_order:dispatch",
+            "work_order:process",
+            "work_order:resolve",
+            "work_order:decide",
+            "work_order:cancel",
         ),
         "PROPERTY_ADMIN": (
             "role:read",
@@ -80,6 +93,12 @@ SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
             "attendance:check_in",
             "attendance:check_out",
             "attendance:read",
+            "work_order:read",
+            "work_order:dispatch",
+            "work_order:process",
+            "work_order:resolve",
+            "work_order:decide",
+            "work_order:cancel",
         ),
         "SUPERVISOR": (
             "property:read",
@@ -89,15 +108,27 @@ SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
             "attendance:check_in",
             "attendance:check_out",
             "attendance:read",
+            "work_order:read",
+            "work_order:dispatch",
+            "work_order:process",
+            "work_order:resolve",
+            "work_order:decide",
+            "work_order:cancel",
         ),
         "STAFF": (
             "attendance:check_in",
             "attendance:check_out",
+            "work_order:read",
+            "work_order:process",
+            "work_order:resolve",
         ),
         "RESIDENT": (
             "resident_binding:create",
             "resident_binding:read",
             "resident_relation:read",
+            "work_order:create",
+            "work_order:read",
+            "work_order:cancel",
         ),
     }
 )

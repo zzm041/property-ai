@@ -251,6 +251,7 @@ class AuditService:
                 "user_id",
                 "employee_id",
                 "property_id",
+                "work_order_id",
             }:
                 if not cls._is_positive_id(value):
                     cls._raise_invalid_details(f"{key} is invalid")
@@ -271,7 +272,19 @@ class AuditService:
                 ):
                     cls._raise_invalid_details("employee_no is invalid")
             elif key == "status":
-                if value not in {"ACTIVE", "DISABLED"}:
+                if value not in {
+                    "ACTIVE",
+                    "DISABLED",
+                    "PENDING_ANALYSIS",
+                    "PENDING_ASSIGNMENT",
+                    "ASSIGNED",
+                    "ACCEPTED",
+                    "PROCESSING",
+                    "WAIT_CONFIRM",
+                    "COMPLETED",
+                    "CANCELLED",
+                    "CLOSED",
+                }:
                     cls._raise_invalid_details("status is invalid")
             elif key == "on_duty":
                 if value not in {"ON_DUTY", "OFF_DUTY", "LEAVE"}:
@@ -279,6 +292,38 @@ class AuditService:
             elif key == "business_date":
                 if not isinstance(value, str) or not cls._is_iso_date(value):
                     cls._raise_invalid_details("business_date is invalid")
+            elif key == "category":
+                if value not in {
+                    "PLUMBING",
+                    "ELECTRICAL",
+                    "HVAC",
+                    "CLEANING",
+                    "SECURITY",
+                    "OTHER",
+                }:
+                    cls._raise_invalid_details("category is invalid")
+            elif key == "priority":
+                if value not in {"LOW", "MEDIUM", "HIGH", "URGENT"}:
+                    cls._raise_invalid_details("priority is invalid")
+            elif key == "process_reason":
+                if value not in {
+                    "NONE",
+                    "WAITING_OWNER",
+                    "WAITING_PARTS",
+                    "INTERNAL_UNRESOLVED",
+                    "ESCALATED",
+                    "EXTERNAL_COORDINATION",
+                    "REASSIGN_REQUIRED",
+                }:
+                    cls._raise_invalid_details("process_reason is invalid")
+            elif key == "reason_code":
+                if (
+                    not isinstance(value, str)
+                    or not value.strip()
+                    or value != value.strip()
+                    or len(value) > 64
+                ):
+                    cls._raise_invalid_details("reason_code is invalid")
 
     @classmethod
     def _reject_sensitive_keys(cls, value: object) -> None:

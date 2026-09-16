@@ -315,6 +315,32 @@ def test_duplicate_checkin_and_checkout_without_checkin(
     assert "1062" not in second.text
 
 
+def test_same_day_return_after_checkout_is_allowed(identity_session: Session) -> None:
+    graph = create_employee_attendance_graph(identity_session)
+    with _client() as client:
+        staff = _token(client, graph.staff_a_user_id)
+        first = client.post(
+            "/api/v1/staff/attendance/checkin",
+            json={"property_id": graph.property_1_id},
+            headers=_auth(staff),
+        )
+        checkout = client.post(
+            "/api/v1/staff/attendance/checkout",
+            json={"property_id": graph.property_1_id},
+            headers=_auth(staff),
+        )
+        returned = client.post(
+            "/api/v1/staff/attendance/checkin",
+            json={"property_id": graph.property_1_id},
+            headers=_auth(staff),
+        )
+    assert first.status_code == 200
+    assert checkout.status_code == 200
+    assert returned.status_code == 200
+    assert returned.json()["data"]["daily_status"]["on_duty"] == "ON_DUTY"
+    assert returned.json()["data"]["attendance"]["check_out_at"] is None
+
+
 def test_wrong_property_inactive_and_disabled_are_denied(
     identity_session: Session,
 ) -> None:
@@ -572,6 +598,11 @@ def test_checkin_audit_failure_rolls_back(identity_session: Session) -> None:
 def test_business_date_uses_property_timezone(identity_session: Session) -> None:
     graph = create_employee_attendance_graph(identity_session)
     clock_time = datetime(2026, 9, 16, 16, 30, tzinfo=UTC)
+    with identity_session.begin():
+        identity_session.execute(
+            text("UPDATE employee_properties SET valid_from = :valid_from"),
+            {"valid_from": clock_time - timedelta(days=1)},
+        )
     service = EmployeeService(
         identity_session,
         clock=lambda: clock_time,
@@ -768,8 +799,8 @@ def test_patch_status_leave_and_header_mismatch(
     assert mismatch.status_code == 422
 
 
-def test_no_work_order_tables_created(test_engine) -> None:
+def test_work_order_tables_exist_alongside_employees(test_engine) -> None:
     tables = set(inspect(test_engine).get_table_names())
-    assert "work_orders" not in tables
-    assert "work_order_assignments" not in tables
+    assert "work_orders" in tables
+    assert "work_order_assignments" in tables
     assert "employees" in tables

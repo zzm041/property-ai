@@ -1,0 +1,244 @@
+"""Resident WorkOrder create, read, append, cancel, confirm, reopen, and rate."""
+
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Header, Request
+from sqlalchemy.orm import Session
+
+from app.api.dependencies.auth import get_current_principal
+from app.api.dependencies.db import get_db_session
+from app.core.errors import AppError, WorkOrderErrorCode
+from app.domain.iam import Principal
+from app.schema.common import request_id_for, success_envelope
+from app.schema.work_order import (
+    AppendWorkOrderRequest,
+    CancelWorkOrderRequest,
+    ConfirmWorkOrderRequest,
+    CreateWorkOrderRequest,
+    RateWorkOrderRequest,
+    ReopenWorkOrderRequest,
+    WorkOrderAssignmentData,
+    WorkOrderData,
+    WorkOrderDetailData,
+    WorkOrderLogData,
+    WorkOrderMediaData,
+)
+from app.service.work_order import WorkOrderService
+
+router = APIRouter(tags=["work-orders"])
+
+
+def get_work_order_service(
+    session: Annotated[Session, Depends(get_db_session)],
+) -> WorkOrderService:
+    return WorkOrderService(session)
+
+
+def work_order_data(record, *, overdue: bool = False) -> WorkOrderData:
+    return WorkOrderData(
+        id=record.id,
+        tenant_id=record.tenant_id,
+        property_id=record.property_id,
+        house_id=record.house_id,
+        reporter_user_id=record.reporter_user_id,
+        status=record.status,
+        process_reason=record.process_reason,
+        category=record.category,
+        severity=record.severity,
+        priority=record.priority,
+        version=record.version,
+        current_assignment_id=record.current_assignment_id,
+        sla_due_at=record.sla_due_at,
+        assigned_at=record.assigned_at,
+        accepted_at=record.accepted_at,
+        started_at=record.started_at,
+        resolved_at=record.resolved_at,
+        closed_at=record.closed_at,
+        created_at=record.created_at,
+        updated_at=record.updated_at,
+        sla_overdue=overdue,
+    )
+
+
+def _require_idempotency_key(idempotency_key: str | None) -> str:
+    if idempotency_key is None or not idempotency_key.strip():
+        raise AppError(
+            code=WorkOrderErrorCode.INVALID_INPUT,
+            message="Idempotency-Key is required",
+            status_code=422,
+        )
+    return idempotency_key.strip()
+
+
+@router.post("/work-orders")
+def create_work_order(
+    body: CreateWorkOrderRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[WorkOrderService, Depends(get_work_order_service)],
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
+) -> dict[str, object]:
+    record = service.create_work_order(
+        actor=actor,
+        house_id=body.house_id,
+        request_id=request_id_for(request),
+        idempotency_key=_require_idempotency_key(idempotency_key),
+        text=body.text,
+        file_ids=body.file_ids,
+        category=body.category,
+        priority=body.priority,
+        severity=body.severity,
+        claimed_tenant_id=body.tenant_id,
+        claimed_property_id=body.property_id,
+    )
+    return success_envelope(
+        request,
+        work_order_data(record, overdue=service.is_overdue(record)).model_dump(
+            mode="json"
+        ),
+    )
+
+
+@router.get("/work-orders/{work_order_id}")
+def get_work_order(
+    work_order_id: int,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[WorkOrderService, Depends(get_work_order_service)],
+) -> dict[str, object]:
+    record, content, media, assignments, logs = service.get_work_order_detail(
+        actor=actor,
+        work_order_id=work_order_id,
+    )
+    detail = WorkOrderDetailData(
+        work_order=work_order_data(record, overdue=service.is_overdue(record)),
+        text=None if content is None else content.text,
+        extra_notes=None if content is None else content.extra_notes,
+        media=[
+            WorkOrderMediaData(
+                id=item.id,
+                file_id=item.file_id,
+                kind=item.kind,
+                taken_phase=item.taken_phase,
+                uploader_user_id=item.uploader_user_id,
+            )
+            for item in media
+        ],
+        assignments=[
+            WorkOrderAssignmentData(
+                id=item.id,
+                employee_id=item.employee_id,
+                assigned_by_user_id=item.assigned_by_user_id,
+                status=item.status,
+                assigned_at=item.assigned_at,
+                accept_at=item.accept_at,
+                ended_at=item.ended_at,
+                reason=item.reason,
+            )
+            for item in assignments
+        ],
+        logs=[
+            WorkOrderLogData(
+                id=item.id,
+                actor_user_id=item.actor_user_id,
+                actor_type=item.actor_type,
+                from_status=item.from_status,
+                to_status=item.to_status,
+                process_reason=item.process_reason,
+                event_code=item.event_code,
+                created_at=item.created_at,
+            )
+            for item in logs
+        ],
+    )
+    return success_envelope(request, detail.model_dump(mode="json"))
+
+
+@router.post("/work-orders/{work_order_id}/append")
+def append_work_order(
+    work_order_id: int,
+    body: AppendWorkOrderRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[WorkOrderService, Depends(get_work_order_service)],
+) -> dict[str, object]:
+    record = service.append_content(
+        actor=actor,
+        work_order_id=work_order_id,
+        request_id=request_id_for(request),
+        text=body.text,
+        file_ids=body.file_ids,
+        taken_phase=body.taken_phase,
+    )
+    return success_envelope(request, work_order_data(record).model_dump(mode="json"))
+
+
+@router.post("/work-orders/{work_order_id}/cancel")
+def cancel_work_order(
+    work_order_id: int,
+    body: CancelWorkOrderRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[WorkOrderService, Depends(get_work_order_service)],
+) -> dict[str, object]:
+    record = service.cancel(
+        actor=actor,
+        work_order_id=work_order_id,
+        request_id=request_id_for(request),
+        reason=body.reason,
+        version=body.version,
+    )
+    return success_envelope(request, work_order_data(record).model_dump(mode="json"))
+
+
+@router.post("/work-orders/{work_order_id}/confirm")
+def confirm_work_order(
+    work_order_id: int,
+    body: ConfirmWorkOrderRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[WorkOrderService, Depends(get_work_order_service)],
+) -> dict[str, object]:
+    record = service.confirm(
+        actor=actor,
+        work_order_id=work_order_id,
+        request_id=request_id_for(request),
+        version=body.version,
+    )
+    return success_envelope(request, work_order_data(record).model_dump(mode="json"))
+
+
+@router.post("/work-orders/{work_order_id}/reopen")
+def reopen_work_order(
+    work_order_id: int,
+    body: ReopenWorkOrderRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[WorkOrderService, Depends(get_work_order_service)],
+) -> dict[str, object]:
+    record = service.reopen(
+        actor=actor,
+        work_order_id=work_order_id,
+        request_id=request_id_for(request),
+        reason=body.reason,
+        version=body.version,
+    )
+    return success_envelope(request, work_order_data(record).model_dump(mode="json"))
+
+
+@router.post("/work-orders/{work_order_id}/rate")
+def rate_work_order(
+    work_order_id: int,
+    body: RateWorkOrderRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[WorkOrderService, Depends(get_work_order_service)],
+) -> dict[str, object]:
+    record = service.rate(
+        actor=actor,
+        work_order_id=work_order_id,
+        request_id=request_id_for(request),
+        rating=body.rating,
+        comment=body.comment,
+    )
+    return success_envelope(request, work_order_data(record).model_dump(mode="json"))
