@@ -1,10 +1,19 @@
 Page({
-  data: { items: [], error: "", propertyId: "" },
-  onProperty(e) { this.setData({ propertyId: e.detail.value }); },
+  data: { items: [], error: "", propertyId: "", loading: false },
+  onLoad(query) {
+    if (query.propertyId) {
+      this.setData({ propertyId: query.propertyId });
+    }
+  },
+  onProperty(e) {
+    this.setData({ propertyId: e.detail.value });
+  },
   load() {
-    require("../../services/api").request({
-      path: `/supervisor/staff/daily?property_id=${this.data.propertyId}`,
-    }).then((data) => this.setData({ items: data.items || [] }))
-      .catch((error) => this.setData({ error: error.message }));
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, () =>
+      require("../../services/api")
+        .staffDaily(this.data.propertyId)
+        .then((data) => this.setData({ items: (data && data.items) || [] }))
+    ).catch(() => {});
   },
 });

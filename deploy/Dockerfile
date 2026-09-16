@@ -6,6 +6,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
+RUN python -c "import sys; assert sys.version_info[:3] == (3, 12, 10), sys.version"
+
 RUN useradd --create-home --uid 10001 appuser
 
 COPY backend/ /app/

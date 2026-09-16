@@ -45,9 +45,21 @@ class DevelopmentRerankerProvider(RerankerProvider):
 class HttpRerankerProvider(RerankerProvider):
     model_version = "bge-reranker"
 
-    def __init__(self, *, endpoint: str, timeout_seconds: float) -> None:
-        self.endpoint = endpoint
+    def __init__(
+        self,
+        *,
+        endpoint: str,
+        timeout_seconds: float,
+        api_key: str = "",
+        model: str = "bge-reranker",
+        client=None,
+    ) -> None:
+        self.endpoint = endpoint.rstrip("/")
         self.timeout_seconds = timeout_seconds
+        self._api_key = api_key
+        self.model = model
+        self._client = client
+        self.model_version = model or self.model_version
 
     def rerank(
         self,
@@ -55,5 +67,35 @@ class HttpRerankerProvider(RerankerProvider):
         query: str,
         documents: Sequence[str],
     ) -> tuple[float, ...]:
-        del query, documents
-        raise ProviderUnavailableError("Production reranker endpoint is not configured")
+        if not self.endpoint:
+            raise ProviderUnavailableError("Reranker is unavailable")
+        from app.provider.errors import ProviderInvalidOutputError
+        from app.provider.http import request_json
+
+        headers = {"Content-Type": "application/json"}
+        if self._api_key:
+            headers["Authorization"] = f"Bearer {self._api_key}"
+        payload = request_json(
+            method="POST",
+            url=self.endpoint,
+            timeout_seconds=self.timeout_seconds,
+            headers=headers,
+            json_body={
+                "model": self.model,
+                "query": query,
+                "documents": list(documents),
+            },
+            client=self._client,
+        )
+        scores = payload.get("scores") or payload.get("results")
+        if not isinstance(scores, list) or len(scores) != len(documents):
+            raise ProviderInvalidOutputError("Reranker returned invalid JSON")
+        values: list[float] = []
+        for item in scores:
+            if isinstance(item, dict):
+                item = item.get("score", item.get("relevance_score"))
+            try:
+                values.append(float(item))
+            except (TypeError, ValueError) as exc:
+                raise ProviderInvalidOutputError("Reranker returned invalid JSON") from exc
+        return tuple(values)

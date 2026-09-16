@@ -1,22 +1,31 @@
 Page({
-  data: { item: null, error: "" },
+  data: { item: null, loading: false, error: "" },
   onLoad(query) {
     this.id = Number(query.id);
     this.reload();
   },
   reload() {
-    const api = require("../../services/api");
-    api.workOrder(this.id)
-      .then((item) => this.setData({ item }))
-      .catch((error) => this.setData({ error: error.message }));
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, () =>
+      require("../../services/api")
+        .workOrder(this.id)
+        .then((item) => this.setData({ item }))
+    ).catch(() => {});
   },
   confirm() {
-    require("../../services/api").confirmWorkOrder(this.id).then(() => this.reload())
-      .catch((error) => this.setData({ error: error.message }));
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, () =>
+      require("../../services/api")
+        .confirmWorkOrder(this.id)
+        .then(() => this.reload())
+    ).catch(() => {});
   },
   reopen() {
-    require("../../services/api").reopenWorkOrder(this.id, { reason: "未解决" })
-      .then(() => this.reload())
-      .catch((error) => this.setData({ error: error.message }));
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, () =>
+      require("../../services/api")
+        .reopenWorkOrder(this.id, { reason: "未解决" })
+        .then(() => this.reload())
+    ).catch(() => {});
   },
 });

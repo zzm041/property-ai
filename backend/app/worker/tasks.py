@@ -5,7 +5,11 @@ from sqlalchemy.orm import Session
 from app.core.config import get_settings
 from app.core.database import create_database_engine
 from app.core.logging import get_logger
-from app.provider.errors import ProviderTimeoutError, ProviderUnavailableError
+from app.provider.errors import (
+    ProviderRateLimitError,
+    ProviderTimeoutError,
+    ProviderUnavailableError,
+)
 from app.service.analysis import AnalysisService
 from app.worker.celery_app import celery_app
 
@@ -28,13 +32,14 @@ def analyze_work_order_task(self, work_order_id: int, request_id: str) -> None:
             request_id=request_id,
             attempt=int(getattr(self.request, "retries", 0)) + 1,
         )
-    except (ProviderTimeoutError, ProviderUnavailableError) as exc:
+    except (ProviderTimeoutError, ProviderUnavailableError, ProviderRateLimitError) as exc:
         logger.warning(
             "ai_analysis_retry",
             work_order_id=work_order_id,
             error_code=exc.error_code,
         )
-        raise self.retry(exc=exc, countdown=2 ** int(getattr(self.request, "retries", 0)))
+        retries = int(getattr(self.request, "retries", 0))
+        raise self.retry(exc=exc, countdown=min(2 ** retries, 30))
     finally:
         session.close()
         engine.dispose()
@@ -63,13 +68,14 @@ def ingest_knowledge_task(
             version=version,
             request_id=request_id,
         )
-    except (ProviderTimeoutError, ProviderUnavailableError) as exc:
+    except (ProviderTimeoutError, ProviderUnavailableError, ProviderRateLimitError) as exc:
         logger.warning(
             "knowledge_ingest_retry",
             document_id=document_id,
             error_code=exc.error_code,
         )
-        raise self.retry(exc=exc, countdown=2 ** int(getattr(self.request, "retries", 0)))
+        retries = int(getattr(self.request, "retries", 0))
+        raise self.retry(exc=exc, countdown=min(2 ** retries, 30))
     finally:
         session.close()
         engine.dispose()
@@ -111,8 +117,9 @@ def deliver_notification_task(self, delivery_id: int) -> None:
         from app.service.notification import NotificationService
 
         NotificationService(session, settings=settings).deliver_pending(delivery_id)
-    except (ProviderTimeoutError, ProviderUnavailableError) as exc:
-        raise self.retry(exc=exc, countdown=2 ** int(getattr(self.request, "retries", 0)))
+    except (ProviderTimeoutError, ProviderUnavailableError, ProviderRateLimitError) as exc:
+        retries = int(getattr(self.request, "retries", 0))
+        raise self.retry(exc=exc, countdown=min(2 ** retries, 30))
     finally:
         session.close()
         engine.dispose()

@@ -19,3 +19,9 @@ page {
   color: #b42318;
   margin: 16rpx 24rpx;
 }
+
+.loading,
+.empty {
+  color: #667085;
+  margin: 16rpx 24rpx;
+}

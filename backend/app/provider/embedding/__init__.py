@@ -5,7 +5,11 @@ import hashlib
 import math
 import re
 
-from app.provider.errors import ProviderTimeoutError, ProviderUnavailableError
+from app.provider.errors import (
+    ProviderInvalidOutputError,
+    ProviderTimeoutError,
+    ProviderUnavailableError,
+)
 
 
 class EmbeddingProvider:
@@ -51,14 +55,71 @@ class HttpEmbeddingProvider(EmbeddingProvider):
 
     model_version = "bge-m3"
 
-    def __init__(self, *, endpoint: str, timeout_seconds: float, dimensions: int) -> None:
-        self.endpoint = endpoint
+    def __init__(
+        self,
+        *,
+        endpoint: str,
+        timeout_seconds: float,
+        dimensions: int,
+        api_key: str = "",
+        model: str = "bge-m3",
+        client=None,
+    ) -> None:
+        self.endpoint = endpoint.rstrip("/")
         self.timeout_seconds = timeout_seconds
         self.dimensions = dimensions
+        self._api_key = api_key
+        self.model = model
+        self._client = client
+        self.model_version = model or self.model_version
 
     def embed(self, texts: Sequence[str]) -> tuple[list[float], ...]:
-        del texts
-        raise ProviderUnavailableError("Production embedding endpoint is not configured")
+        if not self.endpoint:
+            raise ProviderUnavailableError("Embedding is unavailable")
+        if not texts:
+            raise ProviderInvalidOutputError("Embedding input is empty")
+        from app.provider.http import request_json
+
+        headers = {"Content-Type": "application/json"}
+        if self._api_key:
+            headers["Authorization"] = f"Bearer {self._api_key}"
+        payload = request_json(
+            method="POST",
+            url=self.endpoint
+            if self.endpoint.endswith("/embeddings")
+            else f"{self.endpoint}/embeddings",
+            timeout_seconds=self.timeout_seconds,
+            headers=headers,
+            json_body={"model": self.model, "input": list(texts)},
+            client=self._client,
+        )
+        vectors = _parse_embeddings(payload)
+        if len(vectors) != len(texts):
+            raise ProviderInvalidOutputError("Embedding batch size mismatch")
+        normalized: list[list[float]] = []
+        for vector in vectors:
+            if len(vector) != self.dimensions:
+                raise ProviderInvalidOutputError("Embedding dimension mismatch")
+            normalized.append([float(item) for item in vector])
+        return tuple(normalized)
+
+
+def _parse_embeddings(payload: object) -> tuple[list[float], ...]:
+    from app.provider.errors import ProviderInvalidOutputError
+
+    if not isinstance(payload, dict):
+        raise ProviderInvalidOutputError("Embedding returned invalid JSON")
+    if "data" in payload and isinstance(payload["data"], list):
+        rows = []
+        for item in payload["data"]:
+            if not isinstance(item, dict) or "embedding" not in item:
+                raise ProviderInvalidOutputError("Embedding returned invalid JSON")
+            rows.append(list(item["embedding"]))
+        return tuple(rows)
+    embeddings = payload.get("embeddings")
+    if isinstance(embeddings, list) and embeddings:
+        return tuple(list(item) for item in embeddings)
+    raise ProviderInvalidOutputError("Embedding returned an empty response")
 
 
 def _tokens(text: str) -> tuple[str, ...]:

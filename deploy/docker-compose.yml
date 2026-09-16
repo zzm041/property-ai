@@ -127,6 +127,9 @@ services:
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
     command: ["minio", "server", "/minio_data", "--console-address", ":9001"]
+    ports:
+      - "9000:9000"
+      - "9001:9001"
     volumes:
       - minio_data:/minio_data
     healthcheck:
@@ -171,10 +174,12 @@ services:
       dockerfile: deploy/Dockerfile
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
     environment:
+      APP_ENV: ${APP_ENV:-development}
       DATABASE_URL: ${DATABASE_URL:-mysql+pymysql://property:change-me@mysql:3306/property_ai?charset=utf8mb4}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
       CELERY_BROKER_URL: ${CELERY_BROKER_URL:-amqp://property:change-me@rabbitmq:5672/property_ai}
       MILVUS_URI: ${MILVUS_URI:-http://milvus:19530}
+      MILVUS_COLLECTION: ${MILVUS_COLLECTION:-knowledge_chunks_v1}
     depends_on:
       mysql:
         condition: service_healthy
@@ -189,10 +194,12 @@ services:
       dockerfile: deploy/Dockerfile
     command: ["celery", "-A", "app.worker.celery_app.celery_app", "worker", "--loglevel=info"]
     environment:
+      APP_ENV: ${APP_ENV:-development}
       DATABASE_URL: ${DATABASE_URL:-mysql+pymysql://property:change-me@mysql:3306/property_ai?charset=utf8mb4}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
       CELERY_BROKER_URL: ${CELERY_BROKER_URL:-amqp://property:change-me@rabbitmq:5672/property_ai}
       MILVUS_URI: ${MILVUS_URI:-http://milvus:19530}
+      MILVUS_COLLECTION: ${MILVUS_COLLECTION:-knowledge_chunks_v1}
     depends_on:
       mysql:
         condition: service_healthy

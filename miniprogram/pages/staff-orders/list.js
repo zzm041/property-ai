@@ -1,9 +1,12 @@
 Page({
-  data: { items: [], error: "" },
+  data: { items: [], loading: false, error: "" },
   onShow() {
-    require("../../services/api").staffWorkOrders()
-      .then((data) => this.setData({ items: data.items || [] }))
-      .catch((error) => this.setData({ error: error.message }));
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, () =>
+      require("../../services/api")
+        .staffWorkOrders()
+        .then((data) => this.setData({ items: (data && data.items) || [] }))
+    ).catch(() => {});
   },
   open(e) {
     wx.navigateTo({ url: `/pages/staff-orders/detail?id=${e.currentTarget.dataset.id}` });

@@ -139,6 +139,8 @@ class FileObjectData(BaseModel):
     storage_key: str
     scanner_status: str
     created_at: datetime
+    upload_url: str | None = None
+    upload_expires_in: int | None = None
 
 
 class WorkOrderMediaData(BaseModel):

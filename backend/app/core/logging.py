@@ -51,6 +51,10 @@ def configure_logging(*, debug: bool = False) -> None:
         logger.handlers.clear()
         logger.propagate = True
 
+    # httpx logs full URLs; WeChat/LLM query strings can contain secrets.
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("httpcore").setLevel(logging.WARNING)
+
 
 def get_logger(name: str) -> structlog.stdlib.BoundLogger:
     """Return a named structured logger."""

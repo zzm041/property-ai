@@ -1,5 +1,8 @@
-<input placeholder="小区 ID" data-field="propertyId" bindinput="onField" />
+<input placeholder="小区 ID" value="{{propertyId}}" data-field="propertyId" bindinput="onField" />
 <input placeholder="标题" data-field="title" bindinput="onField" />
 <textarea placeholder="内容" data-field="content" bindinput="onField"></textarea>
 <button class="btn" bindtap="create">保存草稿</button>
+<button class="btn" bindtap="publish">人工审核发布</button>
+<view class="loading" wx:if="{{loading}}">处理中...</view>
+<view class="empty" wx:if="{{draftId}}">草稿 {{draftId}} 待发布</view>
 <view class="error" wx:if="{{error}}">{{error}}</view>

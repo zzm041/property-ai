@@ -1,27 +1,74 @@
 Page({
-  data: { houseId: "", text: "", error: "" },
-  onHouse(e) { this.setData({ houseId: e.detail.value }); },
-  onText(e) { this.setData({ text: e.detail.value }); },
+  data: {
+    houseId: "",
+    text: "",
+    fileIds: [],
+    mediaHint: "",
+    loading: false,
+    error: "",
+  },
+  onHouse(e) {
+    this.setData({ houseId: e.detail.value });
+  },
+  onText(e) {
+    this.setData({ text: e.detail.value });
+  },
   chooseImage() {
-    wx.chooseMedia({ count: 1, mediaType: ["image"] });
+    this._pick("image");
   },
   chooseAudio() {
-    wx.showToast({ title: "请先上传拿 file_id", icon: "none" });
+    wx.chooseMessageFile({
+      count: 1,
+      type: "file",
+      extension: ["mp3", "wav", "m4a", "mp4"],
+      success: (result) => {
+        const file = result.tempFiles[0];
+        this._upload(file.path, file.type || "audio/mpeg", file.size, file.name);
+      },
+      fail: (error) => this.setData({ error: error.errMsg || "选择音频失败" }),
+    });
+  },
+  _pick(mediaType) {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: [mediaType],
+      success: (result) => {
+        const file = result.tempFiles[0];
+        this._upload(file.tempFilePath, "image/jpeg", file.size, "repair.jpg");
+      },
+      fail: (error) => this.setData({ error: error.errMsg || "选择图片失败" }),
+    });
+  },
+  _upload(filePath, mimeType, sizeBytes, originalName) {
+    const api = require("../../services/api");
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, () =>
+      api
+        .registerAndUpload({
+          filePath,
+          mimeType,
+          sizeBytes,
+          originalName,
+        })
+        .then((file) => {
+          const fileIds = this.data.fileIds.concat(file.id);
+          this.setData({
+            fileIds,
+            mediaHint: `已添加 ${fileIds.length} 个附件`,
+          });
+        })
+    ).catch(() => {});
   },
   async submit() {
-    this.setData({ error: "" });
-    try {
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, async () => {
       const api = require("../../services/api");
       const item = await api.createWorkOrder({
         house_id: Number(this.data.houseId),
         text: this.data.text,
+        file_ids: this.data.fileIds,
       });
-      const ids = wx.getStorageSync("work_order_ids") || [];
-      ids.unshift(item.id);
-      wx.setStorageSync("work_order_ids", ids);
       wx.navigateTo({ url: `/pages/work-orders/detail?id=${item.id}` });
-    } catch (error) {
-      this.setData({ error: error.message });
-    }
+    }).catch(() => {});
   },
 });

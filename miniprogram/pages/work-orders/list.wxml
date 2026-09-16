@@ -1,5 +1,8 @@
+<view class="loading" wx:if="{{loading}}">加载中...</view>
+<view class="empty" wx:if="{{!loading && !items.length}}">暂无工单</view>
 <view class="card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="open">
   <view>工单 {{item.id}}</view>
   <view>状态 {{item.status}}</view>
 </view>
+<button class="btn" bindtap="retry">重试</button>
 <view class="error" wx:if="{{error}}">{{error}}</view>

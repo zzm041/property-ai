@@ -1,15 +1,26 @@
 Page({
-  data: { items: [], propertyId: "", error: "" },
-  onProperty(e) { this.setData({ propertyId: e.detail.value }); },
+  data: { items: [], propertyId: "", loading: false, error: "" },
+  onLoad(query) {
+    if (query.propertyId) {
+      this.setData({ propertyId: query.propertyId });
+    }
+  },
+  onProperty(e) {
+    this.setData({ propertyId: e.detail.value });
+  },
   load() {
-    require("../../services/api").request({
-      path: `/announcements?property_id=${this.data.propertyId}`,
-    }).then((data) => this.setData({ items: data.items || [] }))
-      .catch((error) => this.setData({ error: error.message }));
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, () =>
+      require("../../services/api")
+        .announcements(this.data.propertyId)
+        .then((data) => this.setData({ items: (data && data.items) || [] }))
+    ).catch(() => {});
   },
   open(e) {
+    const title = encodeURIComponent(e.currentTarget.dataset.title || "");
+    const content = encodeURIComponent(e.currentTarget.dataset.content || "");
     wx.navigateTo({
-      url: `/pages/announcements/detail?title=${e.currentTarget.dataset.title}&content=${e.currentTarget.dataset.content}`,
+      url: `/pages/announcements/detail?title=${title}&content=${content}`,
     });
   },
 });

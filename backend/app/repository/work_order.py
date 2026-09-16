@@ -234,6 +234,25 @@ class WorkOrderRepository:
             ).all()
         )
 
+    def list_for_reporter(
+        self,
+        *,
+        user_id: int,
+        after_id: int = 0,
+        limit: int = 50,
+    ) -> tuple[WorkOrder, ...]:
+        return tuple(
+            self._session.scalars(
+                select(WorkOrder)
+                .where(
+                    WorkOrder.reporter_user_id == user_id,
+                    WorkOrder.id > after_id,
+                )
+                .order_by(WorkOrder.id)
+                .limit(limit)
+            ).all()
+        )
+
     def add_file(self, record: FileObject) -> FileObject:
         self._session.add(record)
         self._session.flush()

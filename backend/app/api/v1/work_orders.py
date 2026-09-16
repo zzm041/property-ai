@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Header, Request
+from fastapi import APIRouter, Depends, Header, Query, Request
 from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_principal
@@ -20,6 +20,7 @@ from app.schema.work_order import (
     WorkOrderAssignmentData,
     WorkOrderData,
     WorkOrderDetailData,
+    WorkOrderListData,
     WorkOrderLogData,
     WorkOrderMediaData,
 )
@@ -96,6 +97,27 @@ def create_work_order(
         work_order_data(record, overdue=service.is_overdue(record)).model_dump(
             mode="json"
         ),
+    )
+
+
+@router.get("/work-orders")
+def list_my_work_orders(
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[WorkOrderService, Depends(get_work_order_service)],
+    after_id: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=100)] = 50,
+) -> dict[str, object]:
+    records = service.list_my_work_orders(
+        actor=actor,
+        after_id=after_id,
+        limit=limit,
+    )
+    items = [work_order_data(item, overdue=service.is_overdue(item)) for item in records]
+    next_cursor = items[-1].id if len(items) == limit else None
+    return success_envelope(
+        request,
+        WorkOrderListData(items=items, next_cursor=next_cursor).model_dump(mode="json"),
     )
 
 

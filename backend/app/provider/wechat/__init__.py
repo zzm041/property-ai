@@ -1,10 +1,14 @@
 """WeChat Mini Program code exchange. Services never call WeChat HTTP directly."""
 
 from dataclasses import dataclass
+import logging
 
 import httpx
 
 from app.provider.errors import ProviderInvalidOutputError, ProviderUnavailableError
+
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
 
 
 @dataclass(frozen=True, slots=True)
@@ -51,14 +55,18 @@ class ProductionWeChatAuthProvider(WeChatAuthProvider):
         appid: str,
         secret: str,
         timeout_seconds: float = 5.0,
+        client: httpx.Client | None = None,
     ) -> None:
         self.appid = appid
         self._secret = secret
         self.timeout_seconds = timeout_seconds
+        self._client = client
 
     def exchange_code(self, code: str) -> WeChatSession:
+        http = self._client or httpx.Client(timeout=self.timeout_seconds)
+        own_client = self._client is None
         try:
-            response = httpx.get(
+            response = http.get(
                 "https://api.weixin.qq.com/sns/jscode2session",
                 params={
                     "appid": self.appid,
@@ -66,13 +74,19 @@ class ProductionWeChatAuthProvider(WeChatAuthProvider):
                     "js_code": code,
                     "grant_type": "authorization_code",
                 },
-                timeout=self.timeout_seconds,
             )
             payload = response.json()
-        except Exception as exc:  # noqa: BLE001 - vendor client surface
-            raise ProviderUnavailableError("WeChat auth is unavailable") from exc
-        if "openid" not in payload:
+        except Exception:
+            raise ProviderUnavailableError("WeChat auth is unavailable")
+        finally:
+            if own_client:
+                http.close()
+        if "openid" not in payload or payload.get("errcode"):
+            code = payload.get("errcode")
+            if code in {45011, -1}:
+                raise ProviderUnavailableError("WeChat auth is unavailable")
             raise ProviderInvalidOutputError("WeChat code is invalid")
+        payload.pop("session_key", None)
         return WeChatSession(
             openid=str(payload["openid"]),
             unionid=str(payload["unionid"]) if payload.get("unionid") else None,

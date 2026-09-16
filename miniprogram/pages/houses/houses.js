@@ -1,8 +1,14 @@
 Page({
-  data: { items: [], error: "" },
+  data: { items: [], loading: false, error: "" },
   onShow() {
-    require("../../services/api").houses()
-      .then((data) => this.setData({ items: data.items || data }))
-      .catch((error) => this.setData({ error: error.message }));
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, () =>
+      require("../../services/api")
+        .houses()
+        .then((data) => this.setData({ items: (data && data.items) || [] }))
+    ).catch(() => {});
+  },
+  retry() {
+    this.onShow();
   },
 });

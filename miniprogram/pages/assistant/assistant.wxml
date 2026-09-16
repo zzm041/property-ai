@@ -1,8 +1,10 @@
-<input placeholder="小区 ID" bindinput="onProperty" />
+<input placeholder="小区 ID" value="{{propertyId}}" bindinput="onProperty" />
 <input placeholder="例如：装修时间是什么？" bindinput="onQuestion" />
 <button class="btn" bindtap="ask">提问</button>
-<view class="card">{{answer}}</view>
-<view class="card" wx:for="{{citations}}" wx:key="document_id">
+<view class="loading" wx:if="{{loading}}">检索中...</view>
+<view class="card" wx:if="{{answer}}">{{answer}}</view>
+<view class="empty" wx:if="{{!loading && !answer}}">输入问题后查询物业知识库</view>
+<view class="card" wx:for="{{citations}}" wx:key="chunk_id">
   {{item.title}} {{item.source_locator}}
 </view>
 <view class="error" wx:if="{{error}}">{{error}}</view>

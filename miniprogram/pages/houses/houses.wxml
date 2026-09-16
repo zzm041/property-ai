@@ -1,2 +1,7 @@
-<view class="card" wx:for="{{items}}" wx:key="id">房屋 {{item.house_id || item.id}} {{item.status || ""}}</view>
+<view class="loading" wx:if="{{loading}}">加载中...</view>
+<view class="empty" wx:if="{{!loading && !items.length}}">暂无绑定房屋</view>
+<view class="card" wx:for="{{items}}" wx:key="relation_id">
+  房屋 {{item.house_id}} {{item.room_no}} {{item.status}}
+</view>
+<button class="btn" bindtap="retry">重试</button>
 <view class="error" wx:if="{{error}}">{{error}}</view>

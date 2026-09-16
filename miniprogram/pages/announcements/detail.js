@@ -1,6 +1,9 @@
 Page({
-  data: { title: "", content: "" },
+  data: { title: "", content: "", error: "" },
   onLoad(query) {
-    this.setData({ title: query.title || "", content: query.content || "" });
+    this.setData({
+      title: decodeURIComponent(query.title || ""),
+      content: decodeURIComponent(query.content || ""),
+    });
   },
 });

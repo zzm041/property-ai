@@ -196,11 +196,13 @@ class WorkOrderService:
             mime_type=mime_type,
             size_bytes=size_bytes,
             filename=original_name,
+            tenant_id=tenant_id,
+            property_id=property_id,
         )
         digest = sha256(
             f"{stored.storage_key}:{mime_type}:{size_bytes}".encode()
         ).hexdigest()
-        return self._execute(
+        record = self._execute(
             lambda: self._repository.add_file(
                 FileObject(
                     tenant_id=tenant_id,
@@ -214,6 +216,66 @@ class WorkOrderService:
                     scanner_status=stored.scanner_status,
                 )
             )
+        )
+        record.upload_url = stored.upload_url
+        record.upload_expires_in = stored.upload_expires_in
+        return record
+
+    def put_file_content(
+        self,
+        *,
+        actor: Principal,
+        file_id: int,
+        content: bytes,
+        request_id: str,
+    ) -> FileObject:
+        self._require_active_actor(actor)
+        self._validate_request_id(request_id)
+        self._require_positive_id(file_id, "file_id")
+        record = self._repository.get_file(file_id)
+        if record is None or not self._actor_can_see_file_tenant(actor, record.tenant_id):
+            raise AppError(
+                code=FileErrorCode.NOT_FOUND,
+                message="File was not found",
+                status_code=404,
+            )
+        if record.uploader_user_id != actor.user_id:
+            raise AppError(
+                code=IamErrorCode.FORBIDDEN,
+                message="Permission denied",
+                status_code=403,
+            )
+        max_bytes = self._settings.upload_max_mb * 1024 * 1024
+        if len(content) > max_bytes:
+            raise AppError(
+                code=FileErrorCode.TOO_LARGE,
+                message="File exceeds the upload size limit",
+                status_code=422,
+            )
+        from app.provider.errors import ProviderTimeoutError, ProviderUnavailableError
+
+        try:
+            self._storage.put_object(record.storage_key, content, record.mime_type)
+        except (ProviderTimeoutError, ProviderUnavailableError) as exc:
+            raise AppError(
+                code=FileErrorCode.STORAGE_UNAVAILABLE,
+                message="Object storage is unavailable",
+                status_code=503,
+            ) from exc
+        return record
+
+    def list_my_work_orders(
+        self,
+        *,
+        actor: Principal,
+        after_id: int = 0,
+        limit: int = 50,
+    ) -> tuple[WorkOrder, ...]:
+        current = self._reload_actor(actor)
+        return self._repository.list_for_reporter(
+            user_id=current.user_id,
+            after_id=after_id,
+            limit=self._page_limit(limit),
         )
 
     def create_work_order(
@@ -255,12 +317,16 @@ class WorkOrderService:
     def _enqueue_analysis(self, work_order_id: int, request_id: str) -> None:
         if not self._settings.should_enqueue_ai_on_create:
             return
-        try:
-            from app.worker.tasks import analyze_work_order_task
+        from app.worker.enqueue import enqueue_celery_task
+        from app.worker.tasks import analyze_work_order_task
 
-            analyze_work_order_task.delay(work_order_id, request_id)
-        except Exception:
-            logger.warning("ai_enqueue_failed", work_order_id=work_order_id)
+        enqueue_celery_task(
+            settings=self._settings,
+            celery_task=analyze_work_order_task,
+            args=(work_order_id, request_id),
+            event="ai_enqueue_failed",
+            extra={"work_order_id": work_order_id},
+        )
 
     def get_work_order(self, *, actor: Principal, work_order_id: int) -> WorkOrder:
         self._require_positive_id(work_order_id, "work_order_id")
@@ -2235,7 +2301,7 @@ class WorkOrderService:
     ) -> None:
         from app.service.notification import NotificationService
 
-        NotificationService(self._session).enqueue(
+        NotificationService(self._session, settings=self._settings).enqueue(
             tenant_id=tenant_id,
             property_id=property_id,
             user_id=user_id,
@@ -2244,6 +2310,14 @@ class WorkOrderService:
             resource_type=resource_type,
             resource_id=resource_id,
         )
+
+    def _actor_can_see_file_tenant(self, actor: Principal, tenant_id: int) -> bool:
+        for grant in actor.grants:
+            if grant.scope.scope_type == ScopeType.SYSTEM:
+                return True
+            if grant.scope.tenant_id == tenant_id:
+                return True
+        return False
 
     def _reload_actor(self, actor: Principal) -> Principal:
         self._require_active_actor(actor)

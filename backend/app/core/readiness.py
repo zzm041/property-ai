@@ -107,6 +107,8 @@ def check_readiness(
         "vlm": (False, lambda _settings: None),
         "asr": (False, lambda _settings: None),
         "embedding": (False, lambda _settings: None),
+        "reranker": (False, lambda _settings: None),
+        "storage": (False, lambda _settings: None),
         "milvus": (False, probe_milvus),
     }
 

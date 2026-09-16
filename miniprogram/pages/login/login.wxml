@@ -1,5 +1,6 @@
 <view class="card">
-  <view>微信登录后按角色展示功能。权限以后端为准。</view>
-  <button class="btn" bindtap="login">微信登录</button>
+  <view>微信登录后按角色展示功能。菜单仅作展示，权限以后端为准。</view>
+  <button class="btn" bindtap="login" disabled="{{loading}}">微信登录</button>
+  <view class="loading" wx:if="{{loading}}">登录中...</view>
   <view class="error" wx:if="{{error}}">{{error}}</view>
 </view>

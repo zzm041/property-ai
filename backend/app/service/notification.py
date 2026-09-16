@@ -1,5 +1,6 @@
 """In-app notification outbox. External push is best-effort after commit."""
 
+from sqlalchemy import event
 from sqlalchemy.orm import Session
 
 from app.core.errors import AppError, IamErrorCode, NotificationErrorCode
@@ -11,6 +12,7 @@ from app.provider.errors import ProviderUnavailableError
 from app.provider.factory import build_notification_provider
 from app.core.config import Settings, get_settings
 from app.repository.knowledge import KnowledgeRepository
+from app.worker.enqueue import schedule_notification_delivery
 
 
 class NotificationService:
@@ -46,13 +48,16 @@ class NotificationService:
                 resource_id=resource_id,
             )
         )
-        self._repository.add_delivery(
+        delivery = self._repository.add_delivery(
             NotificationDelivery(
                 notification_id=record.id,
                 channel="IN_APP",
                 status="PENDING",
             )
         )
+        pending = self._session.info.setdefault("pending_notification_deliveries", [])
+        pending.append(delivery.id)
+        self._session.info["notification_settings"] = self._settings
         return record
 
     def list_mine(
@@ -133,3 +138,18 @@ class NotificationService:
             delivery.attempt += 1
             delivery.status = "SUCCEEDED"
             delivery.delivered_at = utc_now()
+
+
+@event.listens_for(Session, "after_commit")
+def _schedule_notification_deliveries(session: Session) -> None:
+    pending = session.info.pop("pending_notification_deliveries", None)
+    if not pending:
+        return
+    settings = session.info.get("notification_settings") or get_settings()
+    for delivery_id in pending:
+        schedule_notification_delivery(settings, delivery_id)
+
+
+@event.listens_for(Session, "after_rollback")
+def _clear_pending_notification_deliveries(session: Session) -> None:
+    session.info.pop("pending_notification_deliveries", None)

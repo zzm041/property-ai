@@ -1,5 +1,8 @@
 <view class="card">未读 {{unread}}</view>
+<view class="loading" wx:if="{{loading}}">加载中...</view>
+<view class="empty" wx:if="{{!loading && !items.length}}">暂无通知</view>
 <view class="card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="read">
   {{item.title}} {{item.read_at ? "已读" : "未读"}}
 </view>
+<button class="btn" bindtap="onShow">重试</button>
 <view class="error" wx:if="{{error}}">{{error}}</view>

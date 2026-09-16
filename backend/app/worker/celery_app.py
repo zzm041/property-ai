@@ -13,6 +13,12 @@ def create_celery_app() -> Celery:
         task_serializer="json",
         accept_content=["json"],
         result_serializer="json",
+        task_default_retry_delay=2,
+        task_annotations={
+            "app.worker.tasks.analyze_work_order_task": {"max_retries": 2},
+            "app.worker.tasks.ingest_knowledge_task": {"max_retries": 2},
+            "app.worker.tasks.deliver_notification_task": {"max_retries": 3},
+        },
         imports=("app.worker.tasks",),
     )
     return app

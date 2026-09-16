@@ -1,7 +1,10 @@
+<view class="loading" wx:if="{{loading}}">加载中...</view>
 <view class="card" wx:if="{{item}}">
-  <view>工单 {{item.id}}</view>
-  <view>状态 {{item.status}}</view>
+  <view>工单 {{item.work_order ? item.work_order.id : item.id}}</view>
+  <view>状态 {{item.work_order ? item.work_order.status : item.status}}</view>
   <button class="btn" bindtap="confirm">确认解决</button>
   <button class="btn" bindtap="reopen">未解决重开</button>
 </view>
+<view class="empty" wx:if="{{!loading && !item}}">工单不存在或无权查看</view>
+<button class="btn" bindtap="reload">重试</button>
 <view class="error" wx:if="{{error}}">{{error}}</view>

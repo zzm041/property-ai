@@ -1,13 +1,13 @@
 Page({
-  data: { error: "" },
+  data: { error: "", loading: false },
   onLoad() {
     if (require("../../services/auth").getToken()) {
       wx.reLaunch({ url: "/pages/home/home" });
     }
   },
   async login() {
-    this.setData({ error: "" });
-    try {
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, async () => {
       const auth = require("../../services/auth");
       const api = require("../../services/api");
       const code = await auth.login();
@@ -15,8 +15,6 @@ Page({
       auth.setToken(token.access_token);
       getApp().globalData.me = await api.me();
       wx.reLaunch({ url: "/pages/home/home" });
-    } catch (error) {
-      this.setData({ error: error.message || "登录失败" });
-    }
+    }).catch(() => {});
   },
 });

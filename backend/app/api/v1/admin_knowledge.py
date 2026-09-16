@@ -17,7 +17,8 @@ from app.schema.knowledge import (
     KnowledgeIngestionData,
 )
 from app.service.knowledge import KnowledgeService
-from app.worker.tasks import run_ingest_knowledge
+from app.worker.enqueue import enqueue_celery_task
+from app.worker.tasks import ingest_knowledge_task, run_ingest_knowledge
 
 router = APIRouter(prefix="/admin", tags=["admin-knowledge"])
 
@@ -38,6 +39,7 @@ def create_knowledge_document(
     service: Annotated[KnowledgeService, Depends(get_knowledge_service)],
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> dict[str, object]:
+    request_id = request_id_for(request)
     document, job = service.create_document(
         actor=actor,
         property_id=body.property_id,
@@ -45,15 +47,18 @@ def create_knowledge_document(
         document_type=body.document_type,
         visibility=body.visibility,
         source_text=body.source_text,
-        request_id=request_id_for(request),
+        request_id=request_id,
         claimed_tenant_id=body.tenant_id,
     )
-    background.add_task(
-        run_ingest_knowledge,
-        document.id,
-        job.version,
-        request_id_for(request),
-        settings,
+    enqueue_celery_task(
+        settings=settings,
+        celery_task=ingest_knowledge_task,
+        args=(document.id, job.version, request_id),
+        event="knowledge_ingest_enqueue_failed",
+        extra={"document_id": document.id, "version": job.version},
+        background=background,
+        in_process=run_ingest_knowledge,
+        in_process_args=(document.id, job.version, request_id, settings),
     )
     data = KnowledgeIngestionData(
         document_id=document.id,

@@ -1,6 +1,13 @@
+<view class="loading" wx:if="{{loading}}">加载中...</view>
 <view class="card" wx:if="{{item}}">
-  <view>{{item.id}} {{item.status}}</view>
+  <view>{{item.work_order ? item.work_order.id : item.id}} {{item.work_order ? item.work_order.status : item.status}}</view>
   <button class="btn" bindtap="accept">接单</button>
   <button class="btn" bindtap="start">开始处理</button>
+  <button class="btn" bindtap="chooseAfterImage">完工照片</button>
+  <view class="empty" wx:if="{{mediaHint}}">{{mediaHint}}</view>
+  <textarea placeholder="处理反馈" bindinput="onFeedback"></textarea>
+  <button class="btn" bindtap="feedback">提交反馈</button>
+  <button class="btn" bindtap="resolve">填写回执并完成</button>
 </view>
+<button class="btn" bindtap="reload">重试</button>
 <view class="error" wx:if="{{error}}">{{error}}</view>

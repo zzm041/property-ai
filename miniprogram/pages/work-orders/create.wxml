@@ -3,6 +3,8 @@
   <textarea placeholder="报修说明" bindinput="onText"></textarea>
   <button class="btn" bindtap="chooseImage">选择图片</button>
   <button class="btn" bindtap="chooseAudio">选择音频</button>
-  <button class="btn" bindtap="submit">提交报修</button>
+  <view class="empty" wx:if="{{mediaHint}}">{{mediaHint}}</view>
+  <button class="btn" bindtap="submit" disabled="{{loading}}">提交报修</button>
+  <view class="loading" wx:if="{{loading}}">处理中...</view>
   <view class="error" wx:if="{{error}}">{{error}}</view>
 </view>

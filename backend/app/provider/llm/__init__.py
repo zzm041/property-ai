@@ -5,6 +5,8 @@ from typing import Protocol
 
 import re
 
+import httpx
+
 from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
 from app.domain.knowledge import RAG_ANSWER_PROMPT_VERSION
 from app.provider.errors import (
@@ -12,6 +14,7 @@ from app.provider.errors import (
     ProviderTimeoutError,
     ProviderUnavailableError,
 )
+from app.provider.http import parse_json_object, request_json
 
 SUCCESS_ANALYSIS = {
     "category": "electrical",
@@ -112,3 +115,58 @@ def _rag_answer(prompt: str) -> dict[str, object]:
         "answer": "根据物业知识库，装修施工时间为工作日 08:00-18:00。",
         "citation_chunk_ids": list(ids[:2]),
     }
+
+
+class QwenLLMProvider:
+    """OpenAI-compatible Qwen chat completions. Services never import vendor SDKs."""
+
+    model_version = "qwen"
+
+    def __init__(
+        self,
+        *,
+        base_url: str,
+        model: str,
+        api_key: str,
+        timeout_seconds: float,
+        client: httpx.Client | None = None,
+    ) -> None:
+        self.base_url = base_url.rstrip("/")
+        self.model = model
+        self._api_key = api_key
+        self.timeout_seconds = timeout_seconds
+        self._client = client
+        self.model_version = model or self.model_version
+
+    def structured_completion(
+        self,
+        *,
+        prompt: str,
+        prompt_version: str,
+    ) -> Mapping[str, object]:
+        del prompt_version
+        if not self.base_url or not self._api_key:
+            raise ProviderUnavailableError("LLM is unavailable")
+        payload = request_json(
+            method="POST",
+            url=f"{self.base_url}/chat/completions",
+            timeout_seconds=self.timeout_seconds,
+            headers={
+                "Authorization": f"Bearer {self._api_key}",
+                "Content-Type": "application/json",
+            },
+            json_body={
+                "model": self.model,
+                "messages": [{"role": "user", "content": prompt}],
+                "response_format": {"type": "json_object"},
+                "temperature": 0,
+            },
+            client=self._client,
+        )
+        try:
+            content = payload["choices"][0]["message"]["content"]
+        except (KeyError, IndexError, TypeError) as exc:
+            raise ProviderInvalidOutputError("LLM returned invalid JSON") from exc
+        if not isinstance(content, str) or not content.strip():
+            raise ProviderInvalidOutputError("LLM returned an empty response")
+        return parse_json_object(content)

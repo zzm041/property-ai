@@ -13,3 +13,7 @@ def test_celery_task_is_registered() -> None:
     assert ingest_knowledge_task.name == "app.worker.tasks.ingest_knowledge_task"
     assert callable(run_analyze_work_order)
     assert callable(run_ingest_knowledge)
+    assert analyze_work_order_task.max_retries == 2
+    assert ingest_knowledge_task.max_retries == 2
+    assert analyze_work_order_task.max_retries == 2
+    assert ingest_knowledge_task.max_retries == 2
