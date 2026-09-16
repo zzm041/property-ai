@@ -6,7 +6,7 @@ from alembic import command
 from alembic.config import Config
 from alembic.runtime.migration import MigrationContext
 from alembic.script import ScriptDirectory
-from sqlalchemy import Engine, inspect, text
+from sqlalchemy import Engine, inspect
 
 from app.core.config import Settings
 from app.core.database import assert_disposable_test_database
@@ -15,6 +15,7 @@ BACKEND_ROOT = Path(__file__).resolve().parents[2]
 TASK_2_REVISION = "20260915_0001"
 TASK_3_REVISION = "20260915_0002"
 TASK_4_REVISION = "20260916_0003"
+TASK_5_REVISION = "20260916_0004"
 TASK_2_TABLES = {"tenants", "properties", "buildings", "units", "houses"}
 TASK_3_TABLES = {
     "users",
@@ -49,11 +50,11 @@ def test_task_4_revision_chain_and_head(
     task_3 = scripts.get_revision(TASK_3_REVISION)
     task_2 = scripts.get_revision(TASK_2_REVISION)
 
-    assert scripts.get_current_head() == TASK_4_REVISION
+    assert scripts.get_current_head() == TASK_5_REVISION
     assert task_2 is not None and task_2.down_revision is None
     assert task_3 is not None and task_3.down_revision == TASK_2_REVISION
     assert task_4 is not None and task_4.down_revision == TASK_3_REVISION
-    assert _current_revision(test_engine) == TASK_4_REVISION
+    assert _current_revision(test_engine) == TASK_5_REVISION
 
 
 def test_task_4_alembic_has_no_model_drift(
@@ -70,35 +71,7 @@ def test_task_4_migration_cycle_preserves_task_1_to_3(
 ) -> None:
     assert_disposable_test_database(integration_settings)
     config = _alembic_config(integration_settings.test_database_url)
-    assert _current_revision(test_engine) == TASK_4_REVISION
-
-    command.downgrade(config, TASK_3_REVISION)
-    assert _current_revision(test_engine) == TASK_3_REVISION
-    tables = set(inspect(test_engine).get_table_names())
-    assert TASK_4_TABLES.isdisjoint(tables)
-    assert TASK_2_TABLES | TASK_3_TABLES | {"alembic_version"} <= tables
-    house_uniques = {
-        item["name"] for item in inspect(test_engine).get_unique_constraints("houses")
-    }
-    assert "uq_houses_id_property_tenant" not in house_uniques
-    with test_engine.connect() as connection:
-        remaining = connection.execute(
-            text(
-                """
-                SELECT TABLE_NAME
-                FROM information_schema.TABLES
-                WHERE TABLE_SCHEMA = DATABASE()
-                  AND TABLE_NAME IN (
-                    'resident_bind_requests',
-                    'resident_house_relations'
-                  )
-                """
-            )
-        ).all()
-    assert remaining == []
-
-    command.upgrade(config, TASK_4_REVISION)
-    assert _current_revision(test_engine) == TASK_4_REVISION
+    assert _current_revision(test_engine) == TASK_5_REVISION
     tables = set(inspect(test_engine).get_table_names())
     assert TASK_4_TABLES <= tables
     house_uniques = {

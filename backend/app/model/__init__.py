@@ -9,13 +9,32 @@ from app.model.identity import (
     User,
     UserRole,
 )
+from app.model.employee import (
+    AttendanceRecord,
+    Department,
+    Duty,
+    Employee,
+    EmployeeDailyStatus,
+    EmployeeDuty,
+    EmployeeProperty,
+    EmployeeSkill,
+    Skill,
+)
 from app.model.property import Building, House, Property, Tenant, Unit
 from app.model.resident import ResidentBindRequest, ResidentHouseRelation
 
 __all__ = [
+    "AttendanceRecord",
     "AuditLog",
     "Base",
     "Building",
+    "Department",
+    "Duty",
+    "Employee",
+    "EmployeeDailyStatus",
+    "EmployeeDuty",
+    "EmployeeProperty",
+    "EmployeeSkill",
     "House",
     "Permission",
     "Property",
@@ -23,6 +42,7 @@ __all__ = [
     "ResidentHouseRelation",
     "Role",
     "RolePermission",
+    "Skill",
     "Tenant",
     "Unit",
     "User",

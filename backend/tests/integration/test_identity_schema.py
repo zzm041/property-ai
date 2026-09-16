@@ -17,12 +17,23 @@ TASK_4_TABLES = {
     "resident_bind_requests",
     "resident_house_relations",
 }
+TASK_5_TABLES = {
+    "departments",
+    "duties",
+    "skills",
+    "employees",
+    "employee_properties",
+    "employee_duties",
+    "employee_skills",
+    "attendance_records",
+    "employee_daily_statuses",
+}
 
 
 def test_gate_a_creates_exact_business_tables(test_engine: Engine) -> None:
     tables = set(inspect(test_engine).get_table_names())
 
-    assert tables == TASK_2_TABLES | TASK_3_TABLES | TASK_4_TABLES | {
+    assert tables == TASK_2_TABLES | TASK_3_TABLES | TASK_4_TABLES | TASK_5_TABLES | {
         "alembic_version"
     }
 

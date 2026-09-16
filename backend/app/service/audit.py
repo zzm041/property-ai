@@ -245,7 +245,13 @@ class AuditService:
                     or not _SEED_KEY_PATTERN.fullmatch(value)
                 ):
                     cls._raise_invalid_details("seed_key is invalid")
-            elif key in {"house_id", "relation_id"}:
+            elif key in {
+                "house_id",
+                "relation_id",
+                "user_id",
+                "employee_id",
+                "property_id",
+            }:
                 if not cls._is_positive_id(value):
                     cls._raise_invalid_details(f"{key} is invalid")
             elif key == "relation_type":
@@ -256,6 +262,23 @@ class AuditService:
                     "AUTHORIZED_OTHER",
                 }:
                     cls._raise_invalid_details("relation_type is invalid")
+            elif key == "employee_no":
+                if (
+                    not isinstance(value, str)
+                    or not value.strip()
+                    or value != value.strip()
+                    or len(value) > 32
+                ):
+                    cls._raise_invalid_details("employee_no is invalid")
+            elif key == "status":
+                if value not in {"ACTIVE", "DISABLED"}:
+                    cls._raise_invalid_details("status is invalid")
+            elif key == "on_duty":
+                if value not in {"ON_DUTY", "OFF_DUTY", "LEAVE"}:
+                    cls._raise_invalid_details("on_duty is invalid")
+            elif key == "business_date":
+                if not isinstance(value, str) or not cls._is_iso_date(value):
+                    cls._raise_invalid_details("business_date is invalid")
 
     @classmethod
     def _reject_sensitive_keys(cls, value: object) -> None:
@@ -293,6 +316,22 @@ class AuditService:
     @staticmethod
     def _is_positive_id(value: object) -> bool:
         return isinstance(value, int) and not isinstance(value, bool) and value > 0
+
+    @staticmethod
+    def _is_iso_date(value: str) -> bool:
+        if len(value) != 10:
+            return False
+        try:
+            year, month, day = value.split("-")
+            return (
+                len(year) == 4
+                and len(month) == 2
+                and len(day) == 2
+                and 1 <= int(month) <= 12
+                and 1 <= int(day) <= 31
+            )
+        except ValueError:
+            return False
 
     @staticmethod
     def _raise_invalid_event(

@@ -13,6 +13,7 @@ BACKEND_ROOT = Path(__file__).resolve().parents[2]
 TASK_2_REVISION = "20260915_0001"
 TASK_3_REVISION = "20260915_0002"
 TASK_4_REVISION = "20260916_0003"
+TASK_5_REVISION = "20260916_0004"
 
 
 def test_task_3_revision_is_independent_head(
@@ -24,7 +25,7 @@ def test_task_3_revision_is_independent_head(
     scripts = ScriptDirectory.from_config(config)
     revision = scripts.get_revision(TASK_3_REVISION)
 
-    assert scripts.get_current_head() == TASK_4_REVISION
+    assert scripts.get_current_head() == TASK_5_REVISION
     assert revision is not None
     assert revision.down_revision == TASK_2_REVISION
 
@@ -32,6 +33,10 @@ def test_task_3_revision_is_independent_head(
     assert task_4 is not None
     assert task_4.down_revision == TASK_3_REVISION
 
+    task_5 = scripts.get_revision(TASK_5_REVISION)
+    assert task_5 is not None
+    assert task_5.down_revision == TASK_4_REVISION
+
     with test_engine.connect() as connection:
         current = MigrationContext.configure(connection).get_current_revision()
-    assert current == TASK_4_REVISION
+    assert current == TASK_5_REVISION

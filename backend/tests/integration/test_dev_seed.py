@@ -17,6 +17,7 @@ from app.domain.dev_seed import (
     SEED_ROLES,
     SEED_USERS,
 )
+from app.model.employee import Employee
 from app.model.identity import (
     AuditLog,
     Permission,
@@ -345,10 +346,8 @@ def test_seed_does_not_write_task_4_rows_or_later_models(
 ) -> None:
     run_development_seed(integration_settings, request_id="c4-no-task4")
     tables = set(inspect(test_engine).get_table_names())
-    assert "employees" not in tables
-    assert "employee_properties" not in tables
-    assert "attendances" not in tables
     assert "work_orders" not in tables
+    assert _count(identity_session, Employee) == 0
     assert _count(identity_session, Building) == 0
     assert _count(identity_session, House) == 0
     assert _count(identity_session, ResidentBindRequest) == 0

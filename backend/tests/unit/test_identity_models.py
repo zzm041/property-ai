@@ -17,12 +17,25 @@ TASK_4_TABLES = {
     "resident_bind_requests",
     "resident_house_relations",
 }
+TASK_5_TABLES = {
+    "departments",
+    "duties",
+    "skills",
+    "employees",
+    "employee_properties",
+    "employee_duties",
+    "employee_skills",
+    "attendance_records",
+    "employee_daily_statuses",
+}
 
 
 def test_gate_a_metadata_contains_exact_task_3_tables() -> None:
     task_2_tables = {"tenants", "properties", "buildings", "units", "houses"}
 
-    assert set(Base.metadata.tables) == task_2_tables | TASK_3_TABLES | TASK_4_TABLES
+    assert set(Base.metadata.tables) == (
+        task_2_tables | TASK_3_TABLES | TASK_4_TABLES | TASK_5_TABLES
+    )
 
 
 def test_gate_a_models_use_bigint_auto_increment_primary_keys() -> None:

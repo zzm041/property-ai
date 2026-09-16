@@ -23,6 +23,13 @@ class AuditAction(StrEnum):
     RESIDENT_BIND_REQUEST_APPROVED = "RESIDENT_BIND_REQUEST_APPROVED"
     RESIDENT_BIND_REQUEST_REJECTED = "RESIDENT_BIND_REQUEST_REJECTED"
     RESIDENT_HOUSE_RELATION_ENDED = "RESIDENT_HOUSE_RELATION_ENDED"
+    EMPLOYEE_CREATED = "EMPLOYEE_CREATED"
+    EMPLOYEE_UPDATED = "EMPLOYEE_UPDATED"
+    EMPLOYEE_PROPERTY_ASSIGNED = "EMPLOYEE_PROPERTY_ASSIGNED"
+    EMPLOYEE_PROPERTY_ENDED = "EMPLOYEE_PROPERTY_ENDED"
+    ATTENDANCE_CHECKED_IN = "ATTENDANCE_CHECKED_IN"
+    ATTENDANCE_CHECKED_OUT = "ATTENDANCE_CHECKED_OUT"
+    ATTENDANCE_STATUS_UPDATED = "ATTENDANCE_STATUS_UPDATED"
 
 
 class AuditResourceType(StrEnum):
@@ -35,6 +42,10 @@ class AuditResourceType(StrEnum):
     PERMISSION = "PERMISSION"
     RESIDENT_BIND_REQUEST = "RESIDENT_BIND_REQUEST"
     RESIDENT_HOUSE_RELATION = "RESIDENT_HOUSE_RELATION"
+    EMPLOYEE = "EMPLOYEE"
+    EMPLOYEE_PROPERTY = "EMPLOYEE_PROPERTY"
+    ATTENDANCE_RECORD = "ATTENDANCE_RECORD"
+    EMPLOYEE_DAILY_STATUS = "EMPLOYEE_DAILY_STATUS"
 
 
 class AuditSource(StrEnum):
@@ -72,6 +83,15 @@ _RESIDENT_APPROVE_DETAIL_KEYS = frozenset(
     {"house_id", "relation_type", "relation_id"}
 )
 _RESIDENT_RELATION_DETAIL_KEYS = frozenset({"house_id", "relation_type"})
+_EMPLOYEE_CREATED_DETAIL_KEYS = frozenset({"employee_no", "user_id"})
+_EMPLOYEE_UPDATED_DETAIL_KEYS = frozenset({"status"})
+_EMPLOYEE_PROPERTY_DETAIL_KEYS = frozenset({"employee_id", "property_id"})
+_ATTENDANCE_DETAIL_KEYS = frozenset(
+    {"employee_id", "property_id", "business_date"}
+)
+_ATTENDANCE_STATUS_DETAIL_KEYS = frozenset(
+    {"employee_id", "property_id", "business_date", "on_duty"}
+)
 
 AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyType(
     {
@@ -157,6 +177,48 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             resource_type=AuditResourceType.RESIDENT_HOUSE_RELATION,
             allowed_detail_keys=_RESIDENT_RELATION_DETAIL_KEYS,
             required_detail_keys=_RESIDENT_RELATION_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.EMPLOYEE_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.EMPLOYEE,
+            allowed_detail_keys=_EMPLOYEE_CREATED_DETAIL_KEYS,
+            required_detail_keys=_EMPLOYEE_CREATED_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.TENANT}),
+        ),
+        AuditAction.EMPLOYEE_UPDATED: AuditActionPolicy(
+            resource_type=AuditResourceType.EMPLOYEE,
+            allowed_detail_keys=_EMPLOYEE_UPDATED_DETAIL_KEYS,
+            required_detail_keys=_EMPLOYEE_UPDATED_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.TENANT}),
+        ),
+        AuditAction.EMPLOYEE_PROPERTY_ASSIGNED: AuditActionPolicy(
+            resource_type=AuditResourceType.EMPLOYEE_PROPERTY,
+            allowed_detail_keys=_EMPLOYEE_PROPERTY_DETAIL_KEYS,
+            required_detail_keys=_EMPLOYEE_PROPERTY_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.EMPLOYEE_PROPERTY_ENDED: AuditActionPolicy(
+            resource_type=AuditResourceType.EMPLOYEE_PROPERTY,
+            allowed_detail_keys=_EMPLOYEE_PROPERTY_DETAIL_KEYS,
+            required_detail_keys=_EMPLOYEE_PROPERTY_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.ATTENDANCE_CHECKED_IN: AuditActionPolicy(
+            resource_type=AuditResourceType.ATTENDANCE_RECORD,
+            allowed_detail_keys=_ATTENDANCE_DETAIL_KEYS,
+            required_detail_keys=_ATTENDANCE_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.ATTENDANCE_CHECKED_OUT: AuditActionPolicy(
+            resource_type=AuditResourceType.ATTENDANCE_RECORD,
+            allowed_detail_keys=_ATTENDANCE_DETAIL_KEYS,
+            required_detail_keys=_ATTENDANCE_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.ATTENDANCE_STATUS_UPDATED: AuditActionPolicy(
+            resource_type=AuditResourceType.EMPLOYEE_DAILY_STATUS,
+            allowed_detail_keys=_ATTENDANCE_STATUS_DETAIL_KEYS,
+            required_detail_keys=_ATTENDANCE_STATUS_DETAIL_KEYS,
             allowed_scope_types=frozenset({ScopeType.PROPERTY}),
         ),
     }

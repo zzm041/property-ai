@@ -27,6 +27,17 @@ TASK_4_TABLES = (
     "resident_house_relations",
     "resident_bind_requests",
 )
+TASK_5_TABLES = (
+    "employee_daily_statuses",
+    "attendance_records",
+    "employee_skills",
+    "employee_duties",
+    "employee_properties",
+    "employees",
+    "departments",
+    "duties",
+    "skills",
+)
 
 
 def _delete_tables(engine: Engine, tables: tuple[str, ...]) -> None:
@@ -73,7 +84,10 @@ def clean_property_tables(test_engine: Engine) -> Iterator[None]:
         )
 
     def clean() -> None:
-        _delete_tables(test_engine, TASK_4_TABLES + tuple(reversed(TASK_2_TABLES)))
+        _delete_tables(
+            test_engine,
+            TASK_5_TABLES + TASK_4_TABLES + tuple(reversed(TASK_2_TABLES)),
+        )
 
     clean()
     try:
@@ -111,7 +125,10 @@ def clean_identity_tables(
         )
 
     def clean() -> None:
-        _delete_tables(test_engine, TASK_4_TABLES + tuple(reversed(TASK_3_TABLES)))
+        _delete_tables(
+            test_engine,
+            TASK_5_TABLES + TASK_4_TABLES + tuple(reversed(TASK_3_TABLES)),
+        )
 
     clean()
     try:

@@ -365,3 +365,61 @@ def test_resident_bind_audit_allowlist_and_scope() -> None:
     assert reason_error.value.code == AuditErrorCode.INVALID_DETAILS
     assert scope_error.value.code == AuditErrorCode.INVALID_SCOPE
     assert repository.append.call_count == 1
+
+
+def test_employee_attendance_audit_allowlist_and_scope() -> None:
+    service, _, repository = _service()
+
+    created = service.append(
+        action=AuditAction.ATTENDANCE_CHECKED_IN,
+        resource_type=AuditResourceType.ATTENDANCE_RECORD,
+        actor_user_id=11,
+        resource_id=44,
+        request_id="t5-audit-checkin",
+        scope_type=ScopeType.PROPERTY,
+        tenant_id=1,
+        property_id=2,
+        details={
+            "employee_id": 9,
+            "property_id": 2,
+            "business_date": "2026-09-17",
+        },
+    )
+    assert created.details_json == {
+        "employee_id": 9,
+        "property_id": 2,
+        "business_date": "2026-09-17",
+    }
+
+    with pytest.raises(AppError) as phone_error:
+        service.append(
+            action=AuditAction.EMPLOYEE_CREATED,
+            resource_type=AuditResourceType.EMPLOYEE,
+            actor_user_id=11,
+            resource_id=44,
+            request_id="t5-audit-phone",
+            scope_type=ScopeType.TENANT,
+            tenant_id=1,
+            details={
+                "employee_no": "E1",
+                "user_id": 9,
+                "phone": "13800000000",
+            },
+        )
+    with pytest.raises(AppError) as scope_error:
+        service.append(
+            action=AuditAction.ATTENDANCE_CHECKED_OUT,
+            resource_type=AuditResourceType.ATTENDANCE_RECORD,
+            actor_user_id=11,
+            resource_id=44,
+            request_id="t5-audit-system",
+            scope_type=ScopeType.SYSTEM,
+            details={
+                "employee_id": 9,
+                "property_id": 2,
+                "business_date": "2026-09-17",
+            },
+        )
+    assert phone_error.value.code == AuditErrorCode.INVALID_DETAILS
+    assert scope_error.value.code == AuditErrorCode.INVALID_SCOPE
+    assert repository.append.call_count == 1

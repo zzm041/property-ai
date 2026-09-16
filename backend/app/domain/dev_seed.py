@@ -44,6 +44,11 @@ SEED_PERMISSIONS = (
     SeedCodeDefinition("resident_binding:read", "Read resident bind requests"),
     SeedCodeDefinition("resident_binding:review", "Review resident bind requests"),
     SeedCodeDefinition("resident_relation:read", "Read resident house relations"),
+    SeedCodeDefinition("employee:read", "Read employees"),
+    SeedCodeDefinition("employee:manage", "Manage employees"),
+    SeedCodeDefinition("attendance:check_in", "Check in attendance"),
+    SeedCodeDefinition("attendance:check_out", "Check out attendance"),
+    SeedCodeDefinition("attendance:read", "Read attendance"),
 )
 
 SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
@@ -57,6 +62,11 @@ SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
             "resident_binding:read",
             "resident_binding:review",
             "resident_relation:read",
+            "employee:read",
+            "employee:manage",
+            "attendance:check_in",
+            "attendance:check_out",
+            "attendance:read",
         ),
         "PROPERTY_ADMIN": (
             "role:read",
@@ -65,13 +75,25 @@ SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
             "resident_binding:read",
             "resident_binding:review",
             "resident_relation:read",
+            "employee:read",
+            "employee:manage",
+            "attendance:check_in",
+            "attendance:check_out",
+            "attendance:read",
         ),
         "SUPERVISOR": (
             "property:read",
             "resident_binding:read",
             "resident_relation:read",
+            "employee:read",
+            "attendance:check_in",
+            "attendance:check_out",
+            "attendance:read",
         ),
-        "STAFF": (),
+        "STAFF": (
+            "attendance:check_in",
+            "attendance:check_out",
+        ),
         "RESIDENT": (
             "resident_binding:create",
             "resident_binding:read",

@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import Settings
 from app.core.errors import AppError, DevSeedErrorCode
+from app.model.employee import Employee
 from app.model.property import Building, House, Unit
 from app.service.dev_house_fixture import (
     DEV_BUILDING_CODE,
@@ -55,7 +56,8 @@ def test_house_fixture_requires_seed_and_is_idempotent(
     assert unit is not None
     assert unit.code == DEV_UNIT_CODE
     tables = set(inspect(test_engine).get_table_names())
-    assert "employees" not in tables
+    assert "work_orders" not in tables
+    assert identity_session.scalar(select(func.count()).select_from(Employee)) == 0
 
 
 def test_house_fixture_production_guard_does_not_create_engine() -> None:
