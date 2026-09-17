@@ -11,6 +11,7 @@ from app.main import create_app
 from app.repository.identity import IdentityRepository
 from app.service.auth import AuthService
 from app.service.knowledge import KnowledgeService
+from tests.integration.conftest import commit_open_transaction
 from tests.integration.work_order_test_data import create_work_order_graph
 
 TEST_SECRET = "d4-rebuild-secret-that-is-not-production"
@@ -50,7 +51,9 @@ def _auth(token: str, request_id: str) -> dict[str, str]:
 
 
 def _principal(session: Session, user_id: int):
-    return AuthService(session, IdentityRepository(session)).load_principal(user_id)
+    principal = AuthService(session, IdentityRepository(session)).load_principal(user_id)
+    commit_open_transaction(session)
+    return principal
 
 
 def _drop_collection(uri: str, name: str) -> None:

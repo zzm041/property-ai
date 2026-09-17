@@ -20,7 +20,9 @@ Day 4 一次性栈：
 python scripts/ops/day4_prepare.py
 docker compose -f deploy/docker-compose.day4.yml up -d
 python scripts/ops/day4_e2e.py
-python scripts/ops/perf_probe.py --base-url http://127.0.0.1:8082 --concurrency 20 --requests 100
+python scripts/ops/day4_failed_task_drill.py
+python scripts/ops/day4_perf_run.py
+python scripts/ops/perf_probe.py --base-url http://127.0.0.1:8082 --mode cold --concurrency 20 --requests 100
 ```
 
 Production-like 排练：

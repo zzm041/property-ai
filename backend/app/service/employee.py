@@ -1144,11 +1144,10 @@ class EmployeeService:
             )
 
     def _execute(self, operation: Callable[[], T]) -> T:
-        if self._session.in_transaction():
-            self._session.rollback()
+        from app.core.database import run_service_transaction
+
         try:
-            with self._session.begin():
-                return operation()
+            return run_service_transaction(self._session, operation)
         except AppError:
             raise
         except IntegrityError as exc:

@@ -71,6 +71,15 @@ def test_stack_contract_wechat_resident_workorder_knowledge(
         assert manager_token.status_code == 200
         manager = manager_token.json()["data"]["access_token"]
         ops = client.get("/api/v1/opsz", headers=_auth(manager, "d3-ops"))
+        assert ops.status_code == 403
+        system_token = client.post(
+            "/api/v1/auth/dev/token",
+            json={"user_id": graph.employees.system_admin_id},
+            headers={"X-Request-Id": "d3-sys-login"},
+        )
+        assert system_token.status_code == 200
+        system = system_token.json()["data"]["access_token"]
+        ops = client.get("/api/v1/opsz", headers=_auth(system, "d3-ops-sys"))
         assert ops.status_code == 200
         assert ops.json()["data"]["celery_queue"] == "property_ai.test"
         houses = client.get("/api/v1/me/houses", headers=_auth(resident, "d3-houses"))

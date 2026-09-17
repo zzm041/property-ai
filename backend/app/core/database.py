@@ -1,9 +1,10 @@
 """Synchronous SQLAlchemy engine, sessions, UTC setup, and test safety."""
 
-from collections.abc import Generator
+from collections.abc import Callable, Generator
+from contextlib import AbstractContextManager, nullcontext
 from functools import lru_cache
 from threading import Lock
-from typing import Any
+from typing import Any, TypeVar
 
 from sqlalchemy import Engine, create_engine, event, text
 from sqlalchemy.engine import Connection, URL, make_url
@@ -13,6 +14,25 @@ from app.core.config import Settings, get_settings
 
 _engines: set[Engine] = set()
 _engines_lock = Lock()
+T = TypeVar("T")
+
+
+def transaction_context(session: Session) -> AbstractContextManager[object]:
+    """Join an open caller transaction; otherwise open a service-owned unit of work."""
+
+    if session.in_transaction():
+        return nullcontext()
+    return session.begin()
+
+
+def run_service_transaction(session: Session, operation: Callable[[], T]) -> T:
+    """Top-level use cases own begin/commit; nested calls join the open transaction.
+
+    Never roll back a caller transaction to start a new one.
+    """
+
+    with transaction_context(session):
+        return operation()
 
 
 def _database_target(url: str) -> tuple[str | None, int, str | None]:

@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings, get_settings
+from app.core.database import transaction_context
 from app.core.errors import (
     AppError,
     AuthErrorCode,
@@ -123,9 +124,7 @@ class KnowledgeService:
         rebuild: bool = False,
     ) -> None:
         settings = self._settings
-        if self._session.in_transaction():
-            self._session.rollback()
-        with self._session.begin():
+        with transaction_context(self._session):
             job = self._repository.get_ingestion_job_for_update(
                 document_id=document_id,
                 version=version,
@@ -434,11 +433,10 @@ class KnowledgeService:
         return self._principal_loader(actor.user_id)
 
     def _execute(self, operation: Callable[[], T]) -> T:
-        if self._session.in_transaction():
-            self._session.rollback()
+        from app.core.database import run_service_transaction
+
         try:
-            with self._session.begin():
-                return operation()
+            return run_service_transaction(self._session, operation)
         except AppError:
             raise
         except IntegrityError as exc:

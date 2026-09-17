@@ -360,3 +360,150 @@ and data-bearing MySQL/Milvus restore without changing migrations 0001-0007.
 ```
 
 Do not commit until the operator requests it. This working tree still contains Day 3 files that were never committed in this clone.
+
+---
+
+## 15. Post-remediation re-verification (working tree after `3c7b9ac`)
+
+Engineering checkpoint at approval: `f87f7b6`. Starting HEAD for this remediation: `3c7b9ac`. Working tree **dirty** (not committed). Migrations **0001–0007 untouched**. All listed DBs still `20260917_0007`. No `.env` read, no volume delete, no Day 5.
+
+Pre-fix sections 1–14 above are retained as original Day 4 evidence. Counts and PASS lines there are **not** reused as this re-verification.
+
+### 15.1 Images, ports, health
+
+| Container | Image ID | Host bind |
+| --- | --- | --- |
+| `property-ai-api-1` / `property-ai-day4-api-day4-1` | `sha256:3c951ee6cd4b9acbd1229c7d21ce39132b2f74ebcd64055930352ce8ec7fdb24` | via Nginx |
+| `property-ai-worker-1` / `property-ai-day4-worker-day4-1` | `sha256:2f804fc5f3bdc67c7392942a0bd364dcf1e073eb2cab9b5afa98a3b53236e2f2` | n/a |
+| `property-ai-prodlike-api-1` | `sha256:4ca6d28c294dc998003203fabb20d250f7de766da8bdd9da86eed51b45b208f6` | via Nginx |
+| `property-ai-prodlike-worker-1` | `sha256:0ade5c98cfb51fc412371462328491b88324b255a92e2ab231b513a61859d8b4` | n/a |
+| nginx 8080 / 8081 / 8082 | `nginx:1.27.4-alpine` | **127.0.0.1** only |
+
+`/healthz` 200 on 8080/8081/8082. `/readyz` 200 on 8082; llm/vlm/asr/embedding/reranker/storage = `not_checked`. Data-plane ports (MySQL/Redis/Rabbit/MinIO/Milvus) remain `0.0.0.0` on the long-running infra containers that were **not** recreated.
+
+### 15.2 Strict cross-process E2E — PASS (Fake)
+
+Command (not via pytest):
+
+`DAY4_BASE_URL=http://127.0.0.1:8082 TEST_DATABASE_URL=<day4 schema on :3307> python scripts/ops/day4_e2e.py`
+
+Result: `DAY4_CROSS_PROCESS_E2E=PASS (Fake providers; not live vendor)` in 18.5s.
+
+Path: HTTP/Nginx 8082 → api-day4 → RabbitMQ vhost `property_ai_day4` → worker-day4 → MySQL `property_ai_day4` / Milvus `knowledge_chunks_day4` / MinIO `property-ai-day4`.
+
+Required steps asserted (HTTP status + postconditions): login; new WeChat user bind apply PENDING with empty `/me/houses`; approve APPROVED without falling back to seed resident; WO create id=57 + idempotent replay same id; worker stop left paused WO 58 `PENDING_ANALYSIS`; resume → `PENDING_ASSIGNMENT`; staff ON_DUTY (check-in 409 already on duty); assign/accept/start/receipt/confirm; DB status `CLOSED`; ingest `document_id=3 version=1` cited by assistant this round (old doc 2 also present, not accepted alone); announcement PUBLISHED; notifications tied to bind id=7, WO 57, announcement 3.
+
+Negative doubles: `tests/unit/test_day4_e2e_assertions.py` — assign/receipt/timeout/wrong citation/missing BASE → non-zero, no overall PASS.
+
+Pytest wrapper still **skipped** when `DAY4_BASE_URL` unset. Live script result is the evidence.
+
+### 15.3 Silent rollback — PASS
+
+`tests/integration/test_day4_silent_rollback.py` on disposable MySQL. `_execute` now `run_service_transaction` (join open txn; never rollback caller). Pending and flushed rows preserved; outer rollback drops business+audit together; top-level HTTP still commits. Auth Session remains separate from business Session.
+
+### 15.4 Log redaction — PASS (synthetic rendered output)
+
+`tests/unit/test_day4_logging_redaction.py` checks API/Worker/stdlib/provider/wechat formatted records and exception chains, not only helper return values. JWT/Authorization/password/session_key/wx code/provider keys/DB URLs redacted. Error logs were not disabled.
+
+### 15.5 Bind apply / approve — PASS (scope limited to self-bind)
+
+Applicant policy: ACTIVE self-apply PENDING; property A role does not block apply to B; no relation/grants on apply. Approve atomic: APPROVED + relation + PROPERTY RESIDENT (reuse if present) + audit. Missing RESIDENT → `IAM.ROLE_NOT_FOUND` rollback. Live 8082 apply+approve as above. Cross-property review still 403 in pytest. Not “any user any property”. Production WeChat **BLOCKED_BY_CREDENTIALS**.
+
+### 15.6 Failed-task record/replay — PASS (Fake LLM; Redis was available)
+
+`scripts/ops/day4_failed_task_drill.py`:
+
+1. Worker `LLM_PROVIDER_BEHAVIOR=unavailable` → WO 60 `PENDING_ANALYSIS` → Redis record `970f4194-… analyze_work_order_task AI.UNAVAILABLE`.
+2. Restore worker → `python -m app.cli.replay_failed_task` → status `PENDING_ASSIGNMENT`, `analysis_rows=1`, open list empty. FSM not closed.
+3. API broker auth fail after commit → WO 61 persisted `PENDING_ANALYSIS` + `enqueue-… ENQUEUE_FAILED` → restore API → replay → `PENDING_ASSIGNMENT`.
+
+Celery analyze now re-raises retryable `FAILED` analysis (`AI.TIMEOUT/UNAVAILABLE/RATE_LIMITED`) so retries and `task_failure` recording actually happen. Replay status is `REPLAY_ENQUEUED`, not success. Not exactly-once; business idempotency kept.
+
+**Redis+broker both down:** no durable DB `failed_jobs` table. **Not recovery PASS.** Minimum schema (paused, needs 0008 approval): `failed_jobs` with sanitized operation/args, status, lease, work_order_id, env. Do not add migration in this round.
+
+AMQP DLX topology still **NOT_RUN** (named durable publish + `confirm_publish` only). After this drill `property_ai.day4.dlq` had 56 inspectable messages (retry/record publishes). Main queue depth 0, consumers 1.
+
+### 15.7 `/opsz` — PASS on rebuilt stacks; staging operator 200 NOT_RUN
+
+Policy: SYSTEM-scoped `audit:read` only (not flat permissions). Dispatcher/manager **403** is an intentional tighten vs the old “dispatcher can read opsz” expectation.
+
+| Probe | Result |
+| --- | --- |
+| 8082 unauthenticated | 401 `AUTH.MISSING_TOKEN` |
+| 8082 property manager | 403 `IAM.FORBIDDEN` |
+| 8082 SYSTEM admin (Day 4 DevAuth, `APP_ENV=test`) | 200, no secret fields; `celery_queue=property_ai.day4` |
+| 8081 unauthenticated | 401 |
+| 8081 operator 200 | **NOT_RUN** (no staging login; DevAuth stays off) |
+| healthz/readyz | no regression |
+
+### 15.8 Perf / capacity
+
+NFR (`docs/08-NON-FUNCTIONAL.md`): WO create P95 **< 500ms** excluding AI. Dedicated Day 4 stack, Fake providers, unique `Idempotency-Key` per POST, errors counted (all 0).
+
+**Old method reproduced (cold = new HTTP connection per request):**
+
+| Probe | n | c | rps | P50 | P95 | P99 |
+| --- | --- | --- | --- | --- | --- | --- |
+| GET `/healthz` cold | 30 | 1 | 2.20 | 497.45 | 536.96 | 540.38 |
+| GET `/healthz` cold | 100 | 20 | 10.67 | 1861.69 | 2361.71 | 2422.39 |
+| POST `/work-orders` cold | 30 | 1 | 1.87 | 530.29 | **575.98** | 590.14 |
+| POST `/work-orders` cold | 20 | 5 | 5.83 | 815.08 | **1009.63** | 1013.07 |
+
+**New method (pooled `httpx.Client`) — not the same experiment:**
+
+| Probe | n | c | rps | P50 | P95 | P99 |
+| --- | --- | --- | --- | --- | --- | --- |
+| GET `/healthz` pooled | 30 | 1 | 59.98 | 3.19 | 4.97 | 7.48 |
+| GET `/healthz` pooled | 100 | 20 | 144.61 | 29.86 | 44.08 | 58.99 |
+| POST `/work-orders` pooled | 30 | 1 | 24.49 | 22.64 | **31.17** | 31.24 |
+| POST `/work-orders` pooled | 20 | 5 | 17.70 | 138.98 | **206.36** | 215.40 |
+
+Cold WO create **misses** 500ms NFR (PARTIAL). Pooled WO create **meets** 500ms on this host but must not be quoted as the old cold result. Pre-fix report’s 20.63ms sequential WO P95 was a different client setup.
+
+Capacity: `test_second_assignment_to_full_employee_is_rejected` and `test_concurrent_assign_to_same_employee_respects_max_capacity` **PASS**. Cross-day check-in still preserves `current_load` from ACTIVE assignments.
+
+Resource snapshot after probes (not saturation): day4 API ~140 MiB; day4 worker ~1.69 GiB / 2.27% CPU (prefork 24); mysql-test ~1015 MiB. InnoDB lock wait time series **NOT_RUN**.
+
+### 15.9 Vulnerability scan
+
+| Tool | Result |
+| --- | --- |
+| Docker Scout on `property-ai-api:latest` | **BLOCKED** (`docker login` required) |
+| Isolated `pip-audit 2.7.3` `--disable-pip --no-deps` on image `pip freeze` (scan time 2026-09-17) | **28 findings / 5 packages** — not “no vulns” |
+| pip-audit install-to-venv mode | **BLOCKED** (PyPI timeout) |
+| OS/package CVE for mysql/redis/rabbit/milvus/minio images | **NOT_RUN** (Scout login blocked; no Trivy run) |
+
+Direct freeze sample: Python 3.12.10-slim-bookworm; `cryptography==44.0.0`, `orjson==3.10.15`, `PyJWT==2.10.1`, `python-multipart==0.0.20`, `starlette==0.41.3`.
+
+Applicability (no auto-upgrade):
+
+- **PyJWT** several HMAC/JWKS/jku issues: this API issues HS256 with a local secret and does not use `PyJWKClient`. Still a frozen-dep bump candidate (`2.13.0`).
+- **python-multipart / starlette** form DoS and Range/Host issues: FastAPI upload/form path is in scope; we do not use `FileResponse`/`StaticFiles`. Fixes are major for Starlette 1.x.
+- **cryptography** PKCS7/name-constraints/OpenSSL wheel issues: no PKCS7 mail gateway in this product; still a wheel-OpenSSL concern.
+- **orjson** deep dumps recursion: possible if we dump attacker JSON.
+
+Minimum upgrade set is listed in `reports/day4-remediation.md`. Not applied.
+
+### 15.10 Full regression
+
+`531 passed, 2 skipped, 61 warnings` in 408.56s. 0 failed. Migrations 0001–0007 unchanged.
+
+Skipped (not treated as PASS):
+
+1. `test_cross_process_http_nginx_worker_e2e` — `DAY4_BASE_URL` unset in pytest. Independent live command: section 15.2 **PASS**.
+2. `test_live_nginx_health_ready_ops` — `DAY3_PRODLIKE_BASE_URL` unset. Independent curl: 8081 `/opsz` unauth **401**, `/healthz` **200**.
+
+### 15.11 Still blocked / not a release PASS
+
+| Item | Status |
+| --- | --- |
+| Live Qwen / ASR / BGE-M3 / reranker | BLOCKED_BY_CREDENTIALS |
+| Production WeChat `code` | BLOCKED_BY_CREDENTIALS |
+| Real-device miniprogram | NOT_RUN |
+| TLS / domain cert | BLOCKED_BY_DOMAIN_CERT |
+| Dual Redis+broker outage durable compensate | NOT_RUN (needs `failed_jobs` table / 0008) |
+| Frozen dep CVE upgrades | not applied |
+| Cold-connect WO create P95 vs 500ms | PARTIAL |
+| Day 5 | not entered |
+
+No git add / commit / push.

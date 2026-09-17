@@ -22,6 +22,7 @@ def _service() -> tuple[PropertyService, MagicMock, MagicMock]:
 
 def test_service_owns_transaction_boundary() -> None:
     service, session, repository = _service()
+    session.in_transaction.return_value = False
     repository.add_tenant.side_effect = lambda tenant: tenant
 
     tenant = service.create_tenant(name=" Example Tenant ")

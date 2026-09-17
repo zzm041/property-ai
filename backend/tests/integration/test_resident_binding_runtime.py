@@ -16,11 +16,12 @@ from app.core.errors import AppError, IamErrorCode, ResidentErrorCode
 from app.core.time import utc_now
 from app.domain.resident import ResidentRelationStatus
 from app.main import create_app
-from app.model.identity import AuditLog, RolePermission
+from app.model.identity import AuditLog, Role, RolePermission, User, UserRole
 from app.model.resident import ResidentBindRequest, ResidentHouseRelation
 from app.service.auth import AuthService
 from app.repository.identity import IdentityRepository
 from app.service.resident import ResidentBindingService
+from tests.integration.conftest import commit_open_transaction
 from tests.integration.resident_test_data import create_resident_binding_graph
 
 TEST_SECRET = "t4-resident-binding-secret-that-is-not-production"
@@ -182,9 +183,11 @@ def test_nonexistent_and_cross_property_house_are_rejected(
             headers=_auth(token),
         )
     assert missing.status_code == 404
-    assert cross.status_code == 403
+    assert cross.status_code == 200
+    assert cross.json()["data"]["status"] == "PENDING"
     assert mismatched.status_code == 422
-    assert other_tenant.status_code == 403
+    assert other_tenant.status_code == 200
+    assert other_tenant.json()["data"]["status"] == "PENDING"
 
 
 def test_resident_cannot_read_another_users_request(
@@ -391,12 +394,14 @@ def test_stale_reviewer_permission_is_denied(identity_session: Session) -> None:
     auth = AuthService(identity_session, IdentityRepository(identity_session))
     resident = auth.load_principal(graph.resident_a_id)
     reviewer = auth.load_principal(graph.reviewer_p1_id)
+    commit_open_transaction(identity_session)
     created = ResidentBindingService(identity_session).create_bind_request(
         actor=resident,
         house_id=graph.house_1_id,
         relation_type="OWNER",
         request_id="t4-stale-create",
     )
+    commit_open_transaction(identity_session)
     with identity_session.begin():
         identity_session.execute(delete(RolePermission))
     with pytest.raises(AppError) as captured:
@@ -424,12 +429,14 @@ def test_audit_failure_rolls_back_approve(
         identity_session,
         IdentityRepository(identity_session),
     ).load_principal(graph.reviewer_p1_id)
+    commit_open_transaction(identity_session)
     created = ResidentBindingService(identity_session).create_bind_request(
         actor=principal,
         house_id=graph.house_1_id,
         relation_type="OWNER",
         request_id="t4-audit-create",
     )
+    commit_open_transaction(identity_session)
 
     class FailingAudit:
         def append(self, **values: object) -> None:
@@ -467,6 +474,7 @@ def test_concurrent_duplicate_pending_creates_one(
                 session,
                 IdentityRepository(session),
             ).load_principal(graph.resident_a_id)
+            commit_open_transaction(session)
             ResidentBindingService(session).create_bind_request(
                 actor=actor,
                 house_id=graph.house_1_id,
@@ -496,12 +504,14 @@ def test_concurrent_approve_has_single_winner(
         identity_session,
         IdentityRepository(identity_session),
     ).load_principal(graph.resident_a_id)
+    commit_open_transaction(identity_session)
     created = ResidentBindingService(identity_session).create_bind_request(
         actor=actor,
         house_id=graph.house_1_id,
         relation_type="OWNER",
         request_id="t4-concurrent-approve-create",
     )
+    commit_open_transaction(identity_session)
 
     def worker() -> str:
         session = get_session_factory(integration_settings.test_database_url)()
@@ -510,6 +520,7 @@ def test_concurrent_approve_has_single_winner(
                 session,
                 IdentityRepository(session),
             ).load_principal(graph.reviewer_p1_id)
+            commit_open_transaction(session)
             ResidentBindingService(session).approve_bind_request(
                 actor=reviewer,
                 request_id=created.id,
@@ -545,6 +556,7 @@ def test_approve_reject_race_has_single_transition(
         identity_session,
         IdentityRepository(identity_session),
     ).load_principal(graph.resident_a_id)
+    commit_open_transaction(identity_session)
     created = ResidentBindingService(identity_session).create_bind_request(
         actor=actor,
         house_id=graph.house_1_id,
@@ -559,6 +571,7 @@ def test_approve_reject_race_has_single_transition(
                 session,
                 IdentityRepository(session),
             ).load_principal(graph.reviewer_p1_id)
+            commit_open_transaction(session)
             ResidentBindingService(session).approve_bind_request(
                 actor=reviewer,
                 request_id=created.id,
@@ -577,6 +590,7 @@ def test_approve_reject_race_has_single_transition(
                 session,
                 IdentityRepository(session),
             ).load_principal(graph.tenant_admin_id)
+            commit_open_transaction(session)
             ResidentBindingService(session).reject_bind_request(
                 actor=reviewer,
                 request_id=created.id,
@@ -620,6 +634,7 @@ def test_active_relation_unique_and_history_preserved(
         identity_session,
         IdentityRepository(identity_session),
     ).load_principal(graph.reviewer_p1_id)
+    commit_open_transaction(identity_session)
     service = ResidentBindingService(identity_session)
     first = service.create_bind_request(
         actor=resident,
@@ -632,6 +647,7 @@ def test_active_relation_unique_and_history_preserved(
         request_id=first.id,
         http_request_id="t4-history-approve",
     )
+    commit_open_transaction(identity_session)
     with identity_session.begin():
         service.end_relation(
             relation,
@@ -777,12 +793,14 @@ def test_reject_audit_failure_rolls_back(identity_session: Session) -> None:
         identity_session,
         IdentityRepository(identity_session),
     ).load_principal(graph.reviewer_p1_id)
+    commit_open_transaction(identity_session)
     created = ResidentBindingService(identity_session).create_bind_request(
         actor=principal,
         house_id=graph.house_1_id,
         relation_type="OWNER",
         request_id="t4-reject-audit-create",
     )
+    commit_open_transaction(identity_session)
 
     class FailingAudit:
         def append(self, **values: object) -> None:
@@ -921,3 +939,177 @@ def test_mysql_pending_and_active_uniques_and_checks(
             )
             identity_session.flush()
     identity_session.rollback()
+
+
+def test_new_user_without_roles_can_self_apply(
+    identity_session: Session,
+) -> None:
+    graph = create_resident_binding_graph(identity_session)
+    with identity_session.begin():
+        orphan = User(status="ACTIVE", display_name="Orphan Applicant")
+        identity_session.add(orphan)
+        identity_session.flush()
+        orphan_id = orphan.id
+    with _client() as client:
+        token = _token(client, orphan_id)
+        created = client.post(
+            "/api/v1/resident-bind-requests",
+            json={"house_id": graph.house_1_id, "relation_type": "OWNER"},
+            headers=_auth(token),
+        )
+        houses = client.get("/api/v1/me/houses", headers=_auth(token))
+    assert created.status_code == 200
+    assert created.json()["data"]["status"] == "PENDING"
+    assert houses.json()["data"]["items"] == []
+
+
+def test_resident_with_property_a_role_can_apply_to_property_b(
+    identity_session: Session,
+) -> None:
+    graph = create_resident_binding_graph(identity_session)
+    with _client() as client:
+        token = _token(client, graph.resident_a_id)
+        created = client.post(
+            "/api/v1/resident-bind-requests",
+            json={"house_id": graph.house_2_id, "relation_type": "FAMILY"},
+            headers=_auth(token),
+        )
+        houses = client.get("/api/v1/me/houses", headers=_auth(token))
+        reviewer = _token(client, graph.reviewer_p2_id)
+        approved = client.post(
+            f"/api/v1/admin/resident-bind-requests/{created.json()['data']['id']}/approve",
+            headers=_auth(reviewer),
+        )
+        houses_after = client.get("/api/v1/me/houses", headers=_auth(token))
+    assert created.status_code == 200
+    assert created.json()["data"]["status"] == "PENDING"
+    assert houses.json()["data"]["items"] == []
+    assert approved.status_code == 200
+    house_ids = {item["house_id"] for item in houses_after.json()["data"]["items"]}
+    assert graph.house_2_id in house_ids
+
+
+def test_staff_can_self_apply_for_housing_without_gaining_access_before_approve(
+    identity_session: Session,
+) -> None:
+    graph = create_resident_binding_graph(identity_session)
+    with _client() as client:
+        staff = _token(client, graph.staff_id)
+        created = client.post(
+            "/api/v1/resident-bind-requests",
+            json={"house_id": graph.house_1_id, "relation_type": "OWNER"},
+            headers=_auth(staff),
+        )
+        houses = client.get("/api/v1/me/houses", headers=_auth(staff))
+        reviewer = _token(client, graph.reviewer_p1_id)
+        request_id = created.json()["data"]["id"]
+        approved = client.post(
+            f"/api/v1/admin/resident-bind-requests/{request_id}/approve",
+            headers=_auth(reviewer),
+        )
+        houses_after = client.get("/api/v1/me/houses", headers=_auth(staff))
+    assert created.status_code == 200
+    assert created.json()["data"]["status"] == "PENDING"
+    assert houses.json()["data"]["items"] == []
+    assert approved.status_code == 200
+    assert any(
+        item["house_id"] == graph.house_1_id
+        for item in houses_after.json()["data"]["items"]
+    )
+
+
+def test_missing_resident_role_rolls_back_entire_approval(
+    identity_session: Session,
+) -> None:
+    graph = create_resident_binding_graph(identity_session)
+    principal = AuthService(
+        identity_session,
+        IdentityRepository(identity_session),
+    ).load_principal(graph.resident_a_id)
+    commit_open_transaction(identity_session)
+    created = ResidentBindingService(identity_session).create_bind_request(
+        actor=principal,
+        house_id=graph.house_1_id,
+        relation_type="OWNER",
+        request_id="t4-missing-role-create",
+    )
+    commit_open_transaction(identity_session)
+    role = identity_session.scalar(select(Role).where(Role.code == "RESIDENT"))
+    assert role is not None
+    commit_open_transaction(identity_session)
+    with identity_session.begin():
+        identity_session.execute(delete(UserRole).where(UserRole.role_id == role.id))
+        identity_session.execute(
+            delete(RolePermission).where(RolePermission.role_id == role.id)
+        )
+        identity_session.execute(delete(Role).where(Role.id == role.id))
+    reviewer = AuthService(
+        identity_session,
+        IdentityRepository(identity_session),
+    ).load_principal(graph.reviewer_p1_id)
+    with pytest.raises(AppError) as captured:
+        ResidentBindingService(identity_session).approve_bind_request(
+            actor=reviewer,
+            request_id=created.id,
+            http_request_id="t4-missing-role-approve",
+        )
+    assert captured.value.code == IamErrorCode.ROLE_NOT_FOUND
+    identity_session.rollback()
+    request = identity_session.get(ResidentBindRequest, created.id)
+    assert request is not None
+    assert request.status == "PENDING"
+    assert identity_session.scalar(select(func.count()).select_from(ResidentHouseRelation)) == 0
+
+
+def test_concurrent_approve_does_not_duplicate_resident_grant(
+    identity_session: Session,
+    integration_settings: Settings,
+) -> None:
+    graph = create_resident_binding_graph(identity_session)
+    actor = AuthService(
+        identity_session,
+        IdentityRepository(identity_session),
+    ).load_principal(graph.resident_a_id)
+    commit_open_transaction(identity_session)
+    created = ResidentBindingService(identity_session).create_bind_request(
+        actor=actor,
+        house_id=graph.house_1_id,
+        relation_type="OWNER",
+        request_id="t4-grant-race-create",
+    )
+    commit_open_transaction(identity_session)
+
+    def worker() -> str:
+        session = get_session_factory(integration_settings.test_database_url)()
+        try:
+            reviewer = AuthService(
+                session,
+                IdentityRepository(session),
+            ).load_principal(graph.reviewer_p1_id)
+            commit_open_transaction(session)
+            ResidentBindingService(session).approve_bind_request(
+                actor=reviewer,
+                request_id=created.id,
+                http_request_id="t4-grant-race-approve",
+            )
+            return "ok"
+        except AppError as exc:
+            return exc.code
+        finally:
+            session.close()
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(lambda _: worker(), range(2)))
+    assert results.count("ok") == 1
+    identity_session.expire_all()
+    role = identity_session.scalar(select(Role).where(Role.code == "RESIDENT"))
+    assert role is not None
+    grants = identity_session.scalars(
+        select(UserRole).where(
+            UserRole.user_id == graph.resident_a_id,
+            UserRole.role_id == role.id,
+            UserRole.property_id == graph.property_1_id,
+        )
+    ).all()
+    assert len(grants) == 1
+    assert identity_session.scalar(select(func.count()).select_from(ResidentHouseRelation)) == 1

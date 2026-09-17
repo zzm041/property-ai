@@ -4,6 +4,7 @@ from celery import Celery
 from celery.signals import (
     task_failure,
     task_prerun,
+    task_success,
     worker_process_init,
 )
 from kombu import Exchange, Queue
@@ -19,11 +20,12 @@ def create_celery_app() -> Celery:
     settings = get_settings()
     queue_name = settings.resolved_celery_queue
     dlq_name = settings.resolved_celery_dlq
-    exchange = Exchange(queue_name, type="direct")
+    exchange = Exchange(queue_name, type="direct", durable=True)
     app = Celery("property_ai", broker=settings.celery_broker_url)
     app.conf.update(
         task_acks_late=True,
         task_reject_on_worker_lost=True,
+        broker_transport_options={"confirm_publish": True},
         worker_prefetch_multiplier=1,
         worker_hijack_root_logger=False,
         task_serializer="json",
@@ -34,11 +36,12 @@ def create_celery_app() -> Celery:
         task_default_exchange=queue_name,
         task_default_routing_key=queue_name,
         task_queues=(
-            Queue(queue_name, exchange=exchange, routing_key=queue_name),
+            Queue(queue_name, exchange=exchange, routing_key=queue_name, durable=True),
             Queue(
                 dlq_name,
-                exchange=Exchange(dlq_name, type="direct"),
+                exchange=Exchange(dlq_name, type="direct", durable=True),
                 routing_key=dlq_name,
+                durable=True,
             ),
         ),
         task_annotations={
@@ -95,31 +98,35 @@ def _log_permanent_or_retry_failure(
     retries = int(getattr(getattr(sender, "request", None), "retries", 0) or 0)
     max_retries = int(getattr(sender, "max_retries", 0) or 0)
     error_code = getattr(exception, "error_code", type(exception).__name__ if exception else "UNKNOWN")
-    event = "celery_task_failed"
-    if retries >= max_retries:
-        event = "celery_task_dead_lettered"
-        from app.worker.failed_tasks import record_failed_task
+    from app.worker.failed_tasks import record_failed_task
 
-        record_failed_task(
-            get_settings(),
-            task_id=task_id,
-            operation=getattr(sender, "name", None),
-            error_code=str(error_code),
-            extra={},
-            args=tuple(getattr(getattr(sender, "request", None), "args", ()) or ()),
-        )
-        logger.error(
-            event,
-            task_id=task_id,
-            operation=getattr(sender, "name", None),
-            error_code=error_code,
-            queue=get_settings().resolved_celery_dlq,
-        )
-        return
-    logger.warning(
-        event,
+    record_failed_task(
+        get_settings(),
+        task_id=task_id,
+        operation=getattr(sender, "name", None),
+        error_code=str(error_code),
+        extra={},
+        args=tuple(getattr(getattr(sender, "request", None), "args", ()) or ()),
+    )
+    logger.error(
+        "celery_task_dead_lettered" if retries >= max_retries else "celery_task_failed",
         task_id=task_id,
         operation=getattr(sender, "name", None),
         error_code=error_code,
         retries=retries,
+        queue=get_settings().resolved_celery_dlq,
+        exc_info=exception,
     )
+
+
+@task_success.connect
+def _mark_recorded_failure_succeeded(sender=None, **kwargs) -> None:
+    task_id = getattr(getattr(sender, "request", None), "id", None)
+    if not task_id:
+        return
+    try:
+        from app.worker.failed_tasks import mark_failed_task_succeeded
+
+        mark_failed_task_succeeded(str(task_id))
+    except Exception:
+        logger.warning("failed_task_success_mark_unavailable", task_id=str(task_id))

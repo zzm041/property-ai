@@ -5,22 +5,14 @@ from fastapi.responses import JSONResponse
 
 from app.api.dependencies.auth import get_current_principal
 from app.core.config import Settings, get_settings
-from app.core.errors import AppError, IamErrorCode
 from app.core.readiness import check_readiness
-from app.domain.iam import Principal
+from app.domain.iam import OrganizationScope, Principal, ScopeType
 from app.schema.common import success_envelope
+from app.service.rbac import RbacService
 
 router = APIRouter(tags=["system"])
 
-_OPSZ_PERMISSIONS = frozenset(
-    {
-        "role:read",
-        "audit:read",
-        "work_order:dispatch",
-        "knowledge:manage",
-        "employee:manage",
-    }
-)
+_OPSZ_PERMISSION = "audit:read"
 
 
 @router.get("/healthz")
@@ -50,14 +42,13 @@ def opsz(
     principal: Principal = Depends(get_current_principal),
     settings: Settings = Depends(get_settings),
 ) -> dict[str, object]:
-    """Operator namespaces. Requires an operator permission; never includes secrets."""
+    """Operator namespaces. SYSTEM-scoped audit:read only; never includes secrets."""
 
-    if not any(permission in principal.permissions for permission in _OPSZ_PERMISSIONS):
-        raise AppError(
-            code=IamErrorCode.FORBIDDEN,
-            message="Operator status is not visible to this principal",
-            status_code=403,
-        )
+    RbacService.require_permission(
+        principal,
+        _OPSZ_PERMISSION,
+        OrganizationScope(ScopeType.SYSTEM),
+    )
     return success_envelope(
         request,
         {

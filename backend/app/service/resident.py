@@ -19,7 +19,6 @@ from app.core.time import utc_now
 from app.domain.audit import AuditAction, AuditResourceType
 from app.domain.iam import OrganizationScope, Principal, ScopeType
 from app.domain.resident import (
-    RESIDENT_BINDING_CREATE,
     RESIDENT_BINDING_REVIEW,
     ResidentBindStatus,
     ResidentRelationStatus,
@@ -262,19 +261,8 @@ class ResidentBindingService:
                 message="House is not available for binding",
                 status_code=409,
             )
-        scope = OrganizationScope(
-            ScopeType.PROPERTY,
-            tenant_id=house.tenant_id,
-            property_id=house.property_id,
-        )
-        # PRD 2.2: a new authenticated user has no PROPERTY-scoped role yet.
-        # Existing principals still need resident_binding:create on that property.
-        if current.grants:
-            RbacService.require_permission(
-                current,
-                RESIDENT_BINDING_CREATE,
-                scope,
-            )
+        # Self-application is an applicant policy, not a target-property grant.
+        self._require_active_actor(current)
         now = utc_now()
         if (
             self._repository.find_active_relation(
@@ -397,9 +385,15 @@ class ResidentBindingService:
         tenant_id: int,
         property_id: int,
     ) -> None:
-        role = self._session.scalar(select(Role).where(Role.code == "RESIDENT"))
+        role = self._session.scalar(
+            select(Role).where(Role.code == "RESIDENT").with_for_update()
+        )
         if role is None:
-            return
+            raise AppError(
+                code=IamErrorCode.ROLE_NOT_FOUND,
+                message="RESIDENT role is not configured",
+                status_code=500,
+            )
         existing = self._session.scalar(
             select(UserRole).where(
                 UserRole.user_id == user_id,
@@ -578,11 +572,10 @@ class ResidentBindingService:
             )
 
     def _execute(self, operation: Callable[[], T]) -> T:
-        if self._session.in_transaction():
-            self._session.rollback()
+        from app.core.database import run_service_transaction
+
         try:
-            with self._session.begin():
-                return operation()
+            return run_service_transaction(self._session, operation)
         except AppError:
             raise
         except IntegrityError as exc:

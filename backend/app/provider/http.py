@@ -8,7 +8,7 @@ from typing import Any
 
 import httpx
 
-from app.core.logging import get_logger
+from app.core.logging import get_logger, safe_url_for_log
 from app.provider.errors import (
     ProviderInvalidOutputError,
     ProviderRateLimitError,
@@ -49,30 +49,30 @@ def request_json(
             params=params,
         )
     except httpx.TimeoutException as exc:
-        _log_failure(provider, operation, "AI.TIMEOUT", started_at)
+        _log_failure(provider, operation, "AI.TIMEOUT", started_at, url=url, exc=exc)
         raise ProviderTimeoutError("Provider timed out") from exc
     except httpx.HTTPError as exc:
-        _log_failure(provider, operation, "AI.UNAVAILABLE", started_at)
+        _log_failure(provider, operation, "AI.UNAVAILABLE", started_at, url=url, exc=exc)
         raise ProviderUnavailableError("Provider is unavailable") from exc
     finally:
         if own_client:
             http.close()
     if response.status_code == 429:
-        _log_failure(provider, operation, "AI.RATE_LIMITED", started_at)
+        _log_failure(provider, operation, "AI.RATE_LIMITED", started_at, url=url)
         raise ProviderRateLimitError("Provider rate limited")
     if response.status_code >= 500:
-        _log_failure(provider, operation, "AI.UNAVAILABLE", started_at)
+        _log_failure(provider, operation, "AI.UNAVAILABLE", started_at, url=url)
         raise ProviderUnavailableError("Provider is unavailable")
     if response.status_code >= 400:
-        _log_failure(provider, operation, "AI.INVALID_OUTPUT", started_at)
+        _log_failure(provider, operation, "AI.INVALID_OUTPUT", started_at, url=url)
         raise ProviderInvalidOutputError("Provider rejected the request")
     if not response.content:
-        _log_failure(provider, operation, "AI.INVALID_OUTPUT", started_at)
+        _log_failure(provider, operation, "AI.INVALID_OUTPUT", started_at, url=url)
         raise ProviderInvalidOutputError("Provider returned an empty response")
     try:
         payload = response.json()
     except json.JSONDecodeError as exc:
-        _log_failure(provider, operation, "AI.INVALID_OUTPUT", started_at)
+        _log_failure(provider, operation, "AI.INVALID_OUTPUT", started_at, url=url, exc=exc)
         raise ProviderInvalidOutputError("Provider returned invalid JSON") from exc
     logger.info(
         "provider_succeeded",
@@ -102,6 +102,9 @@ def _log_failure(
     operation: str,
     error_code: str,
     started_at: float,
+    *,
+    url: str | None = None,
+    exc: BaseException | None = None,
 ) -> None:
     logger.warning(
         "provider_failed",
@@ -109,4 +112,6 @@ def _log_failure(
         operation=operation,
         error_code=error_code,
         latency_ms=round((time.perf_counter() - started_at) * 1000, 2),
+        url=safe_url_for_log(url) if url else None,
+        exc_info=exc,
     )

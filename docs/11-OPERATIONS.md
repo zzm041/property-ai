@@ -351,5 +351,5 @@ DAY3_PRODLIKE_BASE_URL=http://127.0.0.1:8081
 
 失败任务：Redis `property_ai:{env}:failed_tasks` + 命名 DLQ 发布 + `python -m app.cli.replay_failed_task`。这不是 AMQP DLX。未实际投递/重放时不得写“死信已验证”。
 
-`/opsz` 需要已认证且具备 operator permission；公网未认证应为 401。readyz 未探测的收费模型必须是 `not_checked`，不得标 `up`。
+`/opsz` 需要已认证且具备 **SYSTEM 范围** 的 `audit:read`；PROPERTY/TENANT 业务管理授权不能查看全局部署详情。公网未认证应为 401。本机演练 Nginx 端口绑定 `127.0.0.1`（8080/8081/8082）。readyz 未探测的收费模型必须是 `not_checked`，不得标 `up`。
 

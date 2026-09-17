@@ -194,3 +194,14 @@ def identity_session(
         yield session
     finally:
         session.close()
+
+
+def commit_open_transaction(session: Session) -> None:
+    """End SQLAlchemy autobegin from reads so a top-level use case can own begin/commit.
+
+    Auth HTTP uses a separate session. Service tests that load a Principal on the
+    business session must close that read transaction first.
+    """
+
+    if session.in_transaction():
+        session.commit()

@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings
+from app.core.database import transaction_context
 from app.core.errors import AppError, AuthErrorCode, ErrorCode, WeChatAuthErrorCode
 from app.core.security import issue_access_token
 from app.domain.audit import AuditAction, AuditResourceType
@@ -58,10 +59,8 @@ class WeChatAuthService:
                 message="WeChat auth is unavailable",
                 status_code=503,
             ) from exc
-        if self._session.in_transaction():
-            self._session.rollback()
         try:
-            with self._session.begin():
+            with transaction_context(self._session):
                 binding = self._repository.get_user_wechat(
                     appid=session.appid,
                     openid=session.openid,

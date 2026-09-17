@@ -27,6 +27,7 @@ from app.model.identity import AuditLog, Permission, RolePermission, User
 from app.repository.identity import IdentityRepository
 from app.service.auth import AuthService
 from app.service.employee import EmployeeService
+from tests.integration.conftest import commit_open_transaction
 from tests.integration.employee_test_data import create_employee_attendance_graph
 
 TEST_SECRET = "t5-employee-attendance-secret-that-is-not-production"
@@ -60,7 +61,9 @@ def _auth(token: str) -> dict[str, str]:
 
 
 def _principal(session: Session, user_id: int):
-    return AuthService(session, IdentityRepository(session)).load_principal(user_id)
+    principal = AuthService(session, IdentityRepository(session)).load_principal(user_id)
+    commit_open_transaction(session)
+    return principal
 
 
 def test_admin_creates_and_reads_employee(identity_session: Session) -> None:

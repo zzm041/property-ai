@@ -11,6 +11,7 @@ from app.main import create_app
 from app.repository.identity import IdentityRepository
 from app.service.auth import AuthService
 from app.service.work_order import WorkOrderService
+from tests.integration.conftest import commit_open_transaction
 from tests.integration.work_order_test_data import create_work_order_graph
 
 TEST_SECRET = "d2-file-secret-that-is-not-production"
@@ -92,6 +93,7 @@ def test_cross_tenant_file_content_is_not_found(identity_session: Session) -> No
     actor = AuthService(
         identity_session, IdentityRepository(identity_session)
     ).load_principal(graph.employees.resident_id)
+    commit_open_transaction(identity_session)
     record = WorkOrderService(identity_session, settings=_settings()).register_file(
         actor=actor,
         mime_type="image/jpeg",
@@ -117,6 +119,7 @@ def test_non_uploader_same_tenant_cannot_overwrite_file(
     actor = AuthService(
         identity_session, IdentityRepository(identity_session)
     ).load_principal(graph.employees.resident_id)
+    commit_open_transaction(identity_session)
     record = WorkOrderService(identity_session, settings=_settings()).register_file(
         actor=actor,
         mime_type="image/jpeg",

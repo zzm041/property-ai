@@ -38,7 +38,7 @@ def test_unprobed_vendors_are_not_checked_not_up() -> None:
     assert result["dependencies"]["mysql"]["checked_at"]
 
 
-def test_opsz_forbids_resident_and_allows_dispatcher() -> None:
+def test_opsz_forbids_property_roles_and_allows_system_audit_read() -> None:
     settings = _settings()
     app = create_app(settings)
 
@@ -50,7 +50,7 @@ def test_opsz_forbids_resident_and_allows_dispatcher() -> None:
             RoleGrant(
                 role_code="RESIDENT",
                 scope=OrganizationScope(ScopeType.PROPERTY, tenant_id=1, property_id=1),
-                permissions=frozenset({"work_order:create", "work_order:read"}),
+                permissions=frozenset({"work_order:create", "work_order:read", "audit:read"}),
             ),
         ),
     )
@@ -62,7 +62,19 @@ def test_opsz_forbids_resident_and_allows_dispatcher() -> None:
             RoleGrant(
                 role_code="SUPERVISOR",
                 scope=OrganizationScope(ScopeType.PROPERTY, tenant_id=1, property_id=1),
-                permissions=frozenset({"work_order:dispatch", "work_order:read"}),
+                permissions=frozenset({"work_order:dispatch", "work_order:read", "audit:read"}),
+            ),
+        ),
+    )
+    operator = Principal(
+        user_id=4,
+        status="ACTIVE",
+        display_name="System operator",
+        grants=(
+            RoleGrant(
+                role_code="SYSTEM_ADMIN",
+                scope=OrganizationScope(ScopeType.SYSTEM),
+                permissions=frozenset({"audit:read"}),
             ),
         ),
     )
@@ -73,6 +85,11 @@ def test_opsz_forbids_resident_and_allows_dispatcher() -> None:
     assert forbidden.status_code == 403
 
     app.dependency_overrides[get_current_principal] = lambda: dispatcher
+    with TestClient(app) as client:
+        dispatcher_forbidden = client.get("/api/v1/opsz")
+    assert dispatcher_forbidden.status_code == 403
+
+    app.dependency_overrides[get_current_principal] = lambda: operator
     with TestClient(app) as client:
         allowed = client.get("/api/v1/opsz")
     assert allowed.status_code == 200

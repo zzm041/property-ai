@@ -18,6 +18,7 @@ from tests.integration.test_day3_backup_restore import (
     _exec,
     _mysql_test_container,
 )
+from tests.integration.conftest import commit_open_transaction
 from tests.integration.work_order_test_data import create_work_order_graph
 
 
@@ -33,10 +34,12 @@ def test_mysql_restore_preserves_relations_orders_and_audit(
     principal = AuthService(
         identity_session, IdentityRepository(identity_session)
     ).load_principal(graph.employees.resident_id)
+    staff = AuthService(
+        identity_session, IdentityRepository(identity_session)
+    ).load_principal(graph.employees.staff_a_user_id)
+    commit_open_transaction(identity_session)
     EmployeeService(identity_session).check_in(
-        actor=AuthService(
-            identity_session, IdentityRepository(identity_session)
-        ).load_principal(graph.employees.staff_a_user_id),
+        actor=staff,
         property_id=graph.employees.property_1_id,
         request_id="d4-restore-checkin",
     )
@@ -47,10 +50,12 @@ def test_mysql_restore_preserves_relations_orders_and_audit(
         idempotency_key=str(uuid4()),
         text="Restore drill work order",
     )
+    manager = AuthService(
+        identity_session, IdentityRepository(identity_session)
+    ).load_principal(graph.employees.manager_p1_id)
+    commit_open_transaction(identity_session)
     WorkOrderService(identity_session).assign(
-        actor=AuthService(
-            identity_session, IdentityRepository(identity_session)
-        ).load_principal(graph.employees.manager_p1_id),
+        actor=manager,
         work_order_id=created.id,
         employee_id=graph.employees.employee_a_id,
         request_id="d4-restore-assign",

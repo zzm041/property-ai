@@ -426,8 +426,10 @@ class RbacMutationService:
         target_scope: OrganizationScope,
         operation: Callable[[int], T],
     ) -> T:
+        from app.core.database import run_service_transaction
+
         try:
-            with self._session.begin():
+            def _authorized() -> T:
                 current_actor = self._reload_current_actor(actor.user_id)
                 RbacService.require_permission(
                     current_actor,
@@ -435,6 +437,8 @@ class RbacMutationService:
                     target_scope,
                 )
                 return operation(current_actor.user_id)
+
+            return run_service_transaction(self._session, _authorized)
         except AppError:
             raise
         except SQLAlchemyError as exc:

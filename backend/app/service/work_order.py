@@ -163,50 +163,59 @@ class WorkOrderService:
             )
         property_id = claimed_property_id
         tenant_id = claimed_tenant_id
-        if property_id is not None:
-            property_record = self._employees.get_property_in_tenant(
-                tenant_id=tenant_id or 0,
-                property_id=property_id,
-            ) if tenant_id else self._repository.get_property(property_id)
-            if property_record is None:
-                raise AppError(
-                    code=FileErrorCode.INVALID_INPUT,
-                    message="Target property was not found",
-                    status_code=422,
+        stored_holder: dict[str, object] = {}
+
+        def _persist() -> FileObject:
+            resolved_property_id = property_id
+            resolved_tenant_id = tenant_id
+            if resolved_property_id is not None:
+                property_record = (
+                    self._employees.get_property_in_tenant(
+                        tenant_id=resolved_tenant_id or 0,
+                        property_id=resolved_property_id,
+                    )
+                    if resolved_tenant_id
+                    else self._repository.get_property(resolved_property_id)
                 )
-            tenant_id = property_record.tenant_id
-        elif tenant_id is None:
-            scoped = next(
-                (
-                    grant.scope
-                    for grant in actor.grants
-                    if grant.scope.tenant_id is not None
-                ),
-                None,
+                if property_record is None:
+                    raise AppError(
+                        code=FileErrorCode.INVALID_INPUT,
+                        message="Target property was not found",
+                        status_code=422,
+                    )
+                resolved_tenant_id = property_record.tenant_id
+            elif resolved_tenant_id is None:
+                scoped = next(
+                    (
+                        grant.scope
+                        for grant in actor.grants
+                        if grant.scope.tenant_id is not None
+                    ),
+                    None,
+                )
+                if scoped is None or scoped.tenant_id is None:
+                    raise AppError(
+                        code=FileErrorCode.INVALID_INPUT,
+                        message="A tenant context is required to register a file",
+                        status_code=422,
+                    )
+                resolved_tenant_id = scoped.tenant_id
+                resolved_property_id = scoped.property_id
+            stored = self._storage.register_object(
+                mime_type=mime_type,
+                size_bytes=size_bytes,
+                filename=original_name,
+                tenant_id=resolved_tenant_id,
+                property_id=resolved_property_id,
             )
-            if scoped is None or scoped.tenant_id is None:
-                raise AppError(
-                    code=FileErrorCode.INVALID_INPUT,
-                    message="A tenant context is required to register a file",
-                    status_code=422,
-                )
-            tenant_id = scoped.tenant_id
-            property_id = scoped.property_id
-        stored = self._storage.register_object(
-            mime_type=mime_type,
-            size_bytes=size_bytes,
-            filename=original_name,
-            tenant_id=tenant_id,
-            property_id=property_id,
-        )
-        digest = sha256(
-            f"{stored.storage_key}:{mime_type}:{size_bytes}".encode()
-        ).hexdigest()
-        record = self._execute(
-            lambda: self._repository.add_file(
+            stored_holder["stored"] = stored
+            digest = sha256(
+                f"{stored.storage_key}:{mime_type}:{size_bytes}".encode()
+            ).hexdigest()
+            record = self._repository.add_file(
                 FileObject(
-                    tenant_id=tenant_id,
-                    property_id=property_id,
+                    tenant_id=resolved_tenant_id,
+                    property_id=resolved_property_id,
                     uploader_user_id=actor.user_id,
                     content_hash=digest,
                     mime_type=mime_type.strip().casefold(),
@@ -216,9 +225,13 @@ class WorkOrderService:
                     scanner_status=stored.scanner_status,
                 )
             )
-        )
-        record.upload_url = stored.upload_url
-        record.upload_expires_in = stored.upload_expires_in
+            return record
+
+        record = self._execute(_persist)
+        stored = stored_holder.get("stored")
+        if stored is not None:
+            record.upload_url = stored.upload_url  # type: ignore[attr-defined]
+            record.upload_expires_in = stored.upload_expires_in  # type: ignore[attr-defined]
         return record
 
     def put_file_content(
@@ -2154,7 +2167,7 @@ class WorkOrderService:
             property_record.timezone,
             clock=self._clock,
         )
-        daily = self._employees.get_daily_status(
+        daily = self._employees.get_daily_status_for_update(
             employee_id=employee.id,
             property_id=record.property_id,
             business_date=business_date,
@@ -2338,11 +2351,10 @@ class WorkOrderService:
         return current
 
     def _execute(self, operation: Callable[[], T]) -> T:
-        if self._session.in_transaction():
-            self._session.rollback()
+        from app.core.database import run_service_transaction
+
         try:
-            with self._session.begin():
-                return operation()
+            return run_service_transaction(self._session, operation)
         except AppError:
             raise
         except IntegrityError as exc:

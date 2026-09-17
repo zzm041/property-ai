@@ -7,6 +7,7 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings, get_settings
+from app.core.database import transaction_context
 from app.core.errors import AppError, IamErrorCode, IncidentErrorCode
 from app.core.time import utc_now
 from app.domain.ai import (
@@ -195,9 +196,7 @@ class IncidentService:
         incident_id: int,
         request_id: str,
     ) -> Incident:
-        if self._session.in_transaction():
-            self._session.rollback()
-        with self._session.begin():
+        with transaction_context(self._session):
             incident = self._ai.get_incident_for_update(incident_id)
             if incident is None:
                 raise AppError(
@@ -224,9 +223,7 @@ class IncidentService:
             output = IncidentSummaryOutput.model_validate(payload)
         except (ValidationError, ValueError, Exception):
             output = None
-        if self._session.in_transaction():
-            self._session.rollback()
-        with self._session.begin():
+        with transaction_context(self._session):
             incident = self._ai.get_incident_for_update(incident_id)
             if incident is None:
                 raise AppError(

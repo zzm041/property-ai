@@ -146,7 +146,7 @@ def test_public_grant_reloads_actor_and_writes_fixed_audit_metadata() -> None:
         "scope_type": "SYSTEM",
         "source": "INTERNAL",
     }
-    session.begin.assert_called_once_with()
+    session.begin.assert_not_called()
     session.commit.assert_not_called()
     session.rollback.assert_not_called()
 
@@ -551,9 +551,17 @@ def test_audit_failure_propagates_before_success_return() -> None:
 
 def test_final_transaction_commit_failure_prevents_success_return() -> None:
     service, session, repository, _, audit_service, _ = _build_service()
-    session.begin.return_value.__exit__.side_effect = RuntimeError(
-        "forced commit failure"
-    )
+    session.in_transaction.return_value = False
+
+    class BoomTxn:
+        def __enter__(self) -> object:
+            session.in_transaction.return_value = True
+            return self
+
+        def __exit__(self, exc_type, exc, tb) -> None:
+            raise RuntimeError("forced commit failure")
+
+    session.begin.side_effect = BoomTxn
 
     with pytest.raises(RuntimeError, match="forced commit failure"):
         service.grant_user_role(

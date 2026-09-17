@@ -146,6 +146,7 @@ def create_work_order_graph(session: Session) -> WorkOrderGraph:
             (ANNOUNCEMENT_PUBLISH, "Publish announcements"),
             (KNOWLEDGE_READ, "Read knowledge"),
             (KNOWLEDGE_MANAGE, "Manage knowledge"),
+            ("audit:read", "Read audit"),
         )
         permissions: dict[str, Permission] = {}
         for code, name in permission_defs:
@@ -226,6 +227,10 @@ def create_work_order_graph(session: Session) -> WorkOrderGraph:
                     KNOWLEDGE_READ,
                     KNOWLEDGE_MANAGE,
                 ),
+            ),
+            (
+                "SYSTEM_ADMIN",
+                ("audit:read",),
             ),
         )
         for role_code, codes in grants:

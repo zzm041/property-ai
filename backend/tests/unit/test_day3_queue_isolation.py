@@ -51,6 +51,7 @@ def test_create_celery_app_listens_only_to_env_queue(monkeypatch) -> None:
     assert app.conf.task_default_queue == "property_ai.staging"
     assert app.conf.task_acks_late is True
     assert app.conf.task_reject_on_worker_lost is True
+    assert app.conf.broker_transport_options.get("confirm_publish") is True
     queue_names = {item.name for item in app.conf.task_queues}
     assert queue_names == {"property_ai.staging", "property_ai.staging.dlq"}
 

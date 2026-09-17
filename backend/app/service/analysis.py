@@ -12,6 +12,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings, get_settings
+from app.core.database import transaction_context
 from app.core.errors import (
     AiErrorCode,
     AppError,
@@ -200,10 +201,8 @@ class AnalysisService:
 
     def _prepare(self, *, work_order_id: int, request_id: str) -> AnalysisSnapshot | None:
         del request_id
-        if self._session.in_transaction():
-            self._session.rollback()
         try:
-            with self._session.begin():
+            with transaction_context(self._session):
                 record = self._work_orders.get_work_order_for_update(work_order_id)
                 if record is None:
                     return None
@@ -494,9 +493,7 @@ class AnalysisService:
         error_code: str | None = None,
     ) -> None:
         finished_at = started_at + timedelta(milliseconds=max(latency_ms, 0))
-        if self._session.in_transaction():
-            self._session.rollback()
-        with self._session.begin():
+        with transaction_context(self._session):
             self._ai.add_call_log(
                 AiCallLog(
                     tenant_id=snapshot.tenant_id,
@@ -528,10 +525,8 @@ class AnalysisService:
         attempt: int,
     ) -> WorkOrderAnalysis | None:
         del attempt
-        if self._session.in_transaction():
-            self._session.rollback()
         try:
-            with self._session.begin():
+            with transaction_context(self._session):
                 record = self._work_orders.get_work_order_for_update(snapshot.work_order_id)
                 analysis = self._ai.get_current_analysis_for_update(snapshot.work_order_id)
                 if record is None or analysis is None:

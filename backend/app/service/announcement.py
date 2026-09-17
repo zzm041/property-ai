@@ -7,6 +7,7 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings, get_settings
+from app.core.database import transaction_context
 from app.core.errors import AnnouncementErrorCode, AppError
 from app.core.time import utc_now
 from app.domain.ai import (
@@ -66,9 +67,7 @@ class AnnouncementService:
         claimed_tenant_id: int | None = None,
         audience: str = AnnouncementAudience.RESIDENT.value,
     ) -> Announcement:
-        if self._session.in_transaction():
-            self._session.rollback()
-        with self._session.begin():
+        with transaction_context(self._session):
             property_record = self._work_orders.get_property(property_id)
             if property_record is None:
                 raise AppError(
@@ -133,9 +132,7 @@ class AnnouncementService:
                 message="Announcement title and content are required",
                 status_code=422,
             )
-        if self._session.in_transaction():
-            self._session.rollback()
-        with self._session.begin():
+        with transaction_context(self._session):
             record = self._ai.add_announcement(
                 Announcement(
                     tenant_id=tenant_id,
@@ -182,9 +179,7 @@ class AnnouncementService:
         request_id: str,
     ) -> Announcement:
         del request_id
-        if self._session.in_transaction():
-            self._session.rollback()
-        with self._session.begin():
+        with transaction_context(self._session):
             record = self._require_manage(actor, announcement_id, ANNOUNCEMENT_DRAFT)
             self._transition(record, AnnouncementStatus.PENDING_REVIEW.value)
             return record
@@ -198,9 +193,7 @@ class AnnouncementService:
         decision: str = AnnouncementReviewDecision.APPROVE.value,
         reason: str | None = None,
     ) -> Announcement:
-        if self._session.in_transaction():
-            self._session.rollback()
-        with self._session.begin():
+        with transaction_context(self._session):
             record = self._require_manage(actor, announcement_id, ANNOUNCEMENT_PUBLISH)
             if record.status != AnnouncementStatus.PENDING_REVIEW.value:
                 raise AppError(

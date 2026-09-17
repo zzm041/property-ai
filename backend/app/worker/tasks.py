@@ -4,7 +4,9 @@ from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.database import create_database_engine
+from app.core.errors import AiErrorCode
 from app.core.logging import get_logger
+from app.domain.ai import AnalysisStatus
 from app.provider.errors import (
     ProviderRateLimitError,
     ProviderTimeoutError,
@@ -14,6 +16,22 @@ from app.service.analysis import AnalysisService
 from app.worker.celery_app import celery_app
 
 logger = get_logger(__name__)
+
+
+def raise_retryable_analysis_failure(analysis: object | None) -> None:
+    """Surface retryable provider outcomes so Celery can retry and record failure."""
+
+    if analysis is None:
+        return
+    if getattr(analysis, "status", None) != AnalysisStatus.FAILED.value:
+        return
+    code = getattr(analysis, "error_code", None)
+    if code == AiErrorCode.TIMEOUT:
+        raise ProviderTimeoutError("LLM timed out")
+    if code == AiErrorCode.RATE_LIMITED:
+        raise ProviderRateLimitError("LLM rate limited")
+    if code == AiErrorCode.UNAVAILABLE:
+        raise ProviderUnavailableError("LLM is unavailable")
 
 
 @celery_app.task(
@@ -27,11 +45,12 @@ def analyze_work_order_task(self, work_order_id: int, request_id: str) -> None:
     engine = create_database_engine(settings.active_database_url)
     session = Session(bind=engine, autoflush=False, expire_on_commit=False)
     try:
-        AnalysisService(session, settings=settings).analyze_work_order(
+        analysis = AnalysisService(session, settings=settings).analyze_work_order(
             work_order_id=work_order_id,
             request_id=request_id,
             attempt=int(getattr(self.request, "retries", 0)) + 1,
         )
+        raise_retryable_analysis_failure(analysis)
     except (ProviderTimeoutError, ProviderUnavailableError, ProviderRateLimitError) as exc:
         logger.warning(
             "ai_analysis_retry",
