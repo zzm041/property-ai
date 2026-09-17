@@ -18,7 +18,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     """Build the application without importing any business domain."""
 
     resolved_settings = settings or get_settings()
-    configure_logging(debug=resolved_settings.app_debug)
+    configure_logging(debug=resolved_settings.app_debug, service="api")
     logger = get_logger(__name__)
 
     @asynccontextmanager

@@ -4,16 +4,20 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from hashlib import sha256
 import hmac
+import time
 from urllib.parse import quote
 from uuid import uuid4
 
 import httpx
 
+from app.core.logging import get_logger
 from app.provider.errors import (
     ProviderInvalidOutputError,
     ProviderTimeoutError,
     ProviderUnavailableError,
 )
+
+logger = get_logger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -41,6 +45,9 @@ class StorageProvider:
 
     def get_object(self, storage_key: str) -> bytes:
         raise NotImplementedError
+
+    def ensure_bucket(self) -> None:
+        return None
 
     def presign_put(
         self,
@@ -138,6 +145,11 @@ class ProductionStorageProvider(StorageProvider):
     def get_object(self, storage_key: str) -> bytes:
         return self._request("GET", storage_key)
 
+    def ensure_bucket(self) -> None:
+        """Idempotent bucket create for MinIO/S3-compatible rehearsal."""
+
+        self._request("PUT", "", content=b"", content_type="application/octet-stream")
+
     def presign_put(
         self,
         storage_key: str,
@@ -183,12 +195,12 @@ class ProductionStorageProvider(StorageProvider):
     ) -> bytes:
         if not self.endpoint or not self._access_key:
             raise ProviderUnavailableError("Object storage is unavailable")
-        url = f"{self.endpoint}/{self.bucket}/{storage_key}"
+        url = f"{self.endpoint}/{self.bucket}/{storage_key}".rstrip("/")
         now = datetime.now(timezone.utc)
         amz_date = now.strftime("%Y%m%dT%H%M%SZ")
         datestamp = now.strftime("%Y%m%d")
         payload_hash = sha256(content).hexdigest()
-        canonical_resource = f"/{self.bucket}/{storage_key}"
+        canonical_resource = f"/{self.bucket}/{storage_key}".rstrip("/")
         canonical_headers = (
             f"content-type:{content_type}\n"
             f"host:{self._host()}\n"
@@ -220,19 +232,57 @@ class ProductionStorageProvider(StorageProvider):
         }
         own_client = self._client is None
         http = self._client or httpx.Client(timeout=10.0)
+        started_at = time.perf_counter()
+        operation = "ensure_bucket" if not storage_key else method.lower()
         try:
             response = http.request(method, url, headers=headers, content=content)
         except httpx.TimeoutException as exc:
+            logger.warning(
+                "provider_failed",
+                provider="storage",
+                operation=operation,
+                error_code="AI.TIMEOUT",
+                latency_ms=round((time.perf_counter() - started_at) * 1000, 2),
+            )
             raise ProviderTimeoutError("Object storage timed out") from exc
         except httpx.HTTPError as exc:
+            logger.warning(
+                "provider_failed",
+                provider="storage",
+                operation=operation,
+                error_code="AI.UNAVAILABLE",
+                latency_ms=round((time.perf_counter() - started_at) * 1000, 2),
+            )
             raise ProviderUnavailableError("Object storage is unavailable") from exc
         finally:
             if own_client:
                 http.close()
+        if not storage_key and response.status_code in {200, 201, 204, 409}:
+            return b""
         if response.status_code == 404:
+            logger.warning(
+                "provider_failed",
+                provider="storage",
+                operation=operation,
+                error_code="AI.INVALID_OUTPUT",
+                latency_ms=round((time.perf_counter() - started_at) * 1000, 2),
+            )
             raise ProviderInvalidOutputError("Object was not found")
         if response.status_code >= 400:
+            logger.warning(
+                "provider_failed",
+                provider="storage",
+                operation=operation,
+                error_code="AI.UNAVAILABLE",
+                latency_ms=round((time.perf_counter() - started_at) * 1000, 2),
+            )
             raise ProviderUnavailableError("Object storage is unavailable")
+        logger.info(
+            "provider_succeeded",
+            provider="storage",
+            operation=operation,
+            latency_ms=round((time.perf_counter() - started_at) * 1000, 2),
+        )
         return response.content
 
     def _host(self) -> str:

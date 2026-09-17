@@ -4,6 +4,7 @@ from collections.abc import Callable
 from datetime import datetime
 from typing import TypeVar
 
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -24,6 +25,7 @@ from app.domain.resident import (
     ResidentRelationStatus,
     ResidentRelationType,
 )
+from app.model.identity import Role, UserRole
 from app.model.property import House
 from app.model.resident import ResidentBindRequest, ResidentHouseRelation
 from app.repository.identity import IdentityRepository
@@ -265,11 +267,14 @@ class ResidentBindingService:
             tenant_id=house.tenant_id,
             property_id=house.property_id,
         )
-        RbacService.require_permission(
-            current,
-            RESIDENT_BINDING_CREATE,
-            scope,
-        )
+        # PRD 2.2: a new authenticated user has no PROPERTY-scoped role yet.
+        # Existing principals still need resident_binding:create on that property.
+        if current.grants:
+            RbacService.require_permission(
+                current,
+                RESIDENT_BINDING_CREATE,
+                scope,
+            )
         now = utc_now()
         if (
             self._repository.find_active_relation(
@@ -352,6 +357,11 @@ class ResidentBindingService:
             self._repository.add_relation(relation)
         except IntegrityError as exc:
             self._map_insert_error(exc, expected=_ACTIVE_UNIQUE)
+        self._ensure_resident_role(
+            user_id=request.user_id,
+            tenant_id=house.tenant_id,
+            property_id=house.property_id,
+        )
         self._append_audit(
             action=AuditAction.RESIDENT_BIND_REQUEST_APPROVED,
             resource_type=AuditResourceType.RESIDENT_BIND_REQUEST,
@@ -379,6 +389,38 @@ class ResidentBindingService:
             resource_id=request.id,
         )
         return request, relation
+
+    def _ensure_resident_role(
+        self,
+        *,
+        user_id: int,
+        tenant_id: int,
+        property_id: int,
+    ) -> None:
+        role = self._session.scalar(select(Role).where(Role.code == "RESIDENT"))
+        if role is None:
+            return
+        existing = self._session.scalar(
+            select(UserRole).where(
+                UserRole.user_id == user_id,
+                UserRole.role_id == role.id,
+                UserRole.scope_type == ScopeType.PROPERTY.value,
+                UserRole.tenant_id == tenant_id,
+                UserRole.property_id == property_id,
+            )
+        )
+        if existing is not None:
+            return
+        self._session.add(
+            UserRole(
+                user_id=user_id,
+                role_id=role.id,
+                scope_type=ScopeType.PROPERTY.value,
+                tenant_id=tenant_id,
+                property_id=property_id,
+            )
+        )
+        self._session.flush()
 
     def _review_reject(
         self,

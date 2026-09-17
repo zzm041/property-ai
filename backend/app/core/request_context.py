@@ -50,7 +50,7 @@ class RequestContextMiddleware:
         request_id = _request_id_from_scope(scope)
         scope.setdefault("state", {})["request_id"] = request_id
         clear_contextvars()
-        bind_contextvars(request_id=request_id)
+        bind_contextvars(request_id=request_id, service="api")
 
         method = scope.get("method", "")
         path = scope.get("path", "")

@@ -92,6 +92,8 @@ class HttpEmbeddingProvider(EmbeddingProvider):
             headers=headers,
             json_body={"model": self.model, "input": list(texts)},
             client=self._client,
+            provider="embedding",
+            operation="embed",
         )
         vectors = _parse_embeddings(payload)
         if len(vectors) != len(texts):

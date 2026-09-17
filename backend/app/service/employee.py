@@ -40,6 +40,7 @@ from app.model.employee import (
 from app.model.property import Property
 from app.repository.employee import EmployeeRepository
 from app.repository.identity import IdentityRepository
+from app.repository.work_order import WorkOrderRepository
 from app.service.audit import AuditService
 from app.service.auth import AuthService
 from app.service.rbac import RbacService
@@ -696,7 +697,10 @@ class EmployeeService:
             business_date=business_date,
             on_duty=AttendanceOnDuty.ON_DUTY.value,
             leave_type=None,
-            current_load=0,
+            current_load=WorkOrderRepository(self._session).count_active_assignments_for_employee(
+                employee_id=employee.id,
+                property_id=property_record.id,
+            ),
         )
         try:
             self._repository.add_attendance(attendance)

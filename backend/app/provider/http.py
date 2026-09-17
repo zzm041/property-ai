@@ -3,10 +3,12 @@
 from collections.abc import Mapping
 import json
 import logging
+import time
 from typing import Any
 
 import httpx
 
+from app.core.logging import get_logger
 from app.provider.errors import (
     ProviderInvalidOutputError,
     ProviderRateLimitError,
@@ -16,6 +18,7 @@ from app.provider.errors import (
 
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
+logger = get_logger(__name__)
 
 
 def request_json(
@@ -29,9 +32,12 @@ def request_json(
     files: Any = None,
     params: Mapping[str, str] | None = None,
     client: httpx.Client | None = None,
+    provider: str = "provider",
+    operation: str = "request",
 ) -> Any:
     own_client = client is None
     http = client or httpx.Client(timeout=timeout_seconds)
+    started_at = time.perf_counter()
     try:
         response = http.request(
             method,
@@ -43,24 +49,38 @@ def request_json(
             params=params,
         )
     except httpx.TimeoutException as exc:
+        _log_failure(provider, operation, "AI.TIMEOUT", started_at)
         raise ProviderTimeoutError("Provider timed out") from exc
     except httpx.HTTPError as exc:
+        _log_failure(provider, operation, "AI.UNAVAILABLE", started_at)
         raise ProviderUnavailableError("Provider is unavailable") from exc
     finally:
         if own_client:
             http.close()
     if response.status_code == 429:
+        _log_failure(provider, operation, "AI.RATE_LIMITED", started_at)
         raise ProviderRateLimitError("Provider rate limited")
     if response.status_code >= 500:
+        _log_failure(provider, operation, "AI.UNAVAILABLE", started_at)
         raise ProviderUnavailableError("Provider is unavailable")
     if response.status_code >= 400:
+        _log_failure(provider, operation, "AI.INVALID_OUTPUT", started_at)
         raise ProviderInvalidOutputError("Provider rejected the request")
     if not response.content:
+        _log_failure(provider, operation, "AI.INVALID_OUTPUT", started_at)
         raise ProviderInvalidOutputError("Provider returned an empty response")
     try:
-        return response.json()
+        payload = response.json()
     except json.JSONDecodeError as exc:
+        _log_failure(provider, operation, "AI.INVALID_OUTPUT", started_at)
         raise ProviderInvalidOutputError("Provider returned invalid JSON") from exc
+    logger.info(
+        "provider_succeeded",
+        provider=provider,
+        operation=operation,
+        latency_ms=round((time.perf_counter() - started_at) * 1000, 2),
+    )
+    return payload
 
 
 def parse_json_object(raw: str) -> dict[str, Any]:
@@ -75,3 +95,18 @@ def parse_json_object(raw: str) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise ProviderInvalidOutputError("Provider returned invalid JSON")
     return payload
+
+
+def _log_failure(
+    provider: str,
+    operation: str,
+    error_code: str,
+    started_at: float,
+) -> None:
+    logger.warning(
+        "provider_failed",
+        provider=provider,
+        operation=operation,
+        error_code=error_code,
+        latency_ms=round((time.perf_counter() - started_at) * 1000, 2),
+    )

@@ -162,6 +162,8 @@ class QwenLLMProvider:
                 "temperature": 0,
             },
             client=self._client,
+            provider="llm",
+            operation="structured_completion",
         )
         try:
             content = payload["choices"][0]["message"]["content"]

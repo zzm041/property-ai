@@ -86,6 +86,8 @@ class HttpRerankerProvider(RerankerProvider):
                 "documents": list(documents),
             },
             client=self._client,
+            provider="reranker",
+            operation="rerank",
         )
         scores = payload.get("scores") or payload.get("results")
         if not isinstance(scores, list) or len(scores) != len(documents):

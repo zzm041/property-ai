@@ -116,6 +116,26 @@ def test_hard_filter_and_deterministic_ranking() -> None:
     assert [item[0].employee_id for item in ranked] == [2, 1]
 
 
+def test_hard_filter_rejects_full_capacity() -> None:
+    full = DispatchCandidate(
+        employee_id=4,
+        duty_codes=frozenset({"MAINTENANCE"}),
+        skill_codes=frozenset({"ELECTRICAL"}),
+        current_load=2,
+        max_capacity=2,
+        on_duty=True,
+        employee_active=True,
+        property_effective=True,
+        has_staff_role=True,
+    )
+    assert (
+        hard_filter_candidate(
+            full, required_skill="ELECTRICAL", required_duty="MAINTENANCE"
+        )
+        is FilterReason.CAPACITY_FULL
+    )
+
+
 def test_announcement_cannot_publish_from_draft() -> None:
     assert can_transition_announcement(
         current=AnnouncementStatus.DRAFT.value,

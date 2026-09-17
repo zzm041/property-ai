@@ -6,8 +6,42 @@ from typing import Any
 
 import structlog
 
+_REDACT_TOKENS = (
+    "authorization",
+    "password",
+    "secret",
+    "api_key",
+    "apikey",
+    "session_key",
+    "access_token",
+    "refresh_token",
+    "jwt",
+    "private_key",
+    "credential",
+    "js_code",
+    "wx_code",
+    "app_secret",
+)
 
-def configure_logging(*, debug: bool = False) -> None:
+
+def redact_log_event(
+    _logger: Any,
+    _method: str,
+    event_dict: dict[str, Any],
+) -> dict[str, Any]:
+    """Drop secrets from structured log events. Never log tokens or provider keys."""
+
+    for key, value in list(event_dict.items()):
+        lowered = str(key).casefold()
+        if any(token in lowered for token in _REDACT_TOKENS):
+            event_dict[key] = "[redacted]"
+            continue
+        if isinstance(value, str) and value.casefold().startswith("bearer "):
+            event_dict[key] = "[redacted]"
+    return event_dict
+
+
+def configure_logging(*, debug: bool = False, service: str = "api") -> None:
     """Configure application and Uvicorn logs as one JSON stream."""
 
     level = logging.DEBUG if debug else logging.INFO
@@ -16,6 +50,7 @@ def configure_logging(*, debug: bool = False) -> None:
         structlog.stdlib.add_logger_name,
         structlog.stdlib.add_log_level,
         structlog.processors.TimeStamper(fmt="iso", utc=True),
+        redact_log_event,
     ]
 
     structlog.configure(
@@ -46,14 +81,14 @@ def configure_logging(*, debug: bool = False) -> None:
     root_logger.addHandler(handler)
     root_logger.setLevel(level)
 
-    for logger_name in ("uvicorn", "uvicorn.error", "uvicorn.access"):
+    for logger_name in ("uvicorn", "uvicorn.error", "uvicorn.access", "celery"):
         logger = logging.getLogger(logger_name)
         logger.handlers.clear()
         logger.propagate = True
 
-    # httpx logs full URLs; WeChat/LLM query strings can contain secrets.
     logging.getLogger("httpx").setLevel(logging.WARNING)
     logging.getLogger("httpcore").setLevel(logging.WARNING)
+    structlog.contextvars.bind_contextvars(service=service)
 
 
 def get_logger(name: str) -> structlog.stdlib.BoundLogger:

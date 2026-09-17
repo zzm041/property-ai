@@ -114,6 +114,8 @@ class QwenVLMProvider:
                 "temperature": 0,
             },
             client=self._client,
+            provider="vlm",
+            operation="inspect_image",
         )
         try:
             raw = payload["choices"][0]["message"]["content"]

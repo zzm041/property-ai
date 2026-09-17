@@ -86,7 +86,11 @@ async def http_error_handler(
 
 
 async def unhandled_error_handler(request: Request, exc: Exception) -> JSONResponse:
-    logger.error("unhandled_exception", error_type=type(exc).__name__)
+    logger.error(
+        "unhandled_exception",
+        error_code=ErrorCode.INTERNAL_ERROR,
+        error_type=type(exc).__name__,
+    )
     return _error_response(
         request,
         status_code=500,

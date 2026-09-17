@@ -175,11 +175,22 @@ services:
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
     environment:
       APP_ENV: ${APP_ENV:-development}
+      APP_SECRET_KEY: ${APP_SECRET_KEY:-change-me-to-a-long-random-string}
+      DEV_AUTH_ENABLED: ${DEV_AUTH_ENABLED:-false}
       DATABASE_URL: ${DATABASE_URL:-mysql+pymysql://property:change-me@mysql:3306/property_ai?charset=utf8mb4}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
       CELERY_BROKER_URL: ${CELERY_BROKER_URL:-amqp://property:change-me@rabbitmq:5672/property_ai}
+      CELERY_TASK_QUEUE: ${CELERY_TASK_QUEUE:-property_ai.development}
       MILVUS_URI: ${MILVUS_URI:-http://milvus:19530}
       MILVUS_COLLECTION: ${MILVUS_COLLECTION:-knowledge_chunks_v1}
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-development}
+      STORAGE_ENDPOINT: ${STORAGE_ENDPOINT:-}
+      STORAGE_BUCKET: ${STORAGE_BUCKET:-}
+      STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-}
+      STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-}
+      DB_POOL_SIZE: ${DB_POOL_SIZE:-5}
+      DB_MAX_OVERFLOW: ${DB_MAX_OVERFLOW:-10}
+      DB_POOL_RECYCLE_SECONDS: ${DB_POOL_RECYCLE_SECONDS:-1800}
     depends_on:
       mysql:
         condition: service_healthy
@@ -192,14 +203,34 @@ services:
     build:
       context: ..
       dockerfile: deploy/Dockerfile
-    command: ["celery", "-A", "app.worker.celery_app.celery_app", "worker", "--loglevel=info"]
+    command:
+      [
+        "celery",
+        "-A",
+        "app.worker.celery_app.celery_app",
+        "worker",
+        "--loglevel=info",
+        "-Q",
+        "${CELERY_TASK_QUEUE:-property_ai.development}",
+      ]
     environment:
       APP_ENV: ${APP_ENV:-development}
+      APP_SECRET_KEY: ${APP_SECRET_KEY:-change-me-to-a-long-random-string}
+      DEV_AUTH_ENABLED: ${DEV_AUTH_ENABLED:-false}
       DATABASE_URL: ${DATABASE_URL:-mysql+pymysql://property:change-me@mysql:3306/property_ai?charset=utf8mb4}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
       CELERY_BROKER_URL: ${CELERY_BROKER_URL:-amqp://property:change-me@rabbitmq:5672/property_ai}
+      CELERY_TASK_QUEUE: ${CELERY_TASK_QUEUE:-property_ai.development}
       MILVUS_URI: ${MILVUS_URI:-http://milvus:19530}
       MILVUS_COLLECTION: ${MILVUS_COLLECTION:-knowledge_chunks_v1}
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-development}
+      STORAGE_ENDPOINT: ${STORAGE_ENDPOINT:-}
+      STORAGE_BUCKET: ${STORAGE_BUCKET:-}
+      STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-}
+      STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-}
+      DB_POOL_SIZE: ${DB_POOL_SIZE:-5}
+      DB_MAX_OVERFLOW: ${DB_MAX_OVERFLOW:-10}
+      DB_POOL_RECYCLE_SECONDS: ${DB_POOL_RECYCLE_SECONDS:-1800}
     depends_on:
       mysql:
         condition: service_healthy

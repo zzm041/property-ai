@@ -8,11 +8,13 @@ property-ai/
   .gitignore
   .python-version
   .cursor/rules/project.mdc
-  docs/                          # 规格，先于代码
+  docs/                          # 正式工程规格；需求与验收以此为准
+  reports/                       # 阶段性工程验收证据，不含面试问答
+  learning/                      # 个人学习笔记；不覆盖 docs，不进入运行时/镜像/RAG
   backend/
     pyproject.toml               # 冻结依赖
-    alembic.ini                  # Day 1 Task 2 初始化
-    alembic/versions/            # Stage 0.5 为空，Task 2 创建首个真实迁移
+    alembic.ini
+    alembic/versions/            # 0001–0007 已冻结，禁止改历史
     app/
       api/                       # FastAPI 路由
       domain/                    # 状态机、派单规则
@@ -26,9 +28,10 @@ property-ai/
     tests/
       unit/
       integration/
-  miniprogram/                   # Stage 0.5 占位，Day 1 Task 7 最小纵向链路
-  deploy/                        # Day 1 Task 1 开发 Compose；Production Nginx 后续
-  scripts/
+  miniprogram/                   # 微信原生小程序
+  deploy/                        # Compose + Nginx；Day 4 一次性栈见 docker-compose.day4.yml
+  scripts/                       # 运维与一次性验证脚本
 ```
 
-Stage 0.5 只统一规格、依赖元数据与占位说明。**不要**在此时生成 Route、ORM、Service、Repository、Migration 或小程序业务页面。
+`learning/` 不是业务需求来源，不被运行时代码读取，不进入生产镜像和小程序发布包。
+验收证据写入 `reports/`，不要把面试问答混进工程报告。

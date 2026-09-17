@@ -31,23 +31,36 @@ def enqueue_celery_task(
 ) -> bool:
     """Schedule a Celery task. Return True when work was handed off.
 
-    - test / pytest: BackgroundTasks in-process when provided; never hits the broker
-    - production: Celery only; failure is logged and not converted to in-process work
+    - pytest: BackgroundTasks in-process when provided; never hits the broker
+    - live APP_ENV=test (Day 4 E2E): Celery when not under pytest
+    - production: Celery only; failure is recorded and not converted to in-process work
     - development: Celery first, then BackgroundTasks fallback
     """
     payload = dict(extra or {})
     process_args = tuple(in_process_args if in_process_args is not None else args)
 
-    if settings.app_env == "test" or running_under_pytest():
+    # Pytest must not hit the broker. A live APP_ENV=test process (Day 4 E2E)
+    # enqueues to Celery when AI_ENQUEUE_ON_CREATE is enabled.
+    if running_under_pytest():
         if background is not None and in_process is not None:
             background.add_task(in_process, *process_args)
             return True
         return False
 
     try:
-        celery_task.delay(*args)
+        celery_task.apply_async(args=tuple(args), queue=settings.resolved_celery_queue)
         return True
     except Exception:
+        from app.worker.failed_tasks import record_failed_task
+
+        record_failed_task(
+            settings,
+            task_id=None,
+            operation=getattr(celery_task, "name", None) or event,
+            error_code="ENQUEUE_FAILED",
+            extra={**payload, "enqueue_event": event},
+            args=tuple(args),
+        )
         if settings.app_env == "production":
             logger.error(event, **payload)
             return False

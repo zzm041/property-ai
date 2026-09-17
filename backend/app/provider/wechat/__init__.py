@@ -6,6 +6,7 @@ import logging
 import httpx
 
 from app.provider.errors import ProviderInvalidOutputError, ProviderUnavailableError
+from app.provider.http import request_json
 
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
@@ -63,24 +64,27 @@ class ProductionWeChatAuthProvider(WeChatAuthProvider):
         self._client = client
 
     def exchange_code(self, code: str) -> WeChatSession:
-        http = self._client or httpx.Client(timeout=self.timeout_seconds)
-        own_client = self._client is None
         try:
-            response = http.get(
-                "https://api.weixin.qq.com/sns/jscode2session",
+            payload = request_json(
+                method="GET",
+                url="https://api.weixin.qq.com/sns/jscode2session",
+                timeout_seconds=self.timeout_seconds,
                 params={
                     "appid": self.appid,
                     "secret": self._secret,
                     "js_code": code,
                     "grant_type": "authorization_code",
                 },
+                client=self._client,
+                provider="wechat",
+                operation="jscode2session",
             )
-            payload = response.json()
-        except Exception:
-            raise ProviderUnavailableError("WeChat auth is unavailable")
-        finally:
-            if own_client:
-                http.close()
+        except (ProviderInvalidOutputError, ProviderUnavailableError):
+            raise
+        except Exception as exc:
+            raise ProviderUnavailableError("WeChat auth is unavailable") from exc
+        if not isinstance(payload, dict):
+            raise ProviderInvalidOutputError("WeChat code is invalid")
         if "openid" not in payload or payload.get("errcode"):
             code = payload.get("errcode")
             if code in {45011, -1}:

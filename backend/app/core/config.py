@@ -48,6 +48,10 @@ class Settings(BaseSettings):
     celery_broker_url: str = (
         "amqp://property:change-me@127.0.0.1:5672/property_ai"
     )
+    celery_task_queue: str = ""
+    db_pool_size: int = Field(default=5, ge=1, le=32)
+    db_max_overflow: int = Field(default=10, ge=0, le=32)
+    db_pool_recycle_seconds: int = Field(default=1800, ge=60, le=7200)
 
     readiness_timeout_seconds: float = Field(default=2.0, ge=0.1, le=10.0)
     upload_max_mb: int = Field(default=10, ge=1, le=50)
@@ -120,7 +124,7 @@ class Settings(BaseSettings):
     @property
     def should_enqueue_ai_on_create(self) -> bool:
         if self.app_env == "test":
-            return False
+            return self.ai_enqueue_on_create
         return self.ai_enqueue_on_create or self.app_env in {
             "development",
             "staging",
@@ -208,6 +212,18 @@ class Settings(BaseSettings):
         if self.app_env == "test":
             return self.test_database_url
         return self.database_url
+
+    @property
+    def resolved_celery_queue(self) -> str:
+        """Environment-isolated Celery/RabbitMQ queue. Never share across APP_ENV."""
+
+        if self.celery_task_queue.strip():
+            return self.celery_task_queue.strip()
+        return f"property_ai.{self.app_env}"
+
+    @property
+    def resolved_celery_dlq(self) -> str:
+        return f"{self.resolved_celery_queue}.dlq"
 
 
 @lru_cache

@@ -80,6 +80,8 @@
 
 ## 8. 当前阶段
 
-一次性 **Stage 0.5 — Frozen Specification Reconciliation** 已完成：规格、规则、依赖元数据和占位说明已统一，未实现业务。
+Day 1 / Day 2 基线已验收。Day 3 部署/可观测/备份与 Day 4 发布验证在本工作区执行。
 
-当前 Gate 仅允许重新生成并确认 Day 1 Task 1~8 计划。未经负责人明确批准，不得执行 Day 1 Task 1，更不得进入后续 Task 或 Day 2+。
+**未经负责人明确批准，不得进入 Day 5。**
+
+`learning/` 只解释当前实现与验证状态，**不能覆盖** `docs/` 正式工程规格、`AGENTS.md` 或 `.cursor/rules/`。运行时代码、种子数据、物业知识库导入源和生产镜像不得读取 `learning/`。验收证据放在 `reports/`。

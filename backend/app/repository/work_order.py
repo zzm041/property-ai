@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.model.property import House, Property
@@ -111,6 +111,26 @@ class WorkOrderRepository:
                 WorkOrderAssignment.ended_at.is_(None),
             )
             .with_for_update()
+        )
+
+    def count_active_assignments_for_employee(
+        self,
+        *,
+        employee_id: int,
+        property_id: int,
+    ) -> int:
+        return int(
+            self._session.scalar(
+                select(func.count())
+                .select_from(WorkOrderAssignment)
+                .where(
+                    WorkOrderAssignment.employee_id == employee_id,
+                    WorkOrderAssignment.property_id == property_id,
+                    WorkOrderAssignment.status == "ACTIVE",
+                    WorkOrderAssignment.ended_at.is_(None),
+                )
+            )
+            or 0
         )
 
     def list_assignments(self, work_order_id: int) -> tuple[WorkOrderAssignment, ...]:

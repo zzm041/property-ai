@@ -83,6 +83,8 @@ class HttpASRProvider:
             data={"model": self.model},
             files={"file": (f"audio.{extension}", content, mime_type)},
             client=self._client,
+            provider="asr",
+            operation="transcribe",
         )
         text = payload.get("text") or payload.get("transcript")
         if not isinstance(text, str) or not text.strip():

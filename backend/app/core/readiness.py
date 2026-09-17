@@ -3,6 +3,7 @@
 import time
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
 from typing import Any
 
 import redis
@@ -16,6 +17,7 @@ from app.core.logging import get_logger
 logger = get_logger(__name__)
 
 Probe = Callable[[Settings], None]
+NOT_CHECKED = object()
 
 
 def probe_mysql(settings: Settings) -> None:
@@ -67,10 +69,18 @@ def probe_rabbitmq(settings: Settings) -> None:
         )
 
 
-def _run_probe(name: str, critical: bool, probe: Probe, settings: Settings) -> dict[str, Any]:
+def _run_probe(name: str, critical: bool, probe: Probe | object, settings: Settings) -> dict[str, Any]:
+    if probe is NOT_CHECKED:
+        return {
+            "status": "not_checked",
+            "critical": critical,
+            "checked_at": None,
+            "reason": "live_vendor_not_probed",
+        }
     started_at = time.perf_counter()
+    checked_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     try:
-        probe(settings)
+        probe(settings)  # type: ignore[misc]
     except Exception as exc:  # Dependency clients raise different exception families.
         latency_ms = round((time.perf_counter() - started_at) * 1000, 2)
         logger.warning(
@@ -84,18 +94,20 @@ def _run_probe(name: str, critical: bool, probe: Probe, settings: Settings) -> d
             "status": "down",
             "critical": critical,
             "latency_ms": latency_ms,
+            "checked_at": checked_at,
         }
 
     return {
         "status": "up",
         "critical": critical,
         "latency_ms": round((time.perf_counter() - started_at) * 1000, 2),
+        "checked_at": checked_at,
     }
 
 
 def check_readiness(
     settings: Settings,
-    probes: dict[str, tuple[bool, Probe]] | None = None,
+    probes: dict[str, tuple[bool, Any]] | None = None,
 ) -> tuple[dict[str, Any], int]:
     """Return dependency details and the HTTP status dictated by criticality."""
 
@@ -103,12 +115,12 @@ def check_readiness(
         "mysql": (True, probe_mysql),
         "redis": (False, probe_redis),
         "rabbitmq": (False, probe_rabbitmq),
-        "llm": (False, lambda _settings: None),
-        "vlm": (False, lambda _settings: None),
-        "asr": (False, lambda _settings: None),
-        "embedding": (False, lambda _settings: None),
-        "reranker": (False, lambda _settings: None),
-        "storage": (False, lambda _settings: None),
+        "llm": (False, NOT_CHECKED),
+        "vlm": (False, NOT_CHECKED),
+        "asr": (False, NOT_CHECKED),
+        "embedding": (False, NOT_CHECKED),
+        "reranker": (False, NOT_CHECKED),
+        "storage": (False, NOT_CHECKED),
         "milvus": (False, probe_milvus),
     }
 

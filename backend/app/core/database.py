@@ -41,6 +41,9 @@ def create_database_engine(
     database_url: str,
     *,
     connect_timeout: int = 5,
+    pool_size: int | None = None,
+    max_overflow: int | None = None,
+    pool_recycle: int | None = None,
 ) -> Engine:
     """Create one sync PyMySQL engine whose every connection is explicitly UTC."""
 
@@ -49,9 +52,9 @@ def create_database_engine(
     engine = create_engine(
         parsed,
         pool_pre_ping=True,
-        pool_recycle=1800,
-        pool_size=5,
-        max_overflow=10,
+        pool_recycle=pool_recycle if pool_recycle is not None else 1800,
+        pool_size=pool_size if pool_size is not None else 5,
+        max_overflow=max_overflow if max_overflow is not None else 10,
         connect_args={
             "connect_timeout": connect_timeout,
             "read_timeout": connect_timeout,
@@ -68,7 +71,14 @@ def create_database_engine(
 def get_engine(database_url: str, connect_timeout: int = 5) -> Engine:
     """Return a process-local engine for a validated database URL."""
 
-    return create_database_engine(database_url, connect_timeout=connect_timeout)
+    settings = get_settings()
+    return create_database_engine(
+        database_url,
+        connect_timeout=connect_timeout,
+        pool_size=settings.db_pool_size,
+        max_overflow=settings.db_max_overflow,
+        pool_recycle=settings.db_pool_recycle_seconds,
+    )
 
 
 @lru_cache(maxsize=4)

@@ -28,4 +28,5 @@ alwaysApply: true
 - 不保存原始人脸特征，不让 AI 自动发公告，不让业主自行联系第三方。
 - 不把 `owner_name` 写死在 House 表；不用覆盖历史住户关系。
 - 不硬编码 SLA；不跨 tenant/property 查询知识或工单。
-- Stage 0.5 只统一规格与元数据；完成后不得自动进入 Day 1。
+- `learning/` 只解释实现，不能覆盖 `docs/` 或本规则；不得作为业务需求或 RAG 导入来源。
+- 未经负责人明确批准，不得进入 Day 5。

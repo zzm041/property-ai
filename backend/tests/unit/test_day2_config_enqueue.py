@@ -41,7 +41,7 @@ def test_production_enqueue_does_not_fallback_in_process(monkeypatch) -> None:
     monkeypatch.delenv("PYTEST_CURRENT_TEST", raising=False)
     settings = _production()
     task = MagicMock()
-    task.delay.side_effect = RuntimeError("broker down")
+    task.apply_async.side_effect = RuntimeError("broker down")
     in_process = MagicMock()
     ok = enqueue_celery_task(
         settings=settings,
@@ -60,7 +60,7 @@ def test_development_enqueue_falls_back_to_background(monkeypatch) -> None:
     monkeypatch.delenv("PYTEST_CURRENT_TEST", raising=False)
     settings = Settings(_env_file=None, app_env="development")
     task = MagicMock()
-    task.delay.side_effect = RuntimeError("broker down")
+    task.apply_async.side_effect = RuntimeError("broker down")
     background = MagicMock()
     in_process = MagicMock()
     ok = enqueue_celery_task(
@@ -73,3 +73,51 @@ def test_development_enqueue_falls_back_to_background(monkeypatch) -> None:
     )
     assert ok is True
     background.add_task.assert_called_once()
+
+
+def test_pytest_does_not_hit_broker_in_test_env() -> None:
+    settings = Settings(
+        _env_file=None,
+        app_env="test",
+        ai_enqueue_on_create=True,
+        wechat_login_enabled=False,
+    )
+    task = MagicMock()
+    background = MagicMock()
+    in_process = MagicMock()
+    ok = enqueue_celery_task(
+        settings=settings,
+        celery_task=task,
+        args=(3, "rid"),
+        event="ai_enqueue_failed",
+        background=background,
+        in_process=in_process,
+    )
+    assert ok is True
+    task.apply_async.assert_not_called()
+    background.add_task.assert_called_once()
+
+
+def test_live_test_env_enqueues_to_celery(monkeypatch) -> None:
+    monkeypatch.delenv("PYTEST_CURRENT_TEST", raising=False)
+    settings = Settings(
+        _env_file=None,
+        app_env="test",
+        ai_enqueue_on_create=True,
+        wechat_login_enabled=False,
+        celery_task_queue="property_ai.day4",
+    )
+    task = MagicMock()
+    task.name = "app.worker.tasks.analyze_work_order_task"
+    ok = enqueue_celery_task(
+        settings=settings,
+        celery_task=task,
+        args=(4, "rid-4"),
+        event="ai_enqueue_failed",
+        extra={"work_order_id": 4},
+    )
+    assert ok is True
+    task.apply_async.assert_called_once_with(
+        args=(4, "rid-4"),
+        queue="property_ai.day4",
+    )
