@@ -13,7 +13,7 @@ Unverified items are marked. This file is **not** a requirement source and must 
 
 ### Q. Why can a brand-new WeChat user create a bind request without `resident_binding:create`?
 
-Because they have no PROPERTY-scoped grants yet (PRD 2.2). `ResidentService` skips that permission only when `current.grants` is empty; principals who already have grants still need `resident_binding:create` on the **target house’s** PROPERTY scope (`backend/app/service/resident.py`). Approve then `_ensure_resident_role`. Pytest apply **PASS**; live 8082 apply+approve+work order **PASS**. Production WeChat login **BLOCKED_BY_CREDENTIALS**.
+Because they are an ACTIVE self-applicant, not because `current.grants` is empty. `ResidentService._create_bind_request` uses `_require_active_actor` (applicant policy) and does not require `resident_binding:create` on the target property (`backend/app/service/resident.py`). A role on property A does not block applying to B. Apply stays PENDING and does not create a house relation or grant. Approve is atomic (request + relation + PROPERTY RESIDENT + audit). Pytest apply **PASS**; live 8082 apply+approve+work order **PASS**. Production WeChat login **BLOCKED_BY_CREDENTIALS**.
 
 ---
 
@@ -73,7 +73,7 @@ Assign uses eligibility including capacity. Second assign raises `WO.EMPLOYEE_NO
 
 ### Q. Is `/opsz` a public health URL?
 
-No. Day 4 `/opsz` requires an operator permission. 8082 unauthenticated **401**. 8081 prodlike old image still **200** — do not quote 8081 as the current contract.
+No. `/opsz` requires SYSTEM-scoped `audit:read` (`RbacService.require_permission` + `OrganizationScope(SYSTEM)`). 8082 unauthenticated **401**, property manager **403**, SYSTEM admin **200**. 8081 prodlike unauthenticated **401** after rebuild. Staging operator 200 is **NOT_RUN** without a real ops login; DevAuth stays off on staging.
 
 ---
 

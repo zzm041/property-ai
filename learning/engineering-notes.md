@@ -9,18 +9,11 @@ Verification labels: PASS / FAIL / PARTIAL / NOT_RUN / BLOCKED_BY_CREDENTIALS.
 
 ---
 
-## Transaction boundary vs `_execute` rollback
+## Transaction boundary vs `_execute`
 
-Files: `backend/app/service/employee.py` (`_execute` ~1146), same pattern in `work_order.py`, `knowledge.py`, `resident.py`.
+Files: `backend/app/core/database.py` (`transaction_context`, `run_service_transaction`); service `_execute` in employee / resident / work_order / knowledge / property; `rbac_mutation._execute_authorized`.
 
-`Service` owns the transaction (`AGENTS.md`). Several services still do:
-
-```python
-if self._session.in_transaction():
-    self._session.rollback()
-```
-
-before opening their own `begin()`. That discards **caller** uncommitted work on a shared Session. Day 4 **did not** mass-refactor this (frozen architecture). Status: **FAIL** as a known defect, documented in `reports/day4-verification.md`. Capacity tests create work orders **before** check-in so the rollback does not wipe the graph.
+Top-level use cases own `begin/commit`. Nested helpers join an open transaction and **do not** rollback the caller to re-begin. HTTP Auth uses a separate Session from the business Session (`get_current_principal` vs `get_db_session`). Tests: `tests/integration/test_day4_silent_rollback.py`. Status after remediation: **PASS** on disposable MySQL (pending + flushed rows preserved; outer rollback drops business+audit together; top-level HTTP still commits).
 
 ---
 
@@ -51,7 +44,7 @@ Files: `backend/app/core/readiness.py` (`NOT_CHECKED`), `backend/app/api/v1/heal
 
 Unprobed LLM/VLM/ASR/embedding/reranker/storage → `not_checked` + `live_vendor_not_probed`, never fake `up`. MySQL is critical.
 
-`/opsz` requires `get_current_principal` plus one of `role:read` / `audit:read` / `work_order:dispatch` / `knowledge:manage` / `employee:manage`. Public 401 on Day 4 Nginx 8082 **PASS**. Prodlike 8081 still 200 on old images — **PARTIAL** leftover.
+`/opsz` requires `RbacService.require_permission(principal, "audit:read", OrganizationScope(SYSTEM))`. Flat `Principal.permissions` is not enough. PROPERTY/TENANT managers with `audit:read` on a property still **403**. Unauthenticated **401**. Isolated Day 4 SYSTEM admin **200** without secrets. Prodlike `:8081` unauthenticated **401** after image rebuild. Operator 200 on staging is **NOT_RUN** (no staging login; DevAuth not enabled).
 
 ---
 
@@ -61,13 +54,13 @@ Compose: `deploy/docker-compose.day4.yml`. User `day4` permissions **only** on v
 
 ---
 
-## First-time WeChat user vs `resident_binding:create`
+## First-time WeChat user vs self bind-apply
 
 File: `backend/app/service/resident.py` (`_create_bind_request`, `_ensure_resident_role`).
 
-PRD 2.2: a newly authenticated WeChat user has JWT and **no** PROPERTY grants, so bind-create cannot require `resident_binding:create` until they belong to a property. If `current.grants` is non-empty, the permission is still required **on that house’s PROPERTY scope**. Approve inserts PROPERTY `RESIDENT` so the user can create work orders.
+Self-apply is an applicant/ownership policy: an ACTIVE user may submit a PENDING bind request for themselves. Having a role on property A does not block applying to property B. Apply does **not** create `ResidentHouseRelation` or grants. Approve is atomic: request APPROVED + relation + PROPERTY RESIDENT grant (reuse if present) + audit. Missing RESIDENT role is `IAM.ROLE_NOT_FOUND` and rolls back; the resident service does not create admin/catalog rows.
 
-Verified: pytest apply-only **PASS**; live 8082 apply+approve+WO **PASS**. Production WeChat **BLOCKED_BY_CREDENTIALS**.
+Verified: pytest new-user / A→B / staff self-apply / missing-role rollback / concurrent grant uniqueness; live 8082 apply+approve+WO **PASS**. Production WeChat **BLOCKED_BY_CREDENTIALS**. This is not “any user may access any property”.
 
 ---
 
