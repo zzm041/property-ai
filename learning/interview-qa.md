@@ -77,9 +77,15 @@ No. `/opsz` requires SYSTEM-scoped `audit:read` (`RbacService.require_permission
 
 ---
 
+### Q. If a Session already has a transaction but `new`/`dirty`/`deleted` are empty, may the service roll it back?
+
+No. `begin_owned_transaction` refuses any `in_transaction()` and does not rollback, commit, or join. Empty identity-map collections do not prove there are no flushed writes. `_is_clean_autobegin` was removed. A leftover SELECT autobegin is also refused; HTTP Auth closes its own Session instead of rolling back a shared one. Tests: `test_flushed_*_is_refused_and_caller_can_commit`, `test_query_autobegin_is_not_silently_rolled_back_by_public_use_case`. **PASS** on disposable MySQL.
+
+---
+
 ### Q. Can `learning/` be imported into the property RAG?
 
-Must not. Rebuild reads MySQL documents only. `.dockerignore` excludes `learning/`. No `backend/app` import of `learning/`. Specs remain in `docs/`.
+Must not. Rebuild reads MySQL documents only. `.dockerignore` excludes `learning/`. No `backend/app` import of `learning/`. Specs remain in `docs/`. Interview answers here are not engineering acceptance.
 
 ---
 

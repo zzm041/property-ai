@@ -13,7 +13,7 @@ Verification labels: PASS / FAIL / PARTIAL / NOT_RUN / BLOCKED_BY_CREDENTIALS.
 
 Files: `backend/app/core/database.py` (`begin_owned_transaction`, `run_owned_transaction`, `run_composing_transaction`). `transaction_context` / `run_service_transaction` are **owned aliases** and do **not** auto-join.
 
-Top-level use cases own begin/commit/rollback. Nested work uses an explicit composing entry that requires an owned outer txn. An unexpected open txn is refused before new side effects; caller work is not committed or rolled back. Clean leftover SQLAlchemy `AUTOBEGIN` with no pending/flushed rows may be closed as Session hygiene. HTTP Auth uses a separate Session. WeChat tokens return only after the owned audit txn commits. AI/embed: Tx A ends, provider runs, Tx B starts. Tests: `tests/integration/test_day4_silent_rollback.py` (independent Session persist). Status: **PASS** on disposable MySQL. Auto-join is **not** an accepted pattern.
+Top-level use cases own begin/commit/rollback. Nested work uses an explicit composing entry that requires an **active** owned transaction object, not just a count in `session.info`. Any already-open transaction — including a leftover SQLAlchemy `AUTOBEGIN` from a SELECT, and including a Session whose `new`/`dirty`/`deleted` collections are empty — is **refused** before new side effects. The helper does **not** rollback, commit, or join that leftover work. “Collections are empty, so rollback is safe” is **incorrect** and was removed (`_is_clean_autobegin` / `_close_unowned_read_transaction`). HTTP Auth uses a separate Session closed by the dependency. Reloading a principal inside an owned business transaction reads in that same transaction. WeChat / development tokens return only after the owned audit txn commits. AI/embed/push: Tx A ends, provider runs, Tx B starts. Tests: `tests/integration/test_day4_silent_rollback.py` (independent Session persist; flushed INSERT/UPDATE/DELETE/Core execute; query autobegin not discarded). Status: **PASS** on disposable MySQL. Auto-join is **not** an accepted pattern.
 
 ---
 
@@ -34,7 +34,7 @@ Files: `backend/app/worker/failed_tasks.py`, `backend/app/cli/replay_failed_task
 
 Lookup is direct `hget` by `record_id` (list paging is separate). Replay validates per-operation args, reserves attempt/`task_id` before enqueue, and CAS-updates by attempt. Celery `task_success` is **not** business `SUCCEEDED`. `FAILED`+`INVALID_OUTPUT` is `PERMANENT_FAILED`. Named JSON publish to `{queue}.dlq` is **not** AMQP DLX.
 
-This-round live drill **PASS** (Fake): WO 164 `AI.UNAVAILABLE` record `9a1720cf-…` replay → `PENDING_ASSIGNMENT`; WO 165 `ENQUEUE_FAILED` replay → `PENDING_ASSIGNMENT`. Dual Redis+broker outage is **not** recovery PASS; no 0008 outbox/sweeper yet. Do not say incomplete task recovery is accepted.
+Focused-fix live drill **PASS** (Fake): WO **488** `AI.UNAVAILABLE` record `5c0a106e-17e0-4de1-b7e8-df3cdae1ac83` replay → `PENDING_ASSIGNMENT`; WO **489** `ENQUEUE_FAILED` `enqueue-82cc66444856428689acf39cef0a811e` replay → `PENDING_ASSIGNMENT`. Matching is structured fields, not `str(work_order_id) in line`. Dual Redis+broker outage is **not** recovery PASS; no 0008 outbox/sweeper yet. Notification/knowledge claim on 0007 columns is **PARTIAL** (no dedicated owner token; Development push is at-least-once). Do not say incomplete task recovery is accepted.
 
 ---
 
@@ -88,4 +88,4 @@ MySQL restore does not move JPEG bytes. Day 4 restore test put a unique object i
 
 ## Learning / image copy scope
 
-`deploy/Dockerfile` copies `backend/` only. `.dockerignore` excludes `learning/`, `reports/`, `miniprogram/`, `docs/`. No runtime import of `learning/`.
+`deploy/Dockerfile` copies `backend/` only. `.dockerignore` excludes `learning/`, `reports/`, `miniprogram/`, `docs/`. No runtime import of `learning/`. Interview Q&A in `learning/interview-qa.md` is not engineering acceptance and is not a RAG source.
