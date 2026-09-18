@@ -26,15 +26,21 @@ def main(argv: list[str] | None = None) -> int:
                 KnowledgeDocument.current_version.is_not(None),
             )
         ).all()
+        rows = [
+            (int(document.id), int(document.current_version))
+            for document in documents
+        ]
+        if session.in_transaction():
+            session.commit()
         service = KnowledgeService(session, settings=settings)
-        for document in documents:
+        for document_id, version in rows:
             service.ingest_version(
-                document_id=document.id,
-                version=int(document.current_version),
-                request_id=f"rebuild-{document.id}",
+                document_id=document_id,
+                version=version,
+                request_id=f"rebuild-{document_id}",
                 rebuild=True,
             )
-        print(f"Rebuilt {len(documents)} active knowledge documents")
+        print(f"Rebuilt {len(rows)} active knowledge documents")
         return 0
     except AppError as exc:
         print(f"{exc.code}: {exc.message}", file=sys.stderr)
