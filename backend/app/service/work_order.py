@@ -2350,11 +2350,12 @@ class WorkOrderService:
             )
         return current
 
-    def _execute(self, operation: Callable[[], T]) -> T:
-        from app.core.database import run_service_transaction
+    def _execute(self, operation: Callable[[], T], *, composing: bool = False) -> T:
+        from app.core.database import run_composing_transaction, run_owned_transaction
 
         try:
-            return run_service_transaction(self._session, operation)
+            runner = run_composing_transaction if composing else run_owned_transaction
+            return runner(self._session, operation)
         except AppError:
             raise
         except IntegrityError as exc:

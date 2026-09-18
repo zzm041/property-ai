@@ -426,7 +426,7 @@ class RbacMutationService:
         target_scope: OrganizationScope,
         operation: Callable[[int], T],
     ) -> T:
-        from app.core.database import run_service_transaction
+        from app.core.database import run_owned_transaction
 
         try:
             def _authorized() -> T:
@@ -438,7 +438,7 @@ class RbacMutationService:
                 )
                 return operation(current_actor.user_id)
 
-            return run_service_transaction(self._session, _authorized)
+            return run_owned_transaction(self._session, _authorized)
         except AppError:
             raise
         except SQLAlchemyError as exc:
@@ -610,10 +610,9 @@ class RbacMutationService:
         return any(name.casefold() in message for name in expected_constraints)
 
     def _require_active_transaction(self) -> None:
-        if not self._session.in_transaction():
-            raise RuntimeError(
-                "RBAC current-transaction helper requires an active transaction"
-            )
+        from app.core.database import require_owned_transaction
+
+        require_owned_transaction(self._session)
 
     @classmethod
     def _validate_public_inputs(

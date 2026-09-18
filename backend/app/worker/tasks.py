@@ -34,6 +34,33 @@ def raise_retryable_analysis_failure(analysis: object | None) -> None:
         raise ProviderUnavailableError("LLM is unavailable")
 
 
+def _record_analysis_attempt_outcome(task_id: str | None, analysis: object | None) -> None:
+    if not task_id or analysis is None:
+        return
+    from app.worker.failed_tasks import (
+        STATUS_IGNORED_EXPIRED,
+        STATUS_PERMANENT_FAILED,
+        STATUS_SUCCEEDED,
+        complete_attempt,
+    )
+
+    status = getattr(analysis, "status", None)
+    error_code = getattr(analysis, "error_code", None)
+    outcome = None
+    if status in {AnalysisStatus.COMPLETED.value, AnalysisStatus.LOW_CONFIDENCE.value}:
+        outcome = STATUS_SUCCEEDED
+    elif status == AnalysisStatus.STALE.value:
+        outcome = STATUS_IGNORED_EXPIRED
+    elif status == AnalysisStatus.FAILED.value and error_code == AiErrorCode.INVALID_OUTPUT:
+        outcome = STATUS_PERMANENT_FAILED
+    if outcome is None:
+        return
+    try:
+        complete_attempt(str(task_id), outcome, error_code=error_code)
+    except Exception:
+        logger.warning("failed_task_outcome_unavailable", task_id=str(task_id), outcome=outcome)
+
+
 @celery_app.task(
     bind=True,
     name="app.worker.tasks.analyze_work_order_task",
@@ -51,6 +78,7 @@ def analyze_work_order_task(self, work_order_id: int, request_id: str) -> None:
             attempt=int(getattr(self.request, "retries", 0)) + 1,
         )
         raise_retryable_analysis_failure(analysis)
+        _record_analysis_attempt_outcome(getattr(self.request, "id", None), analysis)
     except (ProviderTimeoutError, ProviderUnavailableError, ProviderRateLimitError) as exc:
         logger.warning(
             "ai_analysis_retry",

@@ -113,5 +113,5 @@ def _log_failure(
         error_code=error_code,
         latency_ms=round((time.perf_counter() - started_at) * 1000, 2),
         url=safe_url_for_log(url) if url else None,
-        exc_info=exc,
+        error_type=type(exc).__name__ if exc is not None else None,
     )

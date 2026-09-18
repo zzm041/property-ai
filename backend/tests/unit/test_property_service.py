@@ -16,6 +16,8 @@ from app.service.property import (
 
 def _service() -> tuple[PropertyService, MagicMock, MagicMock]:
     session = MagicMock()
+    session.in_transaction.return_value = False
+    session.info = {}
     repository = MagicMock(spec=PropertyRepository)
     return PropertyService(session, repository), session, repository
 

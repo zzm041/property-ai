@@ -571,11 +571,39 @@ class ResidentBindingService:
                 else 403,
             )
 
-    def _execute(self, operation: Callable[[], T]) -> T:
-        from app.core.database import run_service_transaction
+    def create_bind_request_in_owned_transaction(
+        self,
+        *,
+        actor: Principal,
+        house_id: int,
+        relation_type: str,
+        request_id: str,
+        claimed_tenant_id: int | None = None,
+        claimed_property_id: int | None = None,
+    ) -> ResidentBindRequest:
+        """Compose bind-request creation into a caller-owned transaction."""
+
+        self._require_positive_id(house_id, "house_id")
+        validated_type = self._validate_relation_type(relation_type)
+        self._validate_request_id(request_id)
+        return self._execute(
+            lambda: self._create_bind_request(
+                actor=actor,
+                house_id=house_id,
+                relation_type=validated_type,
+                request_id=request_id,
+                claimed_tenant_id=claimed_tenant_id,
+                claimed_property_id=claimed_property_id,
+            ),
+            composing=True,
+        )
+
+    def _execute(self, operation: Callable[[], T], *, composing: bool = False) -> T:
+        from app.core.database import run_composing_transaction, run_owned_transaction
 
         try:
-            return run_service_transaction(self._session, operation)
+            runner = run_composing_transaction if composing else run_owned_transaction
+            return runner(self._session, operation)
         except AppError:
             raise
         except IntegrityError as exc:

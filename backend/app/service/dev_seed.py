@@ -10,7 +10,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings
-from app.core.database import create_database_engine
+from app.core.database import begin_owned_transaction, create_database_engine
 from app.core.errors import AppError, DevSeedErrorCode
 from app.domain.audit import AuditAction, AuditResourceType, AuditSource
 from app.domain.dev_seed import (
@@ -88,7 +88,7 @@ def run_development_seed(
         )
         seed_request_id = request_id or f"dev-seed-{uuid4().hex}"
         try:
-            with session.begin():
+            with begin_owned_transaction(session):
                 return DevSeedService(session).seed(request_id=seed_request_id)
         except AppError:
             raise

@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings
-from app.core.database import transaction_context
+from app.core.database import run_owned_transaction
 from app.core.errors import AppError, AuthErrorCode, ErrorCode, WeChatAuthErrorCode
 from app.core.security import issue_access_token
 from app.domain.audit import AuditAction, AuditResourceType
@@ -59,8 +59,11 @@ class WeChatAuthService:
                 message="WeChat auth is unavailable",
                 status_code=503,
             ) from exc
+        issued: IssuedAccessToken | None = None
         try:
-            with transaction_context(self._session):
+
+            def _persist() -> None:
+                nonlocal issued
                 binding = self._repository.get_user_wechat(
                     appid=session.appid,
                     openid=session.openid,
@@ -109,11 +112,13 @@ class WeChatAuthService:
                         "token_type": "access",
                     },
                 )
-                return IssuedAccessToken(
+                issued = IssuedAccessToken(
                     access_token=token,
                     token_type="bearer",
                     expires_in=settings.jwt_access_token_ttl_seconds,
                 )
+
+            run_owned_transaction(self._session, _persist)
         except AppError:
             raise
         except IntegrityError as exc:
@@ -128,3 +133,10 @@ class WeChatAuthService:
                 message="WeChat login could not be completed",
                 status_code=500,
             ) from exc
+        if issued is None:
+            raise AppError(
+                code=ErrorCode.INTERNAL_ERROR,
+                message="WeChat login could not be completed",
+                status_code=500,
+            )
+        return issued

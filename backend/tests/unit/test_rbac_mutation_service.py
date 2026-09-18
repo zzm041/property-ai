@@ -6,6 +6,7 @@ from unittest.mock import MagicMock
 import pytest
 from sqlalchemy.exc import IntegrityError
 
+from app.core.database import OWNED_TXN_KEY
 from app.core.errors import AppError, IamErrorCode
 from app.domain.audit import AuditAction, AuditResourceType, AuditSource
 from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
@@ -50,7 +51,8 @@ def _build_service(
     MagicMock,
 ]:
     session = MagicMock()
-    session.in_transaction.return_value = True
+    session.in_transaction.return_value = False
+    session.info = {}
     repository = MagicMock(spec=RbacMutationRepository)
     property_repository = MagicMock(spec=PropertyRepository)
     audit_service = MagicMock(spec=AuditService)
@@ -146,7 +148,7 @@ def test_public_grant_reloads_actor_and_writes_fixed_audit_metadata() -> None:
         "scope_type": "SYSTEM",
         "source": "INTERNAL",
     }
-    session.begin.assert_not_called()
+    session.begin.assert_called_once()
     session.commit.assert_not_called()
     session.rollback.assert_not_called()
 
@@ -578,6 +580,8 @@ def test_final_transaction_commit_failure_prevents_success_return() -> None:
 
 def test_development_seed_grant_uses_fixed_source_without_transaction_control() -> None:
     service, session, _, _, audit_service, _ = _build_service()
+    session.in_transaction.return_value = True
+    session.info[OWNED_TXN_KEY] = 1
 
     result = service.grant_user_role_for_development_seed(
         target_user_id=20,
@@ -597,6 +601,8 @@ def test_development_seed_grant_uses_fixed_source_without_transaction_control() 
 
 def test_development_seed_role_permission_uses_fixed_source() -> None:
     service, session, _, _, audit_service, _ = _build_service()
+    session.in_transaction.return_value = True
+    session.info[OWNED_TXN_KEY] = 1
 
     service.grant_role_permission_for_development_seed(
         role_code="PROPERTY_ADMIN",

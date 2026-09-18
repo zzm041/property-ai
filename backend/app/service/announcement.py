@@ -7,7 +7,7 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings, get_settings
-from app.core.database import transaction_context
+from app.core.database import begin_owned_transaction
 from app.core.errors import AnnouncementErrorCode, AppError
 from app.core.time import utc_now
 from app.domain.ai import (
@@ -67,7 +67,7 @@ class AnnouncementService:
         claimed_tenant_id: int | None = None,
         audience: str = AnnouncementAudience.RESIDENT.value,
     ) -> Announcement:
-        with transaction_context(self._session):
+        with begin_owned_transaction(self._session):
             property_record = self._work_orders.get_property(property_id)
             if property_record is None:
                 raise AppError(
@@ -109,6 +109,12 @@ class AnnouncementService:
         draft_title = title
         draft_content = content
         if ai_draft:
+            if self._session.in_transaction():
+                from app.core.database import TransactionContractError
+
+                raise TransactionContractError(
+                    "Provider calls must not hold a business transaction"
+                )
             prompt = (
                 f"property={resolved_property_id};incident={resolved_incident_id or ''}"
             )
@@ -132,7 +138,7 @@ class AnnouncementService:
                 message="Announcement title and content are required",
                 status_code=422,
             )
-        with transaction_context(self._session):
+        with begin_owned_transaction(self._session):
             record = self._ai.add_announcement(
                 Announcement(
                     tenant_id=tenant_id,
@@ -179,7 +185,7 @@ class AnnouncementService:
         request_id: str,
     ) -> Announcement:
         del request_id
-        with transaction_context(self._session):
+        with begin_owned_transaction(self._session):
             record = self._require_manage(actor, announcement_id, ANNOUNCEMENT_DRAFT)
             self._transition(record, AnnouncementStatus.PENDING_REVIEW.value)
             return record
@@ -193,7 +199,7 @@ class AnnouncementService:
         decision: str = AnnouncementReviewDecision.APPROVE.value,
         reason: str | None = None,
     ) -> Announcement:
-        with transaction_context(self._session):
+        with begin_owned_transaction(self._session):
             record = self._require_manage(actor, announcement_id, ANNOUNCEMENT_PUBLISH)
             if record.status != AnnouncementStatus.PENDING_REVIEW.value:
                 raise AppError(

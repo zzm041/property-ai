@@ -19,7 +19,7 @@ services:
       - --collation-server=utf8mb4_0900_ai_ci
       - --default-time-zone=+00:00
     ports:
-      - "3316:3306"
+      - "127.0.0.1:3316:3306"
     volumes:
       - prodlike_mysql_data:/var/lib/mysql
     healthcheck:
@@ -40,7 +40,7 @@ services:
     image: redis:7.4.2-alpine
     command: ["redis-server", "--appendonly", "yes"]
     ports:
-      - "6380:6379"
+      - "127.0.0.1:6380:6379"
     volumes:
       - prodlike_redis_data:/data
     healthcheck:
@@ -59,8 +59,8 @@ services:
       RABBITMQ_DEFAULT_PASS: change-me
       RABBITMQ_DEFAULT_VHOST: property_ai_staging
     ports:
-      - "5673:5672"
-      - "15673:15672"
+      - "127.0.0.1:5673:5672"
+      - "127.0.0.1:15673:15672"
     volumes:
       - prodlike_rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
@@ -103,8 +103,8 @@ services:
       MINIO_SECRET_KEY: minioadmin
     command: ["minio", "server", "/minio_data", "--console-address", ":9001"]
     ports:
-      - "9010:9000"
-      - "9011:9001"
+      - "127.0.0.1:9010:9000"
+      - "127.0.0.1:9011:9001"
     volumes:
       - prodlike_minio_data:/minio_data
     healthcheck:
@@ -123,8 +123,8 @@ services:
       ETCD_ENDPOINTS: etcd:2379
       MINIO_ADDRESS: minio:9000
     ports:
-      - "19531:19530"
-      - "9092:9091"
+      - "127.0.0.1:19531:19530"
+      - "127.0.0.1:9092:9091"
     volumes:
       - prodlike_milvus_data:/var/lib/milvus
     depends_on:

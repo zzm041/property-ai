@@ -14,7 +14,7 @@ services:
       - --collation-server=utf8mb4_0900_ai_ci
       - --default-time-zone=+00:00
     ports:
-      - "${MYSQL_PORT:-3306}:3306"
+      - "127.0.0.1:${MYSQL_PORT:-3306}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -45,7 +45,7 @@ services:
       - --collation-server=utf8mb4_0900_ai_ci
       - --default-time-zone=+00:00
     ports:
-      - "${TEST_MYSQL_PORT:-3307}:3306"
+      - "127.0.0.1:${TEST_MYSQL_PORT:-3307}:3306"
     tmpfs:
       - /var/lib/mysql
     healthcheck:
@@ -65,7 +65,7 @@ services:
     image: redis:7.4.2-alpine
     command: ["redis-server", "--appendonly", "yes"]
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -84,8 +84,8 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-change-me}
       RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST:-property_ai}
     ports:
-      - "${RABBITMQ_PORT:-5672}:5672"
-      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+      - "127.0.0.1:${RABBITMQ_PORT:-5672}:5672"
+      - "127.0.0.1:${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
@@ -128,8 +128,8 @@ services:
       MINIO_SECRET_KEY: minioadmin
     command: ["minio", "server", "/minio_data", "--console-address", ":9001"]
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
     volumes:
       - minio_data:/minio_data
     healthcheck:
@@ -148,8 +148,8 @@ services:
       ETCD_ENDPOINTS: etcd:2379
       MINIO_ADDRESS: minio:9000
     ports:
-      - "${MILVUS_PORT:-19530}:19530"
-      - "9091:9091"
+      - "127.0.0.1:${MILVUS_PORT:-19530}:19530"
+      - "127.0.0.1:9091:9091"
     volumes:
       - milvus_data:/var/lib/milvus
     depends_on:

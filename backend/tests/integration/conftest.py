@@ -205,3 +205,21 @@ def commit_open_transaction(session: Session) -> None:
 
     if session.in_transaction():
         session.commit()
+
+
+def fetch_independent(session: Session, model: type, primary_key: int):
+    """Load a row on a different Session/connection. Same-session expire is not persist proof."""
+
+    other = Session(bind=session.get_bind(), autoflush=False, expire_on_commit=False)
+    try:
+        return other.get(model, primary_key)
+    finally:
+        other.close()
+
+
+def count_independent(session: Session, statement):
+    other = Session(bind=session.get_bind(), autoflush=False, expire_on_commit=False)
+    try:
+        return other.scalar(statement)
+    finally:
+        other.close()

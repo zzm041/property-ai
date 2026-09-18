@@ -60,14 +60,18 @@ def main() -> int:
     user_id, house_id = _bound_identity()
     token = _token(user_id)
     jobs = [
-        ("healthz_cold_c1_n30_OLD_METHOD", "/healthz", "GET", 1, 30, "cold", None, 0),
-        ("healthz_cold_c20_n100_OLD_METHOD", "/healthz", "GET", 20, 100, "cold", None, 0),
-        ("healthz_pooled_c1_n30_NEW_METHOD", "/healthz", "GET", 1, 30, "pooled", None, 0),
-        ("healthz_pooled_c20_n100_NEW_METHOD", "/healthz", "GET", 20, 100, "pooled", None, 0),
-        ("wo_post_cold_c1_n30", "/api/v1/work-orders", "POST", 1, 30, "cold", token, house_id),
-        ("wo_post_cold_c5_n20", "/api/v1/work-orders", "POST", 5, 20, "cold", token, house_id),
-        ("wo_post_pooled_c1_n30_NEW_METHOD", "/api/v1/work-orders", "POST", 1, 30, "pooled", token, house_id),
-        ("wo_post_pooled_c5_n20_NEW_METHOD", "/api/v1/work-orders", "POST", 5, 20, "pooled", token, house_id),
+        ("healthz_A_cold_lifecycle_c1_n30_OLD_METHOD", "/healthz", "GET", 1, 30, "cold", None, 0),
+        ("healthz_A_cold_lifecycle_c20_n100_OLD_METHOD", "/healthz", "GET", 20, 100, "cold", None, 0),
+        ("healthz_B_nokeepalive_c1_n30_NEW_METHOD", "/healthz", "GET", 1, 30, "nokeepalive", None, 0),
+        ("healthz_C_pooled_c1_n30_NEW_METHOD", "/healthz", "GET", 1, 30, "pooled", None, 0),
+        ("healthz_C_pooled_c20_n100_NEW_METHOD", "/healthz", "GET", 20, 100, "pooled", None, 0),
+        ("healthz_D_elapsed_c1_n30_NEW_METHOD", "/healthz", "GET", 1, 30, "elapsed", None, 0),
+        ("wo_post_A_cold_c1_n30", "/api/v1/work-orders", "POST", 1, 30, "cold", token, house_id),
+        ("wo_post_A_cold_c5_n20", "/api/v1/work-orders", "POST", 5, 20, "cold", token, house_id),
+        ("wo_post_B_nokeepalive_c1_n30_NEW_METHOD", "/api/v1/work-orders", "POST", 1, 30, "nokeepalive", token, house_id),
+        ("wo_post_C_pooled_c1_n30_NEW_METHOD", "/api/v1/work-orders", "POST", 1, 30, "pooled", token, house_id),
+        ("wo_post_C_pooled_c5_n20_NEW_METHOD", "/api/v1/work-orders", "POST", 5, 20, "pooled", token, house_id),
+        ("wo_post_D_elapsed_c1_n30_NEW_METHOD", "/api/v1/work-orders", "POST", 1, 30, "elapsed", token, house_id),
     ]
     print(f"perf_identity user_present=yes house_id={house_id} (token redacted)")
     failed = False

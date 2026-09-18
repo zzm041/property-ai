@@ -124,12 +124,32 @@ class AuthService:
             )
         self._require_active(user.status)
         records = self._repository.list_grant_permissions(user.id)
-        return Principal(
+        principal = Principal(
             user_id=user.id,
             status=user.status,
             display_name=user.display_name,
             grants=self._build_grants(records),
         )
+        self._close_unowned_read_transaction()
+        return principal
+
+    def _close_unowned_read_transaction(self) -> None:
+        """End a clean autobegin from principal reads. Do not touch owned or dirty work."""
+
+        from app.core.database import OWNED_TXN_KEY
+
+        session = self._session
+        if not session.in_transaction():
+            return
+        try:
+            owned = int(session.info.get(OWNED_TXN_KEY, 0) or 0)
+        except (TypeError, ValueError):
+            owned = 0
+        if owned >= 1:
+            return
+        if session.new or session.dirty or session.deleted:
+            return
+        session.rollback()
 
     @staticmethod
     def _require_active(status: str) -> None:

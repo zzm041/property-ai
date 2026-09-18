@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings, get_settings
-from app.core.database import transaction_context
+from app.core.database import begin_owned_transaction
 from app.core.errors import (
     AppError,
     AuthErrorCode,
@@ -124,18 +124,80 @@ class KnowledgeService:
         rebuild: bool = False,
     ) -> None:
         settings = self._settings
-        with transaction_context(self._session):
+        prepared = self._prepare_ingest(
+            document_id=document_id,
+            version=version,
+            rebuild=rebuild,
+        )
+        if prepared is None:
+            return
+        if self._session.in_transaction():
+            from app.core.database import TransactionContractError
+
+            raise TransactionContractError(
+                "Provider calls must not hold a business transaction"
+            )
+        embedder = build_embedding_provider(settings)
+        store = build_milvus_store(settings)
+        try:
+            vectors = embedder.embed(prepared["excerpts"])
+        except (ProviderTimeoutError, ProviderUnavailableError) as exc:
+            logger.warning(
+                "knowledge_ingest_embedding_failed",
+                document_id=document_id,
+                error_type=type(exc).__name__,
+                request_id=request_id,
+            )
+            self._finish_ingest_failure(
+                document_id=document_id,
+                version=version,
+                rebuild=rebuild,
+            )
+            return
+        try:
+            store.upsert(
+                chunk_ids=prepared["chunk_ids"],
+                tenant_ids=prepared["tenant_ids"],
+                property_ids=prepared["property_ids"],
+                visibilities=prepared["visibilities"],
+                document_ids=prepared["document_ids"],
+                document_versions=prepared["document_versions"],
+                vectors=vectors,
+                dimensions=settings.embedding_dimensions,
+            )
+        except ProviderUnavailableError:
+            logger.warning(
+                "knowledge_ingest_milvus_failed",
+                document_id=document_id,
+                request_id=request_id,
+            )
+            self._finish_ingest_failure(
+                document_id=document_id,
+                version=version,
+                rebuild=rebuild,
+            )
+            return
+        self._finish_ingest_success(document_id=document_id, version=version)
+
+    def _prepare_ingest(
+        self,
+        *,
+        document_id: int,
+        version: int,
+        rebuild: bool,
+    ) -> dict[str, object] | None:
+        with begin_owned_transaction(self._session):
             job = self._repository.get_ingestion_job_for_update(
                 document_id=document_id,
                 version=version,
             )
             if job is None:
-                return
+                return None
             if (
                 job.status == KnowledgeIngestionStatus.SUCCEEDED.value
                 and not rebuild
             ):
-                return
+                return None
             document = self._repository.get_document(document_id)
             version_row = self._repository.get_version(
                 document_id=document_id,
@@ -144,7 +206,7 @@ class KnowledgeService:
             if document is None or version_row is None:
                 job.status = KnowledgeIngestionStatus.FAILED.value
                 job.error_code = KnowledgeErrorCode.NOT_FOUND
-                return
+                return None
             job.status = KnowledgeIngestionStatus.PROCESSING.value
             job.started_at = utc_now()
             job.attempt = (job.attempt or 0) + 1
@@ -158,14 +220,14 @@ class KnowledgeService:
                 job.error_code = KnowledgeErrorCode.INVALID_INPUT
                 version_row.status = KnowledgeVersionStatus.FAILED.value
                 job.finished_at = utc_now()
-                return
+                return None
             pieces = chunk_text(text, title=document.title)
             if not pieces:
                 job.status = KnowledgeIngestionStatus.FAILED.value
                 job.error_code = KnowledgeErrorCode.INVALID_INPUT
                 version_row.status = KnowledgeVersionStatus.FAILED.value
                 job.finished_at = utc_now()
-                return
+                return None
             records = list(
                 self._repository.list_chunks_for_version(
                     document_id=document_id,
@@ -190,39 +252,48 @@ class KnowledgeService:
                     )
                     record.vector_id = record.id
                     records.append(record)
-            embedder = build_embedding_provider(settings)
-            store = build_milvus_store(settings)
-            try:
-                vectors = embedder.embed(tuple(item.excerpt for item in records))
-            except (ProviderTimeoutError, ProviderUnavailableError) as exc:
-                logger.warning(
-                    "knowledge_ingest_embedding_failed",
-                    document_id=document_id,
-                    error_type=type(exc).__name__,
-                    request_id=request_id,
-                )
-                self._fail_ingest(job, version_row, rebuild=rebuild)
+            return {
+                "excerpts": tuple(item.excerpt for item in records),
+                "chunk_ids": [item.id for item in records],
+                "tenant_ids": [item.tenant_id for item in records],
+                "property_ids": [milvus_property_id(item.property_id) for item in records],
+                "visibilities": [item.visibility for item in records],
+                "document_ids": [item.document_id for item in records],
+                "document_versions": [item.version for item in records],
+            }
+
+    def _finish_ingest_failure(
+        self,
+        *,
+        document_id: int,
+        version: int,
+        rebuild: bool,
+    ) -> None:
+        with begin_owned_transaction(self._session):
+            job = self._repository.get_ingestion_job_for_update(
+                document_id=document_id,
+                version=version,
+            )
+            version_row = self._repository.get_version(
+                document_id=document_id,
+                version=version,
+            )
+            if job is None or version_row is None:
                 return
-            try:
-                store.upsert(
-                    chunk_ids=[item.id for item in records],
-                    tenant_ids=[item.tenant_id for item in records],
-                    property_ids=[
-                        milvus_property_id(item.property_id) for item in records
-                    ],
-                    visibilities=[item.visibility for item in records],
-                    document_ids=[item.document_id for item in records],
-                    document_versions=[item.version for item in records],
-                    vectors=vectors,
-                    dimensions=settings.embedding_dimensions,
-                )
-            except ProviderUnavailableError:
-                logger.warning(
-                    "knowledge_ingest_milvus_failed",
-                    document_id=document_id,
-                    request_id=request_id,
-                )
-                self._fail_ingest(job, version_row, rebuild=rebuild)
+            self._fail_ingest(job, version_row, rebuild=rebuild)
+
+    def _finish_ingest_success(self, *, document_id: int, version: int) -> None:
+        with begin_owned_transaction(self._session):
+            job = self._repository.get_ingestion_job_for_update(
+                document_id=document_id,
+                version=version,
+            )
+            document = self._repository.get_document(document_id)
+            version_row = self._repository.get_version(
+                document_id=document_id,
+                version=version,
+            )
+            if job is None or document is None or version_row is None:
                 return
             self._activate_version(document, version_row, job)
 
@@ -432,11 +503,12 @@ class KnowledgeService:
             )
         return self._principal_loader(actor.user_id)
 
-    def _execute(self, operation: Callable[[], T]) -> T:
-        from app.core.database import run_service_transaction
+    def _execute(self, operation: Callable[[], T], *, composing: bool = False) -> T:
+        from app.core.database import run_composing_transaction, run_owned_transaction
 
         try:
-            return run_service_transaction(self._session, operation)
+            runner = run_composing_transaction if composing else run_owned_transaction
+            return runner(self._session, operation)
         except AppError:
             raise
         except IntegrityError as exc:

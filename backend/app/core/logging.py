@@ -44,6 +44,12 @@ _URL_USERINFO_RE = re.compile(r"([a-z][a-z0-9+.-]*://)([^/@\s]+):([^@/\s]+)@", r
 _QUERY_SECRET_RE = re.compile(
     r"(?i)(secret|password|passwd|api_key|access_token|js_code|code|token)=([^\s&\"']+)"
 )
+_JSON_SECRET_RE = re.compile(
+    r'(?i)("(?:password|passwd|api_key|apikey|session_key|sessionkey|secret|authorization|access_token|refresh_token)"\s*:\s*)"(?:\\.|[^"\\])*"'
+)
+_REPR_SECRET_RE = re.compile(
+    r"(?i)(['\"]?(?:password|passwd|api_key|apikey|session_key|sessionkey|secret|authorization)['\"]?\s*[:=]\s*)(['\"])(?:\\.|[^'\\\"])*\2"
+)
 
 
 def _normalize_key(key: object) -> str:
@@ -62,6 +68,8 @@ def redact_text(value: str) -> str:
     text = _JWT_RE.sub(_REDACTED, text)
     text = _URL_USERINFO_RE.sub(r"\1" + _REDACTED + ":" + _REDACTED + "@", text)
     text = _QUERY_SECRET_RE.sub(lambda match: f"{match.group(1)}={_REDACTED}", text)
+    text = _JSON_SECRET_RE.sub(rf'\1"{_REDACTED}"', text)
+    text = _REPR_SECRET_RE.sub(lambda match: f"{match.group(1)}{match.group(2)}{_REDACTED}{match.group(2)}", text)
     return text
 
 

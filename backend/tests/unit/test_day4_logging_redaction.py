@@ -18,6 +18,45 @@ WX_URL = (
 )
 
 
+def test_json_string_and_dict_repr_secrets_are_redacted() -> None:
+    event = redact_log_event(
+        None,
+        "error",
+        {
+            "event": "upstream",
+            "payload": '{"password": "plain-pass", "api_key": "sk-live", "session_key": "wx-sess"}',
+            "repr": "{'password': 'hunter2', 'api_key': 'sk-other'}",
+        },
+    )
+    rendered = str(event)
+    assert "plain-pass" not in rendered
+    assert "sk-live" not in rendered
+    assert "wx-sess" not in rendered
+    assert "hunter2" not in rendered
+    assert "sk-other" not in rendered
+
+
+def test_exception_chain_and_stdlib_keep_error_code_not_raw_secret(capsys: Any) -> None:
+    configure_logging(service="api")
+    try:
+        raise RuntimeError('upstream {"password": "leak-pass", "session_key": "wx-leak"}')
+    except RuntimeError as exc:
+        try:
+            raise ValueError("wrapper") from exc
+        except ValueError as wrapped:
+            get_logger("test").error(
+                "provider_chain",
+                error_code="AI.UNAVAILABLE",
+                operation="jscode2session",
+                exc_info=wrapped,
+            )
+    output = capsys.readouterr().out
+    assert "leak-pass" not in output
+    assert "wx-leak" not in output
+    assert "AI.UNAVAILABLE" in output
+    assert "jscode2session" in output
+
+
 def test_nested_structures_are_redacted() -> None:
     event = redact_log_event(
         None,

@@ -7,7 +7,7 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings, get_settings
-from app.core.database import transaction_context
+from app.core.database import begin_owned_transaction, require_owned_transaction
 from app.core.errors import AppError, IamErrorCode, IncidentErrorCode
 from app.core.time import utc_now
 from app.domain.ai import (
@@ -47,6 +47,7 @@ class IncidentService:
         self._audit = AuditService(session)
 
     def aggregate_locked(self, record: WorkOrder, *, request_id: str) -> Incident | None:
+        require_owned_transaction(self._session)
         window = timedelta(minutes=self._settings.incident_window_minutes)
         building_id = self._ai.get_building_id(record.house_id)
         cluster = self._ai.list_cluster_work_orders(
@@ -196,7 +197,7 @@ class IncidentService:
         incident_id: int,
         request_id: str,
     ) -> Incident:
-        with transaction_context(self._session):
+        with begin_owned_transaction(self._session):
             incident = self._ai.get_incident_for_update(incident_id)
             if incident is None:
                 raise AppError(
@@ -215,6 +216,12 @@ class IncidentService:
                 "category": incident.category,
                 "count": incident.work_order_count,
             }
+        if self._session.in_transaction():
+            from app.core.database import TransactionContractError
+
+            raise TransactionContractError(
+                "Provider calls must not hold a business transaction"
+            )
         try:
             payload = self._llm.structured_completion(
                 prompt=f"incident={snapshot['id']};category={snapshot['category']}",
@@ -223,7 +230,7 @@ class IncidentService:
             output = IncidentSummaryOutput.model_validate(payload)
         except (ValidationError, ValueError, Exception):
             output = None
-        with transaction_context(self._session):
+        with begin_owned_transaction(self._session):
             incident = self._ai.get_incident_for_update(incident_id)
             if incident is None:
                 raise AppError(

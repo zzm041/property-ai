@@ -82,39 +82,28 @@ class NotificationService:
         return items, unread
 
     def mark_read(self, *, actor: Principal, notification_id: int) -> Notification:
-        record = self._repository.get_notification_for_user(
-            notification_id=notification_id,
-            user_id=actor.user_id,
-        )
-        if record is None:
-            raise AppError(
-                code=NotificationErrorCode.NOT_FOUND,
-                message="Notification was not found",
-                status_code=404,
+        from app.core.database import begin_owned_transaction
+
+        with begin_owned_transaction(self._session):
+            record = self._repository.get_notification_for_user(
+                notification_id=notification_id,
+                user_id=actor.user_id,
             )
-        if record.read_at is None:
-            if self._session.in_transaction():
+            if record is None:
+                raise AppError(
+                    code=NotificationErrorCode.NOT_FOUND,
+                    message="Notification was not found",
+                    status_code=404,
+                )
+            if record.read_at is None:
                 record.read_at = utc_now()
-                self._session.flush()
-            else:
-                with self._session.begin():
-                    locked = self._repository.get_notification_for_user(
-                        notification_id=notification_id,
-                        user_id=actor.user_id,
-                    )
-                    if locked is None:
-                        raise AppError(
-                            code=NotificationErrorCode.NOT_FOUND,
-                            message="Notification was not found",
-                            status_code=404,
-                        )
-                    if locked.read_at is None:
-                        locked.read_at = utc_now()
-                    record = locked
-        return record
+            return record
 
     def deliver_pending(self, delivery_id: int) -> None:
-        with self._session.begin():
+        from app.core.database import begin_owned_transaction
+
+        snapshot: dict[str, object] | None = None
+        with begin_owned_transaction(self._session):
             delivery = self._repository.get_delivery(delivery_id)
             if delivery is None or delivery.status != "PENDING":
                 return
@@ -123,19 +112,32 @@ class NotificationService:
                 delivery.status = "FAILED"
                 delivery.last_error_code = "NTF.NOT_FOUND"
                 return
-            provider = build_notification_provider(self._settings)
-            try:
-                provider.deliver_push(
-                    user_id=notification.user_id,
-                    title=notification.title,
-                    body=notification.body,
-                )
-            except ProviderUnavailableError:
-                delivery.attempt += 1
-                delivery.status = "FAILED"
-                delivery.last_error_code = "NTF.PROVIDER_FAILED"
+            snapshot = {
+                "user_id": notification.user_id,
+                "title": notification.title,
+                "body": notification.body,
+            }
+        if snapshot is None:
+            return
+        provider = build_notification_provider(self._settings)
+        push_error: str | None = None
+        try:
+            provider.deliver_push(
+                user_id=int(snapshot["user_id"]),
+                title=str(snapshot["title"]),
+                body=str(snapshot["body"]),
+            )
+        except ProviderUnavailableError:
+            push_error = "NTF.PROVIDER_FAILED"
+        with begin_owned_transaction(self._session):
+            delivery = self._repository.get_delivery(delivery_id)
+            if delivery is None or delivery.status != "PENDING":
                 return
             delivery.attempt += 1
+            if push_error is not None:
+                delivery.status = "FAILED"
+                delivery.last_error_code = push_error
+                return
             delivery.status = "SUCCEEDED"
             delivery.delivered_at = utc_now()
 

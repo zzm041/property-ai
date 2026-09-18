@@ -220,6 +220,33 @@ def _worker_running() -> bool:
     return WORKER in listed.stdout.splitlines()
 
 
+def _worker_inspect_running() -> bool:
+    inspected = subprocess.run(
+        ["docker", "inspect", "-f", "{{.State.Running}}", WORKER],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return inspected.returncode == 0 and inspected.stdout.strip().lower() == "true"
+
+
+def _control_worker(action: str, checks: Checks) -> None:
+    result = subprocess.run(
+        ["docker", action, WORKER],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    checks.expect(
+        result.returncode == 0,
+        f"worker_{action}_rc={result.returncode} err={(result.stderr or '')[-200:]}",
+    )
+    time.sleep(1.5)
+    running = _worker_inspect_running()
+    wanted = action == "start"
+    checks.expect(running is wanted, f"worker_state_after_{action} running={running}")
+
+
 def main() -> int:
     if not BASE:
         print("DAY4_BASE_URL is required", file=sys.stderr)
@@ -243,7 +270,16 @@ def main() -> int:
             _run_flow(client, ids, checks, worker_was_running)
         finally:
             if worker_was_running:
-                subprocess.run(["docker", "start", WORKER], check=False, capture_output=True)
+                restore = subprocess.run(
+                    ["docker", "start", WORKER],
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                )
+                checks.expect(
+                    restore.returncode == 0,
+                    f"worker_restore_rc={restore.returncode}",
+                )
     return finalize(checks.failed, checks.evidence)
 
 
@@ -256,7 +292,7 @@ def _run_flow(
     health = client.get(f"{BASE}/healthz", headers=_headers(None, "d4-healthz"))
     ready = client.get(f"{BASE}/api/v1/readyz", headers=_headers(None, "d4-readyz"))
     checks.expect_status(health, 200, "healthz")
-    checks.expect(ready.status_code in {200, 503}, f"readyz status={ready.status_code}")
+    checks.expect(ready.status_code == 200, f"readyz status={ready.status_code}")
     deps = (ready.json().get("data") or {}).get("dependencies") or {}
     for name in ("llm", "vlm", "asr", "embedding", "reranker"):
         status = (deps.get(name) or {}).get("status")
@@ -347,7 +383,7 @@ def _run_flow(
     )
 
     if worker_was_running:
-        subprocess.run(["docker", "stop", WORKER], check=False, capture_output=True)
+        _control_worker("stop", checks)
         paused = client.post(
             f"{BASE}/api/v1/work-orders",
             json={"house_id": ids["house_id"], "text": "Worker paused analysis"},
@@ -366,7 +402,7 @@ def _run_flow(
             paused_status in {"PENDING_ANALYSIS", "CREATED"},
             f"paused_status={paused_status}",
         )
-        subprocess.run(["docker", "start", WORKER], check=False, capture_output=True)
+        _control_worker("start", checks)
         if paused_id:
             _wait_status(
                 client,
@@ -521,7 +557,7 @@ def _run_flow(
         )
         checks.expect_status(published, 200, "announcement_publish")
         checks.expect(
-            (published.json().get("data") or {}).get("status") in {"PUBLISHED", "APPROVED"},
+            (published.json().get("data") or {}).get("status") == "PUBLISHED",
             f"announcement_status={(published.json().get('data') or {}).get('status')}",
         )
 
@@ -533,20 +569,12 @@ def _run_flow(
         "notification_bind_this_round",
     )
     checks.expect(
-        notifications_include(items, resource_type="WORK_ORDER", resource_id=work_order_id)
-        or any(
-            isinstance(item, dict) and int(item.get("resource_id") or 0) == work_order_id
-            for item in items
-        ),
+        notifications_include(items, resource_type="WORK_ORDER", resource_id=work_order_id),
         "notification_work_order_this_round",
     )
     if ann_id:
         checks.expect(
-            notifications_include(items, resource_type="ANNOUNCEMENT", resource_id=int(ann_id))
-            or any(
-                isinstance(item, dict) and str(item.get("title") or "").find(marker) >= 0
-                for item in items
-            ),
+            notifications_include(items, resource_type="ANNOUNCEMENT", resource_id=int(ann_id)),
             "notification_announcement_this_round",
         )
 

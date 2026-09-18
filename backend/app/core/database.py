@@ -1,10 +1,10 @@
 """Synchronous SQLAlchemy engine, sessions, UTC setup, and test safety."""
 
 from collections.abc import Callable, Generator
-from contextlib import AbstractContextManager, nullcontext
+from contextlib import contextmanager
 from functools import lru_cache
 from threading import Lock
-from typing import Any, TypeVar
+from typing import Any, Iterator, TypeVar
 
 from sqlalchemy import Engine, create_engine, event, text
 from sqlalchemy.engine import Connection, URL, make_url
@@ -16,23 +16,98 @@ _engines: set[Engine] = set()
 _engines_lock = Lock()
 T = TypeVar("T")
 
+OWNED_TXN_KEY = "property_ai_owned_transaction"
 
-def transaction_context(session: Session) -> AbstractContextManager[object]:
-    """Join an open caller transaction; otherwise open a service-owned unit of work."""
+
+class TransactionContractError(RuntimeError):
+    """An open transaction exists without an owned outer unit, or composition lacks one."""
+
+
+def _owned_count(session: Session) -> int:
+    try:
+        return int(session.info.get(OWNED_TXN_KEY, 0) or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def require_owned_transaction(session: Session) -> None:
+    """Refuse work that must participate in a caller-owned unit of work."""
+
+    if _owned_count(session) < 1:
+        raise TransactionContractError(
+            "Composition entry requires an owned active transaction"
+        )
+
+
+@contextmanager
+def begin_owned_transaction(session: Session) -> Iterator[None]:
+    """Open a service-owned begin/commit/rollback boundary.
+
+    An unexpected open transaction is refused before new side effects.
+    The caller transaction is neither committed nor rolled back.
+    A leftover SQLAlchemy autobegin from a prior read may be closed when the
+    Session has no pending or flushed caller work and the origin is autobegin.
+    """
 
     if session.in_transaction():
-        return nullcontext()
-    return session.begin()
+        if _owned_count(session) >= 1:
+            raise TransactionContractError(
+                "Owned transaction is already active"
+            )
+        if not _is_clean_autobegin(session):
+            raise TransactionContractError(
+                "Top-level use case refuses an unexpected open transaction"
+            )
+        session.rollback()
+    session.info[OWNED_TXN_KEY] = _owned_count(session) + 1
+    try:
+        with session.begin():
+            yield
+    finally:
+        count = _owned_count(session) - 1
+        if count <= 0:
+            session.info.pop(OWNED_TXN_KEY, None)
+        else:
+            session.info[OWNED_TXN_KEY] = count
+
+
+def _is_clean_autobegin(session: Session) -> bool:
+    if session.new or session.dirty or session.deleted:
+        return False
+    transaction = session.get_transaction()
+    if transaction is None:
+        return False
+    origin = getattr(transaction, "origin", None)
+    if origin is None:
+        return False
+    origin_name = getattr(origin, "name", str(origin))
+    return str(origin_name).upper() == "AUTOBEGIN"
+
+
+def run_owned_transaction(session: Session, operation: Callable[[], T]) -> T:
+    """Top-level use cases own begin/commit/rollback and do not join autobegin."""
+
+    with begin_owned_transaction(session):
+        return operation()
+
+
+def run_composing_transaction(session: Session, operation: Callable[[], T]) -> T:
+    """Join a caller-owned transaction. The outer owner commits or rolls back."""
+
+    require_owned_transaction(session)
+    return operation()
 
 
 def run_service_transaction(session: Session, operation: Callable[[], T]) -> T:
-    """Top-level use cases own begin/commit; nested calls join the open transaction.
+    """Compatibility alias for top-level owned transactions. Does not auto-join."""
 
-    Never roll back a caller transaction to start a new one.
-    """
+    return run_owned_transaction(session, operation)
 
-    with transaction_context(session):
-        return operation()
+
+def transaction_context(session: Session):
+    """Compatibility alias for an owned transaction context. Does not auto-join."""
+
+    return begin_owned_transaction(session)
 
 
 def _database_target(url: str) -> tuple[str | None, int, str | None]:

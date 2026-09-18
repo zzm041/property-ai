@@ -58,6 +58,8 @@ def _list_failed() -> str:
         text=True,
         check=False,
     )
+    if result.returncode != 0:
+        return f"<list_rc={result.returncode} {(result.stderr or result.stdout or '')[:300]}>"
     return (result.stdout or "").strip()
 
 
@@ -105,6 +107,9 @@ def _enqueue_fail_compensation(evidence: list[str], ids: dict[str, int]) -> bool
         },
     )
     evidence.append(f"api_bad_broker_recreate={recreate.returncode}")
+    if recreate.returncode != 0:
+        evidence.append(f"api_bad_broker_recreate_stderr={(recreate.stderr or '')[-200:]}")
+        return False
     try:
         time.sleep(8)
         with httpx.Client(timeout=30.0) as client:
@@ -137,8 +142,9 @@ def _enqueue_fail_compensation(evidence: list[str], ids: dict[str, int]) -> bool
         listed = _list_failed()
         evidence.append(f"enqueue_fail_records={listed[:800] or '<empty>'}")
         record_id = ""
+        needle = str(work_order_id)
         for line in listed.splitlines():
-            if "ENQUEUE_FAILED" in line or "enqueue-" in line:
+            if needle in line and ("ENQUEUE_FAILED" in line or "enqueue-" in line):
                 record_id = line.split()[0]
                 break
         if not record_id:
@@ -236,59 +242,67 @@ def main() -> int:
                 failed = True
         recreate_ok = _compose(["up", "-d", "--no-deps", "--force-recreate", "worker-day4"])
         evidence.append(f"worker_restored={recreate_ok.returncode}")
+        if recreate_ok.returncode != 0:
+            failed = True
+            evidence.append((recreate_ok.stderr or "")[-300:])
         time.sleep(8)
         if listed and work_order_id is not None:
             record_id = ""
+            needle = str(work_order_id)
             for line in listed.splitlines():
-                if "analyze_work_order_task" in line:
+                if "analyze_work_order_task" in line and needle in line:
                     record_id = line.split()[0]
                     break
             if not record_id:
-                record_id = listed.splitlines()[0].split()[0]
-            replay = subprocess.run(
-                [
-                    "docker",
-                    "exec",
-                    WORKER,
-                    "python",
-                    "-m",
-                    "app.cli.replay_failed_task",
-                    "--record-id",
-                    record_id,
-                ],
-                capture_output=True,
-                text=True,
-                check=False,
-            )
-            evidence.append(
-                f"replay record_id={record_id} rc={replay.returncode} "
-                f"stdout={(replay.stdout or '').strip()[:200]}"
-            )
-            if replay.returncode != 0:
-                failed = True
-            db_url = os.environ["TEST_DATABASE_URL"]
-            for _ in range(25):
-                last_status = _wo_status(db_url, int(work_order_id))
-                if last_status in {"PENDING_ASSIGNMENT", "PENDING_DISPATCH", "ASSIGNED"}:
-                    break
-                time.sleep(1.5)
-            evidence.append(f"after_replay_status={last_status}")
-            if last_status not in {"PENDING_ASSIGNMENT", "PENDING_DISPATCH", "ASSIGNED"}:
-                failed = True
-            listed_after = _list_failed()
-            evidence.append(f"failed_list_after_replay={listed_after[:800] or '<empty>'}")
-            engine = create_engine(db_url)
-            with engine.connect() as connection:
-                analyses = int(
-                    connection.execute(
-                        text("SELECT COUNT(*) FROM work_order_analyses WHERE work_order_id=:id"),
-                        {"id": int(work_order_id)},
-                    ).scalar_one()
+                evidence.append(
+                    f"replay_skipped_no_this_round_record work_order_id={work_order_id}"
                 )
-            engine.dispose()
-            evidence.append(f"analysis_rows={analyses}")
-            if analyses != 1:
                 failed = True
+            else:
+                replay = subprocess.run(
+                    [
+                        "docker",
+                        "exec",
+                        WORKER,
+                        "python",
+                        "-m",
+                        "app.cli.replay_failed_task",
+                        "--record-id",
+                        record_id,
+                    ],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+                evidence.append(
+                    f"replay record_id={record_id} rc={replay.returncode} "
+                    f"stdout={(replay.stdout or '').strip()[:200]}"
+                )
+                if replay.returncode != 0:
+                    failed = True
+                db_url = os.environ["TEST_DATABASE_URL"]
+                for _ in range(25):
+                    last_status = _wo_status(db_url, int(work_order_id))
+                    if last_status in {"PENDING_ASSIGNMENT", "PENDING_DISPATCH", "ASSIGNED"}:
+                        break
+                    time.sleep(1.5)
+                evidence.append(f"after_replay_status={last_status}")
+                if last_status not in {"PENDING_ASSIGNMENT", "PENDING_DISPATCH", "ASSIGNED"}:
+                    failed = True
+                listed_after = _list_failed()
+                evidence.append(f"failed_list_after_replay={listed_after[:800] or '<empty>'}")
+                engine = create_engine(db_url)
+                with engine.connect() as connection:
+                    analyses = int(
+                        connection.execute(
+                            text("SELECT COUNT(*) FROM work_order_analyses WHERE work_order_id=:id"),
+                            {"id": int(work_order_id)},
+                        ).scalar_one()
+                    )
+                engine.dispose()
+                evidence.append(f"analysis_rows={analyses}")
+                if analyses != 1:
+                    failed = True
         else:
             failed = True
             evidence.append("replay_skipped_missing_record_or_work_order")
@@ -300,6 +314,9 @@ def main() -> int:
         restore_api = _compose(["up", "-d", "--no-deps", "--force-recreate", "api-day4"])
         evidence.append(f"finally_worker_restored={restore_worker.returncode}")
         evidence.append(f"finally_api_restored={restore_api.returncode}")
+        if restore_worker.returncode != 0 or restore_api.returncode != 0:
+            failed = True
+            evidence.append("finally_restore_failed")
     print("\n".join(evidence))
     if failed:
         print("DAY4_FAILED_TASK_DRILL=FAIL")

@@ -40,7 +40,7 @@ def run_probe(
     if token:
         headers_base["Authorization"] = f"Bearer {token}"
 
-    def one(index: int) -> tuple[float, int]:
+    def one(index: int) -> tuple[float, int, float | None]:
         headers = dict(headers_base)
         json_body = dict(body or {})
         if method.upper() == "POST" and path.endswith("/work-orders"):
@@ -48,24 +48,42 @@ def run_probe(
             headers["X-Request-Id"] = f"perf-{index}-{uuid4().hex[:8]}"
         started = time.perf_counter()
         try:
-            if mode == "cold":
+            if mode in {"cold", "A"}:
                 with httpx.Client(timeout=10.0) as client:
                     response = client.request(method, url, headers=headers, json=json_body or None)
+            elif mode in {"nokeepalive", "B"}:
+                response = nokeep.request(method, url, headers=headers, json=json_body or None)
             else:
                 response = pooled.request(method, url, headers=headers, json=json_body or None)
-            return (time.perf_counter() - started) * 1000, response.status_code
+            elapsed_ms = (time.perf_counter() - started) * 1000
+            server_ms = None
+            header = response.headers.get("x-process-time") or response.headers.get("server-timing")
+            if header:
+                try:
+                    server_ms = float(header.split(";")[0].split("=")[-1]) * (1000 if float(header.split(";")[0].split("=")[-1]) < 10 else 1)
+                except ValueError:
+                    server_ms = None
+            if mode in {"elapsed", "D"}:
+                elapsed_ms = response.elapsed.total_seconds() * 1000
+            return elapsed_ms, response.status_code, server_ms
         except httpx.HTTPError:
-            return (time.perf_counter() - started) * 1000, 0
+            return (time.perf_counter() - started) * 1000, 0, None
 
     pooled: httpx.Client | None = None
+    nokeep: httpx.Client | None = None
     started_all = time.perf_counter()
     try:
-        if mode == "pooled":
+        if mode in {"pooled", "C", "elapsed", "D"}:
             pooled = httpx.Client(timeout=10.0)
+        if mode in {"nokeepalive", "B"}:
+            nokeep = httpx.Client(
+                timeout=10.0,
+                limits=httpx.Limits(max_keepalive_connections=0, max_connections=concurrency + 2),
+            )
         with ThreadPoolExecutor(max_workers=concurrency) as pool:
             futures = [pool.submit(one, index) for index in range(requests)]
             for future in as_completed(futures):
-                latency, status = future.result()
+                latency, status, _server = future.result()
                 latencies.append(latency)
                 statuses[status] = statuses.get(status, 0) + 1
                 if status != 200:
@@ -73,6 +91,8 @@ def run_probe(
     finally:
         if pooled is not None:
             pooled.close()
+        if nokeep is not None:
+            nokeep.close()
     elapsed = time.perf_counter() - started_all
     latencies.sort()
     return {
@@ -89,7 +109,16 @@ def run_probe(
         "p95_ms": _percentile(latencies, 95),
         "p99_ms": _percentile(latencies, 99),
         "elapsed_s": round(elapsed, 3),
-        "note": "cold = new HTTP connection per request; pooled = shared httpx.Client",
+        "note": {
+            "cold": "A: Client construct + request + close. Not pure server latency.",
+            "A": "A: Client construct + request + close. Not pure server latency.",
+            "nokeepalive": "B: Client initialized, keepalive disabled.",
+            "B": "B: Client initialized, keepalive disabled.",
+            "pooled": "C: shared httpx.Client connection pool reuse.",
+            "C": "C: shared httpx.Client connection pool reuse.",
+            "elapsed": "D: httpx response.elapsed; not exclusive server-side time.",
+            "D": "D: httpx response.elapsed; not exclusive server-side time.",
+        }.get(mode, mode),
     }
 
 
@@ -100,7 +129,11 @@ def main() -> int:
     parser.add_argument("--method", default="GET")
     parser.add_argument("--concurrency", type=int, default=20)
     parser.add_argument("--requests", type=int, default=100)
-    parser.add_argument("--mode", choices=("cold", "pooled"), default="cold")
+    parser.add_argument(
+        "--mode",
+        choices=("cold", "pooled", "nokeepalive", "elapsed", "A", "B", "C", "D"),
+        default="cold",
+    )
     parser.add_argument("--token", default="")
     parser.add_argument("--house-id", type=int, default=0)
     args = parser.parse_args()

@@ -1,59 +1,112 @@
-"""Silent-rollback regression: nested services must join the caller transaction."""
+"""Owned vs composing transaction contract: no autobegin join, no silent discard."""
 
 import pytest
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.core.database import (
+    TransactionContractError,
+    begin_owned_transaction,
+)
 from app.model.identity import User
-from app.model.resident import ResidentBindRequest
+from app.model.resident import ResidentBindRequest, ResidentHouseRelation
 from app.repository.identity import IdentityRepository
 from app.service.auth import AuthService
 from app.service.resident import ResidentBindingService
-from tests.integration.conftest import commit_open_transaction
+from tests.integration.conftest import commit_open_transaction, count_independent, fetch_independent
 from tests.integration.resident_test_data import create_resident_binding_graph
 
 
-def test_nested_service_preserves_flushed_uncommitted_caller_rows(
+def test_public_create_refuses_unexpected_open_transaction_without_discarding_caller(
     identity_session: Session,
 ) -> None:
     graph = create_resident_binding_graph(identity_session)
-    with pytest.raises(RuntimeError, match="force outer rollback"):
-        with identity_session.begin():
-            marker = User(status="ACTIVE", display_name="tx-flushed-marker")
-            identity_session.add(marker)
-            identity_session.flush()
-            marker_id = marker.id
-            principal = AuthService(
-                identity_session,
-                IdentityRepository(identity_session),
-            ).load_principal(graph.resident_a_id)
-            created = ResidentBindingService(identity_session).create_bind_request(
+    principal = AuthService(
+        identity_session,
+        IdentityRepository(identity_session),
+    ).load_principal(graph.resident_a_id)
+    commit_open_transaction(identity_session)
+    marker_id = 0
+    with identity_session.begin():
+        marker = User(status="ACTIVE", display_name="tx-refuse-marker")
+        identity_session.add(marker)
+        identity_session.flush()
+        marker_id = marker.id
+        with pytest.raises(TransactionContractError, match="unexpected open transaction"):
+            ResidentBindingService(identity_session).create_bind_request(
                 actor=principal,
                 house_id=graph.house_1_id,
                 relation_type="OWNER",
-                request_id="d4-tx-flushed",
+                request_id="d4-tx-refuse",
             )
-            assert created.status == "PENDING"
-            assert identity_session.get(User, marker_id) is not None
-            raise RuntimeError("force outer rollback")
+        assert identity_session.get(User, marker_id) is not None
+        identity_session.rollback()
 
-    assert identity_session.get(User, marker_id) is None
-    assert identity_session.scalar(select(func.count()).select_from(ResidentBindRequest)) == 0
+    assert fetch_independent(identity_session, User, marker_id) is None
+
+    assert fetch_independent(identity_session, User, marker_id) is None
+    assert (
+        count_independent(
+            identity_session,
+            select(func.count()).select_from(ResidentBindRequest),
+        )
+        == 0
+    )
 
 
-def test_nested_service_preserves_pending_unflushed_caller_rows(
+def test_composing_bind_request_rolls_back_with_outer_owner(
     identity_session: Session,
 ) -> None:
     graph = create_resident_binding_graph(identity_session)
+    principal = AuthService(
+        identity_session,
+        IdentityRepository(identity_session),
+    ).load_principal(graph.resident_a_id)
+    commit_open_transaction(identity_session)
     with pytest.raises(RuntimeError, match="force outer rollback"):
-        with identity_session.begin():
+        with begin_owned_transaction(identity_session):
+            marker = User(status="ACTIVE", display_name="tx-owned-marker")
+            identity_session.add(marker)
+            identity_session.flush()
+            created = ResidentBindingService(
+                identity_session
+            ).create_bind_request_in_owned_transaction(
+                actor=principal,
+                house_id=graph.house_1_id,
+                relation_type="OWNER",
+                request_id="d4-tx-compose",
+            )
+            assert created.status == "PENDING"
+            raise RuntimeError("force outer rollback")
+
+    assert (
+        count_independent(
+            identity_session,
+            select(func.count()).select_from(ResidentBindRequest),
+        )
+        == 0
+    )
+    leftover = count_independent(
+        identity_session,
+        select(func.count()).select_from(User).where(User.display_name == "tx-owned-marker"),
+    )
+    assert leftover == 0
+
+
+def test_composing_preserves_pending_unflushed_caller_rows(
+    identity_session: Session,
+) -> None:
+    graph = create_resident_binding_graph(identity_session)
+    principal = AuthService(
+        identity_session,
+        IdentityRepository(identity_session),
+    ).load_principal(graph.resident_a_id)
+    commit_open_transaction(identity_session)
+    with pytest.raises(RuntimeError, match="force outer rollback"):
+        with begin_owned_transaction(identity_session):
             marker = User(status="ACTIVE", display_name="tx-pending-marker")
             identity_session.add(marker)
-            principal = AuthService(
-                identity_session,
-                IdentityRepository(identity_session),
-            ).load_principal(graph.resident_a_id)
-            ResidentBindingService(identity_session).create_bind_request(
+            ResidentBindingService(identity_session).create_bind_request_in_owned_transaction(
                 actor=principal,
                 house_id=graph.house_1_id,
                 relation_type="FAMILY",
@@ -62,34 +115,41 @@ def test_nested_service_preserves_pending_unflushed_caller_rows(
             assert marker in identity_session.new or marker.id is not None
             raise RuntimeError("force outer rollback")
 
-    assert identity_session.scalar(select(func.count()).select_from(ResidentBindRequest)) == 0
-    leftover = identity_session.scalar(
-        select(func.count())
-        .select_from(User)
-        .where(User.display_name == "tx-pending-marker")
+    leftover = count_independent(
+        identity_session,
+        select(func.count()).select_from(User).where(User.display_name == "tx-pending-marker"),
     )
     assert leftover == 0
+    assert (
+        count_independent(
+            identity_session,
+            select(func.count()).select_from(ResidentBindRequest),
+        )
+        == 0
+    )
 
 
-def test_top_level_bind_request_still_commits(identity_session: Session) -> None:
+def test_top_level_bind_request_persists_on_independent_session(
+    identity_session: Session,
+) -> None:
     graph = create_resident_binding_graph(identity_session)
     principal = AuthService(
         identity_session,
         IdentityRepository(identity_session),
     ).load_principal(graph.resident_a_id)
+    commit_open_transaction(identity_session)
     created = ResidentBindingService(identity_session).create_bind_request(
         actor=principal,
         house_id=graph.house_1_id,
         relation_type="OWNER",
         request_id="d4-tx-toplevel",
     )
-    identity_session.expire_all()
-    persisted = identity_session.get(ResidentBindRequest, created.id)
+    persisted = fetch_independent(identity_session, ResidentBindRequest, created.id)
     assert persisted is not None
     assert persisted.status == "PENDING"
 
 
-def test_approve_audit_failure_still_rolls_back_together(
+def test_approve_audit_failure_rolls_back_without_manual_rollback(
     identity_session: Session,
 ) -> None:
     graph = create_resident_binding_graph(identity_session)
@@ -108,7 +168,6 @@ def test_approve_audit_failure_still_rolls_back_together(
         relation_type="OWNER",
         request_id="d4-tx-audit-create",
     )
-    commit_open_transaction(identity_session)
 
     class FailingAudit:
         def append(self, **values: object) -> None:
@@ -124,10 +183,13 @@ def test_approve_audit_failure_still_rolls_back_together(
             request_id=created.id,
             http_request_id="d4-tx-audit-approve",
         )
-    identity_session.rollback()
-    request = identity_session.get(ResidentBindRequest, created.id)
+    request = fetch_independent(identity_session, ResidentBindRequest, created.id)
     assert request is not None
     assert request.status == "PENDING"
-    from app.model.resident import ResidentHouseRelation
-
-    assert identity_session.scalar(select(func.count()).select_from(ResidentHouseRelation)) == 0
+    assert (
+        count_independent(
+            identity_session,
+            select(func.count()).select_from(ResidentHouseRelation),
+        )
+        == 0
+    )

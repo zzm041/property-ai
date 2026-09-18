@@ -42,11 +42,12 @@ class PropertyService:
         self._session = session
         self._repository = repository or PropertyRepository(session)
 
-    def _execute(self, operation: Callable[[], T]) -> T:
-        from app.core.database import run_service_transaction
+    def _execute(self, operation: Callable[[], T], *, composing: bool = False) -> T:
+        from app.core.database import run_composing_transaction, run_owned_transaction
 
         try:
-            return run_service_transaction(self._session, operation)
+            runner = run_composing_transaction if composing else run_owned_transaction
+            return runner(self._session, operation)
         except IntegrityError as exc:
             error_number = getattr(exc.orig, "args", [None])[0]
             if error_number == 1062:

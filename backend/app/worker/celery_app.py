@@ -120,13 +120,8 @@ def _log_permanent_or_retry_failure(
 
 
 @task_success.connect
-def _mark_recorded_failure_succeeded(sender=None, **kwargs) -> None:
-    task_id = getattr(getattr(sender, "request", None), "id", None)
-    if not task_id:
-        return
-    try:
-        from app.worker.failed_tasks import mark_failed_task_succeeded
+def _note_celery_success_is_not_business_success(sender=None, **kwargs) -> None:
+    """Celery success is not WorkOrder/ingest business SUCCEEDED."""
 
-        mark_failed_task_succeeded(str(task_id))
-    except Exception:
-        logger.warning("failed_task_success_mark_unavailable", task_id=str(task_id))
+    del sender, kwargs
+    return

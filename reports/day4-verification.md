@@ -507,3 +507,36 @@ Skipped (not treated as PASS):
 | Day 5 | not entered |
 
 No git add / commit / push.
+
+---
+
+## 16. 外部审阅发现与本轮修正
+
+Reviewed WIP was checkpointed locally. **Day 4 is not all PASS.** Corrections ran against checkpoint `5e9e8ba` without a new Plan round. Full evidence: `reports/day4-correction-review.md`. Off-repo diff: `C:\Users\lmj\AppData\Local\Temp\property-ai-day4-review\day4-correction-diff.txt`.
+
+### 16.1 Checkpoints (recovery points only)
+
+| Item | Hash |
+| --- | --- |
+| Pre-review HEAD | `3c7b9ac90c7ec34db6a6bdbc961070b6c315791a` |
+| Engineering checkpoint | `ee0114006d56dcdf4c2da23df09d6a1d13a824be` `chore: checkpoint Day 4 remediation with review findings` |
+| Learning checkpoint / correction baseline | `5e9e8ba5da93c700a56414f082f6011aea56c4a9` `docs(learning): checkpoint separate remediation notes` |
+| Review material SHA-256 | `86cdb5fb67f9630e44678eea4df181d230d96322d2cf4249d0614c319e2dce12` |
+| Working tree after corrections | **dirty** (not committed; no push; no Release tag) |
+
+### 16.2 This-round live / pytest (not reused from §15)
+
+| Check | Status |
+| --- | --- |
+| Strict E2E `http://127.0.0.1:8082` | **PASS** (Fake). WO `162` CLOSED; bind `8`; announcement `4` **PUBLISHED**; knowledge `document_id=4`; notifications exact `resource_type`+`resource_id`; worker stop/start `rc=0` and inspect `Running` |
+| Failed-task drill this-round objects | **PASS** (Fake). WO `164` record `9a1720cf-…` `AI.UNAVAILABLE` replay → `PENDING_ASSIGNMENT` `analysis_rows=1`. WO `165` `enqueue-9ee1e3b6…` `ENQUEUE_FAILED` replay → `PENDING_ASSIGNMENT`. Did not take list-first backlog |
+| Transaction / replay / script negatives / logs | **PASS** (38 tests) then full pytest **547 passed, 2 skipped** in 395.78s |
+| Cold WO create P95 vs NFR 500ms (method A) | **PARTIAL** c=1 **593.73ms**; c=5 **1099.34ms**. Methods B/C/D are different experiments |
+| Dataplane host bind | YAML `127.0.0.1`; **running still `0.0.0.0`**. Recreate of shared data services **not executed** (mysql-test is tmpfs) |
+| pip-audit | **28 findings / 5 packages** (existing isolated JSON). No upgrade applied |
+| Docker Scout / Trivy | Scout **BLOCKED** (`docker login`); Trivy **not installed** |
+| 0008 / outbox | **NOT_RUN** (proposal only) |
+| Live vendor / WeChat / TLS | **BLOCKED_BY_CREDENTIALS** / **BLOCKED_BY_DOMAIN_CERT** |
+| Day 5 | not entered |
+
+Do not treat auto-join or Redis-only failed-task recovery as an accepted production pattern. Details and unexecuted 0008 / CVE plans are in `reports/day4-correction-review.md`.

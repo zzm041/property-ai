@@ -12,7 +12,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings, get_settings
-from app.core.database import transaction_context
+from app.core.database import begin_owned_transaction, require_owned_transaction
 from app.core.errors import (
     AiErrorCode,
     AppError,
@@ -150,9 +150,11 @@ class AnalysisService:
         attempt: int = 1,
         actor: Principal | None = None,
     ) -> WorkOrderAnalysis | None:
-        if actor is not None:
-            self._authorize_review(actor, work_order_id)
-        snapshot = self._prepare(work_order_id=work_order_id, request_id=request_id)
+        snapshot = self._prepare(
+            work_order_id=work_order_id,
+            request_id=request_id,
+            actor=actor,
+        )
         if snapshot is None or snapshot.skipped:
             return self._ai.get_current_analysis(work_order_id)
         bundle = self._call_providers(snapshot=snapshot, request_id=request_id, attempt=attempt)
@@ -199,10 +201,18 @@ class AnalysisService:
         )
         RbacService.require_permission(actor, AI_ANALYSIS_REVIEW, scope)
 
-    def _prepare(self, *, work_order_id: int, request_id: str) -> AnalysisSnapshot | None:
+    def _prepare(
+        self,
+        *,
+        work_order_id: int,
+        request_id: str,
+        actor: Principal | None = None,
+    ) -> AnalysisSnapshot | None:
         del request_id
         try:
-            with transaction_context(self._session):
+            with begin_owned_transaction(self._session):
+                if actor is not None:
+                    self._authorize_review(actor, work_order_id)
                 record = self._work_orders.get_work_order_for_update(work_order_id)
                 if record is None:
                     return None
@@ -323,6 +333,12 @@ class AnalysisService:
         request_id: str,
         attempt: int,
     ) -> ProviderBundle:
+        from app.core.database import TransactionContractError
+
+        if self._session.in_transaction():
+            raise TransactionContractError(
+                "Provider calls must not hold a business transaction"
+            )
         asr_text = snapshot.existing_asr_text
         vision_text = None
         error_code = None
@@ -493,7 +509,7 @@ class AnalysisService:
         error_code: str | None = None,
     ) -> None:
         finished_at = started_at + timedelta(milliseconds=max(latency_ms, 0))
-        with transaction_context(self._session):
+        with begin_owned_transaction(self._session):
             self._ai.add_call_log(
                 AiCallLog(
                     tenant_id=snapshot.tenant_id,
@@ -526,7 +542,7 @@ class AnalysisService:
     ) -> WorkOrderAnalysis | None:
         del attempt
         try:
-            with transaction_context(self._session):
+            with begin_owned_transaction(self._session):
                 record = self._work_orders.get_work_order_for_update(snapshot.work_order_id)
                 analysis = self._ai.get_current_analysis_for_update(snapshot.work_order_id)
                 if record is None or analysis is None:
@@ -775,6 +791,7 @@ class AnalysisService:
         actor_user_id: int,
         request_id: str,
     ) -> None:
+        require_owned_transaction(self._session)
         recommendations = self._ai.list_recommendations(work_order.id)
         if not recommendations:
             return
