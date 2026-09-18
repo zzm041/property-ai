@@ -11,9 +11,9 @@ Verification labels: PASS / FAIL / PARTIAL / NOT_RUN / BLOCKED_BY_CREDENTIALS.
 
 ## Transaction boundary vs `_execute`
 
-Files: `backend/app/core/database.py` (`transaction_context`, `run_service_transaction`); service `_execute` in employee / resident / work_order / knowledge / property; `rbac_mutation._execute_authorized`.
+Files: `backend/app/core/database.py` (`begin_owned_transaction`, `run_owned_transaction`, `run_composing_transaction`). `transaction_context` / `run_service_transaction` are **owned aliases** and do **not** auto-join.
 
-Top-level use cases own `begin/commit`. Nested helpers join an open transaction and **do not** rollback the caller to re-begin. HTTP Auth uses a separate Session from the business Session (`get_current_principal` vs `get_db_session`). Tests: `tests/integration/test_day4_silent_rollback.py`. Status after remediation: **PASS** on disposable MySQL (pending + flushed rows preserved; outer rollback drops business+audit together; top-level HTTP still commits).
+Top-level use cases own begin/commit/rollback. Nested work uses an explicit composing entry that requires an owned outer txn. An unexpected open txn is refused before new side effects; caller work is not committed or rolled back. Clean leftover SQLAlchemy `AUTOBEGIN` with no pending/flushed rows may be closed as Session hygiene. HTTP Auth uses a separate Session. WeChat tokens return only after the owned audit txn commits. AI/embed: Tx A ends, provider runs, Tx B starts. Tests: `tests/integration/test_day4_silent_rollback.py` (independent Session persist). Status: **PASS** on disposable MySQL. Auto-join is **not** an accepted pattern.
 
 ---
 
@@ -32,9 +32,9 @@ File: `backend/app/worker/enqueue.py` (`running_under_pytest`, `enqueue_celery_t
 
 Files: `backend/app/worker/failed_tasks.py`, `backend/app/cli/replay_failed_task.py`, `celery_app.py` `task_failure`.
 
-Permanent failures / enqueue exceptions write `property_ai:{env}:failed_tasks` and publish JSON to `{queue}.dlq`. That is **not** broker DLX configuration.
+Lookup is direct `hget` by `record_id` (list paging is separate). Replay validates per-operation args, reserves attempt/`task_id` before enqueue, and CAS-updates by attempt. Celery `task_success` is **not** business `SUCCEEDED`. `FAILED`+`INVALID_OUTPUT` is `PERMANENT_FAILED`. Named JSON publish to `{queue}.dlq` is **not** AMQP DLX.
 
-Day 4 live: record `d4-live-fail-probe` listed from Redis; `property_ai.day4.dlq` messages=1. Replay CLI unit-tested; live replay of a real analyze failure **NOT_RUN**. Do not say “死信投递与恢复已验证”.
+This-round live drill **PASS** (Fake): WO 164 `AI.UNAVAILABLE` record `9a1720cf-…` replay → `PENDING_ASSIGNMENT`; WO 165 `ENQUEUE_FAILED` replay → `PENDING_ASSIGNMENT`. Dual Redis+broker outage is **not** recovery PASS; no 0008 outbox/sweeper yet. Do not say incomplete task recovery is accepted.
 
 ---
 

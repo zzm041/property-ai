@@ -19,7 +19,7 @@ Because they are an ACTIVE self-applicant, not because `current.grants` is empty
 
 ### Q. If the Worker is down, is the work order lost?
 
-No. Create commits in MySQL first, then enqueues `analyze_work_order_task`. Day 4: worker stop left WO id=6 in `PENDING_ANALYSIS`; after start it reached `PENDING_ASSIGNMENT`. Task id example `6413f0ea-35e6-4159-9b1a-89b33c43cfff`. **PASS** on Fake providers. If enqueue itself throws, `record_failed_task` runs; live replay of a failed analyze **NOT_RUN**.
+No. Create commits in MySQL first, then enqueues `analyze_work_order_task`. Day 4 E2E: worker stop left WO **163** in `PENDING_ANALYSIS`; after start it reached `PENDING_ASSIGNMENT`. **PASS** on Fake providers. If enqueue throws and Redis is up, `record_failed_task` runs. This-round drill: WO **164** `AI.UNAVAILABLE` and WO **165** `ENQUEUE_FAILED` replayed by **this-round** `record_id` → `PENDING_ASSIGNMENT` **PASS** (Fake). Dual Redis+broker down is **not** recovery PASS (no outbox/sweeper). Celery success ≠ business success.
 
 ---
 
@@ -61,7 +61,7 @@ Separate RabbitMQ **user + vhost** (`day4` / `property_ai_day4`), queue `propert
 
 ### Q. Work-order create P95 &lt; 500ms — did Day 4 prove 千人并发?
 
-No. Sequential n=30 Fake create P95 **20.63ms** (meets NFR on that probe). Concurrent c=5 n=20 P95 **658ms** (misses NFR). healthz c=20 P95 ~2.7s. No registered-user-scale ramp. Status **PARTIAL**. Fake assistant P95 27ms is **not** live RAG.
+No. Method **A** (client construct + request + close) WO create P95 **593.73ms** (c=1 n=30) and **1099.34ms** (c=5 n=20) on 8082 Fake — **PARTIAL** vs 500ms NFR. A is **not** pure server latency. Methods B (nokeepalive), C (pooled), D (`response.elapsed`) are different experiments and must not replace A. No registered-user-scale ramp. Fake assistant latency is **not** live RAG.
 
 ---
 
