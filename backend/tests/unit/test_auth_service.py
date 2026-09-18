@@ -208,3 +208,40 @@ def test_commit_failure_prevents_token_result() -> None:
         )
 
     audit_service.append.assert_called_once()
+
+
+def test_development_token_resolves_allowed_seed_key() -> None:
+    service, _, repository, audit_service = _service()
+    repository.get_user_by_display_name.return_value = User(
+        id=4,
+        status="ACTIVE",
+        display_name="__DEV_RESIDENT__",
+    )
+
+    result = service.issue_development_token(
+        None,
+        _settings(),
+        request_id="seed-token",
+        seed_key="__DEV_RESIDENT__",
+    )
+
+    assert result.token_type == "bearer"
+    repository.get_user_by_display_name.assert_called_once_with("__DEV_RESIDENT__")
+    repository.get_user.assert_not_called()
+    assert audit_service.append.call_args.kwargs["actor_user_id"] == 4
+
+
+def test_unknown_or_disallowed_seed_key_is_rejected() -> None:
+    service, _, repository, audit_service = _service()
+
+    with pytest.raises(AppError) as captured:
+        service.issue_development_token(
+            None,
+            _settings(),
+            request_id="bad-seed",
+            seed_key="__NOT_A_SEED__",
+        )
+
+    assert captured.value.code == AuthErrorCode.INVALID_USER
+    repository.get_user_by_display_name.assert_not_called()
+    audit_service.append.assert_not_called()

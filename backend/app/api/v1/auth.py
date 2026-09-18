@@ -24,6 +24,7 @@ def issue_development_token(
         body.user_id,
         settings,
         request_id=request_id_for(request),
+        seed_key=body.seed_key,
     )
     data = AccessTokenData(
         access_token=token.access_token,

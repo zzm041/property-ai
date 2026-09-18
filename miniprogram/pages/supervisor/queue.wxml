@@ -1,12 +1,22 @@
 <input placeholder="小区 ID" value="{{propertyId}}" bindinput="onProperty" />
-<button class="btn" bindtap="load">加载队列</button>
+<button class="btn" bindtap="load">刷新队列</button>
 <view class="loading" wx:if="{{loading}}">加载中...</view>
 <view class="empty" wx:if="{{!loading && !items.length}}">暂无待派工单</view>
 <view class="card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="select">
   {{item.id}} {{item.status}} {{selectedId == item.id ? "已选" : ""}}
 </view>
-<input placeholder="员工 ID" bindinput="onEmployee" />
-<button class="btn" bindtap="recommend">AI 建议</button>
+<view class="card">
+  <view>点选在岗员工（employee_id，不是 user_id）</view>
+  <view class="empty" wx:if="{{!staff.length}}">今日暂无员工日报。请先让员工签到。</view>
+  <view
+    class="empty"
+    wx:for="{{staff}}"
+    wx:key="employee_id"
+    data-id="{{item.employee_id}}"
+    bindtap="selectEmployee"
+  >员工 {{item.employee_id}} {{item.on_duty}} 负荷 {{item.current_load}} {{employeeId == item.employee_id ? "已选" : ""}}</view>
+</view>
+<button class="btn" bindtap="recommend">AI 建议（Fake Provider）</button>
 <button class="btn" bindtap="assign">派单</button>
 <button class="btn" bindtap="reassign">改派</button>
 <view class="card" wx:for="{{recommendations}}" wx:key="employee_id">

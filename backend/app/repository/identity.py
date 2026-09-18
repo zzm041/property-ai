@@ -27,6 +27,14 @@ class IdentityRepository:
     def get_user(self, user_id: int) -> User | None:
         return self._session.get(User, user_id)
 
+    def get_user_by_display_name(self, display_name: str) -> User | None:
+        rows = self._session.scalars(
+            select(User).where(User.display_name == display_name).limit(2)
+        ).all()
+        if len(rows) != 1:
+            return None
+        return rows[0]
+
     def list_grant_permissions(
         self,
         user_id: int,

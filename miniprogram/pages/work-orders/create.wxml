@@ -1,8 +1,9 @@
 <view class="card">
-  <input placeholder="房屋 ID" bindinput="onHouse" />
+  <view class="empty">房屋可从「我的房屋」点选。无绑定房屋时请先申请绑定并等待物业审核。</view>
+  <input placeholder="房屋 ID" value="{{houseId}}" bindinput="onHouse" />
   <textarea placeholder="报修说明" bindinput="onText"></textarea>
-  <button class="btn" bindtap="chooseImage">选择图片</button>
-  <button class="btn" bindtap="chooseAudio">选择音频</button>
+  <button class="btn" bindtap="chooseImage">选择图片（可选）</button>
+  <button class="btn" bindtap="chooseAudio">选择音频（可选）</button>
   <view class="empty" wx:if="{{mediaHint}}">{{mediaHint}}</view>
   <button class="btn" bindtap="submit" disabled="{{loading}}">提交报修</button>
   <view class="loading" wx:if="{{loading}}">处理中...</view>

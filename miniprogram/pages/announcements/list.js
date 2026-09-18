@@ -5,6 +5,11 @@ Page({
       this.setData({ propertyId: query.propertyId });
     }
   },
+  onShow() {
+    if (this.data.propertyId) {
+      this.load();
+    }
+  },
   onProperty(e) {
     this.setData({ propertyId: e.detail.value });
   },
@@ -17,10 +22,9 @@ Page({
     ).catch(() => {});
   },
   open(e) {
-    const title = encodeURIComponent(e.currentTarget.dataset.title || "");
-    const content = encodeURIComponent(e.currentTarget.dataset.content || "");
+    const id = e.currentTarget.dataset.id;
     wx.navigateTo({
-      url: `/pages/announcements/detail?title=${title}&content=${content}`,
+      url: `/pages/announcements/detail?id=${id}&propertyId=${this.data.propertyId}`,
     });
   },
 });

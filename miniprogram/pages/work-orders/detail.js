@@ -1,15 +1,34 @@
 Page({
-  data: { item: null, loading: false, error: "" },
+  data: {
+    item: null,
+    workOrder: null,
+    logs: [],
+    canConfirm: false,
+    canReopen: false,
+    loading: false,
+    error: "",
+  },
   onLoad(query) {
     this.id = Number(query.id);
     this.reload();
   },
   reload() {
-    const { withLoading } = require("../../utils/ui");
+    const { withLoading, workOrderOf } = require("../../utils/ui");
     withLoading(this, () =>
       require("../../services/api")
         .workOrder(this.id)
-        .then((item) => this.setData({ item }))
+        .then((item) => {
+          const workOrder = workOrderOf(item);
+          const status = workOrder ? workOrder.status : "";
+          require("../../services/auth").setLastWorkOrderId(this.id);
+          this.setData({
+            item,
+            workOrder,
+            logs: (item && item.logs) || [],
+            canConfirm: status === "WAIT_CONFIRM",
+            canReopen: status === "WAIT_CONFIRM",
+          });
+        })
     ).catch(() => {});
   },
   confirm() {

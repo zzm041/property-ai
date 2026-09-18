@@ -6,6 +6,14 @@ function loadLocal() {
   }
 }
 
+function envVersion() {
+  try {
+    return wx.getAccountInfoSync().miniProgram.envVersion;
+  } catch (error) {
+    return "";
+  }
+}
+
 function resolveBaseUrl() {
   const local = loadLocal();
   const configured = {
@@ -13,14 +21,34 @@ function resolveBaseUrl() {
     trial: local.trial || "",
     release: local.release || "",
   };
-  try {
-    const env = wx.getAccountInfoSync().miniProgram.envVersion;
-    return configured[env] || configured.develop;
-  } catch (error) {
-    return configured.develop;
+  const env = envVersion() || "develop";
+  return configured[env] || configured.develop || "";
+}
+
+function localPreviewEnabled() {
+  const local = loadLocal();
+  return Boolean(local.localPreview) && envVersion() === "develop";
+}
+
+function localIdentities() {
+  if (!localPreviewEnabled()) {
+    return [];
   }
+  const local = loadLocal();
+  const rows = local.identities || [];
+  return rows.filter((item) => item && item.seedKey && item.label);
 }
 
 module.exports = {
   BASE_URL: resolveBaseUrl(),
+  ENV_VERSION: envVersion(),
+  LOCAL_PREVIEW: localPreviewEnabled(),
+  LOCAL_IDENTITIES: localIdentities(),
+  PREVIEW_HOUSE_ID: localPreviewEnabled() ? localPreviewHouseId() : "",
+  PROVIDER_NOTE: "开发环境 · 外部 LLM/ASR/VLM/Embedding 为 Fake Provider，非正式微信登录",
 };
+
+function localPreviewHouseId() {
+  const local = loadLocal();
+  return local.previewHouseId ? String(local.previewHouseId) : "";
+}

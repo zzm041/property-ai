@@ -1,6 +1,8 @@
 <input placeholder="小区 ID" value="{{propertyId}}" bindinput="onProperty" />
-<button class="btn" bindtap="load">加载公告</button>
+<button class="btn" bindtap="load">刷新公告</button>
 <view class="loading" wx:if="{{loading}}">加载中...</view>
 <view class="empty" wx:if="{{!loading && !items.length}}">暂无公告</view>
-<view class="card" wx:for="{{items}}" wx:key="id" data-title="{{item.title}}" data-content="{{item.content}}" bindtap="open">{{item.title}}</view>
+<view class="card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="open">
+  {{item.title}} {{item.status}}
+</view>
 <view class="error" wx:if="{{error}}">{{error}}</view>

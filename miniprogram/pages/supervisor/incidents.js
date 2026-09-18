@@ -5,6 +5,11 @@ Page({
       this.setData({ propertyId: query.propertyId });
     }
   },
+  onShow() {
+    if (this.data.propertyId) {
+      this.load();
+    }
+  },
   onProperty(e) {
     this.setData({ propertyId: e.detail.value });
   },

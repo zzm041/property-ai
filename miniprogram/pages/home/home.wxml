@@ -1,12 +1,14 @@
+<view class="card" wx:if="{{providerNote}}">{{providerNote}}</view>
 <view class="loading" wx:if="{{loading}}">加载中...</view>
 <view class="card" wx:if="{{me}}">
   <view>{{me.display_name}}</view>
   <view>角色：{{me.roles}}</view>
+  <view class="empty" wx:if="{{propertyId}}">当前小区 {{propertyId}}</view>
 </view>
 <view class="card" wx:if="{{canResident}}">
+  <button class="btn" data-url="/pages/houses/houses" bindtap="go">我的房屋 / 绑定</button>
   <button class="btn" data-url="/pages/work-orders/create" bindtap="go">报修</button>
   <button class="btn" data-url="/pages/work-orders/list" bindtap="go">我的工单</button>
-  <button class="btn" data-url="/pages/houses/houses" bindtap="go">我的房屋</button>
   <button class="btn" data-url="/pages/announcements/list" bindtap="go">公告</button>
   <button class="btn" data-url="/pages/assistant/assistant" bindtap="go">知识助手</button>
 </view>
@@ -22,5 +24,7 @@
   <button class="btn" data-url="/pages/supervisor/staff" bindtap="go">员工状态</button>
 </view>
 <button class="btn" data-url="/pages/notifications/list" bindtap="go">通知</button>
+<button class="btn" wx:if="{{lastWorkOrderId}}" bindtap="openLast">最近工单 {{lastWorkOrderId}}</button>
+<button class="btn" bindtap="switchIdentity">退出并切换身份</button>
 <button class="btn" bindtap="retry">重试</button>
 <view class="error" wx:if="{{error}}">{{error}}</view>

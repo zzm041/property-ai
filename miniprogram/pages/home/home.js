@@ -5,12 +5,21 @@ Page({
     canStaff: false,
     canManage: false,
     propertyId: "",
+    tenantId: "",
     loading: false,
     error: "",
+    providerNote: "",
+    lastWorkOrderId: "",
   },
   onShow() {
+    const env = require("../../config/env");
+    const auth = require("../../services/auth");
+    this.setData({
+      providerNote: env.PROVIDER_NOTE,
+      lastWorkOrderId: auth.getLastWorkOrderId(),
+    });
     const api = require("../../services/api");
-    const { withLoading, firstPropertyId } = require("../../utils/ui");
+    const { withLoading, firstPropertyId, firstTenantId } = require("../../utils/ui");
     withLoading(this, () =>
       api.me().then((me) => {
         const permissions = me.permissions || [];
@@ -21,6 +30,7 @@ Page({
           canStaff: permissions.indexOf("work_order:process") >= 0,
           canManage: permissions.indexOf("work_order:dispatch") >= 0,
           propertyId: firstPropertyId(me),
+          tenantId: firstTenantId(me),
         });
       })
     ).catch(() => {});
@@ -28,9 +38,22 @@ Page({
   retry() {
     this.onShow();
   },
+  switchIdentity() {
+    require("../../services/auth").clearSession();
+    wx.reLaunch({ url: "/pages/login/login" });
+  },
+  openLast() {
+    const id = this.data.lastWorkOrderId;
+    if (!id) {
+      this.setData({ error: "还没有本机记录的工单" });
+      return;
+    }
+    wx.navigateTo({ url: `/pages/work-orders/detail?id=${id}` });
+  },
   go(event) {
     const url = event.currentTarget.dataset.url;
     const propertyId = this.data.propertyId;
+    const tenantId = this.data.tenantId;
     const needsProperty =
       url.indexOf("announcements") >= 0 ||
       url.indexOf("assistant") >= 0 ||
@@ -38,7 +61,8 @@ Page({
       url.indexOf("attendance") >= 0;
     if (needsProperty && propertyId) {
       const join = url.indexOf("?") >= 0 ? "&" : "?";
-      wx.navigateTo({ url: `${url}${join}propertyId=${propertyId}` });
+      const tenant = tenantId ? `&tenantId=${tenantId}` : "";
+      wx.navigateTo({ url: `${url}${join}propertyId=${propertyId}${tenant}` });
       return;
     }
     wx.navigateTo({ url });

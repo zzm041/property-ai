@@ -28,7 +28,7 @@ function request({ path, method, data, headers }) {
       success: (response) => {
         const payload = response.data || {};
         if (isUnauthorized(response.statusCode, payload)) {
-          auth.clearToken();
+          auth.clearSession();
           wx.reLaunch({ url: "/pages/login/login" });
           reject(new Error("请重新登录"));
           return;
@@ -68,7 +68,7 @@ function uploadFile({ fileId, filePath }) {
           return;
         }
         if (isUnauthorized(response.statusCode, payload)) {
-          auth.clearToken();
+          auth.clearSession();
           wx.reLaunch({ url: "/pages/login/login" });
           reject(new Error("请重新登录"));
           return;
@@ -102,14 +102,19 @@ module.exports = {
   uploadFile,
   registerAndUpload,
   wechatLogin: (code) => request({ path: "/auth/wechat/login", method: "POST", data: { code } }),
+  devToken: (seedKey) =>
+    request({ path: "/auth/dev/token", method: "POST", data: { seed_key: seedKey } }),
   me: () => request({ path: "/me" }),
   houses: () => request({ path: "/me/houses" }),
+  myBindRequests: () => request({ path: "/resident-bind-requests/mine" }),
+  createBindRequest: (body) =>
+    request({ path: "/resident-bind-requests", method: "POST", data: body }),
   createWorkOrder: (body) =>
     request({
       path: "/work-orders",
       method: "POST",
       data: body,
-      headers: { "Idempotency-Key": `mp-${Date.now()}` },
+      headers: { "Idempotency-Key": `mp-${Date.now()}-${Math.random().toString(16).slice(2)}` },
     }),
   listWorkOrders: () => request({ path: "/work-orders" }),
   workOrder: (id) => request({ path: `/work-orders/${id}` }),
@@ -119,7 +124,6 @@ module.exports = {
     request({ path: `/work-orders/${id}/reopen`, method: "POST", data: body }),
   announcements: (propertyId) =>
     request({ path: `/announcements?property_id=${propertyId}` }),
-  announcement: (id) => request({ path: `/announcements/${id}` }),
   queryAssistant: (body) =>
     request({ path: "/assistant/query", method: "POST", data: body }),
   notifications: () => request({ path: "/notifications" }),
@@ -176,8 +180,10 @@ module.exports = {
       method: "POST",
       data: body || { decision: "APPROVE" },
     }),
-  bindRequests: (propertyId) =>
-    request({ path: `/admin/resident-bind-requests?property_id=${propertyId}` }),
+  bindRequests: (propertyId, tenantId) =>
+    request({
+      path: `/admin/resident-bind-requests?property_id=${propertyId}&tenant_id=${tenantId}`,
+    }),
   approveBindRequest: (id) =>
     request({
       path: `/admin/resident-bind-requests/${id}/approve`,
@@ -190,6 +196,8 @@ module.exports = {
       method: "POST",
       data: { reason },
     }),
-  staffDaily: (propertyId) =>
-    request({ path: `/supervisor/staff/daily?property_id=${propertyId}` }),
+  staffDaily: (propertyId, tenantId) =>
+    request({
+      path: `/supervisor/staff/daily?property_id=${propertyId}&tenant_id=${tenantId}`,
+    }),
 };

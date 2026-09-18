@@ -1,6 +1,21 @@
 <view class="card">
-  <view>微信登录后按角色展示功能。菜单仅作展示，权限以后端为准。</view>
+  <view>智慧物业 · 按角色展示菜单，权限以后端 /me 为准。</view>
+  <view class="empty">{{providerNote}}</view>
+  <view class="empty" wx:if="{{baseUrl}}">API {{baseUrl}}</view>
   <button class="btn" bindtap="login" disabled="{{loading}}">微信登录</button>
-  <view class="loading" wx:if="{{loading}}">登录中...</view>
-  <view class="error" wx:if="{{error}}">{{error}}</view>
+  <view class="empty">正式微信登录需要已认证 AppID 与微信凭证，本地 touristappid 通常会失败。</view>
 </view>
+<view class="card" wx:if="{{localPreview}}">
+  <view>本地联调登录（仅 develop + env.local.js 显式开启）</view>
+  <view class="empty">使用 Seed 业务键，不写死 user_id。切换身份会清 Token。</view>
+  <button
+    class="btn"
+    wx:for="{{identities}}"
+    wx:key="seedKey"
+    data-seed="{{item.seedKey}}"
+    bindtap="loginLocal"
+    disabled="{{loading}}"
+  >以{{item.label}}登录</button>
+</view>
+<view class="loading" wx:if="{{loading}}">登录中...</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>

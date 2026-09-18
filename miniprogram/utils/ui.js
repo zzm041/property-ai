@@ -15,7 +15,28 @@ function firstPropertyId(me) {
   return scoped ? scoped.property_id : "";
 }
 
+function firstTenantId(me) {
+  const scopes = (me && me.scopes) || [];
+  const scoped = scopes.find((item) => item.tenant_id);
+  return scoped ? scoped.tenant_id : "";
+}
+
+function workOrderOf(item) {
+  if (!item) {
+    return null;
+  }
+  return item.work_order || item;
+}
+
+function workOrderStatus(item) {
+  const row = workOrderOf(item);
+  return row ? row.status : "";
+}
+
 module.exports = {
   withLoading,
   firstPropertyId,
+  firstTenantId,
+  workOrderOf,
+  workOrderStatus,
 };

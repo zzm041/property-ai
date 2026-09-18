@@ -7,6 +7,11 @@ Page({
     loading: false,
     error: "",
   },
+  onLoad(query) {
+    const auth = require("../../services/auth");
+    const houseId = query.houseId || auth.getSelectedHouseId() || "";
+    this.setData({ houseId });
+  },
   onHouse(e) {
     this.setData({ houseId: e.detail.value });
   },
@@ -63,12 +68,20 @@ Page({
     const { withLoading } = require("../../utils/ui");
     withLoading(this, async () => {
       const api = require("../../services/api");
+      const auth = require("../../services/auth");
+      const houseId = Number(this.data.houseId);
+      if (!houseId || !this.data.text) {
+        throw new Error("请填写房屋和报修说明");
+      }
       const item = await api.createWorkOrder({
-        house_id: Number(this.data.houseId),
+        house_id: houseId,
         text: this.data.text,
         file_ids: this.data.fileIds,
       });
-      wx.navigateTo({ url: `/pages/work-orders/detail?id=${item.id}` });
+      const id = item.id || (item.work_order && item.work_order.id);
+      auth.setSelectedHouseId(houseId);
+      auth.setLastWorkOrderId(id);
+      wx.navigateTo({ url: `/pages/work-orders/detail?id=${id}` });
     }).catch(() => {});
   },
 });

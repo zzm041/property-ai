@@ -4,7 +4,7 @@
 <view class="loading" wx:if="{{loading}}">检索中...</view>
 <view class="card" wx:if="{{answer}}">{{answer}}</view>
 <view class="empty" wx:if="{{!loading && !answer}}">输入问题后查询物业知识库</view>
-<view class="card" wx:for="{{citations}}" wx:key="chunk_id">
+<view class="card" wx:for="{{citations}}" wx:key="document_id">
   {{item.title}} {{item.source_locator}}
 </view>
 <view class="error" wx:if="{{error}}">{{error}}</view>

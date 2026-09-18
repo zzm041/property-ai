@@ -1,8 +1,10 @@
 Page({
   data: {
     items: [],
+    staff: [],
     error: "",
     propertyId: "",
+    tenantId: "",
     employeeId: "",
     selectedId: "",
     recommendations: [],
@@ -12,23 +14,40 @@ Page({
     if (query.propertyId) {
       this.setData({ propertyId: query.propertyId });
     }
+    if (query.tenantId) {
+      this.setData({ tenantId: query.tenantId });
+    }
+  },
+  onShow() {
+    if (this.data.propertyId) {
+      this.load();
+    }
   },
   onProperty(e) {
     this.setData({ propertyId: e.detail.value });
   },
-  onEmployee(e) {
-    this.setData({ employeeId: e.detail.value });
-  },
   load() {
     const { withLoading } = require("../../utils/ui");
+    const api = require("../../services/api");
+    const propertyId = this.data.propertyId;
     withLoading(this, () =>
-      require("../../services/api")
-        .supervisorQueue(this.data.propertyId)
-        .then((data) => this.setData({ items: (data && data.items) || [] }))
+      Promise.all([
+        api.supervisorQueue(propertyId),
+        api.staffDaily(propertyId, this.data.tenantId),
+      ]).then(
+        ([queue, daily]) =>
+          this.setData({
+            items: (queue && queue.items) || [],
+            staff: (daily && daily.items) || [],
+          })
+      )
     ).catch(() => {});
   },
   select(e) {
     this.setData({ selectedId: e.currentTarget.dataset.id, recommendations: [] });
+  },
+  selectEmployee(e) {
+    this.setData({ employeeId: String(e.currentTarget.dataset.id) });
   },
   recommend() {
     if (!this.data.selectedId) {
@@ -53,7 +72,7 @@ Page({
   },
   _dispatch(name) {
     if (!this.data.selectedId || !this.data.employeeId) {
-      this.setData({ error: "请填写工单和员工 ID" });
+      this.setData({ error: "请选择工单和在岗员工" });
       return;
     }
     const { withLoading } = require("../../utils/ui");

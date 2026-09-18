@@ -1,6 +1,11 @@
 Page({
   data: {
     item: null,
+    workOrder: null,
+    logs: [],
+    canAccept: false,
+    canStart: false,
+    canFinish: false,
     feedback: "",
     loading: false,
     error: "",
@@ -12,11 +17,23 @@ Page({
     this.reload();
   },
   reload() {
-    const { withLoading } = require("../../utils/ui");
+    const { withLoading, workOrderOf } = require("../../utils/ui");
     withLoading(this, () =>
       require("../../services/api")
         .workOrder(this.id)
-        .then((item) => this.setData({ item }))
+        .then((item) => {
+          const workOrder = workOrderOf(item);
+          const status = workOrder ? workOrder.status : "";
+          require("../../services/auth").setLastWorkOrderId(this.id);
+          this.setData({
+            item,
+            workOrder,
+            logs: (item && item.logs) || [],
+            canAccept: status === "ASSIGNED",
+            canStart: status === "ACCEPTED",
+            canFinish: status === "PROCESSING",
+          });
+        })
     ).catch(() => {});
   },
   accept() {

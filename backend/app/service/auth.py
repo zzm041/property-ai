@@ -15,7 +15,10 @@ from app.core.security import (
     issue_development_access_token,
 )
 from app.domain.audit import AuditAction, AuditResourceType
+from app.domain.dev_seed import SEED_USERS
 from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+
+_ALLOWED_DEV_SEED_KEYS = frozenset(item.display_name for item in SEED_USERS)
 from app.repository.identity import GrantPermissionRecord, IdentityRepository
 from app.service.audit import AuditService
 
@@ -42,10 +45,11 @@ class AuthService:
 
     def issue_development_token(
         self,
-        user_id: int,
+        user_id: int | None,
         settings: Settings,
         *,
         request_id: str,
+        seed_key: str | None = None,
     ) -> IssuedAccessToken:
         if (
             not settings.dev_auth_enabled
@@ -60,7 +64,7 @@ class AuthService:
 
         def _persist() -> None:
             nonlocal issued
-            user = self._repository.get_user(user_id)
+            user = self._resolve_development_user(user_id=user_id, seed_key=seed_key)
             if user is None:
                 raise AppError(
                     code=AuthErrorCode.INVALID_USER,
@@ -97,6 +101,20 @@ class AuthService:
                 status_code=500,
             )
         return issued
+
+    def _resolve_development_user(
+        self,
+        *,
+        user_id: int | None,
+        seed_key: str | None,
+    ):
+        if seed_key:
+            if seed_key not in _ALLOWED_DEV_SEED_KEYS:
+                return None
+            return self._repository.get_user_by_display_name(seed_key)
+        if user_id is None:
+            return None
+        return self._repository.get_user(user_id)
 
     def authenticate_access_token(
         self,
