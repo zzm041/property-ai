@@ -43,6 +43,7 @@ _OPERATION_ARGS: dict[str, tuple[tuple[str, type], ...]] = {
     "app.worker.tasks.deliver_notification_task": (("delivery_id", int),),
 }
 _LEASE_SECONDS = 120
+_CAS_RETRIES = 3
 _MAX_ARG_STRING = 128
 STATUS_RECORDED = "RECORDED"
 STATUS_REPLAY_RESERVED = "REPLAY_RESERVED"
@@ -76,6 +77,14 @@ _REPLAYABLE = frozenset(
         STATUS_REPLAY_LEASE_EXPIRED,
         STATUS_REPLAY_FAILED,
     }
+)
+_RELEASE_LEASE_LUA = (
+    "if redis.call('GET', KEYS[1]) == ARGV[1] then "
+    "return redis.call('DEL', KEYS[1]) else return 0 end"
+)
+_RENEW_LEASE_LUA = (
+    "if redis.call('GET', KEYS[1]) == ARGV[1] then "
+    "return redis.call('EXPIRE', KEYS[1], tonumber(ARGV[2])) else return 0 end"
 )
 
 
@@ -413,7 +422,7 @@ def replay_failed_task(record_id: str, settings: Settings | None = None) -> bool
                     {"status": STATUS_REPLAY_LEASE_EXPIRED}
                 ),
             )
-            _release_lease(resolved, str(match["record_id"]))
+            _release_lease(resolved, str(match["record_id"]), reserved_task_id)
             logger.warning(
                 "failed_task_replay_lease_expired",
                 record_id=match["record_id"],
@@ -441,8 +450,9 @@ def replay_failed_task(record_id: str, settings: Settings | None = None) -> bool
         index_task_id=reserved_task_id,
     )
     if not reserved:
-        _release_lease(resolved, str(match["record_id"]))
+        _release_lease(resolved, str(match["record_id"]), reserved_task_id)
         return False
+    _renew_lease(resolved, str(match["record_id"]), reserved_task_id, _LEASE_SECONDS)
 
     from app.worker.tasks import (
         analyze_work_order_task,
@@ -461,7 +471,7 @@ def replay_failed_task(record_id: str, settings: Settings | None = None) -> bool
             queue=resolved.resolved_celery_queue,
             task_id=reserved_task_id,
         )
-    except Exception:
+    except (TypeError, ValueError):
         _cas_record(
             resolved,
             str(match["record_id"]),
@@ -469,8 +479,21 @@ def replay_failed_task(record_id: str, settings: Settings | None = None) -> bool
             expected_statuses={STATUS_REPLAY_RESERVED},
             mutator=lambda current: current.update({"status": STATUS_PUBLISH_FAILED}),
         )
-        _release_lease(resolved, str(match["record_id"]))
+        _release_lease(resolved, str(match["record_id"]), reserved_task_id)
         logger.error("failed_task_replay_publish_failed", record_id=match["record_id"])
+        return False
+    except Exception:
+        _cas_record(
+            resolved,
+            str(match["record_id"]),
+            expected_attempt=next_attempt,
+            expected_statuses={STATUS_REPLAY_RESERVED},
+            mutator=lambda current: current.update({"status": STATUS_PUBLISH_UNCERTAIN}),
+        )
+        logger.warning(
+            "failed_task_replay_publish_uncertain",
+            record_id=match["record_id"],
+        )
         return False
 
     published_id = str(getattr(async_result, "id", reserved_task_id) or reserved_task_id)
@@ -529,51 +552,99 @@ def _cas_record(
     client = redis.Redis.from_url(settings.redis_url, socket_timeout=2.0)
     hash_key = _hash_key(settings)
     try:
-        pipe = client.pipeline()
-        pipe.watch(hash_key)
-        raw = client.hget(hash_key, record_id)
-        if not raw:
-            pipe.reset()
-            return False
-        try:
-            current = json.loads(raw)
-        except json.JSONDecodeError:
-            pipe.reset()
-            return False
-        if int(current.get("current_attempt") or 0) != expected_attempt:
-            pipe.reset()
-            return False
-        status = str(current.get("status") or "")
-        if not allow_terminal_overwrite and status in _TERMINAL:
-            pipe.reset()
-            return False
-        if expected_statuses is not None and status not in expected_statuses:
-            pipe.reset()
-            return False
-        mutator(current)
-        if current.get("status") in _TERMINAL and status in _TERMINAL and current.get("status") != status:
-            pipe.reset()
-            return False
-        pipe.multi()
-        pipe.hset(hash_key, record_id, json.dumps(current, ensure_ascii=False))
-        if current.get("status") in _TERMINAL:
-            pipe.zrem(_open_key(settings), record_id)
-        else:
-            pipe.zadd(_open_key(settings), {record_id: datetime.now(timezone.utc).timestamp()})
-        if index_task_id:
-            pipe.hset(_task_index_key(settings), index_task_id, record_id)
-        pipe.execute()
-        return True
-    except redis.WatchError:
+        for _attempt in range(_CAS_RETRIES):
+            pipe = None
+            try:
+                pipe = client.pipeline()
+                pipe.watch(hash_key)
+                raw = client.hget(hash_key, record_id)
+                if not raw:
+                    pipe.reset()
+                    return False
+                try:
+                    current = json.loads(raw)
+                except json.JSONDecodeError:
+                    pipe.reset()
+                    return False
+                if int(current.get("current_attempt") or 0) != expected_attempt:
+                    pipe.reset()
+                    return False
+                status = str(current.get("status") or "")
+                if not allow_terminal_overwrite and status in _TERMINAL:
+                    pipe.reset()
+                    return False
+                if expected_statuses is not None and status not in expected_statuses:
+                    pipe.reset()
+                    return False
+                mutator(current)
+                if (
+                    current.get("status") in _TERMINAL
+                    and status in _TERMINAL
+                    and current.get("status") != status
+                ):
+                    pipe.reset()
+                    return False
+                pipe.multi()
+                pipe.hset(hash_key, record_id, json.dumps(current, ensure_ascii=False))
+                if current.get("status") in _TERMINAL:
+                    pipe.zrem(_open_key(settings), record_id)
+                else:
+                    pipe.zadd(
+                        _open_key(settings),
+                        {record_id: datetime.now(timezone.utc).timestamp()},
+                    )
+                if index_task_id:
+                    pipe.hset(_task_index_key(settings), index_task_id, record_id)
+                pipe.execute()
+                return True
+            except redis.WatchError:
+                logger.warning(
+                    "failed_task_cas_contention",
+                    record_id=record_id,
+                    attempt=_attempt + 1,
+                )
+                continue
+            finally:
+                if pipe is not None:
+                    try:
+                        pipe.reset()
+                    except Exception:
+                        pass
         return False
     finally:
         client.close()
 
 
-def _release_lease(settings: Settings, record_id: str) -> None:
+def _release_lease(settings: Settings, record_id: str, token: str) -> bool:
     client = redis.Redis.from_url(settings.redis_url, socket_timeout=2.0)
     try:
-        client.delete(_lease_key(settings, record_id))
+        released = client.eval(
+            _RELEASE_LEASE_LUA,
+            1,
+            _lease_key(settings, record_id),
+            token,
+        )
+        return int(released or 0) == 1
+    finally:
+        client.close()
+
+
+def _renew_lease(
+    settings: Settings,
+    record_id: str,
+    token: str,
+    seconds: int,
+) -> bool:
+    client = redis.Redis.from_url(settings.redis_url, socket_timeout=2.0)
+    try:
+        renewed = client.eval(
+            _RENEW_LEASE_LUA,
+            1,
+            _lease_key(settings, record_id),
+            token,
+            int(seconds),
+        )
+        return int(renewed or 0) == 1
     finally:
         client.close()
 

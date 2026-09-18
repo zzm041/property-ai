@@ -21,6 +21,9 @@ COMPOSE = REPO / "deploy" / "docker-compose.day4.yml"
 BASE = os.environ.get("DAY4_BASE_URL", "").rstrip("/")
 WORKER = os.environ.get("DAY4_WORKER_CONTAINER", "property-ai-day4-worker-day4-1")
 
+sys.path.insert(0, str(REPO / "backend"))
+from app.cli.replay_failed_task import match_failed_task_records  # noqa: E402
+
 
 def _compose(args: list[str], extra_env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
@@ -141,18 +144,21 @@ def _enqueue_fail_compensation(evidence: list[str], ids: dict[str, int]) -> bool
             ok = False
         listed = _list_failed()
         evidence.append(f"enqueue_fail_records={listed[:800] or '<empty>'}")
-        record_id = ""
-        needle = str(work_order_id)
-        for line in listed.splitlines():
-            if needle in line and ("ENQUEUE_FAILED" in line or "enqueue-" in line):
-                record_id = line.split()[0]
-                break
-        if not record_id:
+        matches = match_failed_task_records(
+            listed,
+            operation="app.worker.tasks.analyze_work_order_task",
+            resource_key="work_order_id",
+            resource_id=int(work_order_id),
+            request_id="d4-fail-enqueue-create",
+        )
+        if len(matches) != 1:
             evidence.append(
-                "enqueue_fail_no_durable_record Redis+broker both unavailable "
+                "enqueue_fail_no_durable_record "
+                f"matches={len(matches)} Redis+broker both unavailable "
                 "would also lack evidence; compensation NOT recovery PASS"
             )
             return False
+        record_id = matches[0]["record_id"]
     finally:
         restore = _compose(["up", "-d", "--no-deps", "--force-recreate", "api-day4"])
         evidence.append(f"api_broker_restored={restore.returncode}")
@@ -247,18 +253,23 @@ def main() -> int:
             evidence.append((recreate_ok.stderr or "")[-300:])
         time.sleep(8)
         if listed and work_order_id is not None:
-            record_id = ""
-            needle = str(work_order_id)
-            for line in listed.splitlines():
-                if "analyze_work_order_task" in line and needle in line:
-                    record_id = line.split()[0]
-                    break
-            if not record_id:
+            matches = match_failed_task_records(
+                listed,
+                operation="app.worker.tasks.analyze_work_order_task",
+                resource_key="work_order_id",
+                resource_id=int(work_order_id),
+                request_id="d4-fail-analyze-create",
+            )
+            if len(matches) != 1:
                 evidence.append(
-                    f"replay_skipped_no_this_round_record work_order_id={work_order_id}"
+                    f"replay_skipped_no_this_round_record work_order_id={work_order_id} "
+                    f"matches={len(matches)}"
                 )
                 failed = True
+                record_id = ""
             else:
+                record_id = matches[0]["record_id"]
+            if record_id:
                 replay = subprocess.run(
                     [
                         "docker",

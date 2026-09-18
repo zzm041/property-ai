@@ -67,6 +67,13 @@ class RequestContextMiddleware:
                     if name.lower() != REQUEST_ID_HEADER
                 ]
                 headers.append((REQUEST_ID_HEADER, request_id.encode("ascii")))
+                process_ms = (time.perf_counter() - started_at) * 1000
+                headers.append(
+                    (b"x-process-time-ms", f"{process_ms:.2f}".encode("ascii"))
+                )
+                headers.append(
+                    (b"server-timing", f"app;dur={process_ms:.2f}".encode("ascii"))
+                )
                 message["headers"] = headers
             await send(message)
 

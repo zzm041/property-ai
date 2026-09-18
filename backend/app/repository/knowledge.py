@@ -1,6 +1,8 @@
 """Knowledge metadata and notification-delivery persistence. No commits."""
 
-from sqlalchemy import select
+from datetime import datetime
+
+from sqlalchemy import or_, select, update
 from sqlalchemy.orm import Session
 
 from app.model.ai import Notification
@@ -217,6 +219,71 @@ class KnowledgeRepository:
 
     def get_delivery(self, delivery_id: int) -> NotificationDelivery | None:
         return self._session.get(NotificationDelivery, delivery_id)
+
+    def claim_pending_delivery(
+        self,
+        delivery_id: int,
+        *,
+        now: datetime,
+        lease_until: datetime,
+        claim_code: str,
+    ) -> NotificationDelivery | None:
+        result = self._session.execute(
+            update(NotificationDelivery)
+            .where(
+                NotificationDelivery.id == delivery_id,
+                NotificationDelivery.status == "PENDING",
+                or_(
+                    NotificationDelivery.next_retry_at.is_(None),
+                    NotificationDelivery.next_retry_at <= now,
+                ),
+            )
+            .values(
+                attempt=NotificationDelivery.attempt + 1,
+                next_retry_at=lease_until,
+                last_error_code=claim_code,
+            )
+            .execution_options(synchronize_session="fetch")
+        )
+        if int(result.rowcount or 0) != 1:
+            return None
+        return self._session.get(
+            NotificationDelivery,
+            delivery_id,
+            populate_existing=True,
+        )
+
+    def finish_claimed_delivery(
+        self,
+        *,
+        delivery_id: int,
+        attempt: int,
+        claim_code: str,
+        status: str | None,
+        last_error_code: str | None,
+        delivered_at: datetime | None,
+        next_retry_at: datetime | None,
+        update_lease: bool,
+    ) -> bool:
+        values: dict[str, object] = {"last_error_code": last_error_code}
+        if status is not None:
+            values["status"] = status
+        if delivered_at is not None or status == "SUCCEEDED":
+            values["delivered_at"] = delivered_at
+        if update_lease:
+            values["next_retry_at"] = next_retry_at
+        result = self._session.execute(
+            update(NotificationDelivery)
+            .where(
+                NotificationDelivery.id == delivery_id,
+                NotificationDelivery.status == "PENDING",
+                NotificationDelivery.attempt == attempt,
+                NotificationDelivery.last_error_code == claim_code,
+            )
+            .values(**values)
+            .execution_options(synchronize_session="fetch")
+        )
+        return int(result.rowcount or 0) == 1
 
     def get_notification(self, notification_id: int) -> Notification | None:
         return self._session.get(Notification, notification_id)

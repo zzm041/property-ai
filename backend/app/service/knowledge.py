@@ -1,6 +1,7 @@
 """Knowledge document lifecycle and asynchronous ingestion."""
 
 from collections.abc import Callable
+from datetime import timedelta
 from typing import TypeVar
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -48,6 +49,7 @@ from app.service.rbac import RbacService
 
 T = TypeVar("T")
 logger = get_logger(__name__)
+INGEST_CLAIM_SECONDS = 120
 
 
 class KnowledgeService:
@@ -122,7 +124,7 @@ class KnowledgeService:
         version: int,
         request_id: str,
         rebuild: bool = False,
-    ) -> None:
+    ) -> str:
         settings = self._settings
         prepared = self._prepare_ingest(
             document_id=document_id,
@@ -130,7 +132,10 @@ class KnowledgeService:
             rebuild=rebuild,
         )
         if prepared is None:
-            return
+            return "SKIPPED"
+        done = prepared.get("done")
+        if done is not None:
+            return str(done)
         if self._session.in_transaction():
             from app.core.database import TransactionContractError
 
@@ -152,8 +157,10 @@ class KnowledgeService:
                 document_id=document_id,
                 version=version,
                 rebuild=rebuild,
+                claimed_attempt=int(prepared["attempt"]),
+                claimed_version=int(prepared["version"]),
             )
-            return
+            return "FAILED"
         try:
             store.upsert(
                 chunk_ids=prepared["chunk_ids"],
@@ -175,9 +182,24 @@ class KnowledgeService:
                 document_id=document_id,
                 version=version,
                 rebuild=rebuild,
+                claimed_attempt=int(prepared["attempt"]),
+                claimed_version=int(prepared["version"]),
             )
-            return
-        self._finish_ingest_success(document_id=document_id, version=version)
+            return "FAILED"
+        return self._finish_ingest_success(
+            document_id=document_id,
+            version=version,
+            claimed_attempt=int(prepared["attempt"]),
+            claimed_version=int(prepared["version"]),
+        )
+
+    def _claim_is_held(self, job: KnowledgeIngestionJob) -> bool:
+        if job.status != KnowledgeIngestionStatus.PROCESSING.value:
+            return False
+        started = job.started_at
+        if started is None:
+            return False
+        return (utc_now() - started) < timedelta(seconds=INGEST_CLAIM_SECONDS)
 
     def _prepare_ingest(
         self,
@@ -192,12 +214,14 @@ class KnowledgeService:
                 version=version,
             )
             if job is None:
-                return None
+                return {"done": "SKIPPED"}
             if (
                 job.status == KnowledgeIngestionStatus.SUCCEEDED.value
                 and not rebuild
             ):
-                return None
+                return {"done": KnowledgeIngestionStatus.SUCCEEDED.value}
+            if self._claim_is_held(job):
+                return {"done": KnowledgeIngestionStatus.PROCESSING.value}
             document = self._repository.get_document(document_id)
             version_row = self._repository.get_version(
                 document_id=document_id,
@@ -206,10 +230,18 @@ class KnowledgeService:
             if document is None or version_row is None:
                 job.status = KnowledgeIngestionStatus.FAILED.value
                 job.error_code = KnowledgeErrorCode.NOT_FOUND
-                return None
+                job.finished_at = utc_now()
+                return {"done": KnowledgeIngestionStatus.FAILED.value}
+            if document.status == KnowledgeDocumentStatus.ARCHIVED.value:
+                job.status = KnowledgeIngestionStatus.FAILED.value
+                job.error_code = KnowledgeErrorCode.ARCHIVED
+                job.finished_at = utc_now()
+                return {"done": KnowledgeIngestionStatus.FAILED.value}
             job.status = KnowledgeIngestionStatus.PROCESSING.value
             job.started_at = utc_now()
             job.attempt = (job.attempt or 0) + 1
+            job.error_code = None
+            claimed_attempt = job.attempt
             try:
                 text = self._parser.parse(
                     filename=version_row.storage_key,
@@ -220,14 +252,14 @@ class KnowledgeService:
                 job.error_code = KnowledgeErrorCode.INVALID_INPUT
                 version_row.status = KnowledgeVersionStatus.FAILED.value
                 job.finished_at = utc_now()
-                return None
+                return {"done": KnowledgeIngestionStatus.FAILED.value}
             pieces = chunk_text(text, title=document.title)
             if not pieces:
                 job.status = KnowledgeIngestionStatus.FAILED.value
                 job.error_code = KnowledgeErrorCode.INVALID_INPUT
                 version_row.status = KnowledgeVersionStatus.FAILED.value
                 job.finished_at = utc_now()
-                return None
+                return {"done": KnowledgeIngestionStatus.FAILED.value}
             records = list(
                 self._repository.list_chunks_for_version(
                     document_id=document_id,
@@ -253,6 +285,9 @@ class KnowledgeService:
                     record.vector_id = record.id
                     records.append(record)
             return {
+                "attempt": claimed_attempt,
+                "version": version_row.version,
+                "document_id": document.id,
                 "excerpts": tuple(item.excerpt for item in records),
                 "chunk_ids": [item.id for item in records],
                 "tenant_ids": [item.tenant_id for item in records],
@@ -268,6 +303,8 @@ class KnowledgeService:
         document_id: int,
         version: int,
         rebuild: bool,
+        claimed_attempt: int,
+        claimed_version: int,
     ) -> None:
         with begin_owned_transaction(self._session):
             job = self._repository.get_ingestion_job_for_update(
@@ -280,9 +317,22 @@ class KnowledgeService:
             )
             if job is None or version_row is None:
                 return
+            if job.attempt != claimed_attempt or version_row.version != claimed_version:
+                return
+            if job.status == KnowledgeIngestionStatus.SUCCEEDED.value:
+                return
+            if job.status != KnowledgeIngestionStatus.PROCESSING.value:
+                return
             self._fail_ingest(job, version_row, rebuild=rebuild)
 
-    def _finish_ingest_success(self, *, document_id: int, version: int) -> None:
+    def _finish_ingest_success(
+        self,
+        *,
+        document_id: int,
+        version: int,
+        claimed_attempt: int,
+        claimed_version: int,
+    ) -> str:
         with begin_owned_transaction(self._session):
             job = self._repository.get_ingestion_job_for_update(
                 document_id=document_id,
@@ -294,8 +344,13 @@ class KnowledgeService:
                 version=version,
             )
             if job is None or document is None or version_row is None:
-                return
+                return "SKIPPED"
+            if job.attempt != claimed_attempt or version_row.version != claimed_version:
+                return str(job.status)
+            if job.status != KnowledgeIngestionStatus.PROCESSING.value:
+                return str(job.status)
             self._activate_version(document, version_row, job)
+            return str(job.status)
 
     def _fail_ingest(
         self,
@@ -320,7 +375,17 @@ class KnowledgeService:
         version_row: KnowledgeDocumentVersion,
         job: KnowledgeIngestionJob,
     ) -> None:
+        if document.status == KnowledgeDocumentStatus.ARCHIVED.value:
+            job.status = KnowledgeIngestionStatus.FAILED.value
+            job.error_code = KnowledgeErrorCode.ARCHIVED
+            job.finished_at = utc_now()
+            return
         previous = document.current_version
+        if previous is not None and previous > version_row.version:
+            job.status = KnowledgeIngestionStatus.FAILED.value
+            job.error_code = KnowledgeErrorCode.CONFLICT
+            job.finished_at = utc_now()
+            return
         if previous is not None and previous != version_row.version:
             old = self._repository.get_version(
                 document_id=document.id,

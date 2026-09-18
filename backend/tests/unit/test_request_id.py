@@ -11,6 +11,9 @@ def test_safe_client_request_id_is_preserved(client: TestClient) -> None:
 
     assert response.headers["x-request-id"] == "client-request-123"
     assert response.json()["request_id"] == "client-request-123"
+    process_ms = float(response.headers["x-process-time-ms"])
+    assert process_ms >= 0
+    assert "dur=" in response.headers.get("server-timing", "")
 
 
 def test_unsafe_client_request_id_is_replaced(client: TestClient) -> None:

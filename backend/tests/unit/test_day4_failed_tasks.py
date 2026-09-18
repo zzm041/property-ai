@@ -12,6 +12,8 @@ from app.core.errors import AiErrorCode
 from app.worker.celery_app import _log_permanent_or_retry_failure, _note_celery_success_is_not_business_success
 from app.worker.failed_tasks import (
     STATUS_PERMANENT_FAILED,
+    STATUS_PUBLISH_FAILED,
+    STATUS_PUBLISH_UNCERTAIN,
     STATUS_REPLAY_ENQUEUED,
     STATUS_REPLAY_FAILED,
     STATUS_REPLAY_LEASE_EXPIRED,
@@ -85,6 +87,19 @@ class MemoryRedis:
 
     def delete(self, key: str):
         self.kv.pop(key, None)
+
+    def eval(self, script: str, numkeys: int, *keys_and_args):
+        del numkeys
+        key = str(keys_and_args[0])
+        token = keys_and_args[1]
+        if isinstance(token, bytes):
+            token = token.decode()
+        if self.kv.get(key) != token:
+            return 0
+        if "EXPIRE" in script:
+            return 1
+        self.kv.pop(key, None)
+        return 1
 
     def close(self) -> None:
         return None
@@ -398,3 +413,78 @@ def test_first_non_retryable_celery_failure_is_recorded(monkeypatch) -> None:
     )
     assert recorded["task_id"] == "first-fail"
     assert recorded["error_code"] == "ValueError"
+
+
+def test_release_lease_is_compare_and_delete(monkeypatch) -> None:
+    settings = _settings()
+    client = _bind_redis(monkeypatch)
+    record_failed_task(
+        settings,
+        task_id="wo-lease",
+        operation="app.worker.tasks.analyze_work_order_task",
+        error_code="AI.TIMEOUT",
+        args=(9, "rid-9"),
+    )
+    task = MagicMock()
+    task.apply_async.return_value = MagicMock(id="replay-fixed")
+    monkeypatch.setattr("app.worker.tasks.analyze_work_order_task", task)
+
+    class FakeUUID:
+        hex = "fixed"
+
+    monkeypatch.setattr("app.worker.failed_tasks.uuid4", lambda: FakeUUID())
+    assert replay_failed_task("wo-lease", settings) is True
+    from app.worker.failed_tasks import _lease_key, _release_lease
+
+    lease_key = _lease_key(settings, "wo-lease")
+    assert client.get(lease_key) == "replay-fixed"
+    assert _release_lease(settings, "wo-lease", "stale-holder") is False
+    assert client.get(lease_key) == "replay-fixed"
+    assert _release_lease(settings, "wo-lease", "replay-fixed") is True
+    assert client.get(lease_key) is None
+
+
+def test_apply_async_value_error_is_definite_publish_failure(monkeypatch) -> None:
+    settings = _settings()
+    _bind_redis(monkeypatch)
+    record_failed_task(
+        settings,
+        task_id="wo-pub-fail",
+        operation="app.worker.tasks.analyze_work_order_task",
+        error_code="AI.TIMEOUT",
+        args=(9, "rid-9"),
+    )
+    task = MagicMock()
+    task.apply_async.side_effect = ValueError("task signature is invalid")
+    monkeypatch.setattr("app.worker.tasks.analyze_work_order_task", task)
+    assert replay_failed_task("wo-pub-fail", settings) is False
+    stored = get_failed_task("wo-pub-fail", settings)
+    assert stored is not None
+    assert stored["status"] == STATUS_PUBLISH_FAILED
+
+
+def test_apply_async_timeout_is_publish_uncertain_and_keeps_lease(monkeypatch) -> None:
+    settings = _settings()
+    client = _bind_redis(monkeypatch)
+    record_failed_task(
+        settings,
+        task_id="wo-pub-unc",
+        operation="app.worker.tasks.analyze_work_order_task",
+        error_code="AI.TIMEOUT",
+        args=(9, "rid-9"),
+    )
+    task = MagicMock()
+    task.apply_async.side_effect = TimeoutError("broker timed out after send")
+    monkeypatch.setattr("app.worker.tasks.analyze_work_order_task", task)
+
+    class FakeUUID:
+        hex = "unc1"
+
+    monkeypatch.setattr("app.worker.failed_tasks.uuid4", lambda: FakeUUID())
+    assert replay_failed_task("wo-pub-unc", settings) is False
+    stored = get_failed_task("wo-pub-unc", settings)
+    assert stored is not None
+    assert stored["status"] == STATUS_PUBLISH_UNCERTAIN
+    from app.worker.failed_tasks import _lease_key
+
+    assert client.get(_lease_key(settings, "wo-pub-unc")) == "replay-unc1"

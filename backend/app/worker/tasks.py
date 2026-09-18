@@ -92,6 +92,53 @@ def analyze_work_order_task(self, work_order_id: int, request_id: str) -> None:
         engine.dispose()
 
 
+def _record_ingest_attempt_outcome(task_id: str | None, outcome: str | None) -> None:
+    if not task_id or not outcome:
+        return
+    from app.worker.failed_tasks import (
+        STATUS_IGNORED_EXPIRED,
+        STATUS_PERMANENT_FAILED,
+        STATUS_SUCCEEDED,
+        complete_attempt,
+    )
+
+    mapped = None
+    if outcome == "SUCCEEDED":
+        mapped = STATUS_SUCCEEDED
+    elif outcome == "FAILED":
+        mapped = STATUS_PERMANENT_FAILED
+    elif outcome == "SKIPPED":
+        mapped = STATUS_IGNORED_EXPIRED
+    if mapped is None:
+        return
+    try:
+        complete_attempt(str(task_id), mapped, error_code=None if mapped == STATUS_SUCCEEDED else outcome)
+    except Exception:
+        logger.warning("failed_task_outcome_unavailable", task_id=str(task_id), outcome=mapped)
+
+
+def _record_delivery_attempt_outcome(task_id: str | None, outcome: str | None) -> None:
+    if not task_id or not outcome:
+        return
+    from app.worker.failed_tasks import (
+        STATUS_PERMANENT_FAILED,
+        STATUS_SUCCEEDED,
+        complete_attempt,
+    )
+
+    mapped = None
+    if outcome == "SUCCEEDED":
+        mapped = STATUS_SUCCEEDED
+    elif outcome == "FAILED":
+        mapped = STATUS_PERMANENT_FAILED
+    if mapped is None:
+        return
+    try:
+        complete_attempt(str(task_id), mapped, error_code=None if mapped == STATUS_SUCCEEDED else outcome)
+    except Exception:
+        logger.warning("failed_task_outcome_unavailable", task_id=str(task_id), outcome=mapped)
+
+
 @celery_app.task(
     bind=True,
     name="app.worker.tasks.ingest_knowledge_task",
@@ -110,11 +157,12 @@ def ingest_knowledge_task(
     try:
         from app.service.knowledge import KnowledgeService
 
-        KnowledgeService(session, settings=settings).ingest_version(
+        outcome = KnowledgeService(session, settings=settings).ingest_version(
             document_id=document_id,
             version=version,
             request_id=request_id,
         )
+        _record_ingest_attempt_outcome(getattr(self.request, "id", None), outcome)
     except (ProviderTimeoutError, ProviderUnavailableError, ProviderRateLimitError) as exc:
         logger.warning(
             "knowledge_ingest_retry",
@@ -163,7 +211,8 @@ def deliver_notification_task(self, delivery_id: int) -> None:
     try:
         from app.service.notification import NotificationService
 
-        NotificationService(session, settings=settings).deliver_pending(delivery_id)
+        outcome = NotificationService(session, settings=settings).deliver_pending(delivery_id)
+        _record_delivery_attempt_outcome(getattr(self.request, "id", None), outcome)
     except (ProviderTimeoutError, ProviderUnavailableError, ProviderRateLimitError) as exc:
         retries = int(getattr(self.request, "retries", 0))
         raise self.retry(exc=exc, countdown=min(2 ** retries, 30))

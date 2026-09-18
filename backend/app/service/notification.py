@@ -1,18 +1,27 @@
 """In-app notification outbox. External push is best-effort after commit."""
 
+from datetime import timedelta
+from uuid import uuid4
+
 from sqlalchemy import event
 from sqlalchemy.orm import Session
 
+from app.core.config import Settings, get_settings
 from app.core.errors import AppError, IamErrorCode, NotificationErrorCode
+from app.core.logging import get_logger
 from app.core.time import utc_now
 from app.domain.iam import Principal
 from app.model.ai import Notification
 from app.model.knowledge import NotificationDelivery
 from app.provider.errors import ProviderUnavailableError
 from app.provider.factory import build_notification_provider
-from app.core.config import Settings, get_settings
 from app.repository.knowledge import KnowledgeRepository
 from app.worker.enqueue import schedule_notification_delivery
+
+logger = get_logger(__name__)
+
+DELIVERY_CLAIM_SECONDS = 120
+DELIVERY_CLAIM_PREFIX = "NTF.CLAIM:"
 
 
 class NotificationService:
@@ -99,28 +108,30 @@ class NotificationService:
                 record.read_at = utc_now()
             return record
 
-    def deliver_pending(self, delivery_id: int) -> None:
-        from app.core.database import begin_owned_transaction
+    def deliver_pending(self, delivery_id: int) -> str:
+        """Claim one PENDING row, push outside the transaction, then write back.
 
-        snapshot: dict[str, object] | None = None
-        with begin_owned_transaction(self._session):
-            delivery = self._repository.get_delivery(delivery_id)
-            if delivery is None or delivery.status != "PENDING":
-                return
-            notification = self._repository.get_notification(delivery.notification_id)
-            if notification is None:
-                delivery.status = "FAILED"
-                delivery.last_error_code = "NTF.NOT_FOUND"
-                return
-            snapshot = {
-                "user_id": notification.user_id,
-                "title": notification.title,
-                "body": notification.body,
-            }
+        Status stays PENDING|SUCCEEDED|FAILED (0007 CHECK). Claim uses attempt
+        plus next_retry_at as a lease. DevelopmentNotificationProvider has no
+        vendor idempotency key: a crash after the provider accepted the push
+        but before local write-back can cause a second push after lease expiry.
+        That window is at-least-once, not exactly-once.
+        """
+
+        snapshot = self._claim_delivery(delivery_id)
         if snapshot is None:
-            return
+            return self._delivery_outcome(delivery_id)
+        if snapshot.get("terminal"):
+            return str(snapshot["terminal"])
+        if self._session.in_transaction():
+            from app.core.database import TransactionContractError
+
+            raise TransactionContractError(
+                "Provider calls must not hold a business transaction"
+            )
         provider = build_notification_provider(self._settings)
-        push_error: str | None = None
+        outcome = "SUCCEEDED"
+        error_code: str | None = None
         try:
             provider.deliver_push(
                 user_id=int(snapshot["user_id"]),
@@ -128,18 +139,106 @@ class NotificationService:
                 body=str(snapshot["body"]),
             )
         except ProviderUnavailableError:
-            push_error = "NTF.PROVIDER_FAILED"
+            outcome = "FAILED"
+            error_code = NotificationErrorCode.PROVIDER_FAILED
+        except Exception:
+            outcome = "UNCERTAIN"
+            error_code = NotificationErrorCode.PROVIDER_UNCERTAIN
+            logger.warning(
+                "notification_push_uncertain",
+                delivery_id=delivery_id,
+                attempt=snapshot["attempt"],
+            )
+        self._finish_delivery(snapshot, outcome, error_code)
+        return outcome
+
+    def _claim_delivery(self, delivery_id: int) -> dict[str, object] | None:
+        from app.core.database import begin_owned_transaction
+
         with begin_owned_transaction(self._session):
-            delivery = self._repository.get_delivery(delivery_id)
-            if delivery is None or delivery.status != "PENDING":
+            now = utc_now()
+            claim_code = f"{DELIVERY_CLAIM_PREFIX}{uuid4().hex}"
+            delivery = self._repository.claim_pending_delivery(
+                delivery_id,
+                now=now,
+                lease_until=now + timedelta(seconds=DELIVERY_CLAIM_SECONDS),
+                claim_code=claim_code,
+            )
+            if delivery is None:
+                return None
+            notification = self._repository.get_notification(delivery.notification_id)
+            if notification is None:
+                self._repository.finish_claimed_delivery(
+                    delivery_id=delivery.id,
+                    attempt=delivery.attempt,
+                    claim_code=claim_code,
+                    status="FAILED",
+                    last_error_code=NotificationErrorCode.NOT_FOUND,
+                    delivered_at=None,
+                    next_retry_at=None,
+                    update_lease=True,
+                )
+                return {"terminal": "FAILED"}
+            return {
+                "delivery_id": delivery.id,
+                "attempt": delivery.attempt,
+                "claim_code": claim_code,
+                "user_id": notification.user_id,
+                "title": notification.title,
+                "body": notification.body,
+            }
+
+    def _finish_delivery(
+        self,
+        snapshot: dict[str, object],
+        outcome: str,
+        error_code: str | None,
+    ) -> None:
+        from app.core.database import begin_owned_transaction
+
+        with begin_owned_transaction(self._session):
+            if outcome == "SUCCEEDED":
+                self._repository.finish_claimed_delivery(
+                    delivery_id=int(snapshot["delivery_id"]),
+                    attempt=int(snapshot["attempt"]),
+                    claim_code=str(snapshot["claim_code"]),
+                    status="SUCCEEDED",
+                    last_error_code=None,
+                    delivered_at=utc_now(),
+                    next_retry_at=None,
+                    update_lease=True,
+                )
                 return
-            delivery.attempt += 1
-            if push_error is not None:
-                delivery.status = "FAILED"
-                delivery.last_error_code = push_error
+            if outcome == "FAILED":
+                self._repository.finish_claimed_delivery(
+                    delivery_id=int(snapshot["delivery_id"]),
+                    attempt=int(snapshot["attempt"]),
+                    claim_code=str(snapshot["claim_code"]),
+                    status="FAILED",
+                    last_error_code=error_code,
+                    delivered_at=None,
+                    next_retry_at=None,
+                    update_lease=True,
+                )
                 return
-            delivery.status = "SUCCEEDED"
-            delivery.delivered_at = utc_now()
+            self._repository.finish_claimed_delivery(
+                delivery_id=int(snapshot["delivery_id"]),
+                attempt=int(snapshot["attempt"]),
+                claim_code=str(snapshot["claim_code"]),
+                status=None,
+                last_error_code=error_code,
+                delivered_at=None,
+                next_retry_at=None,
+                update_lease=False,
+            )
+
+    def _delivery_outcome(self, delivery_id: int) -> str:
+        delivery = self._repository.get_delivery(delivery_id)
+        if delivery is None:
+            return "SKIPPED"
+        if delivery.status in {"SUCCEEDED", "FAILED"}:
+            return str(delivery.status)
+        return "SKIPPED"
 
 
 @event.listens_for(Session, "after_commit")

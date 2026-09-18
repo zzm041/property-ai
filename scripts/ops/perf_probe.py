@@ -21,6 +21,34 @@ def _percentile(latencies: list[float], value: float) -> float:
     return round(latencies[index], 2)
 
 
+def parse_server_process_ms(headers: httpx.Headers | dict[str, str]) -> float | None:
+    """Parse server processing time. Header names encode milliseconds; dur is W3C ms.
+
+    Do not infer seconds vs milliseconds from magnitude.
+    """
+
+    raw = None
+    if hasattr(headers, "get"):
+        raw = headers.get("x-process-time-ms")
+    if raw:
+        try:
+            return float(raw)
+        except ValueError:
+            return None
+    timing = headers.get("server-timing") if hasattr(headers, "get") else None
+    if not timing:
+        return None
+    for part in str(timing).split(","):
+        for token in part.split(";"):
+            token = token.strip()
+            if token.startswith("dur="):
+                try:
+                    return float(token.split("=", 1)[1])
+                except ValueError:
+                    return None
+    return None
+
+
 def run_probe(
     *,
     base_url: str,
@@ -34,18 +62,24 @@ def run_probe(
 ) -> dict[str, object]:
     url = base_url.rstrip("/") + path
     latencies: list[float] = []
+    httpx_elapsed: list[float] = []
+    server_samples: list[float] = []
+    error_statuses: list[int] = []
     errors = 0
+    server_missing = 0
+    echo_mismatches = 0
     statuses: dict[int, int] = {}
     headers_base = {}
     if token:
         headers_base["Authorization"] = f"Bearer {token}"
 
-    def one(index: int) -> tuple[float, int, float | None]:
+    def one(index: int) -> tuple[float, int, float | None, float | None, bool]:
         headers = dict(headers_base)
         json_body = dict(body or {})
+        request_id = f"perf-{index}-{uuid4().hex[:8]}"
+        headers["X-Request-Id"] = request_id
         if method.upper() == "POST" and path.endswith("/work-orders"):
             headers["Idempotency-Key"] = f"perf-{uuid4()}"
-            headers["X-Request-Id"] = f"perf-{index}-{uuid4().hex[:8]}"
         started = time.perf_counter()
         try:
             if mode in {"cold", "A"}:
@@ -55,19 +89,16 @@ def run_probe(
                 response = nokeep.request(method, url, headers=headers, json=json_body or None)
             else:
                 response = pooled.request(method, url, headers=headers, json=json_body or None)
-            elapsed_ms = (time.perf_counter() - started) * 1000
-            server_ms = None
-            header = response.headers.get("x-process-time") or response.headers.get("server-timing")
-            if header:
-                try:
-                    server_ms = float(header.split(";")[0].split("=")[-1]) * (1000 if float(header.split(";")[0].split("=")[-1]) < 10 else 1)
-                except ValueError:
-                    server_ms = None
+            client_ms = (time.perf_counter() - started) * 1000
+            httpx_elapsed_ms = response.elapsed.total_seconds() * 1000
+            server_ms = parse_server_process_ms(response.headers)
+            echoed = response.headers.get("x-request-id") == request_id
             if mode in {"elapsed", "D"}:
-                elapsed_ms = response.elapsed.total_seconds() * 1000
-            return elapsed_ms, response.status_code, server_ms
+                # D reports httpx elapsed as the primary client metric. It is not server time.
+                client_ms = httpx_elapsed_ms
+            return client_ms, response.status_code, server_ms, httpx_elapsed_ms, echoed
         except httpx.HTTPError:
-            return (time.perf_counter() - started) * 1000, 0, None
+            return (time.perf_counter() - started) * 1000, 0, None, None, False
 
     pooled: httpx.Client | None = None
     nokeep: httpx.Client | None = None
@@ -83,11 +114,20 @@ def run_probe(
         with ThreadPoolExecutor(max_workers=concurrency) as pool:
             futures = [pool.submit(one, index) for index in range(requests)]
             for future in as_completed(futures):
-                latency, status, _server = future.result()
+                latency, status, server_ms, httpx_ms, echoed = future.result()
                 latencies.append(latency)
+                if httpx_ms is not None:
+                    httpx_elapsed.append(httpx_ms)
+                if server_ms is not None:
+                    server_samples.append(server_ms)
+                else:
+                    server_missing += 1
+                if not echoed:
+                    echo_mismatches += 1
                 statuses[status] = statuses.get(status, 0) + 1
                 if status != 200:
                     errors += 1
+                    error_statuses.append(status)
     finally:
         if pooled is not None:
             pooled.close()
@@ -95,6 +135,8 @@ def run_probe(
             nokeep.close()
     elapsed = time.perf_counter() - started_all
     latencies.sort()
+    httpx_elapsed.sort()
+    server_samples.sort()
     return {
         "url": url,
         "method": method.upper(),
@@ -102,12 +144,25 @@ def run_probe(
         "requests": requests,
         "concurrency": concurrency,
         "errors": errors,
+        "error_statuses": error_statuses,
         "error_rate": round(errors / max(requests, 1), 4),
         "status_counts": statuses,
         "throughput_rps": round(requests / elapsed, 2) if elapsed else 0,
+        "client_lifecycle_p50_ms": _percentile(latencies, 50),
+        "client_lifecycle_p95_ms": _percentile(latencies, 95),
+        "client_lifecycle_p99_ms": _percentile(latencies, 99),
         "p50_ms": _percentile(latencies, 50),
         "p95_ms": _percentile(latencies, 95),
         "p99_ms": _percentile(latencies, 99),
+        "httpx_elapsed_p50_ms": _percentile(httpx_elapsed, 50),
+        "httpx_elapsed_p95_ms": _percentile(httpx_elapsed, 95),
+        "httpx_elapsed_note": "httpx response.elapsed is transfer time, not exclusive server processing",
+        "server_process_samples": len(server_samples),
+        "server_process_missing": server_missing,
+        "server_process_p50_ms": _percentile(server_samples, 50) if server_samples else None,
+        "server_process_p95_ms": _percentile(server_samples, 95) if server_samples else None,
+        "server_process_unit": "milliseconds",
+        "request_id_echo_mismatches": echo_mismatches,
         "elapsed_s": round(elapsed, 3),
         "note": {
             "cold": "A: Client construct + request + close. Not pure server latency.",
