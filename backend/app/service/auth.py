@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings
+from app.core.database import run_owned_transaction
 from app.core.errors import AppError, AuthErrorCode, IamErrorCode
 from app.core.security import (
     AccessTokenExpiredError,
@@ -55,7 +56,10 @@ class AuthService:
                 message="Development Auth is unavailable",
                 status_code=404,
             )
-        with self._session.begin():
+        issued: IssuedAccessToken | None = None
+
+        def _persist() -> None:
+            nonlocal issued
             user = self._repository.get_user(user_id)
             if user is None:
                 raise AppError(
@@ -79,11 +83,20 @@ class AuthService:
                     "token_type": "access",
                 },
             )
-            return IssuedAccessToken(
+            issued = IssuedAccessToken(
                 access_token=token,
                 token_type="bearer",
                 expires_in=settings.jwt_access_token_ttl_seconds,
             )
+
+        run_owned_transaction(self._session, _persist)
+        if issued is None:
+            raise AppError(
+                code=AuthErrorCode.INVALID_TOKEN,
+                message="Development token could not be issued",
+                status_code=500,
+            )
+        return issued
 
     def authenticate_access_token(
         self,
@@ -124,32 +137,12 @@ class AuthService:
             )
         self._require_active(user.status)
         records = self._repository.list_grant_permissions(user.id)
-        principal = Principal(
+        return Principal(
             user_id=user.id,
             status=user.status,
             display_name=user.display_name,
             grants=self._build_grants(records),
         )
-        self._close_unowned_read_transaction()
-        return principal
-
-    def _close_unowned_read_transaction(self) -> None:
-        """End a clean autobegin from principal reads. Do not touch owned or dirty work."""
-
-        from app.core.database import OWNED_TXN_KEY
-
-        session = self._session
-        if not session.in_transaction():
-            return
-        try:
-            owned = int(session.info.get(OWNED_TXN_KEY, 0) or 0)
-        except (TypeError, ValueError):
-            owned = 0
-        if owned >= 1:
-            return
-        if session.new or session.dirty or session.deleted:
-            return
-        session.rollback()
 
     @staticmethod
     def _require_active(status: str) -> None:

@@ -17,6 +17,7 @@ _engines_lock = Lock()
 T = TypeVar("T")
 
 OWNED_TXN_KEY = "property_ai_owned_transaction"
+OWNED_TXN_OBJ_KEY = "property_ai_owned_transaction_obj"
 
 
 class TransactionContractError(RuntimeError):
@@ -30,12 +31,33 @@ def _owned_count(session: Session) -> int:
         return 0
 
 
-def require_owned_transaction(session: Session) -> None:
-    """Refuse work that must participate in a caller-owned unit of work."""
+def _active_transaction(session: Session):
+    if not session.in_transaction():
+        return None
+    transaction = session.get_transaction()
+    if transaction is None:
+        return None
+    is_active = getattr(transaction, "is_active", True)
+    if is_active is False:
+        return None
+    return transaction
 
+
+def require_owned_transaction(session: Session) -> None:
+    """Refuse work unless this Session has an active owner-matched transaction."""
+
+    transaction = _active_transaction(session)
+    if transaction is None:
+        raise TransactionContractError(
+            "Composition entry requires an owned active transaction"
+        )
     if _owned_count(session) < 1:
         raise TransactionContractError(
             "Composition entry requires an owned active transaction"
+        )
+    if session.info.get(OWNED_TXN_OBJ_KEY) is not transaction:
+        raise TransactionContractError(
+            "Composition entry does not match the current transaction owner"
         )
 
 
@@ -43,45 +65,26 @@ def require_owned_transaction(session: Session) -> None:
 def begin_owned_transaction(session: Session) -> Iterator[None]:
     """Open a service-owned begin/commit/rollback boundary.
 
-    An unexpected open transaction is refused before new side effects.
+    Any already-open transaction is refused before new side effects.
     The caller transaction is neither committed nor rolled back.
-    A leftover SQLAlchemy autobegin from a prior read may be closed when the
-    Session has no pending or flushed caller work and the origin is autobegin.
     """
 
     if session.in_transaction():
-        if _owned_count(session) >= 1:
-            raise TransactionContractError(
-                "Owned transaction is already active"
-            )
-        if not _is_clean_autobegin(session):
-            raise TransactionContractError(
-                "Top-level use case refuses an unexpected open transaction"
-            )
-        session.rollback()
+        raise TransactionContractError(
+            "Top-level use case refuses an unexpected open transaction"
+        )
     session.info[OWNED_TXN_KEY] = _owned_count(session) + 1
     try:
         with session.begin():
+            session.info[OWNED_TXN_OBJ_KEY] = session.get_transaction()
             yield
     finally:
+        session.info.pop(OWNED_TXN_OBJ_KEY, None)
         count = _owned_count(session) - 1
         if count <= 0:
             session.info.pop(OWNED_TXN_KEY, None)
         else:
             session.info[OWNED_TXN_KEY] = count
-
-
-def _is_clean_autobegin(session: Session) -> bool:
-    if session.new or session.dirty or session.deleted:
-        return False
-    transaction = session.get_transaction()
-    if transaction is None:
-        return False
-    origin = getattr(transaction, "origin", None)
-    if origin is None:
-        return False
-    origin_name = getattr(origin, "name", str(origin))
-    return str(origin_name).upper() == "AUTOBEGIN"
 
 
 def run_owned_transaction(session: Session, operation: Callable[[], T]) -> T:

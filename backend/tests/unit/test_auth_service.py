@@ -24,6 +24,8 @@ def _settings() -> Settings:
 
 def _service() -> tuple[AuthService, MagicMock, MagicMock, MagicMock]:
     session = MagicMock()
+    session.in_transaction.return_value = False
+    session.info = {}
     repository = MagicMock(spec=IdentityRepository)
     audit_service = MagicMock(spec=AuditService)
     return (
@@ -101,7 +103,7 @@ def test_disabled_development_user_is_rejected() -> None:
 
 
 def test_principal_groups_permissions_by_role_grant() -> None:
-    service, _, repository, _ = _service()
+    service, session, repository, _ = _service()
     repository.get_user.return_value = User(
         id=7,
         status="ACTIVE",
@@ -136,6 +138,8 @@ def test_principal_groups_permissions_by_role_grant() -> None:
 
     principal = service.load_principal(7)
 
+    session.rollback.assert_not_called()
+    session.commit.assert_not_called()
     assert principal.user_id == 7
     assert principal.roles == {"PROPERTY_ADMIN", "RESIDENT"}
     assert principal.permissions == {"property:read", "property:manage"}

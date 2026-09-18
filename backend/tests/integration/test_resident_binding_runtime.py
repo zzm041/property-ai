@@ -1047,6 +1047,7 @@ def test_missing_resident_role_rolls_back_entire_approval(
         identity_session,
         IdentityRepository(identity_session),
     ).load_principal(graph.reviewer_p1_id)
+    commit_open_transaction(identity_session)
     with pytest.raises(AppError) as captured:
         ResidentBindingService(identity_session).approve_bind_request(
             actor=reviewer,

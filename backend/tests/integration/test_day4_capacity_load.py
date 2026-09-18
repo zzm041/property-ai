@@ -20,7 +20,9 @@ from tests.integration.work_order_test_data import create_work_order_graph
 
 
 def _principal(session: Session, user_id: int):
-    return AuthService(session, IdentityRepository(session)).load_principal(user_id)
+    principal = AuthService(session, IdentityRepository(session)).load_principal(user_id)
+    commit_open_transaction(session)
+    return principal
 
 
 def test_second_assignment_to_full_employee_is_rejected(

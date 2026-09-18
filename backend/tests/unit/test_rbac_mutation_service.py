@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from app.core.database import OWNED_TXN_KEY
+from app.core.database import OWNED_TXN_KEY, OWNED_TXN_OBJ_KEY
 from app.core.errors import AppError, IamErrorCode
 from app.domain.audit import AuditAction, AuditResourceType, AuditSource
 from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
@@ -53,6 +53,20 @@ def _build_service(
     session = MagicMock()
     session.in_transaction.return_value = False
     session.info = {}
+    owned_txn = MagicMock()
+    owned_txn.is_active = True
+    session.get_transaction.return_value = owned_txn
+
+    class _Begin:
+        def __enter__(self) -> object:
+            session.in_transaction.return_value = True
+            return self
+
+        def __exit__(self, exc_type, exc, tb) -> bool:
+            session.in_transaction.return_value = False
+            return False
+
+    session.begin.side_effect = lambda: _Begin()
     repository = MagicMock(spec=RbacMutationRepository)
     property_repository = MagicMock(spec=PropertyRepository)
     audit_service = MagicMock(spec=AuditService)
@@ -578,10 +592,18 @@ def test_final_transaction_commit_failure_prevents_success_return() -> None:
     audit_service.append.assert_called_once()
 
 
+def _own_mock_transaction(session: MagicMock) -> None:
+    transaction = MagicMock()
+    transaction.is_active = True
+    session.in_transaction.return_value = True
+    session.get_transaction.return_value = transaction
+    session.info[OWNED_TXN_KEY] = 1
+    session.info[OWNED_TXN_OBJ_KEY] = transaction
+
+
 def test_development_seed_grant_uses_fixed_source_without_transaction_control() -> None:
     service, session, _, _, audit_service, _ = _build_service()
-    session.in_transaction.return_value = True
-    session.info[OWNED_TXN_KEY] = 1
+    _own_mock_transaction(session)
 
     result = service.grant_user_role_for_development_seed(
         target_user_id=20,
@@ -601,8 +623,7 @@ def test_development_seed_grant_uses_fixed_source_without_transaction_control() 
 
 def test_development_seed_role_permission_uses_fixed_source() -> None:
     service, session, _, _, audit_service, _ = _build_service()
-    session.in_transaction.return_value = True
-    session.info[OWNED_TXN_KEY] = 1
+    _own_mock_transaction(session)
 
     service.grant_role_permission_for_development_seed(
         role_code="PROPERTY_ADMIN",
