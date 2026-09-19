@@ -8,9 +8,9 @@
   "automator_ws": "ws://127.0.0.1:9433",
   "devtools": "2.02.2608070",
   "counts": {
-    "PASS": 30,
+    "PASS": 28,
     "FAIL": 1,
-    "PARTIAL": 4,
+    "PARTIAL": 6,
     "BLOCKED_ENV": 1,
     "NOT_IMPLEMENTED": 15,
     "NOT_RUN": 4
@@ -37,5 +37,10 @@
     "real SMS",
     "self-hosted AI"
   ],
-  "headline": "回归完成，仍有缺口"
+  "headline": "回归完成，仍有缺口",
+  "codex_review": {
+    "file": "reports/codex/MP-CURRENT-FULL-REGRESSION-001-review.json",
+    "decision": "NEEDS_CHANGES",
+    "count_adjustment": "AUTH-RESET and AUTH-RESET-REVOKE downgraded PASS→PARTIAL after Codex; original 30 PASS was not acceptance-grade"
+  }
 }

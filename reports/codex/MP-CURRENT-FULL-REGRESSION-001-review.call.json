@@ -1,0 +1,9 @@
+{
+  "task_id": "MP-CURRENT-FULL-REGRESSION-001",
+  "phase": "review",
+  "wrapper_timeout_s": 240,
+  "actual_outcome": "wrapper subprocess timed out and hung on pipe cleanup; Codex process 12920 continued and wrote reports/codex/MP-CURRENT-FULL-REGRESSION-001-review.json",
+  "review_file": "reports/codex/MP-CURRENT-FULL-REGRESSION-001-review.json",
+  "decision": "NEEDS_CHANGES",
+  "note": "Do not treat wrapper exit 4294967295 as a missing review. First timeout marker remains in MP-CURRENT-FULL-REGRESSION-001-review.timeout.json as the failed wrapper attempt."
+}

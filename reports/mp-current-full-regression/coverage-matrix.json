@@ -99,7 +99,7 @@
       "role": "resident",
       "page": "pages/login/login",
       "impl": "已实现可测试",
-      "ui_or_api": "UI"
+      "ui_or_api": "API证明 / UI本轮未证明会话失效",
     },
     {
       "id": "AUTH-PASSWORD-LOGIN",

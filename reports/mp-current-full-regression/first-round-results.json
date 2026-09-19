@@ -123,12 +123,13 @@
       "id": "AUTH-RESET",
       "role": "resident",
       "page": "pages/login/login",
-      "status": "PASS",
+      "status": "PARTIAL",
       "expected": "return to login, not auto logged in",
-      "actual": "pages/login/login",
+      "actual": "automator path pages/login/login; screenshot still shows reset page",
       "evidence": [
         "mp-cfull-20260919-1-reset-back-login.png"
-      ]
+      ],
+      "note": "Codex review: path/API support the flow; screenshot is stale/mismatched so UI return-to-login is not acceptance-grade"
     },
     {
       "id": "AUTH-PASSWORD-LOGIN",
@@ -145,12 +146,13 @@
       "id": "AUTH-RESET-REVOKE",
       "role": "resident",
       "page": "pages/login/login",
-      "status": "PASS",
-      "expected": "uppercase variant rejected then correct password works",
-      "actual": "folded_error=true",
+      "status": "PARTIAL",
+      "expected": "reset invalidates old password and old access/refresh sessions",
+      "actual": "UI only proved uppercase variant rejected; session revoke not exercised on DevTools",
       "evidence": [
         "mp-cfull-20260919-1-resident-password-home.png"
-      ]
+      ],
+      "note": "Codex review: do not treat case-sensitivity as session revoke. Isolated API tests still prove revoke; UI evidence is PARTIAL"
     },
     {
       "id": "RES-HOUSE-CASCADE",
