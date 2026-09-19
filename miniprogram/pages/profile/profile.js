@@ -146,6 +146,7 @@ Page({
       const auth = require("../../services/auth");
       const code = await auth.login();
       await require("../../services/api").wechatBind(code);
+      this.setData({ wechatNotice: "当前微信已绑定" });
       wx.showToast({ title: "已绑定" });
     }).catch(() => {});
   },
