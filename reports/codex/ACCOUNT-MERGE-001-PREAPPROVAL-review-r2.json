@@ -1,0 +1,40 @@
+{
+  "task_id": "ACCOUNT-MERGE-001-PREAPPROVAL-AUDIT",
+  "phase": "review",
+  "reviewed_head": "f5a7b62d83303ab2c742bbd3baef27cf48f99999",
+  "decision": "PASS",
+  "actions_or_findings": [
+    {
+      "title": "NON_BLOCKING: Withdrawal is not a current bind-request outcome",
+      "path": "D:/property-ai/reports/account-merge-001-preapproval/review.md:136; D:/property-ai/backend/app/model/resident.py:33",
+      "trigger": "The revised report says a PENDING request may be reviewed or withdrawn; the current status constraint has no withdrawal state.",
+      "rationale": "Blocking merge until review is a valid current path. Main Codex should not assume withdrawal exists when drafting 0010; adding it would need its own specified change and approval."
+    }
+  ],
+  "evidence_paths": [
+    "D:/property-ai/reports/account-merge-001-preapproval/review.md",
+    "D:/property-ai/reports/mp-current-full-regression/coverage-matrix.json",
+    "D:/property-ai/reports/mp-current-full-regression/combined-results.json",
+    "D:/property-ai/reports/project-handoff.md",
+    "D:/property-ai/docs/03-DOMAIN-MODEL.md",
+    "D:/property-ai/backend/alembic/versions/20260919_0009_official_auth_identity_dispatch.py",
+    "D:/property-ai/backend/app/model/resident.py"
+  ],
+  "unverified": [
+    "I did not rerun tests or business operations, inspect the live database or processes, operate pages, or send requests.",
+    "The saved JUnit files support 407 and 7 cases; warnings and runtime/database observations remain report-derived.",
+    "No 0010 migration or account-merge implementation was reviewed."
+  ],
+  "session_note": "Same independent read-only session. The four prior CURRENT_TASK_BLOCKER findings are addressed in the revised audit: the phone-spec conflict is explicit, VERIFYING holds bound one-use proof state, bind-request applicant history stays on the source, and password disposition is an owner decision. The documents state future down_revision=20260919_0009, an exact isolated-target guard, and evidence-provenance limits. The 83 matrix IDs still match the 83 saved combined-result IDs. No file was edited.\n",
+  "task_result": "PASS for the revised pre-approval audit as a conservative approval decision basis with three explicit product decisions outstanding. This does not approve 0010, pass account merge, or pass Production V1.",
+  "product_gap_changes": [
+    "No product feature was implemented or accepted in this revision. Controlled merge, high-risk recovery, real AI assignment, real Embedding/RAG and the remaining frozen Production V1 gaps stay open."
+  ],
+  "schedule_risk": "High. The original approximately 2026-09-21 aim remains unattainable for full frozen Production V1 given the outstanding decisions, implementation and release validation.",
+  "next_action": "Main Codex should present the three documented policy choices with the audit’s recommendations to the user. After decisions, prepare a concrete 0010 proposal covering all merged-source phone tombstones, proof and lock contracts, collisions, exact isolated target, downgrade limits and the scoped test plan; obtain separate migration approval before creating or applying it. Completion requires a reviewable proposal and explicit approval for any named disposable migration target. Ordinary non-dependent source work may continue within existing authorization.",
+  "approval_requests": [
+    "Decide whether ordinary non-merge ENDED phone numbers may be rebound after fresh verification or remain globally reserved; merged-source numbers are recommended permanently reserved.",
+    "Decide whether a source without an ACTIVE phone must use the separate high-risk recovery flow or may use another specified verified proof route.",
+    "Decide whether to discard a source password and require target-side setup when the target has none, as recommended, or authorize a defined transfer rule."
+  ]
+}

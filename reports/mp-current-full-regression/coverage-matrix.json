@@ -1078,5 +1078,273 @@
     "V1-NTF-EVENTS",
     "V1-GOVERNANCE-OPS"
   ],
-  "denominator_count": 83
+  "denominator_count": 83,
+  "preapproval_audit_20260920": {
+    "task_id": "ACCOUNT-MERGE-001-PREAPPROVAL-AUDIT",
+    "audited_head": "f5a7b62d83303ab2c742bbd3baef27cf48f99999",
+    "rule": "The original 83 rows and historical statuses are preserved. Current overlays are version-bound and do not imply Production V1 acceptance.",
+    "current_test_evidence": {
+      "unit": "reports/account-merge-001-preapproval/unit-results.xml: 407 passed, 1 warning",
+      "isolated_0009": "reports/account-merge-001-preapproval/isolated-0009-results.xml: 7 passed, 1 warning",
+      "database": "127.0.0.1:3307/property_ai_auth001_test at 20260919_0009; no migration or reset was run"
+    },
+    "current_status_overlays": [
+      {
+        "id": "AUTH-PHONE-CHANGE",
+        "implementation_status": "implemented_and_page_wired",
+        "verification_status": "PASS_SCOPED_LOCAL_SYNTHETIC",
+        "evidence_version": "893fd65cfd5c603ea7046c2639c71b076c3fd349 / a25ff332e05f3d6d069fd6b8c191817a9ce5fadf",
+        "remaining_gap": "real SMS and Production V1 acceptance"
+      },
+      {
+        "id": "AUTH-WECHAT-REBIND",
+        "implementation_status": "implemented_and_page_wired",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_PROVIDER",
+        "evidence_version": "a42a7fbb646ee3b892c938fa9cb7cd8d6ab81584 / f5a7b62d83303ab2c742bbd3baef27cf48f99999",
+        "remaining_gap": "real WeChat and real SMS provider acceptance"
+      },
+      {
+        "id": "WO-AUTO-DISPATCH",
+        "implementation_status": "implemented_for_isolated_runtime",
+        "verification_status": "PASS_SCOPED_FAKE_CROSS_PROCESS",
+        "evidence_version": "d144bcddcfc24e6e9eaf60509acd124711bc0561",
+        "remaining_gap": "operator-controlled real model and production runtime"
+      },
+      {
+        "id": "V1-AUTO-DISPATCH-FILTER",
+        "implementation_status": "implemented_for_current_scoring_slice",
+        "verification_status": "PASS_SCOPED_FAKE",
+        "evidence_version": "d144bcddcfc24e6e9eaf60509acd124711bc0561",
+        "remaining_gap": "real-model and full production-policy acceptance"
+      },
+      {
+        "id": "V1-WORKER-ASYNC",
+        "implementation_status": "isolated_worker_present",
+        "verification_status": "PARTIAL",
+        "evidence_version": "d144bcddcfc24e6e9eaf60509acd124711bc0561",
+        "remaining_gap": "production reliability, real providers and complete DLQ/replay acceptance"
+      },
+      {
+        "id": "WO-CANCEL-REJECT-REASSIGN-REOPEN",
+        "implementation_status": "implemented_and_wired_for_current_exception_slice",
+        "verification_status": "PARTIAL",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
+        "remaining_gap": "live supervisor REASSIGN page and full production matrix"
+      },
+      {
+        "id": "V1-RES-APPEND",
+        "implementation_status": "implemented_and_page_wired",
+        "verification_status": "UNIT_AND_CODE_SCOPED",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
+        "remaining_gap": "dedicated real-page evidence"
+      },
+      {
+        "id": "V1-RES-CANCEL",
+        "implementation_status": "implemented_and_page_wired",
+        "verification_status": "UNIT_AND_CODE_SCOPED",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
+        "remaining_gap": "dedicated real-page evidence"
+      },
+      {
+        "id": "V1-RES-RATING",
+        "implementation_status": "implemented_and_page_wired",
+        "verification_status": "UNIT_AND_CODE_SCOPED",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
+        "remaining_gap": "dedicated real-page evidence"
+      },
+      {
+        "id": "V1-STAFF-REJECT",
+        "implementation_status": "implemented_and_page_wired",
+        "verification_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
+        "remaining_gap": "broader production exception matrix"
+      },
+      {
+        "id": "V1-STAFF-ESCALATE",
+        "implementation_status": "implemented_and_page_wired",
+        "verification_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
+        "remaining_gap": "broader production exception matrix"
+      },
+      {
+        "id": "V1-RECEIPT-COMPLETE",
+        "implementation_status": "text_material_fee_fields_wired",
+        "verification_status": "PARTIAL",
+        "evidence_version": "f2839370e493bc4c713f1e73edc9814bb9c419fb / f1de143a546912b0cefaa3aa6b50582feb466016",
+        "remaining_gap": "native before/after photo flow and production media"
+      },
+      {
+        "id": "V1-RECEIPT-HISTORY",
+        "implementation_status": "multi_cycle_receipts_preserved",
+        "verification_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
+        "remaining_gap": "broader concurrency and production acceptance"
+      },
+      {
+        "id": "V1-MGR-EXCEPTION",
+        "implementation_status": "decision_paths_partially_wired",
+        "verification_status": "PARTIAL",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
+        "remaining_gap": "all decision types, external-coordination policy and page evidence"
+      },
+      {
+        "id": "V1-NTF-RETRY",
+        "implementation_status": "delivery_claim_retry_code_present",
+        "verification_status": "PARTIAL",
+        "evidence_version": "f5a7b62d83303ab2c742bbd3baef27cf48f99999",
+        "remaining_gap": "production provider, uncertain-delivery and DLQ/replay acceptance"
+      },
+      {
+        "id": "V1-GOVERNANCE-IDOR",
+        "implementation_status": "scoped_checks_and_tests_present",
+        "verification_status": "PARTIAL",
+        "evidence_version": "f5a7b62d83303ab2c742bbd3baef27cf48f99999",
+        "remaining_gap": "complete cross-module IDOR/security acceptance"
+      },
+      {
+        "id": "V1-AI-FAIL-CREATE",
+        "implementation_status": "fallback_code_and_unit_coverage_present",
+        "verification_status": "PARTIAL",
+        "evidence_version": "d144bcddcfc24e6e9eaf60509acd124711bc0561",
+        "remaining_gap": "current live failure-path evidence with production-equivalent worker/provider"
+      }
+    ],
+    "module_traceability": [
+      {
+        "module": "account_and_credentials",
+        "ids": ["AUTH-LOGIN-DEFAULT", "AUTH-NO-SEED", "AUTH-PASSWORD-TOGGLE", "AUTH-PHONE-KEEP", "AUTH-CHALLENGE", "AUTH-SMS-COOLDOWN", "AUTH-RESET-MISMATCH", "AUTH-RESET", "AUTH-PASSWORD-LOGIN", "AUTH-RESET-REVOKE", "DEV-LOGIN-ISOLATED", "AUTH-PHONE-CHANGE", "AUTH-WECHAT-REBIND", "AUTH-MERGE", "AUTH-RECOVERY", "AUTH-PASSWORD-CHANGE", "REAL-SMS", "AUTH-WECHAT", "AUTH-SMS-EXPIRE", "AUTH-SMS-REUSE", "AUTH-RESET-RELOGIN", "AUTH-PASSWORD-POLICY", "V1-AUTH-LOCKOUT"],
+        "sources": ["docs/01-PRD.md section 1", "docs/02-ROLES-PERMISSIONS.md section 4.1", "docs/03-DOMAIN-MODEL.md Identity and AccountMerge", "docs/06-API-CONTRACT.md auth", "docs/07-SECURITY-PRIVACY.md", "docs/10-ACCEPTANCE.md B1"],
+        "roles_and_actions": "anonymous/unbound/any user: login, recover, update credentials, bind or merge own identity",
+        "pages": ["pages/login/login", "pages/password-reset/password-reset", "pages/profile/profile", "pages/dev-login/dev-login (local guard only)"],
+        "code": ["backend/app/api/v1/credential_auth.py", "backend/app/api/v1/wechat_auth.py", "backend/app/service/credential_auth.py", "backend/app/service/wechat_auth.py", "backend/app/repository/credential.py", "backend/app/model/identity.py"],
+        "dependencies": "MySQL, Redis rate limits, SMS/WeChat/RealName/Vision providers",
+        "tests_and_runtime": "407 current unit; 7 current isolated 0009; version-bound phone-change and WeChat page/API evidence",
+        "gap_and_next": "merge/recovery absent; password-change page and lockout incomplete; real providers remain unverified"
+      },
+      {
+        "module": "property_and_resident",
+        "ids": ["RES-UNBOUND-HOME", "RES-PROFILE", "RES-HOUSE-CASCADE", "RES-BIND-APPLY", "MGR-BIND-APPROVE", "MGR-BIND-REJECT", "RES-AFTER-APPROVE", "HOUSE-IMPORT-EXPORT", "V1-RES-RELATION-HISTORY", "V1-HOUSE-ARCHIVE-UI"],
+        "sources": ["docs/01-PRD.md section 2", "docs/02-ROLES-PERMISSIONS.md", "docs/03-DOMAIN-MODEL.md", "docs/10-ACCEPTANCE.md B2"],
+        "roles_and_actions": "resident applies and views; property/tenant admin reviews and maintains scoped property records",
+        "pages": ["pages/home/home", "pages/profile/profile", "pages/houses/houses", "pages/supervisor/bindings"],
+        "code": ["backend/app/api/v1/resident.py", "backend/app/service/resident.py", "backend/app/repository/resident.py", "backend/app/model/property.py", "backend/app/model/resident.py"],
+        "dependencies": "MySQL tenant/property scopes and relationship history",
+        "tests_and_runtime": "prior real-page apply/approve/reject plus current isolated identity API path",
+        "gap_and_next": "maintenance/import/export and full tenancy/vacancy/history administration incomplete"
+      },
+      {
+        "module": "employee_and_scoped_workforce",
+        "ids": ["MGR-TENANT-HOME", "MGR-TENANT-VS-PROPERTY", "STAFF-CLAIM", "STAFF-ATTENDANCE", "STAFF-CLAIM-DUP", "STAFF-INVITE-PAGE", "STAFF-DEPT-SKILL-UI", "STAFF-DAILY-PAGE"],
+        "sources": ["docs/01-PRD.md section 3", "docs/02-ROLES-PERMISSIONS.md sections 4.2-4.4", "docs/03-DOMAIN-MODEL.md Employee", "docs/10-ACCEPTANCE.md B3"],
+        "roles_and_actions": "admin creates/invites/manages; employee claims, attends and serves authorized properties",
+        "pages": ["pages/employee-claim/employee-claim", "pages/attendance/attendance", "pages/supervisor/staff", "pages/home/home"],
+        "code": ["backend/app/api/v1/admin_employee.py", "backend/app/api/v1/employee.py", "backend/app/service/employee.py", "backend/app/service/employee_identity.py", "backend/app/model/employee.py"],
+        "dependencies": "MySQL roles, EmployeeProperty history, business-date attendance and capacity",
+        "tests_and_runtime": "current unit and isolated claim path; prior attendance/claim/daily page evidence",
+        "gap_and_next": "admin lifecycle pages and complete workforce metrics remain incomplete"
+      },
+      {
+        "module": "resident_repair_and_media",
+        "ids": ["WO-CREATE", "WO-MEDIA-NATIVE", "WO-LIST-PAGING", "WO-CONFIRM-CLOSED", "WO-REENTER", "V1-RES-APPEND", "V1-RES-CANCEL", "V1-RES-RATING", "V1-RECEIPT-COMPLETE", "V1-RECEIPT-HISTORY"],
+        "sources": ["docs/01-PRD.md sections 4 and 7", "docs/04-WORKORDER-STATE-MACHINE.md", "docs/06-API-CONTRACT.md work orders/files", "docs/10-ACCEPTANCE.md B4"],
+        "roles_and_actions": "resident creates/manages owned work orders; staff submits immutable process feedback and receipts",
+        "pages": ["pages/work-orders/create", "pages/work-orders/list", "pages/work-orders/detail", "pages/staff-orders/detail"],
+        "code": ["backend/app/api/v1/work_orders.py", "backend/app/service/work_order.py", "backend/app/repository/work_order.py", "backend/app/model/work_order.py"],
+        "dependencies": "MySQL, object storage, scanner, ASR/VLM and Worker",
+        "tests_and_runtime": "current unit; prior text, lifecycle, exception and development persistent-media evidence",
+        "gap_and_next": "native picker, production storage/scanner, real ASR/VLM and dedicated append/cancel/rate page evidence"
+      },
+      {
+        "module": "analysis_and_dispatch",
+        "ids": ["WO-QUEUE-ASSIGN", "WO-AUTO-DISPATCH", "SELFHOST-AI", "V1-REAL-ASR-VLM", "V1-AI-FAIL-CREATE", "V1-AUTO-DISPATCH-FILTER", "V1-WORKER-ASYNC"],
+        "sources": ["docs/01-PRD.md sections 8-9", "docs/05-AI-DISPATCH-SPEC.md", "docs/10-ACCEPTANCE.md B3-B4"],
+        "roles_and_actions": "system analyzes and assigns; supervisor intervenes only for fallback or authorized override",
+        "pages": ["pages/supervisor/queue", "pages/staff-orders/list", "pages/work-orders/detail"],
+        "code": ["backend/app/service/analysis.py", "backend/app/service/auto_dispatch.py", "backend/app/repository/ai.py", "backend/app/worker/tasks.py", "backend/app/provider"],
+        "dependencies": "RabbitMQ/Celery, Redis, MySQL, object storage, controlled self-hosted model endpoints",
+        "tests_and_runtime": "version-bound isolated DEVELOPMENT-Fake cross-process evidence; current unit regression",
+        "gap_and_next": "real self-hosted model, production reliability and real media understanding remain open"
+      },
+      {
+        "module": "staff_and_supervisor_lifecycle",
+        "ids": ["WO-STAFF-PROCESS", "WO-CANCEL-REJECT-REASSIGN-REOPEN", "V1-STAFF-REJECT", "V1-STAFF-ESCALATE", "V1-MGR-EXCEPTION"],
+        "sources": ["docs/01-PRD.md sections 5-7", "docs/04-WORKORDER-STATE-MACHINE.md", "docs/10-ACCEPTANCE.md B4"],
+        "roles_and_actions": "assigned employee accepts/processes/rejects/escalates; supervisor decides/reassigns; resident confirms/reopens",
+        "pages": ["pages/staff-orders/detail", "pages/supervisor/queue", "pages/work-orders/detail"],
+        "code": ["backend/app/service/work_order.py", "backend/app/repository/work_order.py", "backend/app/domain/work_order.py"],
+        "dependencies": "MySQL optimistic versioning, assignment/load/log/audit/notification consistency",
+        "tests_and_runtime": "prior order-5 and order-8 evidence and focused independent reviews; current unit regression",
+        "gap_and_next": "live supervisor REASSIGN proof and complete decision/concurrency matrix"
+      },
+      {
+        "module": "sla_incident_and_notification",
+        "ids": ["NTF-ROUND", "WO-TIMEOUT", "INCIDENT-UI", "V1-INCIDENT-AGGREGATE", "V1-SLA-CONFIG", "V1-NTF-RETRY", "V1-NTF-EVENTS"],
+        "sources": ["docs/01-PRD.md sections 10, 13 and 14", "docs/04-WORKORDER-STATE-MACHINE.md section 7", "docs/10-ACCEPTANCE.md B5 and B7"],
+        "roles_and_actions": "system runs timers/events/delivery; resident/staff/admin receives scoped notifications; supervisor handles incidents",
+        "pages": ["pages/notifications/list", "pages/supervisor/incidents"],
+        "code": ["backend/app/service/notification.py", "backend/app/service/incident.py", "backend/app/model/ai.py", "backend/app/model/knowledge.py", "backend/app/worker/tasks.py"],
+        "dependencies": "MySQL outbox/delivery, Celery, notification provider and scheduled SLA runner",
+        "tests_and_runtime": "code/unit evidence and prior page slices; isolated Worker present",
+        "gap_and_next": "running SLA loop, duplicate-dispatch-safe incident aggregation, complete event coverage and production delivery acceptance"
+      },
+      {
+        "module": "announcements",
+        "ids": ["ANN-PUBLISH", "ANN-READ", "V1-ANN-TARGET", "V1-ANN-EDIT-HISTORY"],
+        "sources": ["docs/01-PRD.md section 11", "docs/02-ROLES-PERMISSIONS.md", "docs/10-ACCEPTANCE.md B5"],
+        "roles_and_actions": "authorized manager drafts/submits/reviews/publishes; resident reads; AI may only draft",
+        "pages": ["pages/supervisor/announcements", "pages/announcements/list", "pages/announcements/detail"],
+        "code": ["backend/app/service/announcement.py", "backend/app/repository/ai.py", "backend/app/model/ai.py"],
+        "dependencies": "MySQL scope and notification delivery",
+        "tests_and_runtime": "prior local publish/read page evidence; current unit regression",
+        "gap_and_next": "fine-grained targeting, rejection/edit/publication history and complete evidence"
+      },
+      {
+        "module": "knowledge_rag_and_statistics",
+        "ids": ["AST-QUERY", "KNOWLEDGE-INGEST-UI", "STATS-CONFIG", "V1-EMBEDDING-RAG"],
+        "sources": ["docs/01-PRD.md section 12", "docs/05-AI-DISPATCH-SPEC.md section 6", "docs/10-ACCEPTANCE.md B6"],
+        "roles_and_actions": "authorized manager maintains scoped knowledge; users ask and receive cited answers; admins view approved summaries/config",
+        "pages": ["pages/assistant/assistant"],
+        "code": ["backend/app/service/knowledge.py", "backend/app/repository/knowledge.py", "backend/app/model/knowledge.py", "backend/app/worker/tasks.py"],
+        "dependencies": "Celery, storage, bge-m3, Milvus, reranker and self-hosted Qwen",
+        "tests_and_runtime": "Fake answer/citation page wiring and code/unit evidence only",
+        "gap_and_next": "maintenance UI, real retrieval/reranking/generation, visibility runtime proof, summaries and approved config UI"
+      },
+      {
+        "module": "ui_governance_and_release",
+        "ids": ["UX-NO-DEV-LEAK", "V1-GOVERNANCE-IDOR", "V1-BACKUP-RESTORE", "V1-PERF-RELEASE", "V1-GOVERNANCE-OPS"],
+        "sources": ["docs/07-SECURITY-PRIVACY.md", "docs/08-NON-FUNCTIONAL.md", "docs/09-DEPLOYMENT.md", "docs/10-ACCEPTANCE.md B8 and Day 3/4"],
+        "roles_and_actions": "all roles use one production mini program; ops validates security, persistence, recovery, performance and release",
+        "pages": ["all production pages; dev-login remains locally guarded"],
+        "code": ["backend/app/core", "backend/app/api", "backend/app/service", "backend/app/provider", "docker-compose.yml", "miniprogram"],
+        "dependencies": "target infrastructure, backups, monitoring, production providers, real device and release authority",
+        "tests_and_runtime": "current unit and readiness plus earlier scoped page evidence; no release run",
+        "gap_and_next": "complete IDOR/security/performance, backup/restore, target deployment, real-device and formal release acceptance"
+      }
+    ],
+    "special_review": "reports/account-merge-001-preapproval/review.md",
+    "independent_review_round_1": {
+      "result": "NEEDS_CHANGES",
+      "path": "reports/codex/ACCOUNT-MERGE-001-PREAPPROVAL-review.json",
+      "resolved_in_report": [
+        "documented the global-phone-unique wording versus 0009 active-only constraint conflict",
+        "specified a VERIFYING merge intent with bound OTP hash, expiry, attempts and one-use transition",
+        "kept completed bind-request applicant attribution and blocked merge while either account has PENDING requests",
+        "made source-password disposition an explicit owner decision with a no-transfer recommendation",
+        "made phone-free source proof and retired-number reuse explicit owner decisions",
+        "recorded exact future down_revision and isolated-target guard requirement",
+        "preserved the difference between JUnit evidence and report-derived runtime observations"
+      ]
+    },
+    "independent_review_round_2": {
+      "result": "PASS",
+      "path": "reports/codex/ACCOUNT-MERGE-001-PREAPPROVAL-review-r2.json",
+      "scope": "same read-only session; four prior blockers and direct documentation regressions only",
+      "boundary": "approval decision basis only; not 0010 approval, account-merge implementation acceptance, or Production V1 acceptance"
+    },
+    "unresolved_product_decisions": [
+      "ordinary ENDED phone reuse policy; merged-source numbers are recommended permanently reserved",
+      "phone-free source proof or high-risk-recovery-only route",
+      "source password transfer versus explicit target-side password setup when target has no password"
+    ]
+  }
 }

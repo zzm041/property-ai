@@ -1,0 +1,76 @@
+{
+  "task_id": "ACCOUNT-MERGE-001-PREAPPROVAL-AUDIT",
+  "phase": "review",
+  "reviewed_head": "f5a7b62d83303ab2c742bbd3baef27cf48f99999",
+  "decision": "NEEDS_CHANGES",
+  "actions_or_findings": [
+    {
+      "title": "CURRENT_TASK_BLOCKER: Reconcile the frozen phone-uniqueness rule",
+      "path": "D:/property-ai/docs/03-DOMAIN-MODEL.md:32; D:/property-ai/docs/03-DOMAIN-MODEL.md:173; D:/property-ai/backend/alembic/versions/20260919_0009_official_auth_identity_dispatch.py:96; D:/property-ai/reports/account-merge-001-preapproval/review.md:89",
+      "trigger": "The report recommends retaining active-only phone constraints, while the formal model also says unique(phone_e164) without an active-only qualifier.",
+      "rationale": "The recommendation to keep one ACTIVE phone per user is supported by the current scalar flows. The audit must still resolve whether an ENDED number may ever be rebound and how merged-source numbers remain blocked from SMS auto-registration."
+    },
+    {
+      "title": "CURRENT_TASK_BLOCKER: Specify an implementable source-proof path",
+      "path": "D:/property-ai/reports/account-merge-001-preapproval/review.md:46; D:/property-ai/reports/account-merge-001-preapproval/review.md:100; D:/property-ai/reports/account-merge-001-preapproval/review.md:103; D:/property-ai/backend/app/model/identity.py:455; D:/property-ai/backend/app/service/credential_auth.py:153",
+      "trigger": "The proposed source OTP must bind source, target, purpose and expiry, but 0009 has no merge SMS purpose or source-target binding. The report’s own counts also include an ACTIVE user without an ACTIVE phone.",
+      "rationale": "The revised 0010 design must identify where the proof, attempt limits and one-use state live, and define a safe route for a phone-free source. The stated ledger and existing challenge flow do not yet establish this."
+    },
+    {
+      "title": "CURRENT_TASK_BLOCKER: Separate bind-request ownership from applicant history",
+      "path": "D:/property-ai/reports/account-merge-001-preapproval/review.md:130; D:/property-ai/backend/app/service/resident.py:280; D:/property-ai/backend/app/repository/resident.py:62",
+      "trigger": "The report moves every resident_bind_requests.user_id, including reviewed requests.",
+      "rationale": "That column identifies both the current list owner and the person who originally applied. Reparenting a completed request changes its recorded applicant. Specify treatment of PENDING versus APPROVED/REJECTED rows, preserving original attribution and target access."
+    },
+    {
+      "title": "CURRENT_TASK_BLOCKER: Resolve source-password disposition",
+      "path": "D:/property-ai/reports/account-merge-001-preapproval/review.md:104; D:/property-ai/docs/01-PRD.md:33",
+      "trigger": "The report offers transfer of the source password hash when the target has no password.",
+      "rationale": "The frozen requirement does not choose that authentication policy. The owner must choose transfer or a new target password before this branch enters an approved merge design."
+    },
+    {
+      "title": "NON_BLOCKING: Preserve the limits of saved environment evidence",
+      "path": "D:/property-ai/reports/account-merge-001-preapproval/review.md:34; D:/property-ai/reports/account-merge-001-preapproval/review.md:46; D:/property-ai/reports/account-merge-001-preapproval/unit-results.xml; D:/property-ai/reports/account-merge-001-preapproval/isolated-0009-results.xml",
+      "trigger": "The saved JUnit files contain 407 and 7 passing cases, but the listed live database counts, process state and one-warning claims have no separate raw capture in this audit directory.",
+      "rationale": "The counts in JUnit are verified from the files; the other observations remain report-derived. Preserve that provenance boundary when requesting migration approval."
+    }
+  ],
+  "evidence_paths": [
+    "D:/property-ai/reports/project-handoff.md",
+    "D:/property-ai/reports/account-merge-001-preapproval/review.md",
+    "D:/property-ai/reports/account-merge-001-preapproval/unit-results.xml",
+    "D:/property-ai/reports/account-merge-001-preapproval/isolated-0009-results.xml",
+    "D:/property-ai/reports/mp-current-full-regression/coverage-matrix.json",
+    "D:/property-ai/reports/mp-current-full-regression/combined-results.json",
+    "D:/property-ai/docs/01-PRD.md",
+    "D:/property-ai/docs/02-ROLES-PERMISSIONS.md",
+    "D:/property-ai/docs/03-DOMAIN-MODEL.md",
+    "D:/property-ai/docs/06-API-CONTRACT.md",
+    "D:/property-ai/docs/07-SECURITY-PRIVACY.md",
+    "D:/property-ai/docs/10-ACCEPTANCE.md",
+    "D:/property-ai/backend/app/model/identity.py",
+    "D:/property-ai/backend/app/model/resident.py",
+    "D:/property-ai/backend/app/service/credential_auth.py",
+    "D:/property-ai/backend/app/service/notification.py",
+    "D:/property-ai/backend/alembic/versions/20260919_0009_official_auth_identity_dispatch.py"
+  ],
+  "unverified": [
+    "I did not rerun tests, inspect the live database or processes, operate pages, send HTTP requests, or perform business operations.",
+    "The model definitions account for the reported 24 users.id FK columns and three named non-FK actor columns; the live-schema count and post-test database snapshot were not independently queried.",
+    "JUnit does not independently establish the reported warning counts or the current runtime target.",
+    "Account merge, 0010, real AI, real Embedding/RAG and Production V1 acceptance remain untested."
+  ],
+  "session_note": "Read-only review of HEAD and saved working-tree evidence. The 83 matrix IDs exactly match the 83 saved combined-result IDs, with no duplicates; historical feature evidence is labelled as reused, and Fake is not presented as real inference. The report correctly identifies that two user-row locks alone are insufficient, addresses preview freshness, idempotency, expiry and session revocation, and does not claim MySQL rollback covers external effects. No file was edited. Memory was used only as a cross-check for preserving the dirty baseline and distinguishing saved evidence from runtime proof.\n",
+  "task_result": "The audit is conservative about 0010 and prior evidence, but is not yet a sound approval basis because its phone policy and merge-proof design leave material choices and schema effects unresolved. This decision does not grade account merge implementation.",
+  "product_gap_changes": [
+    "No Production V1 gap is closed by this pre-approval audit. Controlled merge and high-risk recovery remain absent.",
+    "Real self-hosted AI assignment and Embedding/RAG, running SLA escalation, production notification and media handling, remaining formal UI, security and release validation remain open."
+  ],
+  "schedule_risk": "High. On 2026-09-20, the original approximately 2026-09-21 one-week aim cannot cover these unresolved merge decisions, the remaining frozen V1 features and production validation without dropping scope.",
+  "next_action": "Main Codex should revise review.md, coverage-matrix.json and project-handoff.md: reconcile the formal phone-index wording with the retired-number policy; specify merge proof storage and attempt limits plus a phone-free-source route; split PENDING and completed bind-request treatment; record the password decision; and state that a proposed 0010 must descend from 0009, retain an exact isolated-target guard, and distinguish DDL recovery from business rollback. Completion is a reviewable revised 0010 proposal with no migration run, followed by independent read-only re-review. Ordinary report work needs no new permission; creating or applying 0010 requires separate explicit approval for an exact disposable target.",
+  "approval_requests": [
+    "Decide whether a retired phone may be rebound after fresh verification or remains reserved; a merged-source number must never silently create another User.",
+    "Decide the authorized proof or recovery route for a merge source with no current phone.",
+    "Decide whether a source password may transfer when the target has none, or the target must set a new password."
+  ]
+}
