@@ -1,0 +1,85 @@
+{
+  "task_id": "AUTO-DISPATCH-MAINLINE-001",
+  "phase": "review",
+  "reviewed_head": "b3bf34d893d2395334b4344c152b50ea28a4fc7f",
+  "decision": "PASS",
+  "actions_or_findings": [
+    {
+      "title": "NON_BLOCKING: FIX-1 idempotent replay closed",
+      "path": "D:/property-ai/backend/app/service/work_order.py:312",
+      "trigger": "The same create idempotency key is replayed.",
+      "rationale": "The existing order returns created=False, so only a new order calls _enqueue_analysis. The focused test asserts one enqueue across create and replay. Concurrent first-create delivery guarantees were not the original finding."
+    },
+    {
+      "title": "NON_BLOCKING: FIX-1 history attribution closed",
+      "path": "D:/property-ai/backend/app/repository/ai.py:263",
+      "trigger": "An order is reassigned and a later handler resolves it.",
+      "rationale": "Completion and same-building history now require the employee's own WorkOrderProcess and a resolved receipt. The former assignee does not receive the later handler's completion credit."
+    },
+    {
+      "title": "NON_BLOCKING: FIX-1 eligibility closed",
+      "path": "D:/property-ai/backend/app/repository/ai.py:140",
+      "trigger": "A linked duty or skill is disabled, or an otherwise eligible employee has a scoped role above STAFF.",
+      "rationale": "Both dispatch paths read only ACTIVE catalog rows. Scoped SUPERVISOR, PROPERTY_ADMIN and TENANT_ADMIN eligibility agrees with docs/05 section 4.1 when all other employee filters pass."
+    },
+    {
+      "title": "NON_BLOCKING: FIX-1 capability audit closed",
+      "path": "D:/property-ai/backend/app/service/employee.py:1090",
+      "trigger": "An add-only duty or skill request repeats a link or races another insert.",
+      "rationale": "The audit receives only inserted IDs. Existence checks and nested savepoints turn the exact composite-unique duplicate into a no-op; unrelated integrity errors are mapped rather than swallowed, and the outer service transaction remains responsible for commit."
+    },
+    {
+      "title": "NON_BLOCKING: FIX-1 order evidence closed",
+      "path": "D:/property-ai/scripts/ops/inspect_auth001_auto_dispatch.py:97",
+      "trigger": "Order 3's no-candidate result and order 4's AUTO result are inspected.",
+      "rationale": "Audits are constrained by request and related resource IDs. Daily status and attendance are constrained to candidate or assigned employees and the work-order business date. Order 3's 16:06:31Z analysis precedes employee 4's 16:08:54Z check-in and persisted NOT_CHECKED_IN; order 4's 16:09:11Z creation follows check-in and has AUTO persistence, system logs and audits, load, and successful notification."
+    },
+    {
+      "title": "NON_BLOCKING: Final repair code is not yet the live API code",
+      "path": "D:/property-ai/reports/project-handoff.md:11",
+      "trigger": "The next runtime slice uses port 8083.",
+      "rationale": "The listening Python API process began before d144bcd was committed. Saved API and isolated-worker logs prove the earlier create-to-AUTO DEVELOPMENT run, while focused tests cover the final code repairs. A restart and fresh isolated smoke check are the next evidence step."
+    },
+    {
+      "title": "RELEASE_BLOCKER: Real AI and broader Production V1 remain open",
+      "path": "D:/property-ai/reports/project-handoff.md",
+      "trigger": "Formal Production V1 acceptance or release is claimed.",
+      "rationale": "The saved provider provenance is DEVELOPMENT/dev-llm-v1. Real operator-controlled Qwen inference, VLM/ASR, Embedding/RAG, persistent production storage, remaining identity and UI work, and formal release validation are still required. This does not invalidate the isolated Fake-path slice."
+    }
+  ],
+  "evidence_paths": [
+    "D:/property-ai/reports/project-handoff.md",
+    "D:/property-ai/docs/05-AI-DISPATCH-SPEC.md",
+    "D:/property-ai/backend/app/service/work_order.py",
+    "D:/property-ai/backend/app/repository/ai.py",
+    "D:/property-ai/backend/app/service/auto_dispatch.py",
+    "D:/property-ai/backend/app/service/employee.py",
+    "D:/property-ai/backend/tests/unit/test_auto_dispatch.py",
+    "D:/property-ai/backend/tests/unit/test_ai_repository.py",
+    "D:/property-ai/backend/tests/unit/test_employee_capability_update.py",
+    "D:/property-ai/scripts/ops/inspect_auth001_auto_dispatch.py",
+    "D:/property-ai/reports/auto-dispatch-mainline-001/order-3-inspector.json",
+    "D:/property-ai/reports/auto-dispatch-mainline-001/order-4-inspector.json",
+    "D:/property-ai/reports/auto-dispatch-mainline-001/staff-current-day-checkin.png",
+    "D:/property-ai/reports/auto-dispatch-mainline-001/resident-auto-assigned.png",
+    "D:/property-ai/reports/auto-dispatch-mainline-001/staff-auto-assigned-list.png",
+    "D:/property-ai/tmp/auth001-runtime/worker-20260919-235314.out.log",
+    "D:/property-ai/tmp/auth001-runtime/api-20260919-235812.out.log"
+  ],
+  "unverified": [
+    "The final d144bcd repairs have not been exercised by a restarted isolated API and worker. Current process command lines and live settings were not independently readable.",
+    "The reviewer did not query the live database or rerun state-changing tests. The targeted 30 passed and full unit 346 passed, 1 warning results are implementer-reported.",
+    "The employee daily load in the saved inspector is a later same-date snapshot, not a historical load value at order 3's analysis time.",
+    "Real-model inference and formal Production V1 acceptance remain unverified."
+  ],
+  "session_note": "Repair review round 2/3. Overall goal remains complete Production V1; this PASS covers AUTO-DISPATCH-MAINLINE-001 on implementation commit d144bcddcfc24e6e9eaf60509acd124711bc0561 and documentation HEAD b3bf34d893d2395334b4344c152b50ea28a4fc7f. The reviewer made no edits, service changes or state-changing calls. All three PNGs were visually inspected. The saved path identifies 8083, property_ai_auth001_test at 20260919_0009, property_ai.auth001 and DEVELOPMENT provenance; launcher code configures the publisher before imports, and worker logs show the isolated queue consuming orders 3 and 4. No new migration or production-default enablement appears in this change. Independent git diff --check and two node --check commands passed; focused Python tests were inspected, not rerun. No auth001 broker or app secret literal was found in the touched tracked ops and evidence files; the ignored secret file was not read. Existing dirty files were preserved. SEC-REFRESH-STAGGER, SEC-WECHAT-BIND-401 and SEC-EMPLOYEE-INVITE-LOCK-ORDER remain closed. Ordinary source and named isolated synthetic verification are authorized; migrations, shared-service maintenance, paid resources, real data, upload and release require separate approval.",
+  "task_result": "PASS for the repaired isolated DEVELOPMENT-Fake automatic-dispatch slice. The five FIX-1 findings are closed by code, focused tests and scoped saved evidence. This is not real-AI, Day 4 or Production V1 acceptance.",
+  "product_gap_changes": [
+    "Closed the replay publish, reassigned-handler history, disabled-capability, capability-audit and order-evidence findings for this slice.",
+    "Accepted the ordinary create → isolated worker → DEVELOPMENT provider → server rule score → persisted AUTO assignment path, with manual dispatch retained as fallback or authorized intervention.",
+    "Phone change, WeChat rebind, controlled merge, recovery, real self-hosted AI auto-assignment, real Embedding/RAG, broader V1 pages, production storage and formal release remain in scope."
+  ],
+  "schedule_risk": "High. The workspace date is 2026-09-20 and the original one-week aim is approximately 2026-09-21. The remaining real-provider and broader V1 work prevents credible full Production V1 delivery by that aim without dropping frozen scope or presenting Fake evidence as formal acceptance.",
+  "next_action": "Main Codex: restart only the authorized 8083 API and property_ai.auth001 worker on committed d144bcd code, then verify process start and code version, the exact property_ai_auth001_test@20260919_0009 target, publisher vhost/queue, and official-session create/replay behavior with one enqueue and a scoped AUTO readback. Save redacted evidence. Then implement the next identity slice—official-session phone change and WeChat rebind with ownership, audit, session-revocation and failure-path tests—while retaining merge, recovery and real AI/RAG on the V1 plan. Ordinary source and this named isolated synthetic verification need no new permission; any new migration, shared-service work, paid endpoint, real data or release needs separate approval.",
+  "approval_requests": []
+}
