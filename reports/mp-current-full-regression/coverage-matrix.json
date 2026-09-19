@@ -99,7 +99,7 @@
       "role": "resident",
       "page": "pages/login/login",
       "impl": "已实现可测试",
-      "ui_or_api": "API证明 / UI本轮未证明会话失效",
+      "ui_or_api": "UI + sidecar API"
     },
     {
       "id": "AUTH-PASSWORD-LOGIN",
@@ -428,5 +428,155 @@
       "impl": "已实现可测试",
       "ui_or_api": "UI"
     }
-  ]
+  ],
+  "extra_v1_from_prd_acceptance": [
+    {
+      "id": "V1-RES-RELATION-HISTORY",
+      "requirement": "退租/变更保留历史关系，禁止覆盖历史行",
+      "impl": "只有API没有页面",
+      "ui_or_api": "API",
+      "prd": "docs/01-PRD.md §2.3",
+      "acceptance": "docs/10-ACCEPTANCE.md B2"
+    },
+    {
+      "id": "V1-RES-APPEND",
+      "requirement": "住户补充问题",
+      "impl": "只有API没有页面",
+      "ui_or_api": "API",
+      "prd": "docs/01-PRD.md §4"
+    },
+    {
+      "id": "V1-RES-CANCEL",
+      "requirement": "未开始处理前撤销工单",
+      "impl": "页面存在但无真实接线",
+      "ui_or_api": "UI",
+      "prd": "docs/01-PRD.md §4"
+    },
+    {
+      "id": "V1-RES-RATING",
+      "requirement": "工单评价",
+      "impl": "只有API没有页面",
+      "ui_or_api": "API",
+      "prd": "docs/01-PRD.md §4"
+    },
+    {
+      "id": "V1-STAFF-REJECT",
+      "requirement": "员工拒单并填原因",
+      "impl": "只有API没有页面",
+      "ui_or_api": "API",
+      "prd": "docs/01-PRD.md §5"
+    },
+    {
+      "id": "V1-STAFF-ESCALATE",
+      "requirement": "无法解决向上级上报",
+      "impl": "只有API没有页面",
+      "ui_or_api": "API",
+      "prd": "docs/01-PRD.md §5"
+    },
+    {
+      "id": "V1-RECEIPT-COMPLETE",
+      "requirement": "正式回执完整字段（材料/费用/前后图片）",
+      "impl": "页面存在但无真实接线",
+      "ui_or_api": "UI",
+      "prd": "docs/01-PRD.md §7"
+    },
+    {
+      "id": "V1-RECEIPT-HISTORY",
+      "requirement": "REOPEN 不覆盖旧回执",
+      "impl": "不属于小程序页面、应单独后端验证",
+      "ui_or_api": "API",
+      "prd": "docs/01-PRD.md §7",
+      "acceptance": "docs/10-ACCEPTANCE.md B4"
+    },
+    {
+      "id": "V1-MGR-EXCEPTION",
+      "requirement": "主管异常决策（再派/等配件/等业主/内部联系第三方）",
+      "impl": "功能尚未实现",
+      "ui_or_api": "none",
+      "prd": "docs/01-PRD.md §6",
+      "acceptance": "docs/10-ACCEPTANCE.md B4"
+    },
+    {
+      "id": "V1-INCIDENT-AGGREGATE",
+      "requirement": "同楼同类短时多单聚合，避免重复派人",
+      "impl": "功能尚未实现",
+      "ui_or_api": "API",
+      "prd": "docs/01-PRD.md §10",
+      "acceptance": "docs/10-ACCEPTANCE.md B5"
+    },
+    {
+      "id": "V1-ANN-TARGET",
+      "requirement": "公告定向企业/小区/楼栋/单元/人群",
+      "impl": "功能尚未实现",
+      "ui_or_api": "API",
+      "prd": "docs/01-PRD.md §11"
+    },
+    {
+      "id": "V1-ANN-EDIT-HISTORY",
+      "requirement": "公告编辑与发布历史",
+      "impl": "功能尚未实现",
+      "ui_or_api": "none",
+      "prd": "docs/01-PRD.md §11"
+    },
+    {
+      "id": "V1-SLA-CONFIG",
+      "requirement": "可配置 SLA Warning/Overdue/Escalation，禁止硬编码时限",
+      "impl": "不属于小程序页面、应单独后端验证",
+      "ui_or_api": "API",
+      "prd": "docs/01-PRD.md §13",
+      "acceptance": "docs/10-ACCEPTANCE.md B7"
+    },
+    {
+      "id": "V1-NTF-RETRY",
+      "requirement": "通知失败重试并留日志",
+      "impl": "不属于小程序页面、应单独后端验证",
+      "ui_or_api": "API",
+      "prd": "docs/01-PRD.md §14",
+      "acceptance": "docs/10-ACCEPTANCE.md B7"
+    },
+    {
+      "id": "V1-GOVERNANCE-IDOR",
+      "requirement": "RBAC + tenant/property 隔离 IDOR 测试",
+      "impl": "不属于小程序页面、应单独后端验证",
+      "ui_or_api": "API",
+      "acceptance": "docs/10-ACCEPTANCE.md B8"
+    },
+    {
+      "id": "V1-WORKER-ASYNC",
+      "requirement": "独立 Worker 分析/通知/入库失败路径",
+      "impl": "缺环境或权限",
+      "ui_or_api": "none",
+      "note": "本轮 analyze 为进程内 Fake；无 auth001 独占 Worker"
+    },
+    {
+      "id": "V1-BACKUP-RESTORE",
+      "requirement": "备份与恢复验收",
+      "impl": "不属于小程序页面、应单独后端验证",
+      "ui_or_api": "none",
+      "acceptance": "docs/10-ACCEPTANCE.md / Day 3"
+    },
+    {
+      "id": "V1-PERF-RELEASE",
+      "requirement": "性能与正式发布验证",
+      "impl": "缺环境或权限",
+      "ui_or_api": "none",
+      "acceptance": "docs/10-ACCEPTANCE.md / Day 4"
+    },
+    {
+      "id": "V1-HOUSE-ARCHIVE-UI",
+      "requirement": "物业建楼栋房屋/导入导出页面",
+      "impl": "功能尚未实现",
+      "ui_or_api": "none",
+      "prd": "docs/01-PRD.md §2.1"
+    },
+    {
+      "id": "V1-REAL-ASR-VLM",
+      "requirement": "真实 ASR/VLM 参与工单理解",
+      "impl": "缺环境或权限",
+      "ui_or_api": "none",
+      "prd": "docs/01-PRD.md §8"
+    }
+  ],
+  "denominator_includes_extra_v1": true,
+  "fix1_run_id": "mp-cfull-20260919-fix1"
 }

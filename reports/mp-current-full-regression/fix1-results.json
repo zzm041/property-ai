@@ -1,0 +1,156 @@
+{
+  "task_id": "MP-CURRENT-FULL-REGRESSION-001-FIX-1",
+  "run_id": "mp-cfull-20260919-fix1",
+  "related": "AUTH-IDENTITY-AI-001-C",
+  "started_at": "2026-09-19T12:54:18.096Z",
+  "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+  "code_sha_reports": null,
+  "api": "http://127.0.0.1:8083/api/v1",
+  "revision": "20260919_0009",
+  "provider_mode": "password=real; sms=development inbox; ai=Fake",
+  "automator_ws": "ws://127.0.0.1:9434",
+  "results": [
+    {
+      "id": "AUTH-RESET",
+      "role": "resident",
+      "page": "pages/login/login",
+      "status": "PASS",
+      "expected": "return to login, not auto logged in",
+      "actual": "path=pages/login/login mode=password; rendered_login_mode=password; rendered_login_mode=password",
+      "evidence": [
+        "mp-cfull-20260919-fix1-reset-back-login.png",
+        "mp-cfull-20260919-fix1-reset-back-login-rendered.png",
+        "mp-cfull-20260919-fix1-reset-old-password.png",
+        "mp-cfull-20260919-fix1-probe-login.png"
+      ],
+      "note": "First post-reset screenshot lagged on the reset page. Rendered login is proved by AUTH-RESET-REVOKE old-password shot and the current login probe shot. path/API already returned login.",
+      "run_id": "mp-cfull-20260919-fix1",
+      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "api": "http://127.0.0.1:8083/api/v1",
+      "revision": "20260919_0009",
+      "provider_mode": "password=real; sms=development inbox; ai=Fake"
+    },
+    {
+      "id": "AUTH-RESET-REVOKE",
+      "role": "resident",
+      "page": "pages/login/login",
+      "status": "PASS",
+      "expected": "old access/refresh 401; old password stays on login with error",
+      "actual": "hadTokens=true me=401 refresh=401 stale_error=true path=pages/login/login",
+      "evidence": [
+        "mp-cfull-20260919-fix1-reset-old-password.png",
+        "mp-cfull-20260919-fix1-reset-back-login.png"
+      ],
+      "note": "UI old-password plus sidecar /me and /auth/token/refresh; tokens not written to reports",
+      "run_id": "mp-cfull-20260919-fix1",
+      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "api": "http://127.0.0.1:8083/api/v1",
+      "revision": "20260919_0009",
+      "provider_mode": "password=real; sms=development inbox; ai=Fake"
+    },
+    {
+      "id": "AUTH-RESET-RELOGIN",
+      "role": "resident",
+      "page": "pages/home/home",
+      "status": "PASS",
+      "expected": "new password enters home",
+      "actual": "path=pages/home/home",
+      "evidence": [
+        "mp-cfull-20260919-fix1-reset-relogin-home.png"
+      ],
+      "run_id": "mp-cfull-20260919-fix1",
+      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "api": "http://127.0.0.1:8083/api/v1",
+      "revision": "20260919_0009",
+      "provider_mode": "password=real; sms=development inbox; ai=Fake"
+    },
+    {
+      "id": "STAFF-CLAIM-DUP",
+      "role": "staff2",
+      "page": "pages/employee-claim/employee-claim",
+      "status": "PASS",
+      "expected": "stable error on claim page",
+      "actual": "path=pages/employee-claim/employee-claim error=true",
+      "evidence": [
+        "mp-cfull-20260919-fix1-staff2-dup-claim.png"
+      ],
+      "note": "After invalid-invite 400 fix; navigated home → 账号与安全 → 员工邀请认领",
+      "baseline_status": "FAIL on ab0b882 because invalid invite returned 401 and client reLaunched login",
+      "run_id": "mp-cfull-20260919-fix1",
+      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "api": "http://127.0.0.1:8083/api/v1",
+      "revision": "20260919_0009",
+      "provider_mode": "password=real; sms=development inbox; ai=Fake"
+    },
+    {
+      "id": "AUTH-SMS-REUSE",
+      "role": "unbound",
+      "page": "pages/login/login",
+      "status": "PASS",
+      "expected": "consumed OTP rejected on login page",
+      "actual": "path=pages/login/login error=true",
+      "evidence": [
+        "mp-cfull-20260919-fix1-sms-reuse.png"
+      ],
+      "run_id": "mp-cfull-20260919-fix1",
+      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "api": "http://127.0.0.1:8083/api/v1",
+      "revision": "20260919_0009",
+      "provider_mode": "password=real; sms=development inbox; ai=Fake"
+    },
+    {
+      "id": "AUTH-SMS-EXPIRE",
+      "role": "anonymous",
+      "page": "pages/login/login",
+      "status": "PARTIAL",
+      "expected": "expired OTP rejected",
+      "actual": "page wait 300s not executed; prior isolated 0009 API expire remains the software evidence",
+      "evidence": [],
+      "note": "UI TTL wait skipped; not claimed as page PASS",
+      "run_id": "mp-cfull-20260919-fix1",
+      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "api": "http://127.0.0.1:8083/api/v1",
+      "revision": "20260919_0009",
+      "provider_mode": "password=real; sms=development inbox; ai=Fake"
+    },
+    {
+      "id": "INCIDENT-UI",
+      "role": "property_admin",
+      "page": "pages/supervisor/incidents",
+      "status": "PARTIAL",
+      "expected": "list page reachable from 物业 home 事件",
+      "actual": "path=pages/supervisor/incidents items=0 propertyId=4 error=",
+      "evidence": [
+        "mp-cfull-20260919-fix1-incidents.png"
+      ],
+      "note": "list/empty only; no create/aggregate UI; raw propertyId control remains V1 UX gap",
+      "run_id": "mp-cfull-20260919-fix1",
+      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "api": "http://127.0.0.1:8083/api/v1",
+      "revision": "20260919_0009",
+      "provider_mode": "password=real; sms=development inbox; ai=Fake"
+    },
+    {
+      "id": "STAFF-DAILY-PAGE",
+      "role": "property_admin",
+      "page": "pages/supervisor/staff",
+      "status": "PASS",
+      "expected": "员工状态 page from home",
+      "actual": "path=pages/supervisor/staff items=1 propertyId=4",
+      "evidence": [
+        "mp-cfull-20260919-fix1-staff-daily.png"
+      ],
+      "run_id": "mp-cfull-20260919-fix1",
+      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "api": "http://127.0.0.1:8083/api/v1",
+      "revision": "20260919_0009",
+      "provider_mode": "password=real; sms=development inbox; ai=Fake"
+    }
+  ],
+  "objects": {},
+  "ended_at": "2026-09-19T13:01:54.466Z",
+  "resume_started_at": "2026-09-19T12:57:32.267Z",
+  "from_home_at": "2026-09-19T12:58:35.509Z",
+  "api_restarted_after_claim_400": true,
+  "from_claim_at": "2026-09-19T13:01:04.804Z"
+}

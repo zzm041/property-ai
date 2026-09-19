@@ -60,3 +60,49 @@ NTF-ROUND PARTIAL
 UX-NO-DEV-LEAK PASS
 DEV-LOGIN-ISOLATED PASS
 wo done
+2026-09-19T12:50:13.566Z fix1 start ws=ws://127.0.0.1:9433
+2026-09-19T12:50:13.575Z connected
+2026-09-19T12:50:31.266Z fix1 fail no pages/home/home last pages/login/login
+2026-09-19T12:54:18.096Z fix1 start ws=ws://127.0.0.1:9434
+2026-09-19T12:54:18.106Z connected
+2026-09-19T12:54:20.471Z resident password home
+2026-09-19T12:54:28.085Z AUTH-RESET PASS
+2026-09-19T12:54:30.392Z AUTH-RESET-REVOKE PASS
+2026-09-19T12:54:32.287Z AUTH-RESET-RELOGIN PASS
+2026-09-19T12:54:50.456Z fix1 fail timeout waiting for automator response
+2026-09-19T12:55:53.285Z fix1 resume ws=ws://127.0.0.1:9434
+2026-09-19T12:55:53.294Z connected
+2026-09-19T12:55:53.809Z startpath pages/login/login
+2026-09-19T12:56:14.050Z fix1 resume fail timeout waiting for automator response
+2026-09-19T12:56:51.259Z fix1 resume ws=ws://127.0.0.1:9435
+2026-09-19T12:56:51.265Z connected
+2026-09-19T12:56:51.778Z startpath pages/login/login
+2026-09-19T12:57:11.376Z fix1 resume fail timeout waiting for automator response
+2026-09-19T12:57:32.268Z fix1 resume ws=ws://127.0.0.1:9435
+2026-09-19T12:57:32.275Z connected
+2026-09-19T12:57:32.792Z startpath pages/login/login
+2026-09-19T12:57:32.794Z staff2 sms start
+2026-09-19T12:57:50.767Z fix1 resume fail timeout waiting for automator response
+2026-09-19T12:58:35.516Z from-home connected ws://127.0.0.1:9435
+2026-09-19T12:58:35.522Z start pages/home/home
+2026-09-19T12:58:37.207Z profile
+2026-09-19T12:58:38.075Z claim page
+2026-09-19T12:58:50.025Z from-home fail timeout waiting for automator response
+2026-09-19T13:01:04.811Z claim-onward connected ws://127.0.0.1:9435
+2026-09-19T13:01:04.815Z start pages/login/login
+2026-09-19T13:01:04.815Z sms last4=2881
+2026-09-19T13:01:09.363Z staff2 home
+2026-09-19T13:01:11.105Z on claim
+2026-09-19T13:01:14.508Z shot mp-cfull-20260919-fix1-staff2-dup-claim.png
+2026-09-19T13:01:14.510Z STAFF-CLAIM-DUP PASS
+2026-09-19T13:01:20.105Z sms last4=7974
+2026-09-19T13:01:34.322Z shot mp-cfull-20260919-fix1-sms-reuse.png
+2026-09-19T13:01:34.323Z AUTH-SMS-REUSE PASS
+2026-09-19T13:01:34.324Z AUTH-SMS-EXPIRE PARTIAL
+2026-09-19T13:01:34.327Z sms last4=6188
+2026-09-19T13:01:41.749Z shot mp-cfull-20260919-fix1-incidents.png
+2026-09-19T13:01:41.750Z INCIDENT-UI PARTIAL
+2026-09-19T13:01:48.642Z shot mp-cfull-20260919-fix1-staff-daily.png
+2026-09-19T13:01:48.643Z STAFF-DAILY-PAGE PASS
+2026-09-19T13:01:54.466Z shot mp-cfull-20260919-fix1-end-login.png
+2026-09-19T13:01:54.467Z claim-onward done

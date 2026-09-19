@@ -1,0 +1,33 @@
+Review MP-CURRENT-FULL-REGRESSION-001 FIX-1. Read-only. Do not edit product source.
+
+Task: WeChat DevTools full-page regression evidence-gate plus one in-scope wiring fix. Related AUTH-IDENTITY-AI-001-C.
+Headline must remain 回归完成，仍有缺口. Decision cannot be Production V1 PASS.
+
+Product baseline: ab0b882. Reports parent: d91d179. FIX-1 product change: backend/app/service/employee_identity.py invalid/expired invite status_code 401 → 400 so authenticated claim stays on the claim page. Do not treat FIX-1 PASS as ab0b882 originally passing STAFF-CLAIM-DUP.
+Operator miniprogram/project.config.json remains unstaged.
+
+Runtime:
+- API http://127.0.0.1:8083/api/v1 restarted after the 400 fix → 127.0.0.1:3307/property_ai_auth001_test @ 20260919_0009
+- 8082 Day4 kept running, not used
+- DevTools HTTP 24540; FIX-1 automator ws://127.0.0.1:9435 (9433/9420 are not required)
+- env.local was found reverted to 8082; re-patched to 8083 and localPreview false (gitignored; not a source fix)
+- Providers: real password, development SMS inbox, Fake AI, in-process memory storage (cleared on API restart), no isolated worker
+
+Read at least:
+- reports/project-handoff.md
+- reports/mp-current-full-regression/summary.json
+- reports/mp-current-full-regression/coverage-matrix.json
+- reports/mp-current-full-regression/combined-results.json
+- reports/mp-current-full-regression/fix1-results.json
+- reports/mp-current-full-regression/env-baseline-fix1.json
+- reports/mp-current-full-regression/screenshot-hashes-fix1.json
+- PNG: mp-cfull-20260919-fix1-reset-old-password.png, mp-cfull-20260919-fix1-reset-relogin-home.png, mp-cfull-20260919-fix1-staff2-dup-claim.png, mp-cfull-20260919-fix1-sms-reuse.png, mp-cfull-20260919-fix1-incidents.png, mp-cfull-20260919-fix1-staff-daily.png, mp-cfull-20260919-fix1-end-login.png
+- backend/app/service/employee_identity.py claim() invalid-invite status codes
+- miniprogram/services/api.js 401 → reLaunch login behavior
+- docs/01-PRD.md and docs/10-ACCEPTANCE.md versus extra_v1_from_prd_acceptance
+
+Look at the actual screenshots. Public copies redact phone/OTP/token; error text remains. Do not treat Cursor PASS as sufficient. Distinguish UI vs API vs code-exists. Keep V1 unimplemented items in the denominator. Closed security items stay closed unless new evidence (the 400 change is not lock-order evidence).
+
+Auto-dispatch: 0009 has assigned_source; reason is ai_auto_assign=false/DISABLED, not shared-0007 SCHEMA_PENDING.
+
+Fill all schema fields including task_result, product_gap_changes, schedule_risk, next_action, approval_requests.

@@ -185,6 +185,15 @@ def test_employee_claim_locks_employee_row() -> None:
     assert service.index("get_employee_for_update", claim_pos) < service.index(
         "with_for_update()", claim_pos
     )
+    invalid_invite = 'message="Invitation is invalid or expired"'
+    assert service.count(invalid_invite) == 3
+    for index in range(3):
+        pos = -1
+        for _ in range(index + 1):
+            pos = service.index(invalid_invite, pos + 1)
+        window = service[pos : pos + 120]
+        assert "status_code=400" in window
+        assert "status_code=401" not in window
 
 
 def test_miniprogram_refresh_retries_once() -> None:

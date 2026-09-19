@@ -1,21 +1,89 @@
 {
   "task_id": "MP-CURRENT-FULL-REGRESSION-001",
   "related": "AUTH-IDENTITY-AI-001-C",
-  "run_id": "mp-cfull-20260919-1",
-  "code_sha": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+  "headline": "回归完成，仍有缺口",
+  "not_claimed": [
+    "Production V1",
+    "Day 4 PASS",
+    "real SMS",
+    "self-hosted AI",
+    "isolated Worker"
+  ],
+  "baseline_run_id": "mp-cfull-20260919-1",
+  "fix1_run_id": "mp-cfull-20260919-fix1",
+  "code_sha_baseline": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+  "product_fix": "invalid employee invite no longer returns 401 (400 INVALID_INPUT) so claim page can show the business error",
   "api": "http://127.0.0.1:8083/api/v1",
   "revision": "20260919_0009",
-  "automator_ws": "ws://127.0.0.1:9433",
-  "devtools": "2.02.2608070",
-  "counts": {
+  "database": "127.0.0.1:3307/property_ai_auth001_test",
+  "automator_ws_fix1": "ws://127.0.0.1:9435",
+  "devtools_http": "http://127.0.0.1:24540",
+  "api_pid_now": 4596,
+  "counts_current_pages_plus_v1_gaps": {
+    "PASS": 34,
+    "BLOCKED_ENV": 4,
+    "NOT_IMPLEMENTED": 32,
+    "PARTIAL": 6
+  },
+  "total_current_pages_plus_v1_gaps": 76,
+  "first_round_counts_kept": {
     "PASS": 28,
     "FAIL": 1,
     "PARTIAL": 6,
     "BLOCKED_ENV": 1,
     "NOT_IMPLEMENTED": 15,
-    "NOT_RUN": 4
+    "NOT_RUN": 4,
+    "total": 55,
+    "note": "Do not back-date FIX-1 PASS onto ab0b882"
   },
-  "total": 55,
+  "fix1_overlays": {
+    "AUTH-RESET": "PASS on unique login shots; stale reset-back-login.png not used as proof",
+    "AUTH-RESET-REVOKE": "PASS UI old-password + sidecar access/refresh 401",
+    "AUTH-RESET-RELOGIN": "PASS",
+    "STAFF-CLAIM-DUP": "FAIL on ab0b882 (401 kicked to login); PASS after 400 fix",
+    "AUTH-SMS-REUSE": "PASS",
+    "AUTH-SMS-EXPIRE": "PARTIAL (no 300s UI wait; isolated API remains)",
+    "INCIDENT-UI": "PARTIAL list/empty only",
+    "STAFF-DAILY-PAGE": "PASS"
+  },
+  "provider_modes": {
+    "password": "real Argon2id on 0009",
+    "sms": "development inbox sidecar",
+    "ai": "Fake / development",
+    "self_host_ai": "not running",
+    "storage": "development in-process memory (cleared when 8083 restarted for the claim 400 fix)",
+    "worker": "no isolated auth001 worker; analyze via in-process Fake API"
+  },
+  "ui_walked_vs_api_only": {
+    "ui_pass_examples": [
+      "AUTH-LOGIN-DEFAULT",
+      "AUTH-NO-SEED",
+      "AUTH-PASSWORD-TOGGLE",
+      "AUTH-PHONE-KEEP",
+      "AUTH-CHALLENGE",
+      "AUTH-SMS-COOLDOWN",
+      "RES-UNBOUND-HOME",
+      "RES-PROFILE",
+      "AUTH-RESET-MISMATCH",
+      "AUTH-RESET",
+      "AUTH-PASSWORD-LOGIN",
+      "AUTH-RESET-REVOKE",
+      "RES-HOUSE-CASCADE",
+      "RES-BIND-APPLY",
+      "MGR-TENANT-HOME",
+      "MGR-TENANT-VS-PROPERTY",
+      "MGR-BIND-APPROVE",
+      "MGR-BIND-REJECT",
+      "RES-AFTER-APPROVE",
+      "STAFF-CLAIM"
+    ],
+    "api_only_examples": [
+      "AUTH-PASSWORD-CHANGE",
+      "STAFF-INVITE-PAGE",
+      "STAFF-DEPT-SKILL-UI",
+      "KNOWLEDGE-INGEST-UI"
+    ]
+  },
   "objects": {
     "bind_request_id": 4,
     "reject_request_id": 5,
@@ -23,24 +91,7 @@
     "announcement_id": 1,
     "employee_id": 4
   },
-  "provider_modes": {
-    "password": "real Argon2id on 0009",
-    "sms": "development inbox sidecar",
-    "ai": "Fake / development",
-    "self_host_ai": "not running",
-    "storage": "development in-process memory",
-    "worker": "no isolated auth001 worker; analyze via in-process Fake API"
-  },
-  "not_claimed": [
-    "Production V1",
-    "Day 4 PASS",
-    "real SMS",
-    "self-hosted AI"
-  ],
-  "headline": "回归完成，仍有缺口",
-  "codex_review": {
-    "file": "reports/codex/MP-CURRENT-FULL-REGRESSION-001-review.json",
-    "decision": "NEEDS_CHANGES",
-    "count_adjustment": "AUTH-RESET and AUTH-RESET-REVOKE downgraded PASS→PARTIAL after Codex; original 30 PASS was not acceptance-grade"
-  }
+  "accounts_public": "reports/mp-current-full-regression/accounts-public.json",
+  "evidence_dir": "reports/mp-current-full-regression/",
+  "codex_review": "reports/codex/MP-CURRENT-FULL-REGRESSION-001-FIX-1-review.json"
 }

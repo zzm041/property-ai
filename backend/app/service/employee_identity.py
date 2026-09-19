@@ -135,7 +135,7 @@ class EmployeeIdentityService:
                 raise AppError(
                     code=EmployeeErrorCode.INVALID_INPUT,
                     message="Invitation is invalid or expired",
-                    status_code=401,
+                    status_code=400,
                 )
             employee = self._employees.get_employee_for_update(peeked.employee_id)
             invite = (
@@ -149,13 +149,13 @@ class EmployeeIdentityService:
                 raise AppError(
                     code=EmployeeErrorCode.INVALID_INPUT,
                     message="Invitation is invalid or expired",
-                    status_code=401,
+                    status_code=400,
                 )
             if invite.employee_id != peeked.employee_id:
                 raise AppError(
                     code=EmployeeErrorCode.INVALID_INPUT,
                     message="Invitation is invalid or expired",
-                    status_code=401,
+                    status_code=400,
                 )
             phone = self._credentials.get_active_phone_for_user(actor.user_id)
             if phone is None or phone.phone_e164 != invite.target_phone_e164:

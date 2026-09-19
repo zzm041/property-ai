@@ -1,0 +1,57 @@
+{
+  "task_id": "MP-CURRENT-FULL-REGRESSION-001-FIX-1",
+  "related": "AUTH-IDENTITY-AI-001-C",
+  "recorded_at": "2026-09-19T13:05:00Z",
+  "code_sha_baseline": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+  "reports_parent": "d91d179e2c3aaf3d6a4c41ac16290d38dd02a21b",
+  "product_fix": "employee_identity.claim invalid/expired invite status_code 401 → 400 so miniprogram does not reLaunch login",
+  "operator_preserved": {
+    "path": "miniprogram/project.config.json",
+    "sha256": "342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F",
+    "not_staged": true,
+    "not_this_round_source_fix": true
+  },
+  "miniprogram_import": "D:\\property-ai\\miniprogram",
+  "effective_api": "http://127.0.0.1:8083/api/v1",
+  "env_local": {
+    "gitignored": true,
+    "found_reverted_to_8082_localPreview_true_during_FIX1": true,
+    "repatched_develop": "http://127.0.0.1:8083/api/v1",
+    "repatched_localPreview": false,
+    "backup": "reports/mp-current-full-regression/private/env.local.js.bak",
+    "appid_untouched": true,
+    "counted_as_source_fix": false
+  },
+  "api_8083": {
+    "first_round_pid": 46740,
+    "restarted_for_claim_400_fix": true,
+    "listen_pid_after_restart": 4596,
+    "command": "serve_auth001_isolated_api.py",
+    "interpreter": "D:\\property-ai\\.venv\\Scripts\\python.exe",
+    "target": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "healthz": "GET /api/v1/healthz 200"
+  },
+  "api_8082": {
+    "role": "Day4 leftover",
+    "listen_pid": 40828,
+    "used_this_round": false
+  },
+  "devtools": {
+    "cli": "D:\\微信web开发者工具\\cli.bat",
+    "http": "http://127.0.0.1:24540",
+    "automator_ws_first_round": "ws://127.0.0.1:9433",
+    "automator_ws_fix1": "ws://127.0.0.1:9435",
+    "note": "9420 not listening is not 'tool missing'; CLI auto --auto-port binds a free port"
+  },
+  "run_id": "mp-cfull-20260919-fix1",
+  "provider_modes": {
+    "password": "real Argon2id on 0009",
+    "sms": "development inbox sidecar (in-process; reset on API restart)",
+    "ai": "Fake / development",
+    "self_host_ai": "not running",
+    "storage": "development in-process memory; cleared on 8083 restart",
+    "worker": "no isolated auth001 worker"
+  },
+  "screenshot_redaction": "public PNGs hide invite token, OTP, and phone; unredacted copies only under gitignored private/"
+}
