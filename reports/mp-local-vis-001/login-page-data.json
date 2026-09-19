@@ -1,0 +1,20 @@
+{
+  "path": "pages/login/login",
+  "localPreview": true,
+  "baseUrl": "http://127.0.0.1:8082/api/v1",
+  "identities": [
+    {
+      "label": "住户",
+      "seedKey": "__DEV_RESIDENT__"
+    },
+    {
+      "label": "物业",
+      "seedKey": "__DEV_PROPERTY_MANAGER__"
+    },
+    {
+      "label": "员工",
+      "seedKey": "__DEV_STAFF__"
+    }
+  ],
+  "error": ""
+}

@@ -1,0 +1,41 @@
+{
+  "path": "pages/home/home",
+  "me": {
+    "display_name": "__DEV_RESIDENT__",
+    "roles": [
+      "RESIDENT"
+    ],
+    "permissions": [
+      "announcement:read",
+      "knowledge:read",
+      "resident_binding:create",
+      "resident_binding:read",
+      "resident_relation:read",
+      "work_order:cancel",
+      "work_order:create",
+      "work_order:read"
+    ],
+    "scopes": [
+      {
+        "role_code": "RESIDENT",
+        "scope_type": "PROPERTY",
+        "tenant_id": 1,
+        "property_id": 1,
+        "permissions": [
+          "announcement:read",
+          "knowledge:read",
+          "resident_binding:create",
+          "resident_binding:read",
+          "resident_relation:read",
+          "work_order:cancel",
+          "work_order:create",
+          "work_order:read"
+        ]
+      }
+    ]
+  },
+  "canResident": true,
+  "canStaff": false,
+  "canManage": false,
+  "error": ""
+}

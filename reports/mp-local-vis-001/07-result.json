@@ -1,18 +1,39 @@
 {
   "task_id": "MP-LOCAL-VIS-001",
-  "head": "c44c051d6d52a34dae13c61dd17afb7589f61473",
-  "base_sha": "c44c051d6d52a34dae13c61dd17afb7589f61473",
+  "head": "7c847813f02d22581aabbb476a2dd5667aa66d47",
+  "base_sha": "7c847813f02d22581aabbb476a2dd5667aa66d47",
   "project_config_sha256": "3FBE70AE8438D137498E55BDD289357473715231E4C96DABA7DEF7601741352D",
+  "project_config_unchanged": true,
   "api_healthz": 200,
   "api_readyz": 200,
-  "compile": "not_executed",
-  "login_page_shown": false,
-  "resident_login_clicked": false,
-  "dev_token_status": null,
-  "me_status": null,
-  "me_projection": null,
-  "screenshots": [],
-  "blocker": "WeChat DevTools CLI service port is disabled. cli open and cli islogin both refuse until 设置 → 安全设置 → 服务端口 is enabled.",
+  "devtools_http": "http://127.0.0.1:24540",
+  "islogin": true,
+  "cli_open": "ok",
+  "cli_auto": "ok AppID wxcfa5fd7dc03cac56",
+  "compile": "cli open + cli auto succeeded; simulator rendered login and home",
+  "login_page_shown": true,
+  "login_page_base_url": "http://127.0.0.1:8082/api/v1",
+  "login_page_local_preview": true,
+  "resident_login_clicked": true,
+  "dev_token": { "method": "POST", "path": "/api/v1/auth/dev/token", "status": 200 },
+  "me": [
+    { "method": "GET", "path": "/api/v1/me", "status": 200 },
+    { "method": "GET", "path": "/api/v1/me", "status": 200 }
+  ],
+  "me_projection": {
+    "display_name": "__DEV_RESIDENT__",
+    "roles": ["RESIDENT"],
+    "canResident": true,
+    "canStaff": false,
+    "canManage": false,
+    "has_work_order_create": true
+  },
+  "screenshots": [
+    "reports/mp-local-vis-001/03-login-page.png",
+    "reports/mp-local-vis-001/06-resident-home.png"
+  ],
   "http_script_not_counted_as_ui": true,
-  "no_fake_screenshots": true
+  "no_fake_screenshots": true,
+  "official_wechat_login_clicked": false,
+  "upload_release": false
 }

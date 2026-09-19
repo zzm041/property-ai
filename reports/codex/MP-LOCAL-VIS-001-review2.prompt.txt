@@ -1,0 +1,46 @@
+You are the read-only reviewer for repository D:\property-ai.
+Do not edit product source. Do not run tests that change databases or shared services.
+Do not request Full Access or sandbox bypass. Do not resume --last.
+
+Previous sessions (context only):
+- plan 01a0b812-28ee-79e0-a462-408409775d3a WAIT_HUMAN
+- review 01a0b819-0019-78b1-b8ff-c8ec11ca1897 WAIT_HUMAN (service port off)
+
+Operator then enabled the DevTools service port. Cursor continued the same task.
+
+Read:
+- reports/project-handoff.md
+- reports/codex/MP-LOCAL-VIS-001-plan.json
+- reports/mp-local-vis-001/01-cli-islogin.txt
+- reports/mp-local-vis-001/02-cli-open-compile.txt
+- reports/mp-local-vis-001/03-login-page.png
+- reports/mp-local-vis-001/04-network-requests.json
+- reports/mp-local-vis-001/05-network-me.json
+- reports/mp-local-vis-001/06-resident-home.png
+- reports/mp-local-vis-001/07-result.json
+- reports/mp-local-vis-001/08-git-status-after.txt
+- reports/mp-local-vis-001/login-page-data.json
+- reports/mp-local-vis-001/login-buttons.json
+- reports/mp-local-vis-001/home-page-data.json
+
+task_id: MP-LOCAL-VIS-001
+phase: review
+base_sha: 7c847813f02d22581aabbb476a2dd5667aa66d47
+reviewed_head: 7c847813f02d22581aabbb476a2dd5667aa66d47
+No product source change this round. Pre-existing dirty miniprogram/project.config.json hash still 3FBE70AE8438D137498E55BDD289357473715231E4C96DABA7DEF7601741352D. Do not treat that file as this-task work or as a blocker.
+
+New evidence:
+- DevTools CLI islogin true, HTTP 127.0.0.1:24540
+- cli open and cli auto succeeded, AppID wxcfa5fd7dc03cac56
+- Simulator login page: localPreview true, API http://127.0.0.1:8082/api/v1, button 以住户登录
+- Automator tapped 以住户登录 (did not tap official 微信登录)
+- Wrapped wx.request recorded POST /api/v1/auth/dev/token 200 then GET /api/v1/me 200 (twice)
+- Home page data and screenshot: display_name __DEV_RESIDENT__, roles RESIDENT, canResident true from live /me
+- Dedup by task_id + this new evidence, not only HEAD
+
+PASS only if compile/simulator + login page + 以住户登录 + live /auth/dev/token + /me + /me-driven home are evidenced.
+NEEDS_CHANGES only for a concrete in-scope product defect that blocks this login-page task.
+Do not require house bind, work orders, official WeChat, 0008, CVE, or production release.
+
+Return JSON matching the output schema.
+session_note: short, no secrets.

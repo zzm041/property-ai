@@ -1,0 +1,17 @@
+[
+  {
+    "method": "POST",
+    "path": "/api/v1/auth/dev/token",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/me",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/me",
+    "status": 200
+  }
+]

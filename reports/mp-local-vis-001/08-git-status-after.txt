@@ -1,6 +1,15 @@
 ﻿ M miniprogram/project.config.json
-?? reports/codex/
-?? reports/mp-local-vis-001/
-?? reports/project-handoff.md
-?? scripts/ops/codex_exec_readonly.py
+ M reports/mp-local-vis-001/01-cli-islogin.txt
+ M reports/mp-local-vis-001/02-cli-open-compile.txt
+ M reports/mp-local-vis-001/07-result.json
+ M reports/project-handoff.md
+?? reports/mp-local-vis-001/03-login-page.png
+?? reports/mp-local-vis-001/04-network-requests.json
+?? reports/mp-local-vis-001/05-network-me.json
+?? reports/mp-local-vis-001/06-resident-home.png
+?? reports/mp-local-vis-001/home-page-data.json
+?? reports/mp-local-vis-001/login-buttons.json
+?? reports/mp-local-vis-001/login-page-data.json
+?? reports/mp-local-vis-001/run-automator.js
 PROJECT_CONFIG_SHA256=3FBE70AE8438D137498E55BDD289357473715231E4C96DABA7DEF7601741352D
+HEAD=7c847813f02d22581aabbb476a2dd5667aa66d47
