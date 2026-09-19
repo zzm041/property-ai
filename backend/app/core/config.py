@@ -120,6 +120,7 @@ class Settings(BaseSettings):
     notification_provider: Literal["development", "production"] = "development"
     notification_provider_behavior: Literal["success", "unavailable"] = "success"
     storage_provider: Literal["development", "production"] = "development"
+    dev_storage_dir: str = ""
     storage_endpoint: str = ""
     storage_bucket: str = ""
     storage_access_key: SecretStr = SecretStr("")

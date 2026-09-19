@@ -42,7 +42,7 @@ def build_storage_provider(settings: Settings) -> StorageProvider:
             region=settings.storage_region,
             presign_ttl_seconds=settings.storage_presign_ttl_seconds,
         )
-    return DevelopmentStorageProvider()
+    return DevelopmentStorageProvider(persist_dir=settings.dev_storage_dir or None)
 
 
 def build_llm_provider(settings: Settings) -> LLMProvider:

@@ -359,3 +359,22 @@ def test_factory_production_branches() -> None:
     assert isinstance(build_reranker_provider(settings), HttpRerankerProvider)
     assert isinstance(build_storage_provider(settings), ProductionStorageProvider)
     assert isinstance(build_wechat_auth_provider(settings), ProductionWeChatAuthProvider)
+
+
+def test_development_storage_persists_across_instances(tmp_path) -> None:
+    from app.provider import storage as storage_mod
+
+    directory = tmp_path / "objects"
+    first = DevelopmentStorageProvider(persist_dir=str(directory))
+    stored = first.register_object(
+        mime_type="image/jpeg",
+        size_bytes=4,
+        tenant_id=1,
+        property_id=2,
+    )
+    first.put_object(stored.storage_key, b"jpeg", "image/jpeg")
+    storage_mod._DEV_OBJECTS.pop(stored.storage_key, None)
+    second = DevelopmentStorageProvider(persist_dir=str(directory))
+    assert second.get_object(stored.storage_key) == b"jpeg"
+    assert stored.storage_key.startswith("dev-object:")
+    assert "jpeg" not in stored.storage_key

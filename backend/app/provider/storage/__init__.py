@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from hashlib import sha256
+from pathlib import Path
 import hmac
 import time
 from urllib.parse import quote
@@ -63,7 +64,22 @@ _DEV_OBJECTS: dict[str, bytes] = {}
 
 
 class DevelopmentStorageProvider(StorageProvider):
-    """Opaque development keys. Not a filesystem path and not a public URL."""
+    """Opaque development keys. Not a filesystem path and not a public URL.
+
+    Optional persist_dir keeps bytes across process restart without exposing
+    the directory as the protocol key.
+    """
+
+    def __init__(self, persist_dir: str | None = None) -> None:
+        self._persist_dir = Path(persist_dir) if persist_dir else None
+        if self._persist_dir is not None:
+            self._persist_dir.mkdir(parents=True, exist_ok=True)
+
+    def _persist_path(self, storage_key: str) -> Path | None:
+        if self._persist_dir is None:
+            return None
+        digest = sha256(storage_key.encode("utf-8")).hexdigest()
+        return self._persist_dir / digest[:2] / digest
 
     def register_object(
         self,
@@ -85,11 +101,21 @@ class DevelopmentStorageProvider(StorageProvider):
     def put_object(self, storage_key: str, content: bytes, mime_type: str) -> None:
         del mime_type
         _DEV_OBJECTS[storage_key] = content
+        path = self._persist_path(storage_key)
+        if path is not None:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(content)
 
     def get_object(self, storage_key: str) -> bytes:
-        if storage_key not in _DEV_OBJECTS:
-            raise ProviderUnavailableError("Object was not found")
-        return _DEV_OBJECTS[storage_key]
+        cached = _DEV_OBJECTS.get(storage_key)
+        if cached is not None:
+            return cached
+        path = self._persist_path(storage_key)
+        if path is not None and path.is_file():
+            data = path.read_bytes()
+            _DEV_OBJECTS[storage_key] = data
+            return data
+        raise ProviderUnavailableError("Object was not found")
 
 
 class ProductionStorageProvider(StorageProvider):

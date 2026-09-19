@@ -51,13 +51,29 @@ def test_auto_dispatch_stays_off_by_default_and_blocks_without_schema() -> None:
     assert AutoDispatchService(None, settings=on).maybe_assign(
         work_order=order, mapped=mapped, request_id="r1"
     ) == "SCHEMA_PENDING_0009"
-    risky = MappedAnalysis(
+    electric = MappedAnalysis(
         category=mapped.category,
         subcategory=mapped.subcategory,
         severity=mapped.severity,
         priority=mapped.priority,
         summary=mapped.summary,
         risk=AiRisk.ELECTRIC,
+        required_role=mapped.required_role,
+        required_skill=mapped.required_skill,
+        required_duty=mapped.required_duty,
+        confidence=mapped.confidence,
+        low_confidence=False,
+    )
+    assert AutoDispatchService(None, settings=on).maybe_assign(
+        work_order=order, mapped=electric, request_id="r1"
+    ) == "SCHEMA_PENDING_0009"
+    risky = MappedAnalysis(
+        category=mapped.category,
+        subcategory=mapped.subcategory,
+        severity=mapped.severity,
+        priority=mapped.priority,
+        summary=mapped.summary,
+        risk=AiRisk.GAS,
         required_role=mapped.required_role,
         required_skill=mapped.required_skill,
         required_duty=mapped.required_duty,

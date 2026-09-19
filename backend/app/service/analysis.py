@@ -593,9 +593,18 @@ class AnalysisService:
                     from app.service.auto_dispatch import AutoDispatchService
                     from app.service.incident import IncidentService
 
-                    AutoDispatchService(self._session, settings=self._settings).maybe_assign(
+                    auto_outcome = AutoDispatchService(
+                        self._session, settings=self._settings
+                    ).maybe_assign(
                         work_order=record,
                         mapped=mapped,
+                        request_id=request_id,
+                    )
+                    logger.info(
+                        "auto_dispatch_outcome",
+                        work_order_id=record.id,
+                        analysis_id=analysis.id,
+                        outcome=auto_outcome,
                         request_id=request_id,
                     )
                     IncidentService(self._session, settings=self._settings).aggregate_locked(

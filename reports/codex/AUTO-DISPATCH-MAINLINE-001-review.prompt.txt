@@ -1,0 +1,47 @@
+Review AUTO-DISPATCH-MAINLINE-001. Read-only. Do not edit product source.
+
+Correct the delivery center: ordinary work-order auto-dispatch is the default mainline. Manual assign is fallback/authorized intervention. Existing manual-loop evidence stays classified; it cannot substitute auto-dispatch acceptance. Do not shrink Production V1. Do not reopen closed security items without new evidence (SEC-REFRESH-STAGGER, SEC-WECHAT-BIND-401, SEC-EMPLOYEE-INVITE-LOCK-ORDER). Do not mix 8082 Day4 leftover with 8083 auth001. Do not treat Cursor PASS fields as sufficient.
+
+HEAD at review start was 177efb4 (ab0b882 regression baseline → b1458bf invite 400 → 177efb4 evidence provenance). Cursor then implemented the first auto-dispatch mainline fix in the working tree. Read HEAD, git status, and the actual working-tree files below. Do not copy old SCHEMA_PENDING_0007 explanations.
+
+Authorized env: 8083 → 127.0.0.1:3307/property_ai_auth001_test @ 20260919_0009. Isolated auto-assign may be enabled only here. Defaults stay ai_auto_assign=false / ai_enqueue_on_create=false. Do not enable shared/persistent/production auto-assign.
+
+Read at least:
+- docs/01-PRD.md docs/02-PERMISSION-MATRIX.md docs/04-WORKORDER-STATE-MACHINE.md docs/05-AI-DISPATCH-SPEC.md docs/06-API-CONTRACT.md docs/10-ACCEPTANCE.md docs/12-BACKLOG.md reports/project-handoff.md
+- reports/mp-current-full-regression/coverage-matrix.json combined-results.json (keep original 83 IDs)
+- backend/app/service/work_order.py create/_enqueue_analysis
+- backend/app/service/analysis.py _apply maybe_assign call
+- backend/app/service/auto_dispatch.py (working tree: Core INSERT AUTO assignment on live 0009 columns; do not map assigned_source onto shared 0007 ORM)
+- backend/app/model/work_order.py WorkOrderAssignment
+- backend/alembic/versions/20260919_0009_official_auth_identity_dispatch.py
+- backend/app/core/config.py ai_auto_assign ai_enqueue_on_create should_enqueue_ai_on_create
+- backend/app/worker/tasks.py analyze_work_order_task
+- backend/app/worker/enqueue.py
+- miniprogram/pages/supervisor/queue.js recommend/assign
+- backend/app/api/v1/supervisor_ai.py
+- scripts/ops/serve_auth001_isolated_api.py scripts/ops/serve_auth001_isolated_worker.py scripts/ops/auth001_isolated_runtime.py scripts/ops/provision_auth001_isolated_broker.py
+- backend/app/provider/storage/__init__.py DevelopmentStorageProvider persist_dir
+- backend/app/provider/llm/__init__.py SUCCESS_ANALYSIS (Fake electric sample)
+
+First question: where does the auto-dispatch chain actually break, after the working-tree fix?
+Must distinguish:
+1. create enqueue (app_env=test needs ai_enqueue_on_create)
+2. exclusive worker consume vs shared/old worker vs in-process BackgroundTasks
+3. worker media read after API restart (memory vs persist_dir)
+4. provider I/O + structured validation
+5. live DB filter/score vs LLM naming people
+6. maybe_assign actually inserting Assignment assigned_source=AUTO
+7. load, WorkOrderLog SYSTEM, audit, notification
+8. remaining UI deviation: supervisor must click 分析 / pick employee / POST employee_id
+
+Flag as core product gaps if still true: analyze button required; recommendations forever wait for human pick; client must send employee_id; ai_auto_assign stuck off or unreachable; over-broad rules send every ordinary ticket to humans.
+
+HUMAN_FALLBACK_RISKS currently SAFETY+GAS; ELECTRIC/FLOODING/NONE/OTHER may auto-assign. Confirm whether that matches docs/05. Do not invent extra statuses.
+
+Full V1 coverage (12 areas). For each: requirement source → user goal → page/API/service/data → worker/storage/model deps → current tests → gap → fix/acceptance. Distinguish approved vs deferred vs unapproved vs code vs evidence. History 暂不实现 does not delete final V1.
+
+Do not introduce parking/mall/ERP/independent web admin. learning/ is not a product source.
+
+Fake/dev LLM may only support “模拟分析下自动派单机制通过”, never “真实AI自动派单通过”. Concentrate ONE executable self-hosted Qwen resource/budget recommendation (not “missing API key”, not largest GPU). No third-party hosted inference.
+
+Fill all schema fields. next_action must be a concrete Cursor operation with completion conditions. approval_requests only for items the user must approve (GPU/budget, risk list if you disagree, migration if 0009 cannot support a necessary field).
