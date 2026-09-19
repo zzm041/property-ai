@@ -9,6 +9,7 @@ Page({
     selectedId: "",
     recommendations: [],
     loading: false,
+    nextCursor: "",
   },
   onLoad(query) {
     if (query.propertyId) {
@@ -27,20 +28,31 @@ Page({
     this.setData({ propertyId: e.detail.value });
   },
   load() {
+    this._loadQueue({ reset: true });
+  },
+  loadMore() {
+    if (!this.data.nextCursor) {
+      return;
+    }
+    this._loadQueue({ reset: false });
+  },
+  _loadQueue({ reset }) {
     const { withLoading } = require("../../utils/ui");
     const api = require("../../services/api");
     const propertyId = this.data.propertyId;
+    const afterId = reset ? 0 : this.data.nextCursor;
     withLoading(this, () =>
       Promise.all([
-        api.supervisorQueue(propertyId),
+        api.supervisorQueue(propertyId, afterId),
         api.staffDaily(propertyId, this.data.tenantId),
-      ]).then(
-        ([queue, daily]) =>
-          this.setData({
-            items: (queue && queue.items) || [],
-            staff: (daily && daily.items) || [],
-          })
-      )
+      ]).then(([queue, daily]) => {
+        const incoming = (queue && queue.items) || [];
+        this.setData({
+          items: reset ? incoming : this.data.items.concat(incoming),
+          staff: (daily && daily.items) || [],
+          nextCursor: (queue && queue.next_cursor) || "",
+        });
+      })
     ).catch(() => {});
   },
   select(e) {

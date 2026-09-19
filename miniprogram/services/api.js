@@ -150,8 +150,12 @@ module.exports = {
     request({ path: `/staff/work-orders/${id}/feedback`, method: "POST", data: body }),
   resolveWorkOrder: (id, body) =>
     request({ path: `/staff/work-orders/${id}/receipts`, method: "POST", data: body }),
-  supervisorQueue: (propertyId) =>
-    request({ path: `/supervisor/work-orders?property_id=${propertyId}` }),
+  supervisorQueue: (propertyId, afterId) =>
+    request({
+      path: `/supervisor/work-orders?property_id=${propertyId}${
+        afterId ? `&after_id=${afterId}` : ""
+      }`,
+    }),
   assignWorkOrder: (id, body) =>
     request({ path: `/supervisor/work-orders/${id}/assign`, method: "POST", data: body }),
   reassignWorkOrder: (id, body) =>
