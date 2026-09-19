@@ -258,6 +258,11 @@ class AuditService:
                     or not _SEED_KEY_PATTERN.fullmatch(value)
                 ):
                     cls._raise_invalid_details("seed_key is invalid")
+            elif key in {"old_phone", "new_phone"}:
+                if not isinstance(value, str) or not re.fullmatch(
+                    r"\d{3}\*{4}\d{4}", value
+                ):
+                    cls._raise_invalid_details("phone audit value must be masked")
             elif key in {
                 "house_id",
                 "relation_id",

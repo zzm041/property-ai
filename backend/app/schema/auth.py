@@ -39,7 +39,7 @@ class SmsSendRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     phone: str = Field(min_length=8, max_length=20)
-    purpose: Literal["login", "reset"] = "login"
+    purpose: Literal["login", "reset", "change_phone"] = "login"
     challenge_id: str = Field(min_length=8, max_length=128)
     challenge_answer: str = Field(min_length=1, max_length=16)
 
@@ -83,6 +83,15 @@ class PasswordChangeRequest(BaseModel):
 
     old_password: str = Field(min_length=1, max_length=128)
     new_password: str = Field(min_length=1, max_length=128)
+
+
+class PhoneChangeRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    old_phone: str = Field(min_length=8, max_length=20)
+    old_code: str = Field(min_length=4, max_length=8)
+    new_phone: str = Field(min_length=8, max_length=20)
+    new_code: str = Field(min_length=4, max_length=8)
 
 
 class PasswordResetVerifyRequest(BaseModel):

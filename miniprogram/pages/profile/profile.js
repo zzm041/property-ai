@@ -1,11 +1,105 @@
 Page({
-  data: { displayName: "", loading: false, error: "" },
+  data: {
+    displayName: "",
+    oldPhone: "",
+    newPhone: "",
+    oldCode: "",
+    newCode: "",
+    oldChallengeId: "",
+    oldChallengePrompt: "",
+    oldChallengeAnswer: "",
+    newChallengeId: "",
+    newChallengePrompt: "",
+    newChallengeAnswer: "",
+    phoneNotice: "",
+    loading: false,
+    error: "",
+  },
   onShow() {
     const me = getApp().globalData.me || {};
     this.setData({ displayName: me.display_name || "" });
   },
   onName(e) {
     this.setData({ displayName: e.detail.value });
+  },
+  onPhoneField(e) {
+    const field = e.currentTarget.dataset.field;
+    const value = e.detail.value;
+    const updates = { [field]: value, error: "" };
+    if (field === "oldPhone") {
+      Object.assign(updates, {
+        oldCode: "",
+        oldChallengeId: "",
+        oldChallengePrompt: "",
+        oldChallengeAnswer: "",
+      });
+    }
+    if (field === "newPhone") {
+      Object.assign(updates, {
+        newCode: "",
+        newChallengeId: "",
+        newChallengePrompt: "",
+        newChallengeAnswer: "",
+      });
+    }
+    this.setData(updates);
+  },
+  sendPhoneCode(e) {
+    const kind = e.currentTarget.dataset.kind;
+    const prefix = kind === "old" ? "old" : "new";
+    const phone = this.data[`${prefix}Phone`];
+    const challengeId = this.data[`${prefix}ChallengeId`];
+    const challengeAnswer = this.data[`${prefix}ChallengeAnswer`];
+    const api = require("../../services/api");
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, async () => {
+      if (!challengeId) {
+        const challenge = await api.issueChallenge(phone, "login");
+        this.setData({
+          [`${prefix}ChallengeId`]: challenge.challenge_id,
+          [`${prefix}ChallengePrompt`]: challenge.prompt,
+          phoneNotice: "请完成安全挑战后再次获取验证码",
+        });
+        return;
+      }
+      if (!challengeAnswer) {
+        throw new Error("请填写安全挑战答案");
+      }
+      await api.sendSms(
+        phone,
+        "change_phone",
+        challengeId,
+        challengeAnswer
+      );
+      this.setData({
+        [`${prefix}ChallengeId`]: "",
+        [`${prefix}ChallengePrompt`]: "",
+        [`${prefix}ChallengeAnswer`]: "",
+        phoneNotice: `${kind === "old" ? "旧" : "新"}手机号验证码已发送`,
+      });
+    }).catch(() => {});
+  },
+  changePhone() {
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, async () => {
+      const token = await require("../../services/api").changePhone({
+        old_phone: this.data.oldPhone,
+        old_code: this.data.oldCode,
+        new_phone: this.data.newPhone,
+        new_code: this.data.newCode,
+      });
+      const auth = require("../../services/auth");
+      auth.setToken(token.access_token);
+      auth.setRefreshToken(token.refresh_token);
+      this.setData({
+        oldPhone: "",
+        newPhone: "",
+        oldCode: "",
+        newCode: "",
+        phoneNotice: "手机号已变更，其他旧会话已失效",
+      });
+      wx.showToast({ title: "手机号已变更", icon: "success" });
+    }).catch(() => {});
   },
   save() {
     const { withLoading } = require("../../utils/ui");

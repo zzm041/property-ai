@@ -15,6 +15,7 @@ class AuditAction(StrEnum):
     AUTH_PASSWORD_TOKEN_ISSUED = "AUTH_PASSWORD_TOKEN_ISSUED"
     AUTH_PASSWORD_CHANGED = "AUTH_PASSWORD_CHANGED"
     AUTH_PASSWORD_RESET = "AUTH_PASSWORD_RESET"
+    AUTH_PHONE_CHANGED = "AUTH_PHONE_CHANGED"
     AUTH_SESSION_REVOKED = "AUTH_SESSION_REVOKED"
     AUTH_PROFILE_UPDATED = "AUTH_PROFILE_UPDATED"
     AUTH_WECHAT_BOUND = "AUTH_WECHAT_BOUND"
@@ -202,6 +203,16 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             resource_type=AuditResourceType.USER,
             allowed_detail_keys=frozenset({"auth_method"}),
             required_detail_keys=frozenset({"auth_method"}),
+            allowed_scope_types=frozenset({ScopeType.SYSTEM}),
+        ),
+        AuditAction.AUTH_PHONE_CHANGED: AuditActionPolicy(
+            resource_type=AuditResourceType.USER,
+            allowed_detail_keys=frozenset(
+                {"old_phone", "new_phone", "reason_code"}
+            ),
+            required_detail_keys=frozenset(
+                {"old_phone", "new_phone", "reason_code"}
+            ),
             allowed_scope_types=frozenset({ScopeType.SYSTEM}),
         ),
         AuditAction.AUTH_SESSION_REVOKED: AuditActionPolicy(

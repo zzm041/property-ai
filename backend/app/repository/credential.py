@@ -41,6 +41,26 @@ class CredentialRepository:
             )
         )
 
+    def get_active_phone_for_update(self, phone_e164: str) -> UserPhone | None:
+        return self._session.scalar(
+            select(UserPhone)
+            .where(
+                UserPhone.phone_e164 == phone_e164,
+                UserPhone.status == "ACTIVE",
+            )
+            .with_for_update()
+        )
+
+    def get_active_phone_for_user_for_update(self, user_id: int) -> UserPhone | None:
+        return self._session.scalar(
+            select(UserPhone)
+            .where(
+                UserPhone.user_id == user_id,
+                UserPhone.status == "ACTIVE",
+            )
+            .with_for_update()
+        )
+
     def add_phone(self, record: UserPhone) -> UserPhone:
         self._session.add(record)
         self._session.flush()

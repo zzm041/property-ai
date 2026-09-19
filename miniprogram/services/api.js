@@ -10,6 +10,7 @@ const CREDENTIAL_AUTH_PATHS = {
   "/auth/sms/login": true,
   "/auth/sms/test-inbox": true,
   "/auth/password/login": true,
+  "/auth/phone/change": true,
   "/auth/password/reset/verify": true,
   "/auth/password/reset/confirm": true,
   "/auth/token/refresh": true,
@@ -261,6 +262,8 @@ module.exports = {
     request({ path: "/auth/sms/login", method: "POST", data: { phone, code } }),
   passwordLogin: (phone, password) =>
     request({ path: "/auth/password/login", method: "POST", data: { phone, password } }),
+  changePhone: (body) =>
+    request({ path: "/auth/phone/change", method: "POST", data: body }),
   verifyPasswordReset: (phone, code) =>
     request({ path: "/auth/password/reset/verify", method: "POST", data: { phone, code } }),
   confirmPasswordReset: (resetToken, newPassword, confirmPassword) =>

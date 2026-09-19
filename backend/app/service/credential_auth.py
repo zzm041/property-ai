@@ -150,7 +150,7 @@ class CredentialAuthService:
         challenge_answer: str,
     ) -> SmsSendData:
         phone_e164 = self._require_phone(phone)
-        if purpose not in {"login", "reset"}:
+        if purpose not in {"login", "reset", "change_phone"}:
             raise AppError(
                 code=AuthErrorCode.INVALID_PHONE,
                 message="Unsupported SMS purpose",
@@ -184,7 +184,7 @@ class CredentialAuthService:
                 challenge_id=challenge_id,
                 answer=challenge_answer,
                 phone_e164=phone_e164,
-                purpose=purpose,
+                purpose="login" if purpose == "change_phone" else purpose,
             )
             if challenge_status["value"] != "ok":
                 return
@@ -393,6 +393,88 @@ class CredentialAuthService:
             issued_box.append(issued)
 
         run_owned_transaction(self._session, _persist)
+        return issued_box[0]
+
+    def change_phone(
+        self,
+        *,
+        user_id: int,
+        old_phone: str,
+        old_code: str,
+        new_phone: str,
+        new_code: str,
+        request_id: str,
+    ) -> IssuedSession:
+        old_phone_e164 = self._require_phone(old_phone)
+        new_phone_e164 = self._require_phone(new_phone)
+        if old_phone_e164 == new_phone_e164:
+            raise AppError(
+                code=AuthErrorCode.INVALID_PHONE,
+                message="New phone must be different from the current phone",
+                status_code=422,
+            )
+        issued_box: list[IssuedSession] = []
+
+        def _persist() -> None:
+            current = self._repository.get_active_phone_for_user_for_update(user_id)
+            if current is None or current.phone_e164 != old_phone_e164:
+                raise AppError(
+                    code=AuthErrorCode.OLD_PHONE_MISMATCH,
+                    message="Current phone does not match the signed-in account",
+                    status_code=409,
+                )
+            self._raise_otp(
+                self._apply_otp(old_phone_e164, purpose="change_phone", code=old_code)
+            )
+            self._raise_otp(
+                self._apply_otp(new_phone_e164, purpose="change_phone", code=new_code)
+            )
+            existing = self._repository.get_active_phone_for_update(new_phone_e164)
+            if existing is not None:
+                raise AppError(
+                    code=AuthErrorCode.PHONE_ALREADY_REGISTERED,
+                    message="New phone is already registered; use account merge",
+                    status_code=409,
+                )
+            now = self._clock()
+            current.status = "ENDED"
+            current.ended_at = now
+            self._session.flush()
+            self._repository.add_phone(
+                UserPhone(
+                    user_id=user_id,
+                    phone_e164=new_phone_e164,
+                    status="ACTIVE",
+                    verified_at=now,
+                )
+            )
+            self._revoke_sessions(user_id, reason="PHONE_CHANGE", request_id=request_id)
+            issued = self._issue_session(user_id=user_id, auth_method="sms")
+            self._audit.append(
+                action=AuditAction.AUTH_PHONE_CHANGED,
+                resource_type=AuditResourceType.USER,
+                actor_user_id=user_id,
+                resource_id=user_id,
+                request_id=request_id,
+                scope_type=ScopeType.SYSTEM,
+                details={
+                    "old_phone": mask_phone(old_phone_e164),
+                    "new_phone": mask_phone(new_phone_e164),
+                    "reason_code": "SELF_SERVICE_VERIFIED",
+                },
+            )
+            issued_box.append(issued)
+
+        try:
+            run_owned_transaction(self._session, _persist)
+        except AppError:
+            raise
+        except IntegrityError as exc:
+            raise AppError(
+                code=AuthErrorCode.PHONE_ALREADY_REGISTERED,
+                message="New phone is already registered; use account merge",
+                status_code=409,
+            ) from exc
         return issued_box[0]
 
     def verify_password_reset(

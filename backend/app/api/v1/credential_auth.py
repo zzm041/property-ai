@@ -16,6 +16,7 @@ from app.provider.sms import development_sms_inbox
 from app.schema.auth import (
     LogoutRequest,
     PasswordChangeRequest,
+    PhoneChangeRequest,
     PasswordLoginRequest,
     PasswordResetConfirmRequest,
     PasswordResetVerifyRequest,
@@ -126,6 +127,24 @@ def verify_password_reset(
     return success_envelope(
         request, {"reset_token": token, "expires_in": 600}
     )
+
+
+@router.post("/phone/change")
+def phone_change(
+    body: PhoneChangeRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[CredentialAuthService, Depends(get_credential_auth_service)],
+) -> dict[str, object]:
+    issued = service.change_phone(
+        user_id=actor.user_id,
+        old_phone=body.old_phone,
+        old_code=body.old_code,
+        new_phone=body.new_phone,
+        new_code=body.new_code,
+        request_id=request_id_for(request),
+    )
+    return success_envelope(request, issued.as_schema().model_dump(mode="json"))
 
 
 @router.post("/password/reset/confirm")

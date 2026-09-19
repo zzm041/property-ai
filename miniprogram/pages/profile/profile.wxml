@@ -8,6 +8,22 @@
   <view class="empty">微信只是同一账号的凭证，不会新建另一套身份。</view>
 </view>
 <view class="card">
+  <view>更换手机号</view>
+  <view class="empty">必须分别验证当前手机号和未注册的新手机号。变更后其他旧会话失效。</view>
+  <input placeholder="当前手机号" value="{{oldPhone}}" data-field="oldPhone" bindinput="onPhoneField" type="number" />
+  <view class="empty" wx:if="{{oldChallengePrompt}}">旧号安全挑战：{{oldChallengePrompt}}</view>
+  <input wx:if="{{oldChallengePrompt}}" placeholder="旧号挑战答案" value="{{oldChallengeAnswer}}" data-field="oldChallengeAnswer" bindinput="onPhoneField" />
+  <input placeholder="旧号验证码" value="{{oldCode}}" data-field="oldCode" bindinput="onPhoneField" />
+  <button class="btn btn-secondary" data-kind="old" bindtap="sendPhoneCode" disabled="{{loading}}">获取旧号验证码</button>
+  <input placeholder="新手机号" value="{{newPhone}}" data-field="newPhone" bindinput="onPhoneField" type="number" />
+  <view class="empty" wx:if="{{newChallengePrompt}}">新号安全挑战：{{newChallengePrompt}}</view>
+  <input wx:if="{{newChallengePrompt}}" placeholder="新号挑战答案" value="{{newChallengeAnswer}}" data-field="newChallengeAnswer" bindinput="onPhoneField" />
+  <input placeholder="新号验证码" value="{{newCode}}" data-field="newCode" bindinput="onPhoneField" />
+  <button class="btn btn-secondary" data-kind="new" bindtap="sendPhoneCode" disabled="{{loading}}">获取新号验证码</button>
+  <button class="btn" bindtap="changePhone" disabled="{{loading}}">确认更换手机号</button>
+  <view class="empty" wx:if="{{phoneNotice}}">{{phoneNotice}}</view>
+</view>
+<view class="card">
   <button class="btn" data-url="/pages/employee-claim/employee-claim" bindtap="goClaim">员工邀请认领</button>
 </view>
 <button class="btn" bindtap="back">返回</button>
