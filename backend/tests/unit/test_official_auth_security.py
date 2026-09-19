@@ -158,7 +158,7 @@ def test_otp_failure_is_raised_after_owned_transaction() -> None:
     ).read_text(encoding="utf-8")
     assert "self._raise_otp(otp_status[\"value\"])" in source
     login_pos = source.index("def login_sms")
-    reset_pos = source.index("def reset_password")
+    reset_pos = source.index("def verify_password_reset")
     raise_login = source.index("self._raise_otp(otp_status[\"value\"])", login_pos)
     raise_reset = source.index("self._raise_otp(otp_status[\"value\"])", reset_pos)
     assert source.index("run_owned_transaction(self._session, _persist)", login_pos) < raise_login
@@ -197,5 +197,152 @@ def test_miniprogram_refresh_retries_once() -> None:
     assert "retried: true" in source
     assert "CREDENTIAL_AUTH_PATHS" in source
     assert "refreshInFlight" in source
-    assert "/auth/wechat/bind" in source
     assert "latestToken" in source
+    assert "/auth/wechat/bind" in source
+    assert "/auth/challenge" in source
+    assert "/auth/password/reset/verify" in source
+    assert "/auth/password/reset/confirm" in source
+    assert "/auth/sms/test-inbox" in source
+    login_page = (
+        Path(__file__).resolve().parents[3] / "miniprogram" / "pages" / "login" / "login.wxml"
+    ).read_text(encoding="utf-8")
+    login_js = (
+        Path(__file__).resolve().parents[3] / "miniprogram" / "pages" / "login" / "login.js"
+    ).read_text(encoding="utf-8")
+    assert "以住户登录" not in login_page
+    assert "以物业登录" not in login_page
+    assert "以员工登录" not in login_page
+    assert "dev-login" not in login_js
+    assert "/auth/dev/token" not in login_js
+    assert "mode === 'password'" in login_page
+    assert "mode === 'sms'" in login_page
+    assert "忘记密码" in login_page
+    reset_js = (
+        Path(__file__).resolve().parents[3]
+        / "miniprogram"
+        / "pages"
+        / "password-reset"
+        / "password-reset.js"
+    ).read_text(encoding="utf-8")
+    assert "confirmPasswordReset" in reset_js
+    assert "redirectTo" in reset_js
+
+
+def test_new_password_policy_rejects_weak_and_login_does_not_use_it() -> None:
+    from app.core.passwords import password_strength, require_new_password
+
+    require_new_password("GoodPass1")
+    require_new_password("Abcd1234")
+    with pytest.raises(AppError) as digits:
+        require_new_password("12345678")
+    assert digits.value.code == "AUTH.WEAK_PASSWORD"
+    with pytest.raises(AppError):
+        require_new_password("abcdefgh")
+    with pytest.raises(AppError):
+        require_new_password("short")
+    assert password_strength("12345678") == "偏弱"
+    assert password_strength("abcdefgh") == "偏弱"
+    assert password_strength("GoodPass1") in {"可用", "较强"}
+    assert password_strength("CorrectHorse1!") == "较强"
+
+    source = (
+        Path(__file__).resolve().parents[2] / "app" / "service" / "credential_auth.py"
+    ).read_text(encoding="utf-8")
+    login_pos = source.index("def login_password")
+    change_pos = source.index("def change_password")
+    login_body = source[login_pos:change_pos]
+    assert "require_new_password" not in login_body
+    assert "verify_password" in login_body
+    assert "require_new_password" in source[change_pos:]
+    assert "def confirm_password_reset" in source
+    confirm_pos = source.index("def confirm_password_reset")
+    assert "require_new_password" in source[confirm_pos : source.index("def refresh")]
+
+
+def test_isolated_auth_guard_rejects_shared_schemas_and_port_only() -> None:
+    from app.core.database import assert_isolated_auth_database
+
+    shared = (
+        "mysql+pymysql://property_test:change-me-test@127.0.0.1:3307/"
+        "property_ai_test?charset=utf8mb4"
+    )
+    day4 = (
+        "mysql+pymysql://property:change-me@127.0.0.1:3306/"
+        "property_ai_day4?charset=utf8mb4"
+    )
+    localhost = (
+        "mysql+pymysql://property_test:change-me-test@localhost:3307/"
+        "property_ai_auth001_test?charset=utf8mb4"
+    )
+    exact = (
+        "mysql+pymysql://property_test:change-me-test@127.0.0.1:3307/"
+        "property_ai_auth001_test?charset=utf8mb4"
+    )
+    settings = Settings(
+        _env_file=None,
+        app_env="test",
+        allow_destructive_test_database=True,
+        test_database_url=shared,
+        database_url=(
+            "mysql+pymysql://property:change-me@127.0.0.1:3306/"
+            "property_ai?charset=utf8mb4"
+        ),
+    )
+    with pytest.raises(RuntimeError, match="protected database"):
+        assert_isolated_auth_database(settings, database_url=shared)
+    with pytest.raises(RuntimeError, match="protected database"):
+        assert_isolated_auth_database(settings, database_url=day4)
+    with pytest.raises(RuntimeError, match="must target"):
+        assert_isolated_auth_database(settings, database_url=localhost)
+    development = Settings(
+        _env_file=None,
+        app_env="development",
+        allow_destructive_test_database=True,
+        test_database_url=exact,
+        database_url=(
+            "mysql+pymysql://property:change-me@127.0.0.1:3306/"
+            "property_ai?charset=utf8mb4"
+        ),
+    )
+    with pytest.raises(RuntimeError, match="APP_ENV=test"):
+        assert_isolated_auth_database(development, database_url=exact)
+    denied_flag = Settings(
+        _env_file=None,
+        app_env="test",
+        allow_destructive_test_database=False,
+        test_database_url=exact,
+        database_url=(
+            "mysql+pymysql://property:change-me@127.0.0.1:3306/"
+            "property_ai?charset=utf8mb4"
+        ),
+    )
+    with pytest.raises(RuntimeError, match="ALLOW_DESTRUCTIVE"):
+        assert_isolated_auth_database(denied_flag, database_url=exact)
+    allowed = Settings(
+        _env_file=None,
+        app_env="test",
+        allow_destructive_test_database=True,
+        test_database_url=exact,
+        database_url=(
+            "mysql+pymysql://property:change-me@127.0.0.1:3306/"
+            "property_ai?charset=utf8mb4"
+        ),
+    )
+    assert_isolated_auth_database(allowed, database_url=exact)
+
+
+def test_send_sms_requires_server_challenge_and_does_not_return_code() -> None:
+    source = (
+        Path(__file__).resolve().parents[2] / "app" / "service" / "credential_auth.py"
+    ).read_text(encoding="utf-8")
+    send_pos = source.index("def send_sms")
+    login_pos = source.index("def login_sms")
+    body = source[send_pos:login_pos]
+    assert "_consume_visual_challenge" in body
+    assert "SmsSendData" in body
+    assert "code=" not in body.split("return SmsSendData")[1][:400]
+    api = (
+        Path(__file__).resolve().parents[2] / "app" / "api" / "v1" / "credential_auth.py"
+    ).read_text(encoding="utf-8")
+    assert "test-inbox" in api
+    assert 'settings.app_env != "test"' in api

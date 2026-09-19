@@ -14,4 +14,7 @@ def test_revision_does_not_occupy_0008_and_revises_0007() -> None:
     assert "0008" in text
     assert "user_phones" in text
     assert "employee_invites" in text
-    assert "assigned_source" in text
+    assert "visual_challenges" in text
+    assert "password_reset_tickets" in text
+    assert "property_ai_auth001_test" in text
+    assert "_require_isolated_auth_schema" in text

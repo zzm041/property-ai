@@ -67,6 +67,8 @@ TASK_9_TABLES = {
     "user_phones",
     "user_passwords",
     "sms_challenges",
+    "visual_challenges",
+    "password_reset_tickets",
     "auth_sessions",
     "employee_invites",
 }

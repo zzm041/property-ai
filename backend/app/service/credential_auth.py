@@ -3,6 +3,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import timedelta
+import secrets
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -10,20 +11,32 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings
 from app.core.database import run_owned_transaction
 from app.core.errors import AppError, AuthErrorCode, ErrorCode
-from app.core.passwords import hash_password, verify_password
+from app.core.passwords import hash_password, require_new_password, verify_password
 from app.core.rate_limit import RateLimiter, RedisRateLimiter
 from app.core.security import issue_access_token
 from app.core.time import utc_now
-from app.core.token_hash import generate_otp_code, generate_refresh_token, keyed_hash
+from app.core.token_hash import generate_invite_token, generate_otp_code, generate_refresh_token, keyed_hash
 from app.domain.audit import AuditAction, AuditResourceType
 from app.domain.iam import ScopeType
 from app.domain.phone import mask_phone, normalize_phone
-from app.model.identity import AuthSession, SmsChallenge, User, UserPassword, UserPhone
+from app.model.identity import (
+    AuthSession,
+    PasswordResetTicket,
+    SmsChallenge,
+    User,
+    UserPassword,
+    UserPhone,
+    VisualChallenge,
+)
 from app.provider.factory import build_sms_provider
 from app.provider.sms import SmsProvider
 from app.repository.credential import CredentialRepository
 from app.repository.identity import IdentityRepository
-from app.schema.auth import SessionTokenData, SmsSendData
+from app.schema.auth import (
+    SessionTokenData,
+    SmsSendData,
+    VisualChallengeData,
+)
 from app.service.audit import AuditService
 
 
@@ -72,13 +85,82 @@ class CredentialAuthService:
         self._otp_factory = otp_factory
         self._clock = clock
 
-    def send_sms(self, *, phone: str, purpose: str, request_id: str) -> SmsSendData:
+    def issue_visual_challenge(
+        self, *, phone: str, purpose: str, request_id: str
+    ) -> VisualChallengeData:
+        del request_id
         phone_e164 = self._require_phone(phone)
         if purpose not in {"login", "reset"}:
             raise AppError(
                 code=AuthErrorCode.INVALID_PHONE,
                 message="Unsupported SMS purpose",
                 status_code=422,
+            )
+        if not self._limiter.hit(
+            f"visual:{phone_e164}:{purpose}",
+            limit=self._settings.sms_send_limit_per_hour,
+            window_seconds=3600,
+        ):
+            raise AppError(
+                code=AuthErrorCode.SMS_RATE_LIMITED,
+                message="Challenge issuing is rate limited",
+                status_code=429,
+            )
+        left = secrets.randbelow(9) + 1
+        right = secrets.randbelow(9) + 1
+        prompt = f"{left} + {right} = ?"
+        answer = str(left + right)
+        token = generate_invite_token()
+        now = self._clock()
+        secret = self._settings.app_secret_key.get_secret_value()
+
+        def _persist() -> None:
+            self._repository.add_visual_challenge(
+                VisualChallenge(
+                    token_hash=keyed_hash(token, secret=secret),
+                    phone_e164=phone_e164,
+                    purpose=purpose,
+                    prompt=prompt,
+                    answer_hash=keyed_hash(answer, secret=secret),
+                    expires_at=now + timedelta(seconds=120),
+                    attempts=0,
+                    max_attempts=5,
+                )
+            )
+
+        try:
+            run_owned_transaction(self._session, _persist)
+        except SQLAlchemyError as exc:
+            raise AppError(
+                code=ErrorCode.INTERNAL_ERROR,
+                message="Challenge could not be stored",
+                status_code=500,
+            ) from exc
+        return VisualChallengeData(
+            challenge_id=token, prompt=prompt, expires_in=120
+        )
+
+    def send_sms(
+        self,
+        *,
+        phone: str,
+        purpose: str,
+        request_id: str,
+        challenge_id: str,
+        challenge_answer: str,
+    ) -> SmsSendData:
+        phone_e164 = self._require_phone(phone)
+        if purpose not in {"login", "reset"}:
+            raise AppError(
+                code=AuthErrorCode.INVALID_PHONE,
+                message="Unsupported SMS purpose",
+                status_code=422,
+            )
+        if not challenge_id or not challenge_answer:
+            raise AppError(
+                code=AuthErrorCode.CHALLENGE_REQUIRED,
+                message="A visual challenge is required",
+                status_code=401,
             )
         send_key = f"sms:send:{phone_e164}:{purpose}"
         if not self._limiter.hit(
@@ -95,8 +177,17 @@ class CredentialAuthService:
         now = self._clock()
         expires = now + timedelta(seconds=self._settings.sms_otp_ttl_seconds)
         secret = self._settings.app_secret_key.get_secret_value()
+        challenge_status = {"value": "ok"}
 
         def _persist() -> None:
+            challenge_status["value"] = self._consume_visual_challenge(
+                challenge_id=challenge_id,
+                answer=challenge_answer,
+                phone_e164=phone_e164,
+                purpose=purpose,
+            )
+            if challenge_status["value"] != "ok":
+                return
             existing = self._repository.get_open_challenge(phone_e164, purpose)
             if existing is not None:
                 existing.consumed_at = now
@@ -119,6 +210,7 @@ class CredentialAuthService:
                 message="SMS challenge could not be stored",
                 status_code=500,
             ) from exc
+        self._raise_challenge(challenge_status["value"])
         try:
             sent = self._sms.send(phone_e164=phone_e164, purpose=purpose, code=code)
         except Exception as exc:
@@ -284,6 +376,7 @@ class CredentialAuthService:
                     message="Current password is incorrect",
                     status_code=401,
                 )
+            require_new_password(new_password)
             credential.password_hash = hash_password(new_password)
             credential.password_algo = "argon2id"
             self._revoke_sessions(user_id, reason="PASSWORD_CHANGE", request_id=request_id)
@@ -302,12 +395,13 @@ class CredentialAuthService:
         run_owned_transaction(self._session, _persist)
         return issued_box[0]
 
-    def reset_password(
-        self, *, phone: str, code: str, new_password: str, request_id: str
-    ) -> IssuedSession:
+    def verify_password_reset(
+        self, *, phone: str, code: str, request_id: str
+    ) -> str:
         phone_e164 = self._require_phone(phone)
         otp_status = {"value": "ok"}
-        issued_box: list[IssuedSession] = []
+        token_box: list[str] = []
+        secret = self._settings.app_secret_key.get_secret_value()
 
         def _persist() -> None:
             otp_status["value"] = self._apply_otp(phone_e164, purpose="reset", code=code)
@@ -315,17 +409,61 @@ class CredentialAuthService:
                 return
             phone_row = self._repository.get_active_phone(phone_e164)
             if phone_row is None:
-                raise AppError(
-                    code=AuthErrorCode.INVALID_CODE,
-                    message="Verification code is invalid or expired",
-                    status_code=401,
+                otp_status["value"] = "invalid"
+                return
+            raw = generate_invite_token()
+            now = self._clock()
+            self._repository.add_reset_ticket(
+                PasswordResetTicket(
+                    token_hash=keyed_hash(raw, secret=secret),
+                    user_id=phone_row.user_id,
+                    phone_e164=phone_e164,
+                    expires_at=now + timedelta(seconds=600),
                 )
-            credential = self._repository.get_password(phone_row.user_id)
+            )
+            token_box.append(raw)
+
+        run_owned_transaction(self._session, _persist)
+        self._raise_otp(otp_status["value"])
+        del request_id
+        return token_box[0]
+
+    def confirm_password_reset(
+        self,
+        *,
+        reset_token: str,
+        new_password: str,
+        confirm_password: str,
+        request_id: str,
+    ) -> None:
+        if new_password != confirm_password:
+            raise AppError(
+                code=AuthErrorCode.PASSWORD_MISMATCH,
+                message="New password confirmation does not match",
+                status_code=422,
+            )
+        require_new_password(new_password)
+        secret = self._settings.app_secret_key.get_secret_value()
+        token_hash = keyed_hash(reset_token, secret=secret)
+        status = {"value": "ok"}
+
+        def _persist() -> None:
+            ticket = self._repository.get_reset_ticket_for_update(token_hash)
+            now = self._clock()
+            if (
+                ticket is None
+                or ticket.consumed_at is not None
+                or ticket.expires_at <= now
+            ):
+                status["value"] = "invalid"
+                return
+            ticket.consumed_at = now
             hashed = hash_password(new_password)
+            credential = self._repository.get_password(ticket.user_id)
             if credential is None:
                 self._repository.add_password(
                     UserPassword(
-                        user_id=phone_row.user_id,
+                        user_id=ticket.user_id,
                         password_hash=hashed,
                         password_algo="argon2id",
                     )
@@ -334,25 +472,25 @@ class CredentialAuthService:
                 credential.password_hash = hashed
                 credential.password_algo = "argon2id"
             self._revoke_sessions(
-                phone_row.user_id, reason="PASSWORD_RESET", request_id=request_id
-            )
-            issued = self._issue_session(
-                user_id=phone_row.user_id, auth_method="password"
+                ticket.user_id, reason="PASSWORD_RESET", request_id=request_id
             )
             self._audit.append(
                 action=AuditAction.AUTH_PASSWORD_RESET,
                 resource_type=AuditResourceType.USER,
-                actor_user_id=phone_row.user_id,
-                resource_id=phone_row.user_id,
+                actor_user_id=ticket.user_id,
+                resource_id=ticket.user_id,
                 request_id=request_id,
                 scope_type=ScopeType.SYSTEM,
                 details={"auth_method": "password"},
             )
-            issued_box.append(issued)
 
         run_owned_transaction(self._session, _persist)
-        self._raise_otp(otp_status["value"])
-        return issued_box[0]
+        if status["value"] != "ok":
+            raise AppError(
+                code=AuthErrorCode.RESET_TOKEN_INVALID,
+                message="Reset credential is invalid or expired",
+                status_code=401,
+            )
 
     def refresh(self, *, refresh_token: str, request_id: str) -> IssuedSession:
         issued_box: list[IssuedSession] = []
@@ -536,6 +674,52 @@ class CredentialAuthService:
             return "invalid"
         challenge.consumed_at = now
         return "ok"
+
+    def _consume_visual_challenge(
+        self,
+        *,
+        challenge_id: str,
+        answer: str,
+        phone_e164: str,
+        purpose: str,
+    ) -> str:
+        secret = self._settings.app_secret_key.get_secret_value()
+        record = self._repository.get_visual_challenge_for_update(
+            keyed_hash(challenge_id, secret=secret)
+        )
+        now = self._clock()
+        if record is None:
+            return "invalid"
+        if (
+            record.phone_e164 != phone_e164
+            or record.purpose != purpose
+            or record.consumed_at is not None
+        ):
+            return "invalid"
+        if record.expires_at <= now:
+            record.consumed_at = now
+            return "expired"
+        if record.attempts >= record.max_attempts:
+            record.consumed_at = now
+            return "exhausted"
+        expected = keyed_hash(answer.strip(), secret=secret)
+        if expected != record.answer_hash:
+            record.attempts += 1
+            if record.attempts >= record.max_attempts:
+                record.consumed_at = now
+            return "invalid"
+        record.consumed_at = now
+        return "ok"
+
+    @staticmethod
+    def _raise_challenge(status: str) -> None:
+        if status == "ok":
+            return
+        raise AppError(
+            code=AuthErrorCode.CHALLENGE_INVALID,
+            message="Visual challenge is invalid or expired",
+            status_code=401,
+        )
 
     @staticmethod
     def _raise_otp(status: str) -> None:

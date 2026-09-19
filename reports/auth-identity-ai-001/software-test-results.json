@@ -1,21 +1,65 @@
 {
   "task_id": "AUTH-IDENTITY-AI-001",
-  "head_at_test": "38d3d09 plus uncommitted software; Codex review 3 NEEDS_CHANGES last findings applied without a 4th review",
+  "head_at_test": "14c0e192fe0835c2b18dfce73fe200d0655b38d1 plus uncommitted login/0009 isolated follow-up",
+  "calendar": {
+    "work_started": "2026-09-15",
+    "operator_day5_confirmed": "2026-09-18",
+    "today": "2026-09-19",
+    "week_aim": "2026-09-21"
+  },
   "unit": {
     "command": "pytest tests/unit -q",
-    "passed": 315,
+    "passed": 318,
     "failed": 0,
     "skipped": 0,
-    "environment": "host .venv Python 3.12.10, no live vendors"
+    "environment": "host .venv Python 3.12, no live vendors"
   },
-  "focused_integration": {
-    "command": "pytest tests/integration/test_day4_wechat_bind.py tests/integration/test_auth_runtime.py tests/integration/test_house_catalog_runtime.py tests/integration/test_auth_identity_dispatch_migration.py tests/integration/test_official_auth_runtime.py tests/integration/test_knowledge_runtime.py::test_wechat_login_issues_token_and_audit tests/integration/test_day3_prodlike_e2e.py tests/integration/test_employee_runtime.py",
-    "passed": 38,
-    "skipped": 2,
+  "shared_property_ai_test": {
+    "host_port_database": "127.0.0.1:3307/property_ai_test",
+    "alembic_revision": "20260917_0007",
+    "auth_tables": "absent (asserted, not skip-as-PASS)",
+    "command": "pytest tests/integration/test_migrations.py tests/integration/test_official_auth_runtime.py tests/integration/test_auth_identity_dispatch_migration.py -q",
+    "result": "included in 31 passed focused run with unit auth tests"
+  },
+  "isolated_0009_runtime": {
+    "host_port_database": "127.0.0.1:3307/property_ai_auth001_test",
+    "alembic_revision": "20260919_0009",
+    "command": "python scripts/ops/provision_auth001_isolated_db.py",
+    "pytest": "tests/integration/test_isolated_auth_runtime.py",
+    "passed": 6,
     "failed": 0,
-    "note": "0009 runtime tests skipped until disposable TEST_DATABASE_URL upgrade is approved"
+    "skipped": 0,
+    "note": "0007 synthetic user preserved; challenge/OTP/reset/session revoke exercised against real MySQL"
   },
+  "isolated_live_api": {
+    "base": "http://127.0.0.1:8083/api/v1",
+    "does_not_replace": "http://127.0.0.1:8082/api/v1",
+    "healthz": 200,
+    "challenge": 200,
+    "wrong_challenge_send": {"status": 401, "code": "AUTH.CHALLENGE_INVALID"},
+    "screenshots": "NOT_RUN"
+  },
+  "development_sms": "software-process inbox only; not real SMS acceptance",
   "live_providers": "NOT_RUN",
   "persistent_db_migrate": "NOT_RUN",
-  "not_claimed": ["formal credential acceptance", "real SMS", "real AI", "Production V1", "Day 4 PASS"]
+  "miniprogram_devtools": {
+    "status": "PARTIAL",
+    "ws": "ws://127.0.0.1:9420",
+    "screenshots": {
+      "login-password.png": "default password form; one 登录; 忘记密码/验证码登录; WeChat secondary; no Seed buttons",
+      "login-sms.png": "SMS replaces password; 获取验证码; 密码登录; no Seed buttons",
+      "password-reset.png": "NOT_RUN (automator timeout after SMS screenshot)"
+    },
+    "seed_buttons_on_ordinary_login": false,
+    "note": "Structural visual evidence only. Not formal credential/real-SMS PASS."
+  },
+  "not_claimed": [
+    "formal credential acceptance",
+    "real SMS",
+    "real WeChat",
+    "real AI",
+    "Production V1",
+    "Day 4 PASS",
+    "WeChat DevTools login screenshot"
+  ]
 }

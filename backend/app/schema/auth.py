@@ -40,6 +40,21 @@ class SmsSendRequest(BaseModel):
 
     phone: str = Field(min_length=8, max_length=20)
     purpose: Literal["login", "reset"] = "login"
+    challenge_id: str = Field(min_length=8, max_length=128)
+    challenge_answer: str = Field(min_length=1, max_length=16)
+
+
+class VisualChallengeRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    phone: str = Field(min_length=8, max_length=20)
+    purpose: Literal["login", "reset"] = "login"
+
+
+class VisualChallengeData(BaseModel):
+    challenge_id: str
+    prompt: str
+    expires_in: int
 
 
 class SmsSendData(BaseModel):
@@ -60,22 +75,34 @@ class PasswordLoginRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     phone: str = Field(min_length=8, max_length=20)
-    password: str = Field(min_length=8, max_length=128)
+    password: str = Field(min_length=1, max_length=128)
 
 
 class PasswordChangeRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    old_password: str = Field(min_length=8, max_length=128)
-    new_password: str = Field(min_length=8, max_length=128)
+    old_password: str = Field(min_length=1, max_length=128)
+    new_password: str = Field(min_length=1, max_length=128)
 
 
-class PasswordResetRequest(BaseModel):
+class PasswordResetVerifyRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     phone: str = Field(min_length=8, max_length=20)
     code: str = Field(min_length=4, max_length=8)
-    new_password: str = Field(min_length=8, max_length=128)
+
+
+class PasswordResetVerifyData(BaseModel):
+    reset_token: str
+    expires_in: int
+
+
+class PasswordResetConfirmRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    reset_token: str = Field(min_length=16, max_length=256)
+    new_password: str = Field(min_length=1, max_length=128)
+    confirm_password: str = Field(min_length=1, max_length=128)
 
 
 class TokenRefreshRequest(BaseModel):

@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/login/login",
+    "pages/password-reset/password-reset",
     "pages/home/home",
     "pages/profile/profile",
     "pages/work-orders/create",
@@ -19,7 +20,8 @@
     "pages/supervisor/announcements",
     "pages/supervisor/bindings",
     "pages/supervisor/staff",
-    "pages/notifications/list"
+    "pages/notifications/list",
+    "pages/dev-login/dev-login"
   ],
   "window": {
     "navigationBarTitleText": "智慧物业",

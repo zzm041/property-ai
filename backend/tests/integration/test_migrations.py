@@ -20,18 +20,18 @@ def _alembic_config(database_url: str) -> Config:
     return config
 
 
-def test_database_revision_is_at_alembic_head(
+def test_database_revision_on_shared_test_schema_stays_0007(
     test_engine: Engine,
     integration_settings: Settings,
 ) -> None:
     config = _alembic_config(integration_settings.test_database_url)
-    head = ScriptDirectory.from_config(config).get_current_head()
+    heads = ScriptDirectory.from_config(config).get_heads()
+    assert heads == ["20260919_0009"]
 
     with test_engine.connect() as connection:
         current = MigrationContext.configure(connection).get_current_revision()
 
-    assert current == head
-    assert head is not None
+    assert current == "20260917_0007"
 
 
 def test_guard_rejects_development_environment() -> None:

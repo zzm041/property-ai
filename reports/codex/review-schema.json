@@ -11,7 +11,12 @@
     "actions_or_findings",
     "evidence_paths",
     "unverified",
-    "session_note"
+    "session_note",
+    "task_result",
+    "product_gap_changes",
+    "schedule_risk",
+    "next_action",
+    "approval_requests"
   ],
   "properties": {
     "task_id": { "type": "string" },
@@ -43,6 +48,17 @@
       "type": "array",
       "items": { "type": "string" }
     },
-    "session_note": { "type": "string" }
+    "session_note": { "type": "string" },
+    "task_result": { "type": "string" },
+    "product_gap_changes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "schedule_risk": { "type": "string" },
+    "next_action": { "type": "string" },
+    "approval_requests": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
   }
 }

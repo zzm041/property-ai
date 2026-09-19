@@ -1,0 +1,16 @@
+<view class="card">
+  <view>本地调试入口</view>
+  <view class="empty">非正式用户路径。发布构建不可用。</view>
+</view>
+<view class="card" wx:if="{{allowed}}">
+  <button
+    class="btn"
+    wx:for="{{identities}}"
+    wx:key="seedKey"
+    data-seed="{{item.seedKey}}"
+    bindtap="loginLocal"
+    disabled="{{loading}}"
+  >{{item.label}}</button>
+</view>
+<view class="empty" wx:if="{{!allowed}}">当前环境不允许调试登录。</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>

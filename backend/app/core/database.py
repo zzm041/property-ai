@@ -12,6 +12,22 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import Settings, get_settings
 
+ISOLATED_AUTH_HOST = "127.0.0.1"
+ISOLATED_AUTH_PORT = 3307
+ISOLATED_AUTH_DATABASE = "property_ai_auth001_test"
+FORBIDDEN_AUTH_MIGRATE_DATABASES = frozenset(
+    {
+        "property_ai",
+        "property_ai_test",
+        "property_ai_day4",
+        "property_ai_restore_drill",
+        "mysql",
+        "sys",
+        "information_schema",
+        "performance_schema",
+    }
+)
+
 _engines: set[Engine] = set()
 _engines_lock = Lock()
 T = TypeVar("T")
@@ -234,6 +250,35 @@ def assert_disposable_test_database(
         raise RuntimeError("Test database must differ from the development database")
     if not parsed.database or "test" not in parsed.database.casefold():
         raise RuntimeError("Disposable database name must contain 'test'")
+
+
+def assert_isolated_auth_database(
+    settings: Settings,
+    *,
+    database_url: str | None = None,
+) -> None:
+    """Authorize AUTH-IDENTITY 0009 work only for the named exclusive test schema."""
+
+    candidate = database_url or settings.test_database_url
+    parsed = make_url(candidate)
+    _require_mysql_pymysql(parsed)
+    if settings.app_env != "test":
+        raise RuntimeError("Isolated auth migrate requires APP_ENV=test")
+    if not settings.allow_destructive_test_database:
+        raise RuntimeError(
+            "Isolated auth migrate requires ALLOW_DESTRUCTIVE_TEST_DATABASE=true"
+        )
+    target = _database_target(candidate)
+    if (parsed.database or "") in FORBIDDEN_AUTH_MIGRATE_DATABASES:
+        raise RuntimeError("Isolated auth migrate refuses a protected database")
+    expected = (ISOLATED_AUTH_HOST, ISOLATED_AUTH_PORT, ISOLATED_AUTH_DATABASE)
+    if target != expected:
+        raise RuntimeError(
+            "Isolated auth migrate must target "
+            f"{ISOLATED_AUTH_HOST}:{ISOLATED_AUTH_PORT}/{ISOLATED_AUTH_DATABASE}"
+        )
+    if _database_target(candidate) == _database_target(settings.database_url):
+        raise RuntimeError("Isolated auth database must differ from development")
 
 
 def dispose_database_engines() -> None:

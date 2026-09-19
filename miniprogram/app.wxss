@@ -25,3 +25,19 @@ page {
   color: #667085;
   margin: 16rpx 24rpx;
 }
+
+.password-row {
+  display: flex;
+  align-items: center;
+}
+
+.grow {
+  flex: 1;
+}
+
+.link {
+  margin: 0 8rpx;
+  font-size: 24rpx;
+  background: transparent;
+  color: #1f4b99;
+}

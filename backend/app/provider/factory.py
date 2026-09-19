@@ -24,7 +24,7 @@ from app.provider.storage import (
 )
 from app.provider.vector import MilvusKnowledgeStore
 from app.provider.vision import DevelopmentVLMProvider, QwenVLMProvider, VLMProvider
-from app.provider.sms import DevelopmentSmsProvider, SmsProvider
+from app.provider.sms import SmsProvider, development_sms_inbox
 from app.provider.wechat import (
     DevelopmentWeChatAuthProvider,
     ProductionWeChatAuthProvider,
@@ -113,8 +113,9 @@ def build_reranker_provider(settings: Settings) -> RerankerProvider:
 
 
 def build_sms_provider(settings: Settings) -> SmsProvider:
-    del settings
-    return DevelopmentSmsProvider()
+    if settings.sms_provider == "development":
+        return development_sms_inbox()
+    raise RuntimeError("Production SMS provider is not implemented")
 
 
 def build_wechat_auth_provider(settings: Settings) -> WeChatAuthProvider:

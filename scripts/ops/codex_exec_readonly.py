@@ -27,7 +27,11 @@ def main() -> int:
     out_path = Path(args.out)
     log_path = Path(args.log)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    prompt = prompt_path.read_text(encoding="utf-8")
+    preamble = (REPO / "reports" / "codex" / "context-preamble.txt").read_text(
+        encoding="utf-8"
+    )
+    task_prompt = prompt_path.read_text(encoding="utf-8")
+    prompt = preamble.rstrip() + "\n\n" + task_prompt.lstrip()
     command = [
         CODEX,
         "exec",

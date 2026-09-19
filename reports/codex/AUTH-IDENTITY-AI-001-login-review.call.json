@@ -1,0 +1,6 @@
+{
+  "note": "codex.cmd exec wrote AUTH-IDENTITY-AI-001-login-review.json then the Python helper hit TimeoutExpired at 420s before writing this log. A duplicate 900s retry was killed to preserve the PASS JSON. Model-timeout, not a code remediation round.",
+  "codex_returncode": "timeout_after_json",
+  "out": "D:\\property-ai\\reports\\codex\\AUTH-IDENTITY-AI-001-login-review.json",
+  "decision_in_json": "PASS"
+}

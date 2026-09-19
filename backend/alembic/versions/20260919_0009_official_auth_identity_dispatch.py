@@ -28,7 +28,17 @@ _TABLE_KW = {
 }
 
 
+def _require_isolated_auth_schema() -> None:
+    name = op.get_bind().execute(sa.text("SELECT DATABASE()")).scalar()
+    if name != "property_ai_auth001_test":
+        raise RuntimeError(
+            "Migration 20260919_0009 may only apply to property_ai_auth001_test, "
+            f"not {name!r}"
+        )
+
+
 def upgrade() -> None:
+    _require_isolated_auth_schema()
     op.add_column(
         "users",
         sa.Column("profile_completed_at", mysql.DATETIME(fsp=6), nullable=True),
@@ -209,6 +219,71 @@ def upgrade() -> None:
     op.create_index("ix_auth_sessions_user_id", "auth_sessions", ["user_id", "id"])
 
     op.create_table(
+        "visual_challenges",
+        sa.Column("token_hash", sa.String(length=128), nullable=False),
+        sa.Column("phone_e164", sa.String(length=16), nullable=False),
+        sa.Column("purpose", sa.String(length=32), nullable=False),
+        sa.Column("prompt", sa.String(length=64), nullable=False),
+        sa.Column("answer_hash", sa.String(length=128), nullable=False),
+        sa.Column("expires_at", mysql.DATETIME(fsp=6), nullable=False),
+        sa.Column("attempts", sa.Integer(), server_default=sa.text("0"), nullable=False),
+        sa.Column("max_attempts", sa.Integer(), server_default=sa.text("5"), nullable=False),
+        sa.Column("consumed_at", mysql.DATETIME(fsp=6), nullable=True),
+        sa.Column("id", sa.BigInteger(), autoincrement=True, nullable=False),
+        sa.Column(
+            "created_at",
+            mysql.DATETIME(fsp=6),
+            server_default=sa.text("CURRENT_TIMESTAMP(6)"),
+            nullable=False,
+        ),
+        sa.CheckConstraint(
+            "BINARY purpose IN ('login', 'reset')",
+            name="ck_visual_challenges_purpose",
+        ),
+        sa.PrimaryKeyConstraint("id", name="pk_visual_challenges"),
+        sa.UniqueConstraint("token_hash", name="uq_visual_challenges_token_hash"),
+        **_TABLE_KW,
+    )
+    op.create_index(
+        "ix_visual_challenges_phone_purpose",
+        "visual_challenges",
+        ["phone_e164", "purpose", "id"],
+    )
+
+    op.create_table(
+        "password_reset_tickets",
+        sa.Column("token_hash", sa.String(length=128), nullable=False),
+        sa.Column("user_id", sa.BigInteger(), nullable=False),
+        sa.Column("phone_e164", sa.String(length=16), nullable=False),
+        sa.Column("expires_at", mysql.DATETIME(fsp=6), nullable=False),
+        sa.Column("consumed_at", mysql.DATETIME(fsp=6), nullable=True),
+        sa.Column("id", sa.BigInteger(), autoincrement=True, nullable=False),
+        sa.Column(
+            "created_at",
+            mysql.DATETIME(fsp=6),
+            server_default=sa.text("CURRENT_TIMESTAMP(6)"),
+            nullable=False,
+        ),
+        sa.ForeignKeyConstraint(
+            ["user_id"],
+            ["users.id"],
+            name="fk_password_reset_tickets_user_id_users",
+            onupdate="RESTRICT",
+            ondelete="RESTRICT",
+        ),
+        sa.PrimaryKeyConstraint("id", name="pk_password_reset_tickets"),
+        sa.UniqueConstraint(
+            "token_hash", name="uq_password_reset_tickets_token_hash"
+        ),
+        **_TABLE_KW,
+    )
+    op.create_index(
+        "ix_password_reset_tickets_user_id",
+        "password_reset_tickets",
+        ["user_id", "id"],
+    )
+
+    op.create_table(
         "employee_invites",
         sa.Column("employee_id", sa.BigInteger(), nullable=False),
         sa.Column("tenant_id", sa.BigInteger(), nullable=False),
@@ -333,6 +408,7 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    _require_isolated_auth_schema()
     op.drop_constraint("ck_ai_call_logs_provider_mode", "ai_call_logs", type_="check")
     op.drop_column("ai_call_logs", "provider_mode")
     op.drop_constraint(
@@ -355,6 +431,14 @@ def downgrade() -> None:
         nullable=False,
     )
     op.drop_table("employee_invites")
+    op.drop_index(
+        "ix_password_reset_tickets_user_id", table_name="password_reset_tickets"
+    )
+    op.drop_table("password_reset_tickets")
+    op.drop_index(
+        "ix_visual_challenges_phone_purpose", table_name="visual_challenges"
+    )
+    op.drop_table("visual_challenges")
     op.drop_index("ix_auth_sessions_user_id", table_name="auth_sessions")
     op.drop_table("auth_sessions")
     op.drop_index("ix_sms_challenges_phone_purpose", table_name="sms_challenges")

@@ -5,7 +5,15 @@ from datetime import datetime
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.model.identity import AuthSession, SmsChallenge, User, UserPassword, UserPhone
+from app.model.identity import (
+    AuthSession,
+    PasswordResetTicket,
+    SmsChallenge,
+    User,
+    UserPassword,
+    UserPhone,
+    VisualChallenge,
+)
 
 
 class CredentialRepository:
@@ -63,6 +71,30 @@ class CredentialRepository:
         self._session.add(record)
         self._session.flush()
         return record
+
+    def add_visual_challenge(self, record: VisualChallenge) -> VisualChallenge:
+        self._session.add(record)
+        self._session.flush()
+        return record
+
+    def get_visual_challenge_for_update(self, token_hash: str) -> VisualChallenge | None:
+        return self._session.scalar(
+            select(VisualChallenge)
+            .where(VisualChallenge.token_hash == token_hash)
+            .with_for_update()
+        )
+
+    def add_reset_ticket(self, record: PasswordResetTicket) -> PasswordResetTicket:
+        self._session.add(record)
+        self._session.flush()
+        return record
+
+    def get_reset_ticket_for_update(self, token_hash: str) -> PasswordResetTicket | None:
+        return self._session.scalar(
+            select(PasswordResetTicket)
+            .where(PasswordResetTicket.token_hash == token_hash)
+            .with_for_update()
+        )
 
     def add_session(self, record: AuthSession) -> AuthSession:
         self._session.add(record)

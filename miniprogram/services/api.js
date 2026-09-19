@@ -5,10 +5,13 @@ const { isUnauthorized, messageFromError } = require("../utils/error");
 const CREDENTIAL_AUTH_PATHS = {
   "/auth/wechat/login": true,
   "/auth/wechat/bind": true,
+  "/auth/challenge": true,
   "/auth/sms/send": true,
   "/auth/sms/login": true,
+  "/auth/sms/test-inbox": true,
   "/auth/password/login": true,
-  "/auth/password/reset": true,
+  "/auth/password/reset/verify": true,
+  "/auth/password/reset/confirm": true,
   "/auth/token/refresh": true,
   "/auth/dev/token": true,
   "/auth/logout": true,
@@ -199,17 +202,34 @@ module.exports = {
   registerAndUpload,
   wechatLogin: (code) => request({ path: "/auth/wechat/login", method: "POST", data: { code } }),
   wechatBind: (code) => request({ path: "/auth/wechat/bind", method: "POST", data: { code } }),
-  sendSms: (phone, purpose) =>
-    request({ path: "/auth/sms/send", method: "POST", data: { phone, purpose: purpose || "login" } }),
+  issueChallenge: (phone, purpose) =>
+    request({ path: "/auth/challenge", method: "POST", data: { phone, purpose: purpose || "login" } }),
+  sendSms: (phone, purpose, challengeId, challengeAnswer) =>
+    request({
+      path: "/auth/sms/send",
+      method: "POST",
+      data: {
+        phone,
+        purpose: purpose || "login",
+        challenge_id: challengeId,
+        challenge_answer: challengeAnswer,
+      },
+    }),
   smsLogin: (phone, code) =>
     request({ path: "/auth/sms/login", method: "POST", data: { phone, code } }),
   passwordLogin: (phone, password) =>
     request({ path: "/auth/password/login", method: "POST", data: { phone, password } }),
-  resetPassword: (phone, code, newPassword) =>
+  verifyPasswordReset: (phone, code) =>
+    request({ path: "/auth/password/reset/verify", method: "POST", data: { phone, code } }),
+  confirmPasswordReset: (resetToken, newPassword, confirmPassword) =>
     request({
-      path: "/auth/password/reset",
+      path: "/auth/password/reset/confirm",
       method: "POST",
-      data: { phone, code, new_password: newPassword },
+      data: {
+        reset_token: resetToken,
+        new_password: newPassword,
+        confirm_password: confirmPassword,
+      },
     }),
   refreshToken: (refreshToken) =>
     request({ path: "/auth/token/refresh", method: "POST", data: { refresh_token: refreshToken } }),

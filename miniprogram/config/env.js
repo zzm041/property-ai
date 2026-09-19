@@ -45,7 +45,7 @@ module.exports = {
   LOCAL_PREVIEW: localPreviewEnabled(),
   LOCAL_IDENTITIES: localIdentities(),
   PREVIEW_HOUSE_ID: localPreviewEnabled() ? localPreviewHouseId() : "",
-  PROVIDER_NOTE: "开发环境 · 外部 LLM/ASR/VLM/Embedding 为 Fake Provider，非正式微信登录",
+  ENV_NOTE: "测试环境 · 短信与模型为开发替身，非正式供应商",
 };
 
 function localPreviewHouseId() {

@@ -1,23 +1,21 @@
-"""Official auth runtime tests wait for disposable-DB approval of migration 0009."""
+"""Official auth runtime tests on shared property_ai_test must not skip-as-PASS."""
 
-import pytest
 from sqlalchemy import inspect
 from sqlalchemy.engine import Engine
 
 
-REQUIRED = ("user_phones", "user_passwords", "sms_challenges", "auth_sessions")
+REQUIRED = (
+    "user_phones",
+    "user_passwords",
+    "sms_challenges",
+    "visual_challenges",
+    "password_reset_tickets",
+    "auth_sessions",
+)
 
 
-@pytest.fixture
-def official_auth_tables(test_engine: Engine) -> None:
+def test_shared_test_database_does_not_host_0009_auth_tables(
+    test_engine: Engine,
+) -> None:
     missing = [name for name in REQUIRED if not inspect(test_engine).has_table(name)]
-    if missing:
-        pytest.skip(
-            "Migration 20260919_0009 is not applied on the disposable test database: "
-            + ", ".join(missing)
-        )
-
-
-def test_official_auth_schema_gate(official_auth_tables: None) -> None:
-    del official_auth_tables
-    assert True
+    assert missing == list(REQUIRED)

@@ -30,4 +30,7 @@ Page({
   back() {
     wx.navigateBack({ delta: 1 });
   },
+  goClaim() {
+    wx.navigateTo({ url: "/pages/employee-claim/employee-claim" });
+  },
 });

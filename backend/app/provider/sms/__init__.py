@@ -1,6 +1,6 @@
 """短信 Provider。Development 实现不得连真实运营商，且不得作为真实短信验收。"""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass(frozen=True, slots=True)
@@ -40,3 +40,10 @@ class DevelopmentSmsProvider(SmsProvider):
             if item["phone_e164"] == phone_e164 and item["purpose"] == purpose:
                 return item["code"]
         return None
+
+
+_DEVELOPMENT_SMS = DevelopmentSmsProvider()
+
+
+def development_sms_inbox() -> DevelopmentSmsProvider:
+    return _DEVELOPMENT_SMS

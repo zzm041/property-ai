@@ -9,13 +9,14 @@ Page({
     loading: false,
     error: "",
     providerNote: "",
+    envNote: "",
     lastWorkOrderId: "",
   },
   onShow() {
     const env = require("../../config/env");
     const auth = require("../../services/auth");
     this.setData({
-      providerNote: env.PROVIDER_NOTE,
+      envNote: env.ENV_NOTE,
       lastWorkOrderId: auth.getLastWorkOrderId(),
     });
     const api = require("../../services/api");

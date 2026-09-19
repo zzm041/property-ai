@@ -12,16 +12,16 @@ Page({
   data: {
     error: "",
     loading: false,
-    localPreview: false,
-    identities: [],
-    baseUrl: "",
-    providerNote: "",
+    envNote: "",
     phone: "",
-    smsCode: "",
+    mode: "password",
     password: "",
-    showReset: false,
-    resetCode: "",
-    newPassword: "",
+    showPassword: false,
+    smsCode: "",
+    challengePrompt: "",
+    challengeId: "",
+    challengeAnswer: "",
+    cooldown: 0,
   },
   onLoad() {
     const auth = require("../../services/auth");
@@ -29,48 +29,120 @@ Page({
       wx.reLaunch({ url: "/pages/home/home" });
       return;
     }
-    this.setData({
-      localPreview: env.LOCAL_PREVIEW,
-      identities: env.LOCAL_IDENTITIES,
-      baseUrl: env.BASE_URL || "未配置",
-      providerNote: env.PROVIDER_NOTE,
-    });
+    this.setData({ envNote: env.ENV_NOTE || "" });
+  },
+  onUnload() {
+    if (this._timer) {
+      clearInterval(this._timer);
+    }
   },
   onPhone(e) {
-    this.setData({ phone: e.detail.value });
-  },
-  onSmsCode(e) {
-    this.setData({ smsCode: e.detail.value });
+    const phone = e.detail.value;
+    if (phone !== this.data.phone) {
+      this.setData({
+        phone,
+        smsCode: "",
+        challengePrompt: "",
+        challengeId: "",
+        challengeAnswer: "",
+        error: "",
+      });
+    }
   },
   onPassword(e) {
     this.setData({ password: e.detail.value });
   },
-  onResetCode(e) {
-    this.setData({ resetCode: e.detail.value });
+  onSmsCode(e) {
+    this.setData({ smsCode: e.detail.value });
   },
-  onNewPassword(e) {
-    this.setData({ newPassword: e.detail.value });
+  onChallengeAnswer(e) {
+    this.setData({ challengeAnswer: e.detail.value });
   },
-  toggleReset() {
-    this.setData({ showReset: !this.data.showReset });
+  togglePassword() {
+    this.setData({ showPassword: !this.data.showPassword });
+  },
+  toggleMode() {
+    const next = this.data.mode === "password" ? "sms" : "password";
+    this.setData({
+      mode: next,
+      password: "",
+      smsCode: "",
+      challengePrompt: "",
+      challengeId: "",
+      challengeAnswer: "",
+      error: "",
+      showPassword: false,
+    });
+  },
+  goReset() {
+    const phone = this.data.phone ? `?phone=${encodeURIComponent(this.data.phone)}` : "";
+    wx.navigateTo({ url: `/pages/password-reset/password-reset${phone}` });
   },
   async afterLogin() {
     const api = require("../../services/api");
     getApp().globalData.me = await api.me();
     wx.reLaunch({ url: "/pages/home/home" });
   },
+  startCooldown(seconds) {
+    if (this._timer) {
+      clearInterval(this._timer);
+    }
+    let left = seconds;
+    this.setData({ cooldown: left });
+    this._timer = setInterval(() => {
+      left -= 1;
+      if (left <= 0) {
+        clearInterval(this._timer);
+        this.setData({ cooldown: 0 });
+        return;
+      }
+      this.setData({ cooldown: left });
+    }, 1000);
+  },
+  async ensureChallenge() {
+    const api = require("../../services/api");
+    if (this.data.challengeId && this.data.challengePrompt) {
+      return;
+    }
+    const data = await api.issueChallenge(this.data.phone, "login");
+    this.setData({
+      challengeId: data.challenge_id,
+      challengePrompt: data.prompt,
+      challengeAnswer: "",
+    });
+  },
   sendSms() {
     const { withLoading } = require("../../utils/ui");
-    withLoading(this, () =>
-      require("../../services/api")
-        .sendSms(this.data.phone, "login")
-        .then((data) => {
-          const note = data && data.delivery_channel === "development"
-            ? "验证码已由开发短信替身发送，不能作为真实短信验收。"
-            : "验证码已发送";
-          this.setData({ error: note });
-        })
-    ).catch(() => {});
+    withLoading(this, async () => {
+      await this.ensureChallenge();
+      if (!this.data.challengeAnswer) {
+        this.setData({ error: "请先完成安全挑战" });
+        return;
+      }
+      const data = await require("../../services/api").sendSms(
+        this.data.phone,
+        "login",
+        this.data.challengeId,
+        this.data.challengeAnswer
+      );
+      this.setData({
+        challengeId: "",
+        challengePrompt: "",
+        challengeAnswer: "",
+        error:
+          data && data.delivery_channel === "development"
+            ? "验证码已由开发短信替身发送，非正式短信验收。"
+            : "验证码已发送",
+      });
+      this.startCooldown(data && data.expires_in ? Math.min(60, data.expires_in) : 60);
+    }).catch(() => {});
+  },
+  submit() {
+    if (this.data.mode === "password") {
+      this.loginPassword();
+      return;
+    }
+    this.loginSms();
   },
   loginSms() {
     const { withLoading } = require("../../utils/ui");
@@ -94,24 +166,6 @@ Page({
       await this.afterLogin();
     }).catch(() => {});
   },
-  sendResetSms() {
-    const { withLoading } = require("../../utils/ui");
-    withLoading(this, () =>
-      require("../../services/api").sendSms(this.data.phone, "reset")
-    ).catch(() => {});
-  },
-  resetPassword() {
-    const { withLoading } = require("../../utils/ui");
-    withLoading(this, async () => {
-      const token = await require("../../services/api").resetPassword(
-        this.data.phone,
-        this.data.resetCode,
-        this.data.newPassword
-      );
-      applySession(token);
-      await this.afterLogin();
-    }).catch(() => {});
-  },
   async loginWechat() {
     const { withLoading } = require("../../utils/ui");
     withLoading(this, async () => {
@@ -119,22 +173,6 @@ Page({
       const api = require("../../services/api");
       const code = await auth.login();
       const token = await api.wechatLogin(code);
-      applySession(token);
-      await this.afterLogin();
-    }).catch(() => {});
-  },
-  loginLocal(event) {
-    const seedKey = event.currentTarget.dataset.seed;
-    if (!seedKey || !env.LOCAL_PREVIEW) {
-      this.setData({ error: "本地联调登录未启用" });
-      return;
-    }
-    const { withLoading } = require("../../utils/ui");
-    withLoading(this, async () => {
-      const auth = require("../../services/auth");
-      const api = require("../../services/api");
-      auth.clearSession();
-      const token = await api.devToken(seedKey);
       applySession(token);
       await this.afterLogin();
     }).catch(() => {});

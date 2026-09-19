@@ -1,17 +1,13 @@
-<view class="card" wx:if="{{providerNote}}">{{providerNote}}</view>
+<view class="card" wx:if="{{envNote}}">{{envNote}}</view>
 <view class="loading" wx:if="{{loading}}">加载中...</view>
 <view class="card" wx:if="{{me}}">
   <view>{{me.display_name}}</view>
-  <view>角色：{{me.roles}}</view>
-  <view class="empty" wx:if="{{propertyId}}">当前小区 {{propertyId}}</view>
 </view>
 <view class="card">
-  <button class="btn" data-url="/pages/profile/profile" bindtap="go">账号资料</button>
+  <button class="btn" data-url="/pages/profile/profile" bindtap="go">账号与安全</button>
   <button class="btn" data-url="/pages/houses/houses" bindtap="go">房屋选择 / 绑定</button>
-  <button class="btn" data-url="/pages/employee-claim/employee-claim" bindtap="go">员工邀请认领</button>
 </view>
 <view class="card" wx:if="{{canResident}}">
-  <button class="btn" data-url="/pages/houses/houses" bindtap="go">已绑定房屋报修入口</button>
   <button class="btn" data-url="/pages/work-orders/create" bindtap="go">报修</button>
   <button class="btn" data-url="/pages/work-orders/list" bindtap="go">我的工单</button>
   <button class="btn" data-url="/pages/announcements/list" bindtap="go">公告</button>
@@ -29,7 +25,7 @@
   <button class="btn" data-url="/pages/supervisor/staff" bindtap="go">员工状态</button>
 </view>
 <button class="btn" data-url="/pages/notifications/list" bindtap="go">通知</button>
-<button class="btn" wx:if="{{lastWorkOrderId}}" bindtap="openLast">最近工单 {{lastWorkOrderId}}</button>
+<button class="btn" wx:if="{{lastWorkOrderId}}" bindtap="openLast">最近工单</button>
 <button class="btn" bindtap="logout">退出登录</button>
 <button class="btn" bindtap="retry">重试</button>
 <view class="error" wx:if="{{error}}">{{error}}</view>

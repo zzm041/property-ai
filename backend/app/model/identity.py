@@ -55,6 +55,10 @@ class User(BigIntPrimaryKeyMixin, TimestampMixin, Base):
         server_default=text("'ACTIVE'"),
     )
     display_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    profile_completed_at: Mapped[datetime | None] = mapped_column(
+        UTCDateTime(),
+        nullable=True,
+    )
 
 
 class Role(BigIntPrimaryKeyMixin, TimestampMixin, Base):
@@ -524,3 +528,57 @@ class AuthSession(BigIntPrimaryKeyMixin, TimestampMixin, Base):
     expires_at: Mapped[datetime] = mapped_column(UTCDateTime(), nullable=False)
     revoked_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
     replaced_by_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+
+
+class VisualChallenge(BigIntPrimaryKeyMixin, Base):
+    __tablename__ = "visual_challenges"
+    __table_args__ = (
+        CheckConstraint(
+            "BINARY purpose IN ('login', 'reset')",
+            name="purpose",
+        ),
+        CheckConstraint("attempts >= 0", name="attempts_non_negative"),
+        UniqueConstraint("token_hash", name="uq_visual_challenges_token_hash"),
+        Index("ix_visual_challenges_phone_purpose", "phone_e164", "purpose", "id"),
+        MYSQL_TABLE_OPTIONS,
+    )
+
+    token_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    phone_e164: Mapped[str] = mapped_column(String(16), nullable=False)
+    purpose: Mapped[str] = mapped_column(String(32), nullable=False)
+    prompt: Mapped[str] = mapped_column(String(64), nullable=False)
+    answer_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(UTCDateTime(), nullable=False)
+    attempts: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default=text("0")
+    )
+    max_attempts: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=5, server_default=text("5")
+    )
+    consumed_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
+    created_at: Mapped[datetime] = _created_at_column()
+
+
+class PasswordResetTicket(BigIntPrimaryKeyMixin, Base):
+    __tablename__ = "password_reset_tickets"
+    __table_args__ = (
+        UniqueConstraint("token_hash", name="uq_password_reset_tickets_token_hash"),
+        Index("ix_password_reset_tickets_user_id", "user_id", "id"),
+        MYSQL_TABLE_OPTIONS,
+    )
+
+    token_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    user_id: Mapped[int] = mapped_column(
+        BigInteger,
+        ForeignKey(
+            "users.id",
+            name="fk_password_reset_tickets_user_id_users",
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+        ),
+        nullable=False,
+    )
+    phone_e164: Mapped[str] = mapped_column(String(16), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(UTCDateTime(), nullable=False)
+    consumed_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
+    created_at: Mapped[datetime] = _created_at_column()

@@ -39,6 +39,9 @@ _REDACT_TOKENS = (
     "database_url",
     "broker_url",
     "celery_broker",
+    "challenge_answer",
+    "reset_token",
+    "captcha",
 )
 _BEARER_RE = re.compile(r"bearer\s+[A-Za-z0-9._\-+=/]+", re.I)
 _JWT_RE = re.compile(r"eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}")

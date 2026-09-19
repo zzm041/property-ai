@@ -5,19 +5,21 @@ Updated for Cursor + Codex CLI collaboration. Not a full-repo audit. Not Product
 | Item | Current fact |
 | --- | --- |
 | Repo | `D:\property-ai` |
-| HEAD | `38d3d09bf2e27154c4d106403cbfa9619026755a` — BATCH-002 evidence. Parent `bc429d3` queue paging. Do not revert. |
-| Working tree | pre-existing `miniprogram/project.config.json` plus AUTH-IDENTITY-AI-001 software (uncommitted until WIP). Do not stage the AppID file |
+| HEAD | `14c0e192fe0835c2b18dfce73fe200d0655b38d1` — official SMS/password software. Parent `38d3d09`. Do not revert. Working tree has AUTH-IDENTITY-AI-001 login/0009 isolated follow-up (uncommitted). |
+| Calendar | Spec/git work started **2026-09-15**. Operator last confirmed actual development **day 5 on 2026-09-18**. **Today is 2026-09-19** (do not rewrite as “still day 5 with two days left”). Original one-week aim ≈ **2026-09-21**. Full Production V1 cannot meet that date without deleting frozen features; do not delete features or relabel Fake as delivery. |
+| Working tree | pre-existing `miniprogram/project.config.json` plus AUTH-IDENTITY-AI-001-B. Do not stage the AppID file |
 | That file SHA-256 | `342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F`. Keep as-is. Do not stage, revert, or overwrite |
 | That file meaning | operator AppID `wxcfa5fd7dc03cac56` and DevTools compile settings |
-| Implementer pytest history | 577 passed, 2 skipped (Day 4 focused-fix). Historical only; not this-task evidence |
-| Local API | `http://127.0.0.1:8082/api/v1` (Day 4 Nginx, Fake providers, DevAuth). Do not treat as formal auth/AI |
+| Implementer pytest | host `.venv` unit **318 passed**. Isolated 0009 runtime **6 passed** on `property_ai_auth001_test`. Shared `property_ai_test` remains **0007** (auth tables absent; not claimed as auth PASS). Historical 577/2 is not this-task evidence |
+| Local API | Day4 Nginx `http://127.0.0.1:8082/api/v1` (Fake/DevAuth) **unchanged**. Isolated auth API `http://127.0.0.1:8083/api/v1` → `127.0.0.1:3307/property_ai_auth001_test` @ `20260919_0009` |
 | Mini program import | `D:\property-ai\miniprogram` |
-| Dev Seed login | `POST /auth/dev/token` seed_key. Formal user path must stop using this. Backend must not mount/accept DevAuth when `APP_ENV` is staging/production (`dev_auth_enabled` already rejected there) |
-| Codex CLI | `codex.cmd` 0.155.1, ChatGPT login. Reviewer only. Existing helper `scripts/ops/codex_exec_readonly.py` |
-| VIS batches | MP-LOCAL-VIS-001 and MP-LOCAL-BATCH-002 (VIS-002/003/004) **page-business vis PASS**. Retain evidence. **Not** formal credential auth, **not** real AI, **not** Production V1. Do not redo unless related product code changes |
-| Current task | AUTH-IDENTITY-AI-001 software. Codex reviews 1–3 NEEDS_CHANGES; 3-round cap reached, no 4th review. Last findings applied locally. Not formal auth/real-AI/Production V1 PASS |
-| Alembic | Heads at `20260917_0007`. Files 0001–0007 frozen. **0008 reserved** for outbox/claim — do not occupy. New identity tables must be a later revision (proposed `0009` revising `0007`). Do not create multiple heads |
-| Persistent DB | Do not migrate/wipe `property_ai` or `property_ai_day4`. Do not recreate shared tmpfs `mysql-test`. Persistent migrate + frozen dep upgrades wait one explicit approval |
+| Dev Seed login | Isolated `pages/dev-login` + `LOCAL_PREVIEW` only. Ordinary login has no Seed buttons and does not call `/auth/dev/token` |
+| Codex CLI | `codex.cmd` 0.155.1. Delivery owner + independent reviewer. Helper `scripts/ops/codex_exec_readonly.py` prepends `reports/codex/context-preamble.txt`. Schema requires `task_result` / `product_gap_changes` / `schedule_risk` / `next_action` / `approval_requests` |
+| VIS batches | MP-LOCAL-VIS-001 and MP-LOCAL-BATCH-002 **page-business vis only**. **Not** formal credential auth, **not** real AI, **not** Production V1 |
+| Current task | AUTH-IDENTITY-AI-001-B: single-form login + isolated 0009 runtime. Reviews 1–3 remain NEEDS_CHANGES historically; one allowed closed-loop of the last three remediations is in this follow-up review. Not formal SMS/real-AI/Production V1 PASS |
+| Alembic | Script heads `20260919_0009` revising `20260917_0007`. **0008 reserved** outbox/claim. `property_ai` / `property_ai_test` / `property_ai_day4` **not** upgraded. Exclusive `property_ai_auth001_test` is at `20260919_0009`. Future 0008 must revise 0009 (or retarget 0009 if 0008 lands first). Never sibling heads |
+| Persistent DB | Do not migrate/wipe `property_ai` or `property_ai_day4`. Do not recreate shared tmpfs `mysql-test`. Isolated 0009 used docker exec CREATE/GRANT on **only** `property_ai_auth001_test` |
+| Password policy (interim, not V1 acceptance) | New/reset passwords: ≥8 chars, not all-digit, not all-lowercase-alpha; case-sensitive; no silent truncate. Login of existing hashes does **not** apply this policy. Pending operator: longer minimum? mandatory character classes? |
 | learning/ | Not a design source |
 
 `env.local.js` and `project.private.config.json` stay gitignored. Do not export secrets, tokens, or `.env`.
@@ -37,19 +39,19 @@ Frozen username rule: PRD/API 为 **手机号 + 密码**。`users.display_name` 
 
 | 功能 | 正式需求 | 当前代码/API/页面 | 测试证据 | 状态 |
 | --- | --- | --- | --- | --- |
-| 统一 User | 一人一号；稳定 `users.id`；角色挂同一 User | 正式登录发同一 `user_id` JWT+`auth_sessions`。小程序统一登录页。Seed 仅 `LOCAL_PREVIEW` | 单测 314；正式运行时表等 0009 | 部分实现（软件已接；持久库未升 0009） |
-| 手机号+验证码 | `POST /auth/sms/send` + `/auth/sms/login`；TTL、一次性、重试、频控；码只存哈希 | 路由+`SmsChallenge` HMAC；失败先落库再 401；Redis Lua INCR+EXPIRE 失败关闭。DevelopmentSms 标记 `delivery_channel=development`。无万能码 | `test_official_auth_security.py`。运行时 skip 至 0009 | 部分实现。真实短信 **缺真实外部配置** |
-| 手机号+密码 | `POST /auth/password/login`；Argon2id | `UserPassword` Argon2id。错密同一错误文案 | 单测哈希/错密。运行时 0009 | 部分实现 |
-| 微信关联 | code 换 session；绑定同一 User；未证明不合并 | 未知 openid `AUTH.WECHAT_BIND_REQUIRED` 不建 User。已知绑定发 `AuthSession`+refresh。`POST /auth/wechat/bind` 仅 `sms`/`password` Principal | `test_day4_wechat_bind.py` BIND_REQUIRED；单测 bind 门禁 | 部分实现。正式 `jscode2session` **缺真实外部配置** |
-| 会话恢复 | 有效会话可恢复；无会话必须真实凭证 | refresh 旋转 + logout 作废。小程序 401 先 refresh 一次。无 token 走登录页，不再用角色选择认证 | 单测 refresh 客户端；运行时 0009 | 部分实现 |
-| 忘记密码 | `POST /auth/password/reset`；验证码重置；失效旧会话 | 已实现；登录页「忘记密码」。Development 短信标记非正式验收 | 单测 OTP 提交后再 raise。运行时 0009 | 部分实现 |
-| 改密 | `POST /auth/password/change` | 路由存在 | 运行时 0009 | 部分实现 |
+| 统一 User | 一人一号；稳定 `users.id`；角色挂同一 User | 正式登录发同一 `user_id` JWT+`auth_sessions`。普通登录无 Seed。调试仅 `pages/dev-login` | 单测 318；独占库 0009 运行时 6 passed | 部分实现（软件+独占库；持久库未升 0009） |
+| 手机号+验证码 | `POST /auth/challenge` 后 `POST /auth/sms/send`（服务端挑战）+ `/auth/sms/login`；码只存哈希；开发取码仅 test-inbox | 单表单验证码模式；切换保留手机号。无万能码。Development 非正式验收 | isolated 挑战错误/过期不发送；OTP 重用/过期拒绝 | 部分实现。真实短信 **缺真实外部配置** |
+| 手机号+密码 | `POST /auth/password/login`；Argon2id；显示/隐藏 | 默认密码表单；唯一主按钮「登录」 | isolated 正确密码登录；角色字段 422 | 部分实现 |
+| 微信关联 | code 换 session；绑定同一 User；未证明不合并 | 未知 openid 不建 User。登录页微信为次级按钮 | `test_day4_wechat_bind.py`；bind 401 不清会话 | 部分实现。正式 `jscode2session` **缺真实外部配置** |
+| 会话恢复 | 有效会话可恢复；无会话必须真实凭证 | 401：latestToken 重试再 `refreshInFlight`。重置后旧会话失效 | isolated 重置后 access/refresh 401 | 部分实现 |
+| 忘记密码 | 独立页：挑战→短信→一次性 reset_token→新密+确认→回登录，不自动登录 | `/auth/password/reset/verify` + `/confirm` | isolated 不一致/弱密/重用拒绝 | 部分实现 |
+| 改密 | `POST /auth/password/change`；新密 `require_new_password` | 路由存在 | 独占库未单列改密用例 | 部分实现 |
 | 换手机 | `POST /auth/phone/change` | 无 | 无 | 未实现（仍在 V1） |
 | 换微信 | `POST /auth/wechat/rebind` | 仅首次 bind；无 rebind | 无 | 未实现（仍在 V1） |
 | 受控合并 | preview + confirm；保留目标 user_id | 无 `AccountMerge`。未知微信不再静默建号 | 无 | 未实现（仍在 V1） |
 | 高风险恢复 | `POST /auth/recovery`；实名+活体；不存人脸 | 无 API。`provider/realname` 仍空 | 无 | 未实现。真实核验 **缺真实外部配置** |
 | Refresh/Logout | `/auth/token/refresh`；`/auth/logout` | 已实现 | 单测客户端重试。运行时 0009 | 部分实现 |
-| DevAuth 隔离 | 正式构建无测试身份；正式环境不接受 DevAuth | 后端 staging/production Settings 拒绝 `dev_auth_enabled`。登录页 Seed 仅 develop+`env.local.js`。正式路径走 `/auth/sms` `/auth/password`，不调用 `/auth/dev/token` | `test_dev_auth_disabled_*` | 部分实现（后端门禁+正式入口已拆。不能只靠前端隐藏作为生产证明） |
+| DevAuth 隔离 | 正式构建无测试身份；正式环境不接受 DevAuth | 普通登录无三个 Seed 按钮、无调试入口。`pages/dev-login` 仅 `LOCAL_PREVIEW`。正式路径不调用 `/auth/dev/token` | 登录 wxml 单测；`test_dev_auth_disabled_*` | 部分实现（发布包仍含页面文件；本轮不改 `project.config.json` packOptions） |
 | 密钥日志 | 失败不泄露密码/验证码/Token | 日志脱敏含 otp/sms_code | logging 单测 | 部分实现 |
 
 不得使用万能验证码验收。Development 短信替身必须明确标记，不能算真实短信验收。
@@ -104,8 +106,8 @@ Frozen username rule: PRD/API 为 **手机号 + 密码**。`users.display_name` 
 | 项 | 为何现在不能擅自做 | 建议 |
 | --- | --- | --- |
 | Alembic **0008** | 预留给 outbox/claim | 不占用。自动派单/账号表不要塞进 0008 |
-| 新 revision **0009**（草案已在仓库） | `20260919_0009` revises `0007`，不占 0008。表：`user_phones`/`user_passwords`/`sms_challenges`/`auth_sessions`/`employee_invites`；assignments source 列 SQL-only 未映射。换绑/合并/恢复表本轮未做 | **不对** `property_ai` / `property_ai_day4` upgrade。Codex schema 意见见 `reports/auth-identity-ai-001/schema-review.md` |
-| 对 disposable `TEST_DATABASE_URL` (3307) 执行 0009 | 正式认证运行时测试 skip。禁止重建共享 tmpfs mysql-test | **WAIT_HUMAN** |
+| 新 revision **0009** | `20260919_0009` revises `0007`；含 visual_challenges / password_reset_tickets；upgrade() 拒绝非 `property_ai_auth001_test` | **已**在独占库 0007 基线→0009。禁止对 `property_ai` / `property_ai_test` / `property_ai_day4` upgrade |
+| 对共享 `property_ai_test` 执行 0009 | 会改变共享集成库 | 仍 **WAIT_HUMAN**。Guard 拒绝该库 |
 | 对 day4/生产库 migrate | 持久联调数据 | 禁止直至单独批准 |
 | 冻结依赖 CVE pin | Day 4 未关闭项 | 等一次批准 |
 | 真实微信/短信/实名/LLM/VLM/ASR/Embedding | 凭证与费用 | 用户本地填写；有授权再有限联调 |
@@ -116,8 +118,9 @@ Frozen username rule: PRD/API 为 **手机号 + 密码**。`users.display_name` 
 ## This-phase execution
 
 1. Codex plan `AUTH-IDENTITY-AI-001` READY（`reports/codex/AUTH-IDENTITY-AI-001-plan.json`）。
-2. 独立软件已落地：正式登录 API/页、房屋目录选择器、员工邀请认领、自动派单 hook（默认仍 False；列未映射则 `SCHEMA_PENDING_0009`）。
-3. Schema 草案 `20260919_0009` 未 upgrade 任何持久库或共享 mysql-test。
-4. Codex review 第 1–3 轮均为 NEEDS_CHANGES。第 3 轮后已达返修上限，不再发起第 4 轮审查。第 3 轮指出的 staggered refresh、`/auth/wechat/bind` 401 清会话、invite/claim 锁顺序已在本地修完，**未经第 4 轮 Codex 复审**。
+2. 正式登录：单表单密码/验证码、独立忘记密码、服务端数字挑战、开发短信 inbox。
+3. `20260919_0009` 已 upgrade **仅** `127.0.0.1:3307/property_ai_auth001_test`。未动 `property_ai` / `property_ai_test` / `property_ai_day4`。未重建 mysql-test。
+4. Reviews 1–3 remain NEEDS_CHANGES historically. This follow-up is the one allowed closed-loop of staggered refresh, wechat bind 401, and invite/claim lock order, plus login/0009 review.
 5. 不 push、不 reset、不 restore、不纳入 `project.config.json` / `env.local.js`。
-6. 正式交付不得用一组 Seed 身份切换截图替代。当前也还没有正式三种身份登录证据（等 0009 + 外部配置）。
+6. DevTools screenshots: `reports/auth-identity-ai-001/login-password.png` and `login-sms.png` show one 登录, secondary 忘记密码/验证码|密码登录, WeChat secondary, no Seed. Reset-page screenshot timed out. **Not** formal SMS/Production V1 PASS.
+7. 换绑/恢复/合并、真实 AI/RAG 缺口仍在。登录修复后不得消失。
