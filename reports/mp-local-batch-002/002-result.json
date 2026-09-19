@@ -1,12 +1,10 @@
 {
   "task_id": "MP-LOCAL-VIS-002",
   "reused_existing_pending": false,
-  "created_new_request": false,
-  "apply_error": "An active house relation already exists",
-  "applied_house_id": 1,
-  "existing_active_house_ids": [
-    1
-  ],
+  "created_new_request": true,
+  "bind_request_id": 11,
+  "house_id": 2,
+  "approved_on_page": true,
   "after_items": [
     {
       "house_id": 1,
@@ -14,12 +12,25 @@
       "relation_type": "OWNER",
       "room_no": "101",
       "relation_id": 10
+    },
+    {
+      "house_id": 2,
+      "status": "ACTIVE",
+      "relation_type": "OWNER",
+      "room_no": "102",
+      "relation_id": 11
     }
   ],
   "after_requests": [
     {
       "id": 10,
       "house_id": 1,
+      "status": "APPROVED",
+      "relation_type": "OWNER"
+    },
+    {
+      "id": 11,
+      "house_id": 2,
       "status": "APPROVED",
       "relation_type": "OWNER"
     }

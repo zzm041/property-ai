@@ -53,7 +53,18 @@ function redactRequests(rows) {
 
   const pending = (before.requests || []).find((row) => row.status === "PENDING");
   const boundIds = (before.items || []).map((row) => Number(row.house_id));
+  let authorizedHouseId = 0;
+  try {
+    authorizedHouseId = Number(
+      JSON.parse(require("fs").readFileSync(path.join(OUT, "002-target-house.json"), "utf8")).house_id
+    );
+  } catch (error) {
+    authorizedHouseId = 0;
+  }
   let targetHouseId = pending ? Number(pending.house_id) : 0;
+  if (!targetHouseId && authorizedHouseId && boundIds.indexOf(authorizedHouseId) < 0) {
+    targetHouseId = authorizedHouseId;
+  }
   if (!targetHouseId) {
     const typed = Number(before.houseId);
     if (typed && boundIds.indexOf(typed) < 0) {

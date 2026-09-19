@@ -1,0 +1,21 @@
+{
+  "unread": 3,
+  "items": [
+    {
+      "id": 54,
+      "title": "工单待确认",
+      "read_at": null
+    },
+    {
+      "id": 52,
+      "title": "房屋绑定已通过",
+      "read_at": null
+    },
+    {
+      "id": 51,
+      "title": "房屋绑定已通过",
+      "read_at": null
+    }
+  ],
+  "error": ""
+}

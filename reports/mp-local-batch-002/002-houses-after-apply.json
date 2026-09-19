@@ -14,8 +14,14 @@
       "house_id": 1,
       "status": "APPROVED",
       "relation_type": "OWNER"
+    },
+    {
+      "id": 11,
+      "house_id": 2,
+      "status": "PENDING",
+      "relation_type": "OWNER"
     }
   ],
-  "error": "An active house relation already exists",
-  "applied_house_id": 1
+  "error": "",
+  "applied_house_id": 2
 }

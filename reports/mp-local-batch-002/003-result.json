@@ -1,0 +1,60 @@
+{
+  "task_id": "MP-LOCAL-VIS-003",
+  "house_id": 2,
+  "work_order_id": 651,
+  "status_after_create": "PENDING_ASSIGNMENT",
+  "employee_id": 1,
+  "status_after_staff": "WAIT_CONFIRM",
+  "status_after_confirm": "CLOSED",
+  "status_reentered": "CLOSED",
+  "logs": [
+    {
+      "id": 963,
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "event_code": "CREATE"
+    },
+    {
+      "id": 964,
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "event_code": "ANALYZE"
+    },
+    {
+      "id": 965,
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "event_code": "ASSIGN"
+    },
+    {
+      "id": 966,
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "event_code": "ACCEPT"
+    },
+    {
+      "id": 967,
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "event_code": "START"
+    },
+    {
+      "id": 968,
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "event_code": "RECEIPT_RESOLVED"
+    },
+    {
+      "id": 969,
+      "from_status": "WAIT_CONFIRM",
+      "to_status": "COMPLETED",
+      "event_code": "CONFIRM"
+    },
+    {
+      "id": 970,
+      "from_status": "COMPLETED",
+      "to_status": "CLOSED",
+      "event_code": "ARCHIVE"
+    }
+  ]
+}

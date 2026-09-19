@@ -1,0 +1,35 @@
+You are the read-only reviewer for D:\property-ai.
+Do not edit product source. Do not change databases. Do not request Full Access.
+Do not resume --last.
+
+task_id: MP-LOCAL-VIS-002
+phase: review
+batch: MP-LOCAL-BATCH-002
+Previous review session 01a0b83d-0611-7732-9a8e-3c689bd40ed2 was WAIT_HUMAN (only house 1 already bound).
+Operator then authorized adding synthetic room 102. Cursor inserted house id 2 in property_ai_day4 and re-ran the page flow.
+Dedup by task_id plus this new evidence, not HEAD alone.
+reviewed_head: 6f65b73f41e96b0af91bbd22595d95c5d37d138b
+No product source change required for this round.
+
+Read:
+- reports/mp-local-batch-002/002-target-house.json
+- reports/mp-local-batch-002/002-result.json
+- reports/mp-local-batch-002/002-houses-after-apply.json
+- reports/mp-local-batch-002/002-bindings-before.json
+- reports/mp-local-batch-002/002-bindings-after.json
+- reports/mp-local-batch-002/002-houses-after.json
+- reports/mp-local-batch-002/002-houses-after-apply.png
+- reports/mp-local-batch-002/002-bindings-before.png
+- reports/mp-local-batch-002/002-houses-after.png
+
+Page facts from automator:
+- Resident applied house_id 2; request 11 created PENDING.
+- Manager 绑定审核 showed 11 PENDING; tapped 通过.
+- Resident refresh shows house 2 room 102 ACTIVE OWNER relation_id 11 and request 11 APPROVED. Historical house 1 / request 10 kept.
+- This is page interaction, not HTTP-script-as-click.
+
+PASS only if apply -> approve -> refresh valid relation for request 11 / house 2 is evidenced.
+NEEDS_CHANGES only for in-scope wiring defects of this bind flow.
+Do not require 0008, CVE, official WeChat, or draining historical work-order queue.
+
+Return JSON matching the output schema.

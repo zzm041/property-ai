@@ -1,0 +1,27 @@
+{
+  "propertyId": "1",
+  "snapshot": {
+    "business_date": "2026-09-19",
+    "attendance": {
+      "id": 3,
+      "employee_id": 1,
+      "tenant_id": 1,
+      "property_id": 1,
+      "business_date": "2026-09-19",
+      "check_in_at": "2026-09-19T06:06:03.023317Z",
+      "check_out_at": null,
+      "source": "STAFF_SELF"
+    },
+    "daily_status": {
+      "id": 3,
+      "employee_id": 1,
+      "tenant_id": 1,
+      "property_id": 1,
+      "business_date": "2026-09-19",
+      "on_duty": "ON_DUTY",
+      "leave_type": null,
+      "current_load": 0
+    }
+  },
+  "error": ""
+}

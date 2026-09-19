@@ -1,0 +1,35 @@
+You are the read-only reviewer for D:\property-ai.
+Do not edit product source or databases. Do not request Full Access. Do not resume --last.
+
+task_id: MP-LOCAL-VIS-003
+phase: review
+batch: MP-LOCAL-BATCH-002
+VIS-001 and VIS-002 remain PASS. Do not reset IDs.
+reviewed_head is the current git HEAD; there is an in-scope miniprogram wiring change: supervisor queue pagination (load more / after_id) so a newly created work order can be selected on the page. Pre-existing dirty miniprogram/project.config.json is operator AppID; do not treat as this-task work.
+
+Read:
+- miniprogram/pages/supervisor/queue.js
+- miniprogram/pages/supervisor/queue.wxml
+- miniprogram/services/api.js (supervisorQueue after_id)
+- reports/mp-local-batch-002/003-result.json
+- reports/mp-local-batch-002/003-staff-checkin.json
+- reports/mp-local-batch-002/003-resident-created.json
+- reports/mp-local-batch-002/003-staff-detail-receipt.json
+- reports/mp-local-batch-002/003-resident-reentered.json
+- reports/mp-local-batch-002/003-resident-created.png
+- reports/mp-local-batch-002/003-staff-receipt.png
+- reports/mp-local-batch-002/003-resident-reentered.png
+
+Page facts:
+- Staff checked in; business_date 2026-09-19; employee_id 1 ON_DUTY.
+- Resident created work order 651 on house 2 via 报修 page; status PENDING_ASSIGNMENT.
+- Manager queued/paged, selected 651, selected employee 1, tapped 派单.
+- Staff accepted, started, submitted receipt; WAIT_CONFIRM.
+- Resident confirmed; re-entered detail status CLOSED with logs CREATE, ANALYZE, ASSIGN, ACCEPT, START, RECEIPT_RESOLVED, CONFIRM, ARCHIVE.
+- Same object 651 throughout. Historical orders were not deleted.
+
+PASS only if this closed loop is evidenced from page interaction for work order 651 ending CLOSED with correct history on re-entry.
+NEEDS_CHANGES only for in-scope defects of this loop.
+Do not require 0008, CVE, official WeChat, or draining the historical queue.
+
+Return JSON matching the output schema.

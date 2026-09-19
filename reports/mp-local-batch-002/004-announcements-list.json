@@ -1,0 +1,31 @@
+{
+  "propertyId": "1",
+  "items": [
+    {
+      "id": 1,
+      "title": "停水通知",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": 2,
+      "title": "停水通知",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": 3,
+      "title": "停水通知 632efe30",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": 4,
+      "title": "停水通知 6ff57391",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": 5,
+      "title": "停水通知 dadc08aa",
+      "status": "PUBLISHED"
+    }
+  ],
+  "error": ""
+}

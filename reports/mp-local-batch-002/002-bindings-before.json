@@ -1,6 +1,13 @@
 {
   "propertyId": "1",
   "tenantId": "1",
-  "items": [],
+  "items": [
+    {
+      "id": 11,
+      "house_id": 2,
+      "status": "PENDING",
+      "relation_type": "OWNER"
+    }
+  ],
   "error": ""
 }

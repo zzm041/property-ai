@@ -1,0 +1,18 @@
+{
+  "propertyId": "1",
+  "question": "装修时间是什么？",
+  "answer": "根据物业知识库，装修施工时间为工作日 08:00-18:00。",
+  "citations": [
+    {
+      "document_id": 4,
+      "title": "Day4 装修规定 6ff57391",
+      "source_locator": "Day4 装修规定 6ff57391#chunk-1"
+    },
+    {
+      "document_id": 3,
+      "title": "Day4 装修规定 632efe30",
+      "source_locator": "Day4 装修规定 632efe30#chunk-1"
+    }
+  ],
+  "error": ""
+}

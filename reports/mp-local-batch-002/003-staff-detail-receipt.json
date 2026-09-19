@@ -1,0 +1,42 @@
+{
+  "status": "WAIT_CONFIRM",
+  "logs": [
+    {
+      "id": 963,
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "event_code": "CREATE"
+    },
+    {
+      "id": 964,
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "event_code": "ANALYZE"
+    },
+    {
+      "id": 965,
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "event_code": "ASSIGN"
+    },
+    {
+      "id": 966,
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "event_code": "ACCEPT"
+    },
+    {
+      "id": 967,
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "event_code": "START"
+    },
+    {
+      "id": 968,
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "event_code": "RECEIPT_RESOLVED"
+    }
+  ],
+  "error": ""
+}

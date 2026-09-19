@@ -16,10 +16,10 @@ Updated for Cursor + Codex CLI collaboration. Not a full-repo audit.
 | Local preview login | `POST /auth/dev/token` with `seed_key` (develop + `env.local.js` `localPreview`). Resident seed `__DEV_RESIDENT__` |
 | DevTools | installed. CLI `D:\微信web开发者工具\cli.bat`. `islogin` failed: IDE service port **off** |
 | Codex CLI | `codex.cmd` 0.155.1, ChatGPT login. Reviewer only |
-| Current task | `MP-LOCAL-BATCH-002` / `MP-LOCAL-VIS-002` is `WAIT_HUMAN`. VIS-001 remains PASS. Page wiring works; only house 1 exists and is already ACTIVE for `__DEV_RESIDENT__`. |
+| Current task | `MP-LOCAL-BATCH-002` complete: VIS-001/002/003/004 PASS. |
 | Codex plan | session `01a0b812-28ee-79e0-a462-408409775d3a`; first schema call failed (`session_note` required); second call exit 0, decision `WAIT_HUMAN`. Files: `reports/codex/MP-LOCAL-VIS-001-plan.json`, `reports/codex/MP-LOCAL-VIS-001-plan.call.json` |
-| Codex review | VIS-001 PASS session `01a0b820-bf4a-7692-82b7-bd8de913aed2`. VIS-002 session `01a0b83d-0611-7732-9a8e-3c689bd40ed2` decision `WAIT_HUMAN`. File: `reports/codex/MP-LOCAL-VIS-002-review.json` |
-| This-task evidence | Service port now on (`127.0.0.1:24540`, `islogin=true`). `cli open`/`cli auto` ok. Login page screenshot + tap 以住户登录. Live POST `/auth/dev/token` 200 and GET `/me` 200. Home shows `__DEV_RESIDENT__` / `RESIDENT` from `/me`. See `reports/mp-local-vis-001/` |
+| Codex review | VIS-001 PASS `01a0b820-bf4a-7692-82b7-bd8de913aed2`. VIS-002 PASS `01a0b842-9d6c-7b71-a9ef-739cdda92a94`. VIS-003 PASS `01a0b847-851d-76b3-94c4-07e98e369012`. VIS-004 PASS `01a0b84b-13db-7873-b474-d8ed3d0326ce`. |
+| This-task evidence | Batch objects: house 2 room 102, bind request 11 / relation 11, work order 651 CLOSED, announcement 1, notification 54 read, assistant citations document_id 3 and 4. See `reports/mp-local-batch-002/`. |
 | Out of this task | house bind, work-order chain, official WeChat login, upload/release |
 | Still open release blockers (not this-task gates) | Migration 0008, CVE pin upgrades, dataplane `0.0.0.0`, live vendor credentials, Day 4 not production PASS |
 

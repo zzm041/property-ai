@@ -6,12 +6,25 @@
       "relation_type": "OWNER",
       "room_no": "101",
       "relation_id": 10
+    },
+    {
+      "house_id": 2,
+      "status": "ACTIVE",
+      "relation_type": "OWNER",
+      "room_no": "102",
+      "relation_id": 11
     }
   ],
   "requests": [
     {
       "id": 10,
       "house_id": 1,
+      "status": "APPROVED",
+      "relation_type": "OWNER"
+    },
+    {
+      "id": 11,
+      "house_id": 2,
       "status": "APPROVED",
       "relation_type": "OWNER"
     }

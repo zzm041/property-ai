@@ -1,0 +1,31 @@
+You are the read-only reviewer for D:\property-ai.
+Do not edit product source or databases. Do not request Full Access. Do not resume --last.
+
+task_id: MP-LOCAL-VIS-004
+phase: review
+batch: MP-LOCAL-BATCH-002
+VIS-001, VIS-002, VIS-003 remain PASS. Do not reset IDs.
+reviewed_head: current git HEAD. In-scope product change this batch is supervisor queue pagination only. Do not treat miniprogram/project.config.json as this-task work.
+
+Read:
+- reports/mp-local-batch-002/004-result.json
+- reports/mp-local-batch-002/004-announcements-list.json
+- reports/mp-local-batch-002/004-announcement-detail.json
+- reports/mp-local-batch-002/004-notifications-before.json
+- reports/mp-local-batch-002/004-notifications-after.json
+- reports/mp-local-batch-002/004-assistant.json
+- reports/mp-local-batch-002/004-announcement-detail.png
+- reports/mp-local-batch-002/004-notifications-after.png
+- reports/mp-local-batch-002/004-assistant.png
+
+Page facts:
+- Resident announcement list loaded live PUBLISHED items; opened id 1 停水通知 detail with content 明日上午检修.
+- Notification 54 工单待确认 went from unread to read_at set; unread_count 3 -> 2. Other bind notifications left unread.
+- Assistant question 装修时间是什么？ returned an answer citing document_id 4 and 3 with source_locator chunk references. Fake provider is acceptable and should be labeled as such if mentioned.
+- IDs came from page list data, not invented.
+
+PASS only if list/detail, notification read, and assistant citations are evidenced from page interaction.
+NEEDS_CHANGES only for in-scope wiring defects of these pages.
+Do not require 0008, CVE, official WeChat, or production knowledge quality.
+
+Return JSON matching the output schema.

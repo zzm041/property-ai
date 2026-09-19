@@ -1,0 +1,9 @@
+{
+  "house_id": 2,
+  "room_no": "102",
+  "tenant_id": 1,
+  "property_id": 1,
+  "unit_id": 1,
+  "status": "ACTIVE",
+  "source": "operator-authorized insert into property_ai_day4"
+}
