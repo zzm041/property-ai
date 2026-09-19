@@ -23,6 +23,12 @@ Page({
     newChallengePrompt: "",
     newChallengeAnswer: "",
     phoneNotice: "",
+    wechatPhone: "",
+    wechatCode: "",
+    wechatChallengeId: "",
+    wechatChallengePrompt: "",
+    wechatChallengeAnswer: "",
+    wechatNotice: "",
     loading: false,
     error: "",
   },
@@ -141,6 +147,75 @@ Page({
       const code = await auth.login();
       await require("../../services/api").wechatBind(code);
       wx.showToast({ title: "已绑定" });
+    }).catch(() => {});
+  },
+  onWechatField(e) {
+    const field = e.currentTarget.dataset.field;
+    const updates = { [field]: e.detail.value, error: "" };
+    if (field === "wechatPhone") {
+      Object.assign(updates, {
+        wechatCode: "",
+        wechatChallengeId: "",
+        wechatChallengePrompt: "",
+        wechatChallengeAnswer: "",
+      });
+    }
+    this.setData(updates);
+  },
+  sendWechatCode() {
+    const api = require("../../services/api");
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, async () => {
+      if (!this.data.wechatChallengeId) {
+        const challenge = await api.issueChallenge(
+          this.data.wechatPhone,
+          "login"
+        );
+        this.setData({
+          wechatChallengeId: challenge.challenge_id,
+          wechatChallengePrompt: challenge.prompt,
+          wechatNotice: "请完成安全挑战后再次获取验证码",
+        });
+        return;
+      }
+      if (!this.data.wechatChallengeAnswer) {
+        throw new Error("请填写安全挑战答案");
+      }
+      await api.sendSms(
+        this.data.wechatPhone,
+        "login",
+        this.data.wechatChallengeId,
+        this.data.wechatChallengeAnswer
+      );
+      this.setData({
+        wechatChallengeId: "",
+        wechatChallengePrompt: "",
+        wechatChallengeAnswer: "",
+        wechatNotice: "当前手机号验证码已发送",
+      });
+    }).catch(() => {});
+  },
+  rebindWechat() {
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, async () => {
+      const auth = require("../../services/auth");
+      const code = await auth.login();
+      const token = await require("../../services/api").wechatRebind({
+        code,
+        phone: this.data.wechatPhone,
+        sms_code: this.data.wechatCode,
+      });
+      auth.setToken(token.access_token);
+      auth.setRefreshToken(token.refresh_token);
+      this.setData({
+        wechatPhone: "",
+        wechatCode: "",
+        wechatChallengeId: "",
+        wechatChallengePrompt: "",
+        wechatChallengeAnswer: "",
+        wechatNotice: "微信已安全更换，其他旧会话已失效",
+      });
+      wx.showToast({ title: "微信已更换", icon: "success" });
     }).catch(() => {});
   },
   back() {

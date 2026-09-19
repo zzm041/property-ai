@@ -5,6 +5,7 @@ const { isUnauthorized, messageFromError } = require("../utils/error");
 const CREDENTIAL_AUTH_PATHS = {
   "/auth/wechat/login": true,
   "/auth/wechat/bind": true,
+  "/auth/wechat/rebind": true,
   "/auth/challenge": true,
   "/auth/sms/send": true,
   "/auth/sms/login": true,
@@ -245,6 +246,8 @@ module.exports = {
   registerAndUpload,
   wechatLogin: (code) => request({ path: "/auth/wechat/login", method: "POST", data: { code } }),
   wechatBind: (code) => request({ path: "/auth/wechat/bind", method: "POST", data: { code } }),
+  wechatRebind: (body) =>
+    request({ path: "/auth/wechat/rebind", method: "POST", data: body }),
   issueChallenge: (phone, purpose) =>
     request({ path: "/auth/challenge", method: "POST", data: { phone, purpose: purpose || "login" } }),
   sendSms: (phone, purpose, challengeId, challengeAnswer) =>

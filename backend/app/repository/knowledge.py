@@ -144,6 +144,34 @@ class KnowledgeRepository:
             select(UserWechat).where(UserWechat.unionid == unionid)
         )
 
+    def list_user_wechat_rebind_candidates_for_update(
+        self,
+        *,
+        user_id: int,
+        appid: str,
+        openid: str,
+        unionid: str | None,
+    ) -> tuple[UserWechat, ...]:
+        target_identity = (
+            (UserWechat.appid == appid) & (UserWechat.openid == openid)
+        )
+        if unionid is not None:
+            target_identity = target_identity | (UserWechat.unionid == unionid)
+        return tuple(
+            self._session.scalars(
+                select(UserWechat)
+                .where(
+                    or_(
+                        (UserWechat.user_id == user_id)
+                        & (UserWechat.appid == appid),
+                        target_identity,
+                    )
+                )
+                .order_by(UserWechat.id)
+                .with_for_update()
+            ).all()
+        )
+
     def add_user(self, record: User) -> User:
         self._session.add(record)
         self._session.flush()

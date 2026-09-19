@@ -8,6 +8,17 @@
   <view class="empty">微信只是同一账号的凭证，不会新建另一套身份。</view>
 </view>
 <view class="card">
+  <view>安全更换微信</view>
+  <view class="empty">验证当前账号手机号后，旧微信登录和其他旧会话会失效。</view>
+  <input placeholder="当前账号手机号" value="{{wechatPhone}}" data-field="wechatPhone" bindinput="onWechatField" type="number" />
+  <view class="empty" wx:if="{{wechatChallengePrompt}}">安全挑战：{{wechatChallengePrompt}}</view>
+  <input wx:if="{{wechatChallengePrompt}}" placeholder="挑战答案" value="{{wechatChallengeAnswer}}" data-field="wechatChallengeAnswer" bindinput="onWechatField" />
+  <input placeholder="当前手机号验证码" value="{{wechatCode}}" data-field="wechatCode" bindinput="onWechatField" />
+  <button class="btn btn-secondary" bindtap="sendWechatCode" disabled="{{loading}}">获取验证短信</button>
+  <button class="btn" bindtap="rebindWechat" disabled="{{loading}}">确认更换为当前微信</button>
+  <view class="empty" wx:if="{{wechatNotice}}">{{wechatNotice}}</view>
+</view>
+<view class="card">
   <view>更换手机号</view>
   <view class="empty">必须分别验证当前手机号和未注册的新手机号。变更后其他旧会话失效。</view>
   <input placeholder="当前手机号" value="{{oldPhone}}" data-field="oldPhone" bindinput="onPhoneField" type="number" />

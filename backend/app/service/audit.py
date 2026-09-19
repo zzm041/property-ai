@@ -337,6 +337,9 @@ class AuditService:
             elif key == "work_order_count":
                 if not isinstance(value, int) or value < 0:
                     cls._raise_invalid_details("work_order_count is invalid")
+            elif key == "replaced_binding_count":
+                if not isinstance(value, int) or isinstance(value, bool) or value < 1:
+                    cls._raise_invalid_details("replaced_binding_count is invalid")
             elif key == "on_duty":
                 if value not in {"ON_DUTY", "OFF_DUTY", "LEAVE"}:
                     cls._raise_invalid_details("on_duty is invalid")

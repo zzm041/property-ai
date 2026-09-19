@@ -9,7 +9,7 @@ from app.core.errors import AppError, IamErrorCode
 from app.core.config import Settings, get_settings
 from app.core.database import get_session_factory
 from app.domain.iam import Principal
-from app.schema.auth import WeChatBindRequest
+from app.schema.auth import WeChatBindRequest, WeChatRebindRequest
 from app.schema.common import request_id_for, success_envelope
 from app.schema.knowledge import AccessTokenWithMethodData, WeChatLoginRequest
 from app.service.wechat_auth import WeChatAuthService
@@ -69,3 +69,31 @@ def wechat_bind(
         request,
         {"user_id": record.user_id, "appid": record.appid},
     )
+
+
+@router.post("/rebind")
+def wechat_rebind(
+    body: WeChatRebindRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> dict[str, object]:
+    if actor.auth_method not in {"sms", "password", "wechat"}:
+        raise AppError(
+            code=IamErrorCode.FORBIDDEN,
+            message="WeChat rebind requires an official authenticated session",
+            status_code=403,
+        )
+    session = get_session_factory(settings.active_database_url)()
+    try:
+        issued = WeChatAuthService(session).rebind(
+            user_id=actor.user_id,
+            code=body.code,
+            phone=body.phone,
+            sms_code=body.sms_code,
+            settings=settings,
+            request_id=request_id_for(request),
+        )
+    finally:
+        session.close()
+    return success_envelope(request, issued.as_schema().model_dump(mode="json"))

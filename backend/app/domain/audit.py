@@ -19,6 +19,7 @@ class AuditAction(StrEnum):
     AUTH_SESSION_REVOKED = "AUTH_SESSION_REVOKED"
     AUTH_PROFILE_UPDATED = "AUTH_PROFILE_UPDATED"
     AUTH_WECHAT_BOUND = "AUTH_WECHAT_BOUND"
+    AUTH_WECHAT_REBOUND = "AUTH_WECHAT_REBOUND"
     EMPLOYEE_INVITE_ISSUED = "EMPLOYEE_INVITE_ISSUED"
     EMPLOYEE_CLAIMED = "EMPLOYEE_CLAIMED"
     IAM_USER_ROLE_GRANTED = "IAM_USER_ROLE_GRANTED"
@@ -231,6 +232,16 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             resource_type=AuditResourceType.USER_WECHAT,
             allowed_detail_keys=frozenset({"auth_method"}),
             required_detail_keys=frozenset({"auth_method"}),
+            allowed_scope_types=frozenset({ScopeType.SYSTEM}),
+        ),
+        AuditAction.AUTH_WECHAT_REBOUND: AuditActionPolicy(
+            resource_type=AuditResourceType.USER_WECHAT,
+            allowed_detail_keys=frozenset(
+                {"auth_method", "reason_code", "replaced_binding_count"}
+            ),
+            required_detail_keys=frozenset(
+                {"auth_method", "reason_code", "replaced_binding_count"}
+            ),
             allowed_scope_types=frozenset({ScopeType.SYSTEM}),
         ),
         AuditAction.EMPLOYEE_INVITE_ISSUED: AuditActionPolicy(

@@ -132,6 +132,14 @@ class WeChatBindRequest(BaseModel):
     code: str = Field(min_length=1, max_length=128)
 
 
+class WeChatRebindRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    code: str = Field(min_length=1, max_length=128)
+    phone: str = Field(min_length=8, max_length=20)
+    sms_code: str = Field(min_length=4, max_length=8)
+
+
 class ProfileUpdateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 

@@ -12,6 +12,7 @@ from app.model.identity import UserWechat
 from app.provider.errors import ProviderInvalidOutputError, ProviderUnavailableError
 from app.provider.factory import build_wechat_auth_provider
 from app.repository.identity import IdentityRepository
+from app.repository.credential import CredentialRepository
 from app.repository.knowledge import KnowledgeRepository
 from app.service.audit import AuditService
 from app.service.credential_auth import CredentialAuthService, IssuedSession
@@ -167,9 +168,23 @@ class WeChatAuthService:
                     message="User is not active",
                     status_code=401,
                 )
-            existing = self._repository.get_user_wechat(
+            candidates = self._repository.list_user_wechat_rebind_candidates_for_update(
+                user_id=user.id,
                 appid=session.appid,
                 openid=session.openid,
+                unionid=session.unionid,
+            )
+            existing = next(
+                (
+                    item
+                    for item in candidates
+                    if (
+                        item.appid == session.appid
+                        and item.openid == session.openid
+                    )
+                    or (session.unionid is not None and item.unionid == session.unionid)
+                ),
+                None,
             )
             if existing is not None and existing.user_id != user.id:
                 raise AppError(
@@ -180,6 +195,15 @@ class WeChatAuthService:
             if existing is not None:
                 bound = existing
                 return
+            if any(
+                item.user_id == user.id and item.appid == session.appid
+                for item in candidates
+            ):
+                raise AppError(
+                    code=AuthErrorCode.WECHAT_REBIND_REQUIRED,
+                    message="Use verified WeChat rebind for an existing binding",
+                    status_code=409,
+                )
             bound = self._repository.add_user_wechat(
                 UserWechat(
                     user_id=user.id,
@@ -215,3 +239,175 @@ class WeChatAuthService:
                 status_code=500,
             )
         return bound
+
+    def rebind(
+        self,
+        *,
+        user_id: int,
+        code: str,
+        phone: str,
+        sms_code: str,
+        settings: Settings,
+        request_id: str,
+    ) -> IssuedSession:
+        if not settings.wechat_login_enabled:
+            raise AppError(
+                code=WeChatAuthErrorCode.UNAVAILABLE,
+                message="WeChat login is unavailable",
+                status_code=503,
+            )
+        provider = build_wechat_auth_provider(settings)
+        try:
+            wechat_session = provider.exchange_code(code.strip())
+        except ProviderInvalidOutputError as exc:
+            raise AppError(
+                code=WeChatAuthErrorCode.INVALID_CODE,
+                message="WeChat code is invalid",
+                status_code=401,
+            ) from exc
+        except ProviderUnavailableError as exc:
+            raise AppError(
+                code=WeChatAuthErrorCode.UNAVAILABLE,
+                message="WeChat auth is unavailable",
+                status_code=503,
+            ) from exc
+
+        credential_repository = CredentialRepository(self._session)
+        credential_service = CredentialAuthService(
+            self._session,
+            settings=settings,
+            repository=credential_repository,
+        )
+        phone_e164 = credential_service._require_phone(phone)
+        otp_status = {"value": "ok"}
+
+        def _verify_phone() -> None:
+            current_phone = (
+                credential_repository.get_active_phone_for_user_for_update(user_id)
+            )
+            if current_phone is None or current_phone.phone_e164 != phone_e164:
+                raise AppError(
+                    code=AuthErrorCode.OLD_PHONE_MISMATCH,
+                    message="Phone does not match the signed-in account",
+                    status_code=409,
+                )
+            otp_status["value"] = credential_service._apply_otp(
+                phone_e164,
+                purpose="login",
+                code=sms_code,
+            )
+
+        run_owned_transaction(self._session, _verify_phone)
+        credential_service._raise_otp(otp_status["value"])
+
+        issued_box: list[IssuedSession] = []
+
+        def _persist() -> None:
+            current_phone = (
+                credential_repository.get_active_phone_for_user_for_update(user_id)
+            )
+            if current_phone is None or current_phone.phone_e164 != phone_e164:
+                raise AppError(
+                    code=AuthErrorCode.OLD_PHONE_MISMATCH,
+                    message="Phone does not match the signed-in account",
+                    status_code=409,
+                )
+            candidates = self._repository.list_user_wechat_rebind_candidates_for_update(
+                user_id=user_id,
+                appid=wechat_session.appid,
+                openid=wechat_session.openid,
+                unionid=wechat_session.unionid,
+            )
+            credential_service._lock_active_user(user_id)
+            current_bindings = [
+                item
+                for item in candidates
+                if item.user_id == user_id and item.appid == wechat_session.appid
+            ]
+            if not current_bindings:
+                raise AppError(
+                    code=AuthErrorCode.WECHAT_BIND_REQUIRED,
+                    message="No existing WeChat binding is available to replace",
+                    status_code=409,
+                )
+            target = next(
+                (
+                    item
+                    for item in candidates
+                    if (
+                        item.appid == wechat_session.appid
+                        and item.openid == wechat_session.openid
+                    )
+                    or (
+                        wechat_session.unionid is not None
+                        and item.unionid == wechat_session.unionid
+                    )
+                ),
+                None,
+            )
+            if target is not None and target.user_id != user_id:
+                raise AppError(
+                    code=AuthErrorCode.WECHAT_ALREADY_BOUND,
+                    message="WeChat identity is already bound; use account merge",
+                    status_code=409,
+                )
+            if target is not None:
+                raise AppError(
+                    code=AuthErrorCode.WECHAT_SAME_BINDING,
+                    message="New WeChat identity must differ from the current binding",
+                    status_code=409,
+                )
+
+            keeper = current_bindings[0]
+            for stale in current_bindings[1:]:
+                self._session.delete(stale)
+            keeper.openid = wechat_session.openid
+            keeper.unionid = wechat_session.unionid
+            self._session.flush()
+            credential_service._revoke_sessions(
+                user_id,
+                reason="WECHAT_REBIND",
+                request_id=request_id,
+            )
+            issued = credential_service._issue_session(
+                user_id=user_id,
+                auth_method="sms",
+            )
+            self._audit.append(
+                action=AuditAction.AUTH_WECHAT_REBOUND,
+                resource_type=AuditResourceType.USER_WECHAT,
+                actor_user_id=user_id,
+                resource_id=keeper.id,
+                request_id=request_id,
+                scope_type=ScopeType.SYSTEM,
+                details={
+                    "auth_method": "sms",
+                    "reason_code": "SELF_SERVICE_VERIFIED",
+                    "replaced_binding_count": len(current_bindings),
+                },
+            )
+            issued_box.append(issued)
+
+        try:
+            run_owned_transaction(self._session, _persist)
+        except AppError:
+            raise
+        except IntegrityError as exc:
+            raise AppError(
+                code=AuthErrorCode.WECHAT_ALREADY_BOUND,
+                message="WeChat identity is already bound; use account merge",
+                status_code=409,
+            ) from exc
+        except SQLAlchemyError as exc:
+            raise AppError(
+                code=ErrorCode.INTERNAL_ERROR,
+                message="WeChat rebind could not be completed",
+                status_code=500,
+            ) from exc
+        if not issued_box:
+            raise AppError(
+                code=ErrorCode.INTERNAL_ERROR,
+                message="WeChat rebind could not be completed",
+                status_code=500,
+            )
+        return issued_box[0]
