@@ -1,0 +1,66 @@
+{
+  "task_id": "PERSISTENT-MEDIA-001",
+  "phase": "review",
+  "reviewed_head": "efdff287dd55d3a2e8b18c42a131bf2c5616ad21",
+  "decision": "NEEDS_CHANGES",
+  "actions_or_findings": [
+    {
+      "title": "CURRENT_TASK_BLOCKER: Another uploader’s media can be attached and read",
+      "path": "D:/property-ai/backend/app/service/work_order.py:2413; D:/property-ai/backend/app/service/work_order.py:425",
+      "trigger": "A resident submits a guessed, uploaded file_id belonging to another user in the same tenant and property when creating their own work order.",
+      "rationale": "The attachment check accepts a non-uploader when the property matches. The new download path then treats that attachment as an authorized relation, allowing the resident to read the other user’s bytes. The same tenant condition does not prevent this anti-IDOR bypass."
+    },
+    {
+      "title": "CURRENT_TASK_BLOCKER: Missing stored bytes permit replacement of committed media",
+      "path": "D:/property-ai/backend/app/service/work_order.py:361; D:/property-ai/backend/app/service/work_order.py:402",
+      "trigger": "An object disappears after its first upload, then its uploader retries with different valid bytes of the declared size and MIME.",
+      "rationale": "The missing-object branch writes the retry and replaces the committed content hash without comparing it with the prior hash. An already attached file can therefore change instead of returning FILE.CONFLICT or a storage failure. The normal-object immutability evidence does not cover this case."
+    },
+    {
+      "title": "CURRENT_TASK_BLOCKER: Process cache masks missing or corrupted persistent objects",
+      "path": "D:/property-ai/backend/app/provider/storage/__init__.py:114",
+      "trigger": "The configured disk object is removed or corrupted while its original bytes remain in _DEV_OBJECTS.",
+      "rationale": "get_object returns cached bytes before checking the persistent file. Read and attachment integrity checks can pass for an object that will fail after process replacement, contrary to the missing-or-corrupted attachment requirement."
+    },
+    {
+      "title": "RELEASE_BLOCKER: Selected PNG or WebP images are declared as JPEG",
+      "path": "D:/property-ai/miniprogram/pages/work-orders/create.js:58",
+      "trigger": "The image picker supplies PNG or WebP bytes.",
+      "rationale": "The page registers every chosen image as image/jpeg with a .jpg name. The new MIME-magic validation correctly rejects those bytes, so the native image upload path needs format detection before V1 delivery."
+    },
+    {
+      "title": "RELEASE_BLOCKER: Production media has no scan finalization",
+      "path": "D:/property-ai/backend/app/provider/storage/__init__.py:168; D:/property-ai/backend/app/service/work_order.py:440",
+      "trigger": "Production storage registers a file.",
+      "rationale": "Registration leaves scanner_status pending, while attachment and download require clean or skipped_dev. No scanner/finalize path is present. Production object storage and private delivery remain outside this approved Development slice."
+    }
+  ],
+  "evidence_paths": [
+    "D:/property-ai/reports/project-handoff.md",
+    "D:/property-ai/reports/persistent-media-001/prepare-evidence.json",
+    "D:/property-ai/reports/persistent-media-001/runtime-evidence.json",
+    "D:/property-ai/reports/persistent-media-001/immutability-evidence.json",
+    "D:/property-ai/reports/persistent-media-001/page-evidence.json",
+    "D:/property-ai/reports/persistent-media-001/run-runtime-evidence.py",
+    "D:/property-ai/reports/persistent-media-001/run-page-evidence.js",
+    "D:/property-ai/reports/persistent-media-001/01-detail-with-media.png",
+    "D:/property-ai/reports/persistent-media-001/02-after-preview-tap.png",
+    "D:/property-ai/tmp/auth001-runtime/api-20260920-014646.out.log",
+    "D:/property-ai/backend/tests/unit/test_persistent_media.py",
+    "D:/property-ai/backend/tests/integration/conftest.py"
+  ],
+  "unverified": [
+    "The reported targeted 38 passes and full unit result of 371 passed, 1 warning were not independently rerun. The 29 affected integration tests were collected only; collection is not integration PASS because their fixture deletes protected shared database rows.",
+    "Audio playback and refresh-after-401 were checked in code but not exercised in page evidence.",
+    "The live database revision was not independently queried. The handoff, isolated runtime script, and logs identify 8083 with property_ai_auth001_test at 20260919_0009 and its isolated queue and storage."
+  ],
+  "session_note": "Read-only review of PERSISTENT-MEDIA-001 only. HEAD and the two stated product commits match; task-uncommitted files are evidence or coordination, while the named dirty product files are outside scope. The isolated disk object is 68 bytes and has the expected SHA-256. Both screenshots were inspected: order 6 displays file 1, and the native 1/1 preview opened; the API log records GET /api/v1/files/1/content 200. No migration or frozen dependency change appears in the task diff. Order 5’s previously accepted lifecycle remains outside this review. The overall goal remains the complete frozen Production V1.",
+  "task_result": "Development persistence, authenticated read, and the documented normal retry worked in the supplied evidence, but attachment authorization and storage-loss handling prevent acceptance of this task.",
+  "product_gap_changes": [
+    "PERSISTENT-MEDIA-001 remains open; this review does not close production storage or scanner work.",
+    "Phone change, WeChat rebind, controlled merge, recovery, real AI auto-assignment, real Embedding/RAG, and the other handoff V1 gaps remain in scope."
+  ],
+  "schedule_risk": "High. The original one-week aim ends approximately 2026-09-21; current-task security fixes plus the remaining frozen V1 features and production validation cannot be completed by then without dropping scope.",
+  "next_action": "Main Codex should make one PERSISTENT-MEDIA-001 remediation slice: require file ownership or an already authorized relation when attaching, enforce tenant and property scope, preserve the committed hash when storage bytes are missing, and make persistent-mode reads detect disk loss or corruption. Add regression coverage for cross-uploader attachment, missing-object retry, and stale cache; then repeat non-destructive synthetic verification on the already approved isolated 8083 environment and request independent read-only re-review. Ordinary code, unit tests, and isolated synthetic verification are authorized; executing the destructive integration fixture requires separate approval for a named disposable database.",
+  "approval_requests": []
+}

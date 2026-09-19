@@ -1,0 +1,44 @@
+{
+  "task_id": "PERSISTENT-MEDIA-001",
+  "phase": "review",
+  "reviewed_head": "b82c33d07bdfa177cb62240163551c5938af8bed",
+  "decision": "PASS",
+  "actions_or_findings": [
+    {
+      "title": "RELEASE_BLOCKER: Production media scan finalization remains open",
+      "path": "D:/property-ai/backend/app/provider/storage/__init__.py:169; D:/property-ai/backend/app/service/work_order.py:453",
+      "trigger": "Production storage registers a file with scanner_status=pending.",
+      "rationale": "Attachment and download require clean or skipped_dev, and this remediation adds no production scan/finalize path. Production storage and private delivery still require release validation. This does not block acceptance of the Development slice."
+    }
+  ],
+  "evidence_paths": [
+    "D:/property-ai/reports/project-handoff.md",
+    "D:/property-ai/reports/codex/PERSISTENT-MEDIA-001-review.json",
+    "D:/property-ai/backend/app/service/work_order.py",
+    "D:/property-ai/backend/app/provider/storage/__init__.py",
+    "D:/property-ai/backend/app/repository/work_order.py",
+    "D:/property-ai/backend/tests/unit/test_persistent_media.py",
+    "D:/property-ai/miniprogram/pages/work-orders/create.js",
+    "D:/property-ai/reports/persistent-media-001/runtime-evidence.json",
+    "D:/property-ai/reports/persistent-media-001/immutability-evidence.json",
+    "D:/property-ai/reports/persistent-media-001/page-evidence.json",
+    "D:/property-ai/reports/persistent-media-001/01-detail-with-media.png",
+    "D:/property-ai/reports/persistent-media-001/02-after-preview-tap.png",
+    "D:/property-ai/tmp/auth001-runtime/api-20260920-020442.out.log"
+  ],
+  "unverified": [
+    "I did not rerun the reported 42 targeted or 375 full unit passes. I inspected the assertions. The 29 integration tests remain collect-only because their fixture deletes protected shared database rows.",
+    "The native picker’s PNG/WebP branches were checked in code but were not exercised in the supplied page run. Related-work-order download authorization was checked in code; its unit test mocks the final authorization call.",
+    "I did not query the live database, process, queue, or worker. Production storage, scanner finalization, and private delivery were not validated."
+  ],
+  "session_note": "Read-only remediation review at the stated HEAD; the reviewed source files have no working-tree diff. The three original current-task blockers are closed in code and failure-path assertions: attachment checks tenant, property, and uploader before storage access; committed missing objects return 503 without a write under a file row lock; persistent reads use disk first and evict stale cache. The image picker now maps JPEG, PNG, and WebP and shows an error for unknown formats. Both current screenshots were inspected: order 6 displays its image attachment, and tapping preview opens the native 1/1 view; the named API log records the download as 200. The overall goal remains frozen Production V1. Earlier accepted AUTO dispatch and order 5 lifecycle evidence remain intact. Existing dirty and untracked files were untouched.\n",
+  "task_result": "PASS for PERSISTENT-MEDIA-001 remediation round 1. The supplied official-session evidence reads the original file after the API restart with its original hash; a same-byte retry returns 200 and different bytes return 409 FILE.CONFLICT. No current-task blocker remains.",
+  "product_gap_changes": [
+    "Closed for this Development slice: cross-uploader attachment, committed-object replacement after storage loss, persistent-cache masking, and incorrect PNG/WebP picker declarations.",
+    "Production object storage, scan finalization, and private delivery remain release gaps.",
+    "Phone change, WeChat rebind, controlled merge, recovery, real AI auto-assignment, real Embedding/RAG, and the other handoff Production V1 gaps remain in scope."
+  ],
+  "schedule_risk": "High. The original one-week aim is approximately through 2026-09-21. On 2026-09-20, the remaining frozen V1 features and production validation cannot be completed by that date without dropping scope.",
+  "next_action": "Main Codex should implement one production-media scan/finalize code slice: verify stored bytes and MIME, transition pending files to clean or blocked under the file row lock, retain pending/blocked attachment and download denial, and cover clean, malicious, missing-object, timeout, retry, and concurrency paths with unit tests. Completion requires passing focused tests and an independent read-only review. Ordinary source and unit work is authorized; any migration, shared-service operation, credentials, paid resource, or production deployment needs separate approval.",
+  "approval_requests": []
+}

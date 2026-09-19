@@ -1,0 +1,9 @@
+{
+  "task_id": "PERSISTENT-MEDIA-001",
+  "head": "3b3036b54d78ed741b35ec686d048ad52f14a9b2",
+  "file_id": 1,
+  "work_order_id": 6,
+  "expected_sha256": "431ced6916a2a21a156e38701afe55bbd7f88969fbbfc56d7fe099d47f265460",
+  "expected_size": 68,
+  "expected_mime": "image/png"
+}

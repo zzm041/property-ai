@@ -1,0 +1,30 @@
+Review `PERSISTENT-MEDIA-001` only. This is an independent read-only review; do not edit files, start/stop services, operate the mini program, or run tests that write MySQL/Redis/RabbitMQ/object storage. Do not create another reviewer.
+
+Baseline and scope:
+- Repository: `D:\property-ai`.
+- Product baseline before this task: `1c8ac1ded21a0ec3fd3b6a9f5406ff536e308e5b`.
+- Product implementation commits: `3b3036b54d78ed741b35ec686d048ad52f14a9b2` and immutable-upload fix `efdff287dd55d3a2e8b18c42a131bf2c5616ad21` (current HEAD).
+- Approval: ordinary product code/tests/docs and isolated synthetic 8083 runtime/page verification were approved. No migration, frozen-dependency change, shared-service maintenance, paid provider, real resident data, upload/release or production action was approved or performed.
+- Operator `miniprogram/project.config.json`, `backend/app/model/ai.py`, the two old AUTH login-review files and unrelated old untracked reports are outside this task. Do not treat them as task changes.
+- Current uncommitted task files should be evidence/coordination only: `reports/persistent-media-001/`, `reports/project-handoff.md`, `reports/codex/context-preamble.txt`, this prompt. Confirm rather than assume.
+
+Overall goal remains the complete frozen Production V1. This task only closes the Development in-process media-loss and page-read boundary; it must not be expanded into production object-storage, real VLM, Day 4 or Production V1 PASS.
+
+Review completion conditions with actual code and evidence:
+1. Development storage persists opaque-key object bytes under the configured isolated path across API process replacement, writes atomically, and does not expose a filesystem path as the storage key.
+2. Registration/upload rejects zero/oversize, unsupported extension/MIME, declared-size mismatch and MIME-magic mismatch; the stored hash is the actual bytes hash. Missing, corrupted, pending or blocked content cannot be attached as if it existed.
+3. File upload is serialized with a database row lock. Same-byte retry is idempotent; different bytes cannot replace an already uploaded/attached object and return stable `FILE.CONFLICT`. Evaluate crash/retry behavior and any remaining race.
+4. `GET /files/{id}/content` is authenticated and anti-IDOR: only uploader or a principal authorized to read an actually related work order can receive bytes. Verify tenant/property behavior, `private, no-store`, `nosniff`, missing-object and integrity failure mappings.
+5. Mini-program downloads with the current bearer session and refresh retry, renders actual work-order media, previews IMAGE and plays AUDIO, and destroys audio context on unload. Confirmation controls now follow the receipt.
+6. Inspect, do not merely cite paths, both final screenshots:
+   - `reports/persistent-media-001/01-detail-with-media.png`
+   - `reports/persistent-media-001/02-after-preview-tap.png`
+   Cross-check `page-evidence.json` with the actual API request path, same work_order_id/file_id, and runtime evidence.
+7. Cross-check `prepare-evidence.json`, `runtime-evidence.json`, `immutability-evidence.json`, their two runner scripts, current HEAD and handoff. The first API process prepared file 1/order 6; the final `efdff28` process read the same bytes and rejected replacement. Evidence must not contain credentials, phones, tokens, resident names or file bytes.
+8. Test evidence: implementer reports targeted 38 passed and full unit `371 passed, 1 warning`; 29 affected integration tests were collect-only because executing their fixture clears protected shared `property_ai_test`. Do not equate collection with integration PASS. You may inspect test code but do not run destructive fixtures.
+9. Production storage returns scanner_status pending and no scanner/finalize path is claimed here. Classify that as RELEASE_BLOCKER unless it invalidates the approved Development slice. Likewise real VLM/ASR, production signed/private delivery and formal release remain open.
+10. Confirm no migration, dependency change, shared 8082 operation, direct DB status stamping, fake front-end success or production claim was introduced.
+
+For every finding, put `CURRENT_TASK_BLOCKER`, `RELEASE_BLOCKER`, or `NON_BLOCKING` in the title and include exact path/location, trigger, impact and evidence. A true current-task blocker requires NEEDS_CHANGES. Release-only gaps remain open but do not invalidate a correct local Development slice. If PASS, set next_action to one concrete main-Codex implementation slice; do not hand work to Cursor or ask the user to relay anything.
+
+Return exactly one schema-valid final JSON with all required fields.

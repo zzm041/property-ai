@@ -1,0 +1,25 @@
+Re-review `PERSISTENT-MEDIA-001` remediation round 1 only. Read-only: do not edit files, start/stop services, operate DevTools, or run stateful integration tests. Do not create another reviewer.
+
+Baseline:
+- Original product feature/fix commits: `3b3036b54d78ed741b35ec686d048ad52f14a9b2` + `efdff287dd55d3a2e8b18c42a131bf2c5616ad21`.
+- Your original review: `reports/codex/PERSISTENT-MEDIA-001-review.json`, decision NEEDS_CHANGES with three CURRENT_TASK_BLOCKER findings and two RELEASE_BLOCKER findings.
+- Remediation commit/current HEAD: `b82c33d07bdfa177cb62240163551c5938af8bed`.
+- Operator `miniprogram/project.config.json` and unrelated dirty/untracked files remain outside scope and untouched.
+
+Check the three existing blocker fixes and only necessary regression context:
+1. Cross-uploader attachment/IDOR: `_attach_media` now requires file tenant match, property match or explicit unscoped property, and uploader_user_id equal to the current actor; denied file IDs return 404 before storage read/add_media. Verify legitimate uploader attachment and authorized related-work-order download still work.
+2. Missing stored bytes after commitment: registration uses a deterministic placeholder hash. A missing object is uploadable only while that placeholder remains; after actual content hash is committed, storage 404 maps to 503 and cannot call put_object. Same-content retry and different-content 409 behavior must remain correct and row-locked.
+3. Persistent cache masking: when persist_dir is configured, DevelopmentStorageProvider reads the disk path first, reflects on-disk corruption, and treats a missing disk file as missing while evicting stale cache. In-memory-only behavior remains available when no persist_dir is configured.
+
+Also check the original image-format release finding: `chooseMedia` now calls `wx.getImageInfo` and maps jpg/jpeg, png and webp to matching MIME and filename; unknown formats fail visibly. Production scanner/finalize remains a RELEASE_BLOCKER, not a reason to fail this Development slice.
+
+Evidence and reported verification:
+- Remediation-targeted tests: `42 passed, 1 warning`; full unit suite: `375 passed, 1 warning`; the reviewer need not rerun them and must not treat implementer PASS alone as evidence—inspect the assertions.
+- The 29 integration tests remain collect-only because their fixture deletes protected shared database rows; do not call that integration PASS.
+- 8083 was restarted on HEAD `b82c33d` as PID 31496, leaving 8082 unchanged. `runtime-evidence.json` now reads the original file 1/order 6 on b82c33d with the original hash; `immutability-evidence.json` shows same bytes 200, replacement `409 FILE.CONFLICT`, and original hash preserved.
+- The same actual mini-program detail/preview path was repeated against b82c33d; `page-evidence.json` names `api-20260920-020442.out.log`. Actually inspect both current screenshots again rather than relying on the original review.
+- Cross-uploader, committed-object loss and stale-cache disk loss/corruption are failure-path unit tests; do not demand destructive deletion of the accepted runtime file.
+
+Do not broaden this round into a full repository re-audit or reopen prior closed findings without new evidence. Classify any remaining item in its title as CURRENT_TASK_BLOCKER, RELEASE_BLOCKER, or NON_BLOCKING with exact path/location, trigger, impact and evidence. If all current-task blockers are closed, decision must be PASS even while production scanner/object storage and other V1 gaps remain open. If PASS, next_action must be one concrete main-Codex implementation slice, not a Cursor handoff or user relay.
+
+Return exactly one schema-valid final JSON with all required fields.

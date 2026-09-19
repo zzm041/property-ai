@@ -1,0 +1,18 @@
+{
+  "task_id": "PERSISTENT-MEDIA-001-IMMUTABLE",
+  "head": "b82c33d07bdfa177cb62240163551c5938af8bed",
+  "file_id": 1,
+  "same_content_retry_status": 200,
+  "same_content_retry_error": null,
+  "different_content_status": 409,
+  "different_content_error": "FILE.CONFLICT",
+  "readback_status": 200,
+  "readback_content_type": "image/png",
+  "original_sha256_preserved": true,
+  "not_claimed": [
+    "real VLM",
+    "production storage",
+    "Production V1"
+  ],
+  "redaction": "No credential, phone, token, resident name, replacement bytes, or original bytes are stored."
+}

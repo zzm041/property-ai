@@ -1,0 +1,27 @@
+{
+  "task_id": "PERSISTENT-MEDIA-001",
+  "head": "3b3036b54d78ed741b35ec686d048ad52f14a9b2",
+  "file_id": 1,
+  "work_order_id": 6,
+  "expected_sha256": "431ced6916a2a21a156e38701afe55bbd7f88969fbbfc56d7fe099d47f265460",
+  "expected_size": 68,
+  "expected_mime": "image/png",
+  "phase": "prepare_before_api_restart",
+  "environment": "8083 -> property_ai_auth001_test @ 20260919_0009",
+  "session": "official password login",
+  "register_status": 200,
+  "upload_status": 200,
+  "create_status": 200,
+  "detail_status": 200,
+  "download_status": 200,
+  "content_type": "image/png",
+  "download_sha256_matches": true,
+  "download_size_matches": true,
+  "detail_links_file": true,
+  "not_claimed": [
+    "real VLM",
+    "production storage",
+    "Production V1"
+  ],
+  "redaction": "No credential, phone, token, resident name, or file bytes are stored."
+}

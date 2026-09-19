@@ -1,0 +1,24 @@
+{
+  "task_id": "PERSISTENT-MEDIA-001-PAGE",
+  "automator_ws": "ws://127.0.0.1:9435",
+  "api_log": "api-20260920-020442.out.log",
+  "login_interaction": "resident password fields and login button",
+  "detail_route": "pages/work-orders/detail?id=6",
+  "work_order_id": 6,
+  "work_order_status": "ASSIGNED",
+  "file_id": 1,
+  "media_kind": "IMAGE",
+  "media_button_tapped": true,
+  "download_200_observed_after_tap": true,
+  "page_error_after_tap": "",
+  "screenshots": [
+    "01-detail-with-media.png",
+    "02-after-preview-tap.png"
+  ],
+  "not_claimed": [
+    "real VLM",
+    "production storage",
+    "Production V1"
+  ],
+  "redaction": "No credential, phone, token, resident name, or file bytes are stored."
+}
