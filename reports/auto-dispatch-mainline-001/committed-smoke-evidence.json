@@ -1,0 +1,76 @@
+{
+  "task_id": "AUTO-DISPATCH-MAINLINE-001-COMMITTED-SMOKE",
+  "captured_at": "2026-09-19T16:53:37.212409+00:00",
+  "head": "20925fe20dfaec04b3d2225b365c02d89688378c",
+  "implementation_commit": "d144bcddcfc24e6e9eaf60509acd124711bc0561",
+  "runtime_restart": {
+    "api_started_at_local": "2026-09-20T00:49:57+08:00",
+    "api_launcher_pid": 26560,
+    "api_listener_pid": 36840,
+    "api_log": "tmp/auth001-runtime/api-20260920-004957.out.log",
+    "worker_started_at_local": "2026-09-20T00:49:31+08:00",
+    "worker_launcher_pid": 17364,
+    "worker_process_chain": [
+      17364,
+      16932,
+      46568,
+      7748
+    ],
+    "worker_log": "tmp/auth001-runtime/worker-20260920-004931.out.log",
+    "api_error_log_empty": true,
+    "worker_error_log_empty": true
+  },
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001",
+    "vhost": "property_ai_auth001",
+    "redis_db": 12,
+    "sms_provider_mode": "DEVELOPMENT",
+    "llm_provider_mode": "DEVELOPMENT"
+  },
+  "readiness": {
+    "healthz": "ok",
+    "readyz": "ready",
+    "mysql": "up",
+    "redis": "up",
+    "rabbitmq": "up",
+    "milvus": "up",
+    "live_vendor_models": "not_checked"
+  },
+  "official_session_create_replay": {
+    "create_status": 200,
+    "replay_status": 200,
+    "work_order_id": 5,
+    "replay_returned_same_id": true,
+    "same_idempotency_key_replayed": true,
+    "analysis_task_received_count": 1,
+    "analysis_task_id": "c4291ac3-79e8-4fab-8acf-1a4617e86080",
+    "final_status": "ASSIGNED",
+    "assignment_reason": "AUTO_DISPATCH",
+    "assignment_actor_is_system": true,
+    "log_events": [
+      "CREATE",
+      "ANALYZE",
+      "ASSIGN"
+    ]
+  },
+  "counter_correction": {
+    "initial_runner_exit_code": 1,
+    "initial_prefix_count": 2,
+    "cause": "The first counter matched both the received and succeeded lines for the same task because it counted only the task-name prefix.",
+    "correction": "The saved count uses the exact event pattern ending in '] received'. The complete new worker log contains exactly one such analysis event and one distinct notification receive event.",
+    "business_request_repeated_after_correction": false
+  },
+  "boundaries": {
+    "official_sms_session": true,
+    "manual_analysis_or_assignment_used": false,
+    "direct_database_write_used": false,
+    "old_8082_touched": false,
+    "shared_queue_touched": false,
+    "real_model_verified": false,
+    "production_v1_passed": false
+  },
+  "redaction": "No phone, SMS code, access/refresh token, credential, resident name, or work-order text is stored."
+}
