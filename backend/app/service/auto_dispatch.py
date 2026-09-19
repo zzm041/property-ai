@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
 from typing import Any
 
 from sqlalchemy import MetaData, Table, inspect as sa_inspect, insert
@@ -15,6 +16,7 @@ from app.domain.ai import (
     AiRisk,
     DispatchCandidate,
     DispatchWeights,
+    FilterReason,
     MappedAnalysis,
     hard_filter_candidate,
     rank_candidates,
@@ -173,6 +175,7 @@ class AutoDispatchService:
         primary_employee_id = None if incident is None else incident.primary_employee_id
         candidates: list[DispatchCandidate] = []
         filter_reasons: dict[int, str | None] = {}
+        recently_rejected = self._recently_rejected_employee_ids(record)
         for employee in employees:
             assignment = self._ai.get_effective_property(
                 employee_id=employee.id,
@@ -228,15 +231,23 @@ class AutoDispatchService:
                 completion_rate=completion,
                 average_rating=rating,
             )
-            reason = hard_filter_candidate(
-                candidate,
-                required_skill=mapped.required_skill,
-                required_duty=mapped.required_duty,
+            reason = (
+                FilterReason.RECENTLY_REJECTED
+                if candidate.employee_id in recently_rejected
+                else hard_filter_candidate(
+                    candidate,
+                    required_skill=mapped.required_skill,
+                    required_duty=mapped.required_duty,
+                )
             )
             candidates.append(candidate)
             filter_reasons[candidate.employee_id] = None if reason is None else reason.value
         ranked = rank_candidates(
-            tuple(candidates),
+            tuple(
+                candidate
+                for candidate in candidates
+                if filter_reasons[candidate.employee_id] is None
+            ),
             required_skill=mapped.required_skill,
             required_duty=mapped.required_duty,
             weights=configured_dispatch_weights(self._settings),
@@ -293,6 +304,12 @@ class AutoDispatchService:
     ) -> str:
         assert self._employees is not None and self._work_orders is not None
         assert self._ai is not None and self._audit is not None
+        prior_assignments = self._work_orders.list_assignments(record.id)
+        if winner.employee_id in self._recently_rejected_employee_ids(
+            record,
+            assignments=prior_assignments,
+        ):
+            return "NO_ELIGIBLE"
         employee = self._employees.get_employee(winner.employee_id)
         if employee is None or employee.status != EmployeeStatus.ACTIVE.value:
             return "NO_ELIGIBLE"
@@ -427,10 +444,21 @@ class AutoDispatchService:
                 incident.primary_employee_id = employee.id
         self._session.flush()
         for item in self._ai.list_recommendations(record.id):
-            if item.employee_id == employee.id:
-                item.selected = 1
+            item.selected = 1 if item.employee_id == employee.id else 0
+        audit_action = (
+            AuditAction.WORK_ORDER_REASSIGNED
+            if prior_assignments
+            else AuditAction.WORK_ORDER_ASSIGNED
+        )
+        audit_details: dict[str, object] = {
+            "work_order_id": record.id,
+            "employee_id": employee.id,
+            "status": record.status,
+        }
+        if prior_assignments:
+            audit_details["reason_code"] = "AUTO_REASSIGN"
         self._audit.append(
-            action=AuditAction.WORK_ORDER_ASSIGNED,
+            action=audit_action,
             resource_type=AuditResourceType.WORK_ORDER_ASSIGNMENT,
             actor_user_id=None,
             resource_id=assignment_id,
@@ -438,11 +466,7 @@ class AutoDispatchService:
             scope_type=ScopeType.PROPERTY,
             tenant_id=record.tenant_id,
             property_id=record.property_id,
-            details={
-                "work_order_id": record.id,
-                "employee_id": employee.id,
-                "status": record.status,
-            },
+            details=audit_details,
         )
         if employee.user_id:
             NotificationService(self._session, settings=self._settings).enqueue(
@@ -463,6 +487,30 @@ class AutoDispatchService:
             request_id=request_id,
         )
         return "ASSIGNED"
+
+    def _recently_rejected_employee_ids(
+        self,
+        record: WorkOrder,
+        *,
+        assignments: tuple[object, ...] | None = None,
+    ) -> frozenset[int]:
+        assert self._work_orders is not None
+        cooldown = self._settings.dispatch_reject_cooldown_seconds
+        if cooldown <= 0:
+            return frozenset()
+        history = (
+            self._work_orders.list_assignments(record.id)
+            if assignments is None
+            else assignments
+        )
+        cutoff = utc_now() - timedelta(seconds=cooldown)
+        return frozenset(
+            int(item.employee_id)
+            for item in history
+            if item.status == AssignmentStatus.REJECTED.value
+            and item.ended_at is not None
+            and item.ended_at >= cutoff
+        )
 
     def _insert_auto_assignment(
         self,

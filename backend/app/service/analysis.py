@@ -158,8 +158,17 @@ class AnalysisService:
             request_id=request_id,
             actor=actor,
         )
-        if snapshot is None or snapshot.skipped:
+        if snapshot is None:
             return self._ai.get_current_analysis(work_order_id)
+        if snapshot.skipped:
+            current = self._ai.get_current_analysis(work_order_id)
+            if current is not None:
+                self._retry_auto_dispatch_from_existing(
+                    work_order_id=work_order_id,
+                    analysis_id=current.id,
+                    request_id=request_id,
+                )
+            return current
         bundle = self._call_providers(snapshot=snapshot, request_id=request_id, attempt=attempt)
         return self._apply(
             snapshot=snapshot,
@@ -167,6 +176,75 @@ class AnalysisService:
             request_id=request_id,
             attempt=attempt,
         )
+
+    def _retry_auto_dispatch_from_existing(
+        self,
+        *,
+        work_order_id: int,
+        analysis_id: int,
+        request_id: str,
+    ) -> str:
+        with begin_owned_transaction(self._session):
+            record = self._work_orders.get_work_order_for_update(work_order_id)
+            current = self._ai.get_current_analysis_for_update(work_order_id)
+            if (
+                record is None
+                or record.status != WorkOrderStatus.PENDING_ASSIGNMENT.value
+                or current is None
+                or current.id != analysis_id
+                or current.status != AnalysisStatus.COMPLETED.value
+            ):
+                return "STALE_STATUS"
+            mapped = self._mapped_from_stored_analysis(current)
+            if mapped is None:
+                return "INVALID_ANALYSIS"
+            from app.service.auto_dispatch import AutoDispatchService
+
+            outcome = AutoDispatchService(
+                self._session,
+                settings=self._settings,
+            ).maybe_assign(
+                work_order=record,
+                mapped=mapped,
+                request_id=request_id,
+            )
+            logger.info(
+                "auto_redispatch_outcome",
+                work_order_id=record.id,
+                analysis_id=current.id,
+                outcome=outcome,
+                request_id=request_id,
+            )
+            return outcome
+
+    def _mapped_from_stored_analysis(
+        self,
+        analysis: WorkOrderAnalysis,
+    ) -> MappedAnalysis | None:
+        fields = {
+            "category": analysis.category,
+            "subcategory": analysis.subcategory,
+            "severity": analysis.severity,
+            "priority": analysis.priority,
+            "summary": analysis.summary,
+            "risk": analysis.risk,
+            "required_role": analysis.required_role,
+            "required_skill": analysis.required_skill,
+            "confidence": (
+                None if analysis.confidence is None else float(analysis.confidence)
+            ),
+        }
+        if any(value is None for value in fields.values()):
+            return None
+        try:
+            output = WorkOrderAnalysisOutput.model_validate(fields)
+            return map_analysis_output(
+                output,
+                threshold=self._settings.ai_confidence_threshold
+                or DEFAULT_CONFIDENCE_THRESHOLD,
+            )
+        except (ValidationError, ValueError):
+            return None
 
     def get_analysis(
         self,

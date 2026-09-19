@@ -89,6 +89,11 @@ class Settings(BaseSettings):
         ge=1.0,
         le=86400.0,
     )
+    dispatch_reject_cooldown_seconds: int = Field(
+        default=1800,
+        ge=0,
+        le=86400,
+    )
     incident_window_minutes: int = Field(default=10, ge=1, le=1440)
     incident_threshold: int = Field(default=5, ge=2, le=100)
     milvus_uri: str = "http://127.0.0.1:19530"

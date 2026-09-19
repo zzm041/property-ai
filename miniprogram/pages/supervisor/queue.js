@@ -7,6 +7,10 @@ Page({
     tenantId: "",
     employeeId: "",
     selectedId: "",
+    selectedStatus: "",
+    selectedProcessReason: "",
+    selectedVersion: "",
+    decisionReason: "",
     recommendations: [],
     loading: false,
     nextCursor: "",
@@ -56,7 +60,16 @@ Page({
     ).catch(() => {});
   },
   select(e) {
-    this.setData({ selectedId: e.currentTarget.dataset.id, recommendations: [] });
+    const selectedId = Number(e.currentTarget.dataset.id);
+    const selected = this.data.items.find((item) => item.id === selectedId);
+    this.setData({
+      selectedId,
+      selectedStatus: selected ? selected.status : "",
+      selectedProcessReason: selected ? selected.process_reason : "",
+      selectedVersion: selected ? selected.version : "",
+      recommendations: [],
+      decisionReason: "",
+    });
   },
   selectEmployee(e) {
     this.setData({ employeeId: String(e.currentTarget.dataset.id) });
@@ -82,16 +95,65 @@ Page({
   reassign() {
     this._dispatch("reassignWorkOrder");
   },
+  onDecisionReason(e) {
+    this.setData({ decisionReason: e.detail.value });
+  },
+  decide(e) {
+    const decision = e.currentTarget.dataset.decision;
+    const reason = this.data.decisionReason.trim();
+    if (!this.data.selectedId || this.data.selectedStatus !== "PROCESSING") {
+      this.setData({ error: "请先选择异常处理中的工单" });
+      return;
+    }
+    if (decision === "CONTINUE" && !reason) {
+      this.setData({ error: "继续处理必须填写方案说明" });
+      return;
+    }
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, () =>
+      require("../../services/api")
+        .decideWorkOrder(this.data.selectedId, {
+          decision,
+          reason: reason || null,
+          version: Number(this.data.selectedVersion),
+        })
+        .then(() => {
+          this._clearSelection();
+          this.load();
+        })
+    ).catch(() => {});
+  },
   _dispatch(name) {
     if (!this.data.selectedId || !this.data.employeeId) {
       this.setData({ error: "请选择工单和在岗员工" });
+      return;
+    }
+    const reason = this.data.decisionReason.trim();
+    if (name === "reassignWorkOrder" && !reason) {
+      this.setData({ error: "改派必须填写原因" });
       return;
     }
     const { withLoading } = require("../../utils/ui");
     withLoading(this, () =>
       require("../../services/api")[name](this.data.selectedId, {
         employee_id: Number(this.data.employeeId),
-      }).then(() => this.load())
+        reason: reason || null,
+        version: Number(this.data.selectedVersion),
+      }).then(() => {
+        this._clearSelection();
+        this.load();
+      })
     ).catch(() => {});
+  },
+  _clearSelection() {
+    this.setData({
+      selectedId: "",
+      selectedStatus: "",
+      selectedProcessReason: "",
+      selectedVersion: "",
+      employeeId: "",
+      decisionReason: "",
+      recommendations: [],
+    });
   },
 });

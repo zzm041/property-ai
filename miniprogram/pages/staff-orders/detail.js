@@ -1,11 +1,32 @@
+function imageUploadType(type) {
+  const normalized = String(type || "").toLowerCase();
+  return {
+    jpg: { mimeType: "image/jpeg", originalName: "after.jpg" },
+    jpeg: { mimeType: "image/jpeg", originalName: "after.jpg" },
+    png: { mimeType: "image/png", originalName: "after.png" },
+    webp: { mimeType: "image/webp", originalName: "after.webp" },
+  }[normalized];
+}
+
 Page({
   data: {
     item: null,
     workOrder: null,
     logs: [],
     canAccept: false,
+    canReject: false,
     canStart: false,
+    canEscalate: false,
     canFinish: false,
+    rejectReason: "",
+    escalationReason: "",
+    escalationIndex: 0,
+    escalationOptions: [
+      { value: "INTERNAL_UNRESOLVED", label: "内部无法解决，升级主管" },
+      { value: "WAITING_PARTS", label: "等待配件" },
+      { value: "WAITING_OWNER", label: "等待住户配合" },
+      { value: "ESCALATED", label: "其他异常，升级主管" },
+    ],
     feedback: "",
     problemType: "",
     method: "",
@@ -13,6 +34,8 @@ Page({
     hasFee: false,
     feeAmount: "",
     followUp: "",
+    receiptResolved: true,
+    unresolvedReason: "",
     loading: false,
     error: "",
     mediaHint: "",
@@ -30,20 +53,45 @@ Page({
         .then((item) => {
           const workOrder = workOrderOf(item);
           const status = workOrder ? workOrder.status : "";
+          const processReason = workOrder ? workOrder.process_reason : "NONE";
           require("../../services/auth").setLastWorkOrderId(this.id);
           this.setData({
             item,
             workOrder,
             logs: (item && item.logs) || [],
             canAccept: status === "ASSIGNED",
+            canReject: status === "ASSIGNED",
             canStart: status === "ACCEPTED",
-            canFinish: status === "PROCESSING",
+            canEscalate: status === "PROCESSING" && processReason === "NONE",
+            canFinish: status === "PROCESSING" && processReason === "NONE",
           });
         })
     ).catch(() => {});
   },
   accept() {
     this._act("acceptWorkOrder");
+  },
+  onRejectReason(e) {
+    this.setData({ rejectReason: e.detail.value });
+  },
+  reject() {
+    const reason = this.data.rejectReason.trim();
+    if (!reason) {
+      this.setData({ error: "请填写拒单原因" });
+      return;
+    }
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, () =>
+      require("../../services/api")
+        .rejectWorkOrder(this.id, {
+          reason,
+          version: this.data.workOrder.version,
+        })
+        .then(() => {
+          wx.showToast({ title: "已拒单，系统重新安排中", icon: "none" });
+          setTimeout(() => wx.navigateBack(), 500);
+        })
+    ).catch(() => {});
   },
   start() {
     this._act("startWorkOrder");
@@ -72,27 +120,71 @@ Page({
   onFollowUp(e) {
     this.setData({ followUp: e.detail.value });
   },
+  onReceiptResolved(e) {
+    this.setData({ receiptResolved: e.detail.value });
+  },
+  onUnresolvedReason(e) {
+    this.setData({ unresolvedReason: e.detail.value });
+  },
+  onEscalationType(e) {
+    this.setData({ escalationIndex: Number(e.detail.value) });
+  },
+  onEscalationReason(e) {
+    this.setData({ escalationReason: e.detail.value });
+  },
+  escalate() {
+    const reason = this.data.escalationReason.trim();
+    if (!reason) {
+      this.setData({ error: "请填写异常或等待原因" });
+      return;
+    }
+    const selected = this.data.escalationOptions[this.data.escalationIndex];
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, () =>
+      require("../../services/api")
+        .escalateWorkOrder(this.id, {
+          process_reason: selected.value,
+          reason,
+          version: this.data.workOrder.version,
+        })
+        .then(() => this.reload())
+    ).catch(() => {});
+  },
   chooseAfterImage() {
     wx.chooseMedia({
       count: 1,
       mediaType: ["image"],
       success: (result) => {
         const file = result.tempFiles[0];
-        const api = require("../../services/api");
-        const { withLoading } = require("../../utils/ui");
-        withLoading(this, () =>
-          api
-            .registerAndUpload({
-              filePath: file.tempFilePath,
-              mimeType: "image/jpeg",
-              sizeBytes: file.size,
-              originalName: "after.jpg",
-            })
-            .then((record) => {
-              const fileIds = this.data.fileIds.concat(record.id);
-              this.setData({ fileIds, mediaHint: `已添加 ${fileIds.length} 张完工照片` });
-            })
-        ).catch(() => {});
+        wx.getImageInfo({
+          src: file.tempFilePath,
+          success: (info) => {
+            const uploadType = imageUploadType(info.type);
+            if (!uploadType) {
+              this.setData({ error: "不支持该图片格式" });
+              return;
+            }
+            const api = require("../../services/api");
+            const { withLoading } = require("../../utils/ui");
+            withLoading(this, () =>
+              api
+                .registerAndUpload({
+                  filePath: file.tempFilePath,
+                  mimeType: uploadType.mimeType,
+                  sizeBytes: file.size,
+                  originalName: uploadType.originalName,
+                })
+                .then((record) => {
+                  const fileIds = this.data.fileIds.concat(record.id);
+                  this.setData({
+                    fileIds,
+                    mediaHint: `已添加 ${fileIds.length} 张完工照片`,
+                  });
+                })
+            ).catch(() => {});
+          },
+          fail: () => this.setData({ error: "无法识别图片格式" }),
+        });
       },
       fail: (error) => this.setData({ error: error.errMsg || "选择图片失败" }),
     });
@@ -115,9 +207,14 @@ Page({
     const method = this.data.method.trim();
     const materials = this.data.materials.trim();
     const followUp = this.data.followUp.trim();
+    const unresolvedReason = this.data.unresolvedReason.trim();
     const feeAmount = this.data.feeAmount.trim();
     if (!problemType || !method) {
       this.setData({ error: "请填写问题类型和处理方式与过程" });
+      return;
+    }
+    if (!this.data.receiptResolved && !unresolvedReason) {
+      this.setData({ error: "未解决回执必须填写未解决原因" });
       return;
     }
     const parsedFeeAmount = Number(feeAmount);
@@ -137,7 +234,8 @@ Page({
           materials: materials || null,
           fee_flag: this.data.hasFee ? "RECORDED" : "NONE",
           fee_amount: this.data.hasFee ? feeAmount : null,
-          resolved: true,
+          resolved: this.data.receiptResolved,
+          unresolved_reason: this.data.receiptResolved ? null : unresolvedReason,
           follow_up: followUp || null,
           file_ids: this.data.fileIds,
           version: this.data.workOrder.version,

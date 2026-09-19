@@ -327,12 +327,16 @@ module.exports = {
   staffWorkOrders: () => request({ path: "/staff/work-orders" }),
   acceptWorkOrder: (id, body = {}) =>
     request({ path: `/staff/work-orders/${id}/accept`, method: "POST", data: body }),
+  rejectWorkOrder: (id, body) =>
+    request({ path: `/staff/work-orders/${id}/reject`, method: "POST", data: body }),
   startWorkOrder: (id, body = {}) =>
     request({ path: `/staff/work-orders/${id}/start`, method: "POST", data: body }),
   feedbackWorkOrder: (id, body) =>
     request({ path: `/staff/work-orders/${id}/feedback`, method: "POST", data: body }),
   resolveWorkOrder: (id, body) =>
     request({ path: `/staff/work-orders/${id}/receipts`, method: "POST", data: body }),
+  escalateWorkOrder: (id, body) =>
+    request({ path: `/staff/work-orders/${id}/escalate`, method: "POST", data: body }),
   supervisorQueue: (propertyId, afterId) =>
     request({
       path: `/supervisor/work-orders?property_id=${propertyId}${
@@ -347,6 +351,8 @@ module.exports = {
       method: "POST",
       data: { decision: "REASSIGN", ...body },
     }),
+  decideWorkOrder: (id, body) =>
+    request({ path: `/supervisor/work-orders/${id}/decide`, method: "POST", data: body }),
   analyzeWorkOrder: (id) =>
     request({ path: `/supervisor/work-orders/${id}/analyze`, method: "POST", data: {} }),
   workOrderRecommendations: (id) =>

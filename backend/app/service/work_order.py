@@ -153,10 +153,14 @@ _QUEUE_STATUSES = tuple(
     WorkOrderStatus.PROCESSING.value,
 )
 _ESCALATION_REASONS = frozenset(
+    reason.value for reason in WAITING_PROCESS_REASONS
+)
+_STAFF_ESCALATION_REASONS = frozenset(
     {
-        ProcessReason.ESCALATED.value,
-        ProcessReason.INTERNAL_UNRESOLVED.value,
-        ProcessReason.REASSIGN_REQUIRED.value,
+        ProcessReason.WAITING_OWNER,
+        ProcessReason.WAITING_PARTS,
+        ProcessReason.INTERNAL_UNRESOLVED,
+        ProcessReason.ESCALATED,
     }
 )
 
@@ -851,7 +855,7 @@ class WorkOrderService:
                 message="reason is required",
                 status_code=422,
             )
-        return self._execute(
+        record = self._execute(
             lambda: self._reject(
                 actor=actor,
                 work_order_id=work_order_id,
@@ -860,6 +864,8 @@ class WorkOrderService:
                 version=version,
             )
         )
+        self._enqueue_analysis(record.id, request_id)
+        return record
 
     def start(
         self,
@@ -1672,6 +1678,13 @@ class WorkOrderService:
                 message="Decision is only allowed while processing",
                 status_code=409,
             )
+        cleaned_reason = self._optional_text(reason)
+        if code is SupervisorDecision.CONTINUE and cleaned_reason is None:
+            raise AppError(
+                code=WorkOrderErrorCode.INVALID_INPUT,
+                message="reason is required for CONTINUE",
+                status_code=422,
+            )
         if code is SupervisorDecision.REASSIGN:
             if employee_id is None:
                 self._end_active_assignment(
@@ -1707,7 +1720,7 @@ class WorkOrderService:
                 SupervisorDecision.EXTERNAL_COORDINATION: (
                     ProcessReason.EXTERNAL_COORDINATION
                 ),
-                SupervisorDecision.CONTINUE: ProcessReason(record.process_reason),
+                SupervisorDecision.CONTINUE: ProcessReason.NONE,
             }
             target_reason = reason_map[code]
             self._apply_transition(
@@ -1719,6 +1732,7 @@ class WorkOrderService:
                 request_id=request_id,
                 process_reason=target_reason,
                 reason_code=code.value,
+                reason_detail=cleaned_reason,
             )
         self._append_audit(
             action=AuditAction.WORK_ORDER_DECIDED,
@@ -1918,6 +1932,19 @@ class WorkOrderService:
             )
             if target_reason is ProcessReason.INTERNAL_UNRESOLVED:
                 target_reason = ProcessReason.ESCALATED
+        if (
+            ProcessReason(record.process_reason) in WAITING_PROCESS_REASONS
+            and target_reason is ProcessReason.NONE
+            and not current.has_permission(
+                WORK_ORDER_DECIDE,
+                self._property_scope(record),
+            )
+        ):
+            raise AppError(
+                code=WorkOrderErrorCode.INVALID_TRANSITION,
+                message="Only a supervisor can resume an escalated work order",
+                status_code=409,
+            )
         self._apply_transition(
             record,
             event=WorkOrderEvent.PROCESS_UPDATE,
@@ -2118,7 +2145,7 @@ class WorkOrderService:
             ProcessReason.ESCALATED,
             "process_reason",
         )
-        if target not in WAITING_PROCESS_REASONS:
+        if target not in _STAFF_ESCALATION_REASONS:
             raise AppError(
                 code=WorkOrderErrorCode.INVALID_INPUT,
                 message="process_reason is not an escalation reason",
@@ -2132,7 +2159,8 @@ class WorkOrderService:
             actor_type=self._actor_type(current, record),
             request_id=request_id,
             process_reason=target,
-            reason_code=reason[:64],
+            reason_code=target.value,
+            reason_detail=reason,
         )
         self._append_audit(
             action=AuditAction.WORK_ORDER_PROCESS_UPDATED,
@@ -2226,6 +2254,7 @@ class WorkOrderService:
         request_id: str,
         process_reason: ProcessReason | None = None,
         reason_code: str | None = None,
+        reason_detail: str | None = None,
     ) -> None:
         from_status = WorkOrderStatus(record.status)
         try:
@@ -2256,6 +2285,7 @@ class WorkOrderService:
             event=event,
             request_id=request_id,
             reason_code=reason_code,
+            reason_detail=reason_detail,
         )
         self._session.flush()
 
@@ -2270,10 +2300,13 @@ class WorkOrderService:
         event: WorkOrderEvent,
         request_id: str,
         reason_code: str | None = None,
+        reason_detail: str | None = None,
     ) -> None:
         payload: dict[str, object] = {"event_code": event.value}
         if reason_code is not None:
             payload["reason_code"] = reason_code
+        if reason_detail is not None:
+            payload["reason"] = reason_detail
         self._repository.add_log(
             WorkOrderLog(
                 tenant_id=record.tenant_id,

@@ -255,7 +255,7 @@ def test_manual_dispatch_and_staff_loop(identity_session: Session) -> None:
         )
         decided = client.post(
             f"/api/v1/supervisor/work-orders/{work_order_id}/decide",
-            json={"decision": "CONTINUE"},
+            json={"decision": "CONTINUE", "reason": "Parts have arrived"},
             headers=_auth(manager, "t6-decide"),
         )
         cleared = client.post(

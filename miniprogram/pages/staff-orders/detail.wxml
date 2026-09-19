@@ -2,8 +2,21 @@
 <view class="card" wx:if="{{workOrder}}">
   <view>工单 {{workOrder.id}}</view>
   <view>状态 {{workOrder.status}}</view>
+  <view wx:if="{{workOrder.process_reason != 'NONE'}}">处理原因 {{workOrder.process_reason}}</view>
   <button class="btn" wx:if="{{canAccept}}" bindtap="accept">接单</button>
+  <block wx:if="{{canReject}}">
+    <textarea class="field" placeholder="拒单原因（必填）" value="{{rejectReason}}" bindinput="onRejectReason" maxlength="255"></textarea>
+    <button class="btn btn-secondary" bindtap="reject" disabled="{{loading}}">拒单并自动改派</button>
+  </block>
   <button class="btn" wx:if="{{canStart}}" bindtap="start">开始处理</button>
+  <block wx:if="{{canEscalate}}">
+    <view class="section-title">异常上报</view>
+    <picker mode="selector" range="{{escalationOptions}}" range-key="label" value="{{escalationIndex}}" bindchange="onEscalationType">
+      <view class="field">{{escalationOptions[escalationIndex].label}}</view>
+    </picker>
+    <textarea class="field" placeholder="异常或等待原因（必填）" value="{{escalationReason}}" bindinput="onEscalationReason" maxlength="255"></textarea>
+    <button class="btn btn-secondary" bindtap="escalate" disabled="{{loading}}">提交主管处理</button>
+  </block>
   <block wx:if="{{canFinish}}">
     <view class="section-title">处理回执</view>
     <view class="field-label">问题类型（必填）</view>
@@ -19,11 +32,16 @@
     <input wx:if="{{hasFee}}" class="field" type="digit" placeholder="费用金额（元）" value="{{feeAmount}}" bindinput="onFeeAmount" />
     <view class="field-label">后续处理方式</view>
     <input class="field" placeholder="无需跟进可留空" value="{{followUp}}" bindinput="onFollowUp" maxlength="255" />
+    <view class="switch-row">
+      <text>问题已解决</text>
+      <switch checked="{{receiptResolved}}" bindchange="onReceiptResolved" />
+    </view>
+    <textarea wx:if="{{!receiptResolved}}" class="field" placeholder="未解决原因（必填）" value="{{unresolvedReason}}" bindinput="onUnresolvedReason" maxlength="255"></textarea>
     <button class="btn" bindtap="chooseAfterImage">完工照片（可选）</button>
     <view class="empty" wx:if="{{mediaHint}}">{{mediaHint}}</view>
     <textarea placeholder="处理反馈（可选）" bindinput="onFeedback"></textarea>
     <button class="btn" bindtap="feedback">提交反馈</button>
-    <button class="btn" bindtap="resolve" disabled="{{loading}}">提交完整回执并完成</button>
+    <button class="btn" bindtap="resolve" disabled="{{loading}}">{{receiptResolved ? "提交完整回执并完成" : "提交未解决回执并上报"}}</button>
   </block>
 </view>
 <view class="card" wx:if="{{logs.length}}">

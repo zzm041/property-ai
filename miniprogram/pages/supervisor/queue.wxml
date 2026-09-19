@@ -4,7 +4,7 @@
 <view class="loading" wx:if="{{loading}}">加载中...</view>
 <view class="empty" wx:if="{{!loading && !items.length}}">暂无待派工单</view>
 <view class="card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="select">
-  {{item.id}} {{item.status}} {{selectedId == item.id ? "已选" : ""}}
+  {{item.id}} {{item.status}} {{item.process_reason}} {{selectedId == item.id ? "已选" : ""}}
 </view>
 <view class="card">
   <view>点选在岗员工（employee_id，不是 user_id）</view>
@@ -18,8 +18,18 @@
   >员工 {{item.employee_id}} {{item.on_duty}} 负荷 {{item.current_load}} {{employeeId == item.employee_id ? "已选" : ""}}</view>
 </view>
 <button class="btn" bindtap="recommend">AI 建议（Fake Provider）</button>
-<button class="btn" bindtap="assign">派单</button>
-<button class="btn" bindtap="reassign">改派</button>
+<button class="btn" wx:if="{{selectedStatus == 'PENDING_ANALYSIS' || selectedStatus == 'PENDING_ASSIGNMENT'}}" bindtap="assign">人工后备派单</button>
+<block wx:if="{{selectedStatus == 'PROCESSING'}}">
+  <view class="card">
+    <view>异常决策 {{selectedProcessReason}}</view>
+    <textarea placeholder="处理方案说明；继续处理时必填" value="{{decisionReason}}" bindinput="onDecisionReason" maxlength="255"></textarea>
+    <button class="btn" bindtap="reassign">改派给已选在岗员工</button>
+    <button class="btn btn-secondary" data-decision="WAIT_PARTS" bindtap="decide">等待配件</button>
+    <button class="btn btn-secondary" data-decision="WAIT_OWNER" bindtap="decide">等待住户配合</button>
+    <button class="btn btn-secondary" data-decision="EXTERNAL_COORDINATION" bindtap="decide">物业协调第三方</button>
+    <button class="btn" data-decision="CONTINUE" bindtap="decide">按说明继续处理</button>
+  </view>
+</block>
 <view class="card" wx:for="{{recommendations}}" wx:key="employee_id">
   员工 {{item.employee_id}} 分 {{item.score}} {{item.eligible ? "可派" : item.filter_reason}}
 </view>
