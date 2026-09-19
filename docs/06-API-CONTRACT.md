@@ -181,6 +181,7 @@
 
 - 大小上限环境变量 `UPLOAD_MAX_MB`
 - MIME allowlist + 魔数校验
+- `file_id` 关联工单前必须属于当前操作人，并与工单 tenant/property 一致；不得通过猜测 ID 引用他人附件
 - 图片/音频病毒扫描位（V1 可先记 `scanner_status=skipped_dev`，生产接 Provider）
 - 不接受可执行文件后缀
 

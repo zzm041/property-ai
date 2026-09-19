@@ -10,10 +10,12 @@ from app.domain.iam import Principal
 from app.domain.work_order import MediaTakenPhase
 from app.model.work_order import FileObject, WorkOrder
 from app.provider.errors import ProviderInvalidOutputError
+from app.provider.storage import DevelopmentStorageProvider
 from app.service.work_order import (
     WorkOrderService,
     _content_matches_mime,
     _filename_matches_mime,
+    _registration_content_hash,
 )
 
 
@@ -85,7 +87,7 @@ def test_filename_extension_must_match_declared_mime() -> None:
 
 def test_upload_validates_bytes_and_records_actual_hash() -> None:
     record = _file()
-    record.content_hash = "registration-placeholder"
+    record.content_hash = _registration_content_hash(record)
     service = _service(record)
     service._storage.get_object.side_effect = ProviderInvalidOutputError(
         "Object was not found"
@@ -140,6 +142,26 @@ def test_uploaded_file_content_cannot_be_replaced() -> None:
 
     assert caught.value.code == FileErrorCode.CONFLICT
     assert caught.value.status_code == 409
+    service._storage.put_object.assert_not_called()
+
+
+def test_committed_file_cannot_be_recreated_after_storage_loss() -> None:
+    record = _file()
+    service = _service(record)
+    service._storage.get_object.side_effect = ProviderInvalidOutputError(
+        "Object was not found"
+    )
+
+    with pytest.raises(AppError) as caught:
+        service._put_file_content(
+            actor=_actor(),
+            file_id=record.id,
+            content=b"\xff\xd8\xff\xe1",
+            request_id="persistent-media-missing-immutable",
+        )
+
+    assert caught.value.code == FileErrorCode.STORAGE_UNAVAILABLE
+    assert caught.value.status_code == 503
     service._storage.put_object.assert_not_called()
 
 
@@ -250,6 +272,36 @@ def test_registered_metadata_without_content_cannot_be_attached() -> None:
     service._repository.add_media.assert_not_called()
 
 
+@pytest.mark.parametrize(
+    ("uploader_user_id", "property_id"),
+    ((8, 3), (7, 4)),
+)
+def test_other_uploader_or_property_file_cannot_be_attached(
+    uploader_user_id: int,
+    property_id: int,
+) -> None:
+    record = _file(uploader_user_id=uploader_user_id)
+    record.property_id = property_id
+    service = _service(record)
+    work_order = WorkOrder()
+    work_order.id = 5
+    work_order.tenant_id = record.tenant_id
+    work_order.property_id = 3
+
+    with pytest.raises(AppError) as caught:
+        service._attach_media(
+            work_order,
+            actor=_actor(),
+            file_ids=(record.id,),
+            taken_phase=MediaTakenPhase.BEFORE,
+        )
+
+    assert caught.value.code == FileErrorCode.NOT_FOUND
+    assert caught.value.status_code == 404
+    service._storage.get_object.assert_not_called()
+    service._repository.add_media.assert_not_called()
+
+
 def test_integrity_checked_content_can_be_attached() -> None:
     record = _file()
     service = _service(record)
@@ -268,6 +320,29 @@ def test_integrity_checked_content_can_be_attached() -> None:
     service._repository.add_media.assert_called_once()
 
 
+def test_persistent_storage_does_not_mask_disk_loss_or_corruption(tmp_path) -> None:
+    from app.provider import storage as storage_mod
+
+    storage = DevelopmentStorageProvider(persist_dir=str(tmp_path))
+    stored = storage.register_object(
+        mime_type="image/jpeg",
+        size_bytes=len(JPEG),
+        tenant_id=2,
+        property_id=3,
+    )
+    storage.put_object(stored.storage_key, JPEG, "image/jpeg")
+    path = storage._persist_path(stored.storage_key)
+    assert path is not None
+
+    path.write_bytes(b"\xff\xd8\xff\xe1")
+    assert storage.get_object(stored.storage_key) == b"\xff\xd8\xff\xe1"
+
+    path.unlink()
+    with pytest.raises(ProviderInvalidOutputError):
+        storage.get_object(stored.storage_key)
+    assert stored.storage_key not in storage_mod._DEV_OBJECTS
+
+
 def test_miniprogram_has_authenticated_media_download_and_preview() -> None:
     api_source = (REPO_ROOT / "miniprogram/services/api.js").read_text(
         encoding="utf-8"
@@ -283,5 +358,11 @@ def test_miniprogram_has_authenticated_media_download_and_preview() -> None:
     assert "Authorization" in api_source
     assert "previewMedia" in page_source
     assert "playMedia" in page_source
+    create_source = (
+        REPO_ROOT / "miniprogram/pages/work-orders/create.js"
+    ).read_text(encoding="utf-8")
+    assert "wx.getImageInfo" in create_source
+    assert 'mimeType: "image/png"' in create_source
+    assert 'mimeType: "image/webp"' in create_source
     assert "查看图片" in template
     assert "播放语音" in template

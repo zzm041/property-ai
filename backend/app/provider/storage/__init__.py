@@ -112,14 +112,17 @@ class DevelopmentStorageProvider(StorageProvider):
         _DEV_OBJECTS[storage_key] = content
 
     def get_object(self, storage_key: str) -> bytes:
+        path = self._persist_path(storage_key)
+        if path is not None:
+            if path.is_file():
+                data = path.read_bytes()
+                _DEV_OBJECTS[storage_key] = data
+                return data
+            _DEV_OBJECTS.pop(storage_key, None)
+            raise ProviderInvalidOutputError("Object was not found")
         cached = _DEV_OBJECTS.get(storage_key)
         if cached is not None:
             return cached
-        path = self._persist_path(storage_key)
-        if path is not None and path.is_file():
-            data = path.read_bytes()
-            _DEV_OBJECTS[storage_key] = data
-            return data
         raise ProviderInvalidOutputError("Object was not found")
 
 

@@ -9,6 +9,16 @@ function audioMimeType(filename) {
   }[extension];
 }
 
+function imageUploadType(type) {
+  const normalized = String(type || "").toLowerCase();
+  return {
+    jpg: { mimeType: "image/jpeg", originalName: "repair.jpg" },
+    jpeg: { mimeType: "image/jpeg", originalName: "repair.jpg" },
+    png: { mimeType: "image/png", originalName: "repair.png" },
+    webp: { mimeType: "image/webp", originalName: "repair.webp" },
+  }[normalized];
+}
+
 Page({
   data: {
     houseId: "",
@@ -55,7 +65,23 @@ Page({
       mediaType: [mediaType],
       success: (result) => {
         const file = result.tempFiles[0];
-        this._upload(file.tempFilePath, "image/jpeg", file.size, "repair.jpg");
+        wx.getImageInfo({
+          src: file.tempFilePath,
+          success: (info) => {
+            const uploadType = imageUploadType(info.type);
+            if (!uploadType) {
+              this.setData({ error: "不支持该图片格式" });
+              return;
+            }
+            this._upload(
+              file.tempFilePath,
+              uploadType.mimeType,
+              file.size,
+              uploadType.originalName
+            );
+          },
+          fail: () => this.setData({ error: "无法识别图片格式" }),
+        });
       },
       fail: (error) => this.setData({ error: error.errMsg || "选择图片失败" }),
     });

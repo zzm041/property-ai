@@ -136,6 +136,12 @@ def _filename_matches_mime(mime_type: str, filename: str | None) -> bool:
         mime_type,
         frozenset(),
     )
+
+
+def _registration_content_hash(record: FileObject) -> str:
+    return sha256(
+        f"{record.storage_key}:{record.mime_type}:{record.size_bytes}".encode()
+    ).hexdigest()
 _ACTIVE_ASSIGNMENT_UNIQUE = frozenset(
     {"uq_work_order_assignments_active_work_order"}
 )
@@ -265,22 +271,19 @@ class WorkOrderService:
                 property_id=resolved_property_id,
             )
             stored_holder["stored"] = stored
-            digest = sha256(
-                f"{stored.storage_key}:{normalized_mime}:{size_bytes}".encode()
-            ).hexdigest()
-            record = self._repository.add_file(
-                FileObject(
-                    tenant_id=resolved_tenant_id,
-                    property_id=resolved_property_id,
-                    uploader_user_id=actor.user_id,
-                    content_hash=digest,
-                    mime_type=normalized_mime,
-                    size_bytes=size_bytes,
-                    storage_key=stored.storage_key,
-                    original_name=original_name,
-                    scanner_status=stored.scanner_status,
-                )
+            record = FileObject(
+                tenant_id=resolved_tenant_id,
+                property_id=resolved_property_id,
+                uploader_user_id=actor.user_id,
+                content_hash="",
+                mime_type=normalized_mime,
+                size_bytes=size_bytes,
+                storage_key=stored.storage_key,
+                original_name=original_name,
+                scanner_status=stored.scanner_status,
             )
+            record.content_hash = _registration_content_hash(record)
+            record = self._repository.add_file(record)
             return record
 
         record = self._execute(_persist)
@@ -358,9 +361,22 @@ class WorkOrderService:
             ProviderUnavailableError,
         )
 
+        placeholder_hash = _registration_content_hash(record)
         try:
             existing = self._storage.get_object(record.storage_key)
         except ProviderInvalidOutputError:
+            if record.content_hash != placeholder_hash:
+                logger.error(
+                    "stored_object_missing",
+                    file_id=record.id,
+                    tenant_id=record.tenant_id,
+                    property_id=record.property_id,
+                )
+                raise AppError(
+                    code=FileErrorCode.STORAGE_UNAVAILABLE,
+                    message="Stored file content is unavailable",
+                    status_code=503,
+                )
             existing = None
         except (ProviderTimeoutError, ProviderUnavailableError) as exc:
             raise AppError(
@@ -370,9 +386,6 @@ class WorkOrderService:
             ) from exc
         if existing is not None:
             existing_hash = sha256(existing).hexdigest()
-            placeholder_hash = sha256(
-                f"{record.storage_key}:{record.mime_type}:{record.size_bytes}".encode()
-            ).hexdigest()
             if (
                 len(existing) != record.size_bytes
                 or not _content_matches_mime(record.mime_type, existing)
@@ -2404,20 +2417,16 @@ class WorkOrderService:
                 continue
             seen.add(file_id)
             file_object = self._repository.get_file(file_id)
-            if file_object is None or file_object.tenant_id != record.tenant_id:
+            if (
+                file_object is None
+                or file_object.tenant_id != record.tenant_id
+                or file_object.property_id not in {None, record.property_id}
+                or file_object.uploader_user_id != actor.user_id
+            ):
                 raise AppError(
                     code=FileErrorCode.NOT_FOUND,
                     message="File was not found",
                     status_code=404,
-                )
-            if (
-                file_object.uploader_user_id != actor.user_id
-                and file_object.property_id not in {None, record.property_id}
-            ):
-                raise AppError(
-                    code=IamErrorCode.FORBIDDEN,
-                    message="Permission denied",
-                    status_code=403,
                 )
             kind = _ALLOWED_MIME.get(file_object.mime_type)
             if kind is None:
