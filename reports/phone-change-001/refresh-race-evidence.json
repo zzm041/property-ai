@@ -1,0 +1,51 @@
+{
+  "task_id": "PHONE-CHANGE-001-FIX-1",
+  "environment": {
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "migration": "20260919_0009",
+    "mode": "real MySQL service concurrency with synthetic data"
+  },
+  "user_id": 29,
+  "session_ids": {
+    "original_refresh": 155,
+    "second_prechange": 156,
+    "refresh_successor": 157,
+    "phone_change_replacement": 158
+  },
+  "sessions": [
+    {
+      "id": 155,
+      "revoked_at": "2026-09-19T19:54:33.306710"
+    },
+    {
+      "id": 156,
+      "revoked_at": "2026-09-19T19:54:33.562738"
+    },
+    {
+      "id": 157,
+      "revoked_at": "2026-09-19T19:54:33.562738"
+    },
+    {
+      "id": 158,
+      "revoked_at": null
+    }
+  ],
+  "phone_status_counts": [
+    {
+      "status": "ACTIVE",
+      "count": 1
+    },
+    {
+      "status": "ENDED",
+      "count": 1
+    }
+  ],
+  "assertions": {
+    "phone_change_waited_for_uncommitted_refresh": true,
+    "original_refresh_session_revoked": true,
+    "second_prechange_session_revoked": true,
+    "refresh_successor_revoked": true,
+    "phone_change_replacement_active": true
+  },
+  "status": "PASS"
+}

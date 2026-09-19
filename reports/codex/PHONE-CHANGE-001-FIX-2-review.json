@@ -1,0 +1,51 @@
+{
+  "task_id": "PHONE-CHANGE-001",
+  "phase": "review",
+  "reviewed_head": "893fd65cfd5c603ea7046c2639c71b076c3fd349",
+  "decision": "PASS",
+  "actions_or_findings": [
+    {
+      "title": "NON_BLOCKING: Refresh stale-session blocker closed",
+      "path": "backend/app/repository/credential.py:132",
+      "trigger": "Refresh discovers a session before phone change commits, then waits for the user lock.",
+      "rationale": "The locked reread now uses populate_existing, so SQLAlchemy refreshes the cached session before checking revocation. The reverse-refresh evidence reports AUTH.INVALID_TOKEN and no successor. This matches [SQLAlchemy’s documented behavior](https://docs.sqlalchemy.org/en/20/orm/queryguide/api.html)."
+    },
+    {
+      "title": "NON_BLOCKING: Logout lock-order blocker closed",
+      "path": "backend/app/service/credential_auth.py:644",
+      "trigger": "Logout discovers an old session while phone change holds the user lock.",
+      "rationale": "Logout now locks the user before locking and refreshing the session, then returns idempotently if it was revoked. The MySQL race evidence reports completion without deadlock. Refresh, revoke, and session issue also take the user lock before session locks or insertion."
+    }
+  ],
+  "evidence_paths": [
+    "reports/project-handoff.md",
+    "reports/codex/PHONE-CHANGE-001-FIX-1-review.json",
+    "backend/app/repository/credential.py",
+    "backend/app/service/credential_auth.py",
+    "backend/tests/unit/test_phone_change.py",
+    "scripts/ops/probe_auth001_phone_reverse_races.py",
+    "reports/phone-change-001/reverse-races-evidence.json",
+    "reports/phone-change-001/refresh-race-evidence.json",
+    "reports/phone-change-001/page-evidence.json",
+    "reports/phone-change-001/database-evidence.json",
+    "reports/phone-change-001/unit-results.xml",
+    "reports/phone-change-001/01-phone-change-success.png",
+    "reports/phone-change-001/02-new-phone-relogin-home.png",
+    "tmp/auth001-runtime/api-20260920-040442.out.log",
+    "tmp/auth001-runtime/worker-20260920-024454.out.log"
+  ],
+  "unverified": [
+    "Tests and database probes were inspected, not rerun under this read-only review. The supplied JUnit file records 401 tests with zero failures, errors, or skips.",
+    "The reverse-race artifact predates the commit by about 33 seconds and does not embed a code hash; its final-code provenance is inferred from the reviewed patch and later unit results.",
+    "Both 8082 and 8083 were listening, and isolation markers were present in the API and worker logs. Process command lines and the exact currently loaded code commit could not be independently confirmed."
+  ],
+  "session_note": "Round 3 reviewed only FIX-2 against parent 5ae38f7200be3922e492c78ee3a63ccd695e5815. Both required screenshots were visually inspected: the success page shows the phone-change notice and new masked label; the relogin home page shows that label. The opposite refresh ordering also reports revocation of its committed successor. This PASS covers PHONE-CHANGE-001 with official sessions and development SMS on the named isolated 8083/0009 synthetic environment. It is not controlled merge, real SMS, Day 4, release, or Production V1 acceptance. The handoff still lists an older commit and test tally.",
+  "task_result": "PASS: Both prior current-task blockers are closed, with no FIX-2 task blocker found.",
+  "product_gap_changes": [
+    "Phone change advances to scoped local synthetic acceptance.",
+    "WeChat rebind, controlled merge, recovery, real self-hosted AI auto-assignment, real Embedding/RAG, production providers, and release validation remain in Production V1 scope."
+  ],
+  "schedule_risk": "High. As of 2026-09-20, the approximate 2026-09-21 one-week aim cannot accommodate the remaining frozen Production V1 gaps and release validation.",
+  "next_action": "Main Codex should record this scoped PASS and its evidence at commit 893fd65 in reports/project-handoff.md, correct the stale current-commit and unit-count entries, then continue the next frozen identity task in the isolated synthetic environment. Completion requires official-session, failure-path, audit, page, and independent-review evidence. Ordinary source work and isolated synthetic verification are authorized; obtain separate approval before a migration, shared-service change, paid or production-provider call, real-data use, or release.",
+  "approval_requests": []
+}

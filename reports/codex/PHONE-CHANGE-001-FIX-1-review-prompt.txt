@@ -1,0 +1,42 @@
+Re-review PHONE-CHANGE-001-FIX-1 only. This is review round 2 for the same task ID, not a new task. Read-only: do not edit files, run mutating tests, call business APIs, alter services, or create another reviewer.
+
+Prior review `reports/codex/PHONE-CHANGE-001-review.json` at e9420e5 returned NEEDS_CHANGES with two CURRENT_TASK_BLOCKER findings and one NON_BLOCKING issue:
+1. Wrong/expired change-phone OTP attempt and expiry mutations were rolled back because `_raise_otp` executed inside the owned transaction.
+2. Phone change scanned sessions without serialization against refresh, so a refresh successor could survive.
+3. The default display label created from the old masked phone remained stale after change.
+
+Review FIX-1 commit 5ae38f7b937d55f79404fd1dfd6c0a685c6808d6 (parent e9420e59801ca095159f81e73e78532762fc6928) only for those findings and regressions introduced by their repair.
+
+Implemented repairs to verify:
+- change_phone now commits the OTP verification transaction before raising an invalid/expired result; identity mutation remains a separate owned transaction and re-locks/rechecks the current phone;
+- all credential session issuance/revocation takes a stable per-user row lock; refresh first discovers the user without a row lock, then takes the user lock, then re-locks/revalidates the refresh session; session scans use SELECT FOR UPDATE;
+- SMS/password login uses a locking active-phone read so a login that began against the old credential is serialized with phone change;
+- only an auto-generated masked-phone display name is changed; a custom name is preserved; the page synchronizes the same rule immediately after success.
+
+Mandatory reads:
+- backend/app/repository/credential.py
+- backend/app/service/credential_auth.py
+- backend/tests/unit/test_phone_change.py
+- miniprogram/pages/profile/profile.js
+- reports/codex/PHONE-CHANGE-001-review.json
+- reports/phone-change-001/page-evidence.json
+- reports/phone-change-001/database-evidence.json
+- reports/phone-change-001/refresh-race-evidence.json
+- scripts/ops/probe_auth001_phone_refresh_race.py
+- scripts/ops/inspect_auth001_phone_change.py
+
+Actually inspect both final screenshots with supported image input:
+- reports/phone-change-001/01-phone-change-success.png
+- reports/phone-change-001/02-new-phone-relogin-home.png
+
+Main-session results to assess, not automatically accept:
+- focused PHONE-CHANGE-001 tests: 12 passed, 1 warning;
+- final full backend unit suite: 399 passed, 1 warning;
+- actual DevTools page flow on a new synthetic user 28: one wrong old-phone OTP produced a page error while the current session stayed valid and identity stayed unchanged; the correct OTP then completed the page change; old fields were cleared; new-phone relogin returned the same user;
+- database evidence: failed old OTP attempt persisted as attempts=1; old phone ENDED; exactly one new ACTIVE phone; default display label follows the new masked phone; audit values are masked;
+- a second old session refreshed at the change boundary and produced a successor, then the change revoked both the page session and that successor; their access/refresh checks were 401;
+- deterministic real-MySQL service concurrency probe on a separate synthetic user 29 paused refresh after inserting its uncommitted successor. Phone change reached and waited on the user lock, then after refresh commit revoked the original session, the second pre-change session, and the refresh successor while leaving only its replacement active.
+
+Check that the lock ordering is coherent across login, refresh, revoke, and issue; that the unlocked refresh discovery is revalidated after the user lock; that invalid OTP counters now commit without partially changing identity; that successful OTP consumption cannot be used to mutate the wrong account if the phone changes between phases; and that no new task-scoped regression exists. Do not demand unrelated full-repo audit or reopen prior closed work without new evidence.
+
+Classify titles as CURRENT_TASK_BLOCKER, RELEASE_BLOCKER, or NON_BLOCKING. Return PASS if both prior blockers are closed and no current-task regression blocks PHONE-CHANGE-001. This remains local synthetic/development-SMS evidence, not controlled merge, real SMS, Day 4, release, or Production V1 PASS. Controlled account merge and other frozen V1 gaps stay open separately.

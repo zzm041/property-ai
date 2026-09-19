@@ -1,0 +1,135 @@
+{
+  "task_id": "PHONE-CHANGE-001",
+  "database": {
+    "host": "127.0.0.1",
+    "port": 3307,
+    "name": "property_ai_auth001_test",
+    "migration": "20260919_0009",
+    "mode": "read-only inspection"
+  },
+  "user_id": 32,
+  "user": {
+    "id": 32,
+    "display_name": "188****8441",
+    "status": "ACTIVE"
+  },
+  "phones": [
+    {
+      "id": 38,
+      "status": "ENDED",
+      "verified_at": "2026-09-19T20:04:59.194442",
+      "ended_at": "2026-09-19T20:05:05.690834",
+      "created_at": "2026-09-19T20:04:59.194442",
+      "phone_masked": "139****8441"
+    },
+    {
+      "id": 39,
+      "status": "ACTIVE",
+      "verified_at": "2026-09-19T20:05:05.690834",
+      "ended_at": null,
+      "created_at": "2026-09-19T20:05:05.692834",
+      "phone_masked": "188****8441"
+    }
+  ],
+  "sessions": [
+    {
+      "id": 165,
+      "auth_method": "sms",
+      "expires_at": "2026-10-03T20:04:59.197942",
+      "revoked_at": "2026-09-19T20:05:05.621113",
+      "created_at": "2026-09-19T20:04:59.198442"
+    },
+    {
+      "id": 166,
+      "auth_method": "sms",
+      "expires_at": "2026-10-03T20:05:02.279102",
+      "revoked_at": "2026-09-19T20:05:05.695333",
+      "created_at": "2026-09-19T20:05:02.279705"
+    },
+    {
+      "id": 167,
+      "auth_method": "sms",
+      "expires_at": "2026-10-03T20:05:05.623111",
+      "revoked_at": "2026-09-19T20:05:05.695333",
+      "created_at": "2026-09-19T20:05:05.625113"
+    },
+    {
+      "id": 168,
+      "auth_method": "sms",
+      "expires_at": "2026-10-03T20:05:05.704834",
+      "revoked_at": null,
+      "created_at": "2026-09-19T20:05:05.705333"
+    },
+    {
+      "id": 169,
+      "auth_method": "sms",
+      "expires_at": "2026-10-03T20:05:09.131634",
+      "revoked_at": null,
+      "created_at": "2026-09-19T20:05:09.131634"
+    }
+  ],
+  "audits": [
+    {
+      "action": "AUTH_SESSION_REVOKED",
+      "resource_type": "AUTH_SESSION",
+      "resource_id": 166,
+      "request_id": "19ad32394a594361bf92efcc156a5b9d",
+      "details_json": {
+        "auth_method": "sms",
+        "reason_code": "PHONE_CHANGE"
+      },
+      "created_at": "2026-09-19T20:05:05.697833"
+    },
+    {
+      "action": "AUTH_SESSION_REVOKED",
+      "resource_type": "AUTH_SESSION",
+      "resource_id": 167,
+      "request_id": "19ad32394a594361bf92efcc156a5b9d",
+      "details_json": {
+        "auth_method": "sms",
+        "reason_code": "PHONE_CHANGE"
+      },
+      "created_at": "2026-09-19T20:05:05.701335"
+    },
+    {
+      "action": "AUTH_PHONE_CHANGED",
+      "resource_type": "USER",
+      "resource_id": 32,
+      "request_id": "19ad32394a594361bf92efcc156a5b9d",
+      "details_json": {
+        "new_phone": "188****8441",
+        "old_phone": "139****8441",
+        "reason_code": "SELF_SERVICE_VERIFIED"
+      },
+      "created_at": "2026-09-19T20:05:05.707334"
+    }
+  ],
+  "sms_challenges": [
+    {
+      "purpose": "change_phone",
+      "attempts": 1,
+      "max_attempts": 5,
+      "consumed_at": "2026-09-19T20:05:05.678835",
+      "created_at": "2026-09-19T20:05:04.165802",
+      "phone_masked": "139****8441"
+    },
+    {
+      "purpose": "change_phone",
+      "attempts": 0,
+      "max_attempts": 5,
+      "consumed_at": "2026-09-19T20:05:05.680334",
+      "created_at": "2026-09-19T20:05:04.900290",
+      "phone_masked": "188****8441"
+    }
+  ],
+  "assertions": {
+    "one_active_phone": true,
+    "ended_phone_retained": true,
+    "phone_change_audit_present": true,
+    "audit_contains_masked_phones_only": true,
+    "revoked_session_present": true,
+    "active_session_present": true,
+    "failed_otp_attempt_persisted": true,
+    "default_label_tracks_active_phone": true
+  }
+}

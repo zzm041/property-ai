@@ -1,0 +1,63 @@
+{
+  "task_id": "PHONE-CHANGE-001-FIX-2",
+  "environment": {
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "migration": "20260919_0009",
+    "mode": "real MySQL deterministic reverse-order concurrency"
+  },
+  "reverse_refresh": {
+    "user_id": 30,
+    "sessions": [
+      {
+        "id": 159,
+        "revoked_at": "2026-09-19T20:03:46.191867"
+      },
+      {
+        "id": 160,
+        "revoked_at": "2026-09-19T20:03:46.191867"
+      },
+      {
+        "id": 161,
+        "revoked_at": null
+      }
+    ],
+    "refresh_result": {
+      "error_code": "AUTH.INVALID_TOKEN"
+    },
+    "assertions": {
+      "refresh_discovered_session_then_waited_for_user": true,
+      "refresh_rejected_after_phone_change": true,
+      "no_refresh_successor_created": true,
+      "both_prechange_sessions_revoked": true,
+      "phone_change_replacement_active": true
+    }
+  },
+  "logout_race": {
+    "user_id": 31,
+    "sessions": [
+      {
+        "id": 162,
+        "revoked_at": "2026-09-19T20:03:46.576880"
+      },
+      {
+        "id": 163,
+        "revoked_at": "2026-09-19T20:03:46.576880"
+      },
+      {
+        "id": 164,
+        "revoked_at": null
+      }
+    ],
+    "logout_result": {
+      "completed": true
+    },
+    "assertions": {
+      "logout_discovered_session_then_waited_for_user": true,
+      "logout_completed_without_deadlock": true,
+      "no_extra_session_created": true,
+      "both_prechange_sessions_revoked": true,
+      "phone_change_replacement_active": true
+    }
+  },
+  "status": "PASS"
+}

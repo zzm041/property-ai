@@ -1,0 +1,50 @@
+{
+  "task_id": "PHONE-CHANGE-001",
+  "phase": "review",
+  "reviewed_head": "5ae38f7200be3922e492c78ee3a63ccd695e5815",
+  "decision": "NEEDS_CHANGES",
+  "actions_or_findings": [
+    {
+      "title": "CURRENT_TASK_BLOCKER: Refresh can accept a revoked session after phone change",
+      "path": "backend/app/repository/credential.py:132",
+      "trigger": "Refresh reads the session before phone change, waits for the user lock, then rereads it after phone change commits.",
+      "rationale": "The first read places the session in SQLAlchemy’s identity map. The locked reread does not use populate_existing, so its ORM object can retain the old revoked_at value and issue a surviving successor. The race evidence exercises the opposite ordering. [SQLAlchemy documentation](https://docs.sqlalchemy.org/en/20/orm/queryguide/api.html) confirms that populate_existing is needed to refresh an already loaded instance."
+    },
+    {
+      "title": "CURRENT_TASK_BLOCKER: Logout retains a conflicting lock order",
+      "path": "backend/app/service/credential_auth.py:649",
+      "trigger": "Logout locks an old session while phone change holds the user lock and tries to lock active sessions.",
+      "rationale": "Logout then inserts an audit row whose actor_user_id foreign key needs a shared user-row lock. That creates a session-to-user versus user-to-session deadlock. If phone change is aborted, its OTPs have already been consumed. This lock inversion was introduced by the new user lock and session scan. [MySQL documentation](https://dev.mysql.com/doc/refman/8.0/en/innodb-locks-set.html) describes the foreign-key shared locks."
+    }
+  ],
+  "evidence_paths": [
+    "reports/codex/PHONE-CHANGE-001-review.json",
+    "backend/app/repository/credential.py",
+    "backend/app/service/credential_auth.py",
+    "backend/tests/unit/test_phone_change.py",
+    "miniprogram/pages/profile/profile.js",
+    "reports/phone-change-001/page-evidence.json",
+    "reports/phone-change-001/database-evidence.json",
+    "reports/phone-change-001/refresh-race-evidence.json",
+    "reports/phone-change-001/01-phone-change-success.png",
+    "reports/phone-change-001/02-new-phone-relogin-home.png",
+    "scripts/ops/probe_auth001_phone_refresh_race.py",
+    "scripts/ops/inspect_auth001_phone_change.py",
+    "reports/project-handoff.md"
+  ],
+  "unverified": [
+    "The reported 12 focused and 399 full unit passes were not independently rerun; no captured test output was found in the task evidence.",
+    "Neither the reverse refresh ordering nor the logout lock inversion has a real-MySQL reproduction in the supplied evidence.",
+    "The current live process, deployed code, schema, publisher, and worker identity were not reverified in this read-only review. The handoff still lists the earlier implementation commit and test count."
+  ],
+  "session_note": "This is round 2 of PHONE-CHANGE-001 only. The prompt’s long commit IDs do not resolve; Git identifies parent e9420e57d57b18923e0c80ecdbbe3d1f78f0c848 and reviewed HEAD above. The failed-OTP transaction repair is supported by code and synthetic database evidence showing attempts=1 without an identity change. The display-label repair is supported by code, custom-name coverage, database evidence, and both inspected screenshots. The supplied page flow supports official-session development-SMS success on isolated 8083/0009 and sequential old-session 401 results. Prior scoped work-order and media reviews remain unchanged. The frozen Production V1 goal, controlled merge, WeChat rebind, recovery, real self-hosted AI, real Embedding/RAG, and release validation remain open.",
+  "task_result": "PHONE-CHANGE-001 remains open. The OTP counter and default-label findings are closed, but complete old-session revocation is still unproven and the repair introduces a logout concurrency failure.",
+  "product_gap_changes": [
+    "Failed or expired change-phone OTP state now commits without changing identity.",
+    "The generated masked-phone label now follows the new phone; a custom label is preserved.",
+    "Phone change remains incomplete pending the two current-task concurrency fixes. Controlled merge and the other frozen V1 gaps remain in scope."
+  ],
+  "schedule_risk": "High. On 2026-09-20, the approximate 2026-09-21 one-week aim cannot cover these fixes and the remaining frozen Production V1 gaps without removing required features.",
+  "next_action": "Main Codex should make refresh reread current session state after acquiring the user lock, align logout with the user-before-session lock order, and add meaningful tests for both refresh orderings and concurrent logout. Then verify the resulting commit on the named isolated 8083/0009 synthetic environment: confirm process/code/target/schema and queue/worker identity, failed OTP persistence, no surviving old-session successor, no deadlock, masked audits, page flow, and focused/full unit results. Update reports/project-handoff.md and submit the commit for independent rereview. Ordinary source work and isolated synthetic verification are already authorized; obtain separate approval before any migration, shared-service change, paid call, real-data use, or release.",
+  "approval_requests": []
+}

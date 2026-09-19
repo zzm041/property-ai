@@ -1,0 +1,52 @@
+{
+  "task_id": "PHONE-CHANGE-001",
+  "phase": "review",
+  "reviewed_head": "e9420e57d57b18923e0c80ecdbbe3d1f78f0c848",
+  "decision": "NEEDS_CHANGES",
+  "actions_or_findings": [
+    {
+      "title": "CURRENT_TASK_BLOCKER: Wrong OTP attempts roll back",
+      "path": "backend/app/service/credential_auth.py:426",
+      "trigger": "Either phone-change OTP is wrong or expired.",
+      "rationale": "_apply_otp updates attempt or expiry state, then _raise_otp throws inside run_owned_transaction. The rollback discards that state. The change endpoint has no separate attempt limit, so a valid-session holder can repeatedly guess a phone OTP without exhausting its configured attempts. The unit tests mock away the transaction."
+    },
+    {
+      "title": "CURRENT_TASK_BLOCKER: Concurrent refresh can survive session revocation",
+      "path": "backend/app/repository/credential.py:134",
+      "trigger": "An old-session refresh commits while phone change scans active sessions.",
+      "rationale": "Refresh locks its session and creates a successor, while phone change scans sessions with an unlocked SELECT. If the scan occurs before refresh commits, phone change can revoke the old row yet miss the new successor. This violates the requirement to revoke all old sessions. The successful run checked only sequential access and refresh."
+    },
+    {
+      "title": "NON_BLOCKING: The old masked number remains the default account label",
+      "path": "backend/app/service/credential_auth.py:243",
+      "trigger": "A user created by SMS login changes phone without editing their display name.",
+      "rationale": "Initial registration sets display_name to the old masked phone; phone change leaves it in place. Both inspected screenshots still show that label after success and new-phone login. The database evidence supports that the credential changed, but the label is misleading."
+    }
+  ],
+  "evidence_paths": [
+    "reports/phone-change-001/page-evidence.json",
+    "reports/phone-change-001/database-evidence.json",
+    "reports/phone-change-001/first-run-evidence.json",
+    "reports/phone-change-001/second-run-evidence.json",
+    "reports/phone-change-001/third-run-evidence.json",
+    "reports/phone-change-001/01-phone-change-success.png",
+    "reports/phone-change-001/02-new-phone-relogin-home.png",
+    "tmp/auth001-runtime/api-20260920-033333.out.log",
+    "reports/project-handoff.md",
+    "backend/tests/unit/test_phone_change.py"
+  ],
+  "unverified": [
+    "The reported 8 focused and 395 full unit passes were not independently rerun; the task evidence contains no captured test output.",
+    "Wrong-OTP attempt persistence and the concurrent refresh interleaving have no isolated database reproduction.",
+    "Current live process and code identity could not be confirmed from this read-only session. Historical API and worker logs identify the isolated target; the operating-system process query was denied."
+  ],
+  "session_note": "Overall goal remains frozen Production V1. This review covers PHONE-CHANGE-001 only, using actual Git parent a1b1b8b6d97edf41280526f7ee0d5571fa71299c and HEAD above; the longer SHAs in the prompt do not resolve. The worktree's existing dirty files were left untouched. Historical logs, page evidence, database evidence, and both inspected screenshots support the sequential synthetic development-SMS success on 8083 and property_ai_auth001_test at 20260919_0009: the old phone is ENDED, the new phone is the sole ACTIVE credential, old access and refresh return 401, and masked audit events are present. The client excludes phone change from automatic 401 retries. Prior scoped work-order and media passes remain unaffected. Main Codex is authorized for ordinary source fixes and isolated synthetic verification; migration, shared-service changes, paid providers, real data, and release require separate approval.",
+  "task_result": "PHONE-CHANGE-001 remains open because OTP lockout and complete session revocation are not assured. The sequential local page flow is supported, but it does not establish these security conditions or broader V1 acceptance.",
+  "product_gap_changes": [
+    "Phone change remains incomplete pending the two current-task fixes.",
+    "Controlled merge, WeChat rebind, recovery, real self-hosted AI auto-assignment, real Embedding/RAG, and release validation remain frozen V1 gaps."
+  ],
+  "schedule_risk": "High. The workspace date is 2026-09-20; the approximate 2026-09-21 one-week aim cannot cover these fixes and the remaining frozen Production V1 gaps without removing required work.",
+  "next_action": "Main Codex should make wrong or expired phone-change OTP attempts persist their counters while identity changes still roll back; serialize refresh with phone-change revocation so no pre-change session successor survives; and address the stale default phone label. Add meaningful failure and concurrency tests, then rerun focused and full unit suites plus fresh synthetic page and database checks on the isolated 8083/0009 environment. Capture code, schema, process, queue/worker, masked audit, and old/new session evidence; update project-handoff.md and submit the resulting commit for independent rereview. Ordinary code and isolated synthetic development-SMS work is already authorized. Seek approval before any migration, shared-service mutation, paid call, real-data use, or release.",
+  "approval_requests": []
+}

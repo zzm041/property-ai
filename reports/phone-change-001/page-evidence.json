@@ -1,0 +1,52 @@
+{
+  "task_id": "PHONE-CHANGE-001",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "migration": "20260919_0009",
+    "sms_provider": "development",
+    "interaction": "WeChat DevTools automator page controls"
+  },
+  "checks": {
+    "invalid_old_otp": {
+      "status": "PASS",
+      "page_error_present": true,
+      "current_session_status": 200,
+      "identity_unchanged": true
+    },
+    "phone_change": {
+      "status": "PASS",
+      "user_id": 32,
+      "old_phone_masked": "139****8441",
+      "new_phone_masked": "188****8441",
+      "page_notice": "手机号已变更，其他旧会话已失效",
+      "sensitive_fields_cleared_before_screenshot": true,
+      "replacement_access_changed": true,
+      "replacement_refresh_changed": true
+    },
+    "session_rotation": {
+      "status": "PASS",
+      "original_access_status": 401,
+      "original_refresh_status": 401,
+      "change_access_status": 401,
+      "change_refresh_status": 401,
+      "concurrent_refresh_status": 200,
+      "concurrent_refresh_successor_access_status": 401,
+      "concurrent_refresh_successor_refresh_status": 401,
+      "replacement_access_status": 200,
+      "replacement_user_id": 32
+    },
+    "new_phone_relogin": {
+      "status": "PASS",
+      "page": "pages/home/home",
+      "http_status": 200,
+      "user_id": 32,
+      "same_identity": true
+    }
+  },
+  "screenshots": [
+    "01-phone-change-success.png",
+    "02-new-phone-relogin-home.png"
+  ],
+  "status": "PASS"
+}

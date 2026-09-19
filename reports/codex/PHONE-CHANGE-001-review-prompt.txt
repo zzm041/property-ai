@@ -1,0 +1,47 @@
+Review PHONE-CHANGE-001 only. Read-only; do not edit files, run mutating tests, call business APIs, or alter services. Do not create another reviewer.
+
+Task baseline is a1b1b8b919d85d64ae2b14bb72769d83be9fbb0c. Review implementation commit e9420e59801ca095159f81e73e78532762fc6928 and its necessary call context. Current task completion conditions:
+- logged-in official-session phone change requires control of both the current and new phone;
+- the target phone cannot already be active on another account, and the response must direct controlled merge rather than silently combine identities;
+- all old sessions are revoked and a replacement session is returned/stored;
+- old number history is retained, new number becomes the sole active credential, and audit data contains masked phones only;
+- invalid current phone, invalid OTP, same-phone, and duplicate-target paths do not mutate identity;
+- the actual mini-program page flow works on isolated 8083/0009 using development SMS and synthetic data;
+- no migration, paid SMS, real-user data, shared-service mutation, or release action.
+
+Mandatory source reads:
+- backend/app/api/v1/credential_auth.py
+- backend/app/core/errors.py
+- backend/app/domain/audit.py
+- backend/app/repository/credential.py
+- backend/app/schema/auth.py
+- backend/app/service/audit.py
+- backend/app/service/credential_auth.py
+- backend/tests/unit/test_phone_change.py
+- miniprogram/pages/profile/profile.js
+- miniprogram/pages/profile/profile.wxml
+- miniprogram/services/api.js
+- backend/app/model/identity.py for current 0009 constraints
+
+Mandatory evidence reads:
+- reports/phone-change-001/page-evidence.json
+- reports/phone-change-001/database-evidence.json
+- reports/phone-change-001/first-run-evidence.json
+- reports/phone-change-001/second-run-evidence.json
+- reports/phone-change-001/third-run-evidence.json
+- reports/project-handoff.md only as prior context; it is intentionally not yet updated with this task PASS.
+
+Actually inspect both screenshots with supported image input; a pathname alone is not inspection:
+- reports/phone-change-001/01-phone-change-success.png
+- reports/phone-change-001/02-new-phone-relogin-home.png
+
+Observed implementation evidence from the main session, which you must assess rather than automatically accept:
+- focused suite: 8 passed, 1 warning;
+- full backend unit suite: 395 passed, 1 warning;
+- actual page flow generated a new synthetic user, performed old/new visual challenge and development-SMS verification through page controls, changed phone, observed old access and refresh both return 401, replacement access return 200, and new-phone page login return the same user_id 25;
+- read-only database evidence at 127.0.0.1:3307/property_ai_auth001_test @ 20260919_0009 shows old phone ENDED, one new ACTIVE phone, revoked original session, active replacement/relogin sessions, AUTH_SESSION_REVOKED, and AUTH_PHONE_CHANGED with masked old/new values;
+- the first automation attempt clicked while loading and never sent the change OTP; the second exposed the missing change_phone send whitelist; the third reached the transaction but audit policy was missing and rolled back. These failures were preserved and fixed before the successful run.
+
+Review security and correctness, especially transaction ownership/rollback, OTP locking and purpose binding, account-enumeration/duplicate handling, concurrency under the existing generated active-phone unique constraints, session revocation/replacement ordering, audit redaction policy, and whether the UI can accidentally retry a credential mutation after an OTP 401. Do not demand an unrelated full-repo audit or reopen closed prior tasks without new evidence.
+
+Classify findings in titles as CURRENT_TASK_BLOCKER, RELEASE_BLOCKER, or NON_BLOCKING. Return PASS only if no current-task blocker remains. A PASS is scoped to local synthetic/development-SMS PHONE-CHANGE-001 and must not be described as controlled account merge, real SMS, Day 4, release, or Production V1 PASS. Controlled merge itself remains a separate frozen V1 gap; this task only has to reject an already-registered target safely.

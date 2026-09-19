@@ -1,0 +1,40 @@
+Final scoped re-review of PHONE-CHANGE-001, review round 3 for the same task ID. Read-only: do not edit files, mutate services/data, run tests, or create another reviewer.
+
+Previous round `reports/codex/PHONE-CHANGE-001-FIX-1-review.json` at 5ae38f7 closed OTP-counter persistence and display-label issues but returned NEEDS_CHANGES for:
+1. a refresh session loaded before waiting for the user lock could remain stale in SQLAlchemy's identity map after phone change, because the locking reread lacked populate_existing;
+2. logout retained session-before-user ordering and could deadlock against phone change's user-before-session ordering.
+
+Review FIX-2 commit 893fd65cfd5c603ea7046c2639c71b076c3fd349 (parent 5ae38f7200be3922e492c78ee3a63ccd695e5815) only for those two blockers and regressions introduced by their repair.
+
+Implemented repair:
+- CredentialRepository locking rereads by refresh hash and session ID now use execution_options(populate_existing=True) plus FOR UPDATE.
+- logout now performs an unlocked session discovery, locks the stable user row, then locking-rereads the session and returns idempotently if phone change already revoked it.
+- focused tests assert both locking reads refresh identity-map state and logout call order is discovery -> user lock -> session lock.
+
+Mandatory reads:
+- backend/app/repository/credential.py
+- backend/app/service/credential_auth.py
+- backend/tests/unit/test_phone_change.py
+- reports/codex/PHONE-CHANGE-001-FIX-1-review.json
+- reports/phone-change-001/reverse-races-evidence.json
+- scripts/ops/probe_auth001_phone_reverse_races.py
+- reports/phone-change-001/refresh-race-evidence.json
+- reports/phone-change-001/page-evidence.json
+- reports/phone-change-001/database-evidence.json
+- reports/phone-change-001/unit-results.xml
+
+Actually inspect the two final 893fd65 page screenshots with supported image input:
+- reports/phone-change-001/01-phone-change-success.png
+- reports/phone-change-001/02-new-phone-relogin-home.png
+
+Evidence to assess rather than automatically accept:
+- pytest JUnit records 401 tests, 0 failures/errors/skips on the final code;
+- deterministic reverse-refresh MySQL scenario: phone change held the user lock; refresh first loaded the old session and then waited; after phone change committed, refresh returned AUTH.INVALID_TOKEN, created no successor, both pre-change sessions were revoked, and only the phone-change replacement remained active;
+- deterministic logout scenario: phone change held the user lock; logout first discovered the old session and then waited; phone change and logout both completed without deadlock, created no extra session, revoked both pre-change sessions, and left only the phone-change replacement active;
+- earlier deterministic opposite ordering paused refresh after inserting its uncommitted successor; phone change waited, then revoked that successor after refresh committed;
+- final actual DevTools page flow on 8083/0009 user 32 passed wrong-OTP persistence, page change, concurrent refresh successor revocation, old access/refresh 401, new-phone same-identity relogin, masked audit, and current masked display label.
+- main session rechecked listeners and exact commands: 8083 is `serve_auth001_isolated_api.py`; Worker is `serve_auth001_isolated_worker.py` with Celery queue `property_ai.auth001`; latest `tmp/auth001-runtime/api-20260920-040442.out.log` identifies 127.0.0.1:3307/property_ai_auth001_test, queue `property_ai.auth001`, vhost `property_ai_auth001`, redis DB 12; 8082 remained separate.
+
+Check the populate_existing semantics, user-before-session lock order for refresh/logout/revoke/issue, both reverse-order probes, and any FIX-2 regression. Do not expand to a full-repo audit or reopen closed findings without new evidence.
+
+Classify titles as CURRENT_TASK_BLOCKER, RELEASE_BLOCKER, or NON_BLOCKING. Return PASS if the two prior blockers are closed and no new task blocker exists. This remains local synthetic/development-SMS PHONE-CHANGE-001 only, not controlled merge, real SMS, Day 4, release, or Production V1 PASS. Controlled merge and other frozen V1 gaps remain open.
