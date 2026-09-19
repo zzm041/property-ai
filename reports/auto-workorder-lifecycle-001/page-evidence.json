@@ -1,0 +1,60 @@
+{
+  "task_id": "AUTO-WO-LIFECYCLE-001",
+  "captured_at": "2026-09-19T17:09:39.516Z",
+  "code_sha": "f2839370e493bc4c713f1e73edc9814bb9c419fb",
+  "automator_ws": "ws://127.0.0.1:9435",
+  "work_order_id": 5,
+  "page_interactions": [
+    "staff accept button",
+    "staff start button",
+    "staff complete receipt form and submit button",
+    "resident receipt review and confirm button",
+    "resident fresh SMS login and detail re-entry"
+  ],
+  "transitions_executed_this_run": [
+    "ASSIGNED->ACCEPTED",
+    "ACCEPTED->PROCESSING",
+    "PROCESSING->WAIT_CONFIRM",
+    "WAIT_CONFIRM->COMPLETED->CLOSED"
+  ],
+  "receipt_before_confirm": {
+    "problem_type": "电气维修",
+    "method": "现场检查插座接线，紧固松动端子并完成通电复测，运行正常。",
+    "materials": "绝缘胶带",
+    "fee_flag": "NONE",
+    "fee_amount": null,
+    "resolved": true,
+    "follow_up": "住户继续观察，如再次出现火花请立即重开工单。",
+    "finished_at": "2026-09-19T17:09:27.569880Z"
+  },
+  "final_status": "CLOSED",
+  "relogin_status": "CLOSED",
+  "relogin_receipt_matches": true,
+  "final_log_events": [
+    "CREATE",
+    "ANALYZE",
+    "ASSIGN",
+    "ACCEPT",
+    "START",
+    "RECEIPT_RESOLVED",
+    "CONFIRM",
+    "ARCHIVE"
+  ],
+  "manual_supervisor_interaction_used": false,
+  "screenshots": [
+    "01-staff-auto-assigned.png",
+    "02-staff-complete-receipt.png",
+    "03-staff-awaiting-confirmation.png",
+    "04-resident-receipt-wait-confirm.png",
+    "05-resident-closed.png",
+    "06-resident-relogin-closed.png"
+  ],
+  "not_claimed": [
+    "persistent production media",
+    "real SMS",
+    "real AI",
+    "Production V1",
+    "formal release"
+  ],
+  "redaction": "No phone, SMS code, token, credential, or resident name is stored."
+}

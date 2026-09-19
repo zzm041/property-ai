@@ -120,6 +120,43 @@ def inspect_dispatch(work_order_id: int) -> dict[str, object]:
             "ORDER BY n.id, d.id",
             {"work_order_id": work_order_id},
         )
+        processes = _rows(
+            connection,
+            "SELECT id, cycle_no, assignee_id, started_at, ended_at "
+            "FROM work_order_processes WHERE work_order_id = :work_order_id "
+            "ORDER BY cycle_no",
+            {"work_order_id": work_order_id},
+        )
+        receipts = _rows(
+            connection,
+            "SELECT id, process_id, problem_type, method, materials, fee_amount, "
+            "fee_flag, resolved, unresolved_reason, follow_up, finished_at "
+            "FROM work_order_receipts WHERE work_order_id = :work_order_id ORDER BY id",
+            {"work_order_id": work_order_id},
+        )
+        feedbacks = _rows(
+            connection,
+            "SELECT id, process_id, actor_user_id, confirmed, unresolved_flag, rating, "
+            "comment, created_at FROM work_order_feedbacks "
+            "WHERE work_order_id = :work_order_id ORDER BY id",
+            {"work_order_id": work_order_id},
+        )
+        identities = _rows(
+            connection,
+            "SELECT wo.reporter_user_id, a.employee_id, e.user_id AS employee_user_id "
+            "FROM work_orders wo LEFT JOIN work_order_assignments a "
+            "ON a.id = (SELECT MAX(latest.id) FROM work_order_assignments latest "
+            "WHERE latest.work_order_id = wo.id) LEFT JOIN employees e "
+            "ON e.id = a.employee_id WHERE wo.id = :work_order_id",
+            {"work_order_id": work_order_id},
+        )
+        lifecycle_audits = _rows(
+            connection,
+            "SELECT action, actor_user_id, request_id FROM audit_logs "
+            "WHERE resource_type = 'WORK_ORDER' AND resource_id = :work_order_id "
+            "ORDER BY id",
+            {"work_order_id": work_order_id},
+        )
         daily = _rows(
             connection,
             "SELECT employee_id, business_date, on_duty, current_load "
@@ -193,6 +230,11 @@ def inspect_dispatch(work_order_id: int) -> dict[str, object]:
         "work_order_logs": logs,
         "audits": audits,
         "notifications": notifications,
+        "processes": processes,
+        "receipts": receipts,
+        "resident_feedbacks": feedbacks,
+        "lifecycle_identities": identities,
+        "lifecycle_audits": lifecycle_audits,
         "employee_daily_statuses": daily,
         "attendance_records": attendance,
         "redaction": "No phone, token, credential, resident name, or work-order text is emitted.",
@@ -202,10 +244,24 @@ def inspect_dispatch(work_order_id: int) -> dict[str, object]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--work-order-id", required=True, type=int)
+    parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     if args.work_order_id <= 0:
         parser.error("--work-order-id must be positive")
-    print(json.dumps(inspect_dispatch(args.work_order_id), ensure_ascii=False, indent=2, default=str))
+    serialized = json.dumps(
+        inspect_dispatch(args.work_order_id),
+        ensure_ascii=False,
+        indent=2,
+        default=str,
+    )
+    if args.output is not None:
+        output = args.output.resolve()
+        reports = (REPO / "reports").resolve()
+        if reports not in output.parents:
+            parser.error("--output must be under reports/")
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(f"{serialized}\n", encoding="utf-8")
+    print(serialized)
     return 0
 
 

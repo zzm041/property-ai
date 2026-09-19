@@ -1,0 +1,47 @@
+Review AUTO-WO-LIFECYCLE-001 only. This is an independent read-only review. Do not edit files, do not run tests or page automation, do not send business requests, and do not create another reviewer.
+
+Overall goal: complete the frozen enterprise property Production V1 without treating local/Fake evidence as formal delivery. This slice continues the normal mainline from the already accepted automatic assignment: resident create -> automatic analysis/rules assignment -> assigned staff processes and submits a complete receipt -> resident reviews and confirms -> persistent CLOSED.
+
+Task baseline and scope:
+- implementation base: 9de240d328eaf14db9ac8447c85c855a69569c06
+- implementation head: f2839370e493bc4c713f1e73edc9814bb9c419fb
+- current task: AUTO-WO-LIFECYCLE-001
+- target: existing synthetic work order 5 only; no new work order and no manual supervisor assignment
+- approved environment: 8083 -> 127.0.0.1:3307/property_ai_auth001_test at 20260919_0009, isolated queue property_ai.auth001, development SMS inbox, Fake AI already clearly labeled
+- 8082, shared databases, migrations, dependencies, real providers, release/upload were out of scope and unchanged
+- implementation tests: 15 targeted passed, then 349 unit passed; JS syntax and git diff checks passed. Do not treat those fields alone as proof.
+
+Review the actual commit diff and necessary context. At minimum read:
+- docs/01-PRD.md receipt section
+- docs/04-WORKORDER-STATE-MACHINE.md relevant transitions
+- backend/app/schema/work_order.py
+- backend/app/api/v1/work_orders.py
+- backend/app/repository/work_order.py
+- backend/app/service/work_order.py receipt and confirm paths
+- miniprogram/services/api.js
+- miniprogram/pages/staff-orders/detail.js and .wxml
+- miniprogram/pages/work-orders/detail.js and .wxml
+- backend/tests/unit/test_miniprogram_work_order_lifecycle.py
+- reports/auto-workorder-lifecycle-001/page-evidence.json
+- reports/auto-workorder-lifecycle-001/order-5-lifecycle-inspector.json
+- reports/project-handoff.md only as historical/living context; it has not yet been updated for this just-completed slice
+
+You MUST actually open/view the following PNGs with a supported image-reading tool. A filename or existence check is not visual inspection:
+- reports/auto-workorder-lifecycle-001/01-staff-auto-assigned.png
+- reports/auto-workorder-lifecycle-001/02-staff-complete-receipt.png
+- reports/auto-workorder-lifecycle-001/03-staff-awaiting-confirmation.png
+- reports/auto-workorder-lifecycle-001/04-resident-receipt-wait-confirm.png
+- reports/auto-workorder-lifecycle-001/05-resident-closed.png
+- reports/auto-workorder-lifecycle-001/06-resident-relogin-closed.png
+
+Cross-check rather than accepting PASS text:
+- page evidence must describe actual button/form interactions and must not contain secrets
+- DB evidence must show the same order 5, AUTO/system assignment to employee 4, process assignee 4, employee user 20 for staff audit actions, reporter/resident user 16 for confirmation, one receipt attached to that process, one confirmed resident feedback, ENDED assignment, released load, ordered CREATE/ANALYZE/ASSIGN/ACCEPT/START/RECEIPT_RESOLVED/CONFIRM/ARCHIVE logs, and persisted CLOSED
+- resident UI must display the actual receipt before confirmation and after relogin
+- mutation requests should carry optimistic versions
+- fee data validation must reject inconsistent/invalid records without breaking the no-fee path
+- no hardcoded repair/on_site receipt may remain
+
+Classify findings as CURRENT_TASK_BLOCKER, RELEASE_BLOCKER, or NON_BLOCKING. Only concrete current-task blockers should yield NEEDS_CHANGES. Keep persistent production media, real SMS/WeChat, real self-hosted model inference, full formal UI/identity display, remaining account lifecycle, RAG, deployment/security/performance acceptance as release gaps rather than reopening or blocking this safe local slice unless the implementation regressed them.
+
+Do not claim Production V1, Day 4, real provider, real AI, persistent media, or formal release PASS. If this slice passes, next_action should tell the main Codex session to record the evidence/commit and proceed to the next highest-priority approved implementation slice; do not hand work to Cursor and do not ask the user to relay findings.

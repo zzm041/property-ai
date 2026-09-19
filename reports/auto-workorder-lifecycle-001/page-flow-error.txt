@@ -1,0 +1,6 @@
+Expected /pages/staff-orders/detail; current=pages/staff-orders/detail
+Error: Expected /pages/staff-orders/detail; current=pages/staff-orders/detail
+    at waitPath (D:\property-ai\reports\auto-workorder-lifecycle-001\run-page-flow.js:85:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async openDetail (D:\property-ai\reports\auto-workorder-lifecycle-001\run-page-flow.js:141:16)
+    at async D:\property-ai\reports\auto-workorder-lifecycle-001\run-page-flow.js:178:10
