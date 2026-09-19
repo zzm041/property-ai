@@ -133,6 +133,7 @@ class CredentialRepository:
         return self._session.scalar(
             select(AuthSession)
             .where(AuthSession.refresh_token_hash == token_hash)
+            .execution_options(populate_existing=True)
             .with_for_update()
         )
 
@@ -159,5 +160,6 @@ class CredentialRepository:
         return self._session.scalar(
             select(AuthSession)
             .where(AuthSession.id == session_id)
+            .execution_options(populate_existing=True)
             .with_for_update()
         )

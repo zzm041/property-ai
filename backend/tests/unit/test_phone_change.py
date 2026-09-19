@@ -14,6 +14,7 @@ from app.domain.audit import AuditAction, AuditResourceType
 from app.domain.iam import ScopeType
 from app.service.credential_auth import CredentialAuthService
 from app.service.audit import AuditService
+from app.repository.credential import CredentialRepository
 
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -365,4 +366,49 @@ def test_revoke_sessions_locks_user_and_session_rows(
     assert repository_calls[:2] == [
         "get_user_for_update",
         "list_active_sessions_for_update",
+    ]
+
+
+def test_locked_session_rereads_refresh_identity_map_state() -> None:
+    session = MagicMock()
+    repository = CredentialRepository(session)
+
+    repository.get_session_by_refresh_hash("hashed-refresh")
+    refresh_statement = session.scalar.call_args.args[0]
+    assert refresh_statement.get_execution_options()["populate_existing"] is True
+    assert refresh_statement._for_update_arg is not None
+
+    repository.get_session_for_update(51)
+    id_statement = session.scalar.call_args.args[0]
+    assert id_statement.get_execution_options()["populate_existing"] is True
+    assert id_statement._for_update_arg is not None
+
+
+def test_logout_uses_user_before_session_lock(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    service = _service(monkeypatch)
+    candidate = SimpleNamespace(id=51, user_id=17)
+    record = SimpleNamespace(
+        id=51,
+        user_id=17,
+        auth_method="sms",
+        revoked_at=None,
+    )
+    service._repository.get_session_by_refresh_hash_unlocked.return_value = candidate
+    service._repository.get_session_by_refresh_hash.return_value = record
+    service._repository.reset_mock()
+
+    service.logout(
+        session_id=None,
+        refresh_token="refresh-value",
+        request_id="logout-lock-order",
+    )
+
+    assert record.revoked_at == datetime(2026, 9, 20, 3, 0, tzinfo=UTC)
+    repository_calls = [item[0] for item in service._repository.method_calls]
+    assert repository_calls[:3] == [
+        "get_session_by_refresh_hash_unlocked",
+        "get_user_for_update",
+        "get_session_by_refresh_hash",
     ]

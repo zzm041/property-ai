@@ -645,13 +645,24 @@ class CredentialAuthService:
         secret = self._settings.app_secret_key.get_secret_value()
 
         def _persist() -> None:
-            record = None
+            candidate = None
+            if refresh_token:
+                candidate = self._repository.get_session_by_refresh_hash_unlocked(
+                    keyed_hash(refresh_token, secret=secret)
+                )
+            elif session_id:
+                candidate = self._repository.get_session(session_id)
+            if candidate is None:
+                return
+            user = self._repository.get_user_for_update(candidate.user_id)
+            if user is None:
+                return
             if refresh_token:
                 record = self._repository.get_session_by_refresh_hash(
                     keyed_hash(refresh_token, secret=secret)
                 )
-            elif session_id:
-                record = self._repository.get_session_for_update(session_id)
+            else:
+                record = self._repository.get_session_for_update(candidate.id)
             if record is None or record.revoked_at is not None:
                 return
             record.revoked_at = self._clock()
