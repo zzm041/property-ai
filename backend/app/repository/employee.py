@@ -66,7 +66,11 @@ class EmployeeRepository:
 
     def get_duty_in_tenant(self, *, tenant_id: int, duty_id: int) -> Duty | None:
         return self._session.scalar(
-            select(Duty).where(Duty.id == duty_id, Duty.tenant_id == tenant_id)
+            select(Duty).where(
+                Duty.id == duty_id,
+                Duty.tenant_id == tenant_id,
+                Duty.status == "ACTIVE",
+            )
         )
 
     def get_skill_in_tenant(
@@ -76,8 +80,28 @@ class EmployeeRepository:
         skill_id: int,
     ) -> Skill | None:
         return self._session.scalar(
-            select(Skill).where(Skill.id == skill_id, Skill.tenant_id == tenant_id)
+            select(Skill).where(
+                Skill.id == skill_id,
+                Skill.tenant_id == tenant_id,
+                Skill.status == "ACTIVE",
+            )
         )
+
+    def has_employee_duty(self, *, employee_id: int, duty_id: int) -> bool:
+        return self._session.scalar(
+            select(EmployeeDuty.id).where(
+                EmployeeDuty.employee_id == employee_id,
+                EmployeeDuty.duty_id == duty_id,
+            )
+        ) is not None
+
+    def has_employee_skill(self, *, employee_id: int, skill_id: int) -> bool:
+        return self._session.scalar(
+            select(EmployeeSkill.id).where(
+                EmployeeSkill.employee_id == employee_id,
+                EmployeeSkill.skill_id == skill_id,
+            )
+        ) is not None
 
     def get_department_by_code(
         self,
@@ -201,6 +225,24 @@ class EmployeeRepository:
                 )
                 .where(EmployeeSkill.employee_id == employee_id)
                 .order_by(Skill.id)
+            ).all()
+        )
+
+    def list_duties_for_tenant(self, tenant_id: int) -> tuple[Duty, ...]:
+        return tuple(
+            self._session.scalars(
+                select(Duty)
+                .where(Duty.tenant_id == tenant_id, Duty.status == "ACTIVE")
+                .order_by(Duty.code, Duty.id)
+            ).all()
+        )
+
+    def list_skills_for_tenant(self, tenant_id: int) -> tuple[Skill, ...]:
+        return tuple(
+            self._session.scalars(
+                select(Skill)
+                .where(Skill.tenant_id == tenant_id, Skill.status == "ACTIVE")
+                .order_by(Skill.code, Skill.id)
             ).all()
         )
 

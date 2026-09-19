@@ -8,6 +8,7 @@ from hashlib import sha256
 from time import perf_counter
 
 from pydantic import ValidationError
+from sqlalchemy import MetaData, Table, inspect as sa_inspect, update
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -78,6 +79,8 @@ from app.service.rbac import RbacService
 
 logger = get_logger(__name__)
 
+# Keep recommendation eligibility aligned with docs/05: STAFF or a higher
+# scoped property-management role, in addition to all live employee filters.
 _STAFF_ROLES = frozenset({"STAFF", "SUPERVISOR", "PROPERTY_ADMIN", "TENANT_ADMIN"})
 
 
@@ -510,7 +513,7 @@ class AnalysisService:
     ) -> None:
         finished_at = started_at + timedelta(milliseconds=max(latency_ms, 0))
         with begin_owned_transaction(self._session):
-            self._ai.add_call_log(
+            call_log = self._ai.add_call_log(
                 AiCallLog(
                     tenant_id=snapshot.tenant_id,
                     property_id=snapshot.property_id,
@@ -531,6 +534,35 @@ class AnalysisService:
                     input_hash=snapshot.input_hash,
                 )
             )
+            self._write_provider_mode(call_log.id, provider_type)
+
+    def _write_provider_mode(
+        self,
+        call_log_id: int,
+        provider_type: ProviderType,
+    ) -> None:
+        """Populate the 0009 provenance column without mapping it on shared 0007."""
+
+        bind = self._session.get_bind()
+        if bind is None:
+            return
+        columns = {
+            column["name"]
+            for column in sa_inspect(bind).get_columns("ai_call_logs")
+        }
+        if "provider_mode" not in columns:
+            return
+        configured = {
+            ProviderType.LLM: self._settings.llm_provider,
+            ProviderType.VLM: self._settings.vlm_provider,
+            ProviderType.ASR: self._settings.asr_provider,
+        }[provider_type]
+        table = Table("ai_call_logs", MetaData(), autoload_with=bind)
+        self._session.execute(
+            update(table)
+            .where(table.c.id == call_log_id)
+            .values(provider_mode=configured.upper())
+        )
 
     def _apply(
         self,
@@ -587,11 +619,16 @@ class AnalysisService:
                     record.severity = mapped.severity.value
                     record.priority = mapped.priority.value
                     self._transition_analyzed(record, request_id)
+                    from app.service.incident import IncidentService
+
+                    IncidentService(self._session, settings=self._settings).aggregate_locked(
+                        record,
+                        request_id=request_id,
+                    )
                 self._write_recommendations(record, analysis, mapped, snapshot.building_id)
                 self._append_success_audit(record, analysis, request_id, mapped)
                 if analysis.status == AnalysisStatus.COMPLETED.value:
                     from app.service.auto_dispatch import AutoDispatchService
-                    from app.service.incident import IncidentService
 
                     auto_outcome = AutoDispatchService(
                         self._session, settings=self._settings
@@ -605,10 +642,6 @@ class AnalysisService:
                         work_order_id=record.id,
                         analysis_id=analysis.id,
                         outcome=auto_outcome,
-                        request_id=request_id,
-                    )
-                    IncidentService(self._session, settings=self._settings).aggregate_locked(
-                        record,
                         request_id=request_id,
                     )
                 return analysis
@@ -695,6 +728,8 @@ class AnalysisService:
         )
         candidates: list[DispatchCandidate] = []
         ineligible: list[tuple[DispatchCandidate, FilterReason]] = []
+        incident = self._ai.get_incident(record.incident_id) if record.incident_id else None
+        primary_employee_id = None if incident is None else incident.primary_employee_id
         for employee in employees:
             assignment = self._ai.get_effective_property(
                 employee_id=employee.id,
@@ -706,7 +741,25 @@ class AnalysisService:
                 property_id=record.property_id,
                 business_date=business_date,
             )
-            roles = self._ai.list_employee_role_codes(employee.user_id)
+            attendance = self._ai.get_attendance(
+                employee_id=employee.id,
+                property_id=record.property_id,
+                business_date=business_date,
+            )
+            roles = (
+                self._ai.list_employee_role_codes(
+                    employee.user_id,
+                    tenant_id=record.tenant_id,
+                    property_id=record.property_id,
+                )
+                if employee.user_id
+                else frozenset()
+            )
+            response, completion, rating = self._ai.get_dispatch_history(
+                employee_id=employee.id,
+                tenant_id=record.tenant_id,
+                property_id=record.property_id,
+            )
             candidate = DispatchCandidate(
                 employee_id=employee.id,
                 duty_codes=self._ai.list_employee_duties(employee.id),
@@ -716,15 +769,21 @@ class AnalysisService:
                 on_duty=daily is not None
                 and daily.on_duty == AttendanceOnDuty.ON_DUTY.value,
                 employee_active=employee.status == EmployeeStatus.ACTIVE.value,
+                user_active=self._ai.get_user_status(employee.user_id) == "ACTIVE",
                 property_effective=assignment is not None,
                 has_staff_role=bool(roles & _STAFF_ROLES),
+                checked_in=attendance is not None,
+                check_in_at=None if attendance is None else attendance.check_in_at,
                 same_building_history=self._ai.count_same_building_history(
                     employee_id=employee.id,
                     building_id=building_id,
                     tenant_id=record.tenant_id,
                     property_id=record.property_id,
                 ),
-                primary_incident_handler=False,
+                primary_incident_handler=employee.id == primary_employee_id,
+                average_response_seconds=response,
+                completion_rate=completion,
+                average_rating=rating,
             )
             reason = hard_filter_candidate(
                 candidate,
@@ -735,10 +794,13 @@ class AnalysisService:
                 candidates.append(candidate)
             else:
                 ineligible.append((candidate, reason))
+        from app.service.auto_dispatch import configured_dispatch_weights
+
         ranked = rank_candidates(
             tuple(candidates),
             required_skill=mapped.required_skill,
             required_duty=mapped.required_duty,
+            weights=configured_dispatch_weights(self._settings),
         )
         rank_no = 1
         for candidate, score, reasons in ranked:

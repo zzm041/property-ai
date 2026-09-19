@@ -1,0 +1,213 @@
+"""Read-only, redacted evidence for one AUTH001 automatic dispatch run."""
+
+from __future__ import annotations
+
+import argparse
+from datetime import UTC
+import json
+import sys
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
+from sqlalchemy import create_engine, inspect, text
+from sqlalchemy.engine import make_url
+
+REPO = Path(__file__).resolve().parents[2]
+BACKEND = REPO / "backend"
+OPS = Path(__file__).resolve().parent
+for candidate in (BACKEND, OPS):
+    if str(candidate) not in sys.path:
+        sys.path.insert(0, str(candidate))
+
+from auth001_isolated_runtime import build_isolated_settings  # noqa: E402
+
+
+def _json_value(value: object) -> object:
+    if isinstance(value, str):
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError:
+            return None
+    return value
+
+
+def _rows(connection, statement: str, parameters: dict[str, object]) -> list[dict[str, object]]:
+    return [dict(row) for row in connection.execute(text(statement), parameters).mappings()]
+
+
+def inspect_dispatch(work_order_id: int) -> dict[str, object]:
+    settings = build_isolated_settings(enable_enqueue=True)
+    engine = create_engine(settings.test_database_url)
+    with engine.connect() as connection:
+        revision = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
+        order = connection.execute(
+            text(
+                "SELECT wo.id, wo.tenant_id, wo.property_id, wo.status, wo.category, "
+                "wo.priority, wo.current_assignment_id, wo.created_at, p.timezone "
+                "FROM work_orders wo JOIN properties p ON p.id = wo.property_id "
+                "WHERE wo.id = :work_order_id"
+            ),
+            {"work_order_id": work_order_id},
+        ).mappings().one()
+        created_at = order["created_at"]
+        if created_at.tzinfo is None:
+            created_at = created_at.replace(tzinfo=UTC)
+        business_date = created_at.astimezone(ZoneInfo(order["timezone"])).date()
+        assignment = connection.execute(
+            text(
+                "SELECT id, employee_id, assigned_by_user_id, assigned_source, "
+                "status, reason, payload_json FROM work_order_assignments "
+                "WHERE work_order_id = :work_order_id ORDER BY id DESC LIMIT 1"
+            ),
+            {"work_order_id": work_order_id},
+        ).mappings().one_or_none()
+        payload = _json_value(None if assignment is None else assignment["payload_json"])
+        if not isinstance(payload, dict):
+            payload = {}
+        snapshot = payload.get("filter_snapshot")
+        if not isinstance(snapshot, dict):
+            snapshot = {}
+        candidates = snapshot.get("candidates")
+        if not isinstance(candidates, list):
+            candidates = []
+        analyses = _rows(
+            connection,
+            "SELECT id, status, category, priority, risk, required_skill, confidence "
+            "FROM work_order_analyses WHERE work_order_id = :work_order_id ORDER BY id",
+            {"work_order_id": work_order_id},
+        )
+        ai_columns = {item["name"] for item in inspect(connection).get_columns("ai_call_logs")}
+        provider_mode = "provider_mode" if "provider_mode" in ai_columns else "NULL AS provider_mode"
+        ai_calls = _rows(
+            connection,
+            f"SELECT provider_type, {provider_mode}, operation, model_version, status, prompt_version "
+            "FROM ai_call_logs WHERE work_order_id = :work_order_id ORDER BY id",
+            {"work_order_id": work_order_id},
+        )
+        recommendations = _rows(
+            connection,
+            "SELECT employee_id, eligible, filter_reason, score, reason_codes "
+            "FROM dispatch_recommendations WHERE work_order_id = :work_order_id ORDER BY id",
+            {"work_order_id": work_order_id},
+        )
+        logs = _rows(
+            connection,
+            "SELECT actor_type, actor_user_id IS NULL AS actor_is_system, event_code, "
+            "from_status, to_status, request_id, created_at FROM work_order_logs "
+            "WHERE work_order_id = :work_order_id ORDER BY id",
+            {"work_order_id": work_order_id},
+        )
+        request_id = str(logs[0]["request_id"])
+        audits = _rows(
+            connection,
+            "SELECT action, resource_type, actor_user_id IS NULL AS actor_is_system "
+            "FROM audit_logs WHERE request_id = :request_id AND ("
+            "(resource_type = 'WORK_ORDER' AND resource_id = :work_order_id) OR "
+            "(resource_type = 'WORK_ORDER_ANALYSIS' AND resource_id IN ("
+            "SELECT id FROM work_order_analyses WHERE work_order_id = :work_order_id"
+            ")) OR "
+            "(resource_type = 'WORK_ORDER_ASSIGNMENT' AND resource_id IN ("
+            "SELECT id FROM work_order_assignments WHERE work_order_id = :work_order_id"
+            "))) ORDER BY id",
+            {"request_id": request_id, "work_order_id": work_order_id},
+        )
+        notifications = _rows(
+            connection,
+            "SELECT n.id, n.resource_type, n.resource_id, d.status AS delivery_status "
+            "FROM notifications n LEFT JOIN notification_deliveries d "
+            "ON d.notification_id = n.id "
+            "WHERE n.resource_type = 'WORK_ORDER' AND n.resource_id = :work_order_id "
+            "ORDER BY n.id, d.id",
+            {"work_order_id": work_order_id},
+        )
+        daily = _rows(
+            connection,
+            "SELECT employee_id, business_date, on_duty, current_load "
+            "FROM employee_daily_statuses WHERE property_id = :property_id "
+            "AND business_date = :business_date AND employee_id IN ("
+            "SELECT employee_id FROM dispatch_recommendations "
+            "WHERE work_order_id = :work_order_id UNION "
+            "SELECT employee_id FROM work_order_assignments "
+            "WHERE work_order_id = :work_order_id) "
+            "ORDER BY employee_id",
+            {
+                "property_id": order["property_id"],
+                "business_date": business_date,
+                "work_order_id": work_order_id,
+            },
+        )
+        attendance = _rows(
+            connection,
+            "SELECT employee_id, business_date, check_in_at, check_out_at, "
+            "check_out_at IS NULL AS currently_checked_in "
+            "FROM attendance_records WHERE property_id = :property_id "
+            "AND business_date = :business_date AND employee_id IN ("
+            "SELECT employee_id FROM dispatch_recommendations "
+            "WHERE work_order_id = :work_order_id UNION "
+            "SELECT employee_id FROM work_order_assignments "
+            "WHERE work_order_id = :work_order_id) "
+            "ORDER BY employee_id",
+            {
+                "property_id": order["property_id"],
+                "business_date": business_date,
+                "work_order_id": work_order_id,
+            },
+        )
+    engine.dispose()
+    database_url = make_url(settings.test_database_url)
+    return {
+        "environment": {
+            "database": f"{database_url.host}:{database_url.port}/{database_url.database}",
+            "revision": revision,
+            "queue": settings.celery_task_queue,
+            "ai_auto_assign": settings.ai_auto_assign,
+            "ai_enqueue_on_create": settings.ai_enqueue_on_create,
+        },
+        "work_order": {
+            key: value for key, value in order.items() if key != "timezone"
+        }
+        | {"business_date": business_date},
+        "assignment": None
+        if assignment is None
+        else {
+            "id": assignment["id"],
+            "employee_id": assignment["employee_id"],
+            "assigned_by_user_id_is_null": assignment["assigned_by_user_id"] is None,
+            "assigned_source": assignment["assigned_source"],
+            "status": assignment["status"],
+            "reason": assignment["reason"],
+            "score": payload.get("score"),
+            "required_duty": payload.get("required_duty"),
+            "required_skill": payload.get("required_skill"),
+            "filter_candidate_count": len(candidates),
+            "eligible_employee_ids": [
+                item.get("employee_id")
+                for item in candidates
+                if isinstance(item, dict) and item.get("eligible") is True
+            ],
+            "weights": snapshot.get("weights"),
+        },
+        "analyses": analyses,
+        "ai_calls": ai_calls,
+        "dispatch_recommendations": recommendations,
+        "work_order_logs": logs,
+        "audits": audits,
+        "notifications": notifications,
+        "employee_daily_statuses": daily,
+        "attendance_records": attendance,
+        "redaction": "No phone, token, credential, resident name, or work-order text is emitted.",
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--work-order-id", required=True, type=int)
+    args = parser.parse_args()
+    if args.work_order_id <= 0:
+        parser.error("--work-order-id must be positive")
+    print(json.dumps(inspect_dispatch(args.work_order_id), ensure_ascii=False, indent=2, default=str))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

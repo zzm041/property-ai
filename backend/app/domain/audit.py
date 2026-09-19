@@ -35,6 +35,8 @@ class AuditAction(StrEnum):
     RESIDENT_HOUSE_RELATION_ENDED = "RESIDENT_HOUSE_RELATION_ENDED"
     EMPLOYEE_CREATED = "EMPLOYEE_CREATED"
     EMPLOYEE_UPDATED = "EMPLOYEE_UPDATED"
+    EMPLOYEE_DUTY_CREATED = "EMPLOYEE_DUTY_CREATED"
+    EMPLOYEE_SKILL_CREATED = "EMPLOYEE_SKILL_CREATED"
     EMPLOYEE_PROPERTY_ASSIGNED = "EMPLOYEE_PROPERTY_ASSIGNED"
     EMPLOYEE_PROPERTY_ENDED = "EMPLOYEE_PROPERTY_ENDED"
     ATTENDANCE_CHECKED_IN = "ATTENDANCE_CHECKED_IN"
@@ -75,6 +77,8 @@ class AuditResourceType(StrEnum):
     RESIDENT_BIND_REQUEST = "RESIDENT_BIND_REQUEST"
     RESIDENT_HOUSE_RELATION = "RESIDENT_HOUSE_RELATION"
     EMPLOYEE = "EMPLOYEE"
+    DUTY = "DUTY"
+    SKILL = "SKILL"
     EMPLOYEE_PROPERTY = "EMPLOYEE_PROPERTY"
     ATTENDANCE_RECORD = "ATTENDANCE_RECORD"
     EMPLOYEE_DAILY_STATUS = "EMPLOYEE_DAILY_STATUS"
@@ -126,7 +130,16 @@ _RESIDENT_APPROVE_DETAIL_KEYS = frozenset(
 )
 _RESIDENT_RELATION_DETAIL_KEYS = frozenset({"house_id", "relation_type"})
 _EMPLOYEE_CREATED_DETAIL_KEYS = frozenset({"employee_no", "user_id"})
-_EMPLOYEE_UPDATED_DETAIL_KEYS = frozenset({"status"})
+_EMPLOYEE_UPDATED_DETAIL_KEYS = frozenset(
+    {
+        "status",
+        "department_id",
+        "max_capacity",
+        "added_duty_ids",
+        "added_skill_ids",
+    }
+)
+_EMPLOYEE_CATALOG_DETAIL_KEYS = frozenset({"code", "name"})
 _EMPLOYEE_PROPERTY_DETAIL_KEYS = frozenset({"employee_id", "property_id"})
 _ATTENDANCE_DETAIL_KEYS = frozenset(
     {"employee_id", "property_id", "business_date"}
@@ -308,7 +321,19 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
         AuditAction.EMPLOYEE_UPDATED: AuditActionPolicy(
             resource_type=AuditResourceType.EMPLOYEE,
             allowed_detail_keys=_EMPLOYEE_UPDATED_DETAIL_KEYS,
-            required_detail_keys=_EMPLOYEE_UPDATED_DETAIL_KEYS,
+            required_detail_keys=frozenset({"status"}),
+            allowed_scope_types=frozenset({ScopeType.TENANT}),
+        ),
+        AuditAction.EMPLOYEE_DUTY_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.DUTY,
+            allowed_detail_keys=_EMPLOYEE_CATALOG_DETAIL_KEYS,
+            required_detail_keys=_EMPLOYEE_CATALOG_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.TENANT}),
+        ),
+        AuditAction.EMPLOYEE_SKILL_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.SKILL,
+            allowed_detail_keys=_EMPLOYEE_CATALOG_DETAIL_KEYS,
+            required_detail_keys=_EMPLOYEE_CATALOG_DETAIL_KEYS,
             allowed_scope_types=frozenset({ScopeType.TENANT}),
         ),
         AuditAction.EMPLOYEE_PROPERTY_ASSIGNED: AuditActionPolicy(

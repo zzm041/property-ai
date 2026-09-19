@@ -17,6 +17,7 @@ from app.model.ai import (
     WorkOrderAnalysis,
 )
 from app.model.employee import (
+    AttendanceRecord,
     Duty,
     Employee,
     EmployeeDailyStatus,
@@ -25,9 +26,17 @@ from app.model.employee import (
     EmployeeSkill,
     Skill,
 )
-from app.model.identity import Role, UserRole
+from app.model.identity import Role, User, UserRole
 from app.model.property import House, Unit
-from app.model.work_order import FileObject, WorkOrder, WorkOrderMedia
+from app.model.work_order import (
+    FileObject,
+    WorkOrder,
+    WorkOrderAssignment,
+    WorkOrderFeedback,
+    WorkOrderMedia,
+    WorkOrderProcess,
+    WorkOrderReceipt,
+)
 
 
 class AiRepository:
@@ -133,7 +142,10 @@ class AiRepository:
         rows = self._session.execute(
             select(Duty.code)
             .join(EmployeeDuty, EmployeeDuty.duty_id == Duty.id)
-            .where(EmployeeDuty.employee_id == employee_id)
+            .where(
+                EmployeeDuty.employee_id == employee_id,
+                Duty.status == "ACTIVE",
+            )
         ).all()
         return frozenset(row[0] for row in rows)
 
@@ -141,15 +153,43 @@ class AiRepository:
         rows = self._session.execute(
             select(Skill.code)
             .join(EmployeeSkill, EmployeeSkill.skill_id == Skill.id)
-            .where(EmployeeSkill.employee_id == employee_id)
+            .where(
+                EmployeeSkill.employee_id == employee_id,
+                Skill.status == "ACTIVE",
+            )
         ).all()
         return frozenset(row[0] for row in rows)
 
-    def list_employee_role_codes(self, user_id: int) -> frozenset[str]:
+    def get_user_status(self, user_id: int | None) -> str | None:
+        if user_id is None:
+            return None
+        return self._session.scalar(select(User.status).where(User.id == user_id))
+
+    def list_employee_role_codes(
+        self,
+        user_id: int,
+        *,
+        tenant_id: int,
+        property_id: int,
+    ) -> frozenset[str]:
         rows = self._session.execute(
             select(Role.code)
             .join(UserRole, UserRole.role_id == Role.id)
-            .where(UserRole.user_id == user_id)
+            .where(
+                UserRole.user_id == user_id,
+                (
+                    (UserRole.scope_type == "SYSTEM")
+                    | (
+                        (UserRole.scope_type == "TENANT")
+                        & (UserRole.tenant_id == tenant_id)
+                    )
+                    | (
+                        (UserRole.scope_type == "PROPERTY")
+                        & (UserRole.tenant_id == tenant_id)
+                        & (UserRole.property_id == property_id)
+                    )
+                ),
+            )
         ).all()
         return frozenset(row[0] for row in rows)
 
@@ -186,6 +226,88 @@ class AiRepository:
             )
         )
 
+    def get_attendance(
+        self,
+        *,
+        employee_id: int,
+        property_id: int,
+        business_date,
+    ) -> AttendanceRecord | None:
+        return self._session.scalar(
+            select(AttendanceRecord).where(
+                AttendanceRecord.employee_id == employee_id,
+                AttendanceRecord.property_id == property_id,
+                AttendanceRecord.business_date == business_date,
+                AttendanceRecord.check_out_at.is_(None),
+            )
+        )
+
+    def get_dispatch_history(
+        self,
+        *,
+        employee_id: int,
+        tenant_id: int,
+        property_id: int,
+    ) -> tuple[float | None, float | None, float | None]:
+        assignment_rows = self._session.execute(
+            select(
+                WorkOrderAssignment.assigned_at,
+                WorkOrderAssignment.accept_at,
+            )
+            .where(
+                WorkOrderAssignment.employee_id == employee_id,
+                WorkOrderAssignment.tenant_id == tenant_id,
+                WorkOrderAssignment.property_id == property_id,
+            )
+        ).all()
+        response_seconds = [
+            max((accepted_at - assigned_at).total_seconds(), 0.0)
+            for assigned_at, accepted_at in assignment_rows
+            if accepted_at is not None
+        ]
+        average_response = (
+            sum(response_seconds) / len(response_seconds)
+            if response_seconds
+            else None
+        )
+        process_rows = self._session.execute(
+            select(WorkOrderProcess.id, WorkOrderReceipt.resolved)
+            .outerjoin(
+                WorkOrderReceipt,
+                WorkOrderReceipt.process_id == WorkOrderProcess.id,
+            )
+            .where(
+                WorkOrderProcess.assignee_id == employee_id,
+                WorkOrderProcess.tenant_id == tenant_id,
+                WorkOrderProcess.property_id == property_id,
+            )
+        ).all()
+        completion_rate = (
+            sum(1 for _process_id, resolved in process_rows if resolved == 1)
+            / len(process_rows)
+            if process_rows
+            else None
+        )
+        ratings = tuple(
+            float(value)
+            for value in self._session.scalars(
+                select(WorkOrderFeedback.rating)
+                .join(
+                    WorkOrderProcess,
+                    WorkOrderProcess.id == WorkOrderFeedback.process_id,
+                )
+                .where(
+                    WorkOrderProcess.assignee_id == employee_id,
+                    WorkOrderProcess.tenant_id == tenant_id,
+                    WorkOrderProcess.property_id == property_id,
+                    WorkOrderFeedback.rating.is_not(None),
+                )
+            ).all()
+            if value is not None
+        )
+        average_rating = sum(ratings) / len(ratings) if ratings else None
+        return average_response, completion_rate, average_rating
+
     def count_same_building_history(
         self,
         *,
@@ -200,14 +322,23 @@ class AiRepository:
             select(WorkOrder.id)
             .join(House, House.id == WorkOrder.house_id)
             .join(Unit, Unit.id == House.unit_id)
+            .join(
+                WorkOrderProcess,
+                WorkOrderProcess.work_order_id == WorkOrder.id,
+            )
+            .join(
+                WorkOrderReceipt,
+                WorkOrderReceipt.process_id == WorkOrderProcess.id,
+            )
             .where(
                 WorkOrder.tenant_id == tenant_id,
                 WorkOrder.property_id == property_id,
                 Unit.building_id == building_id,
-                WorkOrder.current_assignment_id.is_not(None),
+                WorkOrderProcess.assignee_id == employee_id,
+                WorkOrderReceipt.resolved == 1,
             )
+            .distinct()
         ).all()
-        del employee_id
         return len(rows)
 
     def list_cluster_work_orders(

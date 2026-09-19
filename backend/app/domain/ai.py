@@ -1,6 +1,7 @@
 """Pure AI analysis validation, mapping, and explainable dispatch scoring."""
 
 from dataclasses import dataclass
+from datetime import datetime
 from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -41,7 +42,9 @@ class AiCallStatus(StrEnum):
 
 class FilterReason(StrEnum):
     NOT_ACTIVE = "NOT_ACTIVE"
+    USER_NOT_ACTIVE = "USER_NOT_ACTIVE"
     PROPERTY_NOT_EFFECTIVE = "PROPERTY_NOT_EFFECTIVE"
+    NOT_CHECKED_IN = "NOT_CHECKED_IN"
     NOT_ON_DUTY = "NOT_ON_DUTY"
     DUTY_MISMATCH = "DUTY_MISMATCH"
     SKILL_MISMATCH = "SKILL_MISMATCH"
@@ -219,8 +222,38 @@ class DispatchCandidate:
     employee_active: bool
     property_effective: bool
     has_staff_role: bool
+    user_active: bool = True
+    checked_in: bool = True
+    check_in_at: datetime | None = None
     same_building_history: int = 0
     primary_incident_handler: bool = False
+    average_response_seconds: float | None = None
+    completion_rate: float | None = None
+    average_rating: float | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class DispatchWeights:
+    duty: float = 0.25
+    skill: float = 0.20
+    capacity: float = 0.20
+    same_building: float = 0.10
+    response: float = 0.10
+    completion: float = 0.08
+    rating: float = 0.07
+    response_reference_seconds: float = 900.0
+
+    @property
+    def total(self) -> float:
+        return (
+            self.duty
+            + self.skill
+            + self.capacity
+            + self.same_building
+            + self.response
+            + self.completion
+            + self.rating
+        )
 
 
 def hard_filter_candidate(
@@ -231,8 +264,12 @@ def hard_filter_candidate(
 ) -> FilterReason | None:
     if not candidate.employee_active:
         return FilterReason.NOT_ACTIVE
+    if not candidate.user_active:
+        return FilterReason.USER_NOT_ACTIVE
     if not candidate.property_effective:
         return FilterReason.PROPERTY_NOT_EFFECTIVE
+    if not candidate.checked_in:
+        return FilterReason.NOT_CHECKED_IN
     if not candidate.on_duty:
         return FilterReason.NOT_ON_DUTY
     if not candidate.has_staff_role:
@@ -251,6 +288,7 @@ def score_candidate(
     *,
     required_skill: str | None,
     required_duty: str | None,
+    weights: DispatchWeights = DispatchWeights(),
 ) -> tuple[float, tuple[str, ...]]:
     reasons: list[str] = []
     duty_score = 1.0 if required_duty and required_duty in candidate.duty_codes else 0.0
@@ -261,15 +299,28 @@ def score_candidate(
         else 0.0
     )
     building = 1.0 if candidate.same_building_history > 0 else 0.0
-    primary = 1.0 if candidate.primary_incident_handler else 0.0
-    score = (
-        0.25 * duty_score
-        + 0.20 * skill_score
-        + 0.20 * capacity
-        + 0.10 * building
-        + 0.15 * primary
-        + 0.10 * 0.5
+    response = (
+        0.5
+        if candidate.average_response_seconds is None
+        else 1.0
+        / (
+            1.0
+            + max(candidate.average_response_seconds, 0.0)
+            / weights.response_reference_seconds
+        )
     )
+    completion = 0.5 if candidate.completion_rate is None else candidate.completion_rate
+    rating = 0.5 if candidate.average_rating is None else candidate.average_rating / 5.0
+    weighted = (
+        weights.duty * duty_score
+        + weights.skill * skill_score
+        + weights.capacity * capacity
+        + weights.same_building * building
+        + weights.response * response
+        + weights.completion * completion
+        + weights.rating * rating
+    )
+    score = weighted / weights.total if weights.total > 0 else 0.0
     if duty_score:
         reasons.append("DUTY_MATCH")
     if skill_score:
@@ -277,7 +328,13 @@ def score_candidate(
     reasons.append("LOAD_REMAINING")
     if building:
         reasons.append("SAME_BUILDING_HISTORY")
-    if primary:
+    if candidate.average_response_seconds is not None:
+        reasons.append("RESPONSE_HISTORY")
+    if candidate.completion_rate is not None:
+        reasons.append("COMPLETION_HISTORY")
+    if candidate.average_rating is not None:
+        reasons.append("RATING_HISTORY")
+    if candidate.primary_incident_handler:
         reasons.append("PRIMARY_INCIDENT_HANDLER")
     return round(score, 4), tuple(reasons)
 
@@ -287,6 +344,7 @@ def rank_candidates(
     *,
     required_skill: str | None,
     required_duty: str | None,
+    weights: DispatchWeights = DispatchWeights(),
 ) -> tuple[tuple[DispatchCandidate, float, tuple[str, ...]], ...]:
     eligible: list[tuple[DispatchCandidate, float, tuple[str, ...]]] = []
     for candidate in candidates:
@@ -300,12 +358,19 @@ def rank_candidates(
             candidate,
             required_skill=required_skill,
             required_duty=required_duty,
+            weights=weights,
         )
         eligible.append((candidate, score, reasons))
     eligible.sort(
         key=lambda item: (
+            -int(item[0].primary_incident_handler),
             -item[1],
             item[0].current_load,
+            -(
+                item[0].check_in_at.timestamp()
+                if item[0].check_in_at is not None
+                else float("-inf")
+            ),
             -item[0].same_building_history,
             item[0].employee_id,
         )

@@ -2,6 +2,7 @@
 <view class="card" wx:if="{{workOrder}}">
   <view>工单 {{workOrder.id}}</view>
   <view>状态 {{workOrder.status}}</view>
+  <view wx:if="{{autoDispatched}}">系统已自动派单</view>
   <view wx:if="{{workOrder.process_reason && workOrder.process_reason != 'NONE'}}">原因 {{workOrder.process_reason}}</view>
   <view class="empty" wx:if="{{item.text}}">{{item.text}}</view>
   <button class="btn" wx:if="{{canConfirm}}" bindtap="confirm">确认解决</button>

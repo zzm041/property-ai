@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import quote, urlsplit, urlunsplit
 
 from sqlalchemy.engine import make_url
 
@@ -22,7 +23,9 @@ ISOLATED_API_PORT = 8083
 ISOLATED_QUEUE = "property_ai.auth001"
 ISOLATED_VHOST = "property_ai_auth001"
 ISOLATED_BROKER_USER = "auth001"
-ISOLATED_BROKER_PASSWORD = "change-me-auth001"
+ISOLATED_BROKER_PASSWORD_ENV = "AUTH001_BROKER_PASSWORD"
+ISOLATED_BROKER_PASSWORD_FILE_ENV = "AUTH001_BROKER_PASSWORD_FILE"
+DEFAULT_BROKER_PASSWORD_FILE = REPO / "tmp" / "auth001-runtime" / "broker-password.txt"
 ISOLATED_REDIS_DB = 12
 ISOLATED_STORAGE_DIR = REPO / "tmp" / "auth001-objects"
 RABBIT_CONTAINER_FILTER = "property-ai-rabbitmq-1"
@@ -36,9 +39,32 @@ def isolated_database_url(source: Settings) -> str:
     )
 
 
+def isolated_broker_password() -> str:
+    password = os.environ.get(ISOLATED_BROKER_PASSWORD_ENV, "").strip()
+    if password:
+        return password
+    password_file = Path(
+        os.environ.get(
+            ISOLATED_BROKER_PASSWORD_FILE_ENV,
+            str(DEFAULT_BROKER_PASSWORD_FILE),
+        )
+    )
+    try:
+        password = password_file.read_text(encoding="utf-8").strip()
+    except OSError as exc:
+        raise RuntimeError(
+            f"Set {ISOLATED_BROKER_PASSWORD_ENV} or create the local secret file "
+            f"configured by {ISOLATED_BROKER_PASSWORD_FILE_ENV}"
+        ) from exc
+    if not password:
+        raise RuntimeError("AUTH001 broker password must not be empty")
+    return password
+
+
 def isolated_broker_url() -> str:
+    password = quote(isolated_broker_password(), safe="")
     return (
-        f"amqp://{ISOLATED_BROKER_USER}:{ISOLATED_BROKER_PASSWORD}"
+        f"amqp://{ISOLATED_BROKER_USER}:{password}"
         f"@127.0.0.1:5672/{ISOLATED_VHOST}"
     )
 
@@ -81,7 +107,7 @@ def build_isolated_settings(
         wechat_login_enabled=True,
         wechat_provider="development",
         api_port=ISOLATED_API_PORT,
-        app_secret_key="auth001-isolated-secret-not-production",
+        app_secret_key=source.app_secret_key,
         jwt_issuer="test-issuer",
         jwt_audience="test-audience",
         llm_provider="development",

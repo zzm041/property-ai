@@ -13,7 +13,10 @@ from app.domain.iam import Principal
 from app.schema.common import request_id_for, success_envelope
 from app.schema.employee import (
     AssignEmployeePropertyRequest,
+    CreateEmployeeCatalogItemRequest,
     CreateEmployeeRequest,
+    EmployeeCatalogData,
+    EmployeeCatalogItemData,
     EmployeeData,
     EmployeeDetailData,
     EmployeePropertyData,
@@ -62,6 +65,16 @@ def _assignment_data(record) -> EmployeePropertyData:
         status=record.status,
         valid_from=record.valid_from,
         valid_to=record.valid_to,
+    )
+
+
+def _catalog_item_data(record) -> EmployeeCatalogItemData:
+    return EmployeeCatalogItemData(
+        id=record.id,
+        tenant_id=record.tenant_id,
+        code=record.code,
+        name=record.name,
+        status=record.status,
     )
 
 
@@ -125,6 +138,8 @@ def update_employee(
         status=body.status,
         department_id=body.department_id,
         max_capacity=body.max_capacity,
+        add_duty_ids=body.add_duty_ids,
+        add_skill_ids=body.add_skill_ids,
     )
     return success_envelope(request, _employee_data(record).model_dump(mode="json"))
 
@@ -137,12 +152,82 @@ def get_employee(
     service: Annotated[EmployeeService, Depends(get_employee_service)],
 ) -> dict[str, object]:
     employee, assignments = service.get_employee(actor=actor, employee_id=employee_id)
+    duties, skills = service.get_employee_catalog_links(
+        actor=actor,
+        employee_id=employee_id,
+    )
     return success_envelope(
         request,
         EmployeeDetailData(
             employee=_employee_data(employee),
             assignments=[_assignment_data(item) for item in assignments],
+            duties=[_catalog_item_data(item) for item in duties],
+            skills=[_catalog_item_data(item) for item in skills],
         ).model_dump(mode="json"),
+    )
+
+
+@router.get("/employee-catalog")
+def list_employee_catalog(
+    tenant_id: int,
+    property_id: int,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[EmployeeService, Depends(get_employee_service)],
+) -> dict[str, object]:
+    duties, skills = service.list_catalog(
+        actor=actor,
+        tenant_id=tenant_id,
+        property_id=property_id,
+    )
+    return success_envelope(
+        request,
+        EmployeeCatalogData(
+            duties=[_catalog_item_data(item) for item in duties],
+            skills=[_catalog_item_data(item) for item in skills],
+        ).model_dump(mode="json"),
+    )
+
+
+@router.post("/duties")
+def create_duty(
+    body: CreateEmployeeCatalogItemRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[EmployeeService, Depends(get_employee_service)],
+) -> dict[str, object]:
+    record = service.create_duty(
+        actor=actor,
+        tenant_id=body.tenant_id,
+        property_id=body.property_id,
+        code=body.code,
+        name=body.name,
+        request_id=request_id_for(request),
+    )
+    return success_envelope(
+        request,
+        _catalog_item_data(record).model_dump(mode="json"),
+    )
+
+
+@router.post("/skills")
+def create_skill(
+    body: CreateEmployeeCatalogItemRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[EmployeeService, Depends(get_employee_service)],
+) -> dict[str, object]:
+    record = service.create_skill(
+        actor=actor,
+        tenant_id=body.tenant_id,
+        property_id=body.property_id,
+        code=body.code,
+        name=body.name,
+        request_id=request_id_for(request),
+    )
+    return success_envelope(
+        request,
+        _catalog_item_data(record).model_dump(mode="json"),
     )
 
 

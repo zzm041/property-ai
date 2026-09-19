@@ -1,0 +1,102 @@
+{
+  "environment": {
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001",
+    "ai_auto_assign": true,
+    "ai_enqueue_on_create": true
+  },
+  "work_order": {
+    "id": 3,
+    "tenant_id": 4,
+    "property_id": 4,
+    "status": "PENDING_ASSIGNMENT",
+    "category": "ELECTRICAL",
+    "priority": "HIGH",
+    "current_assignment_id": null,
+    "created_at": "2026-09-19 16:06:31.506294",
+    "business_date": "2026-09-20"
+  },
+  "assignment": null,
+  "analyses": [
+    {
+      "id": 3,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "priority": "HIGH",
+      "risk": "electric",
+      "required_skill": "ELECTRICAL",
+      "confidence": "0.860"
+    }
+  ],
+  "ai_calls": [
+    {
+      "provider_type": "LLM",
+      "provider_mode": "DEVELOPMENT",
+      "operation": "structured_completion",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS",
+      "prompt_version": "wo-analysis-v1"
+    }
+  ],
+  "dispatch_recommendations": [
+    {
+      "employee_id": 4,
+      "eligible": 0,
+      "filter_reason": "NOT_CHECKED_IN",
+      "score": "0.0000",
+      "reason_codes": "[\"NOT_CHECKED_IN\"]"
+    }
+  ],
+  "work_order_logs": [
+    {
+      "actor_type": "RESIDENT",
+      "actor_is_system": 0,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "7de18892e73942f9bb9863c3bf974dec",
+      "created_at": "2026-09-19 16:06:31.514794"
+    },
+    {
+      "actor_type": "SYSTEM",
+      "actor_is_system": 1,
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "7de18892e73942f9bb9863c3bf974dec",
+      "created_at": "2026-09-19 16:06:31.651805"
+    }
+  ],
+  "audits": [
+    {
+      "action": "WORK_ORDER_CREATED",
+      "resource_type": "WORK_ORDER",
+      "actor_is_system": 0
+    },
+    {
+      "action": "WORK_ORDER_AI_ANALYSIS_COMPLETED",
+      "resource_type": "WORK_ORDER_ANALYSIS",
+      "actor_is_system": 1
+    }
+  ],
+  "notifications": [],
+  "employee_daily_statuses": [
+    {
+      "employee_id": 4,
+      "business_date": "2026-09-20",
+      "on_duty": "ON_DUTY",
+      "current_load": 2
+    }
+  ],
+  "attendance_records": [
+    {
+      "employee_id": 4,
+      "business_date": "2026-09-20",
+      "check_in_at": "2026-09-19 16:08:54.921080",
+      "check_out_at": null,
+      "currently_checked_in": 1
+    }
+  ],
+  "redaction": "No phone, token, credential, resident name, or work-order text is emitted."
+}

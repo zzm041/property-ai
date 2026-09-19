@@ -19,14 +19,19 @@ import uvicorn
 
 from auth001_isolated_runtime import (
     ISOLATED_API_PORT,
+    apply_isolated_environ,
     build_isolated_settings,
     describe_isolated_target,
 )
-from app.main import create_app
 
 
 def main() -> None:
     settings = build_isolated_settings(enable_enqueue=True)
+    # Configure the publisher before importing app.main. Importing the router can
+    # import Celery tasks, whose process-global app reads its broker only once.
+    apply_isolated_environ(settings)
+    from app.main import create_app
+
     print(describe_isolated_target(settings), flush=True)
     uvicorn.run(
         create_app(settings),

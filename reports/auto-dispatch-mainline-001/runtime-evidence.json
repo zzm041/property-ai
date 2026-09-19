@@ -1,0 +1,93 @@
+{
+  "task_id": "AUTO-DISPATCH-MAINLINE-001",
+  "captured_at": "2026-09-19T16:01:07Z",
+  "evidence_kind": "business_api_create_plus_read_only_database_confirmation",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001",
+    "ai_auto_assign": true,
+    "ai_enqueue_on_create": true
+  },
+  "work_order": {
+    "id": 2,
+    "tenant_id": 4,
+    "property_id": 4,
+    "status": "ASSIGNED",
+    "category": "ELECTRICAL",
+    "priority": "HIGH",
+    "current_assignment_id": 2
+  },
+  "assignment": {
+    "id": 2,
+    "employee_id": 4,
+    "assigned_by_user_id_is_null": true,
+    "assigned_source": "AUTO",
+    "status": "ACTIVE",
+    "reason": "AUTO_DISPATCH",
+    "score": 0.9637,
+    "required_duty": "MAINTENANCE",
+    "required_skill": "ELECTRICAL",
+    "filter_candidate_count": 1,
+    "eligible_employee_ids": [4],
+    "weights": {
+      "duty": 0.25,
+      "skill": 0.2,
+      "capacity": 0.2,
+      "same_building": 0.1,
+      "response": 0.1,
+      "completion": 0.08,
+      "rating": 0.07,
+      "response_reference_seconds": 900.0
+    }
+  },
+  "analysis": {
+    "id": 2,
+    "status": "COMPLETED",
+    "category": "ELECTRICAL",
+    "priority": "HIGH",
+    "risk": "electric",
+    "required_skill": "ELECTRICAL",
+    "confidence": "0.860"
+  },
+  "ai_call": {
+    "provider_type": "LLM",
+    "provider_mode": "DEVELOPMENT",
+    "operation": "structured_completion",
+    "model_version": "dev-llm-v1",
+    "status": "SUCCESS",
+    "prompt_version": "wo-analysis-v1"
+  },
+  "work_order_log_path": [
+    "CREATE:PENDING_ANALYSIS",
+    "ANALYZE:PENDING_ASSIGNMENT",
+    "ASSIGN:ASSIGNED"
+  ],
+  "audit_actions": [
+    "WORK_ORDER_CREATED",
+    "WORK_ORDER_AI_ANALYSIS_COMPLETED",
+    "WORK_ORDER_ASSIGNED"
+  ],
+  "notification_delivery_status": "SUCCEEDED",
+  "employee_daily_status": {
+    "on_duty": "ON_DUTY",
+    "current_load": 1
+  },
+  "api_readback": {
+    "status": "ASSIGNED",
+    "assignment_reason": "AUTO_DISPATCH",
+    "assigned_by_user_id_is_null": true,
+    "detail_serialization_regression_fixed": true
+  },
+  "boundaries": {
+    "creation_path": "official SMS session plus POST /work-orders",
+    "assignment_path": "Celery worker plus DEVELOPMENT Fake LLM plus server-side rule engine",
+    "manual_analysis_or_assignment_used": false,
+    "direct_database_write_used": false,
+    "real_model_verified": false,
+    "page_interaction_verified": false,
+    "production_v1_passed": false,
+    "redaction": "No phone, token, credential, resident name, or work-order text is stored."
+  }
+}

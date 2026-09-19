@@ -1,10 +1,13 @@
 """Pure AI mapping, hard-filter, and explainable scoring tests."""
 
+from datetime import UTC, datetime
+
 from pydantic import ValidationError
 import pytest
 
 from app.domain.ai import (
     DispatchCandidate,
+    DispatchWeights,
     FilterReason,
     WorkOrderAnalysisOutput,
     hard_filter_candidate,
@@ -134,6 +137,122 @@ def test_hard_filter_rejects_full_capacity() -> None:
         )
         is FilterReason.CAPACITY_FULL
     )
+
+
+def test_hard_filter_requires_active_user_and_live_check_in() -> None:
+    candidate = DispatchCandidate(
+        employee_id=5,
+        duty_codes=frozenset({"MAINTENANCE"}),
+        skill_codes=frozenset({"ELECTRICAL"}),
+        current_load=0,
+        max_capacity=2,
+        on_duty=True,
+        employee_active=True,
+        property_effective=True,
+        has_staff_role=True,
+        user_active=False,
+    )
+    assert hard_filter_candidate(
+        candidate,
+        required_skill="ELECTRICAL",
+        required_duty="MAINTENANCE",
+    ) is FilterReason.USER_NOT_ACTIVE
+    checked_out = DispatchCandidate(
+        employee_id=6,
+        duty_codes=candidate.duty_codes,
+        skill_codes=candidate.skill_codes,
+        current_load=0,
+        max_capacity=2,
+        on_duty=True,
+        employee_active=True,
+        property_effective=True,
+        has_staff_role=True,
+        checked_in=False,
+    )
+    assert hard_filter_candidate(
+        checked_out,
+        required_skill="ELECTRICAL",
+        required_duty="MAINTENANCE",
+    ) is FilterReason.NOT_CHECKED_IN
+
+
+def test_scoring_uses_configurable_operational_history_weights() -> None:
+    proven = DispatchCandidate(
+        employee_id=7,
+        duty_codes=frozenset({"MAINTENANCE"}),
+        skill_codes=frozenset({"ELECTRICAL"}),
+        current_load=0,
+        max_capacity=2,
+        on_duty=True,
+        employee_active=True,
+        property_effective=True,
+        has_staff_role=True,
+        average_response_seconds=30,
+        completion_rate=1.0,
+        average_rating=5.0,
+    )
+    unknown = DispatchCandidate(
+        employee_id=8,
+        duty_codes=proven.duty_codes,
+        skill_codes=proven.skill_codes,
+        current_load=0,
+        max_capacity=2,
+        on_duty=True,
+        employee_active=True,
+        property_effective=True,
+        has_staff_role=True,
+    )
+    weights = DispatchWeights(
+        duty=0,
+        skill=0,
+        capacity=0,
+        same_building=0,
+        response=0.4,
+        completion=0.3,
+        rating=0.3,
+    )
+    ranked = rank_candidates(
+        (unknown, proven),
+        required_skill="ELECTRICAL",
+        required_duty="MAINTENANCE",
+        weights=weights,
+    )
+    assert [item[0].employee_id for item in ranked] == [7, 8]
+
+
+def test_incident_primary_precedes_score_and_recent_checkin_breaks_ties() -> None:
+    base = dict(
+        duty_codes=frozenset({"MAINTENANCE"}),
+        skill_codes=frozenset({"ELECTRICAL"}),
+        current_load=0,
+        max_capacity=2,
+        on_duty=True,
+        employee_active=True,
+        property_effective=True,
+        has_staff_role=True,
+    )
+    primary = DispatchCandidate(
+        employee_id=9,
+        check_in_at=datetime(2026, 9, 19, 1, tzinfo=UTC),
+        primary_incident_handler=True,
+        **base,
+    )
+    recent = DispatchCandidate(
+        employee_id=10,
+        check_in_at=datetime(2026, 9, 19, 3, tzinfo=UTC),
+        **base,
+    )
+    older = DispatchCandidate(
+        employee_id=11,
+        check_in_at=datetime(2026, 9, 19, 2, tzinfo=UTC),
+        **base,
+    )
+    ranked = rank_candidates(
+        (older, recent, primary),
+        required_skill="ELECTRICAL",
+        required_duty="MAINTENANCE",
+    )
+    assert [item[0].employee_id for item in ranked] == [9, 10, 11]
 
 
 def test_announcement_cannot_publish_from_draft() -> None:

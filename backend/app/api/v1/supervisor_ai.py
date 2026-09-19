@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.api.dependencies.auth import get_current_principal
 from app.api.dependencies.db import get_db_session
 from app.api.v1.work_orders import work_order_data
+from app.core.config import Settings, get_settings
 from app.domain.iam import Principal
 from app.schema.ai import (
     DispatchRecommendationData,
@@ -22,8 +23,9 @@ router = APIRouter(prefix="/supervisor", tags=["supervisor-ai"])
 
 def get_analysis_service(
     session: Annotated[Session, Depends(get_db_session)],
+    settings: Annotated[Settings, Depends(get_settings)],
 ) -> AnalysisService:
-    return AnalysisService(session)
+    return AnalysisService(session, settings=settings)
 
 
 def analysis_data(record) -> WorkOrderAnalysisData:

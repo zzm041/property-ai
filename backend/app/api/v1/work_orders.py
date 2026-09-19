@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_principal
 from app.api.dependencies.db import get_db_session
+from app.core.config import Settings, get_settings
 from app.core.errors import AppError, WorkOrderErrorCode
 from app.domain.iam import Principal
 from app.schema.common import request_id_for, success_envelope
@@ -31,8 +32,9 @@ router = APIRouter(tags=["work-orders"])
 
 def get_work_order_service(
     session: Annotated[Session, Depends(get_db_session)],
+    settings: Annotated[Settings, Depends(get_settings)],
 ) -> WorkOrderService:
-    return WorkOrderService(session)
+    return WorkOrderService(session, settings=settings)
 
 
 def work_order_data(record, *, overdue: bool = False) -> WorkOrderData:

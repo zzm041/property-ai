@@ -15,10 +15,10 @@ if str(OPS) not in sys.path:
     sys.path.insert(0, str(OPS))
 
 from auth001_isolated_runtime import (
-    ISOLATED_BROKER_PASSWORD,
     ISOLATED_BROKER_USER,
     ISOLATED_VHOST,
     RABBIT_CONTAINER_FILTER,
+    isolated_broker_password,
 )
 
 
@@ -27,6 +27,7 @@ def _run(args: list[str]) -> subprocess.CompletedProcess[str]:
 
 
 def main() -> int:
+    broker_password = isolated_broker_password()
     running = _run(
         [
             "docker",
@@ -53,7 +54,7 @@ def main() -> int:
             "rabbitmqctl",
             "add_user",
             ISOLATED_BROKER_USER,
-            ISOLATED_BROKER_PASSWORD,
+            broker_password,
         ]
     )
     _run(
@@ -64,7 +65,7 @@ def main() -> int:
             "rabbitmqctl",
             "change_password",
             ISOLATED_BROKER_USER,
-            ISOLATED_BROKER_PASSWORD,
+            broker_password,
         ]
     )
     created = _run(

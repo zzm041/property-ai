@@ -165,7 +165,9 @@ class WorkOrderLogData(BaseModel):
 class WorkOrderAssignmentData(BaseModel):
     id: int
     employee_id: int
-    assigned_by_user_id: int
+    # Automatic dispatch has no human actor. Migration 0009 permits NULL for
+    # this column while manual assignments continue to return the actor id.
+    assigned_by_user_id: int | None
     status: str
     assigned_at: datetime
     accept_at: datetime | None

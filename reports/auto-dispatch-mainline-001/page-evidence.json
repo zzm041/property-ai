@@ -1,0 +1,33 @@
+{
+  "task_id": "AUTO-DISPATCH-MAINLINE-001-PAGE",
+  "captured_at": "2026-09-19T16:10:58.397Z",
+  "automator_ws": "ws://127.0.0.1:9435",
+  "staff_checkin_interaction": "staff attendance page and check-in button",
+  "staff_checkin_business_date": "2026-09-20",
+  "create_interaction": "resident page form and submit button",
+  "work_order_id": 4,
+  "resident_detail_status": "ASSIGNED",
+  "resident_detail_auto_dispatched": true,
+  "resident_detail_log_events": [
+    "CREATE",
+    "ANALYZE",
+    "ASSIGN"
+  ],
+  "visible_to_assigned_staff": true,
+  "staff_list_status": [
+    "ASSIGNED"
+  ],
+  "manual_supervisor_interaction_used": false,
+  "screenshots": [
+    "staff-current-day-checkin.png",
+    "resident-auto-assigned.png",
+    "staff-auto-assigned-list.png"
+  ],
+  "not_claimed": [
+    "real AI",
+    "real SMS",
+    "Production V1",
+    "formal release"
+  ],
+  "redaction": "No phone, SMS code, token, credential, or resident name is stored."
+}

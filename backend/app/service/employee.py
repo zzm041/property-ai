@@ -2,6 +2,7 @@
 
 from collections.abc import Callable
 from datetime import date, datetime
+import re
 from typing import TypeVar
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -36,6 +37,8 @@ from app.model.employee import (
     EmployeeDuty,
     EmployeeProperty,
     EmployeeSkill,
+    Duty,
+    Skill,
 )
 from app.model.property import Property
 from app.repository.employee import EmployeeRepository
@@ -53,6 +56,8 @@ _ATTENDANCE_UNIQUE = frozenset({"uq_attendance_records_employee_property_date"})
 _DAILY_UNIQUE = frozenset({"uq_employee_daily_statuses_employee_property_date"})
 _DUTY_UNIQUE = frozenset({"uq_employee_duties_employee_duty"})
 _SKILL_UNIQUE = frozenset({"uq_employee_skills_employee_skill"})
+_DUTY_CODE_UNIQUE = frozenset({"uq_duties_tenant_code"})
+_SKILL_CODE_UNIQUE = frozenset({"uq_skills_tenant_code"})
 _SCOPE_FK = frozenset(
     {
         "fk_employee_properties_property_tenant_properties",
@@ -130,6 +135,8 @@ class EmployeeService:
         status: str | None = None,
         department_id: int | None = None,
         max_capacity: int | None = None,
+        add_duty_ids: tuple[int, ...] | None = None,
+        add_skill_ids: tuple[int, ...] | None = None,
     ) -> Employee:
         self._require_positive_id(employee_id, "employee_id")
         self._validate_request_id(request_id)
@@ -141,7 +148,76 @@ class EmployeeService:
                 status=status,
                 department_id=department_id,
                 max_capacity=max_capacity,
+                add_duty_ids=add_duty_ids,
+                add_skill_ids=add_skill_ids,
             )
+        )
+
+    def create_duty(
+        self,
+        *,
+        actor: Principal,
+        tenant_id: int,
+        property_id: int,
+        code: str,
+        name: str,
+        request_id: str,
+    ) -> Duty:
+        self._validate_catalog_item(code=code, name=name)
+        self._validate_request_id(request_id)
+        return self._execute(
+            lambda: self._create_catalog_item(
+                actor=actor,
+                tenant_id=tenant_id,
+                property_id=property_id,
+                code=code.strip().upper(),
+                name=name.strip(),
+                request_id=request_id,
+                kind="DUTY",
+            )
+        )
+
+    def create_skill(
+        self,
+        *,
+        actor: Principal,
+        tenant_id: int,
+        property_id: int,
+        code: str,
+        name: str,
+        request_id: str,
+    ) -> Skill:
+        self._validate_catalog_item(code=code, name=name)
+        self._validate_request_id(request_id)
+        return self._execute(
+            lambda: self._create_catalog_item(
+                actor=actor,
+                tenant_id=tenant_id,
+                property_id=property_id,
+                code=code.strip().upper(),
+                name=name.strip(),
+                request_id=request_id,
+                kind="SKILL",
+            )
+        )
+
+    def list_catalog(
+        self,
+        *,
+        actor: Principal,
+        tenant_id: int,
+        property_id: int,
+    ) -> tuple[tuple[Duty, ...], tuple[Skill, ...]]:
+        current = self._reload_actor(actor)
+        property_record = self._require_managed_property(
+            current,
+            tenant_id=tenant_id,
+            property_id=property_id,
+            permission=EMPLOYEE_READ,
+        )
+        return (
+            self._repository.list_duties_for_tenant(property_record.tenant_id),
+            self._repository.list_skills_for_tenant(property_record.tenant_id),
         )
 
     def get_employee(
@@ -167,6 +243,21 @@ class EmployeeService:
             assignments,
         )
         return employee, assignments
+
+    def get_employee_catalog_links(
+        self,
+        *,
+        actor: Principal,
+        employee_id: int,
+    ) -> tuple[tuple[Duty, ...], tuple[Skill, ...]]:
+        employee, _assignments = self.get_employee(
+            actor=actor,
+            employee_id=employee_id,
+        )
+        return (
+            self._repository.list_duties_for_employee(employee.id),
+            self._repository.list_skills_for_employee(employee.id),
+        )
 
     def assign_property(
         self,
@@ -460,6 +551,8 @@ class EmployeeService:
         status: str | None,
         department_id: int | None,
         max_capacity: int | None,
+        add_duty_ids: tuple[int, ...] | None,
+        add_skill_ids: tuple[int, ...] | None,
     ) -> Employee:
         current = self._reload_actor(actor)
         employee = self._repository.get_employee(employee_id)
@@ -476,9 +569,10 @@ class EmployeeService:
             employee,
             assignments,
         )
+        details: dict[str, object] = {}
         if status is not None:
             try:
-                employee.status = EmployeeStatus(status).value
+                next_status = EmployeeStatus(status).value
             except ValueError as exc:
                 raise AppError(
                     code=EmployeeErrorCode.INVALID_INPUT,
@@ -486,6 +580,9 @@ class EmployeeService:
                     status_code=422,
                     details={"field": "status"},
                 ) from exc
+            if employee.status != next_status:
+                employee.status = next_status
+                details["status"] = employee.status
         if department_id is not None:
             self._require_positive_id(department_id, "department_id")
             department = self._repository.get_department_in_tenant(
@@ -498,10 +595,27 @@ class EmployeeService:
                     message="Department was not found",
                     status_code=404,
                 )
-            employee.department_id = department.id
+            if employee.department_id != department.id:
+                employee.department_id = department.id
+                details["department_id"] = department.id
         if max_capacity is not None:
             self._validate_capacity(max_capacity)
-            employee.max_capacity = max_capacity
+            if employee.max_capacity != max_capacity:
+                employee.max_capacity = max_capacity
+                details["max_capacity"] = max_capacity
+        added_duty_ids: tuple[int, ...] = ()
+        added_skill_ids: tuple[int, ...] = ()
+        if add_duty_ids is not None:
+            added_duty_ids = self._add_duties(employee, add_duty_ids)
+        if add_skill_ids is not None:
+            added_skill_ids = self._add_skills(employee, add_skill_ids)
+        if added_duty_ids:
+            details["added_duty_ids"] = list(added_duty_ids)
+        if added_skill_ids:
+            details["added_skill_ids"] = list(added_skill_ids)
+        if not details:
+            return employee
+        details.setdefault("status", employee.status)
         self._append_audit(
             action=AuditAction.EMPLOYEE_UPDATED,
             resource_type=AuditResourceType.EMPLOYEE,
@@ -510,9 +624,65 @@ class EmployeeService:
             request_id=request_id,
             scope_type=ScopeType.TENANT,
             tenant_id=employee.tenant_id,
-            details={"status": employee.status},
+            details=details,
         )
         return employee
+
+    def _create_catalog_item(
+        self,
+        *,
+        actor: Principal,
+        tenant_id: int,
+        property_id: int,
+        code: str,
+        name: str,
+        request_id: str,
+        kind: str,
+    ) -> Duty | Skill:
+        current = self._reload_actor(actor)
+        property_record = self._require_managed_property(
+            current,
+            tenant_id=tenant_id,
+            property_id=property_id,
+            permission=EMPLOYEE_MANAGE,
+        )
+        if kind == "DUTY":
+            record: Duty | Skill = Duty(
+                tenant_id=property_record.tenant_id,
+                code=code,
+                name=name,
+                status="ACTIVE",
+            )
+            action = AuditAction.EMPLOYEE_DUTY_CREATED
+            resource_type = AuditResourceType.DUTY
+            add = self._repository.add_duty
+            expected = _DUTY_CODE_UNIQUE
+        else:
+            record = Skill(
+                tenant_id=property_record.tenant_id,
+                code=code,
+                name=name,
+                status="ACTIVE",
+            )
+            action = AuditAction.EMPLOYEE_SKILL_CREATED
+            resource_type = AuditResourceType.SKILL
+            add = self._repository.add_skill
+            expected = _SKILL_CODE_UNIQUE
+        try:
+            add(record)
+        except IntegrityError as exc:
+            self._map_insert_error(exc, expected=expected)
+        self._append_audit(
+            action=action,
+            resource_type=resource_type,
+            actor_user_id=current.user_id,
+            resource_id=record.id,
+            request_id=request_id,
+            scope_type=ScopeType.TENANT,
+            tenant_id=record.tenant_id,
+            details={"code": record.code, "name": record.name},
+        )
+        return record
 
     def _assign_property(
         self,
@@ -923,7 +1093,9 @@ class EmployeeService:
         *,
         duty_ids: tuple[int, ...],
         skill_ids: tuple[int, ...],
-    ) -> None:
+    ) -> tuple[tuple[int, ...], tuple[int, ...]]:
+        added_duty_ids: list[int] = []
+        added_skill_ids: list[int] = []
         for duty_id in duty_ids:
             self._require_positive_id(duty_id, "duty_id")
             duty = self._repository.get_duty_in_tenant(
@@ -936,16 +1108,24 @@ class EmployeeService:
                     message="Duty was not found",
                     status_code=404,
                 )
+            if self._repository.has_employee_duty(
+                employee_id=employee.id,
+                duty_id=duty.id,
+            ):
+                continue
             try:
-                self._repository.add_employee_duty(
-                    EmployeeDuty(
-                        employee_id=employee.id,
-                        tenant_id=employee.tenant_id,
-                        duty_id=duty.id,
+                with self._session.begin_nested():
+                    self._repository.add_employee_duty(
+                        EmployeeDuty(
+                            employee_id=employee.id,
+                            tenant_id=employee.tenant_id,
+                            duty_id=duty.id,
+                        )
                     )
-                )
+                added_duty_ids.append(duty.id)
             except IntegrityError as exc:
-                self._map_insert_error(exc, expected=_DUTY_UNIQUE)
+                if not self._is_expected_duplicate(exc, _DUTY_UNIQUE):
+                    self._map_insert_error(exc, expected=_DUTY_UNIQUE)
         for skill_id in skill_ids:
             self._require_positive_id(skill_id, "skill_id")
             skill = self._repository.get_skill_in_tenant(
@@ -958,16 +1138,85 @@ class EmployeeService:
                     message="Skill was not found",
                     status_code=404,
                 )
+            if self._repository.has_employee_skill(
+                employee_id=employee.id,
+                skill_id=skill.id,
+            ):
+                continue
             try:
-                self._repository.add_employee_skill(
-                    EmployeeSkill(
-                        employee_id=employee.id,
-                        tenant_id=employee.tenant_id,
-                        skill_id=skill.id,
+                with self._session.begin_nested():
+                    self._repository.add_employee_skill(
+                        EmployeeSkill(
+                            employee_id=employee.id,
+                            tenant_id=employee.tenant_id,
+                            skill_id=skill.id,
+                        )
                     )
-                )
+                added_skill_ids.append(skill.id)
             except IntegrityError as exc:
-                self._map_insert_error(exc, expected=_SKILL_UNIQUE)
+                if not self._is_expected_duplicate(exc, _SKILL_UNIQUE):
+                    self._map_insert_error(exc, expected=_SKILL_UNIQUE)
+        return tuple(added_duty_ids), tuple(added_skill_ids)
+
+    def _add_duties(
+        self,
+        employee: Employee,
+        duty_ids: tuple[int, ...],
+    ) -> tuple[int, ...]:
+        if len(set(duty_ids)) != len(duty_ids):
+            raise AppError(
+                code=EmployeeErrorCode.INVALID_INPUT,
+                message="duty_ids contains duplicates",
+                status_code=422,
+                details={"field": "duty_ids"},
+            )
+        for duty_id in duty_ids:
+            self._require_positive_id(duty_id, "duty_id")
+            if self._repository.get_duty_in_tenant(
+                tenant_id=employee.tenant_id,
+                duty_id=duty_id,
+            ) is None:
+                raise AppError(
+                    code=EmployeeErrorCode.DUTY_NOT_FOUND,
+                    message="Duty was not found",
+                    status_code=404,
+                )
+        added, _ = self._link_duties_and_skills(
+            employee,
+            duty_ids=duty_ids,
+            skill_ids=(),
+        )
+        return added
+
+    def _add_skills(
+        self,
+        employee: Employee,
+        skill_ids: tuple[int, ...],
+    ) -> tuple[int, ...]:
+        if len(set(skill_ids)) != len(skill_ids):
+            raise AppError(
+                code=EmployeeErrorCode.INVALID_INPUT,
+                message="skill_ids contains duplicates",
+                status_code=422,
+                details={"field": "skill_ids"},
+            )
+        for skill_id in skill_ids:
+            self._require_positive_id(skill_id, "skill_id")
+            if self._repository.get_skill_in_tenant(
+                tenant_id=employee.tenant_id,
+                skill_id=skill_id,
+            ) is None:
+                raise AppError(
+                    code=EmployeeErrorCode.SKILL_NOT_FOUND,
+                    message="Skill was not found",
+                    status_code=404,
+                )
+        _, added = self._link_duties_and_skills(
+            employee,
+            duty_ids=(),
+            skill_ids=skill_ids,
+        )
+        return added
 
     def _require_managed_property(
         self,
@@ -1174,6 +1423,18 @@ class EmployeeService:
                 status_code=500,
             ) from exc
 
+    @staticmethod
+    def _is_expected_duplicate(
+        error: IntegrityError,
+        expected: frozenset[str],
+    ) -> bool:
+        arguments = getattr(error.orig, "args", ())
+        number = arguments[0] if arguments else None
+        message = str(arguments[1]).casefold() if len(arguments) > 1 else ""
+        return number == 1062 and any(
+            name.casefold() in message for name in expected
+        )
+
     def _map_insert_error(
         self,
         error: IntegrityError,
@@ -1267,6 +1528,25 @@ class EmployeeService:
                 message="max_capacity is invalid",
                 status_code=422,
                 details={"field": "max_capacity"},
+            )
+
+    @staticmethod
+    def _validate_catalog_item(*, code: str, name: str) -> None:
+        normalized_code = code.strip().upper() if isinstance(code, str) else ""
+        normalized_name = name.strip() if isinstance(name, str) else ""
+        if not re.fullmatch(r"[A-Z][A-Z0-9_]{0,63}", normalized_code):
+            raise AppError(
+                code=EmployeeErrorCode.INVALID_INPUT,
+                message="code is invalid",
+                status_code=422,
+                details={"field": "code"},
+            )
+        if not normalized_name or len(normalized_name) > 200:
+            raise AppError(
+                code=EmployeeErrorCode.INVALID_INPUT,
+                message="name is invalid",
+                status_code=422,
+                details={"field": "name"},
             )
 
     @staticmethod

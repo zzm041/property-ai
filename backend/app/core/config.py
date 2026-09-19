@@ -77,6 +77,18 @@ class Settings(BaseSettings):
     ai_max_attempts: int = Field(default=2, ge=1, le=5)
     ai_enqueue_on_create: bool = False
     ai_auto_assign: bool = False
+    dispatch_weight_duty: float = Field(default=0.25, ge=0, le=1)
+    dispatch_weight_skill: float = Field(default=0.20, ge=0, le=1)
+    dispatch_weight_capacity: float = Field(default=0.20, ge=0, le=1)
+    dispatch_weight_same_building: float = Field(default=0.10, ge=0, le=1)
+    dispatch_weight_response: float = Field(default=0.10, ge=0, le=1)
+    dispatch_weight_completion: float = Field(default=0.08, ge=0, le=1)
+    dispatch_weight_rating: float = Field(default=0.07, ge=0, le=1)
+    dispatch_response_reference_seconds: float = Field(
+        default=900.0,
+        ge=1.0,
+        le=86400.0,
+    )
     incident_window_minutes: int = Field(default=10, ge=1, le=1440)
     incident_threshold: int = Field(default=5, ge=2, le=100)
     milvus_uri: str = "http://127.0.0.1:19530"

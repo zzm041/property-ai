@@ -106,9 +106,17 @@
 | POST | `/staff/attendance/checkin` |
 | POST | `/staff/attendance/checkout` |
 | PATCH | `/staff/attendance/status` |
+| GET | `/staff/attendance/today` |
 | GET | `/supervisor/staff/daily` |
 | POST | `/admin/employees` |
 | PATCH | `/admin/employees/{id}` |
+| GET | `/admin/employees/{id}` |
+| GET | `/admin/employee-catalog` |
+| POST | `/admin/duties` |
+| POST | `/admin/skills` |
+| POST | `/admin/employees/{id}/property-assignments` |
+| POST | `/admin/employees/{id}/property-assignments/{assignment_id}/end` |
+| POST | `/admin/employees/{id}/invites` |
 
 签到请求携带目标 `property_id`，服务端须校验 Employee 在该 Property 当前存在有效 `EmployeeProperty`，不能信任客户端声明。成功响应至少包含：
 
@@ -117,6 +125,8 @@
 - 当天 `EmployeeDailyStatus`
 
 签到失败（不在有效服务范围、篡改 property_id、重复签到）返回 `EMP.CHECKIN_DENIED`。签到写入 `AttendanceRecord` 与更新 `EmployeeDailyStatus` 必须处于同一 Service 事务。
+
+职责、技能目录属于 Tenant，创建和查询时仍须以目标 Property 做 RBAC 范围校验。员工更新使用 `add_duty_ids` / `add_skill_ids` 追加当前能力关系；不得以修改接口删除既有历史证据。
 
 ## 6. 工单
 
@@ -143,6 +153,8 @@
 创建工单：`Idempotency-Key` 必填（客户端生成）。重复键返回同一工单，不建第二条。
 
 创建成功响应即含 `id` 与 `status=PENDING_ANALYSIS`，不等待 AI。
+
+工单详情中的 assignment 若来自系统自动派单，则 `assigned_by_user_id=null`；人工派单仍返回实际操作者。自动来源必须由服务端持久化的 `assigned_source=AUTO` 与审计/状态日志共同判定，不能由客户端伪造。
 
 ## 7. Incident / 公告 / 知识 / SLA / 通知 / 文件
 

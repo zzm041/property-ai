@@ -69,6 +69,10 @@ class IncidentService:
         created = False
         now = self._clock()
         if incident is None:
+            primary_work_order = cluster[0]
+            primary_assignment = self._work_orders.get_active_assignment(
+                primary_work_order.id
+            )
             incident = self._ai.add_incident(
                 Incident(
                     tenant_id=record.tenant_id,
@@ -81,7 +85,12 @@ class IncidentService:
                     first_seen_at=min(item.created_at for item in cluster),
                     last_seen_at=max(item.created_at for item in cluster),
                     work_order_count=0,
-                    primary_work_order_id=cluster[0].id,
+                    primary_work_order_id=primary_work_order.id,
+                    primary_employee_id=(
+                        None
+                        if primary_assignment is None
+                        else primary_assignment.employee_id
+                    ),
                 )
             )
             created = True
@@ -119,6 +128,12 @@ class IncidentService:
         incident.last_seen_at = now
         if incident.primary_work_order_id is None and cluster:
             incident.primary_work_order_id = cluster[0].id
+        if incident.primary_employee_id is None and incident.primary_work_order_id:
+            primary_assignment = self._work_orders.get_active_assignment(
+                incident.primary_work_order_id
+            )
+            if primary_assignment is not None:
+                incident.primary_employee_id = primary_assignment.employee_id
         action = (
             AuditAction.INCIDENT_CREATED if created else AuditAction.INCIDENT_UPDATED
         )

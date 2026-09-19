@@ -24,6 +24,17 @@ class UpdateEmployeeRequest(BaseModel):
     status: str | None = None
     department_id: int | None = Field(default=None, gt=0)
     max_capacity: int | None = Field(default=None, ge=1, le=100)
+    add_duty_ids: tuple[int, ...] | None = None
+    add_skill_ids: tuple[int, ...] | None = None
+
+
+class CreateEmployeeCatalogItemRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    tenant_id: int = Field(gt=0)
+    property_id: int = Field(gt=0)
+    code: str = Field(min_length=1, max_length=64)
+    name: str = Field(min_length=1, max_length=200)
 
 
 class IssueEmployeeInviteRequest(BaseModel):
@@ -80,9 +91,24 @@ class EmployeePropertyData(BaseModel):
     valid_to: datetime | None
 
 
+class EmployeeCatalogItemData(BaseModel):
+    id: int
+    tenant_id: int
+    code: str
+    name: str
+    status: str
+
+
+class EmployeeCatalogData(BaseModel):
+    duties: list[EmployeeCatalogItemData]
+    skills: list[EmployeeCatalogItemData]
+
+
 class EmployeeDetailData(BaseModel):
     employee: EmployeeData
     assignments: list[EmployeePropertyData]
+    duties: list[EmployeeCatalogItemData] = Field(default_factory=list)
+    skills: list[EmployeeCatalogItemData] = Field(default_factory=list)
 
 
 class AttendanceRecordData(BaseModel):

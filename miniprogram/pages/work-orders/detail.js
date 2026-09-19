@@ -2,6 +2,7 @@ Page({
   data: {
     item: null,
     workOrder: null,
+    autoDispatched: false,
     logs: [],
     canConfirm: false,
     canReopen: false,
@@ -10,7 +11,13 @@ Page({
   },
   onLoad(query) {
     this.id = Number(query.id);
+    this._pollCount = 0;
     this.reload();
+  },
+  onUnload() {
+    if (this._pollTimer) {
+      clearTimeout(this._pollTimer);
+    }
   },
   reload() {
     const { withLoading, workOrderOf } = require("../../utils/ui");
@@ -20,16 +27,38 @@ Page({
         .then((item) => {
           const workOrder = workOrderOf(item);
           const status = workOrder ? workOrder.status : "";
+          const assignments = (item && item.assignments) || [];
+          const currentAssignment = assignments.length
+            ? assignments[assignments.length - 1]
+            : null;
           require("../../services/auth").setLastWorkOrderId(this.id);
           this.setData({
             item,
             workOrder,
+            autoDispatched:
+              Boolean(currentAssignment) &&
+              currentAssignment.reason === "AUTO_DISPATCH" &&
+              currentAssignment.assigned_by_user_id == null,
             logs: (item && item.logs) || [],
             canConfirm: status === "WAIT_CONFIRM",
             canReopen: status === "WAIT_CONFIRM",
           });
+          this._schedulePendingRefresh(status);
         })
     ).catch(() => {});
+  },
+  _schedulePendingRefresh(status) {
+    if (this._pollTimer) {
+      clearTimeout(this._pollTimer);
+      this._pollTimer = null;
+    }
+    if (
+      (status === "PENDING_ANALYSIS" || status === "PENDING_ASSIGNMENT") &&
+      this._pollCount < 20
+    ) {
+      this._pollCount += 1;
+      this._pollTimer = setTimeout(() => this.reload(), 1000);
+    }
   },
   confirm() {
     const { withLoading } = require("../../utils/ui");

@@ -1,0 +1,78 @@
+{
+  "task_id": "AUTO-DISPATCH-MAINLINE-001-FIX-1",
+  "phase": "review",
+  "reviewed_head": "ae2071e3cb2c562bcf2271cddf4bff35b8d2623f",
+  "decision": "NEEDS_CHANGES",
+  "actions_or_findings": [
+    {
+      "title": "CURRENT_TASK_BLOCKER: Idempotent create replay publishes analysis again",
+      "path": "D:/property-ai/backend/app/service/work_order.py:312",
+      "trigger": "A resident repeats POST /work-orders with the same idempotency key.",
+      "rationale": "_create_work_order returns the existing order at line 809, but create_work_order always calls _enqueue_analysis at line 327. The order stays unique while the isolated queue receives another task, so the exactly-once publish condition is unmet."
+    },
+    {
+      "title": "CURRENT_TASK_BLOCKER: Completion history credits earlier assignees for another employee's work",
+      "path": "D:/property-ai/backend/app/repository/ai.py:245",
+      "trigger": "An order is reassigned and its later handler completes it.",
+      "rationale": "get_dispatch_history calculates each employee's completion rate from the order's current status. Every former assignee of a CLOSED order receives completion credit. This distorts one of the seven ranking factors; the same-building query at lines 308-325 also counts assignments without establishing completed work."
+    },
+    {
+      "title": "CURRENT_TASK_BLOCKER: Admin-only and disabled capabilities can pass dispatch filtering",
+      "path": "D:/property-ai/backend/app/service/auto_dispatch.py:45",
+      "trigger": "An active, checked-in employee has matching capability links but only an admin role, or a linked duty or skill has DISABLED status.",
+      "rationale": "_STAFF_ROLES accepts SUPERVISOR, PROPERTY_ADMIN and TENANT_ADMIN without STAFF. AiRepository.list_employee_duties/list_employee_skills at lines 140-153 do not require ACTIVE catalog rows. The recommendation path repeats these rules in analysis.py. This does not enforce the scoped STAFF and usable duty/skill filter required by docs/05 §4.1."
+    },
+    {
+      "title": "CURRENT_TASK_BLOCKER: Repeated capability add writes a false audit delta",
+      "path": "D:/property-ai/backend/app/service/employee.py:598",
+      "trigger": "PATCH /admin/employees/{id} repeats an already linked add_duty_ids or add_skill_ids value.",
+      "rationale": "_add_duties/_add_skills skip existing links, but the audit records every requested ID as added at lines 603-606. Concurrent identical adds can instead hit the unique constraint and return a generic 409. State is protected from duplicate links, but the append-only change record is inaccurate and repeat behavior is not idempotent."
+    },
+    {
+      "title": "CURRENT_TASK_BLOCKER: Saved database evidence does not establish the required order 3 and order 4 boundaries",
+      "path": "D:/property-ai/scripts/ops/inspect_auth001_auto_dispatch.py:86",
+      "trigger": "The review checks NOT_CHECKED_IN for order 3 and the same-order AUTO, audit, load and notification records for the page-created order 4.",
+      "rationale": "runtime-evidence.json summarizes order 2; page-evidence.json and screenshots concern order 4. No redacted inspector output for orders 3 or 4 is saved. Worker logs show order 3 NO_ELIGIBLE and order 4 ASSIGNED, but do not show order 3's persisted filter reason or order 4's database audit and load rows. The inspector also selects audits by request_id alone at line 97, which can attribute another resource's audit to the order."
+    },
+    {
+      "title": "NON_BLOCKING: Living handoff is behind the reviewed checkout",
+      "path": "D:/property-ai/reports/project-handoff.md:5",
+      "trigger": "A later session uses the handoff as its fact source.",
+      "rationale": "It still names aa268d1 as HEAD and says the Settings and isolated publisher proof is outstanding. Git reports ae2071e plus this uncommitted FIX-1 tree; code and saved logs now support the isolated path for one run."
+    }
+  ],
+  "evidence_paths": [
+    "D:/property-ai/reports/project-handoff.md",
+    "D:/property-ai/docs/05-AI-DISPATCH-SPEC.md",
+    "D:/property-ai/backend/app/service/work_order.py",
+    "D:/property-ai/backend/app/repository/ai.py",
+    "D:/property-ai/backend/app/service/auto_dispatch.py",
+    "D:/property-ai/backend/app/service/employee.py",
+    "D:/property-ai/scripts/ops/inspect_auth001_auto_dispatch.py",
+    "D:/property-ai/reports/auto-dispatch-mainline-001/runtime-evidence.json",
+    "D:/property-ai/reports/auto-dispatch-mainline-001/page-evidence.json",
+    "D:/property-ai/reports/auto-dispatch-mainline-001/staff-current-day-checkin.png",
+    "D:/property-ai/reports/auto-dispatch-mainline-001/resident-auto-assigned.png",
+    "D:/property-ai/reports/auto-dispatch-mainline-001/staff-auto-assigned-list.png",
+    "D:/property-ai/tmp/auth001-runtime/worker-20260919-235314.out.log",
+    "D:/property-ai/tmp/auth001-runtime/api-20260919-235812.out.log"
+  ],
+  "unverified": [
+    "I could not independently query 0009: the workspace Python environment points to an inaccessible interpreter, and Docker and process connection inspection were denied. The read-only inspector produced no result in this review.",
+    "The saved artifacts do not prove order 3 persisted PENDING_ASSIGNMENT with NOT_CHECKED_IN across the Asia/Shanghai rollover. The worker log proves NO_ELIGIBLE before the later page check-in.",
+    "The claim of 336 passed is implementer-reported; no test suite was independently rerun.",
+    "Current live process identity and publisher connection could not be inspected. Launcher code and historical logs match the auth001 queue and vhost.",
+    "The existing 79-file release-pack inventory was read, but the pack was not rebuilt or operated during this review."
+  ],
+  "session_note": "Overall goal remains full Production V1. This review covers only AUTO-DISPATCH-MAINLINE-001-FIX-1 on HEAD ae2071e plus its working tree, within the authorized 8083 → 127.0.0.1:3307/property_ai_auth001_test @ 20260919_0009 synthetic environment. The main Codex alone implements; this session made no edits or service-state changes. The three screenshots were viewed: the staff page shows business date 2026-09-20, the resident detail shows order 4 ASSIGNED with an AUTO marker, and the staff list shows order 4. API logs show a successful check-in before order 4 creation; worker logs show auth001 consumption and AUTO assignment. The code sets isolated environment before importing Celery, gates AUTO columns against the live schema, stores DEVELOPMENT provenance, and contains no auth001 broker or app secret literal. The ignored tmp secret file exists; inspected logs redact broker credentials. Closed security items remain closed. Phone change, WeChat rebind, controlled merge, recovery, real self-hosted AI assignment and real Embedding/RAG remain V1 gaps, along with production storage and release acceptance.",
+  "task_result": "NEEDS_CHANGES. One official-session DEVELOPMENT Fake path reached ASSIGNED/AUTO without supervisor interaction, but duplicate publishing, eligibility and ranking errors, inaccurate capability audit, and missing required database boundary evidence prevent accepting this FIX-1 slice. Fake output is not real-model acceptance.",
+  "product_gap_changes": [
+    "The sample isolated create → auth001 worker → DEVELOPMENT provider → AUTO path now has code and matching API/worker/page evidence.",
+    "AUTO persistence uses 0009 live-schema gating; no new migration appears in the diff, and shared 0007 defaults remain unchanged.",
+    "Order 3's no-candidate outcome and order 4's successful page path must remain distinct; neither requires deletion or SQL-stamped state.",
+    "Real self-hosted Qwen/VLM/ASR, production storage, real Embedding/RAG and formal release remain open Production V1 work."
+  ],
+  "schedule_risk": "High. The workspace date is 2026-09-20 and the original one-week aim is approximately 2026-09-21. These current-slice blockers plus the remaining real-provider and broader V1 gaps make full Production V1 delivery by that aim implausible without dropping frozen scope or mislabeling Fake evidence.",
+  "next_action": "Main Codex: on the current working tree, make create replay enqueue only when a new order is committed; correct STAFF and active-capability filters and attribute completion to the actual employee process; make capability-add audits record only inserted links with safe concurrent repeat behavior. Then, only in the already authorized auth001 synthetic environment, run targeted negative and official-session checks, save redacted read-only inspector outputs for orders 3 and 4 with resource-scoped audits and employee/date-scoped load and attendance, and update project-handoff.md. Completion requires one queue publication per idempotency key, correct ranking and fallback under reassignment/inactive-role cases, accurate append-only audits, and same-order AUTO/log/audit/notification proof. Ordinary source and named isolated synthetic verification need no new permission; migration, shared-service work, paid providers and release still require separate approval.",
+  "approval_requests": []
+}

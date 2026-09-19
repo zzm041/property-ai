@@ -309,7 +309,7 @@ class WorkOrderService:
         self._require_positive_id(house_id, "house_id")
         self._validate_request_id(request_id)
         self._validate_idempotency_key(idempotency_key)
-        record = self._execute(
+        record, created = self._execute(
             lambda: self._create_work_order(
                 actor=actor,
                 house_id=house_id,
@@ -324,7 +324,8 @@ class WorkOrderService:
                 claimed_property_id=claimed_property_id,
             )
         )
-        self._enqueue_analysis(record.id, request_id)
+        if created:
+            self._enqueue_analysis(record.id, request_id)
         return record
 
     def _enqueue_analysis(self, work_order_id: int, request_id: str) -> None:
@@ -771,7 +772,7 @@ class WorkOrderService:
         severity: str | None,
         claimed_tenant_id: int | None,
         claimed_property_id: int | None,
-    ) -> WorkOrder:
+    ) -> tuple[WorkOrder, bool]:
         current = self._reload_actor(actor)
         cleaned_text = self._optional_text(text)
         if cleaned_text is None and not file_ids:
@@ -806,7 +807,7 @@ class WorkOrderService:
                     message="Idempotent work order could not be loaded",
                     status_code=409,
                 )
-            return record
+            return record, False
         house = self._residents.find_active_relation(
             user_id=current.user_id,
             house_id=house_id,
@@ -951,7 +952,7 @@ class WorkOrderService:
                 "category": record.category,
             },
         )
-        return record
+        return record, True
 
     def _append_content(
         self,
