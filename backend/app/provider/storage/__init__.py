@@ -100,11 +100,16 @@ class DevelopmentStorageProvider(StorageProvider):
 
     def put_object(self, storage_key: str, content: bytes, mime_type: str) -> None:
         del mime_type
-        _DEV_OBJECTS[storage_key] = content
         path = self._persist_path(storage_key)
         if path is not None:
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_bytes(content)
+            temporary = path.with_name(f".{path.name}.{uuid4()}.tmp")
+            try:
+                temporary.write_bytes(content)
+                temporary.replace(path)
+            finally:
+                temporary.unlink(missing_ok=True)
+        _DEV_OBJECTS[storage_key] = content
 
     def get_object(self, storage_key: str) -> bytes:
         cached = _DEV_OBJECTS.get(storage_key)
@@ -115,7 +120,7 @@ class DevelopmentStorageProvider(StorageProvider):
             data = path.read_bytes()
             _DEV_OBJECTS[storage_key] = data
             return data
-        raise ProviderUnavailableError("Object was not found")
+        raise ProviderInvalidOutputError("Object was not found")
 
 
 class ProductionStorageProvider(StorageProvider):

@@ -1,3 +1,14 @@
+function audioMimeType(filename) {
+  const extension = String(filename || "").split(".").pop().toLowerCase();
+  return {
+    mp3: "audio/mpeg",
+    wav: "audio/wav",
+    m4a: "audio/mp4",
+    mp4: "audio/mp4",
+    webm: "audio/webm",
+  }[extension];
+}
+
 Page({
   data: {
     houseId: "",
@@ -25,10 +36,15 @@ Page({
     wx.chooseMessageFile({
       count: 1,
       type: "file",
-      extension: ["mp3", "wav", "m4a", "mp4"],
+      extension: ["mp3", "wav", "m4a", "mp4", "webm"],
       success: (result) => {
         const file = result.tempFiles[0];
-        this._upload(file.path, file.type || "audio/mpeg", file.size, file.name);
+        const mimeType = audioMimeType(file.name);
+        if (!mimeType) {
+          this.setData({ error: "不支持该音频格式" });
+          return;
+        }
+        this._upload(file.path, mimeType, file.size, file.name);
       },
       fail: (error) => this.setData({ error: error.errMsg || "选择音频失败" }),
     });

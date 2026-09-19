@@ -183,6 +183,47 @@ function uploadFile({ fileId, filePath, retried }) {
   });
 }
 
+function downloadFile({ fileId, retried }) {
+  if (!BASE_URL) {
+    return Promise.reject(new Error("未配置 API 地址"));
+  }
+  const token = auth.getToken();
+  return new Promise((resolve, reject) => {
+    wx.downloadFile({
+      url: `${BASE_URL}/files/${fileId}/content`,
+      header: token ? { Authorization: `Bearer ${token}` } : {},
+      success: (response) => {
+        if (response.statusCode === 401) {
+          const latestToken = auth.getToken();
+          if (!retried && latestToken && latestToken !== token) {
+            downloadFile({ fileId, retried: true }).then(resolve).catch(reject);
+            return;
+          }
+          if (!retried && auth.getRefreshToken()) {
+            refreshSessionOnce()
+              .then(() => downloadFile({ fileId, retried: true }))
+              .then(resolve)
+              .catch(() => {
+                sendUnauthorizedToLogin();
+                reject(new Error("请重新登录"));
+              });
+            return;
+          }
+          sendUnauthorizedToLogin();
+          reject(new Error("请重新登录"));
+          return;
+        }
+        if (response.statusCode >= 400 || !response.tempFilePath) {
+          reject(new Error("附件读取失败"));
+          return;
+        }
+        resolve(response.tempFilePath);
+      },
+      fail: () => reject(new Error("附件读取失败，请检查网络后重试")),
+    });
+  });
+}
+
 function registerAndUpload({ filePath, mimeType, sizeBytes, originalName, propertyId }) {
   return request({
     path: "/files",
@@ -199,6 +240,7 @@ function registerAndUpload({ filePath, mimeType, sizeBytes, originalName, proper
 module.exports = {
   request,
   uploadFile,
+  downloadFile,
   registerAndUpload,
   wechatLogin: (code) => request({ path: "/auth/wechat/login", method: "POST", data: { code } }),
   wechatBind: (code) => request({ path: "/auth/wechat/bind", method: "POST", data: { code } }),

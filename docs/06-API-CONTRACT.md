@@ -171,7 +171,9 @@
 | GET/PUT | `/admin/sla-policies` |
 | GET | `/notifications` |
 | POST | `/notifications/{id}/read` |
-| POST | `/files` | multipart 上传 |
+| POST | `/files` | 注册文件元数据，取得 `file_id` |
+| POST | `/files/{id}/content` | 上传文件内容；校验声明大小、扩展名、MIME 魔数并记录内容哈希 |
+| GET | `/files/{id}/content` | 鉴权读取已上传内容；仅上传者或可读关联工单的主体可访问 |
 | GET | `/healthz` | 进程存活 |
 | GET | `/readyz` | 报告 MySQL、Redis、RabbitMQ；非关键依赖可显示 degraded |
 

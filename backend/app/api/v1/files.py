@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, File, Request, UploadFile
+from fastapi import APIRouter, Depends, File, Request, Response, UploadFile
 
 from app.api.dependencies.auth import get_current_principal
 from app.api.v1.work_orders import get_work_order_service
@@ -72,3 +72,20 @@ def upload_file_content(
         request_id=request_id_for(request),
     )
     return success_envelope(request, _file_data(record).model_dump(mode="json"))
+
+
+@router.get("/files/{file_id}/content")
+def download_file_content(
+    file_id: int,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[WorkOrderService, Depends(get_work_order_service)],
+) -> Response:
+    record, content = service.get_file_content(actor=actor, file_id=file_id)
+    return Response(
+        content=content,
+        media_type=record.mime_type,
+        headers={
+            "Cache-Control": "private, no-store",
+            "X-Content-Type-Options": "nosniff",
+        },
+    )

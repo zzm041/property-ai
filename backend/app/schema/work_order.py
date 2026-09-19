@@ -137,7 +137,7 @@ class RegisterFileRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     mime_type: str = Field(min_length=1, max_length=128)
-    size_bytes: int = Field(ge=0)
+    size_bytes: int = Field(gt=0)
     original_name: str | None = Field(default=None, max_length=255)
     tenant_id: int | None = Field(default=None, gt=0)
     property_id: int | None = Field(default=None, gt=0)

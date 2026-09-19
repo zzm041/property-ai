@@ -4,6 +4,7 @@ from collections.abc import Callable
 from datetime import datetime, timedelta
 from decimal import Decimal
 from hashlib import sha256
+from pathlib import Path
 from typing import TypeVar
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -87,6 +88,54 @@ _ALLOWED_MIME = {
     "audio/wav": MediaKind.AUDIO,
     "audio/webm": MediaKind.AUDIO,
 }
+_ALLOWED_EXTENSIONS = {
+    "image/jpeg": frozenset({".jpg", ".jpeg"}),
+    "image/png": frozenset({".png"}),
+    "image/webp": frozenset({".webp"}),
+    "audio/mpeg": frozenset({".mp3"}),
+    "audio/mp4": frozenset({".m4a", ".mp4"}),
+    "audio/wav": frozenset({".wav"}),
+    "audio/webm": frozenset({".webm"}),
+}
+
+
+def _content_matches_mime(mime_type: str, content: bytes) -> bool:
+    if mime_type == "image/jpeg":
+        return content.startswith(b"\xff\xd8\xff")
+    if mime_type == "image/png":
+        return content.startswith(b"\x89PNG\r\n\x1a\n")
+    if mime_type == "image/webp":
+        return (
+            len(content) >= 12
+            and content.startswith(b"RIFF")
+            and content[8:12] == b"WEBP"
+        )
+    if mime_type == "audio/mpeg":
+        return content.startswith(b"ID3") or (
+            len(content) >= 2
+            and content[0] == 0xFF
+            and content[1] & 0xE0 == 0xE0
+        )
+    if mime_type == "audio/mp4":
+        return len(content) >= 12 and content[4:8] == b"ftyp"
+    if mime_type == "audio/wav":
+        return (
+            len(content) >= 12
+            and content.startswith(b"RIFF")
+            and content[8:12] == b"WAVE"
+        )
+    if mime_type == "audio/webm":
+        return content.startswith(b"\x1aE\xdf\xa3")
+    return False
+
+
+def _filename_matches_mime(mime_type: str, filename: str | None) -> bool:
+    if not filename:
+        return True
+    return Path(filename).suffix.casefold() in _ALLOWED_EXTENSIONS.get(
+        mime_type,
+        frozenset(),
+    )
 _ACTIVE_ASSIGNMENT_UNIQUE = frozenset(
     {"uq_work_order_assignments_active_work_order"}
 )
@@ -154,8 +203,15 @@ class WorkOrderService:
                 message="File type is not allowed",
                 status_code=422,
             )
+        normalized_mime = mime_type.strip().casefold()
+        if not _filename_matches_mime(normalized_mime, original_name):
+            raise AppError(
+                code=FileErrorCode.UNSUPPORTED_TYPE,
+                message="File extension does not match the declared type",
+                status_code=422,
+            )
         max_bytes = self._settings.upload_max_mb * 1024 * 1024
-        if size_bytes < 0 or size_bytes > max_bytes:
+        if size_bytes <= 0 or size_bytes > max_bytes:
             raise AppError(
                 code=FileErrorCode.TOO_LARGE,
                 message="File exceeds the upload size limit",
@@ -202,7 +258,7 @@ class WorkOrderService:
                 resolved_tenant_id = scoped.tenant_id
                 resolved_property_id = scoped.property_id
             stored = self._storage.register_object(
-                mime_type=mime_type,
+                mime_type=normalized_mime,
                 size_bytes=size_bytes,
                 filename=original_name,
                 tenant_id=resolved_tenant_id,
@@ -210,7 +266,7 @@ class WorkOrderService:
             )
             stored_holder["stored"] = stored
             digest = sha256(
-                f"{stored.storage_key}:{mime_type}:{size_bytes}".encode()
+                f"{stored.storage_key}:{normalized_mime}:{size_bytes}".encode()
             ).hexdigest()
             record = self._repository.add_file(
                 FileObject(
@@ -218,7 +274,7 @@ class WorkOrderService:
                     property_id=resolved_property_id,
                     uploader_user_id=actor.user_id,
                     content_hash=digest,
-                    mime_type=mime_type.strip().casefold(),
+                    mime_type=normalized_mime,
                     size_bytes=size_bytes,
                     storage_key=stored.storage_key,
                     original_name=original_name,
@@ -242,17 +298,36 @@ class WorkOrderService:
         content: bytes,
         request_id: str,
     ) -> FileObject:
-        self._require_active_actor(actor)
+        return self._execute(
+            lambda: self._put_file_content(
+                actor=actor,
+                file_id=file_id,
+                content=content,
+                request_id=request_id,
+            )
+        )
+
+    def _put_file_content(
+        self,
+        *,
+        actor: Principal,
+        file_id: int,
+        content: bytes,
+        request_id: str,
+    ) -> FileObject:
+        current = self._reload_actor(actor)
         self._validate_request_id(request_id)
         self._require_positive_id(file_id, "file_id")
         record = self._repository.get_file(file_id)
-        if record is None or not self._actor_can_see_file_tenant(actor, record.tenant_id):
+        if record is None or not self._actor_can_see_file_tenant(
+            current, record.tenant_id
+        ):
             raise AppError(
                 code=FileErrorCode.NOT_FOUND,
                 message="File was not found",
                 status_code=404,
             )
-        if record.uploader_user_id != actor.user_id:
+        if record.uploader_user_id != current.user_id:
             raise AppError(
                 code=IamErrorCode.FORBIDDEN,
                 message="Permission denied",
@@ -265,6 +340,18 @@ class WorkOrderService:
                 message="File exceeds the upload size limit",
                 status_code=422,
             )
+        if not content or len(content) != record.size_bytes:
+            raise AppError(
+                code=FileErrorCode.INVALID_INPUT,
+                message="Uploaded content size does not match registration",
+                status_code=422,
+            )
+        if not _content_matches_mime(record.mime_type, content):
+            raise AppError(
+                code=FileErrorCode.INVALID_INPUT,
+                message="Uploaded content does not match the declared type",
+                status_code=422,
+            )
         from app.provider.errors import ProviderTimeoutError, ProviderUnavailableError
 
         try:
@@ -275,7 +362,80 @@ class WorkOrderService:
                 message="Object storage is unavailable",
                 status_code=503,
             ) from exc
+        record.content_hash = sha256(content).hexdigest()
+        self._session.flush()
         return record
+
+    def get_file_content(
+        self,
+        *,
+        actor: Principal,
+        file_id: int,
+    ) -> tuple[FileObject, bytes]:
+        current = self._reload_actor(actor)
+        self._require_positive_id(file_id, "file_id")
+        record = self._repository.get_file(file_id)
+        if record is None:
+            self._raise_file_not_found()
+        allowed = record.uploader_user_id == current.user_id
+        if not allowed:
+            for work_order in self._repository.list_work_orders_for_file(record.id):
+                try:
+                    self._authorize_read(current, work_order)
+                except AppError:
+                    continue
+                allowed = True
+                break
+        if not allowed:
+            self._raise_file_not_found()
+
+        return record, self._read_stored_file(record)
+
+    def _read_stored_file(self, record: FileObject) -> bytes:
+        if record.scanner_status not in {"clean", "skipped_dev"}:
+            raise AppError(
+                code=FileErrorCode.INVALID_INPUT,
+                message="File content is not ready for use",
+                status_code=409,
+            )
+
+        from app.provider.errors import (
+            ProviderInvalidOutputError,
+            ProviderTimeoutError,
+            ProviderUnavailableError,
+        )
+
+        try:
+            content = self._storage.get_object(record.storage_key)
+        except ProviderInvalidOutputError as exc:
+            raise AppError(
+                code=FileErrorCode.NOT_FOUND,
+                message="File content was not found",
+                status_code=404,
+            ) from exc
+        except (ProviderTimeoutError, ProviderUnavailableError) as exc:
+            raise AppError(
+                code=FileErrorCode.STORAGE_UNAVAILABLE,
+                message="Object storage is unavailable",
+                status_code=503,
+            ) from exc
+        if (
+            len(content) != record.size_bytes
+            or sha256(content).hexdigest() != record.content_hash
+            or not _content_matches_mime(record.mime_type, content)
+        ):
+            logger.error(
+                "stored_object_integrity_failed",
+                file_id=record.id,
+                tenant_id=record.tenant_id,
+                property_id=record.property_id,
+            )
+            raise AppError(
+                code=FileErrorCode.STORAGE_UNAVAILABLE,
+                message="Stored file failed integrity validation",
+                status_code=503,
+            )
+        return content
 
     def list_my_work_orders(
         self,
@@ -2221,6 +2381,7 @@ class WorkOrderService:
                     message="File type is not allowed",
                     status_code=422,
                 )
+            self._read_stored_file(file_object)
             self._repository.add_media(
                 WorkOrderMedia(
                     tenant_id=record.tenant_id,
@@ -2545,5 +2706,13 @@ class WorkOrderService:
         raise AppError(
             code=WorkOrderErrorCode.NOT_FOUND,
             message="Work order was not found",
+            status_code=404,
+        )
+
+    @staticmethod
+    def _raise_file_not_found() -> None:
+        raise AppError(
+            code=FileErrorCode.NOT_FOUND,
+            message="File was not found",
             status_code=404,
         )

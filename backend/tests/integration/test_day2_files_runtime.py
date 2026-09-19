@@ -65,7 +65,7 @@ def test_resident_lists_own_work_orders_and_uploads_media(
         assert registered.json()["data"]["storage_key"]
         uploaded = client.post(
             f"/api/v1/files/{file_id}/content",
-            files={"file": ("spark.jpg", b"jpeg", "image/jpeg")},
+            files={"file": ("spark.jpg", b"\xff\xd8\xff\xe0", "image/jpeg")},
             headers=_auth(token, "d2-file-put"),
         )
         assert uploaded.status_code == 200

@@ -228,6 +228,12 @@ def test_manual_dispatch_and_staff_loop(identity_session: Session) -> None:
             headers=_auth(staff, "t6-file"),
         )
         file_id = file_resp.json()["data"]["id"]
+        uploaded = client.post(
+            f"/api/v1/files/{file_id}/content",
+            files={"file": ("feedback.jpg", b"\xff\xd8\xff\xe0DATA", "image/jpeg")},
+            headers=_auth(staff, "t6-file-content"),
+        )
+        assert uploaded.status_code == 200
         feedback = client.post(
             f"/api/v1/staff/work-orders/{work_order_id}/feedback",
             json={"text": "Opened panel", "file_ids": [file_id], "taken_phase": "BEFORE"},

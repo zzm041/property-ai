@@ -234,6 +234,12 @@ def test_asr_failure_still_creates_and_analyzes_text(identity_session: Session) 
         request_id="t7-audio",
         claimed_property_id=graph.employees.property_1_id,
     )
+    service.put_file_content(
+        actor=actor,
+        file_id=file_object.id,
+        content=b"ID3audioDATA",
+        request_id="t7-audio-content",
+    )
     record = service.create_work_order(
         actor=actor,
         house_id=graph.house_1_id,
@@ -267,6 +273,12 @@ def test_vlm_failure_does_not_block_llm_analysis(identity_session: Session) -> N
         size_bytes=12,
         request_id="t7-image",
         claimed_property_id=graph.employees.property_1_id,
+    )
+    service.put_file_content(
+        actor=actor,
+        file_id=file_object.id,
+        content=b"\xff\xd8\xff\xe0image123",
+        request_id="t7-image-content",
     )
     record = service.create_work_order(
         actor=actor,

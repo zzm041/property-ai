@@ -4,6 +4,7 @@ Page({
     workOrder: null,
     autoDispatched: false,
     latestReceipt: null,
+    media: [],
     logs: [],
     canConfirm: false,
     canReopen: false,
@@ -18,6 +19,10 @@ Page({
   onUnload() {
     if (this._pollTimer) {
       clearTimeout(this._pollTimer);
+    }
+    if (this._audio) {
+      this._audio.destroy();
+      this._audio = null;
     }
   },
   reload() {
@@ -42,6 +47,7 @@ Page({
               currentAssignment.reason === "AUTO_DISPATCH" &&
               currentAssignment.assigned_by_user_id == null,
             latestReceipt: receipts.length ? receipts[receipts.length - 1] : null,
+            media: (item && item.media) || [],
             logs: (item && item.logs) || [],
             canConfirm: status === "WAIT_CONFIRM",
             canReopen: status === "WAIT_CONFIRM",
@@ -80,6 +86,42 @@ Page({
           version: this.data.workOrder.version,
         })
         .then(() => this.reload())
+    ).catch(() => {});
+  },
+  previewMedia(e) {
+    const fileId = Number(e.currentTarget.dataset.fileId);
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, () =>
+      require("../../services/api")
+        .downloadFile({ fileId })
+        .then(
+          (filePath) =>
+            new Promise((resolve, reject) => {
+              wx.previewImage({
+                urls: [filePath],
+                current: filePath,
+                success: resolve,
+                fail: () => reject(new Error("图片预览失败")),
+              });
+            })
+        )
+    ).catch(() => {});
+  },
+  playMedia(e) {
+    const fileId = Number(e.currentTarget.dataset.fileId);
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, () =>
+      require("../../services/api")
+        .downloadFile({ fileId })
+        .then((filePath) => {
+          if (this._audio) {
+            this._audio.destroy();
+          }
+          this._audio = wx.createInnerAudioContext();
+          this._audio.src = filePath;
+          this._audio.onError(() => this.setData({ error: "语音播放失败" }));
+          this._audio.play();
+        })
     ).catch(() => {});
   },
 });

@@ -192,6 +192,16 @@ class WorkOrderRepository:
             select(WorkOrderReceipt).where(WorkOrderReceipt.process_id == process_id)
         )
 
+    def list_work_orders_for_file(self, file_id: int) -> tuple[WorkOrder, ...]:
+        return tuple(
+            self._session.scalars(
+                select(WorkOrder)
+                .join(WorkOrderMedia, WorkOrderMedia.work_order_id == WorkOrder.id)
+                .where(WorkOrderMedia.file_id == file_id)
+                .order_by(WorkOrder.id)
+            ).all()
+        )
+
     def list_receipts(self, work_order_id: int) -> tuple[WorkOrderReceipt, ...]:
         return tuple(
             self._session.scalars(
