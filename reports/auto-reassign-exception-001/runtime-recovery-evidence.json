@@ -1,0 +1,53 @@
+{
+  "task_id": "AUTO-REASSIGN-EXCEPTION-001-RUNTIME-RECOVERY",
+  "work_order_id": 7,
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001"
+  },
+  "observed_failure": {
+    "failed_task_id": "13757826-b499-4840-ba98-60a5ea77e2f2",
+    "error_code": "TransactionContractError",
+    "cause": "A read of the existing final analysis started an implicit SQLAlchemy transaction before the owned redispatch transaction.",
+    "business_state_after_failure": "PENDING_ASSIGNMENT"
+  },
+  "remediation": {
+    "product_commit": "c3a9fef",
+    "change": "Open the owned redispatch transaction before re-reading the final analysis.",
+    "targeted_unit_result": "8 passed, 1 warning",
+    "full_unit_result": "383 passed, 1 warning"
+  },
+  "safe_fallback_observed": {
+    "replay_result": "NO_ELIGIBLE",
+    "reason": "Employee 4 was ON_DUTY but current_load 3 equaled max_capacity 3; employee 5 was within rejection cooldown.",
+    "state_preserved": "PENDING_ASSIGNMENT",
+    "manual_assignment_created": false
+  },
+  "synthetic_fixture_adjustment": {
+    "method": "official tenant-admin employee PATCH API",
+    "employee_id": 4,
+    "previous_max_capacity": 3,
+    "current_max_capacity": 8,
+    "direct_database_write_used": false
+  },
+  "retry_result": {
+    "worker_outcome": "ASSIGNED",
+    "new_assignment_id": 7,
+    "new_employee_id": 4,
+    "rejected_employee_id": 5,
+    "rejected_employee_filter": "RECENTLY_REJECTED",
+    "assigned_by_user_id": null,
+    "assigned_source": "AUTO",
+    "provider_recalled": false
+  },
+  "boundaries": {
+    "old_8082_touched": false,
+    "shared_database_touched": false,
+    "real_external_contact_performed": false,
+    "real_model_verified": false,
+    "production_v1_passed": false
+  },
+  "redaction": "No phone, SMS code, token, password, resident name, broker credential, or database credential is stored."
+}

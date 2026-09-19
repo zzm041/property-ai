@@ -1,0 +1,413 @@
+{
+  "environment": {
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001",
+    "ai_auto_assign": true,
+    "ai_enqueue_on_create": true
+  },
+  "work_order": {
+    "id": 8,
+    "tenant_id": 4,
+    "property_id": 4,
+    "status": "CLOSED",
+    "process_reason": "NONE",
+    "category": "ELECTRICAL",
+    "priority": "HIGH",
+    "current_assignment_id": null,
+    "version": 10,
+    "created_at": "2026-09-19 19:08:14.228018",
+    "business_date": "2026-09-20"
+  },
+  "assignment": {
+    "id": 8,
+    "employee_id": 4,
+    "assigned_by_user_id_is_null": true,
+    "assigned_source": "AUTO",
+    "status": "ENDED",
+    "reason": "AUTO_DISPATCH",
+    "score": 0.8616,
+    "required_duty": "MAINTENANCE",
+    "required_skill": "ELECTRICAL",
+    "filter_candidate_count": 2,
+    "eligible_employee_ids": [
+      4,
+      5
+    ],
+    "weights": {
+      "duty": 0.25,
+      "skill": 0.2,
+      "rating": 0.07,
+      "capacity": 0.2,
+      "response": 0.1,
+      "completion": 0.08,
+      "same_building": 0.1,
+      "response_reference_seconds": 900.0
+    }
+  },
+  "assignment_history": [
+    {
+      "id": 8,
+      "employee_id": 4,
+      "assigned_source": "AUTO",
+      "status": "ENDED",
+      "reason": "AUTO_DISPATCH",
+      "ended_at": "2026-09-19 19:08:44.088653",
+      "assigned_by_user_id_is_null": true,
+      "score": 0.8616,
+      "candidate_filters": [
+        {
+          "employee_id": 4,
+          "eligible": true,
+          "filter_reason": null
+        },
+        {
+          "employee_id": 5,
+          "eligible": true,
+          "filter_reason": null
+        }
+      ]
+    }
+  ],
+  "analyses": [
+    {
+      "id": 8,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "priority": "HIGH",
+      "risk": "electric",
+      "required_skill": "ELECTRICAL",
+      "confidence": "0.860"
+    }
+  ],
+  "ai_calls": [
+    {
+      "provider_type": "LLM",
+      "provider_mode": "DEVELOPMENT",
+      "operation": "structured_completion",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS",
+      "prompt_version": "wo-analysis-v1"
+    }
+  ],
+  "dispatch_recommendations": [
+    {
+      "employee_id": 4,
+      "eligible": 1,
+      "filter_reason": null,
+      "score": "0.8616",
+      "reason_codes": "[\"DUTY_MATCH\", \"SKILL_MATCH\", \"LOAD_REMAINING\", \"SAME_BUILDING_HISTORY\", \"RESPONSE_HISTORY\", \"COMPLETION_HISTORY\"]"
+    },
+    {
+      "employee_id": 5,
+      "eligible": 1,
+      "filter_reason": null,
+      "score": "0.7750",
+      "reason_codes": "[\"DUTY_MATCH\", \"SKILL_MATCH\", \"LOAD_REMAINING\"]"
+    }
+  ],
+  "work_order_logs": [
+    {
+      "actor_type": "RESIDENT",
+      "actor_is_system": 0,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "0863efc2e64e4a9a872a82365bcfc3b2",
+      "created_at": "2026-09-19 19:08:14.235519"
+    },
+    {
+      "actor_type": "SYSTEM",
+      "actor_is_system": 1,
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "0863efc2e64e4a9a872a82365bcfc3b2",
+      "created_at": "2026-09-19 19:08:14.363680"
+    },
+    {
+      "actor_type": "SYSTEM",
+      "actor_is_system": 1,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "0863efc2e64e4a9a872a82365bcfc3b2",
+      "created_at": "2026-09-19 19:08:14.572587"
+    },
+    {
+      "actor_type": "STAFF",
+      "actor_is_system": 0,
+      "event_code": "ACCEPT",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "request_id": "f4bbf44b29db433cac3bdb414888da0e",
+      "created_at": "2026-09-19 19:08:27.819059"
+    },
+    {
+      "actor_type": "STAFF",
+      "actor_is_system": 0,
+      "event_code": "START",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "request_id": "40c3106821b64ee0a8b139ac3ea4ed26",
+      "created_at": "2026-09-19 19:08:28.130124"
+    },
+    {
+      "actor_type": "STAFF",
+      "actor_is_system": 0,
+      "event_code": "RECEIPT_UNRESOLVED",
+      "from_status": "PROCESSING",
+      "to_status": "PROCESSING",
+      "request_id": "0fae91f12ab04539ae47b5ec855e56f0",
+      "created_at": "2026-09-19 19:08:29.422216"
+    },
+    {
+      "actor_type": "SUPERVISOR",
+      "actor_is_system": 0,
+      "event_code": "DECIDE",
+      "from_status": "PROCESSING",
+      "to_status": "PROCESSING",
+      "request_id": "1560eb9f68b94e588a13ef9364d50325",
+      "created_at": "2026-09-19 19:08:34.416272"
+    },
+    {
+      "actor_type": "STAFF",
+      "actor_is_system": 0,
+      "event_code": "RECEIPT_RESOLVED",
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "request_id": "e8c6f2eeb7b2476f9306d16fa02a8942",
+      "created_at": "2026-09-19 19:08:40.013022"
+    },
+    {
+      "actor_type": "RESIDENT",
+      "actor_is_system": 0,
+      "event_code": "CONFIRM",
+      "from_status": "WAIT_CONFIRM",
+      "to_status": "COMPLETED",
+      "request_id": "f0fd6a2bca724f5da0824d256e34c798",
+      "created_at": "2026-09-19 19:08:44.086223"
+    },
+    {
+      "actor_type": "SYSTEM",
+      "actor_is_system": 0,
+      "event_code": "ARCHIVE",
+      "from_status": "COMPLETED",
+      "to_status": "CLOSED",
+      "request_id": "f0fd6a2bca724f5da0824d256e34c798",
+      "created_at": "2026-09-19 19:08:44.105652"
+    }
+  ],
+  "audits": [
+    {
+      "action": "WORK_ORDER_CREATED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 8,
+      "request_id": "0863efc2e64e4a9a872a82365bcfc3b2",
+      "actor_is_system": 0
+    },
+    {
+      "action": "WORK_ORDER_AI_ANALYSIS_COMPLETED",
+      "resource_type": "WORK_ORDER_ANALYSIS",
+      "resource_id": 8,
+      "request_id": "0863efc2e64e4a9a872a82365bcfc3b2",
+      "actor_is_system": 1
+    },
+    {
+      "action": "WORK_ORDER_ASSIGNED",
+      "resource_type": "WORK_ORDER_ASSIGNMENT",
+      "resource_id": 8,
+      "request_id": "0863efc2e64e4a9a872a82365bcfc3b2",
+      "actor_is_system": 1
+    },
+    {
+      "action": "WORK_ORDER_ACCEPTED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 8,
+      "request_id": "f4bbf44b29db433cac3bdb414888da0e",
+      "actor_is_system": 0
+    },
+    {
+      "action": "WORK_ORDER_PROCESS_STARTED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 8,
+      "request_id": "40c3106821b64ee0a8b139ac3ea4ed26",
+      "actor_is_system": 0
+    },
+    {
+      "action": "WORK_ORDER_PROCESS_UPDATED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 8,
+      "request_id": "0fae91f12ab04539ae47b5ec855e56f0",
+      "actor_is_system": 0
+    },
+    {
+      "action": "WORK_ORDER_DECIDED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 8,
+      "request_id": "1560eb9f68b94e588a13ef9364d50325",
+      "actor_is_system": 0
+    },
+    {
+      "action": "WORK_ORDER_RESOLVED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 8,
+      "request_id": "e8c6f2eeb7b2476f9306d16fa02a8942",
+      "actor_is_system": 0
+    },
+    {
+      "action": "WORK_ORDER_CLOSED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 8,
+      "request_id": "f0fd6a2bca724f5da0824d256e34c798",
+      "actor_is_system": 0
+    }
+  ],
+  "notifications": [
+    {
+      "id": 17,
+      "user_id": 20,
+      "resource_type": "WORK_ORDER",
+      "resource_id": 8,
+      "delivery_status": "SUCCEEDED"
+    },
+    {
+      "id": 18,
+      "user_id": 16,
+      "resource_type": "WORK_ORDER",
+      "resource_id": 8,
+      "delivery_status": "SUCCEEDED"
+    }
+  ],
+  "processes": [
+    {
+      "id": 4,
+      "cycle_no": 1,
+      "assignee_id": 4,
+      "started_at": "2026-09-19 19:08:28.128214",
+      "ended_at": "2026-09-19 19:08:29.419154"
+    },
+    {
+      "id": 5,
+      "cycle_no": 2,
+      "assignee_id": 4,
+      "started_at": "2026-09-19 19:08:34.417772",
+      "ended_at": "2026-09-19 19:08:40.009117"
+    }
+  ],
+  "receipts": [
+    {
+      "id": 4,
+      "process_id": 4,
+      "problem_type": "电气维修",
+      "method": "完成初检，但需要主管给出继续处理方案。",
+      "materials": null,
+      "fee_amount": null,
+      "fee_flag": "NONE",
+      "resolved": 0,
+      "unresolved_reason": "当前处理周期无法解决，等待主管方案。",
+      "follow_up": null,
+      "finished_at": "2026-09-19 19:08:29.419154"
+    },
+    {
+      "id": 5,
+      "process_id": 5,
+      "problem_type": "电气维修复办",
+      "method": "按主管方案更换接线端子并完成通电复测。",
+      "materials": null,
+      "fee_amount": null,
+      "fee_flag": "NONE",
+      "resolved": 1,
+      "unresolved_reason": null,
+      "follow_up": null,
+      "finished_at": "2026-09-19 19:08:40.009117"
+    }
+  ],
+  "resident_feedbacks": [
+    {
+      "id": 4,
+      "process_id": 5,
+      "actor_user_id": 16,
+      "confirmed": 1,
+      "unresolved_flag": 0,
+      "rating": null,
+      "comment": null,
+      "created_at": "2026-09-19 19:08:44.082205"
+    }
+  ],
+  "lifecycle_identities": [
+    {
+      "reporter_user_id": 16,
+      "employee_id": 4,
+      "employee_user_id": 20
+    }
+  ],
+  "lifecycle_audits": [
+    {
+      "action": "WORK_ORDER_CREATED",
+      "actor_user_id": 16,
+      "request_id": "0863efc2e64e4a9a872a82365bcfc3b2"
+    },
+    {
+      "action": "WORK_ORDER_ACCEPTED",
+      "actor_user_id": 20,
+      "request_id": "f4bbf44b29db433cac3bdb414888da0e"
+    },
+    {
+      "action": "WORK_ORDER_PROCESS_STARTED",
+      "actor_user_id": 20,
+      "request_id": "40c3106821b64ee0a8b139ac3ea4ed26"
+    },
+    {
+      "action": "WORK_ORDER_PROCESS_UPDATED",
+      "actor_user_id": 20,
+      "request_id": "0fae91f12ab04539ae47b5ec855e56f0"
+    },
+    {
+      "action": "WORK_ORDER_DECIDED",
+      "actor_user_id": 18,
+      "request_id": "1560eb9f68b94e588a13ef9364d50325"
+    },
+    {
+      "action": "WORK_ORDER_RESOLVED",
+      "actor_user_id": 20,
+      "request_id": "e8c6f2eeb7b2476f9306d16fa02a8942"
+    },
+    {
+      "action": "WORK_ORDER_CLOSED",
+      "actor_user_id": 16,
+      "request_id": "f0fd6a2bca724f5da0824d256e34c798"
+    }
+  ],
+  "employee_daily_statuses": [
+    {
+      "employee_id": 4,
+      "business_date": "2026-09-20",
+      "on_duty": "ON_DUTY",
+      "current_load": 3
+    },
+    {
+      "employee_id": 5,
+      "business_date": "2026-09-20",
+      "on_duty": "ON_DUTY",
+      "current_load": 0
+    }
+  ],
+  "attendance_records": [
+    {
+      "employee_id": 4,
+      "business_date": "2026-09-20",
+      "check_in_at": "2026-09-19 16:08:54.921080",
+      "check_out_at": null,
+      "currently_checked_in": 1
+    },
+    {
+      "employee_id": 5,
+      "business_date": "2026-09-20",
+      "check_in_at": "2026-09-19 18:35:11.673129",
+      "check_out_at": null,
+      "currently_checked_in": 1
+    }
+  ],
+  "redaction": "No phone, token, credential, resident name, or work-order text is emitted."
+}

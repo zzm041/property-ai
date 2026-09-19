@@ -1,0 +1,39 @@
+Review AUTO-REASSIGN-EXCEPTION-001 only. Read-only; do not edit files or mutate services.
+
+Implementation baseline is product commits 14fb4a127da93ccdd3af05da2b8234b377a78624 and c3a9fef (transaction-boundary runtime fix). The working tree also contains task evidence and a read-only inspector enhancement. Ignore unrelated pre-existing dirty files, especially miniprogram/project.config.json and old reports/codex call logs.
+
+Completion conditions to verify against code and evidence:
+1. Staff rejection requires a reason, commits ASSIGNED -> PENDING_ASSIGNMENT, then automatically queues redispatch without a supervisor selecting an employee.
+2. Redispatch reuses a completed analysis without another provider call, excludes a recent rejecter using the configurable cooldown, validates candidates again, creates a system AUTO assignment, load and notification effects, and safely remains PENDING_ASSIGNMENT when nobody is eligible.
+3. Staff can accept/start and escalate an unresolved case; escalated/waiting work cannot be completed until a supervisor decision.
+4. Supervisor UI/service support WAIT_PARTS, WAIT_OWNER, EXTERNAL_COORDINATION, CONTINUE with plan, and reasoned REASSIGN. No real third-party contact is performed automatically.
+5. Actual mini-program pages drove the same work order 7 through create, automatic initial assignment, rejection, automatic reassignment, accept/start, escalation, EXTERNAL_COORDINATION, CONTINUE, resolved receipt, resident confirmation, CLOSED, and fresh-login CLOSED persistence.
+6. Logs, assignments, audits, identities, receipt, notifications, loads and failure/recovery evidence are internally consistent.
+
+Mandatory reads:
+- backend/app/service/analysis.py
+- backend/app/service/auto_dispatch.py
+- backend/app/service/work_order.py
+- backend/app/core/config.py
+- backend/app/domain/ai.py
+- miniprogram/pages/staff-orders/detail.js and .wxml
+- miniprogram/pages/supervisor/queue.js and .wxml
+- miniprogram/services/api.js
+- backend/tests/unit/test_auto_reassign_exception.py
+- reports/auto-reassign-exception-001/page-evidence.json
+- reports/auto-reassign-exception-001/final-business-evidence.json
+- reports/auto-reassign-exception-001/runtime-recovery-evidence.json
+- reports/auto-reassign-exception-001/fallback-capacity-evidence.json
+
+Actually inspect at least these screenshots with supported image input; a path-only check is insufficient:
+- reports/auto-reassign-exception-001/03-staff-reject.png
+- reports/auto-reassign-exception-001/04-resident-auto-reassigned.png
+- reports/auto-reassign-exception-001/05-staff-escalated.png
+- reports/auto-reassign-exception-001/07-supervisor-external.png
+- reports/auto-reassign-exception-001/08-supervisor-after-continue.png
+- reports/auto-reassign-exception-001/10-resident-wait-confirm.png
+- reports/auto-reassign-exception-001/12-resident-relogin-closed.png
+
+Known runtime history must be assessed, not hidden: first redispatch exposed TransactionContractError and stranded order 7 in PENDING_ASSIGNMENT; c3a9fef fixed the boundary and 8 targeted plus 383 full unit tests passed. Replay then correctly returned NO_ELIGIBLE because the only alternate was at max capacity. The synthetic tenant-admin API raised employee 4 capacity 3 -> 8, one isolated queue retry assigned employee 4 while employee 5 was RECENTLY_REJECTED, and the page flow then closed the same order. Decide whether this is sufficient runtime verification of the fix and clearly list any residual limitation.
+
+Do not claim real AI, real SMS, real external coordination, Day 4, release, or Production V1 PASS. Distinguish CURRENT_TASK_BLOCKER, RELEASE_BLOCKER, and NON_BLOCKING. Findings require location, trigger, impact, and evidence. If there is no current-task blocker, return PASS for this task even though release blockers remain.

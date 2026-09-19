@@ -1,0 +1,85 @@
+{
+  "task_id": "AUTO-REASSIGN-EXCEPTION-001",
+  "captured_at": "2026-09-19T18:53:16.944Z",
+  "code_sha": "14fb4a127da93ccdd3af05da2b8234b377a78624",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001",
+    "provider": "DEVELOPMENT",
+    "automator_ws": "ws://127.0.0.1:9435"
+  },
+  "work_order_id": 7,
+  "house_id": 4,
+  "initial_employee_id": 5,
+  "reassigned_employee_id": 4,
+  "rejected_employee_excluded": true,
+  "page_actions": [
+    "resident created repair",
+    "initial staff rejected with reason",
+    "reassigned staff accepted and started",
+    "reassigned staff escalated",
+    "supervisor selected external coordination",
+    "supervisor continued with plan",
+    "staff submitted resolved receipt",
+    "resident confirmed and re-entered after fresh SMS login"
+  ],
+  "transitions": [
+    "CREATE->PENDING_ANALYSIS->PENDING_ASSIGNMENT->ASSIGNED",
+    "ASSIGNED->PENDING_ASSIGNMENT->ASSIGNED(reassigned)",
+    "PROCESSING/NONE->PROCESSING/INTERNAL_UNRESOLVED",
+    "INTERNAL_UNRESOLVED->EXTERNAL_COORDINATION",
+    "EXTERNAL_COORDINATION->NONE",
+    "PROCESSING->WAIT_CONFIRM",
+    "WAIT_CONFIRM->COMPLETED->CLOSED"
+  ],
+  "final_status": "CLOSED",
+  "relogin_status": "CLOSED",
+  "final_process_reason": "NONE",
+  "assignment_count": 2,
+  "latest_assignment": {
+    "employee_id": 4,
+    "status": "ENDED",
+    "reason": "AUTO_DISPATCH",
+    "assigned_by_user_id": null
+  },
+  "final_log_events": [
+    "CREATE",
+    "ANALYZE",
+    "ASSIGN",
+    "REJECT",
+    "ASSIGN",
+    "ACCEPT",
+    "START",
+    "ESCALATE",
+    "DECIDE",
+    "DECIDE",
+    "RECEIPT_RESOLVED",
+    "CONFIRM",
+    "ARCHIVE"
+  ],
+  "screenshots": [
+    "01-resident-create.png",
+    "02-resident-auto-assigned.png",
+    "03-staff-reject.png",
+    "04-resident-auto-reassigned.png",
+    "05-staff-escalated.png",
+    "06-supervisor-before-external.png",
+    "07-supervisor-external.png",
+    "08-supervisor-after-continue.png",
+    "09-staff-complete.png",
+    "10-resident-wait-confirm.png",
+    "11-resident-closed.png",
+    "12-resident-relogin-closed.png"
+  ],
+  "boundaries": {
+    "official_sms_sessions": true,
+    "page_actions_not_http_substitutes": true,
+    "direct_database_write_used": false,
+    "real_external_coordination_performed": false,
+    "real_model_verified": false,
+    "production_v1_passed": false
+  },
+  "redaction": "No phone, SMS code, token, password, resident name, or credential is stored."
+}

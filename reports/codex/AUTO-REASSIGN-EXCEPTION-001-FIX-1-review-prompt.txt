@@ -1,0 +1,41 @@
+Re-review AUTO-REASSIGN-EXCEPTION-001-FIX-1 only. Read-only; do not edit files or mutate services. This is review round 2 for the same task, not a new task ID.
+
+Previous review at c3a9fef returned NEEDS_CHANGES with three CURRENT_TASK_BLOCKER findings:
+1. An unresolved receipt occupied the process cycle, so CONTINUE or REASSIGN could cause a later receipt conflict or wrong assignee attribution.
+2. A feedback caller with work_order:decide could clear a waiting exception without a formal DECIDE.
+3. The API accepted REASSIGN without a nonblank reason.
+
+Implementation commit f1de143 addresses those findings:
+- unresolved receipts end their process cycle;
+- CONTINUE with a required plan opens a new cycle only when the prior cycle has a receipt, preserving same-assignee attribution;
+- processing-stage reassignment closes the open process before ending the assignment, so the new assignee starts a new cycle;
+- feedback can never clear waiting/escalated state to NONE; a formal supervisor decision is required regardless of the caller's permissions;
+- REASSIGN and CONTINUE both require a nonblank reason in the service, including both REASSIGN branches;
+- focused tests cover privileged feedback, both reasonless REASSIGN branches, same-assignee follow-up cycle, and closing an open process on reassignment.
+
+Implementer results: focused 12 passed, 1 warning; full unit 387 passed, 1 warning.
+
+Actual isolated page/runtime evidence on work order 8 at 8083 -> property_ai_auth001_test @ 20260919_0009:
+- actual staff page submitted an unresolved receipt;
+- actual supervisor page selected CONTINUE with a plan;
+- actual staff page then submitted a resolved receipt;
+- actual resident page confirmed CLOSED;
+- database evidence shows process cycles 1 and 2, both assignee_id 4, unresolved receipt on process 4 and resolved receipt on process 5, DECIDE audit, CLOSED state, and correct recipient notifications.
+
+Mandatory reads:
+- backend/app/service/work_order.py, especially _assign, _decide, _feedback, _submit_receipt, _end_current_process, _resume_receipted_process
+- backend/tests/unit/test_auto_reassign_exception.py
+- reports/auto-reassign-exception-001/fix1-page-evidence.json
+- reports/auto-reassign-exception-001/fix1-business-evidence.json
+- reports/auto-reassign-exception-001/final-business-evidence.json (audit projection now includes all related request IDs and notification user IDs)
+- reports/codex/AUTO-REASSIGN-EXCEPTION-001-review.json
+
+Actually inspect these screenshots with supported image input:
+- reports/auto-reassign-exception-001/13-staff-unresolved-receipt.png
+- reports/auto-reassign-exception-001/14-supervisor-continue-unresolved.png
+- reports/auto-reassign-exception-001/15-staff-resolved-new-cycle.png
+- reports/auto-reassign-exception-001/16-resident-unresolved-cycle-closed.png
+
+Limit review to the three prior blockers and regressions introduced by their fix. Do not reopen closed findings without new evidence and do not demand a new full-repo audit. A live supervisor REASSIGN page flow was not rerun; judge whether code plus focused branch tests and process-cycle runtime evidence suffice, and name it as an unverified limitation if appropriate.
+
+Do not claim real AI, real SMS, real external coordination, Day 4, release, or Production V1 PASS. Distinguish CURRENT_TASK_BLOCKER, RELEASE_BLOCKER, and NON_BLOCKING. If the three prior findings are fixed and no regression blocks this task, return PASS for AUTO-REASSIGN-EXCEPTION-001-FIX-1 while preserving release blockers.

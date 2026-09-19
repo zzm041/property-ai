@@ -42,8 +42,9 @@ def inspect_dispatch(work_order_id: int) -> dict[str, object]:
         revision = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
         order = connection.execute(
             text(
-                "SELECT wo.id, wo.tenant_id, wo.property_id, wo.status, wo.category, "
-                "wo.priority, wo.current_assignment_id, wo.created_at, p.timezone "
+                "SELECT wo.id, wo.tenant_id, wo.property_id, wo.status, wo.process_reason, "
+                "wo.category, wo.priority, wo.current_assignment_id, wo.version, "
+                "wo.created_at, p.timezone "
                 "FROM work_orders wo JOIN properties p ON p.id = wo.property_id "
                 "WHERE wo.id = :work_order_id"
             ),
@@ -61,6 +62,13 @@ def inspect_dispatch(work_order_id: int) -> dict[str, object]:
             ),
             {"work_order_id": work_order_id},
         ).mappings().one_or_none()
+        assignment_rows = _rows(
+            connection,
+            "SELECT id, employee_id, assigned_by_user_id, assigned_source, status, "
+            "reason, ended_at, payload_json FROM work_order_assignments "
+            "WHERE work_order_id = :work_order_id ORDER BY id",
+            {"work_order_id": work_order_id},
+        )
         payload = _json_value(None if assignment is None else assignment["payload_json"])
         if not isinstance(payload, dict):
             payload = {}
@@ -97,11 +105,11 @@ def inspect_dispatch(work_order_id: int) -> dict[str, object]:
             "WHERE work_order_id = :work_order_id ORDER BY id",
             {"work_order_id": work_order_id},
         )
-        request_id = str(logs[0]["request_id"])
         audits = _rows(
             connection,
-            "SELECT action, resource_type, actor_user_id IS NULL AS actor_is_system "
-            "FROM audit_logs WHERE request_id = :request_id AND ("
+            "SELECT action, resource_type, resource_id, request_id, "
+            "actor_user_id IS NULL AS actor_is_system "
+            "FROM audit_logs WHERE ("
             "(resource_type = 'WORK_ORDER' AND resource_id = :work_order_id) OR "
             "(resource_type = 'WORK_ORDER_ANALYSIS' AND resource_id IN ("
             "SELECT id FROM work_order_analyses WHERE work_order_id = :work_order_id"
@@ -109,11 +117,12 @@ def inspect_dispatch(work_order_id: int) -> dict[str, object]:
             "(resource_type = 'WORK_ORDER_ASSIGNMENT' AND resource_id IN ("
             "SELECT id FROM work_order_assignments WHERE work_order_id = :work_order_id"
             "))) ORDER BY id",
-            {"request_id": request_id, "work_order_id": work_order_id},
+            {"work_order_id": work_order_id},
         )
         notifications = _rows(
             connection,
-            "SELECT n.id, n.resource_type, n.resource_id, d.status AS delivery_status "
+            "SELECT n.id, n.user_id, n.resource_type, n.resource_id, "
+            "d.status AS delivery_status "
             "FROM notifications n LEFT JOIN notification_deliveries d "
             "ON d.notification_id = n.id "
             "WHERE n.resource_type = 'WORK_ORDER' AND n.resource_id = :work_order_id "
@@ -192,6 +201,30 @@ def inspect_dispatch(work_order_id: int) -> dict[str, object]:
         )
     engine.dispose()
     database_url = make_url(settings.test_database_url)
+    assignment_history = []
+    for item in assignment_rows:
+        item_payload = _json_value(item.pop("payload_json"))
+        item_payload = item_payload if isinstance(item_payload, dict) else {}
+        item_snapshot = item_payload.get("filter_snapshot")
+        item_snapshot = item_snapshot if isinstance(item_snapshot, dict) else {}
+        item_candidates = item_snapshot.get("candidates")
+        item_candidates = item_candidates if isinstance(item_candidates, list) else []
+        assignment_history.append(
+            item
+            | {
+                "assigned_by_user_id_is_null": item.pop("assigned_by_user_id") is None,
+                "score": item_payload.get("score"),
+                "candidate_filters": [
+                    {
+                        "employee_id": candidate.get("employee_id"),
+                        "eligible": candidate.get("eligible"),
+                        "filter_reason": candidate.get("filter_reason"),
+                    }
+                    for candidate in item_candidates
+                    if isinstance(candidate, dict)
+                ],
+            }
+        )
     return {
         "environment": {
             "database": f"{database_url.host}:{database_url.port}/{database_url.database}",
@@ -224,6 +257,7 @@ def inspect_dispatch(work_order_id: int) -> dict[str, object]:
             ],
             "weights": snapshot.get("weights"),
         },
+        "assignment_history": assignment_history,
         "analyses": analyses,
         "ai_calls": ai_calls,
         "dispatch_recommendations": recommendations,

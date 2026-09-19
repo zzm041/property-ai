@@ -1,0 +1,11 @@
+{
+  "task_id": "AUTO-REASSIGN-EXCEPTION-001-FIXTURE",
+  "captured_at": "2026-09-19T18:47:58.019449+00:00",
+  "employee_id": 4,
+  "previous_max_capacity": 3,
+  "current_max_capacity": 8,
+  "method": "official tenant-admin employee PATCH API",
+  "reason": "Synthetic fallback employee had current_load equal to max_capacity; preserve no-eligible evidence, then enable the approved redispatch path.",
+  "direct_database_write_used": false,
+  "redaction": "No phone, SMS code, token, password, employee name, or credential is stored."
+}

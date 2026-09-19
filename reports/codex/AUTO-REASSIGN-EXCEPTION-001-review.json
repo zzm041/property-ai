@@ -1,0 +1,86 @@
+{
+  "task_id": "AUTO-REASSIGN-EXCEPTION-001",
+  "phase": "review",
+  "reviewed_head": "c3a9fef7c207bcc79815c8b3f6a22bba4caee53c (parent 14fb4a127da93ccdd3af05da2b8234b377a78624)",
+  "decision": "NEEDS_CHANGES",
+  "actions_or_findings": [
+    {
+      "title": "CURRENT_TASK_BLOCKER: unresolved receipt leaves the process cycle stuck",
+      "path": "D:/property-ai/backend/app/service/work_order.py:2005",
+      "trigger": "Staff submits an unresolved receipt, then a supervisor chooses CONTINUE or REASSIGN.",
+      "rationale": "The receipt occupies the current process cycle. CONTINUE does not open a new cycle, so a later resolved receipt returns 409. Reassignment during PROCESSING also leaves the old process open; the new assignee's receipt can retain the former assignee's process attribution. The page run used escalation without an unresolved receipt and did not exercise these paths."
+    },
+    {
+      "title": "CURRENT_TASK_BLOCKER: feedback can bypass a formal supervisor decision",
+      "path": "D:/property-ai/backend/app/service/work_order.py:1935",
+      "trigger": "A processing actor with work_order:decide permission sends staff feedback with process_reason=NONE on a waiting or escalated order.",
+      "rationale": "The permission check allows ordinary feedback to clear the exception. A resolved receipt can then follow without a CONTINUE plan, DECIDE log, or WORK_ORDER_DECIDED audit. The unit test covers only an actor without that permission."
+    },
+    {
+      "title": "CURRENT_TASK_BLOCKER: API accepts an unreasoned REASSIGN",
+      "path": "D:/property-ai/backend/app/service/work_order.py:1681",
+      "trigger": "A supervisor calls the decide API with decision=REASSIGN and an empty or absent reason.",
+      "rationale": "Only CONTINUE requires a reason in the service. With a selected employee, the service substitutes the literal REASSIGN; without one, it can end the assignment without a stated reason. The mini-program's required field does not protect the API."
+    },
+    {
+      "title": "NON_BLOCKING: transaction repair has controlled runtime evidence",
+      "path": "D:/property-ai/backend/app/service/analysis.py:163",
+      "trigger": "Order 7's first redispatch failed with TransactionContractError; the failed task was replayed after the fix.",
+      "rationale": "The repaired code opens its owned transaction before reading the stored analysis. The isolated worker replay returned NO_ELIGIBLE while the alternate was at capacity. After a tenant-admin API capacity change, one isolated queue retry selected employee 4, excluded rejecter 5 as RECENTLY_REJECTED, and created a system AUTO assignment without another provider call. This verifies the repair and selection path. A fresh rejection that succeeds on its first post-fix queue attempt remains unshown."
+    },
+    {
+      "title": "NON_BLOCKING: saved audit projection omits the later assignment audit",
+      "path": "D:/property-ai/scripts/ops/inspect_auth001_auto_dispatch.py:109",
+      "trigger": "The final-business-evidence.json audits array is used to inspect reassignment.",
+      "rationale": "That query filters to the creation request ID, so it shows only the first assignment audit. Code writes WORK_ORDER_REASSIGNED in the assignment transaction, and the second assignment and notification delivery are evidenced, but the saved projection does not directly show the later audit row or notification recipient."
+    },
+    {
+      "title": "RELEASE_BLOCKER: Production V1 remains incomplete",
+      "path": "D:/property-ai/reports/project-handoff.md",
+      "trigger": "The current task is treated as formal release, real AI, or Day 4 acceptance.",
+      "rationale": "The run used DEVELOPMENT AI and synthetic data. Phone change, WeChat rebind, controlled merge, recovery, self-hosted inference, real Embedding/RAG, production media, SLA and worker reliability, and release validation remain in scope."
+    }
+  ],
+  "evidence_paths": [
+    "D:/property-ai/reports/project-handoff.md",
+    "D:/property-ai/backend/app/service/analysis.py",
+    "D:/property-ai/backend/app/service/auto_dispatch.py",
+    "D:/property-ai/backend/app/service/work_order.py",
+    "D:/property-ai/backend/app/core/config.py",
+    "D:/property-ai/backend/app/domain/ai.py",
+    "D:/property-ai/backend/tests/unit/test_auto_reassign_exception.py",
+    "D:/property-ai/miniprogram/pages/staff-orders/detail.js",
+    "D:/property-ai/miniprogram/pages/staff-orders/detail.wxml",
+    "D:/property-ai/miniprogram/pages/supervisor/queue.js",
+    "D:/property-ai/miniprogram/pages/supervisor/queue.wxml",
+    "D:/property-ai/miniprogram/services/api.js",
+    "D:/property-ai/reports/auto-reassign-exception-001/page-evidence.json",
+    "D:/property-ai/reports/auto-reassign-exception-001/final-business-evidence.json",
+    "D:/property-ai/reports/auto-reassign-exception-001/runtime-recovery-evidence.json",
+    "D:/property-ai/reports/auto-reassign-exception-001/fallback-capacity-evidence.json",
+    "D:/property-ai/reports/auto-reassign-exception-001/03-staff-reject.png",
+    "D:/property-ai/reports/auto-reassign-exception-001/04-resident-auto-reassigned.png",
+    "D:/property-ai/reports/auto-reassign-exception-001/05-staff-escalated.png",
+    "D:/property-ai/reports/auto-reassign-exception-001/07-supervisor-external.png",
+    "D:/property-ai/reports/auto-reassign-exception-001/08-supervisor-after-continue.png",
+    "D:/property-ai/reports/auto-reassign-exception-001/10-resident-wait-confirm.png",
+    "D:/property-ai/reports/auto-reassign-exception-001/12-resident-relogin-closed.png",
+    "D:/property-ai/tmp/auth001-runtime/worker-20260920-024454.out.log"
+  ],
+  "unverified": [
+    "The reported 8 targeted and 383 full unit passes were not rerun in this read-only review.",
+    "No live database query was completed: the local virtual-environment Python launcher was unavailable. Later audit-row details and notification recipients were checked through code and saved evidence, not a fresh database read.",
+    "page-evidence.json names 14fb4a1; the repaired worker ran before c3a9fef was committed. The page record should not be described as a run against that committed SHA.",
+    "No fresh post-fix first-attempt rejection, unresolved-receipt continuation, or supervisor REASSIGN page run is supplied."
+  ],
+  "session_note": "Overall goal: frozen Production V1. Current task: AUTO-REASSIGN-EXCEPTION-001. Main Codex alone implements; this session was read-only. Earlier AUTO dispatch, order 5 lifecycle, and persistent-media reviews remain accepted at their stated commits. I inspected the seven required screenshots and three additional flow screenshots. Order 7's saved history reaches CLOSED after fresh resident login, but the three service defects block this task. Existing dirty files, including project.config.json, were untouched.\n",
+  "task_result": "NEEDS_CHANGES for this task. The controlled replay sufficiently verifies the transaction fix and automatic candidate selection after an isolated retry, but unresolved-receipt cycling, formal-decision enforcement, and reasoned REASSIGN remain defective. This is not real-AI, Day 4, release, or Production V1 PASS.",
+  "product_gap_changes": [
+    "Order 7 demonstrates local rejection, cooldown exclusion, capacity fallback, automatic system assignment, escalation, supervisor EXTERNAL_COORDINATION and CONTINUE, receipt, confirmation, and persisted CLOSED.",
+    "Current-task acceptance remains open for the three defects above.",
+    "The remaining frozen Production V1 features, including phone change, WeChat rebind, controlled merge, recovery, real AI auto-assignment, and real Embedding/RAG, remain in scope."
+  ],
+  "schedule_risk": "High. Work began 2026-09-15; the operator last confirmed development day 5 on 2026-09-18. At the 2026-09-20 workspace date, the approximately 2026-09-21 one-week aim cannot cover these fixes plus the remaining frozen Production V1 features and release validation without dropping scope.",
+  "next_action": "Main Codex should fix process-cycle handling for unresolved receipts and processing-stage reassignment; require a nonblank REASSIGN reason in the service; and make CONTINUE with a plan the only path that clears a waiting exception. Add focused failure-path tests for both REASSIGN branches, privileged feedback bypass, same-assignee CONTINUE after an unresolved receipt, and new-assignee process/receipt attribution. Then verify the changed paths on 8083 against only 127.0.0.1:3307/property_ai_auth001_test at 20260919_0009 with the isolated worker, and capture redacted audit and notification-recipient evidence. Completion requires those tests and the isolated business paths to pass before independent read-only re-review. Ordinary source, tests, and named isolated synthetic validation are within current authorization; migrations, protected databases, shared services, paid calls, credentials, and release require separate approval.",
+  "approval_requests": []
+}

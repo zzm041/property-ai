@@ -1,0 +1,47 @@
+{
+  "task_id": "AUTO-REASSIGN-EXCEPTION-001-PREPARE",
+  "captured_at": "2026-09-19T18:35:11.691629+00:00",
+  "head": "14fb4a127da93ccdd3af05da2b8234b377a78624",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001",
+    "provider": "DEVELOPMENT"
+  },
+  "tenant_id": 4,
+  "property_id": 4,
+  "house_id": 4,
+  "employees": {
+    "staff": {
+      "employee_id": 4,
+      "business_date": "2026-09-20",
+      "on_duty": "ON_DUTY",
+      "current_load": 3,
+      "action": "existing"
+    },
+    "staff2": {
+      "employee_id": 5,
+      "business_date": "2026-09-20",
+      "on_duty": "ON_DUTY",
+      "current_load": 0,
+      "action": "checked_in"
+    }
+  },
+  "staff2_preparation": {
+    "created_employee": true,
+    "claimed_invite": true,
+    "added_duty": false,
+    "added_skill": false,
+    "added_property_assignment": false
+  },
+  "boundaries": {
+    "official_sms_sessions": true,
+    "business_api_writes_only": true,
+    "direct_database_write_used": false,
+    "shared_database_touched": false,
+    "real_model_verified": false,
+    "production_v1_passed": false
+  },
+  "redaction": "No phone, password, invite token, access token, resident name, or credential is emitted."
+}

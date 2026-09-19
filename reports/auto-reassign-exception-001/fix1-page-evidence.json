@@ -1,0 +1,29 @@
+{
+  "task_id": "AUTO-REASSIGN-EXCEPTION-001-FIX-1-RUNTIME",
+  "captured_at": "2026-09-19T19:08:45.078Z",
+  "code_sha": "f1de143a546912b0cefaa3aa6b50582feb466016",
+  "work_order_id": 8,
+  "employee_id": 4,
+  "final_status": "CLOSED",
+  "path": [
+    "PROCESSING receipt unresolved",
+    "INTERNAL_UNRESOLVED",
+    "supervisor CONTINUE with plan",
+    "new process cycle resolved receipt",
+    "resident CLOSED"
+  ],
+  "screenshots": [
+    "13-staff-unresolved-receipt.png",
+    "14-supervisor-continue-unresolved.png",
+    "15-staff-resolved-new-cycle.png",
+    "16-resident-unresolved-cycle-closed.png"
+  ],
+  "boundaries": {
+    "actual_page_actions": true,
+    "official_sms_sessions": true,
+    "direct_database_write_used": false,
+    "real_model_verified": false,
+    "production_v1_passed": false
+  },
+  "redaction": "No phone, SMS code, token, password, resident name, or credential is stored."
+}
