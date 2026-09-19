@@ -1,0 +1,92 @@
+{
+  "task_id": "WECHAT-REBIND-001",
+  "database": {
+    "host": "127.0.0.1",
+    "port": 3307,
+    "name": "property_ai_auth001_test",
+    "migration": "20260919_0009",
+    "mode": "read-only inspection"
+  },
+  "user": {
+    "id": 35,
+    "display_name": "185****4581",
+    "status": "ACTIVE"
+  },
+  "phones": [
+    {
+      "status": "ACTIVE",
+      "verified_at": "2026-09-19T20:30:52.760916",
+      "ended_at": null,
+      "created_at": "2026-09-19T20:30:52.760916",
+      "phone_masked": "185****4581"
+    }
+  ],
+  "bindings": [
+    {
+      "id": 3,
+      "appid": "wx-dev-app",
+      "created_at": "2026-09-19T20:30:54.854458",
+      "updated_at": "2026-09-19T20:30:56.126277",
+      "openid_fingerprint": "3919c24c6825",
+      "unionid_present": false
+    }
+  ],
+  "sessions": [
+    {
+      "id": 178,
+      "auth_method": "sms",
+      "expires_at": "2026-10-03T20:30:52.764309",
+      "revoked_at": "2026-09-19T20:30:56.129777",
+      "created_at": "2026-09-19T20:30:52.764309"
+    },
+    {
+      "id": 179,
+      "auth_method": "sms",
+      "expires_at": "2026-10-03T20:30:56.137779",
+      "revoked_at": null,
+      "created_at": "2026-09-19T20:30:56.137779"
+    }
+  ],
+  "audits": [
+    {
+      "action": "AUTH_WECHAT_BOUND",
+      "resource_type": "USER_WECHAT",
+      "resource_id": 3,
+      "request_id": "d6844785eeaa414baf7d9bc35595b3a9",
+      "details_json": {
+        "auth_method": "wechat"
+      },
+      "created_at": "2026-09-19T20:30:54.856824"
+    },
+    {
+      "action": "AUTH_SESSION_REVOKED",
+      "resource_type": "AUTH_SESSION",
+      "resource_id": 178,
+      "request_id": "180f3398c513489fa61ace68a078e410",
+      "details_json": {
+        "auth_method": "sms",
+        "reason_code": "WECHAT_REBIND"
+      },
+      "created_at": "2026-09-19T20:30:56.131779"
+    },
+    {
+      "action": "AUTH_WECHAT_REBOUND",
+      "resource_type": "USER_WECHAT",
+      "resource_id": 3,
+      "request_id": "180f3398c513489fa61ace68a078e410",
+      "details_json": {
+        "auth_method": "sms",
+        "reason_code": "SELF_SERVICE_VERIFIED",
+        "replaced_binding_count": 1
+      },
+      "created_at": "2026-09-19T20:30:56.140277"
+    }
+  ],
+  "assertions": {
+    "one_binding_for_configured_appid": true,
+    "rebind_audit_present": true,
+    "revoked_sessions_present": true,
+    "active_sms_session_present": true,
+    "audit_has_no_phone_or_wechat_identifier": true
+  }
+}

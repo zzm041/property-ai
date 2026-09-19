@@ -1,0 +1,41 @@
+{
+  "task_id": "WECHAT-REBIND-001",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "migration": "20260919_0009",
+    "wechat_provider": "development",
+    "sms_provider": "development",
+    "interaction": "WeChat DevTools automator page controls"
+  },
+  "checks": {
+    "initial_sms_login": {
+      "status": "PASS",
+      "user_id": 35,
+      "phone_masked": "185****4581",
+      "page": "pages/home/home"
+    },
+    "initial_wechat_bind": {
+      "status": "PASS",
+      "page_notice": "当前微信已绑定"
+    },
+    "verified_rebind": {
+      "status": "PASS",
+      "page_notice": "微信已安全更换，其他旧会话已失效",
+      "sensitive_fields_cleared_before_screenshot": true,
+      "replacement_access_changed": true,
+      "replacement_refresh_changed": true
+    },
+    "session_rotation": {
+      "status": "PASS",
+      "old_access_status": 401,
+      "old_refresh_status": 401,
+      "replacement_access_status": 200,
+      "same_user_id": true
+    }
+  },
+  "screenshots": [
+    "01-wechat-rebind-success.png"
+  ],
+  "status": "PASS"
+}

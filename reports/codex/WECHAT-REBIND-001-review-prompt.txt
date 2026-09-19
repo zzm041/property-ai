@@ -1,0 +1,62 @@
+Independent scoped review of WECHAT-REBIND-001, round 1. Read-only: do not edit files, mutate services/data, run tests, or create another reviewer.
+
+Task baseline: base a25ff33ceea66575c2fde4293fc77b7e945666dc; reviewed head a42a7fbb646ee3b892c938fa9cb7cd8d6ab81584. Product implementation commits are 006653e and a42a7fb. The task is not a full-repository audit.
+
+Approved completion scope:
+- a signed-in user can replace an existing WeChat Mini Program identity only after current-phone OTP secondary verification under an official sms/password/wechat session;
+- an identity already bound to another user cannot be taken over and must direct the user to controlled merge;
+- old WeChat identifiers no longer log in after success;
+- active pre-change SMS/WeChat sessions are revoked and a replacement SMS session is issued;
+- the mutation is atomic, audited without raw phone, WeChat code, openid, unionid, token, or secret data, and invalid OTP attempt state persists;
+- the existing /auth/wechat/bind path cannot be used to add another identity for the same appid when rebind is required;
+- the mini-program performs the real bind and verified rebind page actions against isolated 8083/0009 using Development WeChat/SMS providers.
+
+Mandatory formal-spec reads:
+- docs/01-PRD.md identity/account sections
+- docs/02-ROLES-PERMISSIONS.md self credential maintenance and audit requirements
+- docs/03-DOMAIN-MODEL.md UserWechat constraints
+- docs/06-API-CONTRACT.md /auth/wechat/rebind
+- docs/07-SECURITY-PRIVACY.md takeover and secondary-verification requirements
+- docs/10-ACCEPTANCE.md identity acceptance bullets
+
+Mandatory implementation reads:
+- backend/app/api/v1/wechat_auth.py
+- backend/app/service/wechat_auth.py
+- backend/app/repository/knowledge.py
+- backend/app/repository/credential.py
+- backend/app/schema/auth.py
+- backend/app/core/errors.py
+- backend/app/domain/audit.py
+- backend/app/service/audit.py
+- backend/app/service/credential_auth.py session issue/revoke and OTP helpers only
+- backend/app/model/identity.py UserWechat, SmsChallenge, AuthSession, AuditLog only
+- miniprogram/pages/profile/profile.js
+- miniprogram/pages/profile/profile.wxml
+- miniprogram/services/api.js credential request handling only
+- backend/tests/unit/test_wechat_rebind.py
+- scripts/ops/probe_auth001_wechat_rebind.py
+- scripts/ops/inspect_auth001_wechat_rebind.py
+
+Evidence to inspect rather than automatically accept:
+- reports/wechat-rebind-001/unit-results.xml records 407 tests, zero failures/errors/skips on current code.
+- reports/wechat-rebind-001/api-evidence.json was recovered without replaying business mutations from the completed request log and read-only DB state after the evidence assembler failed only by assuming the WeChat login response contained user_id. It records invalid OTP 401 with persisted attempt, takeover 409 with rollback integrity, successful rebind, one binding, audit, old identity login 401, new identity login same user, both old SMS/WeChat access and refresh invalid, and replacement access/refresh valid.
+- reports/wechat-rebind-001/page-evidence.json records actual DevTools controls for user 35: page SMS login, initial page bind, current-phone challenge/SMS, page rebind, cleared sensitive fields, replacement tokens, old access/refresh 401, replacement access 200, same user.
+- reports/wechat-rebind-001/database-evidence.json is a read-only redacted inspection of that same page user 35: one configured-appid binding (same resource id updated), old session revoked, replacement SMS session active, bind/revoke/rebind audits, no phone or WeChat identifier in audit details.
+- tmp/auth001-runtime/api-20260920-042221.out.log identifies 127.0.0.1:3307/property_ai_auth001_test, API 8083, queue property_ai.auth001, vhost property_ai_auth001, Redis DB12, and contains the fixed probe request/status/error events.
+
+Actually inspect this screenshot with supported image input; a path alone is not inspection:
+- reports/wechat-rebind-001/01-wechat-rebind-success.png
+
+Review especially:
+1. OTP invalid-attempt commit-before-raise and phone ownership recheck between verification and mutation.
+2. Transaction and lock ordering across phone rows, WeChat candidates, user row, session revoke/issue; takeover/concurrent unique conflicts and rollback.
+3. openid/unionid collision checks, same-binding handling, and whether old or legacy duplicate bindings survive.
+4. Whether existing /bind can still bypass verified /rebind.
+5. Session revocation and replacement-token semantics, including stolen old WeChat sessions.
+6. Audit policy and evidence redaction.
+7. Actual page wiring, high-risk endpoint refresh behavior, cleared inputs, screenshot, and same-business-object evidence.
+8. Whether the no-migration approach is valid under the current frozen UserWechat model.
+
+Classify findings as CURRENT_TASK_BLOCKER, RELEASE_BLOCKER, or NON_BLOCKING. Every issue needs a concrete path/line, trigger, impact, and evidence. Return PASS only if no current-task blocker exists. Do not manufacture style-only refactors.
+
+This can pass only for isolated local synthetic users with Development WeChat/SMS on 8083/0009. It is not real WeChat, real SMS, controlled merge, recovery, Day 4, release, or Production V1 acceptance. Those remain separate gaps. Migration, shared infrastructure, production provider calls, credentials, deployment, and release are outside this task and require approval.

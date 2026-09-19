@@ -1,0 +1,83 @@
+{
+  "task_id": "WECHAT-REBIND-001",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "api_log": "tmp\\auth001-runtime\\api-20260920-042221.out.log",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "migration": "20260919_0009",
+    "wechat_provider": "development",
+    "sms_provider": "development",
+    "interaction": "recovered from completed HTTP request log plus read-only database assertions"
+  },
+  "identities": {
+    "primary_user_id": 33,
+    "primary_phone_masked": "187****5320",
+    "occupied_user_id": 34,
+    "occupied_phone_masked": "186****1642"
+  },
+  "checks": {
+    "invalid_otp": {
+      "error_code": "AUTH.INVALID_CODE",
+      "status": 401,
+      "attempt_persisted": true
+    },
+    "takeover_prevention": {
+      "error_code": "AUTH.WECHAT_ALREADY_BOUND",
+      "status": 409,
+      "old_wechat_session_remained_valid_after_rollback": true,
+      "occupied_identity_kept_original_user": true
+    },
+    "rebind": {
+      "status": 200,
+      "one_binding_for_appid": true,
+      "audit": {
+        "action": "AUTH_WECHAT_REBOUND",
+        "resource_type": "USER_WECHAT",
+        "resource_id": 1,
+        "request_id": "wechat-rebind-success",
+        "details_json": {
+          "auth_method": "sms",
+          "reason_code": "SELF_SERVICE_VERIFIED",
+          "replaced_binding_count": 1
+        },
+        "created_at": "2026-09-19T20:28:10.616360"
+      }
+    },
+    "old_binding_invalidation": {
+      "old_login": {
+        "error_code": "AUTH.WECHAT_BIND_REQUIRED",
+        "status": 401
+      },
+      "new_login": {
+        "status": 200
+      },
+      "new_login_same_user": true
+    },
+    "session_rotation": {
+      "old_sms_access": {
+        "error_code": "AUTH.SESSION_REVOKED",
+        "status": 401
+      },
+      "old_sms_refresh": {
+        "error_code": "AUTH.INVALID_TOKEN",
+        "status": 401
+      },
+      "old_wechat_access": {
+        "error_code": "AUTH.SESSION_REVOKED",
+        "status": 401
+      },
+      "old_wechat_refresh": {
+        "error_code": "AUTH.INVALID_TOKEN",
+        "status": 401
+      },
+      "replacement_access": {
+        "status": 200
+      },
+      "replacement_refresh": {
+        "status": 200
+      },
+      "revoked_session_count": 3
+    }
+  },
+  "status": "PASS"
+}
