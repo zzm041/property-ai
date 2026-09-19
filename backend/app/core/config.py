@@ -29,6 +29,12 @@ class Settings(BaseSettings):
     jwt_issuer: str = "property-ai"
     jwt_audience: str = "property-ai-api"
     jwt_access_token_ttl_seconds: int = Field(default=900, ge=60, le=3600)
+    jwt_refresh_token_ttl_seconds: int = Field(default=1209600, ge=3600, le=2592000)
+    sms_provider: Literal["development", "production"] = "development"
+    sms_otp_ttl_seconds: int = Field(default=300, ge=60, le=600)
+    sms_otp_max_attempts: int = Field(default=5, ge=1, le=10)
+    sms_send_limit_per_hour: int = Field(default=5, ge=1, le=20)
+    sms_login_limit_per_hour: int = Field(default=10, ge=1, le=30)
     dev_seed_lock_timeout_seconds: int = Field(default=5, ge=0, le=30)
 
     api_host: str = "0.0.0.0"

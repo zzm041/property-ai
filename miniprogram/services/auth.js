@@ -10,8 +10,23 @@ function setToken(token) {
   wx.setStorageSync(TOKEN_KEY, token);
 }
 
+const REFRESH_KEY = "refresh_token";
+
+function getRefreshToken() {
+  return wx.getStorageSync(REFRESH_KEY) || "";
+}
+
+function setRefreshToken(token) {
+  if (token) {
+    wx.setStorageSync(REFRESH_KEY, token);
+  } else {
+    wx.removeStorageSync(REFRESH_KEY);
+  }
+}
+
 function clearToken() {
   wx.removeStorageSync(TOKEN_KEY);
+  wx.removeStorageSync(REFRESH_KEY);
 }
 
 function setSelectedHouseId(houseId) {
@@ -62,6 +77,8 @@ function clearSession() {
 module.exports = {
   getToken,
   setToken,
+  getRefreshToken,
+  setRefreshToken,
   clearToken,
   clearSession,
   setSelectedHouseId,

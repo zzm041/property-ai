@@ -50,8 +50,8 @@ def test_stack_contract_wechat_resident_workorder_knowledge(
             json={"code": "wx-new-day3"},
             headers={"X-Request-Id": "d3-wx"},
         )
-        assert wechat.status_code == 200
-        assert wechat.json()["data"]["auth_method"] == "wechat"
+        assert wechat.status_code == 401
+        assert wechat.json()["error"]["code"] == "AUTH.WECHAT_BIND_REQUIRED"
         assert "session_key" not in str(wechat.json())
 
         token = client.post(

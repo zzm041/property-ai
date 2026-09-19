@@ -100,3 +100,4 @@ class AccessTokenWithMethodData(BaseModel):
     token_type: Literal["bearer"]
     expires_in: int
     auth_method: Literal["wechat"]
+    refresh_token: str | None = None

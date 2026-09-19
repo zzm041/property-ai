@@ -24,6 +24,7 @@ from app.provider.storage import (
 )
 from app.provider.vector import MilvusKnowledgeStore
 from app.provider.vision import DevelopmentVLMProvider, QwenVLMProvider, VLMProvider
+from app.provider.sms import DevelopmentSmsProvider, SmsProvider
 from app.provider.wechat import (
     DevelopmentWeChatAuthProvider,
     ProductionWeChatAuthProvider,
@@ -109,6 +110,11 @@ def build_reranker_provider(settings: Settings) -> RerankerProvider:
             model=settings.reranker_model,
         )
     return DevelopmentRerankerProvider(settings.reranker_provider_behavior)
+
+
+def build_sms_provider(settings: Settings) -> SmsProvider:
+    del settings
+    return DevelopmentSmsProvider()
 
 
 def build_wechat_auth_provider(settings: Settings) -> WeChatAuthProvider:

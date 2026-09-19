@@ -20,3 +20,4 @@ class MeData(BaseModel):
     roles: list[str]
     permissions: list[str]
     scopes: list[GrantedScopeData]
+    profile_completed: bool = False

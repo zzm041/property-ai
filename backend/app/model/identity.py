@@ -10,6 +10,7 @@ from sqlalchemy import (
     ForeignKey,
     ForeignKeyConstraint,
     Index,
+    Integer,
     String,
     UniqueConstraint,
     text,
@@ -353,3 +354,173 @@ class AuditLog(BigIntPrimaryKeyMixin, Base):
         nullable=True,
     )
     created_at: Mapped[datetime] = _created_at_column()
+
+
+class UserPhone(BigIntPrimaryKeyMixin, TimestampMixin, Base):
+    __tablename__ = "user_phones"
+    __table_args__ = (
+        CheckConstraint(
+            "BINARY status IN ('ACTIVE', 'ENDED')",
+            name="status",
+        ),
+        CheckConstraint(
+            "("
+            "BINARY status = 'ACTIVE' AND ended_at IS NULL AND verified_at IS NOT NULL"
+            ") OR ("
+            "BINARY status = 'ENDED' AND ended_at IS NOT NULL"
+            ")",
+            name="active_window",
+        ),
+        UniqueConstraint(
+            "phone_e164",
+            "active_phone_key",
+            name="uq_user_phones_active_e164",
+        ),
+        UniqueConstraint(
+            "user_id",
+            "active_phone_key",
+            name="uq_user_phones_active_user",
+        ),
+        Index("ix_user_phones_user_id", "user_id", "id"),
+        MYSQL_TABLE_OPTIONS,
+    )
+
+    user_id: Mapped[int] = mapped_column(
+        BigInteger,
+        ForeignKey(
+            "users.id",
+            name="fk_user_phones_user_id_users",
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+        ),
+        nullable=False,
+    )
+    phone_e164: Mapped[str] = mapped_column(String(16), nullable=False)
+    status: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default="ACTIVE",
+        server_default=text("'ACTIVE'"),
+    )
+    verified_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
+    ended_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
+    active_phone_key: Mapped[int | None] = mapped_column(
+        mysql.TINYINT(),
+        Computed(
+            "CASE WHEN BINARY status = 'ACTIVE' THEN 1 ELSE NULL END",
+            persisted=True,
+        ),
+        nullable=True,
+    )
+
+
+class UserPassword(BigIntPrimaryKeyMixin, TimestampMixin, Base):
+    __tablename__ = "user_passwords"
+    __table_args__ = (
+        CheckConstraint(
+            "BINARY password_algo = 'argon2id'",
+            name="password_algo",
+        ),
+        UniqueConstraint("user_id", name="uq_user_passwords_user_id"),
+        MYSQL_TABLE_OPTIONS,
+    )
+
+    user_id: Mapped[int] = mapped_column(
+        BigInteger,
+        ForeignKey(
+            "users.id",
+            name="fk_user_passwords_user_id_users",
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+        ),
+        nullable=False,
+    )
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    password_algo: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default="argon2id",
+        server_default=text("'argon2id'"),
+    )
+
+
+class SmsChallenge(BigIntPrimaryKeyMixin, Base):
+    __tablename__ = "sms_challenges"
+    __table_args__ = (
+        CheckConstraint(
+            "BINARY purpose IN ('login', 'reset', 'change_phone', 'invite')",
+            name="purpose",
+        ),
+        CheckConstraint("attempts >= 0", name="attempts_non_negative"),
+        CheckConstraint("max_attempts >= 1", name="max_attempts_positive"),
+        UniqueConstraint(
+            "phone_e164",
+            "purpose",
+            "open_challenge_key",
+            name="uq_sms_challenges_open_phone_purpose",
+        ),
+        Index(
+            "ix_sms_challenges_phone_purpose",
+            "phone_e164",
+            "purpose",
+            "id",
+        ),
+        MYSQL_TABLE_OPTIONS,
+    )
+
+    phone_e164: Mapped[str] = mapped_column(String(16), nullable=False)
+    purpose: Mapped[str] = mapped_column(String(32), nullable=False)
+    code_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(UTCDateTime(), nullable=False)
+    attempts: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=0,
+        server_default=text("0"),
+    )
+    max_attempts: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=5,
+        server_default=text("5"),
+    )
+    consumed_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
+    client_fingerprint: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    open_challenge_key: Mapped[int | None] = mapped_column(
+        mysql.TINYINT(),
+        Computed(
+            "CASE WHEN consumed_at IS NULL THEN 1 ELSE NULL END",
+            persisted=True,
+        ),
+        nullable=True,
+    )
+    created_at: Mapped[datetime] = _created_at_column()
+
+
+class AuthSession(BigIntPrimaryKeyMixin, TimestampMixin, Base):
+    __tablename__ = "auth_sessions"
+    __table_args__ = (
+        CheckConstraint(
+            "BINARY auth_method IN ('sms', 'password', 'wechat')",
+            name="auth_method",
+        ),
+        UniqueConstraint("refresh_token_hash", name="uq_auth_sessions_refresh_hash"),
+        Index("ix_auth_sessions_user_id", "user_id", "id"),
+        MYSQL_TABLE_OPTIONS,
+    )
+
+    user_id: Mapped[int] = mapped_column(
+        BigInteger,
+        ForeignKey(
+            "users.id",
+            name="fk_auth_sessions_user_id_users",
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+        ),
+        nullable=False,
+    )
+    auth_method: Mapped[str] = mapped_column(String(32), nullable=False)
+    refresh_token_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(UTCDateTime(), nullable=False)
+    revoked_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
+    replaced_by_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)

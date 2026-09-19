@@ -164,7 +164,7 @@ class Employee(BigIntPrimaryKeyMixin, TimestampMixin, Base):
         MYSQL_TABLE_OPTIONS,
     )
 
-    user_id: Mapped[int] = mapped_column(
+    user_id: Mapped[int | None] = mapped_column(
         BigInteger,
         ForeignKey(
             "users.id",
@@ -172,7 +172,7 @@ class Employee(BigIntPrimaryKeyMixin, TimestampMixin, Base):
             ondelete="RESTRICT",
             onupdate="RESTRICT",
         ),
-        nullable=False,
+        nullable=True,
     )
     tenant_id: Mapped[int] = mapped_column(
         BigInteger,
@@ -448,4 +448,82 @@ class EmployeeDailyStatus(BigIntPrimaryKeyMixin, TimestampMixin, Base):
         nullable=False,
         default=0,
         server_default=text("0"),
+    )
+
+
+class EmployeeInvite(BigIntPrimaryKeyMixin, TimestampMixin, Base):
+    __tablename__ = "employee_invites"
+    __table_args__ = (
+        CheckConstraint(
+            "BINARY status IN ('ACTIVE', 'CONSUMED', 'REVOKED', 'EXPIRED')",
+            name="status",
+        ),
+        CheckConstraint("attempts >= 0", name="attempts_non_negative"),
+        UniqueConstraint("token_hash", name="uq_employee_invites_token_hash"),
+        UniqueConstraint(
+            "employee_id",
+            "active_invite_key",
+            name="uq_employee_invites_active_employee",
+        ),
+        ForeignKeyConstraint(
+            ["employee_id", "tenant_id"],
+            ["employees.id", "employees.tenant_id"],
+            name="fk_employee_invites_employee_tenant_employees",
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+        ),
+        MYSQL_TABLE_OPTIONS,
+    )
+
+    employee_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    tenant_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    target_phone_e164: Mapped[str] = mapped_column(String(16), nullable=False)
+    token_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    inviter_user_id: Mapped[int] = mapped_column(
+        BigInteger,
+        ForeignKey(
+            "users.id",
+            name="fk_employee_invites_inviter_user_id_users",
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+        ),
+        nullable=False,
+    )
+    status: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        default="ACTIVE",
+        server_default=text("'ACTIVE'"),
+    )
+    expires_at: Mapped[datetime] = mapped_column(UTCDateTime(), nullable=False)
+    attempts: Mapped[int] = mapped_column(
+        SmallInteger,
+        nullable=False,
+        default=0,
+        server_default=text("0"),
+    )
+    max_attempts: Mapped[int] = mapped_column(
+        SmallInteger,
+        nullable=False,
+        default=5,
+        server_default=text("5"),
+    )
+    claimed_user_id: Mapped[int | None] = mapped_column(
+        BigInteger,
+        ForeignKey(
+            "users.id",
+            name="fk_employee_invites_claimed_user_id_users",
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+        ),
+        nullable=True,
+    )
+    consumed_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
+    active_invite_key: Mapped[int | None] = mapped_column(
+        mysql.TINYINT(),
+        Computed(
+            "CASE WHEN BINARY status = 'ACTIVE' THEN 1 ELSE NULL END",
+            persisted=True,
+        ),
+        nullable=True,
     )

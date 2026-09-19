@@ -2,7 +2,65 @@ const { BASE_URL } = require("../config/env");
 const auth = require("./auth");
 const { isUnauthorized, messageFromError } = require("../utils/error");
 
-function request({ path, method, data, headers }) {
+const CREDENTIAL_AUTH_PATHS = {
+  "/auth/wechat/login": true,
+  "/auth/wechat/bind": true,
+  "/auth/sms/send": true,
+  "/auth/sms/login": true,
+  "/auth/password/login": true,
+  "/auth/password/reset": true,
+  "/auth/token/refresh": true,
+  "/auth/dev/token": true,
+  "/auth/logout": true,
+};
+
+function sendUnauthorizedToLogin() {
+  auth.clearSession();
+  wx.reLaunch({ url: "/pages/login/login" });
+}
+
+let refreshInFlight = null;
+
+function refreshSessionOnce() {
+  if (refreshInFlight) {
+    return refreshInFlight;
+  }
+  const refreshToken = auth.getRefreshToken();
+  if (!refreshToken) {
+    return Promise.reject(new Error("请重新登录"));
+  }
+  refreshInFlight = new Promise((resolve, reject) => {
+    wx.request({
+      url: `${BASE_URL}/auth/token/refresh`,
+      method: "POST",
+      header: { "Content-Type": "application/json" },
+      data: { refresh_token: refreshToken },
+      success: (response) => {
+        const payload = response.data || {};
+        if (response.statusCode >= 400) {
+          reject(new Error(messageFromError(payload, "请重新登录")));
+          return;
+        }
+        const data = payload.data || {};
+        if (!data.access_token) {
+          reject(new Error("请重新登录"));
+          return;
+        }
+        auth.setToken(data.access_token);
+        if (data.refresh_token) {
+          auth.setRefreshToken(data.refresh_token);
+        }
+        resolve(data);
+      },
+      fail: () => reject(new Error("网络不可用")),
+    });
+  }).finally(() => {
+    refreshInFlight = null;
+  });
+  return refreshInFlight;
+}
+
+function request({ path, method, data, headers, retried }) {
   if (!BASE_URL) {
     return Promise.reject(new Error("未配置 API 地址"));
   }
@@ -28,13 +86,35 @@ function request({ path, method, data, headers }) {
       success: (response) => {
         const payload = response.data || {};
         if (isUnauthorized(response.statusCode, payload)) {
-          auth.clearSession();
-          wx.reLaunch({ url: "/pages/login/login" });
+          if (CREDENTIAL_AUTH_PATHS[path]) {
+            reject(new Error(messageFromError(payload, "认证失败")));
+            return;
+          }
+          const latestToken = auth.getToken();
+          if (!retried && latestToken && latestToken !== token) {
+            request({ path, method, data, headers, retried: true })
+              .then(resolve)
+              .catch(reject);
+            return;
+          }
+          if (!retried && auth.getRefreshToken()) {
+            refreshSessionOnce()
+              .then(() =>
+                request({ path, method, data, headers, retried: true })
+              )
+              .then(resolve)
+              .catch(() => {
+                sendUnauthorizedToLogin();
+                reject(new Error("请重新登录"));
+              });
+            return;
+          }
+          sendUnauthorizedToLogin();
           reject(new Error("请重新登录"));
           return;
         }
         if (response.statusCode === 403) {
-          reject(new Error("无权限"));
+          reject(new Error(messageFromError(payload, "无权限")));
           return;
         }
         if (response.statusCode >= 400) {
@@ -48,7 +128,7 @@ function request({ path, method, data, headers }) {
   });
 }
 
-function uploadFile({ fileId, filePath }) {
+function uploadFile({ fileId, filePath, retried }) {
   if (!BASE_URL) {
     return Promise.reject(new Error("未配置 API 地址"));
   }
@@ -68,8 +148,24 @@ function uploadFile({ fileId, filePath }) {
           return;
         }
         if (isUnauthorized(response.statusCode, payload)) {
-          auth.clearSession();
-          wx.reLaunch({ url: "/pages/login/login" });
+          const latestToken = auth.getToken();
+          if (!retried && latestToken && latestToken !== token) {
+            uploadFile({ fileId, filePath, retried: true })
+              .then(resolve)
+              .catch(reject);
+            return;
+          }
+          if (!retried && auth.getRefreshToken()) {
+            refreshSessionOnce()
+              .then(() => uploadFile({ fileId, filePath, retried: true }))
+              .then(resolve)
+              .catch(() => {
+                sendUnauthorizedToLogin();
+                reject(new Error("请重新登录"));
+              });
+            return;
+          }
+          sendUnauthorizedToLogin();
           reject(new Error("请重新登录"));
           return;
         }
@@ -102,6 +198,31 @@ module.exports = {
   uploadFile,
   registerAndUpload,
   wechatLogin: (code) => request({ path: "/auth/wechat/login", method: "POST", data: { code } }),
+  wechatBind: (code) => request({ path: "/auth/wechat/bind", method: "POST", data: { code } }),
+  sendSms: (phone, purpose) =>
+    request({ path: "/auth/sms/send", method: "POST", data: { phone, purpose: purpose || "login" } }),
+  smsLogin: (phone, code) =>
+    request({ path: "/auth/sms/login", method: "POST", data: { phone, code } }),
+  passwordLogin: (phone, password) =>
+    request({ path: "/auth/password/login", method: "POST", data: { phone, password } }),
+  resetPassword: (phone, code, newPassword) =>
+    request({
+      path: "/auth/password/reset",
+      method: "POST",
+      data: { phone, code, new_password: newPassword },
+    }),
+  refreshToken: (refreshToken) =>
+    request({ path: "/auth/token/refresh", method: "POST", data: { refresh_token: refreshToken } }),
+  logout: (refreshToken) =>
+    request({ path: "/auth/logout", method: "POST", data: { refresh_token: refreshToken || undefined } }),
+  updateProfile: (displayName) =>
+    request({ path: "/me/profile", method: "PATCH", data: { display_name: displayName } }),
+  catalogProperties: () => request({ path: "/properties" }),
+  catalogBuildings: (propertyId) => request({ path: `/properties/${propertyId}/buildings` }),
+  catalogUnits: (buildingId) => request({ path: `/buildings/${buildingId}/units` }),
+  catalogHouses: (unitId) => request({ path: `/units/${unitId}/houses` }),
+  claimEmployee: (token) =>
+    request({ path: "/staff/employee-claim", method: "POST", data: { token } }),
   devToken: (seedKey) =>
     request({ path: "/auth/dev/token", method: "POST", data: { seed_key: seedKey } }),
   me: () => request({ path: "/me" }),

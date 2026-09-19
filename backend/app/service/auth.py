@@ -135,9 +135,17 @@ class AuthService:
                 message="Access token is invalid",
                 status_code=401,
             ) from exc
+        if claims.auth_method in {"sms", "password", "wechat"} and claims.session_id:
+            from app.service.credential_auth import CredentialAuthService
+
+            CredentialAuthService(self._session, settings=settings).require_active_session(
+                claims.session_id,
+                claims.user_id,
+            )
         return self.load_principal(
             claims.user_id,
             missing_user_code=AuthErrorCode.INVALID_TOKEN,
+            auth_method=claims.auth_method,
         )
 
     def load_principal(
@@ -145,6 +153,7 @@ class AuthService:
         user_id: int,
         *,
         missing_user_code: str = AuthErrorCode.INVALID_USER,
+        auth_method: str = "unknown",
     ) -> Principal:
         user = self._repository.get_user(user_id)
         if user is None:
@@ -160,6 +169,7 @@ class AuthService:
             status=user.status,
             display_name=user.display_name,
             grants=self._build_grants(records),
+            auth_method=auth_method,
         )
 
     @staticmethod

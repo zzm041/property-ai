@@ -1,0 +1,28 @@
+You are the read-only reviewer for repository D:\property-ai.
+Do not edit product source. Do not run tests that change MySQL/Redis/RabbitMQ/MinIO/Milvus or wipe data.
+Do not request Full Access. Do not do a full-repo audit.
+
+Read reports/project-handoff.md and reports/auth-identity-ai-001/.
+Reviewed HEAD commit is still 38d3d09; there is uncommitted software for AUTH-IDENTITY-AI-001.
+
+task_id: AUTH-IDENTITY-AI-001
+phase: review
+round: 3 of max 3 remediations
+
+Round 2 was NEEDS_CHANGES. Check whether these remediations are actually in the working tree:
+
+1. miniprogram/services/api.js shares one in-flight refresh (refreshInFlight) so concurrent 401s, including Promise.all on houses.js, cannot each rotate/replay the same refresh token and then clear a successful session.
+2. EmployeeIdentityService.claim and issue_invite lock the Employee row via EmployeeRepository.get_employee_for_update (SELECT ... FOR UPDATE) in addition to locking EmployeeInvite.
+
+Round 1 remediations that must still hold:
+OTP persist-then-raise; Redis Lua INCR+EXPIRE fail-closed; WeChat bind sms/password only; WeChat known-binding session+refresh; staging/production reject admin employee user_id; app.json no duplicate pages; credential-auth 401 does not clear session.
+
+Also re-check the authorized slice as before. Auto-dispatch remains SCHEMA_PENDING_0009 until mapped. 0009 not applied. DevAuth gated. project.config.json unstaged.
+
+PASS only if this slice matches the plan without secret leakage, without applying 0009 to persistent DBs, and without claiming real SMS/AI/Production V1.
+NEEDS_CHANGES for concrete in-scope defects (path + trigger + rationale).
+WAIT_HUMAN only for operator config or disposable TEST_DATABASE_URL 0009 upgrade.
+BLOCKED only if the slice itself cannot be accepted for a concrete reason.
+
+Do not tell the user to copy ordinary remediations.
+session_note: short. No secrets.

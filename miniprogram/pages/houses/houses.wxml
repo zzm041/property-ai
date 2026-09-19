@@ -1,17 +1,28 @@
 <view class="loading" wx:if="{{loading}}">加载中...</view>
-<view class="empty" wx:if="{{!loading && !items.length}}">暂无绑定房屋。可申请绑定合成测试房屋，等待物业审核。</view>
+<view class="empty" wx:if="{{!loading && !items.length}}">暂无绑定房屋。请按小区 / 楼栋 / 单元 / 房号申请，等待物业审核。</view>
 <view class="card" wx:for="{{items}}" wx:key="relation_id" data-id="{{item.house_id}}" bindtap="selectHouse">
-  房屋 {{item.house_id}} 房间 {{item.room_no}} {{item.status}} {{item.relation_type}}
+  {{item.room_no}} {{item.status}} {{item.relation_type}}
   <view class="empty">点此用该房屋报修</view>
 </view>
 <view class="card">
-  <view>申请绑定</view>
-  <input placeholder="房屋 ID" value="{{houseId}}" bindinput="onHouse" />
+  <view>申请绑定（按地址选择，无需填写房屋编号）</view>
+  <picker range="{{propertyNames}}" value="{{propertyIndex}}" bindchange="onProperty">
+    <view>小区：{{propertyNames[propertyIndex] || "请选择"}}</view>
+  </picker>
+  <picker range="{{buildingNames}}" value="{{buildingIndex}}" bindchange="onBuilding">
+    <view>楼栋：{{buildingNames[buildingIndex] || "请选择"}}</view>
+  </picker>
+  <picker range="{{unitNames}}" value="{{unitIndex}}" bindchange="onUnit">
+    <view>单元：{{unitNames[unitIndex] || "请选择"}}</view>
+  </picker>
+  <picker range="{{houseNames}}" value="{{houseIndex}}" bindchange="onHousePick">
+    <view>房号：{{houseNames[houseIndex] || "请选择"}}</view>
+  </picker>
   <button class="btn" bindtap="applyBind" disabled="{{loading}}">提交绑定申请</button>
 </view>
 <view class="card" wx:if="{{requests.length}}">
   <view>我的申请</view>
-  <view wx:for="{{requests}}" wx:key="id">{{item.id}} 房屋 {{item.house_id}} {{item.status}}</view>
+  <view wx:for="{{requests}}" wx:key="id">申请 {{item.id}} {{item.status}}</view>
 </view>
 <button class="btn" bindtap="retry">重试</button>
 <view class="error" wx:if="{{error}}">{{error}}</view>

@@ -223,7 +223,12 @@ class AuditService:
     @classmethod
     def _validate_detail_values(cls, details: dict[str, object]) -> None:
         for key, value in details.items():
-            if key == "auth_method" and value not in {"development", "wechat"}:
+            if key == "auth_method" and value not in {
+                "development",
+                "wechat",
+                "sms",
+                "password",
+            }:
                 cls._raise_invalid_details("auth_method is invalid")
             elif key == "token_type" and value != "access":
                 cls._raise_invalid_details("token_type is invalid")

@@ -1,0 +1,12 @@
+{
+  "status": "NOT_RUN",
+  "reason": "No authorized live credentials. Paid SMS/models were not invoked.",
+  "wechat_jscode2session": "NOT_RUN",
+  "sms_carrier": "NOT_RUN",
+  "realname": "NOT_RUN",
+  "llm": "NOT_RUN",
+  "vlm": "NOT_RUN",
+  "asr": "NOT_RUN",
+  "embedding": "NOT_RUN",
+  "reranker": "NOT_RUN"
+}

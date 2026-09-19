@@ -28,6 +28,11 @@ class EmployeeRepository:
     def get_employee(self, employee_id: int) -> Employee | None:
         return self._session.get(Employee, employee_id)
 
+    def get_employee_for_update(self, employee_id: int) -> Employee | None:
+        return self._session.scalar(
+            select(Employee).where(Employee.id == employee_id).with_for_update()
+        )
+
     def get_employee_in_tenant(
         self,
         *,

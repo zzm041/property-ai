@@ -46,6 +46,8 @@ class AccessTokenClaims:
     jwt_id: str
     token_type: str
     auth_method: str
+    session_id: str | None = None
+    session_id: str | None = None
 
 
 def issue_development_access_token(
@@ -84,6 +86,10 @@ def issue_development_access_token(
     return jwt.encode(payload, secret, algorithm=JWT_ALGORITHM)
 
 
+FORMAL_AUTH_METHODS = frozenset({"wechat", "sms", "password"})
+OFFICIAL_AUTH_METHODS = FORMAL_AUTH_METHODS
+
+
 def issue_access_token(
     user_id: int,
     settings: Settings,
@@ -91,6 +97,7 @@ def issue_access_token(
     auth_method: str,
     now: datetime | None = None,
     jwt_id: str | None = None,
+    session_id: str | None = None,
 ) -> str:
     if auth_method == "development":
         return issue_development_access_token(
@@ -99,10 +106,12 @@ def issue_access_token(
             now=now,
             jwt_id=jwt_id,
         )
-    if auth_method != "wechat":
+    if auth_method not in FORMAL_AUTH_METHODS:
         raise ValueError("Unsupported auth_method")
     if user_id <= 0 or isinstance(user_id, bool):
         raise ValueError("user_id must be a positive integer")
+    if auth_method in {"sms", "password"} and not session_id:
+        raise ValueError("session_id is required")
     current = now or utc_now()
     if current.tzinfo is None or current.utcoffset() is None:
         raise ValueError("JWT signing time must be timezone-aware")
@@ -117,8 +126,10 @@ def issue_access_token(
         "exp": expires_at,
         "jti": jwt_id or uuid4().hex,
         "token_type": "access",
-        "auth_method": "wechat",
+        "auth_method": auth_method,
     }
+    if session_id:
+        payload["sid"] = session_id
     secret = settings.app_secret_key.get_secret_value()
     if not secret:
         raise ValueError("APP_SECRET_KEY must not be empty")
@@ -146,7 +157,7 @@ def decode_access_token(
     auth_method = payload.get("auth_method")
     if auth_method == "development":
         return decode_development_access_token(token, settings)
-    if auth_method != "wechat":
+    if auth_method not in OFFICIAL_AUTH_METHODS:
         raise InvalidAccessTokenError("Access token claims are invalid")
     try:
         subject = payload["sub"]
@@ -165,6 +176,16 @@ def decode_access_token(
             raise ValueError
         if issued_at > expires_at or not_before > expires_at:
             raise ValueError
+        raw_sid = payload.get("sid")
+        session_id: str | None
+        if raw_sid is None:
+            session_id = None
+        elif isinstance(raw_sid, str) and raw_sid.isdecimal() and int(raw_sid) > 0:
+            session_id = raw_sid
+        else:
+            raise ValueError
+        if auth_method in {"sms", "password"} and session_id is None:
+            raise ValueError
     except (KeyError, TypeError, ValueError) as exc:
         raise InvalidAccessTokenError("Access token claims are invalid") from exc
     return AccessTokenClaims(
@@ -176,7 +197,8 @@ def decode_access_token(
         expires_at=expires_at,
         jwt_id=jwt_id,
         token_type="access",
-        auth_method="wechat",
+        auth_method=str(auth_method),
+        session_id=session_id,
     )
 
 

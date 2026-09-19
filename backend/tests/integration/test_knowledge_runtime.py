@@ -76,12 +76,8 @@ def test_wechat_login_issues_token_and_audit(identity_session: Session) -> None:
             json={"code": "wx-new-anon"},
             headers={"X-Request-Id": "t8-wx-new"},
         )
-        assert created.status_code == 200
-        assert created.json()["data"]["auth_method"] == "wechat"
-        token = created.json()["data"]["access_token"]
-        me = client.get("/api/v1/me", headers=_auth(token, "t8-wx-me"))
-        assert me.status_code == 200
-        assert me.json()["data"]["display_name"] == "微信用户"
+        assert created.status_code == 401
+        assert created.json()["error"]["code"] == "AUTH.WECHAT_BIND_REQUIRED"
         invalid = client.post(
             "/api/v1/auth/wechat/login",
             json={"code": "wx-invalid"},
@@ -94,12 +90,7 @@ def test_wechat_login_issues_token_and_audit(identity_session: Session) -> None:
             AuditLog.action == AuditAction.WECHAT_AUTH_TOKEN_ISSUED.value
         )
     ).all()
-    assert logs
-    for item in logs:
-        payload = item.details_json or {}
-        assert "code" not in payload
-        assert "session_key" not in payload
-        assert payload.get("auth_method") == "wechat"
+    assert logs == []
 
 
 def test_resident_query_returns_citation_and_blocks_other_property(

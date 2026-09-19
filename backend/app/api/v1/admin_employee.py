@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_principal
 from app.api.dependencies.db import get_db_session
+from app.core.config import Settings, get_settings
 from app.core.errors import AppError, EmployeeErrorCode
 from app.domain.iam import Principal
 from app.schema.common import request_id_for, success_envelope
@@ -16,9 +17,11 @@ from app.schema.employee import (
     EmployeeData,
     EmployeeDetailData,
     EmployeePropertyData,
+    IssueEmployeeInviteRequest,
     UpdateEmployeeRequest,
 )
 from app.service.employee import EmployeeService
+from app.service.employee_identity import EmployeeIdentityService
 
 router = APIRouter(prefix="/admin", tags=["admin-employees"])
 
@@ -27,6 +30,15 @@ def get_employee_service(
     session: Annotated[Session, Depends(get_db_session)],
 ) -> EmployeeService:
     return EmployeeService(session)
+
+
+def _reject_direct_user_id(*, user_id: int | None, settings: Settings) -> None:
+    if user_id is not None and settings.app_env not in {"development", "test"}:
+        raise AppError(
+            code=EmployeeErrorCode.INVALID_INPUT,
+            message="Direct user_id attach is not allowed",
+            status_code=400,
+        )
 
 
 def _employee_data(record) -> EmployeeData:
@@ -78,9 +90,11 @@ def create_employee(
     request: Request,
     actor: Annotated[Principal, Depends(get_current_principal)],
     service: Annotated[EmployeeService, Depends(get_employee_service)],
+    settings: Annotated[Settings, Depends(get_settings)],
     x_property_id: Annotated[str | None, Header(alias="X-Property-Id")] = None,
 ) -> dict[str, object]:
     _reject_header_mismatch(property_id=body.property_id, x_property_id=x_property_id)
+    _reject_direct_user_id(user_id=body.user_id, settings=settings)
     record = service.create_employee(
         actor=actor,
         user_id=body.user_id,
@@ -172,3 +186,23 @@ def end_employee_property(
         request,
         _assignment_data(assignment).model_dump(mode="json"),
     )
+
+
+@router.post("/employees/{employee_id}/invites")
+def issue_employee_invite(
+    employee_id: int,
+    body: IssueEmployeeInviteRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    settings: Annotated[Settings, Depends(get_settings)],
+    session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    token = EmployeeIdentityService(
+        session, secret=settings.app_secret_key.get_secret_value()
+    ).issue_invite(
+        actor=actor,
+        employee_id=employee_id,
+        target_phone=body.phone,
+        request_id=request_id_for(request),
+    )
+    return success_envelope(request, {"invite_token": token})

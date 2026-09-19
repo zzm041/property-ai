@@ -9,10 +9,13 @@ from app.api.v1.admin_resident import router as admin_resident_router
 from app.api.v1.announcements import router as announcements_router
 from app.api.v1.assistant import router as assistant_router
 from app.api.v1.auth import router as development_auth_router
+from app.api.v1.credential_auth import router as credential_auth_router
+from app.api.v1.employee_claim import router as employee_claim_router
 from app.api.v1.files import router as files_router
 from app.api.v1.health import router as health_router
 from app.api.v1.me import router as me_router
 from app.api.v1.notifications import router as notifications_router
+from app.api.v1.property_catalog import router as property_catalog_router
 from app.api.v1.resident import router as resident_router
 from app.api.v1.staff_attendance import router as staff_attendance_router
 from app.api.v1.staff_work_orders import router as staff_work_orders_router
@@ -29,10 +32,13 @@ def build_api_router(settings: Settings) -> APIRouter:
     router = APIRouter()
     router.include_router(health_router)
     router.include_router(me_router)
+    router.include_router(credential_auth_router)
+    router.include_router(property_catalog_router)
     router.include_router(resident_router)
     router.include_router(admin_resident_router)
     router.include_router(admin_employee_router)
     router.include_router(staff_attendance_router)
+    router.include_router(employee_claim_router)
     router.include_router(supervisor_staff_router)
     router.include_router(files_router)
     router.include_router(work_orders_router)

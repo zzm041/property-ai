@@ -4,8 +4,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Request
 
+from app.api.dependencies.auth import get_current_principal
+from app.core.errors import AppError, IamErrorCode
 from app.core.config import Settings, get_settings
 from app.core.database import get_session_factory
+from app.domain.iam import Principal
+from app.schema.auth import WeChatBindRequest
 from app.schema.common import request_id_for, success_envelope
 from app.schema.knowledge import AccessTokenWithMethodData, WeChatLoginRequest
 from app.service.wechat_auth import WeChatAuthService
@@ -33,5 +37,35 @@ def wechat_login(
         token_type="bearer",
         expires_in=token.expires_in,
         auth_method="wechat",
+        refresh_token=getattr(token, "refresh_token", None),
     )
     return success_envelope(request, data.model_dump(mode="json"))
+
+
+@router.post("/bind")
+def wechat_bind(
+    body: WeChatBindRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> dict[str, object]:
+    if actor.auth_method not in {"sms", "password"}:
+        raise AppError(
+            code=IamErrorCode.FORBIDDEN,
+            message="WeChat bind requires a verified phone session",
+            status_code=403,
+        )
+    session = get_session_factory(settings.active_database_url)()
+    try:
+        record = WeChatAuthService(session).bind(
+            user_id=actor.user_id,
+            code=body.code,
+            settings=settings,
+            request_id=request_id_for(request),
+        )
+    finally:
+        session.close()
+    return success_envelope(
+        request,
+        {"user_id": record.user_id, "appid": record.appid},
+    )

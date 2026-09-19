@@ -61,6 +61,7 @@ class Principal:
     status: str
     display_name: str
     grants: tuple[RoleGrant, ...]
+    auth_method: str = "unknown"
 
     @property
     def roles(self) -> frozenset[str]:

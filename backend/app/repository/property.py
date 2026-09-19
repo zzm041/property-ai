@@ -117,6 +117,23 @@ class PropertyRepository:
             .limit(limit)
         ).all()
 
+    def list_active_catalog_properties(
+        self,
+        *,
+        after_id: int = 0,
+        limit: int = 100,
+    ) -> Sequence[Property]:
+        return self._session.scalars(
+            select(Property)
+            .join(Tenant, Tenant.id == Property.tenant_id)
+            .where(
+                Tenant.status == "ACTIVE",
+                Property.id > after_id,
+            )
+            .order_by(Property.id)
+            .limit(limit)
+        ).all()
+
     def list_buildings(
         self,
         *,

@@ -1,0 +1,44 @@
+You are the read-only planner/reviewer for repository D:\property-ai.
+Do not edit product source. Do not run tests that change MySQL/Redis/RabbitMQ/MinIO/Milvus or wipe data.
+Do not request Full Access or sandbox bypass. Do not do a full-repo audit.
+
+Read reports/project-handoff.md. That is the current engineering fact sheet.
+Also confirm against docs/01-PRD.md, docs/02-ROLES-PERMISSIONS.md, docs/03-DOMAIN-MODEL.md, docs/05-AI-DISPATCH-SPEC.md, docs/06-API-CONTRACT.md and the actual code paths named in the handoff.
+
+task_id: AUTH-IDENTITY-AI-001
+phase: plan
+base_sha / reviewed_head: 38d3d09bf2e27154c4d106403cbfa9619026755a
+
+Operator authorization: stop Seed/Fake demo expansion. Implement official unified login, business identity bind, and real-AI core wiring. Keep VIS-001..004 as local vis only — not formal auth/real AI/Production V1 PASS. Do not delete missing V1 items. Do not occupy Alembic 0008. Do not migrate or wipe property_ai / property_ai_day4. Do not recreate shared tmpfs mysql-test. Do not ask the user to copy ordinary remediations. Do not buy services or send paid SMS/models. Do not echo secrets.
+
+Frozen rules Cursor must follow:
+- One User; stable user_id; no split resident/staff/admin account systems.
+- Formal login: phone+OTP; phone+password. Do NOT add a separate username login identity (display_name is display only).
+- WeChat is a credential on the same User; unknown openid must not silently create a merge-unsafe User as the only path; no auto-merge without proven ownership.
+- Valid session may restore; no session requires real credentials. Role picker is not auth.
+- DevAuth stays development/test-only; production must not register or accept it. Formal miniprogram path must not use /auth/dev/token. localPreview Seed may remain behind explicit local config only.
+- Backend must actually verify credentials. A new password/OTP box that still calls /auth/dev/token is a fail.
+- OTP: hashed, TTL, one-time consume, retry limits, send rate limits. No master OTP. Dev SMS substitute must be explicitly labeled and is not real-SMS acceptance.
+- Passwords stored as Argon2id (argon2-cffi already pinned). Reset/change invalidates old sessions per policy.
+- Resident: auth → profile → property/building/unit/room picker (no raw house_id on formal UI) → bind request → manager review. House query must not leak other residents.
+- Staff: reuse Employee, EmployeeProperty, Duty/Skill, RBAC. Controlled invite/verify to bind the person's User. Client role or typed employee_no must not grant admin.
+- Auto-dispatch: cannot remain permanently recommendations + human assign as the completed V1 path. Reuse hard filter + deterministic score; create Assignment under approved policy; low-confidence/no-candidate/high-risk/provider-fail → explicit human path. LLM must not pick employee_id. Human fallback ≠ cancelling auto-dispatch.
+- Real vs Fake evidence must not be mixed. Adapter-exists or HTTP 200 is not real-AI PASS.
+- New migration draft allowed. 0001–0007 frozen. 0008 reserved for outbox. Propose 0009 revising 0007. Schema review must name tables, constraints, existing-data impact, relation to outbox/claim, how to migrate/regress. Do not apply to persistent DBs in this plan.
+
+Return JSON matching the provided output schema.
+decision READY only if Cursor can start in-scope software work now without user secrets and without persistent-DB migrate.
+Use WAIT_HUMAN only for a single necessary operator action (credentials, persistent migrate approval, security risk). If some slices are WAIT_HUMAN, still READY the independent software slices and list the human gates in unverified — do not block the whole phase unless nothing can proceed.
+Use BLOCKED only if the authorized phase itself cannot start for a concrete in-scope reason.
+Do not expand into Day 5, CVE pin upgrades, or recreating containers.
+
+actions_or_findings must be concrete ordered implementation steps for Cursor (paths, tests, expected evidence). Sequence:
+1) Official credential auth (models, 0009 draft, SMS/password APIs, JWT auth_method sms|password, session revoke strategy, miniprogram formal login UI, DevAuth off formal path).
+2) House catalog HTTP APIs + miniprogram picker without house_id; keep bind/approve APIs.
+3) Employee invite/claim onto existing Employee (minimal; no second account system).
+4) Auto-assign wiring behind settings (default remains False on persistent env); tests that Assignment is created without human assign; system actor vs assigned_by_user_id NOT NULL must be resolved in the 0009 draft or an equivalent non-breaking approach you specify.
+5) Tests required: wrong password; wrong/expired/replayed OTP; unauthorized identity switch; unapproved house access; employee disabled; permission revoke; production DevAuth reject; Fake vs real AI not mixed.
+
+evidence_paths: files Cursor should produce (handoff already written; include migration draft, tests, pages, Codex review artifacts).
+unverified: real WeChat/SMS/realname/LLM/VLM/ASR/embedding live calls; persistent DB migrate; Production V1 PASS.
+session_note: short. Do not include tokens or secrets.

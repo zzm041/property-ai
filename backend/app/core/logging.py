@@ -24,7 +24,9 @@ _REDACT_TOKENS = (
     "accesstoken",
     "refresh_token",
     "refreshtoken",
-    "jwt",
+    "otp",
+    "sms_code",
+    "verification_code",
     "private_key",
     "privatekey",
     "credential",
@@ -45,7 +47,7 @@ _QUERY_SECRET_RE = re.compile(
     r"(?i)(secret|password|passwd|api_key|access_token|js_code|code|token)=([^\s&\"']+)"
 )
 _JSON_SECRET_RE = re.compile(
-    r'(?i)("(?:password|passwd|api_key|apikey|session_key|sessionkey|secret|authorization|access_token|refresh_token)"\s*:\s*)"(?:\\.|[^"\\])*"'
+    r'(?i)("(?:password|passwd|api_key|apikey|session_key|sessionkey|secret|authorization|access_token|refresh_token|otp|sms_code|verification_code|code)"\s*:\s*)"(?:\\.|[^"\\])*"'
 )
 _REPR_SECRET_RE = re.compile(
     r"(?i)(['\"]?(?:password|passwd|api_key|apikey|session_key|sessionkey|secret|authorization)['\"]?\s*[:=]\s*)(['\"])(?:\\.|[^'\\\"])*\2"

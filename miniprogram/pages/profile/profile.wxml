@@ -1,0 +1,12 @@
+<view class="card">
+  <view>完善资料</view>
+  <input placeholder="姓名" value="{{displayName}}" bindinput="onName" />
+  <button class="btn" bindtap="save" disabled="{{loading}}">保存</button>
+</view>
+<view class="card">
+  <button class="btn" bindtap="bindWechat" disabled="{{loading}}">绑定当前微信</button>
+  <view class="empty">微信只是同一账号的凭证，不会新建另一套身份。</view>
+</view>
+<button class="btn" bindtap="back">返回</button>
+<view class="loading" wx:if="{{loading}}">处理中...</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>

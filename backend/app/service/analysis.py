@@ -590,8 +590,14 @@ class AnalysisService:
                 self._write_recommendations(record, analysis, mapped, snapshot.building_id)
                 self._append_success_audit(record, analysis, request_id, mapped)
                 if analysis.status == AnalysisStatus.COMPLETED.value:
+                    from app.service.auto_dispatch import AutoDispatchService
                     from app.service.incident import IncidentService
 
+                    AutoDispatchService(self._session, settings=self._settings).maybe_assign(
+                        work_order=record,
+                        mapped=mapped,
+                        request_id=request_id,
+                    )
                     IncidentService(self._session, settings=self._settings).aggregate_locked(
                         record,
                         request_id=request_id,

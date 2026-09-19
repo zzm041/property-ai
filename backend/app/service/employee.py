@@ -89,7 +89,7 @@ class EmployeeService:
         self,
         *,
         actor: Principal,
-        user_id: int,
+        user_id: int | None,
         tenant_id: int,
         employee_no: str,
         property_id: int,
@@ -99,7 +99,8 @@ class EmployeeService:
         skill_ids: tuple[int, ...] = (),
         max_capacity: int = 1,
     ) -> Employee:
-        self._require_positive_id(user_id, "user_id")
+        if user_id is not None:
+            self._require_positive_id(user_id, "user_id")
         self._require_positive_id(tenant_id, "tenant_id")
         self._require_positive_id(property_id, "property_id")
         self._validate_employee_no(employee_no)
@@ -348,7 +349,7 @@ class EmployeeService:
         self,
         *,
         actor: Principal,
-        user_id: int,
+        user_id: int | None,
         tenant_id: int,
         employee_no: str,
         property_id: int,
@@ -365,14 +366,17 @@ class EmployeeService:
             property_id=property_id,
             permission=EMPLOYEE_MANAGE,
         )
-        user = IdentityRepository(self._session).get_user(user_id)
-        if user is None or user.status != "ACTIVE":
-            raise AppError(
-                code=EmployeeErrorCode.INVALID_INPUT,
-                message="Target user is not available",
-                status_code=422,
-                details={"field": "user_id"},
-            )
+        resolved_user_id = None
+        if user_id is not None:
+            user = IdentityRepository(self._session).get_user(user_id)
+            if user is None or user.status != "ACTIVE":
+                raise AppError(
+                    code=EmployeeErrorCode.INVALID_INPUT,
+                    message="Target user is not available",
+                    status_code=422,
+                    details={"field": "user_id"},
+                )
+            resolved_user_id = user.id
         department = None
         if department_id is not None:
             self._require_positive_id(department_id, "department_id")
@@ -387,7 +391,7 @@ class EmployeeService:
                     status_code=404,
                 )
         employee = Employee(
-            user_id=user.id,
+            user_id=resolved_user_id,
             tenant_id=property_record.tenant_id,
             employee_no=employee_no,
             department_id=None if department is None else department.id,
@@ -427,7 +431,9 @@ class EmployeeService:
             request_id=request_id,
             scope_type=ScopeType.TENANT,
             tenant_id=employee.tenant_id,
-            details={"employee_no": employee.employee_no, "user_id": employee.user_id},
+            details={"employee_no": employee.employee_no}
+            if employee.user_id is None
+            else {"employee_no": employee.employee_no, "user_id": employee.user_id},
         )
         self._append_audit(
             action=AuditAction.EMPLOYEE_PROPERTY_ASSIGNED,

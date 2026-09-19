@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class CreateEmployeeRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    user_id: int = Field(gt=0)
+    user_id: int | None = Field(default=None, gt=0)
     tenant_id: int = Field(gt=0)
     employee_no: str = Field(min_length=1, max_length=32)
     property_id: int = Field(gt=0)
@@ -24,6 +24,18 @@ class UpdateEmployeeRequest(BaseModel):
     status: str | None = None
     department_id: int | None = Field(default=None, gt=0)
     max_capacity: int | None = Field(default=None, ge=1, le=100)
+
+
+class IssueEmployeeInviteRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    phone: str = Field(min_length=8, max_length=20)
+
+
+class ClaimEmployeeInviteRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    token: str = Field(min_length=8, max_length=128)
 
 
 class AssignEmployeePropertyRequest(BaseModel):
@@ -50,7 +62,7 @@ class UpdateAttendanceStatusRequest(BaseModel):
 
 class EmployeeData(BaseModel):
     id: int
-    user_id: int
+    user_id: int | None
     tenant_id: int
     employee_no: str
     department_id: int | None

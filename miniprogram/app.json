@@ -2,10 +2,12 @@
   "pages": [
     "pages/login/login",
     "pages/home/home",
+    "pages/profile/profile",
     "pages/work-orders/create",
     "pages/work-orders/list",
     "pages/work-orders/detail",
     "pages/houses/houses",
+    "pages/employee-claim/employee-claim",
     "pages/announcements/list",
     "pages/announcements/detail",
     "pages/assistant/assistant",

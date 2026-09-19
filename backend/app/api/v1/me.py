@@ -3,20 +3,22 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Request
+from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_principal
+from app.api.dependencies.db import get_db_session
+from app.core.config import Settings, get_settings
 from app.domain.iam import Principal
-from app.schema.common import success_envelope
+from app.repository.identity import IdentityRepository
+from app.schema.auth import ProfileUpdateRequest
+from app.schema.common import request_id_for, success_envelope
 from app.schema.identity import GrantedScopeData, MeData
+from app.service.credential_auth import CredentialAuthService
 
 router = APIRouter(tags=["identity"])
 
 
-@router.get("/me")
-def get_me(
-    request: Request,
-    principal: Annotated[Principal, Depends(get_current_principal)],
-) -> dict[str, object]:
+def _me_data(principal: Principal, *, profile_completed: bool) -> MeData:
     ordered_grants = sorted(
         principal.grants,
         key=lambda grant: (
@@ -26,7 +28,7 @@ def get_me(
             grant.scope.property_id or 0,
         ),
     )
-    data = MeData(
+    return MeData(
         user_id=principal.user_id,
         status=principal.status,
         display_name=principal.display_name,
@@ -42,5 +44,49 @@ def get_me(
             )
             for grant in ordered_grants
         ],
+        profile_completed=profile_completed,
     )
-    return success_envelope(request, data.model_dump(mode="json"))
+
+
+@router.get("/me")
+def get_me(
+    request: Request,
+    principal: Annotated[Principal, Depends(get_current_principal)],
+    session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    user = IdentityRepository(session).get_user(principal.user_id)
+    completed = bool(
+        user is not None
+        and user.display_name
+        and not user.display_name.startswith("微信")
+        and "****" not in user.display_name
+    )
+    return success_envelope(
+        request,
+        _me_data(principal, profile_completed=completed).model_dump(mode="json"),
+    )
+
+
+@router.patch("/me/profile")
+def update_profile(
+    body: ProfileUpdateRequest,
+    request: Request,
+    principal: Annotated[Principal, Depends(get_current_principal)],
+    session: Annotated[Session, Depends(get_db_session)],
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> dict[str, object]:
+    user = CredentialAuthService(session, settings=settings).update_profile(
+        user_id=principal.user_id,
+        display_name=body.display_name,
+        request_id=request_id_for(request),
+    )
+    refreshed = Principal(
+        user_id=principal.user_id,
+        status=principal.status,
+        display_name=user.display_name,
+        grants=principal.grants,
+    )
+    return success_envelope(
+        request,
+        _me_data(refreshed, profile_completed=True).model_dump(mode="json"),
+    )

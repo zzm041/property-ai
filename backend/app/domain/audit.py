@@ -11,6 +11,15 @@ from app.domain.iam import OrganizationScope, ScopeType
 class AuditAction(StrEnum):
     DEV_AUTH_TOKEN_ISSUED = "DEV_AUTH_TOKEN_ISSUED"
     WECHAT_AUTH_TOKEN_ISSUED = "WECHAT_AUTH_TOKEN_ISSUED"
+    AUTH_SMS_TOKEN_ISSUED = "AUTH_SMS_TOKEN_ISSUED"
+    AUTH_PASSWORD_TOKEN_ISSUED = "AUTH_PASSWORD_TOKEN_ISSUED"
+    AUTH_PASSWORD_CHANGED = "AUTH_PASSWORD_CHANGED"
+    AUTH_PASSWORD_RESET = "AUTH_PASSWORD_RESET"
+    AUTH_SESSION_REVOKED = "AUTH_SESSION_REVOKED"
+    AUTH_PROFILE_UPDATED = "AUTH_PROFILE_UPDATED"
+    AUTH_WECHAT_BOUND = "AUTH_WECHAT_BOUND"
+    EMPLOYEE_INVITE_ISSUED = "EMPLOYEE_INVITE_ISSUED"
+    EMPLOYEE_CLAIMED = "EMPLOYEE_CLAIMED"
     IAM_USER_ROLE_GRANTED = "IAM_USER_ROLE_GRANTED"
     IAM_USER_ROLE_REVOKED = "IAM_USER_ROLE_REVOKED"
     IAM_ROLE_PERMISSION_GRANTED = "IAM_ROLE_PERMISSION_GRANTED"
@@ -77,6 +86,8 @@ class AuditResourceType(StrEnum):
     ANNOUNCEMENT = "ANNOUNCEMENT"
     KNOWLEDGE_DOCUMENT = "KNOWLEDGE_DOCUMENT"
     USER_WECHAT = "USER_WECHAT"
+    AUTH_SESSION = "AUTH_SESSION"
+    EMPLOYEE_INVITE = "EMPLOYEE_INVITE"
 
 
 class AuditSource(StrEnum):
@@ -155,6 +166,60 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             allowed_detail_keys=frozenset({"auth_method", "token_type"}),
             required_detail_keys=frozenset({"auth_method", "token_type"}),
             allowed_scope_types=frozenset({ScopeType.SYSTEM}),
+        ),
+        AuditAction.AUTH_SMS_TOKEN_ISSUED: AuditActionPolicy(
+            resource_type=AuditResourceType.USER,
+            allowed_detail_keys=frozenset({"auth_method", "token_type"}),
+            required_detail_keys=frozenset({"auth_method", "token_type"}),
+            allowed_scope_types=frozenset({ScopeType.SYSTEM}),
+        ),
+        AuditAction.AUTH_PASSWORD_TOKEN_ISSUED: AuditActionPolicy(
+            resource_type=AuditResourceType.USER,
+            allowed_detail_keys=frozenset({"auth_method", "token_type"}),
+            required_detail_keys=frozenset({"auth_method", "token_type"}),
+            allowed_scope_types=frozenset({ScopeType.SYSTEM}),
+        ),
+        AuditAction.AUTH_PASSWORD_CHANGED: AuditActionPolicy(
+            resource_type=AuditResourceType.USER,
+            allowed_detail_keys=frozenset({"auth_method"}),
+            required_detail_keys=frozenset({"auth_method"}),
+            allowed_scope_types=frozenset({ScopeType.SYSTEM}),
+        ),
+        AuditAction.AUTH_PASSWORD_RESET: AuditActionPolicy(
+            resource_type=AuditResourceType.USER,
+            allowed_detail_keys=frozenset({"auth_method"}),
+            required_detail_keys=frozenset({"auth_method"}),
+            allowed_scope_types=frozenset({ScopeType.SYSTEM}),
+        ),
+        AuditAction.AUTH_SESSION_REVOKED: AuditActionPolicy(
+            resource_type=AuditResourceType.AUTH_SESSION,
+            allowed_detail_keys=frozenset({"auth_method", "reason_code"}),
+            required_detail_keys=frozenset({"auth_method"}),
+            allowed_scope_types=frozenset({ScopeType.SYSTEM}),
+        ),
+        AuditAction.AUTH_PROFILE_UPDATED: AuditActionPolicy(
+            resource_type=AuditResourceType.USER,
+            allowed_detail_keys=frozenset({"auth_method"}),
+            required_detail_keys=frozenset(),
+            allowed_scope_types=frozenset({ScopeType.SYSTEM}),
+        ),
+        AuditAction.AUTH_WECHAT_BOUND: AuditActionPolicy(
+            resource_type=AuditResourceType.USER_WECHAT,
+            allowed_detail_keys=frozenset({"auth_method"}),
+            required_detail_keys=frozenset({"auth_method"}),
+            allowed_scope_types=frozenset({ScopeType.SYSTEM}),
+        ),
+        AuditAction.EMPLOYEE_INVITE_ISSUED: AuditActionPolicy(
+            resource_type=AuditResourceType.EMPLOYEE_INVITE,
+            allowed_detail_keys=frozenset({"employee_id"}),
+            required_detail_keys=frozenset({"employee_id"}),
+            allowed_scope_types=frozenset({ScopeType.TENANT}),
+        ),
+        AuditAction.EMPLOYEE_CLAIMED: AuditActionPolicy(
+            resource_type=AuditResourceType.EMPLOYEE,
+            allowed_detail_keys=frozenset({"employee_id", "user_id"}),
+            required_detail_keys=frozenset({"employee_id", "user_id"}),
+            allowed_scope_types=frozenset({ScopeType.TENANT}),
         ),
         AuditAction.IAM_USER_ROLE_GRANTED: AuditActionPolicy(
             resource_type=AuditResourceType.USER_ROLE,
@@ -237,7 +302,7 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
         AuditAction.EMPLOYEE_CREATED: AuditActionPolicy(
             resource_type=AuditResourceType.EMPLOYEE,
             allowed_detail_keys=_EMPLOYEE_CREATED_DETAIL_KEYS,
-            required_detail_keys=_EMPLOYEE_CREATED_DETAIL_KEYS,
+            required_detail_keys=frozenset({"employee_no"}),
             allowed_scope_types=frozenset({ScopeType.TENANT}),
         ),
         AuditAction.EMPLOYEE_UPDATED: AuditActionPolicy(

@@ -39,8 +39,21 @@ Page({
     this.onShow();
   },
   switchIdentity() {
-    require("../../services/auth").clearSession();
-    wx.reLaunch({ url: "/pages/login/login" });
+    this.logout();
+  },
+  logout() {
+    const auth = require("../../services/auth");
+    const api = require("../../services/api");
+    const refresh = auth.getRefreshToken();
+    const finish = () => {
+      auth.clearSession();
+      wx.reLaunch({ url: "/pages/login/login" });
+    };
+    if (!refresh) {
+      finish();
+      return;
+    }
+    api.logout(refresh).then(finish).catch(finish);
   },
   openLast() {
     const id = this.data.lastWorkOrderId;
