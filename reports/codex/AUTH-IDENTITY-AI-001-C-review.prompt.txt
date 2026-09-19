@@ -1,0 +1,29 @@
+Review AUTH-IDENTITY-AI-001-C on D:\property-ai. Read-only. Do not edit product source.
+
+Baseline:
+- Start HEAD 8269336c259f791d4e1d115b0e5c2111c16eab46 (parent 14c0e19). Working tree has C changes. Do not require HEAD equality if newer WIP exists; do not revert.
+- Isolated API 8083 is scripts/ops/serve_auth001_isolated_api.py → 127.0.0.1:3307/property_ai_auth001_test @ 20260919_0009 (probed). 8082 remains Day4. Port alone is not evidence.
+- Operator miniprogram/project.config.json must remain unstaged and unmodified by this task.
+- Closed security items stay closed without new evidence: SEC-REFRESH-STAGGER, SEC-WECHAT-BIND-401, SEC-EMPLOYEE-INVITE-LOCK-ORDER.
+
+This slice claims (verify against code, tests, evidence; reject overclaim):
+1. Password: min 8, uppercase not required, goodpass1 accepted, no hash/verify casefold, login does not apply new-password policy.
+2. Isolated official sessions: profile, house catalog cascade, bind+approve, employee invite/claim, workbench permissions; lowercase reset revokes old sessions. No Seed login, no SYSTEM grant, no SQL-stamped APPROVED/ACTIVE.
+3. Local release pack excludes pages/dev-login files without editing operator project.config.json. Evidence: scripts/ops/pack_miniprogram_release.py, tests/unit/test_release_pack.py, reports/auth-identity-ai-001/release-pack-inventory.json. Pack tree itself is gitignored. No upload.
+4. Self-host AI: inventory + recommendation only (reports/auth-identity-ai-001/self-host-recommendation.md). No running endpoint, no download, no rental. Recommended Qwen3-VL-4B-Instruct on operator-controlled 24GB GPU. Dev PC 5070 Ti 16GB is optional only. Disk ~14.8GiB free.
+
+Implementer tests this round:
+- pytest tests/unit: 319 passed
+- isolated auth+identity: 7 passed on property_ai_auth001_test
+Do not treat 318/6 as this-round numbers. Do not treat as full-repo integration.
+
+Unverified this round:
+- WeChat DevTools 9420 down: password-reset page screenshots not taken
+- Miniprogram visual bind/claim
+- Real SMS / WeChat / self-hosted inference / offline model independence
+- Auto-dispatch ORM mapping on 0007 shared DBs (do not demand mapping that breaks 0007)
+
+Fill every schema field including task_result, product_gap_changes, schedule_risk, next_action, approval_requests.
+next_action must be a concrete Cursor operation with completion conditions.
+Do not PASS Production V1, Day 4, real SMS, or real AI.
+Password uppercase is decided; do not list it as pending approval.

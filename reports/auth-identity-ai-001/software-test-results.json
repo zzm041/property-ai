@@ -1,6 +1,6 @@
 {
-  "task_id": "AUTH-IDENTITY-AI-001",
-  "head_at_test": "14c0e192fe0835c2b18dfce73fe200d0655b38d1 plus uncommitted login/0009 isolated follow-up",
+  "task_id": "AUTH-IDENTITY-AI-001-C",
+  "head_at_test": "8269336c259f791d4e1d115b0e5c2111c16eab46 plus uncommitted AUTH-IDENTITY-AI-001-C",
   "calendar": {
     "work_started": "2026-09-15",
     "operator_day5_confirmed": "2026-09-18",
@@ -9,57 +9,72 @@
   },
   "unit": {
     "command": "pytest tests/unit -q",
-    "passed": 318,
+    "passed": 320,
     "failed": 0,
     "skipped": 0,
-    "environment": "host .venv Python 3.12, no live vendors"
-  },
-  "shared_property_ai_test": {
-    "host_port_database": "127.0.0.1:3307/property_ai_test",
-    "alembic_revision": "20260917_0007",
-    "auth_tables": "absent (asserted, not skip-as-PASS)",
-    "command": "pytest tests/integration/test_migrations.py tests/integration/test_official_auth_runtime.py tests/integration/test_auth_identity_dispatch_migration.py -q",
-    "result": "included in 31 passed focused run with unit auth tests"
+    "environment": "host .venv Python 3.12, no live vendors",
+    "note": "320 is this-round unit count after FIX-1. Do not cite historical 318/319 as this slice."
   },
   "isolated_0009_runtime": {
     "host_port_database": "127.0.0.1:3307/property_ai_auth001_test",
     "alembic_revision": "20260919_0009",
-    "command": "python scripts/ops/provision_auth001_isolated_db.py",
-    "pytest": "tests/integration/test_isolated_auth_runtime.py",
-    "passed": 6,
+    "pytest": [
+      "tests/integration/test_isolated_auth_runtime.py",
+      "tests/integration/test_isolated_identity_runtime.py"
+    ],
+    "passed": 7,
     "failed": 0,
     "skipped": 0,
-    "note": "0007 synthetic user preserved; challenge/OTP/reset/session revoke exercised against real MySQL"
+    "note": "Prior 6 isolated auth tests plus 1 official-session bind/claim/lowercase-reset test. Not claimed as full-repo integration."
   },
   "isolated_live_api": {
+    "process": "python scripts/ops/serve_auth001_isolated_api.py PID 46740 started 2026-09-19T10:56:05Z after passwords.py 10:54:47Z",
     "base": "http://127.0.0.1:8083/api/v1",
     "does_not_replace": "http://127.0.0.1:8082/api/v1",
     "healthz": 200,
-    "challenge": 200,
-    "wrong_challenge_send": {"status": 401, "code": "AUTH.CHALLENGE_INVALID"},
-    "screenshots": "NOT_RUN"
+    "schema_probe": "127.0.0.1:3307/property_ai_auth001_test @ 20260919_0009"
+  },
+  "password_policy": {
+    "min_length": 8,
+    "uppercase_required": false,
+    "accepted_example": "goodpass1",
+    "casefold_on_hash": false,
+    "login_applies_new_policy": false
+  },
+  "release_pack": {
+    "script": "scripts/ops/pack_miniprogram_release.py",
+    "inventory": "reports/auth-identity-ai-001/release-pack-inventory.json",
+    "file_count": 79,
+    "dev_login_files": 0,
+    "dev_login_registered": false,
+    "operator_project_config_touched": false,
+    "upload_submit_publish": "NOT_RUN"
+  },
+  "miniprogram_devtools": {
+    "status": "NOT_RUN_THIS_ROUND",
+    "ws": "ws://127.0.0.1:9420",
+    "reason": "port 9420 not listening",
+    "historical_screenshots_only": ["login-password.png", "login-sms.png"],
+    "password_reset_page_screenshots": "NOT_RUN"
+  },
+  "self_host_ai": {
+    "status": "PLAN_ONLY",
+    "running_endpoint": false,
+    "local_gpu_optional": "RTX 5070 Ti 16GB",
+    "recommendation": "reports/auth-identity-ai-001/self-host-recommendation.md"
   },
   "development_sms": "software-process inbox only; not real SMS acceptance",
   "live_providers": "NOT_RUN",
   "persistent_db_migrate": "NOT_RUN",
-  "miniprogram_devtools": {
-    "status": "PARTIAL",
-    "ws": "ws://127.0.0.1:9420",
-    "screenshots": {
-      "login-password.png": "default password form; one 登录; 忘记密码/验证码登录; WeChat secondary; no Seed buttons",
-      "login-sms.png": "SMS replaces password; 获取验证码; 密码登录; no Seed buttons",
-      "password-reset.png": "NOT_RUN (automator timeout after SMS screenshot)"
-    },
-    "seed_buttons_on_ordinary_login": false,
-    "note": "Structural visual evidence only. Not formal credential/real-SMS PASS."
-  },
   "not_claimed": [
     "formal credential acceptance",
     "real SMS",
     "real WeChat",
     "real AI",
+    "self-hosted inference running",
+    "offline-independent model runtime",
+    "miniprogram page bind/claim visual",
     "Production V1",
-    "Day 4 PASS",
-    "WeChat DevTools login screenshot"
+    "Day 4 PASS"
   ]
 }

@@ -2,6 +2,7 @@
 
 from datetime import UTC, datetime
 from pathlib import Path
+import subprocess
 
 import jwt
 import pytest
@@ -233,6 +234,11 @@ def test_new_password_policy_rejects_weak_and_login_does_not_use_it() -> None:
 
     require_new_password("GoodPass1")
     require_new_password("Abcd1234")
+    require_new_password("goodpass1")
+    require_new_password("goodpass!")
+    require_new_password("一二三四五六七八")
+    require_new_password("😀😀😀😀😀😀😀😀")
+    require_new_password("１２３４５６７８")
     with pytest.raises(AppError) as digits:
         require_new_password("12345678")
     assert digits.value.code == "AUTH.WEAK_PASSWORD"
@@ -240,10 +246,19 @@ def test_new_password_policy_rejects_weak_and_login_does_not_use_it() -> None:
         require_new_password("abcdefgh")
     with pytest.raises(AppError):
         require_new_password("short")
+    with pytest.raises(AppError):
+        require_new_password("😀😀😀😀")
     assert password_strength("12345678") == "偏弱"
     assert password_strength("abcdefgh") == "偏弱"
+    assert password_strength("😀😀😀😀") == "偏弱"
+    assert password_strength("goodpass1") == "可用"
     assert password_strength("GoodPass1") in {"可用", "较强"}
     assert password_strength("CorrectHorse1!") == "较强"
+    digest = hash_password("goodpass1")
+    assert digest.startswith("$argon2id$")
+    assert verify_password(digest, "goodpass1")
+    assert not verify_password(digest, "GOODPASS1")
+    assert not verify_password(digest, "Goodpass1")
 
     source = (
         Path(__file__).resolve().parents[2] / "app" / "service" / "credential_auth.py"
@@ -257,6 +272,52 @@ def test_new_password_policy_rejects_weak_and_login_does_not_use_it() -> None:
     assert "def confirm_password_reset" in source
     confirm_pos = source.index("def confirm_password_reset")
     assert "require_new_password" in source[confirm_pos : source.index("def refresh")]
+    hasher = (
+        Path(__file__).resolve().parents[2] / "app" / "core" / "passwords.py"
+    ).read_text(encoding="utf-8")
+    hash_pos = hasher.index("def hash_password")
+    verify_pos = hasher.index("def verify_password")
+    strength_pos = hasher.index("def password_strength")
+    hash_body = hasher[hash_pos:verify_pos]
+    verify_body = hasher[verify_pos:strength_pos]
+    assert "casefold(" not in hash_body
+    assert "password.lower(" not in hash_body
+    assert "casefold(" not in verify_body
+    assert "password.lower(" not in verify_body
+    frontend = (
+        Path(__file__).resolve().parents[3] / "miniprogram" / "utils" / "password.js"
+    ).read_text(encoding="utf-8")
+    assert "toLowerCase" not in frontend
+    assert "toUpperCase" not in frontend
+    reset_page = (
+        Path(__file__).resolve().parents[3]
+        / "miniprogram"
+        / "pages"
+        / "password-reset"
+        / "password-reset.wxml"
+    ).read_text(encoding="utf-8")
+    assert "不强制大写" in reset_page
+    frontend_check = (
+        "const p=require('./miniprogram/utils/password');"
+        "if(!p.meetsCurrentPolicy('goodpass1')) process.exit(2);"
+        "if(p.strength('goodpass1')!=='可用') process.exit(3);"
+        "if(p.meetsCurrentPolicy('abcdefgh')) process.exit(4);"
+        "if(p.strength('abcdefgh')!=='偏弱') process.exit(5);"
+        "if(p.meetsCurrentPolicy('😀😀😀😀')) process.exit(6);"
+        "if(p.strength('😀😀😀😀')!=='偏弱') process.exit(7);"
+        "if(!p.meetsCurrentPolicy('😀😀😀😀😀😀😀😀')) process.exit(8);"
+        "if(!p.meetsCurrentPolicy('一二三四五六七八')) process.exit(9);"
+        "if(!p.meetsCurrentPolicy('１２３４５６７８')) process.exit(10);"
+        "if(p.codePoints('😀😀😀😀').length!==4) process.exit(11);"
+    )
+    completed = subprocess.run(
+        ["node", "-e", frontend_check],
+        cwd=Path(__file__).resolve().parents[3],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
 
 
 def test_isolated_auth_guard_rejects_shared_schemas_and_port_only() -> None:

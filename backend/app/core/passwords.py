@@ -1,13 +1,16 @@
 """Argon2id password hashing and the current new-password policy.
 
-Interim policy pending operator confirmation:
-- at least 8 characters (not a fixed width of 8, not digits-only)
-- case-sensitive; digits and symbols allowed
-- no silent truncation or case folding
-- login of an existing correct hash must not apply this policy
+Current new/reset password policy (operator decision 2026-09-19):
+- at least 8 Unicode code points (minimum length, not a fixed width of 8)
+- uppercase is not required; lowercase+digit (e.g. goodpass1) is accepted
+- reject ASCII-all-digit and ASCII-all-lowercase-letter passwords
+- hash and verify the original input; never lower/casefold before hashing
+- different casing is a different password; historical hashes stay exact-match
+- login of an existing correct hash must not apply this new-password policy
+- length and reject classes are shared with miniprogram/utils/password.js
 
-Not yet decided: longer minimum, mandatory character classes.
-Do not record this interim rule as formal Production V1 acceptance.
+Do not add extra character-class rules without a new operator decision.
+Do not record this rule as formal Production V1 acceptance.
 """
 
 from argon2 import PasswordHasher
@@ -20,13 +23,31 @@ NEW_PASSWORD_MIN_LENGTH = 8
 NEW_PASSWORD_MAX_LENGTH = 128
 
 
+def code_point_length(password: str) -> int:
+    """Count Unicode scalar values, not UTF-16 units."""
+
+    return len(password)
+
+
+def is_ascii_digits_only(password: str) -> bool:
+    return bool(password) and all("0" <= item <= "9" for item in password)
+
+
+def is_ascii_lowercase_letters_only(password: str) -> bool:
+    return bool(password) and all("a" <= item <= "z" for item in password)
+
+
 def hash_password(password: str) -> str:
+    """Hash the original input. Do not lower or casefold first."""
+
     if not password or not isinstance(password, str):
         raise ValueError("password is required")
     return _HASHER.hash(password)
 
 
 def verify_password(password_hash: str, password: str) -> bool:
+    """Compare the original input to the stored hash. Casing differences fail."""
+
     if not password_hash or not password:
         return False
     try:
@@ -41,16 +62,20 @@ def password_strength(password: str) -> str:
     if not password:
         return "未输入"
     classes = 0
-    if any(item.islower() for item in password):
+    if any("a" <= item <= "z" for item in password):
         classes += 1
-    if any(item.isupper() for item in password):
+    if any("A" <= item <= "Z" for item in password):
         classes += 1
-    if any(item.isdigit() for item in password):
+    if any("0" <= item <= "9" for item in password):
         classes += 1
     if any(not item.isalnum() for item in password):
         classes += 1
-    length = len(password)
-    if length < NEW_PASSWORD_MIN_LENGTH or password.isdigit() or classes < 2:
+    length = code_point_length(password)
+    if (
+        length < NEW_PASSWORD_MIN_LENGTH
+        or is_ascii_digits_only(password)
+        or classes < 2
+    ):
         return "偏弱"
     if length >= 12 and classes >= 3:
         return "较强"
@@ -64,19 +89,14 @@ def require_new_password(password: str) -> None:
             message="New password does not meet the current policy",
             status_code=422,
         )
-    if len(password) < NEW_PASSWORD_MIN_LENGTH or len(password) > NEW_PASSWORD_MAX_LENGTH:
+    length = code_point_length(password)
+    if length < NEW_PASSWORD_MIN_LENGTH or length > NEW_PASSWORD_MAX_LENGTH:
         raise AppError(
             code=AuthErrorCode.WEAK_PASSWORD,
             message="New password does not meet the current policy",
             status_code=422,
         )
-    if password.isdigit():
-        raise AppError(
-            code=AuthErrorCode.WEAK_PASSWORD,
-            message="New password does not meet the current policy",
-            status_code=422,
-        )
-    if password.lower() == password and password.isalpha():
+    if is_ascii_digits_only(password) or is_ascii_lowercase_letters_only(password):
         raise AppError(
             code=AuthErrorCode.WEAK_PASSWORD,
             message="New password does not meet the current policy",

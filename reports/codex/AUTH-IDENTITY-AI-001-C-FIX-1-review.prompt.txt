@@ -1,0 +1,13 @@
+Review AUTH-IDENTITY-AI-001-C-FIX-1 only. Read-only. Do not edit product source.
+
+Previous C review was NEEDS_CHANGES. Cursor applied:
+1. pack_miniprogram_release.py: destination must be under reports/ or tmp/, refuses protected paths and unmanaged dirs without sentinel; fail-path test keeps KEEP_ME.txt. Default out may replace previous pack.
+2. .gitignore restored `.cursor/*.log` and kept release-pack ignore.
+3. Password Unicode: code-point length; ASCII-all-digit and ASCII-all-lowercase-letter rejects; JS Array.from; tests include goodpass1, 4 emoji, 8 emoji, 8 Chinese, fullwidth digits.
+4. BGE-M3 license corrected to MIT with official card URL. Snapshot hashes still "pin at download".
+5. 8083 restarted: PID 46740, command serve_auth001_isolated_api.py, started 2026-09-19T10:56:05Z after passwords.py 10:54:47Z, healthz 200, schema probe 127.0.0.1:3307/property_ai_auth001_test @ 20260919_0009. 8082 still 200.
+
+Implementer tests after FIX-1: pytest tests/unit 320 passed. Pack 79 files, 0 dev-login. Operator project.config.json SHA-256 still 342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F, unstaged.
+
+Closed security items stay closed. Do not PASS V1/Day4/real SMS/real AI.
+Fill all schema fields. If remaining issues are documentation-only, say so in next_action.

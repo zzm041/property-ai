@@ -23,3 +23,14 @@ task_result, product_gap_changes, schedule_risk, next_action, approval_requests.
 next_action must be a concrete Cursor operation with completion conditions and permission needs.
 
 Calendar: git/spec work started 2026-09-15. Operator last confirmed actual development day 5 on 2026-09-18. Today is 2026-09-19 (do not reset the clock to "still day 5 with two days left"). Original one-week aim is approximately through 2026-09-21. If the date cannot be met, say why; do not delete features or relabel Fake as formal delivery.
+
+Current task AUTH-IDENTITY-AI-001-C (does not shrink Production V1):
+- Password: min 8 chars, uppercase not required, no silent casefold; login of existing hashes does not apply new-password policy. This decision is closed; do not list uppercase as pending approval.
+- Continue official auth on 8083 → 127.0.0.1:3307/property_ai_auth001_test @ 20260919_0009. Port 8082 remains Day4 Fake/DevAuth. Do not migrate/wipe other DBs. Verify process, code, target, and schema; port alone is not evidence.
+- Forgot-password page evidence, session revoke, resident bind/approve, employee invite/claim via official sessions. No Seed login, no SQL-stamped APPROVED/ACTIVE/CLOSED, no SYSTEM grant to bypass.
+- Local release pack must exclude pages/dev-login files without editing operator miniprogram/project.config.json. No upload/submit/publish.
+- AI default: licensed open-weight Qwen-family, self-hosted on operator/enterprise-controlled servers (rented GPU, owned, hosted, or private cloud). OpenAI-compatible to our server ≠ third-party cloud. Dev PC is optional verification only. Do not rent/buy or start billed instances without approval.
+- Isolated auto-dispatch only on a named exclusive synthetic environment. Do not remap assigned_source onto shared 0007 DBs in this slice if it breaks 0007 tests.
+- Closed security items SEC-REFRESH-STAGGER, SEC-WECHAT-BIND-401, SEC-EMPLOYEE-INVITE-LOCK-ORDER stay closed unless new evidence appears.
+
+Every review context must still include: overall goal, remaining V1 gaps, current task, approval scope, code version, related evidence, open issues, and next action.

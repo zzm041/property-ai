@@ -58,3 +58,6 @@ docker-compose.override.yml
 
 # Cursor / agent local
 .cursor/*.log
+
+# Local isolated miniprogram release-pack tree (inventory JSON is kept)
+reports/auth-identity-ai-001/release-pack/

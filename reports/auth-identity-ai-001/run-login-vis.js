@@ -49,9 +49,37 @@ function forbiddenLabels(labels) {
     resetButtons.push(((await button.text()) || "").trim());
   }
   await screenshot(miniProgram, "password-reset.png");
+  await page.setData({
+    step: 2,
+    newPassword: "goodpass1",
+    confirmPassword: "goodpass2",
+    strength: "可用",
+    error: "两次密码不一致",
+    showPassword: true,
+  });
+  await wait(300);
+  await screenshot(miniProgram, "password-reset-mismatch.png");
+  await page.setData({
+    newPassword: "abcdefgh",
+    confirmPassword: "abcdefgh",
+    strength: "偏弱",
+    error: "新密码不符合当前策略",
+    showPassword: false,
+  });
+  await wait(300);
+  await screenshot(miniProgram, "password-reset-weak.png");
+  await page.setData({
+    newPassword: "goodpass1",
+    confirmPassword: "goodpass1",
+    strength: "可用",
+    error: "",
+    showPassword: false,
+  });
+  await wait(300);
+  await screenshot(miniProgram, "password-reset-ready.png");
 
   writeJson("login-vis.json", {
-    task_id: "AUTH-IDENTITY-AI-001-B",
+    task_id: "AUTH-IDENTITY-AI-001-C",
     path_password: "pages/login/login",
     password_mode: passwordData.mode,
     password_buttons: passwordButtons,
@@ -60,7 +88,14 @@ function forbiddenLabels(labels) {
     reset_buttons: resetButtons,
     forbidden_on_password: forbiddenLabels(passwordButtons),
     forbidden_on_sms: forbiddenLabels(smsButtons),
-    evidence: ["login-password.png", "login-sms.png", "password-reset.png"],
+    evidence: [
+      "login-password.png",
+      "login-sms.png",
+      "password-reset.png",
+      "password-reset-mismatch.png",
+      "password-reset-weak.png",
+      "password-reset-ready.png",
+    ],
     not_claimed: ["real SMS", "Production V1", "Day 4 PASS"],
   });
   if (passwordData.mode !== "password") {
