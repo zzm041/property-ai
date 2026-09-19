@@ -192,6 +192,15 @@ class WorkOrderRepository:
             select(WorkOrderReceipt).where(WorkOrderReceipt.process_id == process_id)
         )
 
+    def list_receipts(self, work_order_id: int) -> tuple[WorkOrderReceipt, ...]:
+        return tuple(
+            self._session.scalars(
+                select(WorkOrderReceipt)
+                .where(WorkOrderReceipt.work_order_id == work_order_id)
+                .order_by(WorkOrderReceipt.id)
+            ).all()
+        )
+
     def list_feedbacks(self, work_order_id: int) -> tuple[WorkOrderFeedback, ...]:
         return tuple(
             self._session.scalars(

@@ -1,0 +1,29 @@
+.section-title {
+  font-weight: 600;
+  margin: 24rpx 0 16rpx;
+}
+
+.field-label {
+  color: #475467;
+  margin: 20rpx 0 8rpx;
+}
+
+.field {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 76rpx;
+  padding: 16rpx;
+  border: 1rpx solid #d0d5dd;
+  border-radius: 8rpx;
+}
+
+textarea.field {
+  min-height: 160rpx;
+}
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20rpx;
+}

@@ -2,8 +2,9 @@
 
 from datetime import datetime
 from decimal import Decimal
+from typing import Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class CreateWorkOrderRequest(BaseModel):
@@ -102,13 +103,26 @@ class StaffReceiptRequest(BaseModel):
     problem_type: str = Field(min_length=1, max_length=64)
     method: str = Field(min_length=1, max_length=255)
     materials: str | None = Field(default=None, max_length=255)
-    fee_amount: Decimal | None = None
-    fee_flag: str = Field(default="NONE", max_length=32)
+    fee_amount: Decimal | None = Field(
+        default=None,
+        gt=0,
+        max_digits=12,
+        decimal_places=2,
+    )
+    fee_flag: Literal["NONE", "RECORDED"] = "NONE"
     resolved: bool
     unresolved_reason: str | None = Field(default=None, max_length=255)
     follow_up: str | None = Field(default=None, max_length=255)
     file_ids: tuple[int, ...] = ()
     version: int | None = Field(default=None, ge=1)
+
+    @model_validator(mode="after")
+    def validate_fee_record(self) -> Self:
+        if self.fee_flag == "RECORDED" and self.fee_amount is None:
+            raise ValueError("fee_amount is required when fee_flag is RECORDED")
+        if self.fee_flag == "NONE" and self.fee_amount is not None:
+            raise ValueError("fee_amount must be omitted when fee_flag is NONE")
+        return self
 
 
 class StaffEscalateRequest(BaseModel):
@@ -175,6 +189,20 @@ class WorkOrderAssignmentData(BaseModel):
     reason: str | None
 
 
+class WorkOrderReceiptData(BaseModel):
+    id: int
+    process_id: int
+    problem_type: str
+    method: str
+    materials: str | None
+    fee_amount: Decimal | None
+    fee_flag: str
+    resolved: bool
+    unresolved_reason: str | None
+    follow_up: str | None
+    finished_at: datetime
+
+
 class WorkOrderData(BaseModel):
     id: int
     tenant_id: int
@@ -206,6 +234,7 @@ class WorkOrderDetailData(BaseModel):
     extra_notes: str | None = None
     media: list[WorkOrderMediaData] = Field(default_factory=list)
     assignments: list[WorkOrderAssignmentData] = Field(default_factory=list)
+    receipts: list[WorkOrderReceiptData] = Field(default_factory=list)
     logs: list[WorkOrderLogData] = Field(default_factory=list)
 
 

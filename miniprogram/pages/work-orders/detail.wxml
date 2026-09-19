@@ -8,6 +8,16 @@
   <button class="btn" wx:if="{{canConfirm}}" bindtap="confirm">确认解决</button>
   <button class="btn" wx:if="{{canReopen}}" bindtap="reopen">未解决重开</button>
 </view>
+<view class="card" wx:if="{{latestReceipt}}">
+  <view>处理回执</view>
+  <view>问题类型 {{latestReceipt.problem_type}}</view>
+  <view>处理方式与过程 {{latestReceipt.method}}</view>
+  <view wx:if="{{latestReceipt.materials}}">使用材料 {{latestReceipt.materials}}</view>
+  <view wx:if="{{latestReceipt.fee_flag === 'RECORDED'}}">费用记录 ¥{{latestReceipt.fee_amount}}</view>
+  <view wx:else>未产生费用</view>
+  <view wx:if="{{latestReceipt.follow_up}}">后续处理 {{latestReceipt.follow_up}}</view>
+  <view>完成时间 {{latestReceipt.finished_at}}</view>
+</view>
 <view class="card" wx:if="{{logs.length}}">
   <view>历史</view>
   <view wx:for="{{logs}}" wx:key="id">{{item.from_status}} → {{item.to_status}} {{item.event_code}}</view>

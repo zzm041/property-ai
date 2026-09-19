@@ -3,6 +3,7 @@ Page({
     item: null,
     workOrder: null,
     autoDispatched: false,
+    latestReceipt: null,
     logs: [],
     canConfirm: false,
     canReopen: false,
@@ -28,6 +29,7 @@ Page({
           const workOrder = workOrderOf(item);
           const status = workOrder ? workOrder.status : "";
           const assignments = (item && item.assignments) || [];
+          const receipts = (item && item.receipts) || [];
           const currentAssignment = assignments.length
             ? assignments[assignments.length - 1]
             : null;
@@ -39,6 +41,7 @@ Page({
               Boolean(currentAssignment) &&
               currentAssignment.reason === "AUTO_DISPATCH" &&
               currentAssignment.assigned_by_user_id == null,
+            latestReceipt: receipts.length ? receipts[receipts.length - 1] : null,
             logs: (item && item.logs) || [],
             canConfirm: status === "WAIT_CONFIRM",
             canReopen: status === "WAIT_CONFIRM",
@@ -64,7 +67,7 @@ Page({
     const { withLoading } = require("../../utils/ui");
     withLoading(this, () =>
       require("../../services/api")
-        .confirmWorkOrder(this.id)
+        .confirmWorkOrder(this.id, { version: this.data.workOrder.version })
         .then(() => this.reload())
     ).catch(() => {});
   },
@@ -72,7 +75,10 @@ Page({
     const { withLoading } = require("../../utils/ui");
     withLoading(this, () =>
       require("../../services/api")
-        .reopenWorkOrder(this.id, { reason: "未解决" })
+        .reopenWorkOrder(this.id, {
+          reason: "未解决",
+          version: this.data.workOrder.version,
+        })
         .then(() => this.reload())
     ).catch(() => {});
   },

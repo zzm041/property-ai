@@ -259,8 +259,8 @@ module.exports = {
     }),
   listWorkOrders: () => request({ path: "/work-orders" }),
   workOrder: (id) => request({ path: `/work-orders/${id}` }),
-  confirmWorkOrder: (id) =>
-    request({ path: `/work-orders/${id}/confirm`, method: "POST", data: {} }),
+  confirmWorkOrder: (id, body = {}) =>
+    request({ path: `/work-orders/${id}/confirm`, method: "POST", data: body }),
   reopenWorkOrder: (id, body) =>
     request({ path: `/work-orders/${id}/reopen`, method: "POST", data: body }),
   announcements: (propertyId) =>
@@ -283,10 +283,10 @@ module.exports = {
       data: { property_id: propertyId },
     }),
   staffWorkOrders: () => request({ path: "/staff/work-orders" }),
-  acceptWorkOrder: (id) =>
-    request({ path: `/staff/work-orders/${id}/accept`, method: "POST", data: {} }),
-  startWorkOrder: (id) =>
-    request({ path: `/staff/work-orders/${id}/start`, method: "POST", data: {} }),
+  acceptWorkOrder: (id, body = {}) =>
+    request({ path: `/staff/work-orders/${id}/accept`, method: "POST", data: body }),
+  startWorkOrder: (id, body = {}) =>
+    request({ path: `/staff/work-orders/${id}/start`, method: "POST", data: body }),
   feedbackWorkOrder: (id, body) =>
     request({ path: `/staff/work-orders/${id}/feedback`, method: "POST", data: body }),
   resolveWorkOrder: (id, body) =>

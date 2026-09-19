@@ -5,11 +5,25 @@
   <button class="btn" wx:if="{{canAccept}}" bindtap="accept">接单</button>
   <button class="btn" wx:if="{{canStart}}" bindtap="start">开始处理</button>
   <block wx:if="{{canFinish}}">
+    <view class="section-title">处理回执</view>
+    <view class="field-label">问题类型（必填）</view>
+    <input class="field" placeholder="例如：电气维修" value="{{problemType}}" bindinput="onProblemType" maxlength="64" />
+    <view class="field-label">处理方式与过程（必填）</view>
+    <textarea class="field" placeholder="说明检查、处理步骤和结果" value="{{method}}" bindinput="onMethod" maxlength="255"></textarea>
+    <view class="field-label">使用材料</view>
+    <input class="field" placeholder="无材料可留空" value="{{materials}}" bindinput="onMaterials" maxlength="255" />
+    <view class="switch-row">
+      <text>产生费用</text>
+      <switch checked="{{hasFee}}" bindchange="onHasFee" />
+    </view>
+    <input wx:if="{{hasFee}}" class="field" type="digit" placeholder="费用金额（元）" value="{{feeAmount}}" bindinput="onFeeAmount" />
+    <view class="field-label">后续处理方式</view>
+    <input class="field" placeholder="无需跟进可留空" value="{{followUp}}" bindinput="onFollowUp" maxlength="255" />
     <button class="btn" bindtap="chooseAfterImage">完工照片（可选）</button>
     <view class="empty" wx:if="{{mediaHint}}">{{mediaHint}}</view>
     <textarea placeholder="处理反馈（可选）" bindinput="onFeedback"></textarea>
     <button class="btn" bindtap="feedback">提交反馈</button>
-    <button class="btn" bindtap="resolve">填写回执并完成</button>
+    <button class="btn" bindtap="resolve" disabled="{{loading}}">提交完整回执并完成</button>
   </block>
 </view>
 <view class="card" wx:if="{{logs.length}}">

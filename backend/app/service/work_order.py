@@ -361,6 +361,7 @@ class WorkOrderService:
         WorkOrderContent | None,
         tuple[WorkOrderMedia, ...],
         tuple[WorkOrderAssignment, ...],
+        tuple[WorkOrderReceipt, ...],
         tuple[WorkOrderLog, ...],
     ]:
         record = self.get_work_order(actor=actor, work_order_id=work_order_id)
@@ -369,6 +370,7 @@ class WorkOrderService:
             self._repository.get_content(record.id),
             self._repository.list_media(record.id),
             self._repository.list_assignments(record.id),
+            self._repository.list_receipts(record.id),
             self._repository.list_logs(record.id),
         )
 

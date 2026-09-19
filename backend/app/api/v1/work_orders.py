@@ -24,6 +24,7 @@ from app.schema.work_order import (
     WorkOrderListData,
     WorkOrderLogData,
     WorkOrderMediaData,
+    WorkOrderReceiptData,
 )
 from app.service.work_order import WorkOrderService
 
@@ -130,10 +131,14 @@ def get_work_order(
     actor: Annotated[Principal, Depends(get_current_principal)],
     service: Annotated[WorkOrderService, Depends(get_work_order_service)],
 ) -> dict[str, object]:
-    record, content, media, assignments, logs = service.get_work_order_detail(
-        actor=actor,
-        work_order_id=work_order_id,
-    )
+    (
+        record,
+        content,
+        media,
+        assignments,
+        receipts,
+        logs,
+    ) = service.get_work_order_detail(actor=actor, work_order_id=work_order_id)
     detail = WorkOrderDetailData(
         work_order=work_order_data(record, overdue=service.is_overdue(record)),
         text=None if content is None else content.text,
@@ -161,6 +166,22 @@ def get_work_order(
                 reason=item.reason,
             )
             for item in assignments
+        ],
+        receipts=[
+            WorkOrderReceiptData(
+                id=item.id,
+                process_id=item.process_id,
+                problem_type=item.problem_type,
+                method=item.method,
+                materials=item.materials,
+                fee_amount=item.fee_amount,
+                fee_flag=item.fee_flag,
+                resolved=bool(item.resolved),
+                unresolved_reason=item.unresolved_reason,
+                follow_up=item.follow_up,
+                finished_at=item.finished_at,
+            )
+            for item in receipts
         ],
         logs=[
             WorkOrderLogData(
