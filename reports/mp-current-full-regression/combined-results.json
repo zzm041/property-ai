@@ -3,8 +3,12 @@
   "related": "AUTH-IDENTITY-AI-001-C",
   "baseline_run_id": "mp-cfull-20260919-1",
   "fix1_run_id": "mp-cfull-20260919-fix1",
-  "code_sha_baseline": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-  "api": "http://127.0.0.1:8083/api/v1",
+  "code_sha_product_patch": "b1458bf54a7cd66d8c4024c12f5b8f2125a148ea",
+  "automator_ws": {
+    "reset_segment": "ws://127.0.0.1:9434",
+    "claim_onward_segment": "ws://127.0.0.1:9435",
+    "note": "cli auto --auto-port; 9420/9433 are not this FIX-1 requirement"
+  },
   "revision": "20260919_0009",
   "provider_mode": "password=real; sms=development inbox; ai=Fake",
   "objects": {
@@ -128,12 +132,14 @@
       ],
       "note": "waitPath was login. File mp-cfull-20260919-fix1-reset-back-login.png lagged on the reset page and is not used as UI proof. Rendered login is mp-cfull-20260919-fix1-reset-old-password.png (phones redacted in public copy).",
       "run_id": "mp-cfull-20260919-fix1",
-      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "code_sha_product": "b1458bf54a7cd66d8c4024c12f5b8f2125a148ea",
       "api": "http://127.0.0.1:8083/api/v1",
       "revision": "20260919_0009",
       "provider_mode": "password=real; sms=development inbox; ai=Fake",
       "baseline_status": "PARTIAL",
-      "baseline_run_id": "mp-cfull-20260919-1"
+      "baseline_run_id": "mp-cfull-20260919-1",
+      "code_sha_baseline": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "product_patch": "invalid-invite-400 + DevTools FIX-1"
     },
     {
       "id": "AUTH-PASSWORD-LOGIN",
@@ -159,12 +165,14 @@
       ],
       "note": "UI old-password plus sidecar /me and /auth/token/refresh; tokens not written to reports",
       "run_id": "mp-cfull-20260919-fix1",
-      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "code_sha_product": "b1458bf54a7cd66d8c4024c12f5b8f2125a148ea",
       "api": "http://127.0.0.1:8083/api/v1",
       "revision": "20260919_0009",
       "provider_mode": "password=real; sms=development inbox; ai=Fake",
       "baseline_status": "PARTIAL",
-      "baseline_run_id": "mp-cfull-20260919-1"
+      "baseline_run_id": "mp-cfull-20260919-1",
+      "code_sha_baseline": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "product_patch": "invalid-invite-400 + DevTools FIX-1"
     },
     {
       "id": "RES-HOUSE-CASCADE",
@@ -280,11 +288,13 @@
       "note": "After invalid-invite 400 fix; navigated home → 账号与安全 → 员工邀请认领",
       "baseline_status": "FAIL",
       "run_id": "mp-cfull-20260919-fix1",
-      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "code_sha_product": "b1458bf54a7cd66d8c4024c12f5b8f2125a148ea",
       "api": "http://127.0.0.1:8083/api/v1",
       "revision": "20260919_0009",
       "provider_mode": "password=real; sms=development inbox; ai=Fake",
-      "baseline_run_id": "mp-cfull-20260919-1"
+      "baseline_run_id": "mp-cfull-20260919-1",
+      "code_sha_baseline": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "product_patch": "invalid-invite-400 + DevTools FIX-1"
     },
     {
       "id": "WO-CREATE",
@@ -499,12 +509,14 @@
       "evidence": [],
       "note": "UI TTL wait skipped; not claimed as page PASS",
       "run_id": "mp-cfull-20260919-fix1",
-      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "code_sha_product": "b1458bf54a7cd66d8c4024c12f5b8f2125a148ea",
       "api": "http://127.0.0.1:8083/api/v1",
       "revision": "20260919_0009",
       "provider_mode": "password=real; sms=development inbox; ai=Fake",
       "baseline_status": "NOT_RUN",
-      "baseline_run_id": "mp-cfull-20260919-1"
+      "baseline_run_id": "mp-cfull-20260919-1",
+      "code_sha_baseline": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "product_patch": "invalid-invite-400 + DevTools FIX-1"
     },
     {
       "id": "AUTH-SMS-REUSE",
@@ -517,12 +529,14 @@
         "mp-cfull-20260919-fix1-sms-reuse.png"
       ],
       "run_id": "mp-cfull-20260919-fix1",
-      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "code_sha_product": "b1458bf54a7cd66d8c4024c12f5b8f2125a148ea",
       "api": "http://127.0.0.1:8083/api/v1",
       "revision": "20260919_0009",
       "provider_mode": "password=real; sms=development inbox; ai=Fake",
       "baseline_status": "NOT_RUN",
-      "baseline_run_id": "mp-cfull-20260919-1"
+      "baseline_run_id": "mp-cfull-20260919-1",
+      "code_sha_baseline": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "product_patch": "invalid-invite-400 + DevTools FIX-1"
     },
     {
       "id": "INCIDENT-UI",
@@ -536,12 +550,14 @@
       ],
       "note": "list/empty only; no create/aggregate UI; raw propertyId control remains V1 UX gap",
       "run_id": "mp-cfull-20260919-fix1",
-      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "code_sha_product": "b1458bf54a7cd66d8c4024c12f5b8f2125a148ea",
       "api": "http://127.0.0.1:8083/api/v1",
       "revision": "20260919_0009",
       "provider_mode": "password=real; sms=development inbox; ai=Fake",
       "baseline_status": "NOT_RUN",
-      "baseline_run_id": "mp-cfull-20260919-1"
+      "baseline_run_id": "mp-cfull-20260919-1",
+      "code_sha_baseline": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "product_patch": "invalid-invite-400 + DevTools FIX-1"
     },
     {
       "id": "STAFF-DAILY-PAGE",
@@ -554,12 +570,14 @@
         "mp-cfull-20260919-fix1-staff-daily.png"
       ],
       "run_id": "mp-cfull-20260919-fix1",
-      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "code_sha_product": "b1458bf54a7cd66d8c4024c12f5b8f2125a148ea",
       "api": "http://127.0.0.1:8083/api/v1",
       "revision": "20260919_0009",
       "provider_mode": "password=real; sms=development inbox; ai=Fake",
       "baseline_status": "NOT_RUN",
-      "baseline_run_id": "mp-cfull-20260919-1"
+      "baseline_run_id": "mp-cfull-20260919-1",
+      "code_sha_baseline": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "product_patch": "invalid-invite-400 + DevTools FIX-1"
     },
     {
       "id": "AUTH-RESET-RELOGIN",
@@ -572,10 +590,25 @@
         "mp-cfull-20260919-fix1-reset-relogin-home.png"
       ],
       "run_id": "mp-cfull-20260919-fix1",
-      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "code_sha_product": "b1458bf54a7cd66d8c4024c12f5b8f2125a148ea",
       "api": "http://127.0.0.1:8083/api/v1",
       "revision": "20260919_0009",
-      "provider_mode": "password=real; sms=development inbox; ai=Fake"
+      "provider_mode": "password=real; sms=development inbox; ai=Fake",
+      "code_sha_baseline": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "product_patch": "invalid-invite-400 + DevTools FIX-1"
+    },
+    {
+      "id": "AUTH-PASSWORD-POLICY",
+      "role": "resident",
+      "page": "pages/password-reset/password-reset",
+      "status": "PARTIAL",
+      "expected": "不强制大写；最少 8 字符；禁止纯数字/纯小写字母",
+      "actual": "no dedicated policy-only case; AUTH-RESET-MISMATCH recorded 偏弱 then 两次密码不一致; page copy includes 不强制大写",
+      "evidence": [
+        "mp-cfull-20260919-1-reset-mismatch.png"
+      ],
+      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "note": "Not a new product decision. Do not treat as a dedicated FIX-1 PASS."
     },
     {
       "id": "V1-RES-RELATION-HISTORY",
@@ -796,14 +829,80 @@
       "evidence": [],
       "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
       "note": "Full V1 denominator item; not removed as N/A"
+    },
+    {
+      "id": "V1-AUTH-LOCKOUT",
+      "status": "NOT_IMPLEMENTED",
+      "role": "mixed",
+      "page": null,
+      "expected": "密码/验证码失败计数与锁定窗口",
+      "actual": "not delivered in current mini-program build",
+      "evidence": [],
+      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "note": "Full V1 denominator item; not removed as N/A"
+    },
+    {
+      "id": "V1-EMBEDDING-RAG",
+      "status": "BLOCKED_ENV",
+      "role": "mixed",
+      "page": null,
+      "expected": "真实 Embedding/RAG 引用，租户小区可见性过滤",
+      "actual": "not delivered in current mini-program build",
+      "evidence": [],
+      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "note": "Full V1 denominator item; not removed as N/A"
+    },
+    {
+      "id": "V1-AI-FAIL-CREATE",
+      "status": "NOT_IMPLEMENTED",
+      "role": "mixed",
+      "page": null,
+      "expected": "AI 故障时工单仍创建成功进入人工队列",
+      "actual": "not delivered in current mini-program build",
+      "evidence": [],
+      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "note": "Full V1 denominator item; not removed as N/A"
+    },
+    {
+      "id": "V1-AUTO-DISPATCH-FILTER",
+      "status": "NOT_IMPLEMENTED",
+      "role": "mixed",
+      "page": null,
+      "expected": "自动派单硬过滤+评分+可追溯理由，禁止 LLM 点名",
+      "actual": "not delivered in current mini-program build",
+      "evidence": [],
+      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "note": "Full V1 denominator item; not removed as N/A"
+    },
+    {
+      "id": "V1-NTF-EVENTS",
+      "status": "NOT_IMPLEMENTED",
+      "role": "mixed",
+      "page": null,
+      "expected": "创建/派单/接单/状态/SLA/完成/公告通知事件覆盖",
+      "actual": "not delivered in current mini-program build",
+      "evidence": [],
+      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "note": "Full V1 denominator item; not removed as N/A"
+    },
+    {
+      "id": "V1-GOVERNANCE-OPS",
+      "status": "NOT_IMPLEMENTED",
+      "role": "mixed",
+      "page": null,
+      "expected": "健康检查、结构化日志、request_id、上传校验、幂等、并发接单",
+      "actual": "not delivered in current mini-program build",
+      "evidence": [],
+      "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+      "note": "Full V1 denominator item; not removed as N/A"
     }
   ],
   "counts": {
     "PASS": 34,
-    "BLOCKED_ENV": 4,
-    "NOT_IMPLEMENTED": 32,
-    "PARTIAL": 6
+    "BLOCKED_ENV": 5,
+    "NOT_IMPLEMENTED": 37,
+    "PARTIAL": 7
   },
-  "total": 76,
+  "total": 83,
   "headline": "回归完成，仍有缺口"
 }

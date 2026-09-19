@@ -16,16 +16,21 @@
   "api": "http://127.0.0.1:8083/api/v1",
   "revision": "20260919_0009",
   "database": "127.0.0.1:3307/property_ai_auth001_test",
-  "automator_ws_fix1": "ws://127.0.0.1:9435",
+  "code_sha_product_patch": "b1458bf54a7cd66d8c4024c12f5b8f2125a148ea",
+  "automator_ws": {
+    "reset_segment": "ws://127.0.0.1:9434",
+    "claim_onward_segment": "ws://127.0.0.1:9435",
+    "note": "cli auto --auto-port; 9420/9433 are not this FIX-1 requirement"
+  },
   "devtools_http": "http://127.0.0.1:24540",
   "api_pid_now": 4596,
   "counts_current_pages_plus_v1_gaps": {
     "PASS": 34,
-    "BLOCKED_ENV": 4,
-    "NOT_IMPLEMENTED": 32,
-    "PARTIAL": 6
+    "BLOCKED_ENV": 5,
+    "NOT_IMPLEMENTED": 37,
+    "PARTIAL": 7
   },
-  "total_current_pages_plus_v1_gaps": 76,
+  "total_current_pages_plus_v1_gaps": 83,
   "first_round_counts_kept": {
     "PASS": 28,
     "FAIL": 1,

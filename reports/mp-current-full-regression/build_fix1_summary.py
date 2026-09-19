@@ -33,11 +33,47 @@ EXTRA_V1 = [
     {"id": "V1-PERF-RELEASE", "requirement": "性能与正式发布验证", "impl": "缺环境或权限", "ui_or_api": "none", "acceptance": "docs/10-ACCEPTANCE.md / Day 4"},
     {"id": "V1-HOUSE-ARCHIVE-UI", "requirement": "物业建楼栋房屋/导入导出页面", "impl": "功能尚未实现", "ui_or_api": "none", "prd": "docs/01-PRD.md §2.1"},
     {"id": "V1-REAL-ASR-VLM", "requirement": "真实 ASR/VLM 参与工单理解", "impl": "缺环境或权限", "ui_or_api": "none", "prd": "docs/01-PRD.md §8"},
+    {"id": "V1-AUTH-LOCKOUT", "requirement": "密码/验证码失败计数与锁定窗口", "impl": "不属于小程序页面、应单独后端验证", "ui_or_api": "API", "prd": "docs/01-PRD.md §1.1", "acceptance": "docs/10-ACCEPTANCE.md B8"},
+    {"id": "V1-EMBEDDING-RAG", "requirement": "真实 Embedding/RAG 引用，租户小区可见性过滤", "impl": "缺环境或权限", "ui_or_api": "none", "prd": "docs/01-PRD.md §12", "acceptance": "docs/10-ACCEPTANCE.md B6"},
+    {"id": "V1-AI-FAIL-CREATE", "requirement": "AI 故障时工单仍创建成功进入人工队列", "impl": "不属于小程序页面、应单独后端验证", "ui_or_api": "API", "prd": "docs/01-PRD.md §8", "acceptance": "docs/10-ACCEPTANCE.md B4"},
+    {"id": "V1-AUTO-DISPATCH-FILTER", "requirement": "自动派单硬过滤+评分+可追溯理由，禁止 LLM 点名", "impl": "页面存在但无真实接线", "ui_or_api": "API", "prd": "docs/01-PRD.md §9", "acceptance": "docs/10-ACCEPTANCE.md B3"},
+    {"id": "V1-NTF-EVENTS", "requirement": "创建/派单/接单/状态/SLA/完成/公告通知事件覆盖", "impl": "部分实现", "ui_or_api": "API", "prd": "docs/01-PRD.md §14"},
+    {"id": "V1-GOVERNANCE-OPS", "requirement": "健康检查、结构化日志、request_id、上传校验、幂等、并发接单", "impl": "不属于小程序页面、应单独后端验证", "ui_or_api": "API", "acceptance": "docs/10-ACCEPTANCE.md B8"},
 ]
 
+FIX1_OVERLAY_IDS = {
+    "AUTH-RESET",
+    "AUTH-RESET-REVOKE",
+    "AUTH-RESET-RELOGIN",
+    "STAFF-CLAIM-DUP",
+    "AUTH-SMS-REUSE",
+    "AUTH-SMS-EXPIRE",
+    "INCIDENT-UI",
+    "STAFF-DAILY-PAGE",
+}
+PRODUCT_PATCH = "b1458bf54a7cd66d8c4024c12f5b8f2125a148ea"
+
+MATRIX["items"].extend(
+    [
+        {"id": "MGR-TENANT-HOME", "requirement": "租户管理员首页入口", "role": "tenant_admin", "page": "pages/home/home", "impl": "已实现可测试", "ui_or_api": "UI"},
+        {"id": "RES-AFTER-APPROVE", "requirement": "批准后刷新可见有效房屋关系", "role": "resident", "page": "pages/home/home", "impl": "已实现可测试", "ui_or_api": "UI"},
+        {"id": "WO-REENTER", "requirement": "重新进入详情状态人员房屋历史一致", "role": "resident", "page": "pages/work-orders/detail", "impl": "已实现可测试", "ui_or_api": "UI"},
+        {"id": "STAFF-DAILY-PAGE", "requirement": "物业员工状态页", "role": "property_admin", "page": "pages/supervisor/staff", "impl": "已实现可测试", "ui_or_api": "UI"},
+        {"id": "AUTH-RESET-RELOGIN", "requirement": "重置后用新密码进入首页", "role": "resident", "page": "pages/home/home", "impl": "已实现可测试", "ui_or_api": "UI"},
+    ]
+)
+seen = set()
+unique_items = []
+for item in MATRIX["items"]:
+    if item["id"] in seen:
+        continue
+    seen.add(item["id"])
+    unique_items.append(item)
+MATRIX["items"] = unique_items
 MATRIX["extra_v1_from_prd_acceptance"] = EXTRA_V1
 MATRIX["denominator_includes_extra_v1"] = True
 MATRIX["fix1_run_id"] = "mp-cfull-20260919-fix1"
+MATRIX["product_patch"] = PRODUCT_PATCH
 (ROOT / "coverage-matrix.json").write_text(json.dumps(MATRIX, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 by_id = {row["id"]: dict(row) for row in FIRST["results"]}
@@ -47,6 +83,10 @@ for row in FIX1["results"]:
     if previous:
         merged["baseline_status"] = previous.get("status")
         merged["baseline_run_id"] = FIRST.get("run_id")
+    if row["id"] in FIX1_OVERLAY_IDS:
+        merged["code_sha_baseline"] = "ab0b8822b34ab26c4c2960dde00c157c3b141725"
+        merged["code_sha_product"] = PRODUCT_PATCH
+        merged["product_patch"] = "invalid-invite-400 + DevTools FIX-1"
     by_id[row["id"]] = merged
 
 # AUTH-RESET: first named screenshot lagged; login is proved by later unique shots.
@@ -54,12 +94,26 @@ if "AUTH-RESET" in by_id:
     by_id["AUTH-RESET"]["status"] = "PASS"
     by_id["AUTH-RESET"]["evidence"] = [
         "mp-cfull-20260919-fix1-reset-old-password.png",
+        "mp-cfull-20260919-fix1-reset-back-login-rendered.png",
         "mp-cfull-20260919-fix1-probe-login.png",
     ]
     by_id["AUTH-RESET"]["note"] = (
         "waitPath was login. File mp-cfull-20260919-fix1-reset-back-login.png lagged on the reset page and is not used as UI proof. "
         "Rendered login is mp-cfull-20260919-fix1-reset-old-password.png (phones redacted in public copy)."
     )
+
+if "AUTH-PASSWORD-POLICY" not in by_id:
+    by_id["AUTH-PASSWORD-POLICY"] = {
+        "id": "AUTH-PASSWORD-POLICY",
+        "role": "resident",
+        "page": "pages/password-reset/password-reset",
+        "status": "PARTIAL",
+        "expected": "不强制大写；最少 8 字符；禁止纯数字/纯小写字母",
+        "actual": "no dedicated policy-only case; AUTH-RESET-MISMATCH recorded 偏弱 then 两次密码不一致; page copy includes 不强制大写",
+        "evidence": ["mp-cfull-20260919-1-reset-mismatch.png"],
+        "code_sha_product": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "note": "Not a new product decision. Do not treat as a dedicated FIX-1 PASS.",
+    }
 
 combined_results = list(by_id.values())
 counts = Counter(row.get("status") for row in combined_results)
@@ -84,6 +138,12 @@ extra_status = {
     "V1-PERF-RELEASE": "BLOCKED_ENV",
     "V1-HOUSE-ARCHIVE-UI": "NOT_IMPLEMENTED",
     "V1-REAL-ASR-VLM": "BLOCKED_ENV",
+    "V1-AUTH-LOCKOUT": "NOT_IMPLEMENTED",
+    "V1-EMBEDDING-RAG": "BLOCKED_ENV",
+    "V1-AI-FAIL-CREATE": "NOT_IMPLEMENTED",
+    "V1-AUTO-DISPATCH-FILTER": "NOT_IMPLEMENTED",
+    "V1-NTF-EVENTS": "NOT_IMPLEMENTED",
+    "V1-GOVERNANCE-OPS": "NOT_IMPLEMENTED",
 }
 for item_id, status in extra_status.items():
     if item_id not in by_id:
@@ -102,6 +162,28 @@ for item_id, status in extra_status.items():
         )
 counts = Counter(row.get("status") for row in combined_results)
 
+req_by_id = {item["id"]: item for item in MATRIX["items"]}
+for extra in EXTRA_V1:
+    req_by_id.setdefault(extra["id"], extra)
+synced = []
+for row in combined_results:
+    base = dict(req_by_id.get(row["id"], {}))
+    base["id"] = row["id"]
+    base["requirement"] = base.get("requirement") or row.get("expected") or row["id"]
+    base["role"] = base.get("role") or row.get("role")
+    if "page" not in base:
+        base["page"] = row.get("page")
+    base["impl"] = base.get("impl") or "from_results"
+    base["ui_or_api"] = base.get("ui_or_api") or "UI"
+    base["result_status"] = row.get("status")
+    synced.append(base)
+MATRIX["items"] = synced
+MATRIX["extra_v1_from_prd_acceptance"] = EXTRA_V1
+MATRIX["denominator_ids"] = [row["id"] for row in combined_results]
+MATRIX["denominator_count"] = len(combined_results)
+assert {item["id"] for item in MATRIX["items"]} == {row["id"] for row in combined_results}
+(ROOT / "coverage-matrix.json").write_text(json.dumps(MATRIX, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
 hashes = {}
 for png in sorted(ROOT.glob("mp-cfull-20260919-fix1*.png")):
     hashes[png.name] = hashlib.sha256(png.read_bytes()).hexdigest()
@@ -111,8 +193,12 @@ combined = {
     "related": "AUTH-IDENTITY-AI-001-C",
     "baseline_run_id": FIRST.get("run_id"),
     "fix1_run_id": FIX1.get("run_id"),
-    "code_sha_baseline": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-    "api": "http://127.0.0.1:8083/api/v1",
+    "code_sha_product_patch": PRODUCT_PATCH,
+    "automator_ws": {
+        "reset_segment": "ws://127.0.0.1:9434",
+        "claim_onward_segment": "ws://127.0.0.1:9435",
+        "note": "cli auto --auto-port; 9420/9433 are not this FIX-1 requirement",
+    },
     "revision": "20260919_0009",
     "provider_mode": FIX1.get("provider_mode"),
     "objects": FIRST.get("objects"),
@@ -137,7 +223,12 @@ summary = {
     "api": "http://127.0.0.1:8083/api/v1",
     "revision": "20260919_0009",
     "database": "127.0.0.1:3307/property_ai_auth001_test",
-    "automator_ws_fix1": "ws://127.0.0.1:9435",
+    "code_sha_product_patch": PRODUCT_PATCH,
+    "automator_ws": {
+        "reset_segment": "ws://127.0.0.1:9434",
+        "claim_onward_segment": "ws://127.0.0.1:9435",
+        "note": "cli auto --auto-port; 9420/9433 are not this FIX-1 requirement",
+    },
     "devtools_http": "http://127.0.0.1:24540",
     "api_pid_now": 4596,
     "counts_current_pages_plus_v1_gaps": dict(counts),

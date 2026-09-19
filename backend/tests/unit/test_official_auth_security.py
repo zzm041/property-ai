@@ -9,7 +9,8 @@ import pytest
 
 from app.api.v1.admin_employee import _reject_direct_user_id
 from app.core.config import Settings
-from app.core.errors import AppError, EmployeeErrorCode
+from app.core.errors import AppError, EmployeeErrorCode, IamErrorCode
+from app.domain.iam import Principal
 from app.core.passwords import hash_password, verify_password
 from app.core.rate_limit import MemoryRateLimiter, RedisRateLimiter
 from app.core.security import (
@@ -194,6 +195,97 @@ def test_employee_claim_locks_employee_row() -> None:
         window = service[pos : pos + 120]
         assert "status_code=400" in window
         assert "status_code=401" not in window
+
+
+class _InviteQuery:
+    def __init__(self, result: object) -> None:
+        self._result = result
+
+    def filter(self, *args: object, **kwargs: object) -> "_InviteQuery":
+        return self
+
+    def with_for_update(self) -> "_InviteQuery":
+        return self
+
+    def one_or_none(self) -> object:
+        return self._result
+
+
+def _claim_actor() -> Principal:
+    return Principal(user_id=21, status="ACTIVE", display_name="staff2", grants=())
+
+
+def test_claim_unknown_or_consumed_invite_is_400_not_401(monkeypatch: pytest.MonkeyPatch) -> None:
+    from types import SimpleNamespace
+    from unittest.mock import MagicMock
+
+    from app.service.employee_identity import EmployeeIdentityService
+
+    monkeypatch.setattr(
+        "app.service.employee_identity.run_owned_transaction",
+        lambda session, fn: fn(),
+    )
+    session = MagicMock()
+    session.query.return_value = _InviteQuery(None)
+    service = EmployeeIdentityService(session, secret="test-secret")
+    with pytest.raises(AppError) as unknown:
+        service.claim(actor=_claim_actor(), token="not-a-real-token", request_id="r1")
+    assert unknown.value.status_code == 400
+    assert unknown.value.code == EmployeeErrorCode.INVALID_INPUT
+    session.commit.assert_not_called()
+    session.rollback.assert_not_called()
+
+    peeked = SimpleNamespace(employee_id=4)
+    consumed = SimpleNamespace(
+        employee_id=4,
+        status="CONSUMED",
+        expires_at=datetime(2099, 1, 1, tzinfo=UTC),
+        target_phone_e164="+8613900002881",
+    )
+    employee = SimpleNamespace(id=4, status="ACTIVE", user_id=None)
+    session.query.side_effect = [_InviteQuery(peeked), _InviteQuery(consumed)]
+    service._employees = MagicMock()
+    service._employees.get_employee_for_update.return_value = employee
+    with pytest.raises(AppError) as reused:
+        service.claim(actor=_claim_actor(), token="consumed-token", request_id="r2")
+    assert reused.value.status_code == 400
+    assert reused.value.code == EmployeeErrorCode.INVALID_INPUT
+    session.commit.assert_not_called()
+
+
+def test_claim_wrong_phone_stays_403(monkeypatch: pytest.MonkeyPatch) -> None:
+    from types import SimpleNamespace
+    from unittest.mock import MagicMock
+
+    from app.service.employee_identity import EmployeeIdentityService
+
+    monkeypatch.setattr(
+        "app.service.employee_identity.run_owned_transaction",
+        lambda session, fn: fn(),
+    )
+    peeked = SimpleNamespace(employee_id=4)
+    active = SimpleNamespace(
+        employee_id=4,
+        status="ACTIVE",
+        expires_at=datetime(2099, 1, 1, tzinfo=UTC),
+        target_phone_e164="+8613900000001",
+    )
+    session = MagicMock()
+    session.query.side_effect = [_InviteQuery(peeked), _InviteQuery(active)]
+    service = EmployeeIdentityService(session, secret="test-secret")
+    service._employees = MagicMock()
+    service._employees.get_employee_for_update.return_value = SimpleNamespace(
+        id=4, status="ACTIVE", user_id=None
+    )
+    service._credentials = MagicMock()
+    service._credentials.get_active_phone_for_user.return_value = SimpleNamespace(
+        phone_e164="+8613900002881"
+    )
+    with pytest.raises(AppError) as denied:
+        service.claim(actor=_claim_actor(), token="other-phone-token", request_id="r3")
+    assert denied.value.status_code == 403
+    assert denied.value.code == IamErrorCode.FORBIDDEN
+    session.commit.assert_not_called()
 
 
 def test_miniprogram_refresh_retries_once() -> None:

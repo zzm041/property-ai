@@ -3,6 +3,8 @@
 Updated for Cursor + Codex CLI collaboration. Not a full-repo audit. Not Production V1 / Day 4 / real-AI PASS.
 
 Headline for MP-CURRENT-FULL-REGRESSION-001: **回归完成，仍有缺口**.
+Codex FIX-1 review: `reports/codex/MP-CURRENT-FULL-REGRESSION-001-FIX-1-review.json` **NEEDS_CHANGES** (evidence provenance / denominator). Page wiring for invalid-invite 400 is accepted on `b1458bf`, not on `ab0b882`.
+FIX-2 evidence normalize in the same follow-up: matrix IDs = combined-results IDs (83); FIX-1 overlays tagged `code_sha_product=b1458bf` with `baseline_status`; automator 9434 then 9435; extra V1 items include lockout/RAG/AI-fail-create; mock unit tests for invite 400/403. Not Production V1 PASS.
 
 | Item | Current fact |
 | --- | --- |
