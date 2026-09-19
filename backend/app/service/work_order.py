@@ -318,7 +318,7 @@ class WorkOrderService:
         current = self._reload_actor(actor)
         self._validate_request_id(request_id)
         self._require_positive_id(file_id, "file_id")
-        record = self._repository.get_file(file_id)
+        record = self._repository.get_file_for_update(file_id)
         if record is None or not self._actor_can_see_file_tenant(
             current, record.tenant_id
         ):
@@ -352,7 +352,52 @@ class WorkOrderService:
                 message="Uploaded content does not match the declared type",
                 status_code=422,
             )
-        from app.provider.errors import ProviderTimeoutError, ProviderUnavailableError
+        from app.provider.errors import (
+            ProviderInvalidOutputError,
+            ProviderTimeoutError,
+            ProviderUnavailableError,
+        )
+
+        try:
+            existing = self._storage.get_object(record.storage_key)
+        except ProviderInvalidOutputError:
+            existing = None
+        except (ProviderTimeoutError, ProviderUnavailableError) as exc:
+            raise AppError(
+                code=FileErrorCode.STORAGE_UNAVAILABLE,
+                message="Object storage is unavailable",
+                status_code=503,
+            ) from exc
+        if existing is not None:
+            existing_hash = sha256(existing).hexdigest()
+            placeholder_hash = sha256(
+                f"{record.storage_key}:{record.mime_type}:{record.size_bytes}".encode()
+            ).hexdigest()
+            if (
+                len(existing) != record.size_bytes
+                or not _content_matches_mime(record.mime_type, existing)
+                or record.content_hash not in {placeholder_hash, existing_hash}
+            ):
+                logger.error(
+                    "stored_object_integrity_failed",
+                    file_id=record.id,
+                    tenant_id=record.tenant_id,
+                    property_id=record.property_id,
+                )
+                raise AppError(
+                    code=FileErrorCode.STORAGE_UNAVAILABLE,
+                    message="Stored file failed integrity validation",
+                    status_code=503,
+                )
+            if existing != content:
+                raise AppError(
+                    code=FileErrorCode.CONFLICT,
+                    message="File content is immutable after upload",
+                    status_code=409,
+                )
+            record.content_hash = existing_hash
+            self._session.flush()
+            return record
 
         try:
             self._storage.put_object(record.storage_key, content, record.mime_type)

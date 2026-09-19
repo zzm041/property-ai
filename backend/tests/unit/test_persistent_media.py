@@ -49,6 +49,7 @@ def _service(record: FileObject, *, content: bytes = JPEG) -> WorkOrderService:
     service._settings = Settings(_env_file=None, app_env="test")
     service._repository = MagicMock()
     service._repository.get_file.return_value = record
+    service._repository.get_file_for_update.return_value = record
     service._repository.list_work_orders_for_file.return_value = ()
     service._storage = MagicMock()
     service._storage.get_object.return_value = content
@@ -86,6 +87,9 @@ def test_upload_validates_bytes_and_records_actual_hash() -> None:
     record = _file()
     record.content_hash = "registration-placeholder"
     service = _service(record)
+    service._storage.get_object.side_effect = ProviderInvalidOutputError(
+        "Object was not found"
+    )
 
     result = service._put_file_content(
         actor=_actor(),
@@ -102,6 +106,41 @@ def test_upload_validates_bytes_and_records_actual_hash() -> None:
         record.mime_type,
     )
     service._session.flush.assert_called_once_with()
+
+
+def test_same_file_content_retry_is_idempotent() -> None:
+    record = _file()
+    service = _service(record)
+
+    result = service._put_file_content(
+        actor=_actor(),
+        file_id=record.id,
+        content=JPEG,
+        request_id="persistent-media-idempotent",
+    )
+
+    assert result is record
+    service._repository.get_file_for_update.assert_called_once_with(record.id)
+    service._storage.put_object.assert_not_called()
+    service._session.flush.assert_called_once_with()
+
+
+def test_uploaded_file_content_cannot_be_replaced() -> None:
+    existing = b"\xff\xd8\xff\xe1"
+    record = _file(content=existing)
+    service = _service(record, content=existing)
+
+    with pytest.raises(AppError) as caught:
+        service._put_file_content(
+            actor=_actor(),
+            file_id=record.id,
+            content=JPEG,
+            request_id="persistent-media-immutable",
+        )
+
+    assert caught.value.code == FileErrorCode.CONFLICT
+    assert caught.value.status_code == 409
+    service._storage.put_object.assert_not_called()
 
 
 @pytest.mark.parametrize(

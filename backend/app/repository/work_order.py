@@ -45,6 +45,11 @@ class WorkOrderRepository:
     def get_file(self, file_id: int) -> FileObject | None:
         return self._session.get(FileObject, file_id)
 
+    def get_file_for_update(self, file_id: int) -> FileObject | None:
+        return self._session.scalar(
+            select(FileObject).where(FileObject.id == file_id).with_for_update()
+        )
+
     def get_idempotency(
         self,
         *,
