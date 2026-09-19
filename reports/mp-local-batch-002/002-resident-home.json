@@ -1,0 +1,9 @@
+{
+  "path": "pages/home/home",
+  "display_name": "__DEV_RESIDENT__",
+  "roles": [
+    "RESIDENT"
+  ],
+  "propertyId": 1,
+  "tenantId": 1
+}

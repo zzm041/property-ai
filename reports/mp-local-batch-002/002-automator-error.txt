@@ -1,0 +1,4 @@
+Error: button not found: 住户绑定; have 今日考勤|我的任务|待派工单|事件|公告审核|绑定审核|员工状态|通知|退出并切换身份|重试
+    at tapButton (D:\property-ai\reports\mp-local-batch-002\automator-lib.js:34:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async D:\property-ai\reports\mp-local-batch-002\run-vis-002.js:103:3
