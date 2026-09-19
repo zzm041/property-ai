@@ -1556,6 +1556,7 @@ class WorkOrderService:
                     message="Work order is already assigned",
                     status_code=409,
                 )
+            self._end_current_process(record, now=now)
             self._end_active_assignment(
                 record,
                 now=now,
@@ -1679,19 +1680,21 @@ class WorkOrderService:
                 status_code=409,
             )
         cleaned_reason = self._optional_text(reason)
-        if code is SupervisorDecision.CONTINUE and cleaned_reason is None:
+        if code in {SupervisorDecision.CONTINUE, SupervisorDecision.REASSIGN} and cleaned_reason is None:
             raise AppError(
                 code=WorkOrderErrorCode.INVALID_INPUT,
-                message="reason is required for CONTINUE",
+                message=f"reason is required for {code.value}",
                 status_code=422,
             )
         if code is SupervisorDecision.REASSIGN:
             if employee_id is None:
+                now = self._clock()
+                self._end_current_process(record, now=now)
                 self._end_active_assignment(
                     record,
-                    now=self._clock(),
+                    now=now,
                     status=AssignmentStatus.REASSIGNED,
-                    reason=reason,
+                    reason=cleaned_reason,
                 )
                 self._apply_transition(
                     record,
@@ -1708,7 +1711,7 @@ class WorkOrderService:
                     work_order_id=record.id,
                     employee_id=employee_id,
                     request_id=request_id,
-                    reason=reason or "REASSIGN",
+                    reason=cleaned_reason,
                     version=record.version,
                     claimed_tenant_id=None,
                     claimed_property_id=None,
@@ -1734,6 +1737,8 @@ class WorkOrderService:
                 reason_code=code.value,
                 reason_detail=cleaned_reason,
             )
+            if code is SupervisorDecision.CONTINUE:
+                self._resume_receipted_process(record, now=self._clock())
         self._append_audit(
             action=AuditAction.WORK_ORDER_DECIDED,
             resource_type=AuditResourceType.WORK_ORDER,
@@ -1935,14 +1940,10 @@ class WorkOrderService:
         if (
             ProcessReason(record.process_reason) in WAITING_PROCESS_REASONS
             and target_reason is ProcessReason.NONE
-            and not current.has_permission(
-                WORK_ORDER_DECIDE,
-                self._property_scope(record),
-            )
         ):
             raise AppError(
                 code=WorkOrderErrorCode.INVALID_TRANSITION,
-                message="Only a supervisor can resume an escalated work order",
+                message="Use a supervisor decision to resume an escalated work order",
                 status_code=409,
             )
         self._apply_transition(
@@ -2100,6 +2101,7 @@ class WorkOrderService:
                     finished_at=now,
                 )
             )
+            process.ended_at = now
             self._apply_transition(
                 record,
                 event=WorkOrderEvent.RECEIPT_UNRESOLVED,
@@ -2364,6 +2366,38 @@ class WorkOrderService:
         if employee is not None:
             self._adjust_load(record, employee, delta=-1)
         record.current_assignment_id = None
+        self._session.flush()
+
+    def _end_current_process(self, record: WorkOrder, *, now: datetime) -> None:
+        process = self._repository.get_current_process(record.id)
+        if process is None or process.ended_at is not None:
+            return
+        process.ended_at = now
+        self._session.flush()
+
+    def _resume_receipted_process(self, record: WorkOrder, *, now: datetime) -> None:
+        process = self._repository.get_current_process(record.id)
+        if process is None or self._repository.get_receipt_for_process(process.id) is None:
+            return
+        assignment = self._repository.get_active_assignment_for_update(record.id)
+        if assignment is None:
+            raise AppError(
+                code=WorkOrderErrorCode.INVALID_TRANSITION,
+                message="An active assignment is required to continue processing",
+                status_code=409,
+            )
+        if process.ended_at is None:
+            process.ended_at = now
+        self._repository.add_process(
+            WorkOrderProcess(
+                tenant_id=record.tenant_id,
+                property_id=record.property_id,
+                work_order_id=record.id,
+                cycle_no=process.cycle_no + 1,
+                assignee_id=assignment.employee_id,
+                started_at=now,
+            )
+        )
         self._session.flush()
 
     def _adjust_load(

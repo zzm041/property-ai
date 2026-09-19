@@ -178,10 +178,10 @@ def test_recently_rejecting_employee_is_filtered_before_ranking() -> None:
     assert by_employee[8]["eligible"] is True
 
 
-def test_staff_cannot_clear_escalation_without_supervisor_decision() -> None:
+def test_feedback_cannot_clear_escalation_even_with_decide_permission() -> None:
     service = WorkOrderService.__new__(WorkOrderService)
     current = MagicMock()
-    current.has_permission.return_value = False
+    current.has_permission.return_value = True
     record = SimpleNamespace(
         id=41,
         status="PROCESSING",
@@ -211,6 +211,8 @@ def test_staff_cannot_clear_escalation_without_supervisor_decision() -> None:
 
 def test_supervisor_continue_requires_plan_and_clears_exception(monkeypatch) -> None:
     service = WorkOrderService.__new__(WorkOrderService)
+    fixed_now = datetime(2026, 9, 19, 19, 0, tzinfo=UTC)
+    service._clock = lambda: fixed_now
     current = SimpleNamespace(user_id=22)
     record = SimpleNamespace(
         id=41,
@@ -227,6 +229,7 @@ def test_supervisor_continue_requires_plan_and_clears_exception(monkeypatch) -> 
     service._actor_type = MagicMock()
     service._apply_transition = MagicMock()
     service._append_audit = MagicMock()
+    service._resume_receipted_process = MagicMock()
     monkeypatch.setattr(
         "app.service.work_order.RbacService.require_permission",
         lambda *_args, **_kwargs: None,
@@ -258,6 +261,88 @@ def test_supervisor_continue_requires_plan_and_clears_exception(monkeypatch) -> 
     transition = service._apply_transition.call_args.kwargs
     assert transition["process_reason"] is ProcessReason.NONE
     assert transition["reason_detail"] == "Use the safe internal repair plan"
+    service._resume_receipted_process.assert_called_once_with(
+        record,
+        now=fixed_now,
+    )
+
+
+@pytest.mark.parametrize("employee_id", [None, 27])
+def test_supervisor_reassign_requires_reason_for_both_branches(
+    monkeypatch, employee_id: int | None
+) -> None:
+    service = WorkOrderService.__new__(WorkOrderService)
+    service._reload_actor = MagicMock(return_value=SimpleNamespace(user_id=22))
+    record = SimpleNamespace(
+        id=41,
+        tenant_id=1,
+        property_id=2,
+        status="PROCESSING",
+        process_reason="INTERNAL_UNRESOLVED",
+        version=7,
+    )
+    service._lock_work_order = MagicMock(return_value=record)
+    service._assert_version = MagicMock()
+    service._property_scope = MagicMock()
+    service._assign = MagicMock()
+    service._end_current_process = MagicMock()
+    service._end_active_assignment = MagicMock()
+    monkeypatch.setattr(
+        "app.service.work_order.RbacService.require_permission",
+        lambda *_args, **_kwargs: None,
+    )
+
+    with pytest.raises(AppError) as captured:
+        service._decide(
+            actor=MagicMock(),
+            work_order_id=record.id,
+            decision="REASSIGN",
+            request_id="reassign-without-reason",
+            employee_id=employee_id,
+            reason="  ",
+            version=record.version,
+        )
+
+    assert captured.value.code == WorkOrderErrorCode.INVALID_INPUT
+    service._assign.assert_not_called()
+    service._end_current_process.assert_not_called()
+
+
+def test_continue_after_unresolved_receipt_opens_new_same_assignee_cycle() -> None:
+    service = WorkOrderService.__new__(WorkOrderService)
+    service._repository = MagicMock()
+    service._session = MagicMock()
+    ended = datetime(2026, 9, 19, 18, 0, tzinfo=UTC)
+    process = SimpleNamespace(id=9, cycle_no=2, ended_at=ended)
+    service._repository.get_current_process.return_value = process
+    service._repository.get_receipt_for_process.return_value = SimpleNamespace(id=10)
+    service._repository.get_active_assignment_for_update.return_value = SimpleNamespace(
+        employee_id=27
+    )
+    record = SimpleNamespace(id=41, tenant_id=1, property_id=2)
+    now = datetime(2026, 9, 19, 19, 0, tzinfo=UTC)
+
+    service._resume_receipted_process(record, now=now)
+
+    created = service._repository.add_process.call_args.args[0]
+    assert created.cycle_no == 3
+    assert created.assignee_id == 27
+    assert created.started_at == now
+
+
+def test_reassignment_closes_open_process_cycle() -> None:
+    service = WorkOrderService.__new__(WorkOrderService)
+    service._repository = MagicMock()
+    service._session = MagicMock()
+    process = SimpleNamespace(ended_at=None)
+    service._repository.get_current_process.return_value = process
+    record = SimpleNamespace(id=41)
+    now = datetime(2026, 9, 19, 19, 0, tzinfo=UTC)
+
+    service._end_current_process(record, now=now)
+
+    assert process.ended_at == now
+    service._session.flush.assert_called_once()
 
 
 def test_staff_page_wires_reject_escalate_and_unresolved_receipt() -> None:
