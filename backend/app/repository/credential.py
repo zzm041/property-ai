@@ -25,6 +25,11 @@ class CredentialRepository:
         self._session.flush()
         return user
 
+    def get_user_for_update(self, user_id: int) -> User | None:
+        return self._session.scalar(
+            select(User).where(User.id == user_id).with_for_update()
+        )
+
     def get_active_phone(self, phone_e164: str) -> UserPhone | None:
         return self._session.scalar(
             select(UserPhone).where(
@@ -131,12 +136,22 @@ class CredentialRepository:
             .with_for_update()
         )
 
-    def list_active_sessions(self, user_id: int) -> tuple[AuthSession, ...]:
+    def get_session_by_refresh_hash_unlocked(
+        self, token_hash: str
+    ) -> AuthSession | None:
+        return self._session.scalar(
+            select(AuthSession).where(AuthSession.refresh_token_hash == token_hash)
+        )
+
+    def list_active_sessions_for_update(
+        self, user_id: int
+    ) -> tuple[AuthSession, ...]:
         rows = self._session.scalars(
-            select(AuthSession).where(
-                AuthSession.user_id == user_id,
-                AuthSession.revoked_at.is_(None),
+            select(AuthSession)
+            .where(
+                AuthSession.user_id == user_id, AuthSession.revoked_at.is_(None)
             )
+            .with_for_update()
         ).all()
         return tuple(rows)
 

@@ -1,3 +1,14 @@
+function maskPhone(value) {
+  let digits = String(value || "").replace(/\D/g, "");
+  if (/^861[3-9]\d{9}$/.test(digits)) {
+    digits = digits.slice(2);
+  }
+  if (digits.length < 7) {
+    return "****";
+  }
+  return `${digits.slice(0, 3)}****${digits.slice(-4)}`;
+}
+
 Page({
   data: {
     displayName: "",
@@ -82,16 +93,27 @@ Page({
   changePhone() {
     const { withLoading } = require("../../utils/ui");
     withLoading(this, async () => {
+      const oldPhone = this.data.oldPhone;
+      const newPhone = this.data.newPhone;
       const token = await require("../../services/api").changePhone({
-        old_phone: this.data.oldPhone,
+        old_phone: oldPhone,
         old_code: this.data.oldCode,
-        new_phone: this.data.newPhone,
+        new_phone: newPhone,
         new_code: this.data.newCode,
       });
       const auth = require("../../services/auth");
       auth.setToken(token.access_token);
       auth.setRefreshToken(token.refresh_token);
+      const displayName =
+        this.data.displayName === maskPhone(oldPhone)
+          ? maskPhone(newPhone)
+          : this.data.displayName;
+      const app = getApp();
+      if (app.globalData.me) {
+        app.globalData.me.display_name = displayName;
+      }
       this.setData({
+        displayName,
         oldPhone: "",
         newPhone: "",
         oldCode: "",

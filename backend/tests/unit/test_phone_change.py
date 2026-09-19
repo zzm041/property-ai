@@ -32,6 +32,11 @@ def _service(monkeypatch: pytest.MonkeyPatch) -> CredentialAuthService:
         app_secret_key="phone-change-unit-secret",
     )
     service._repository = MagicMock()
+    service._repository.get_user_for_update.return_value = SimpleNamespace(
+        id=17,
+        status="ACTIVE",
+        display_name="resident",
+    )
     service._audit = MagicMock()
     service._clock = lambda: datetime(2026, 9, 20, 3, 0, tzinfo=UTC)
     service._apply_otp = MagicMock(return_value="ok")
@@ -45,8 +50,10 @@ def test_change_phone_verifies_both_numbers_rebinds_and_rotates_sessions(
 ) -> None:
     service = _service(monkeypatch)
     old = SimpleNamespace(phone_e164="+8613800001001", status="ACTIVE", ended_at=None)
+    user = SimpleNamespace(id=17, status="ACTIVE", display_name="138****1001")
     service._repository.get_active_phone_for_user_for_update.return_value = old
     service._repository.get_active_phone_for_update.return_value = None
+    service._repository.get_user_for_update.return_value = user
 
     issued = service.change_phone(
         user_id=17,
@@ -60,6 +67,7 @@ def test_change_phone_verifies_both_numbers_rebinds_and_rotates_sessions(
     assert issued.session_id == 91
     assert old.status == "ENDED"
     assert old.ended_at == datetime(2026, 9, 20, 3, 0, tzinfo=UTC)
+    assert user.display_name == "138****1002"
     service._apply_otp.assert_has_calls(
         [
             call("+8613800001001", purpose="change_phone", code="111111"),
@@ -154,6 +162,62 @@ def test_change_phone_rejects_invalid_new_code_before_mutation(
     service._revoke_sessions.assert_not_called()
 
 
+def test_change_phone_commits_invalid_otp_attempt_before_raising(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    service = _service(monkeypatch)
+    service._repository.get_active_phone_for_user_for_update.return_value = (
+        SimpleNamespace(phone_e164="+8613800001001")
+    )
+    service._apply_otp.side_effect = ["ok", "invalid"]
+    transaction_outcomes: list[str] = []
+
+    def run_transaction(_session: object, operation: object) -> object:
+        result = operation()
+        transaction_outcomes.append("committed")
+        return result
+
+    monkeypatch.setattr(
+        "app.service.credential_auth.run_owned_transaction", run_transaction
+    )
+
+    with pytest.raises(AppError) as captured:
+        service.change_phone(
+            user_id=17,
+            old_phone="13800001001",
+            old_code="111111",
+            new_phone="13800001002",
+            new_code="000000",
+            request_id="phone-change-invalid-attempt-commit",
+        )
+
+    assert captured.value.code == AuthErrorCode.INVALID_CODE
+    assert transaction_outcomes == ["committed"]
+    service._repository.add_phone.assert_not_called()
+
+
+def test_phone_change_preserves_custom_display_name(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    service = _service(monkeypatch)
+    old = SimpleNamespace(phone_e164="+8613800001001", status="ACTIVE", ended_at=None)
+    user = SimpleNamespace(id=17, status="ACTIVE", display_name="张三")
+    service._repository.get_active_phone_for_user_for_update.return_value = old
+    service._repository.get_active_phone_for_update.return_value = None
+    service._repository.get_user_for_update.return_value = user
+
+    service.change_phone(
+        user_id=17,
+        old_phone="13800001001",
+        old_code="111111",
+        new_phone="13800001002",
+        new_code="222222",
+        request_id="phone-change-custom-name",
+    )
+
+    assert user.display_name == "张三"
+
+
 def test_change_phone_rejects_same_number_without_consuming_codes(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -200,6 +264,8 @@ def test_profile_page_wires_dual_phone_verification_and_session_replacement() ->
     assert "api.issueChallenge(phone, \"login\")" in source
     assert "auth.setToken(token.access_token)" in source
     assert "auth.setRefreshToken(token.refresh_token)" in source
+    assert "this.data.displayName === maskPhone(oldPhone)" in source
+    assert "app.globalData.me.display_name = displayName" in source
     assert "/auth/phone/change" in api
     assert '"/auth/phone/change": true' in api
     for label in (
@@ -250,3 +316,53 @@ def test_phone_change_audit_policy_requires_masked_phone_values() -> None:
         )
 
     assert captured.value.code == AuditErrorCode.INVALID_DETAILS
+
+
+def test_session_rotation_uses_user_lock_before_refresh_session_lock(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    service = _service(monkeypatch)
+    candidate = SimpleNamespace(user_id=17)
+    record = SimpleNamespace(
+        user_id=17,
+        revoked_at=None,
+        expires_at=datetime(2027, 1, 1, tzinfo=UTC),
+        auth_method="sms",
+        replaced_by_id=None,
+    )
+    service._repository.get_session_by_refresh_hash_unlocked.return_value = candidate
+    service._repository.get_session_by_refresh_hash.return_value = record
+    service._repository.reset_mock()
+
+    issued = service.refresh(refresh_token="refresh-value", request_id="refresh-race")
+
+    assert issued.session_id == 91
+    assert record.revoked_at == datetime(2026, 9, 20, 3, 0, tzinfo=UTC)
+    assert record.replaced_by_id == 91
+    repository_calls = [item[0] for item in service._repository.method_calls]
+    assert repository_calls[:3] == [
+        "get_session_by_refresh_hash_unlocked",
+        "get_user_for_update",
+        "get_session_by_refresh_hash",
+    ]
+
+
+def test_revoke_sessions_locks_user_and_session_rows(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    service = _service(monkeypatch)
+    service._revoke_sessions = CredentialAuthService._revoke_sessions.__get__(
+        service, CredentialAuthService
+    )
+    active = SimpleNamespace(id=51, auth_method="sms", revoked_at=None)
+    service._repository.list_active_sessions_for_update.return_value = (active,)
+    service._repository.reset_mock()
+
+    service._revoke_sessions(17, reason="PHONE_CHANGE", request_id="revoke-locks")
+
+    assert active.revoked_at == datetime(2026, 9, 20, 3, 0, tzinfo=UTC)
+    repository_calls = [item[0] for item in service._repository.method_calls]
+    assert repository_calls[:2] == [
+        "get_user_for_update",
+        "list_active_sessions_for_update",
+    ]

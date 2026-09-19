@@ -238,7 +238,7 @@ class CredentialAuthService:
             otp_status["value"] = self._apply_otp(phone_e164, purpose="login", code=code)
             if otp_status["value"] != "ok":
                 return
-            phone_row = self._repository.get_active_phone(phone_e164)
+            phone_row = self._repository.get_active_phone_for_update(phone_e164)
             if phone_row is None:
                 user = self._repository.add_user(
                     User(status="ACTIVE", display_name=mask_phone(phone_e164))
@@ -311,7 +311,7 @@ class CredentialAuthService:
         issued_box: list[IssuedSession] = []
 
         def _persist() -> None:
-            phone_row = self._repository.get_active_phone(phone_e164)
+            phone_row = self._repository.get_active_phone_for_update(phone_e164)
             credential = None
             if phone_row is not None:
                 credential = self._repository.get_password(phone_row.user_id)
@@ -415,6 +415,29 @@ class CredentialAuthService:
             )
         issued_box: list[IssuedSession] = []
 
+        otp_status = {"old": "ok", "new": "ok"}
+
+        def _verify_codes() -> None:
+            current = self._repository.get_active_phone_for_user_for_update(user_id)
+            if current is None or current.phone_e164 != old_phone_e164:
+                raise AppError(
+                    code=AuthErrorCode.OLD_PHONE_MISMATCH,
+                    message="Current phone does not match the signed-in account",
+                    status_code=409,
+                )
+            otp_status["old"] = self._apply_otp(
+                old_phone_e164, purpose="change_phone", code=old_code
+            )
+            if otp_status["old"] != "ok":
+                return
+            otp_status["new"] = self._apply_otp(
+                new_phone_e164, purpose="change_phone", code=new_code
+            )
+
+        run_owned_transaction(self._session, _verify_codes)
+        self._raise_otp(otp_status["old"])
+        self._raise_otp(otp_status["new"])
+
         def _persist() -> None:
             current = self._repository.get_active_phone_for_user_for_update(user_id)
             if current is None or current.phone_e164 != old_phone_e164:
@@ -423,12 +446,7 @@ class CredentialAuthService:
                     message="Current phone does not match the signed-in account",
                     status_code=409,
                 )
-            self._raise_otp(
-                self._apply_otp(old_phone_e164, purpose="change_phone", code=old_code)
-            )
-            self._raise_otp(
-                self._apply_otp(new_phone_e164, purpose="change_phone", code=new_code)
-            )
+            user = self._lock_active_user(user_id)
             existing = self._repository.get_active_phone_for_update(new_phone_e164)
             if existing is not None:
                 raise AppError(
@@ -448,6 +466,8 @@ class CredentialAuthService:
                     verified_at=now,
                 )
             )
+            if user.display_name == mask_phone(old_phone_e164):
+                user.display_name = mask_phone(new_phone_e164)
             self._revoke_sessions(user_id, reason="PHONE_CHANGE", request_id=request_id)
             issued = self._issue_session(user_id=user_id, auth_method="sms")
             self._audit.append(
@@ -580,6 +600,16 @@ class CredentialAuthService:
         token_hash = keyed_hash(refresh_token, secret=secret)
 
         def _persist() -> None:
+            candidate = self._repository.get_session_by_refresh_hash_unlocked(
+                token_hash
+            )
+            if candidate is None:
+                raise AppError(
+                    code=AuthErrorCode.INVALID_TOKEN,
+                    message="Refresh token is invalid",
+                    status_code=401,
+                )
+            self._lock_active_user(candidate.user_id)
             record = self._repository.get_session_by_refresh_hash(token_hash)
             now = self._clock()
             if (
@@ -694,6 +724,7 @@ class CredentialAuthService:
             )
 
     def _issue_session(self, *, user_id: int, auth_method: str) -> IssuedSession:
+        self._lock_active_user(user_id)
         refresh = generate_refresh_token()
         now = self._clock()
         record = self._repository.add_session(
@@ -724,8 +755,9 @@ class CredentialAuthService:
         )
 
     def _revoke_sessions(self, user_id: int, *, reason: str, request_id: str) -> None:
+        self._lock_active_user(user_id)
         now = self._clock()
-        for record in self._repository.list_active_sessions(user_id):
+        for record in self._repository.list_active_sessions_for_update(user_id):
             record.revoked_at = now
             self._audit.append(
                 action=AuditAction.AUTH_SESSION_REVOKED,
@@ -736,6 +768,16 @@ class CredentialAuthService:
                 scope_type=ScopeType.SYSTEM,
                 details={"auth_method": record.auth_method, "reason_code": reason},
             )
+
+    def _lock_active_user(self, user_id: int) -> User:
+        user = self._repository.get_user_for_update(user_id)
+        if user is None or user.status != "ACTIVE":
+            raise AppError(
+                code=AuthErrorCode.USER_DISABLED,
+                message="User is not active",
+                status_code=401,
+            )
+        return user
 
     def _apply_otp(self, phone_e164: str, *, purpose: str, code: str) -> str:
         challenge = self._repository.get_open_challenge(phone_e164, purpose)
