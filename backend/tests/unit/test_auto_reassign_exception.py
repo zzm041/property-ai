@@ -60,11 +60,17 @@ def test_reject_enqueues_redispatch_only_after_business_transaction() -> None:
 
 def test_final_analysis_skip_attempts_redispatch_without_provider_recall() -> None:
     service = AnalysisService.__new__(AnalysisService)
-    service._prepare = MagicMock(return_value=SimpleNamespace(skipped=True))
+    service._prepare = MagicMock(
+        return_value=SimpleNamespace(skipped=True, analysis_id=19)
+    )
     analysis = SimpleNamespace(id=19)
     service._ai = MagicMock()
-    service._ai.get_current_analysis.return_value = analysis
     service._retry_auto_dispatch_from_existing = MagicMock(return_value="ASSIGNED")
+    service._ai.get_current_analysis.side_effect = lambda _work_order_id: (
+        analysis
+        if service._retry_auto_dispatch_from_existing.called
+        else pytest.fail("analysis read must not autobegin before redispatch")
+    )
     service._call_providers = MagicMock()
 
     result = service.analyze_work_order(

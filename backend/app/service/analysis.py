@@ -161,14 +161,16 @@ class AnalysisService:
         if snapshot is None:
             return self._ai.get_current_analysis(work_order_id)
         if snapshot.skipped:
-            current = self._ai.get_current_analysis(work_order_id)
-            if current is not None:
-                self._retry_auto_dispatch_from_existing(
-                    work_order_id=work_order_id,
-                    analysis_id=current.id,
-                    request_id=request_id,
-                )
-            return current
+            # _prepare committed its owned transaction before returning this
+            # snapshot. Do not issue an ORM read before opening the redispatch
+            # transaction: SQLAlchemy autobegin would otherwise leave an
+            # unexpected read transaction open and reject the owned boundary.
+            self._retry_auto_dispatch_from_existing(
+                work_order_id=work_order_id,
+                analysis_id=snapshot.analysis_id,
+                request_id=request_id,
+            )
+            return self._ai.get_current_analysis(work_order_id)
         bundle = self._call_providers(snapshot=snapshot, request_id=request_id, attempt=attempt)
         return self._apply(
             snapshot=snapshot,
