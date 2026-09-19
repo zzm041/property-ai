@@ -1,0 +1,40 @@
+You are the read-only reviewer for repository D:\property-ai.
+Do not edit product source. Do not run tests that change databases or shared services.
+Do not request Full Access or sandbox bypass.
+
+Read:
+- reports/project-handoff.md
+- reports/codex/MP-LOCAL-VIS-001-plan.json
+- reports/mp-local-vis-001/00-preflight.txt
+- reports/mp-local-vis-001/01-cli-islogin.txt
+- reports/mp-local-vis-001/02-cli-open-compile.txt
+- reports/mp-local-vis-001/07-result.json
+- reports/mp-local-vis-001/08-git-status-after.txt
+
+Do not resume --last. Previous plan session id (context only): 01a0b812-28ee-79e0-a462-408409775d3a
+
+task_id: MP-LOCAL-VIS-001
+phase: review
+base_sha: c44c051d6d52a34dae13c61dd17afb7589f61473
+reviewed_head: c44c051d6d52a34dae13c61dd17afb7589f61473
+No product source change. Pre-existing dirty file miniprogram/project.config.json hash unchanged 3FBE70AE8438D137498E55BDD289357473715231E4C96DABA7DEF7601741352D. Do not treat that dirty file as this-task work or as an infinite blocker.
+
+Implementer actions already taken:
+- Called Codex plan (exit 0, decision WAIT_HUMAN).
+- Preflight: HEAD matches, API healthz/readyz 200.
+- cli open and cli islogin both failed: IDE service port disabled.
+- Started WeChat DevTools GUI process. CLI still refuses. No compile, no login page screenshot, no /auth/dev/token or /me from the miniprogram.
+- HTTP script success must not be counted as page display.
+
+Dedup this review by task_id + evidence content, not only HEAD.
+
+Return JSON matching the output schema.
+PASS only if compile + login page + 以住户登录 + live /auth/dev/token + /me + /me-driven home are evidenced.
+WAIT_HUMAN if the only remaining in-scope gate is the operator enabling DevTools 服务端口 (or a later QR login).
+NEEDS_CHANGES only for a concrete in-scope product defect that blocks the login page.
+Do not require 0008 / CVE / production release items to finish this task.
+
+actions_or_findings: concrete remaining issues or the single human action.
+evidence_paths: files you actually used.
+unverified: login page, resident tap, live token/me UI.
+session_note: short, no secrets.

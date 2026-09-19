@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Codex collaboration result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id",
+    "phase",
+    "reviewed_head",
+    "decision",
+    "actions_or_findings",
+    "evidence_paths",
+    "unverified",
+    "session_note"
+  ],
+  "properties": {
+    "task_id": { "type": "string" },
+    "phase": { "type": "string", "enum": ["plan", "review"] },
+    "reviewed_head": { "type": "string" },
+    "decision": {
+      "type": "string",
+      "enum": ["READY", "PASS", "NEEDS_CHANGES", "BLOCKED", "WAIT_HUMAN"]
+    },
+    "actions_or_findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title", "path", "trigger", "rationale"],
+        "properties": {
+          "title": { "type": "string" },
+          "path": { "type": "string" },
+          "trigger": { "type": "string" },
+          "rationale": { "type": "string" }
+        }
+      }
+    },
+    "evidence_paths": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "unverified": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "session_note": { "type": "string" }
+  }
+}

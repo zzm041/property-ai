@@ -1,0 +1,18 @@
+{
+  "task_id": "MP-LOCAL-VIS-001",
+  "head": "c44c051d6d52a34dae13c61dd17afb7589f61473",
+  "base_sha": "c44c051d6d52a34dae13c61dd17afb7589f61473",
+  "project_config_sha256": "3FBE70AE8438D137498E55BDD289357473715231E4C96DABA7DEF7601741352D",
+  "api_healthz": 200,
+  "api_readyz": 200,
+  "compile": "not_executed",
+  "login_page_shown": false,
+  "resident_login_clicked": false,
+  "dev_token_status": null,
+  "me_status": null,
+  "me_projection": null,
+  "screenshots": [],
+  "blocker": "WeChat DevTools CLI service port is disabled. cli open and cli islogin both refuse until 设置 → 安全设置 → 服务端口 is enabled.",
+  "http_script_not_counted_as_ui": true,
+  "no_fake_screenshots": true
+}

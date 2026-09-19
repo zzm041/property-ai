@@ -1,0 +1,6 @@
+﻿ M miniprogram/project.config.json
+?? reports/codex/
+?? reports/mp-local-vis-001/
+?? reports/project-handoff.md
+?? scripts/ops/codex_exec_readonly.py
+PROJECT_CONFIG_SHA256=3FBE70AE8438D137498E55BDD289357473715231E4C96DABA7DEF7601741352D

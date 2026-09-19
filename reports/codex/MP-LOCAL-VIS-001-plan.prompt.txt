@@ -1,0 +1,30 @@
+You are the read-only planner/reviewer for repository D:\property-ai.
+Do not edit product source. Do not run tests that change MySQL/Redis/RabbitMQ/MinIO/Milvus or wipe data.
+Do not request Full Access or sandbox bypass.
+
+Read reports/project-handoff.md. That is the current engineering fact sheet.
+
+task_id: MP-LOCAL-VIS-001
+phase: plan
+base_sha / reviewed_head: c44c051d6d52a34dae13c61dd17afb7589f61473
+Allowed scope: compile existing miniprogram in WeChat DevTools; show login page; tap 以住户登录; POST /api/v1/auth/dev/token with seed_key __DEV_RESIDENT__; GET /api/v1/me; show resident home driven by real /me.
+Out of scope: house bind, work orders, official wx.login, upload/release, Migration 0008, CVE upgrades, recreating shared containers.
+
+Known facts:
+- Pre-existing dirty file miniprogram/project.config.json SHA-256 3FBE70AE8438D137498E55BDD289357473715231E4C96DABA7DEF7601741352D with operator AppID wxcfa5fd7dc03cac56. Do not treat as a blocker. Do not stage/revert/overwrite it.
+- Day 4 API http://127.0.0.1:8082/api/v1 is up (healthz 200, readyz 200).
+- WeChat DevTools installed. CLI: D:\微信web开发者工具\cli.bat
+- cli islogin failed: IDE service port is OFF. Operator may need to enable 设置 → 安全设置 → 服务端口.
+- Local preview login exists in miniprogram/pages/login when env.local.js localPreview=true and envVersion=develop.
+- 577 passed / 2 skipped is implementer history, not this-task proof.
+
+Return JSON matching the provided output schema.
+decision READY only if Cursor can execute this task now with listed in-scope steps.
+Use WAIT_HUMAN only for a single necessary operator action (for example enable DevTools service port or scan login) that CLI cannot do.
+Use BLOCKED only if the login-page task itself cannot proceed for a concrete in-scope reason.
+Do not expand into release blockers.
+
+actions_or_findings must be concrete ordered steps Cursor should run (paths, commands, expected evidence).
+evidence_paths: files Cursor should produce.
+unverified: what this plan cannot claim.
+session_note: short. Do not include tokens or secrets.
