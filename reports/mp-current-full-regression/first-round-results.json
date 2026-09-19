@@ -1,0 +1,977 @@
+{
+  "task_id": "MP-CURRENT-FULL-REGRESSION-001",
+  "run_id": "mp-cfull-20260919-1",
+  "code_sha": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+  "api": "http://127.0.0.1:8083/api/v1",
+  "revision": "20260919_0009",
+  "provider": {
+    "sms": "development",
+    "llm": "development",
+    "embedding": "development",
+    "storage": "development_in_process_memory",
+    "wechat": "development",
+    "ai_enqueue_on_create": false
+  },
+  "objects": {
+    "bind_request_id": 4,
+    "reject_request_id": 5,
+    "work_order_id": 1,
+    "announcement_id": 1,
+    "employee_id": 4
+  },
+  "results": [
+    {
+      "id": "AUTH-LOGIN-DEFAULT",
+      "role": "anonymous",
+      "page": "pages/login/login",
+      "status": "PASS",
+      "expected": "mode=password",
+      "actual": "mode=password",
+      "evidence": [
+        "mp-cfull-20260919-1-login-password.png"
+      ]
+    },
+    {
+      "id": "AUTH-NO-SEED",
+      "role": "anonymous",
+      "page": "pages/login/login",
+      "status": "PASS",
+      "expected": "no seed buttons",
+      "actual": "显示|登录|微信登录",
+      "evidence": [
+        "mp-cfull-20260919-1-login-password.png"
+      ]
+    },
+    {
+      "id": "AUTH-PASSWORD-TOGGLE",
+      "role": "anonymous",
+      "page": "pages/login/login",
+      "status": "PASS",
+      "expected": "toggle then error, stay on login",
+      "actual": "show=true error=true path=pages/login/login",
+      "evidence": [
+        "mp-cfull-20260919-1-login-wrong-password.png"
+      ]
+    },
+    {
+      "id": "AUTH-PHONE-KEEP",
+      "role": "anonymous",
+      "page": "pages/login/login",
+      "status": "PASS",
+      "expected": "keep phone, clear password/sms",
+      "actual": "mode=sms phone_kept=true sms=",
+      "evidence": [
+        "mp-cfull-20260919-1-login-sms.png"
+      ]
+    },
+    {
+      "id": "AUTH-CHALLENGE",
+      "role": "anonymous",
+      "page": "pages/login/login",
+      "status": "PASS",
+      "expected": "wrong answer rejected",
+      "actual": "error=true prompt=true",
+      "evidence": [
+        "mp-cfull-20260919-1-challenge-wrong.png"
+      ]
+    },
+    {
+      "id": "AUTH-SMS-COOLDOWN",
+      "role": "unbound",
+      "page": "pages/home/home",
+      "status": "PASS",
+      "expected": "development SMS login via inbox sidecar",
+      "actual": "logged in",
+      "evidence": [
+        "mp-cfull-20260919-1-unbound-home.png"
+      ]
+    },
+    {
+      "id": "RES-UNBOUND-HOME",
+      "role": "unbound",
+      "page": "pages/home/home",
+      "status": "PASS",
+      "expected": "no resident/staff/manage menus",
+      "actual": "{\"canResident\":false,\"canStaff\":false,\"canManage\":false,\"buttons\":[\"账号与安全\",\"房屋选择 / 绑定\",\"通知\",\"退出登录\",\"重试\"],\"me\":{\"display_name\":\"139****7974\",\"roles\":[],\"permissions\":[],\"scopes\":[]}}",
+      "evidence": [
+        "mp-cfull-20260919-1-unbound-home.png"
+      ]
+    },
+    {
+      "id": "RES-PROFILE",
+      "role": "unbound",
+      "page": "pages/profile/profile",
+      "status": "PASS",
+      "expected": "display name saved",
+      "actual": "name=未绑定住户 error=",
+      "evidence": [
+        "mp-cfull-20260919-1-unbound-profile.png"
+      ]
+    },
+    {
+      "id": "AUTH-RESET-MISMATCH",
+      "role": "resident",
+      "page": "pages/password-reset/password-reset",
+      "status": "PASS",
+      "expected": "weak strength then mismatch error",
+      "actual": "weak=偏弱 error=两次密码不一致",
+      "evidence": [
+        "mp-cfull-20260919-1-reset-mismatch.png"
+      ]
+    },
+    {
+      "id": "AUTH-RESET",
+      "role": "resident",
+      "page": "pages/login/login",
+      "status": "PASS",
+      "expected": "return to login, not auto logged in",
+      "actual": "pages/login/login",
+      "evidence": [
+        "mp-cfull-20260919-1-reset-back-login.png"
+      ]
+    },
+    {
+      "id": "AUTH-PASSWORD-LOGIN",
+      "role": "resident",
+      "page": "pages/home/home",
+      "status": "PASS",
+      "expected": "goodpass1 login after reset",
+      "actual": "home",
+      "evidence": [
+        "mp-cfull-20260919-1-resident-password-home.png"
+      ]
+    },
+    {
+      "id": "AUTH-RESET-REVOKE",
+      "role": "resident",
+      "page": "pages/login/login",
+      "status": "PASS",
+      "expected": "uppercase variant rejected then correct password works",
+      "actual": "folded_error=true",
+      "evidence": [
+        "mp-cfull-20260919-1-resident-password-home.png"
+      ]
+    },
+    {
+      "id": "RES-HOUSE-CASCADE",
+      "role": "resident",
+      "page": "pages/houses/houses",
+      "status": "PASS",
+      "expected": "cascade selects room without typing house_id",
+      "actual": "{\"propertyIndex\":3,\"selectedHouseId\":4,\"houseNames\":[\"101\"]}",
+      "evidence": [
+        "mp-cfull-20260919-1-houses-cascade.png"
+      ],
+      "note": "picker change via automator trigger, not native picker UI"
+    },
+    {
+      "id": "RES-BIND-APPLY",
+      "role": "resident",
+      "page": "pages/houses/houses",
+      "status": "PASS",
+      "expected": "PENDING bind request",
+      "actual": "{\"requests\":[{\"id\":4,\"status\":\"PENDING\"}],\"error\":\"\"}",
+      "evidence": [
+        "mp-cfull-20260919-1-houses-applied.png"
+      ]
+    },
+    {
+      "id": "MGR-TENANT-HOME",
+      "role": "tenant_admin",
+      "page": "pages/home/home",
+      "status": "PASS",
+      "expected": "tenant admin manage menus; SYSTEM_ADMIN absent",
+      "actual": "{\"me\":{\"display_name\":\"139****8751\",\"roles\":[\"TENANT_ADMIN\"],\"permissions\":[\"ai_analysis:read\",\"ai_analysis:review\",\"announcement:draft\",\"announcement:publish\",\"announcement:read\",\"attendance:check_in\",\"attendance:check_out\",\"attendance:read\",\"audit:read\",\"dispatch_recommendation:read\",\"employee:manage\",\"employee:read\",\"incident:manage\",\"incident:read\",\"knowledge:manage\",\"knowledge:read\",\"property:read\",\"resident_binding:read\",\"resident_binding:review\",\"resident_relation:read\",\"role:manage\",\"role:read\",\"work_order:cancel\",\"work_order:decide\",\"work_order:dispatch\",\"work_order:process\",\"work_order:read\",\"work_order:resolve\"],\"scopes\":[{\"scope_type\":\"TENANT\",\"tenant_id\":4,\"property_id\":null}]},\"propertyId\":\"\",\"tenantId\":4,\"buttons\":[\"账号与安全\",\"房屋选择 / 绑定\",\"今日考勤\",\"我的任务\",\"待派工单\",\"事件\",\"公告审核\",\"绑定审核\",\"员工状态\",\"通知\",\"退出登录\",\"重试\"]}",
+      "evidence": [
+        "mp-cfull-20260919-1-tenant-admin-home.png"
+      ]
+    },
+    {
+      "id": "MGR-TENANT-VS-PROPERTY",
+      "role": "property_admin",
+      "page": "pages/home/home",
+      "status": "PASS",
+      "expected": "PROPERTY_ADMIN has propertyId; not SYSTEM",
+      "actual": "{\"me\":{\"display_name\":\"139****6188\",\"roles\":[\"PROPERTY_ADMIN\"],\"permissions\":[\"ai_analysis:read\",\"ai_analysis:review\",\"announcement:draft\",\"announcement:publish\",\"announcement:read\",\"attendance:check_in\",\"attendance:check_out\",\"attendance:read\",\"audit:read\",\"dispatch_recommendation:read\",\"employee:manage\",\"employee:read\",\"incident:manage\",\"incident:read\",\"knowledge:manage\",\"knowledge:read\",\"property:read\",\"resident_binding:read\",\"resident_binding:review\",\"resident_relation:read\",\"role:read\",\"work_order:cancel\",\"work_order:decide\",\"work_order:dispatch\",\"work_order:process\",\"work_order:read\",\"work_order:resolve\"],\"scopes\":[{\"scope_type\":\"PROPERTY\",\"tenant_id\":4,\"property_id\":4}]},\"propertyId\":4,\"buttons\":[\"账号与安全\",\"房屋选择 / 绑定\",\"今日考勤\",\"我的任务\",\"待派工单\",\"事件\",\"公告审核\",\"绑定审核\",\"员工状态\",\"通知\",\"退出登录\",\"重试\"]}",
+      "evidence": [
+        "mp-cfull-20260919-1-property-admin-home.png"
+      ]
+    },
+    {
+      "id": "MGR-BIND-APPROVE",
+      "role": "property_admin",
+      "page": "pages/supervisor/bindings",
+      "status": "PASS",
+      "expected": "approve pending request from page",
+      "actual": "{\"bind_request_id\":4,\"remaining\":[],\"error\":\"\"}",
+      "evidence": [
+        "mp-cfull-20260919-1-bindings-after-approve.png"
+      ]
+    },
+    {
+      "id": "MGR-BIND-REJECT",
+      "role": "reject",
+      "page": "pages/houses/houses",
+      "status": "PASS",
+      "expected": "rejected request visible to applicant",
+      "actual": "{\"requests\":[{\"id\":5,\"status\":\"REJECTED\"}],\"error\":\"\"}",
+      "evidence": [
+        "mp-cfull-20260919-1-houses-rejected.png"
+      ]
+    },
+    {
+      "id": "RES-AFTER-APPROVE",
+      "role": "resident",
+      "page": "pages/home/home",
+      "status": "PASS",
+      "expected": "canResident after approve",
+      "actual": "{\"me\":{\"display_name\":\"139****3804\",\"roles\":[\"RESIDENT\"],\"permissions\":[\"announcement:read\",\"knowledge:read\",\"resident_binding:create\",\"resident_binding:read\",\"resident_relation:read\",\"work_order:cancel\",\"work_order:create\",\"work_order:read\"],\"scopes\":[{\"scope_type\":\"PROPERTY\",\"tenant_id\":4,\"property_id\":4}]},\"canResident\":true}",
+      "evidence": [
+        "mp-cfull-20260919-1-resident-after-approve-home.png"
+      ]
+    },
+    {
+      "id": "STAFF-CLAIM",
+      "role": "staff",
+      "page": "pages/home/home",
+      "status": "PASS",
+      "expected": "claim via page then staff menus",
+      "actual": "{\"before\":[\"账号与安全\",\"房屋选择 / 绑定\",\"通知\",\"退出登录\",\"重试\"],\"after\":[\"账号与安全\",\"房屋选择 / 绑定\",\"今日考勤\",\"我的任务\",\"通知\",\"退出登录\",\"重试\"],\"me\":{\"display_name\":\"139****9045\",\"roles\":[\"STAFF\"],\"permissions\":[\"announcement:read\",\"attendance:check_in\",\"attendance:check_out\",\"incident:read\",\"knowledge:read\",\"work_order:process\",\"work_order:read\",\"work_order:resolve\"],\"scopes\":[{\"scope_type\":\"PROPERTY\",\"tenant_id\":4,\"property_id\":4}]}}",
+      "evidence": [
+        "mp-cfull-20260919-1-staff-after-claim.png"
+      ]
+    },
+    {
+      "id": "STAFF-ATTENDANCE",
+      "role": "staff",
+      "page": "pages/attendance/attendance",
+      "status": "PASS",
+      "expected": "check-in, duplicate message, check-out, check-in again",
+      "actual": "{\"inError\":\"\",\"dupError\":\"Check-in was denied\",\"outError\":\"\",\"secondError\":\"\",\"business_date\":\"2026-09-19\"}",
+      "evidence": [
+        "mp-cfull-20260919-1-staff-checkin.png",
+        "mp-cfull-20260919-1-staff-checkout.png"
+      ]
+    },
+    {
+      "id": "STAFF-CLAIM-DUP",
+      "status": "FAIL",
+      "page": "pages/login/login",
+      "actual": "error=false path=pages/login/login",
+      "evidence": [
+        "mp-cfull-20260919-1-staff2-dup-claim.png"
+      ],
+      "note": "navigateTo used after home button tap hung on degraded session"
+    },
+    {
+      "id": "WO-CREATE",
+      "status": "PASS",
+      "actual": "{\"id\":1,\"status\":\"PENDING_ANALYSIS\"}",
+      "evidence": [
+        "mp-cfull-20260919-1-wo-create.png",
+        "mp-cfull-20260919-1-wo-created.png"
+      ]
+    },
+    {
+      "id": "WO-MEDIA-NATIVE",
+      "status": "BLOCKED_ENV",
+      "actual": "automator cannot operate native pickers",
+      "evidence": []
+    },
+    {
+      "id": "WO-QUEUE-ASSIGN",
+      "status": "PASS",
+      "actual": "{\"still\":false,\"error\":\"\",\"staff\":1,\"selectedId\":1,\"employeeId\":\"4\"}",
+      "evidence": [
+        "mp-cfull-20260919-1-queue-after-assign.png"
+      ]
+    },
+    {
+      "id": "WO-AUTO-DISPATCH",
+      "status": "NOT_IMPLEMENTED",
+      "actual": "ai_auto_assign=false assigned_source_column=true wo_status_on_create=PENDING_ANALYSIS",
+      "evidence": [
+        "mp-cfull-20260919-1-queue-after-assign.png"
+      ]
+    },
+    {
+      "id": "WO-STAFF-PROCESS",
+      "status": "PASS",
+      "actual": "{\"status\":\"WAIT_CONFIRM\",\"error\":\"\"}",
+      "evidence": [
+        "mp-cfull-20260919-1-staff-orders.png",
+        "mp-cfull-20260919-1-staff-resolved.png"
+      ]
+    },
+    {
+      "id": "WO-LIST-PAGING",
+      "status": "PARTIAL",
+      "actual": "{\"count\":1,\"listed\":true,\"ids\":[1]}",
+      "evidence": [
+        "mp-cfull-20260919-1-resident-orders.png"
+      ]
+    },
+    {
+      "id": "WO-CONFIRM-CLOSED",
+      "status": "PASS",
+      "actual": "{\"status\":\"CLOSED\"}",
+      "evidence": [
+        "mp-cfull-20260919-1-resident-confirmed.png"
+      ]
+    },
+    {
+      "id": "WO-REENTER",
+      "status": "PASS",
+      "actual": "{\"status\":\"CLOSED\",\"logs\":9}",
+      "evidence": [
+        "mp-cfull-20260919-1-resident-reentered.png"
+      ]
+    },
+    {
+      "id": "ANN-PUBLISH",
+      "status": "PASS",
+      "actual": "{\"draftId\":1,\"error\":\"\"}",
+      "evidence": [
+        "mp-cfull-20260919-1-announcement-publish.png"
+      ]
+    },
+    {
+      "id": "ANN-READ",
+      "status": "PASS",
+      "actual": "{\"title\":\"mp-cfull-20260919-1 停水通知\",\"status\":\"PUBLISHED\"}",
+      "evidence": [
+        "mp-cfull-20260919-1-announcements-list.png",
+        "mp-cfull-20260919-1-announcement-detail.png"
+      ]
+    },
+    {
+      "id": "AST-QUERY",
+      "status": "PARTIAL",
+      "actual": "{\"hasAnswer\":true,\"citations\":0,\"error\":\"\"}",
+      "evidence": [
+        "mp-cfull-20260919-1-assistant.png"
+      ]
+    },
+    {
+      "id": "NTF-ROUND",
+      "status": "PARTIAL",
+      "actual": "{\"unread\":3,\"count\":3,\"error\":\"\"}",
+      "evidence": [
+        "mp-cfull-20260919-1-notifications.png"
+      ]
+    },
+    {
+      "id": "UX-NO-DEV-LEAK",
+      "status": "PASS",
+      "actual": "ended on login",
+      "evidence": [
+        "mp-cfull-20260919-1-end-login.png"
+      ]
+    },
+    {
+      "id": "DEV-LOGIN-ISOLATED",
+      "status": "PASS",
+      "actual": "{\"allowed\":false,\"error\":\"当前环境不允许调试登录。\"}",
+      "evidence": [
+        "mp-cfull-20260919-1-dev-login-blocked.png"
+      ]
+    },
+    {
+      "id": "AUTH-PHONE-CHANGE",
+      "status": "NOT_IMPLEMENTED",
+      "actual": "功能尚未实现",
+      "evidence": []
+    },
+    {
+      "id": "AUTH-WECHAT-REBIND",
+      "status": "NOT_IMPLEMENTED",
+      "actual": "功能尚未实现",
+      "evidence": []
+    },
+    {
+      "id": "AUTH-MERGE",
+      "status": "NOT_IMPLEMENTED",
+      "actual": "功能尚未实现",
+      "evidence": []
+    },
+    {
+      "id": "AUTH-RECOVERY",
+      "status": "NOT_IMPLEMENTED",
+      "actual": "功能尚未实现",
+      "evidence": []
+    },
+    {
+      "id": "AUTH-PASSWORD-CHANGE",
+      "status": "NOT_IMPLEMENTED",
+      "actual": "只有API没有页面",
+      "evidence": []
+    },
+    {
+      "id": "STAFF-INVITE-PAGE",
+      "status": "NOT_IMPLEMENTED",
+      "actual": "只有API没有页面；本轮测试前置准备由 TENANT_ADMIN HTTP 发邀请。PROPERTY_ADMIN invite 403",
+      "evidence": []
+    },
+    {
+      "id": "STAFF-DEPT-SKILL-UI",
+      "status": "NOT_IMPLEMENTED",
+      "actual": "只有API没有页面",
+      "evidence": []
+    },
+    {
+      "id": "KNOWLEDGE-INGEST-UI",
+      "status": "NOT_IMPLEMENTED",
+      "actual": "只有API没有页面",
+      "evidence": []
+    },
+    {
+      "id": "HOUSE-IMPORT-EXPORT",
+      "status": "NOT_IMPLEMENTED",
+      "actual": "功能尚未实现",
+      "evidence": []
+    },
+    {
+      "id": "STATS-CONFIG",
+      "status": "NOT_IMPLEMENTED",
+      "actual": "功能尚未实现",
+      "evidence": []
+    },
+    {
+      "id": "SELFHOST-AI",
+      "status": "NOT_IMPLEMENTED",
+      "actual": "自托管推理未运行",
+      "evidence": []
+    },
+    {
+      "id": "REAL-SMS",
+      "status": "NOT_IMPLEMENTED",
+      "actual": "缺真实外部配置；本轮 development inbox",
+      "evidence": []
+    },
+    {
+      "id": "WO-TIMEOUT",
+      "status": "NOT_IMPLEMENTED",
+      "actual": "不属于小程序页面、应单独后端验证",
+      "evidence": []
+    },
+    {
+      "id": "WO-CANCEL-REJECT-REASSIGN-REOPEN",
+      "status": "PARTIAL",
+      "actual": "详情有确认/重开；队列有改派；本轮主链未并行互斥分支",
+      "evidence": []
+    },
+    {
+      "id": "AUTH-WECHAT",
+      "status": "NOT_IMPLEMENTED",
+      "actual": "缺真实外部配置",
+      "evidence": []
+    },
+    {
+      "id": "AUTH-SMS-EXPIRE",
+      "status": "NOT_RUN",
+      "actual": "OTP TTL 300s 未在页面等待",
+      "evidence": []
+    },
+    {
+      "id": "AUTH-SMS-REUSE",
+      "status": "NOT_RUN",
+      "actual": "登录后离开页；isolated API 已覆盖",
+      "evidence": []
+    },
+    {
+      "id": "INCIDENT-UI",
+      "status": "NOT_RUN",
+      "actual": "续跑未覆盖事件页；页面仅列表无创建/处理",
+      "evidence": []
+    },
+    {
+      "id": "STAFF-DAILY-PAGE",
+      "status": "NOT_RUN",
+      "actual": "续跑未覆盖员工状态页；队列页已见 on_duty staff",
+      "evidence": []
+    }
+  ],
+  "request_log": [
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/admin/resident-bind-requests",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/admin/resident-bind-requests/4/approve",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/admin/resident-bind-requests",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/logout",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/challenge",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/sms/send",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/sms/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me/houses",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/resident-bind-requests/mine",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/properties",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/properties/1/buildings",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/buildings/1/units",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/units/1/houses",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/properties/4/buildings",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/buildings/4/units",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/units/4/houses",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/resident-bind-requests",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me/houses",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/properties",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/resident-bind-requests/mine",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/properties/1/buildings",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/buildings/1/units",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/units/1/houses",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/logout",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/challenge",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/sms/send",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/sms/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/admin/resident-bind-requests",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/admin/resident-bind-requests/5/reject",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/admin/resident-bind-requests",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/logout",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/challenge",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/sms/send",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/sms/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me/houses",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/resident-bind-requests/mine",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/properties",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/properties/1/buildings",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/buildings/1/units",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/units/1/houses",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/logout",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/challenge",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/sms/send",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/sms/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/logout",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/challenge",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/sms/send",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/sms/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/staff/employee-claim",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/staff/attendance/checkin",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/staff/attendance/checkin",
+      "method": "POST",
+      "status": 409
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/staff/attendance/checkout",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/staff/attendance/checkin",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/logout",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/challenge",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/sms/send",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/sms/login",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/staff/employee-claim",
+      "method": "POST",
+      "status": 401
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/auth/token/refresh",
+      "method": "POST",
+      "status": 200
+    },
+    {
+      "host": "127.0.0.1:8083",
+      "path": "/api/v1/staff/employee-claim",
+      "method": "POST",
+      "status": 401
+    }
+  ],
+  "resumed": true
+}

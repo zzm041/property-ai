@@ -1,0 +1,88 @@
+{
+  "task_id": "MP-CURRENT-FULL-REGRESSION-001",
+  "related": "AUTH-IDENTITY-AI-001-C",
+  "prepared_at": "2026-09-19T11:34:52Z",
+  "code_sha": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+  "api": "http://127.0.0.1:8083/api/v1",
+  "database": "127.0.0.1:3307/property_ai_auth001_test",
+  "revision": "20260919_0009",
+  "property_count_before_plus_one": 4,
+  "assignment_columns_include_assigned_source": true,
+  "provider": {
+    "sms": "development",
+    "llm": "development",
+    "embedding": "development",
+    "storage": "development_in_process_memory",
+    "wechat": "development",
+    "ai_enqueue_on_create": false
+  },
+  "healthz": {
+    "path": "/api/v1/healthz",
+    "status": 200
+  },
+  "env_local": {
+    "changed": true,
+    "develop": "http://127.0.0.1:8083/api/v1",
+    "localPreview": "false",
+    "backup": "reports/mp-current-full-regression/private/env.local.js.bak",
+    "note": "identities/AppID untouched; localPreview false so Seed identities unused"
+  },
+  "org": {
+    "tenant_id": 4,
+    "property_id": 4,
+    "property_name": "cfull-property-9168b2",
+    "building_id": 4,
+    "unit_id": 4,
+    "house_id": 4,
+    "room_no": "101"
+  },
+  "roles": {
+    "unbound": {
+      "label": "unbound",
+      "user_id": 15,
+      "phone_last4": "7974"
+    },
+    "resident": {
+      "label": "resident",
+      "user_id": 16,
+      "phone_last4": "3804"
+    },
+    "reject": {
+      "label": "reject",
+      "user_id": 17,
+      "phone_last4": "8633"
+    },
+    "tenant_admin": {
+      "label": "tenant_admin",
+      "user_id": 18,
+      "phone_last4": "8751"
+    },
+    "property_admin": {
+      "label": "property_admin",
+      "user_id": 19,
+      "phone_last4": "6188"
+    },
+    "staff": {
+      "label": "staff",
+      "user_id": 20,
+      "phone_last4": "9045"
+    },
+    "staff2": {
+      "label": "staff2",
+      "user_id": 21,
+      "phone_last4": "2881"
+    }
+  },
+  "employee_id": 4,
+  "property_admin_invite_status": 403,
+  "property_admin_invite_error": "IAM.FORBIDDEN",
+  "catalog": {
+    "pages_scanned": 1,
+    "first_page_count": 4,
+    "first_page_contains_target": true,
+    "found_page": 1,
+    "first_page_index": 3
+  },
+  "fixture_note": "测试前置准备: org/RBAC/TENANT_ADMIN+PROPERTY_ADMIN grants/employee+invite. Claim/bind/work-order left to pages.",
+  "credential_location": "reports/mp-current-full-regression/accounts.local.json (gitignored)"
+}

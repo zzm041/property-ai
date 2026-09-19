@@ -1,0 +1,74 @@
+{
+  "task_id": "MP-CURRENT-FULL-REGRESSION-001",
+  "related": "AUTH-IDENTITY-AI-001-C",
+  "recorded_at": "2026-09-19T11:30:00Z",
+  "code_sha": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+  "parents": ["8269336", "14c0e19"],
+  "working_tree": {
+    "operator_preserved": "miniprogram/project.config.json",
+    "operator_sha256": "342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F",
+    "not_this_round_source_fix": true,
+    "other_dirty": [
+      "reports/codex/AUTH-IDENTITY-AI-001-login-review.call.json",
+      "reports/codex/AUTH-IDENTITY-AI-001-login-review.json",
+      "reports/auth-identity-ai-001/login-vis-error.txt"
+    ]
+  },
+  "miniprogram_import": "D:\\property-ai\\miniprogram",
+  "effective_api": "http://127.0.0.1:8083/api/v1",
+  "env_local": {
+    "gitignored": true,
+    "previous_develop": "http://127.0.0.1:8082/api/v1",
+    "previous_localPreview": true,
+    "current_develop": "http://127.0.0.1:8083/api/v1",
+    "current_localPreview": false,
+    "backup": "reports/mp-current-full-regression/private/env.local.js.bak",
+    "appid_untouched": true,
+    "counted_as_source_fix": false
+  },
+  "api_8083": {
+    "listen_pid": 46740,
+    "parent_pid": 55648,
+    "started": "2026-09-19 18:56:05",
+    "command": "serve_auth001_isolated_api.py",
+    "python_child": "C:\\Users\\lmj\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "python_parent": "D:\\property-ai\\.venv\\Scripts\\python.exe",
+    "healthz": "GET /api/v1/healthz 200",
+    "root_healthz": "GET /healthz 404"
+  },
+  "api_8082": {
+    "role": "Day4 leftover",
+    "healthz": 200,
+    "used_this_round": false
+  },
+  "database": {
+    "target": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "exclusive": true
+  },
+  "workers": {
+    "isolated_auth001_worker": false,
+    "day4_worker": "property-ai-day4-worker-day4-1 up, not used",
+    "default_worker": "property-ai-worker-1 up, not used",
+    "prodlike_worker": "property-ai-prodlike-worker-1 up, not used",
+    "ai_enqueue_on_create": false,
+    "analysis_path": "in-process Fake via POST /supervisor/work-orders/{id}/analyze",
+    "storage": "development in-process memory"
+  },
+  "devtools": {
+    "cli": "D:\\微信web开发者工具\\cli.bat",
+    "islogin": true,
+    "http": "http://127.0.0.1:24540",
+    "automator_ws": "ws://127.0.0.1:9420",
+    "automator_pid": 56952,
+    "cli_auto_has_auto_port": "accepted by CLI even if omitted from --help; bind can lag several seconds",
+    "automator_ws_used": "ws://127.0.0.1:9433"
+  },
+  "run_id": "mp-cfull-20260919-1",
+  "provider_modes": {
+    "password": "real Argon2id on 0009",
+    "sms": "development inbox sidecar",
+    "ai": "Fake / development",
+    "self_host_ai": "not running"
+  }
+}

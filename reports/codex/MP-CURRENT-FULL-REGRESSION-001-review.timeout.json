@@ -1,0 +1,6 @@
+{
+  "task_id": "MP-CURRENT-FULL-REGRESSION-001",
+  "phase": "review",
+  "status": "CODEX_TIMEOUT",
+  "note": "codex_exec_readonly.py --timeout 240 did not return; wrapper killed after ~420s with no review JSON. Do not treat as PASS. Cursor evidence still in reports/mp-current-full-regression/."
+}

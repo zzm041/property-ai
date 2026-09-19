@@ -1,0 +1,41 @@
+{
+  "task_id": "MP-CURRENT-FULL-REGRESSION-001",
+  "related": "AUTH-IDENTITY-AI-001-C",
+  "run_id": "mp-cfull-20260919-1",
+  "code_sha": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+  "api": "http://127.0.0.1:8083/api/v1",
+  "revision": "20260919_0009",
+  "automator_ws": "ws://127.0.0.1:9433",
+  "devtools": "2.02.2608070",
+  "counts": {
+    "PASS": 30,
+    "FAIL": 1,
+    "PARTIAL": 4,
+    "BLOCKED_ENV": 1,
+    "NOT_IMPLEMENTED": 15,
+    "NOT_RUN": 4
+  },
+  "total": 55,
+  "objects": {
+    "bind_request_id": 4,
+    "reject_request_id": 5,
+    "work_order_id": 1,
+    "announcement_id": 1,
+    "employee_id": 4
+  },
+  "provider_modes": {
+    "password": "real Argon2id on 0009",
+    "sms": "development inbox sidecar",
+    "ai": "Fake / development",
+    "self_host_ai": "not running",
+    "storage": "development in-process memory",
+    "worker": "no isolated auth001 worker; analyze via in-process Fake API"
+  },
+  "not_claimed": [
+    "Production V1",
+    "Day 4 PASS",
+    "real SMS",
+    "self-hosted AI"
+  ],
+  "headline": "回归完成，仍有缺口"
+}

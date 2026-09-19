@@ -1,0 +1,432 @@
+{
+  "task_id": "MP-CURRENT-FULL-REGRESSION-001",
+  "related": "AUTH-IDENTITY-AI-001-C",
+  "code_sha_baseline": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+  "denominator_rule": "Unimplemented V1 items stay in the denominator. Do not relabel as N/A.",
+  "items": [
+    {
+      "id": "AUTH-LOGIN-DEFAULT",
+      "requirement": "默认仅密码主表单",
+      "role": "anonymous",
+      "page": "pages/login/login",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "AUTH-NO-SEED",
+      "requirement": "普通登录无三种 Seed 按钮，不请求 /auth/dev/token",
+      "role": "anonymous",
+      "page": "pages/login/login",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "AUTH-PHONE-KEEP",
+      "requirement": "切换验证码/密码保留手机号并清理无关字段",
+      "role": "anonymous",
+      "page": "pages/login/login",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "AUTH-PASSWORD-TOGGLE",
+      "requirement": "密码显示/隐藏、错误提示、提交防重复",
+      "role": "anonymous",
+      "page": "pages/login/login",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "AUTH-PASSWORD-POLICY",
+      "requirement": "不强制大写；最少 8 字符；禁止纯数字/纯小写字母",
+      "role": "resident",
+      "page": "pages/password-reset/password-reset",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "AUTH-CHALLENGE",
+      "requirement": "数字挑战成功/错误；过期",
+      "role": "anonymous",
+      "page": "pages/login/login",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "AUTH-SMS-COOLDOWN",
+      "requirement": "验证码发送冷却、错误、开发短信取码",
+      "role": "unbound",
+      "page": "pages/login/login",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "AUTH-SMS-REUSE",
+      "requirement": "验证码不可重复使用",
+      "role": "unbound",
+      "page": "pages/login/login",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "AUTH-SMS-EXPIRE",
+      "requirement": "验证码过期拒绝",
+      "role": "anonymous",
+      "page": "pages/login/login",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI",
+      "note": "OTP TTL 300s；页面等待过长则 NOT_RUN 并引用 isolated API"
+    },
+    {
+      "id": "AUTH-RESET",
+      "requirement": "忘记密码→验证码核验→新密确认→返回登录",
+      "role": "resident",
+      "page": "pages/password-reset/password-reset",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "AUTH-RESET-MISMATCH",
+      "requirement": "两次不一致不能提交成功；强度提示变化",
+      "role": "resident",
+      "page": "pages/password-reset/password-reset",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "AUTH-RESET-REVOKE",
+      "requirement": "重置后旧密码与旧会话失效",
+      "role": "resident",
+      "page": "pages/login/login",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "AUTH-PASSWORD-LOGIN",
+      "requirement": "正常密码登录、退出、重新进入",
+      "role": "resident",
+      "page": "pages/login/login",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "AUTH-WECHAT",
+      "requirement": "正式微信登录/换绑",
+      "role": "any",
+      "page": "pages/login/login",
+      "impl": "缺环境或权限",
+      "ui_or_api": "UI",
+      "note": "开发 WeChat provider；正式 jscode2session 未验证"
+    },
+    {
+      "id": "AUTH-PHONE-CHANGE",
+      "requirement": "换手机号",
+      "role": "any",
+      "page": null,
+      "impl": "功能尚未实现",
+      "ui_or_api": "none"
+    },
+    {
+      "id": "AUTH-WECHAT-REBIND",
+      "requirement": "换微信",
+      "role": "any",
+      "page": null,
+      "impl": "功能尚未实现",
+      "ui_or_api": "none"
+    },
+    {
+      "id": "AUTH-MERGE",
+      "requirement": "受控账号合并",
+      "role": "any",
+      "page": null,
+      "impl": "功能尚未实现",
+      "ui_or_api": "none"
+    },
+    {
+      "id": "AUTH-RECOVERY",
+      "requirement": "高风险恢复（实名+活体）",
+      "role": "any",
+      "page": null,
+      "impl": "功能尚未实现",
+      "ui_or_api": "none"
+    },
+    {
+      "id": "AUTH-PASSWORD-CHANGE",
+      "requirement": "已登录改密",
+      "role": "any",
+      "page": null,
+      "impl": "只有API没有页面",
+      "ui_or_api": "API"
+    },
+    {
+      "id": "DEV-LOGIN-ISOLATED",
+      "requirement": "localPreview=false 时调试页不可用；源码仍有 pages/dev-login",
+      "role": "anonymous",
+      "page": "pages/dev-login/dev-login",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "RES-UNBOUND-HOME",
+      "requirement": "无房屋关系首页空状态与权限",
+      "role": "unbound",
+      "page": "pages/home/home",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "RES-PROFILE",
+      "requirement": "资料填写/修改",
+      "role": "unbound",
+      "page": "pages/profile/profile",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "RES-HOUSE-CASCADE",
+      "requirement": "小区→楼栋→单元→房号级联，不手填 house_id",
+      "role": "resident",
+      "page": "pages/houses/houses",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "RES-BIND-APPLY",
+      "requirement": "提交申请并看待审核",
+      "role": "resident",
+      "page": "pages/houses/houses",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "MGR-BIND-APPROVE",
+      "requirement": "物业批准后住户可见有效关系",
+      "role": "property_admin",
+      "page": "pages/supervisor/bindings",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "MGR-BIND-REJECT",
+      "requirement": "驳回原因与重复申请分支",
+      "role": "property_admin",
+      "page": "pages/supervisor/bindings",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "MGR-TENANT-VS-PROPERTY",
+      "requirement": "租户管理员与小区管理员分别验收，不用 SYSTEM",
+      "role": "tenant_admin,property_admin",
+      "page": "pages/home/home",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "STAFF-INVITE-PAGE",
+      "requirement": "页面创建员工并发邀请",
+      "role": "tenant_admin",
+      "page": null,
+      "impl": "只有API没有页面",
+      "ui_or_api": "API"
+    },
+    {
+      "id": "STAFF-CLAIM",
+      "requirement": "本人用邀请令牌认领并进入工作台",
+      "role": "staff",
+      "page": "pages/employee-claim/employee-claim",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "STAFF-CLAIM-DUP",
+      "requirement": "邀请失效/重复认领拒绝",
+      "role": "staff2",
+      "page": "pages/employee-claim/employee-claim",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "STAFF-ATTENDANCE",
+      "requirement": "签到、签退、重复签到、当天状态",
+      "role": "staff",
+      "page": "pages/attendance/attendance",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "STAFF-DEPT-SKILL-UI",
+      "requirement": "员工/部门/岗位/技能/服务小区管理页面",
+      "role": "tenant_admin",
+      "page": null,
+      "impl": "只有API没有页面",
+      "ui_or_api": "API"
+    },
+    {
+      "id": "WO-CREATE",
+      "requirement": "住户从已绑房屋报修（文字）",
+      "role": "resident",
+      "page": "pages/work-orders/create",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "WO-MEDIA-NATIVE",
+      "requirement": "图片/语音原生选择上传并预览",
+      "role": "resident",
+      "page": "pages/work-orders/create",
+      "impl": "缺环境或权限",
+      "ui_or_api": "UI",
+      "note": "automator 无法操作系统文件选择器/摄像头/麦克风"
+    },
+    {
+      "id": "WO-QUEUE-ASSIGN",
+      "requirement": "待处理队列人工派单",
+      "role": "property_admin",
+      "page": "pages/supervisor/queue",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "WO-AUTO-DISPATCH",
+      "requirement": "自动派单生成 Assignment",
+      "role": "system",
+      "page": "pages/supervisor/queue",
+      "impl": "页面存在但无真实接线",
+      "ui_or_api": "API",
+      "note": "Fake + ai_auto_assign 默认 false；0009 列情况以本轮探测为准"
+    },
+    {
+      "id": "WO-STAFF-PROCESS",
+      "requirement": "接单/开始/反馈/回执",
+      "role": "staff",
+      "page": "pages/staff-orders/detail",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "WO-CONFIRM-CLOSED",
+      "requirement": "住户确认同一工单 CLOSED 且历史一致",
+      "role": "resident",
+      "page": "pages/work-orders/detail",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "WO-LIST-PAGING",
+      "requirement": "工单列表分页/加载更多",
+      "role": "resident",
+      "page": "pages/work-orders/list",
+      "impl": "页面存在但无真实接线",
+      "ui_or_api": "UI",
+      "note": "API 有 after_id；页面只拉第一页"
+    },
+    {
+      "id": "WO-CANCEL-REJECT-REASSIGN-REOPEN",
+      "requirement": "撤销/拒单/改派/未解决上报/重开（独立对象）",
+      "role": "mixed",
+      "page": "mixed",
+      "impl": "部分页面接线",
+      "ui_or_api": "UI",
+      "note": "详情有确认/重开；队列有改派；拒单/撤销入口可能缺失"
+    },
+    {
+      "id": "WO-TIMEOUT",
+      "requirement": "超时提醒",
+      "role": "mixed",
+      "page": null,
+      "impl": "不属于小程序页面、应单独后端验证",
+      "ui_or_api": "API"
+    },
+    {
+      "id": "ANN-PUBLISH",
+      "requirement": "公告创建、提交审核、发布",
+      "role": "property_admin",
+      "page": "pages/supervisor/announcements",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "ANN-READ",
+      "requirement": "住户阅读/详情",
+      "role": "resident",
+      "page": "pages/announcements/detail",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "NTF-ROUND",
+      "requirement": "本轮通知未读/已读/详情跳转匹配 resource",
+      "role": "resident",
+      "page": "pages/notifications/list",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI",
+      "note": "异步投递若无本轮 Worker 则 BLOCKED_ENV"
+    },
+    {
+      "id": "AST-QUERY",
+      "requirement": "知识助手提问/回答/引用（Fake 只验接线）",
+      "role": "resident",
+      "page": "pages/assistant/assistant",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    },
+    {
+      "id": "KNOWLEDGE-INGEST-UI",
+      "requirement": "文档维护/入库/归档页面",
+      "role": "property_admin",
+      "page": null,
+      "impl": "只有API没有页面",
+      "ui_or_api": "API"
+    },
+    {
+      "id": "INCIDENT-UI",
+      "requirement": "事件列表/处理",
+      "role": "property_admin",
+      "page": "pages/supervisor/incidents",
+      "impl": "页面存在但无真实接线",
+      "ui_or_api": "UI",
+      "note": "仅列表；无创建/处理按钮"
+    },
+    {
+      "id": "HOUSE-IMPORT-EXPORT",
+      "requirement": "房产导入导出",
+      "role": "property_admin",
+      "page": null,
+      "impl": "功能尚未实现",
+      "ui_or_api": "none"
+    },
+    {
+      "id": "STATS-CONFIG",
+      "requirement": "统计与配置页面",
+      "role": "property_admin",
+      "page": null,
+      "impl": "功能尚未实现",
+      "ui_or_api": "none"
+    },
+    {
+      "id": "SELFHOST-AI",
+      "requirement": "自托管 Qwen 推理",
+      "role": "ops",
+      "page": null,
+      "impl": "缺环境或权限",
+      "ui_or_api": "none"
+    },
+    {
+      "id": "REAL-SMS",
+      "requirement": "真实短信投递",
+      "role": "ops",
+      "page": null,
+      "impl": "缺环境或权限",
+      "ui_or_api": "none"
+    },
+    {
+      "id": "UX-NO-DEV-LEAK",
+      "requirement": "普通页面无 API/Seed/内部角色码备注；返回刷新不串号",
+      "role": "mixed",
+      "page": "pages/home/home",
+      "impl": "已实现可测试",
+      "ui_or_api": "UI"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "propertyNames": [
+    "auth001-id-property-40edb0",
+    "auth001-id-property-277d26",
+    "auth001-id-property-18e0f7",
+    "cfull-property-9168b2"
+  ],
+  "buildingNames": [
+    "Building 1"
+  ],
+  "unitNames": [
+    "Unit 1"
+  ],
+  "houseNames": [
+    "101"
+  ],
+  "selectedHouseId": 1,
+  "items": [],
+  "requests": []
+}

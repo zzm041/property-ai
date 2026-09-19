@@ -1,0 +1,62 @@
+mp-cfull-20260919-1 start
+AUTH-LOGIN-DEFAULT PASS mode=password
+AUTH-NO-SEED PASS 显示|登录|微信登录
+AUTH-PASSWORD-TOGGLE PASS show=true error=true path=pages/login/login
+AUTH-PHONE-KEEP PASS mode=sms phone_kept=true sms=
+AUTH-CHALLENGE PASS error=true prompt=true
+AUTH-SMS-COOLDOWN PASS logged in
+RES-UNBOUND-HOME PASS {"canResident":false,"canStaff":false,"canManage":false,"buttons":["账号与安全","房屋选择 / 绑定","通知","退出登录","重试"],"me":{"display_name":"139****7974","roles":[],"permissions":[],"scopes":[]}}
+RES-PROFILE PASS name=未绑定住户 error=
+AUTH-RESET-MISMATCH PASS weak=偏弱 error=两次密码不一致
+AUTH-RESET PASS pages/login/login
+AUTH-PASSWORD-LOGIN PASS home
+AUTH-RESET-REVOKE PASS folded_error=true
+RES-HOUSE-CASCADE PASS {"propertyIndex":3,"selectedHouseId":4,"houseNames":["101"]}
+RES-BIND-APPLY PASS {"requests":[{"id":4,"status":"PENDING"}],"error":""}
+MGR-TENANT-HOME PASS {"me":{"display_name":"139****8751","roles":["TENANT_ADMIN"],"permissions":["ai_analysis:read","ai_analysis:review","announcement:draft","announcement:publish","announcement:read","attendance:check_in","attendance:check_out","attendance:read","audit:read","dispatch_recommendation:read","employee:manage","employee:read","incident:manage","incident:read","knowledge:manage","knowledge:read","property:read","resident_binding:read","resident_binding:review","resident_relation:read","role:manage","role:read","work_order:cancel","work_order:decide","work_order:dispatch","work_order:process","work_order:read","work_order:resolve"],"scopes":[{"scope_type":"TENANT","tenant_id":4,"property_id":null}]},"propertyId":"","tenantId":4,"buttons":["账号与安全","房屋选择 / 绑定","今日考勤","我的任务","待派工单","事件","公告审核","绑定审核","员工状态","通知","退出登录","重试"]}
+MGR-TENANT-VS-PROPERTY PASS {"me":{"display_name":"139****6188","roles":["PROPERTY_ADMIN"],"permissions":["ai_analysis:read","ai_analysis:review","announcement:draft","announcement:publish","announcement:read","attendance:check_in","attendance:check_out","attendance:read","audit:read","dispatch_recommendation:read","employee:manage","employee:read","incident:manage","incident:read","knowledge:manage","knowledge:read","property:read","resident_binding:read","resident_binding:review","resident_relation:read","role:read","work_order:cancel","work_order:decide","work_order:dispatch","work_order:process","work_order:read","work_order:resolve"],"scopes":[{"scope_type":"PROPERTY","tenant_id":4,"property_id":4}]},"propertyId":4,"buttons":["账号与安全","房屋选择 / 绑定","今日考勤","我的任务","待派工单","事件","公告审核","绑定审核","员工状态","通知","退出登录","重试"]}
+MGR-BIND-APPROVE PASS {"bind_request_id":4,"remaining":[],"error":""}
+MGR-BIND-REJECT PASS {"requests":[{"id":5,"status":"REJECTED"}],"error":""}
+RES-AFTER-APPROVE PASS {"me":{"display_name":"139****3804","roles":["RESIDENT"],"permissions":["announcement:read","knowledge:read","resident_binding:create","resident_binding:read","resident_relation:read","work_order:cancel","work_order:create","work_order:read"],"scopes":[{"scope_type":"PROPERTY","tenant_id":4,"property_id":4}]},"canResident":true}
+STAFF-CLAIM PASS {"before":["账号与安全","房屋选择 / 绑定","通知","退出登录","重试"],"after":["账号与安全","房屋选择 / 绑定","今日考勤","我的任务","通知","退出登录","重试"],"me":{"display_name":"139****9045","roles":["STAFF"],"permissions":["announcement:read","attendance:check_in","attendance:check_out","incident:read","knowledge:read","work_order:process","work_order:read","work_order:resolve"],"scopes":[{"scope_type":"PROPERTY","tenant_id":4,"property_id":4}]}}
+STAFF-ATTENDANCE PASS {"inError":"","dupError":"Check-in was denied","outError":"","secondError":"","business_date":"2026-09-19"}
+resume start
+resume start
+resume start
+resume start
+resume start
+resume already on home
+resume start
+resume page pages/home/home
+resume start
+resume page pages/home/home
+mini start
+connected
+startpath pages/login/login
+staff2 home
+STAFF-CLAIM-DUP FAIL
+resident home
+WO-CREATE PASS
+WO-MEDIA-NATIVE BLOCKED_ENV
+ERR no pages/login/login last pages/home/home
+wo start
+path pages/home/home wo=1
+ERR no pages/login/login last pages/home/home
+wo start
+path pages/home/home wo=1
+on login
+manager home
+queue items=1 staff=1
+WO-QUEUE-ASSIGN PASS
+WO-AUTO-DISPATCH NOT_IMPLEMENTED
+WO-STAFF-PROCESS PASS
+WO-LIST-PAGING PARTIAL
+WO-CONFIRM-CLOSED PASS
+WO-REENTER PASS
+ANN-PUBLISH PASS
+ANN-READ PASS
+AST-QUERY PARTIAL
+NTF-ROUND PARTIAL
+UX-NO-DEV-LEAK PASS
+DEV-LOGIN-ISOLATED PASS
+wo done

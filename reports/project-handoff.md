@@ -5,18 +5,18 @@ Updated for Cursor + Codex CLI collaboration. Not a full-repo audit. Not Product
 | Item | Current fact |
 | --- | --- |
 | Repo | `D:\property-ai` |
-| HEAD | `8269336c259f791d4e1d115b0e5c2111c16eab46` (parent `14c0e19`). Working tree AUTH-IDENTITY-AI-001-C. Do not revert. |
+| HEAD | `ab0b8822b34ab26c4c2960dde00c157c3b141725` (parent `8269336`). Do not revert. |
 | Calendar | Spec/git work started **2026-09-15**. Operator last confirmed actual development **day 5 on 2026-09-18**. **Today is 2026-09-19**. Original one-week aim ≈ **2026-09-21**. Full Production V1 cannot meet that date without deleting frozen features; do not delete features or relabel Fake as delivery. |
-| Working tree | pre-existing `miniprogram/project.config.json` plus AUTH-IDENTITY-AI-001-C. Do not stage the AppID file |
+| Working tree | pre-existing `miniprogram/project.config.json`. Do not stage the AppID file |
 | That file SHA-256 | `342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F`. Keep as-is. Do not stage, revert, or overwrite |
 | That file meaning | operator AppID `wxcfa5fd7dc03cac56` and DevTools compile settings |
-| Implementer pytest | host `.venv` unit **320 passed** (FIX-1; do not cite 318 as C). Isolated 0009 **7 passed** on `property_ai_auth001_test`. Shared `property_ai_test` remains **0007** |
-| Local API | Day4 Nginx `http://127.0.0.1:8082/api/v1` **unchanged**. Isolated auth API restarted `http://127.0.0.1:8083/api/v1` PID **46740** started 2026-09-19 18:56:05 (after `passwords.py` 18:54:47) → `127.0.0.1:3307/property_ai_auth001_test` @ `20260919_0009` |
-| Mini program import | `D:\property-ai\miniprogram` |
-| Dev Seed login | Source still has `pages/dev-login` + `LOCAL_PREVIEW`. Ordinary login has no Seed buttons. Local **release pack** at `reports/auth-identity-ai-001/release-pack` has **0** dev-login files and does not register the page. Operator `project.config.json` was not modified. No upload/submit |
-| Codex CLI | `codex.cmd` 0.155.1. Delivery owner + independent reviewer. Helper `scripts/ops/codex_exec_readonly.py` prepends `reports/codex/context-preamble.txt`. Schema requires `task_result` / `product_gap_changes` / `schedule_risk` / `next_action` / `approval_requests` |
-| VIS batches | MP-LOCAL-VIS-001 and MP-LOCAL-BATCH-002 **page-business vis only**. **Not** formal credential auth, **not** real AI, **not** Production V1. This round DevTools `9420` was down; reset-page screenshots **not** taken |
-| Current task | AUTH-IDENTITY-AI-001-C: password no-uppercase, official-session identity, release-pack isolation, self-host AI inventory. Closed security items stay closed. Not formal SMS/real-AI/Production V1 PASS |
+| Implementer pytest | host `.venv` unit **320 passed** (FIX-1). Isolated 0009 **7 passed** on `property_ai_auth001_test`. Shared `property_ai_test` remains **0007**. This vis round did not rerun full pytest |
+| Local API | Day4 Nginx `http://127.0.0.1:8082/api/v1` **unchanged**. Isolated auth API `http://127.0.0.1:8083/api/v1` PID **46740** (parent 55648) started 2026-09-19 18:56:05 → `127.0.0.1:3307/property_ai_auth001_test` @ `20260919_0009` |
+| Mini program import | `D:\property-ai\miniprogram`. This round `env.local.js` develop=`http://127.0.0.1:8083/api/v1`, `localPreview=false` (gitignored; backup under `reports/mp-current-full-regression/private/`) |
+| Dev Seed login | Source still has `pages/dev-login`. Ordinary login has no Seed buttons. `localPreview=false` blocks debug page. Operator `project.config.json` was not modified |
+| Codex CLI | Helper `scripts/ops/codex_exec_readonly.py`. This vis review **timed out** (~240s, no JSON). Evidence still in `reports/mp-current-full-regression/` |
+| VIS batches | **MP-CURRENT-FULL-REGRESSION-001** on 8083/0009 via DevTools automator WS `9433`. Official SMS/password pages, bind/claim, work-order CLOSED, announcement. **Not** Production V1 / Day4 / real SMS / self-hosted AI PASS. Summary: 55 cases, 30 PASS, 1 FAIL, 4 PARTIAL, 1 BLOCKED_ENV, 15 NOT_IMPLEMENTED, 4 NOT_RUN |
+| Current task | MP-CURRENT-FULL-REGRESSION-001 done as vis+gap inventory on AUTH-IDENTITY-AI-001-C baseline `ab0b882`. No product-code commit this round |
 | Alembic | Script heads `20260919_0009` revising `20260917_0007`. **0008 reserved**. Exclusive `property_ai_auth001_test` is at `20260919_0009`. Other DBs not upgraded |
 | Persistent DB | Do not migrate/wipe `property_ai` or `property_ai_day4`. Do not recreate shared tmpfs `mysql-test` |
 | Password policy (operator 2026-09-19; not V1 acceptance) | New/reset: ≥8 chars, **uppercase not required**, reject all-digit and all-lowercase-alpha; `goodpass1` accepted; hash/verify original input (no casefold). Login of existing hashes does **not** apply new-password policy. Do not list uppercase as pending |

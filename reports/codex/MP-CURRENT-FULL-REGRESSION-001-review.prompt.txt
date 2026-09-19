@@ -1,0 +1,29 @@
+Review MP-CURRENT-FULL-REGRESSION-001. Read-only. Do not edit product source.
+
+Task: WeChat DevTools full-page regression of current implemented features, plus V1 gap inventory. Related AUTH-IDENTITY-AI-001-C.
+
+Reviewed HEAD: ab0b8822b34ab26c4c2960dde00c157c3b141725 (parent 8269336). No product-code fix this round. Operator miniprogram/project.config.json remains unstaged.
+
+Runtime:
+- API http://127.0.0.1:8083/api/v1 PID 46740 serve_auth001_isolated_api.py → 127.0.0.1:3307/property_ai_auth001_test @ 20260919_0009
+- 8082 Day4 kept running, not used
+- DevTools 2.02.2608070 HTTP 24540, automator WS ended on 9433 (cli auto --auto-port binds after delay; 9420 is not magic)
+- env.local develop 8083 localPreview false (gitignored backup under private/)
+- Providers: real password, development SMS inbox, Fake AI, in-process memory storage, no isolated worker. Supervisor analyze is in-process Fake API.
+
+Read at least:
+- reports/mp-current-full-regression/summary.json
+- reports/mp-current-full-regression/coverage-matrix.json
+- reports/mp-current-full-regression/first-round-results.json
+- reports/mp-current-full-regression/accounts-public.json
+- reports/mp-current-full-regression/env-baseline.json
+- several PNG screenshots (login, houses, bindings, staff claim, WO create/queue/closed, announcement, assistant, notifications, end-login)
+- miniprogram/pages/login/login.wxml and app.json
+
+Do not treat Cursor PASS as sufficient. Distinguish UI vs API vs code-exists. Keep V1 unimplemented items in the denominator. Closed security items stay closed.
+
+STAFF-CLAIM-DUP FAIL: after claim tap, automator saw login not an error on claim page; do not invent a product token-reuse bug without the screenshot/page error.
+
+Auto-dispatch: 0009 has assigned_source column; this round reason is ai_auto_assign=false (DISABLED), not shared 0007 SCHEMA_PENDING.
+
+Fill all schema fields. Decision cannot be Production V1 PASS.

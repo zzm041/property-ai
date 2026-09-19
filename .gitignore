@@ -61,3 +61,7 @@ docker-compose.override.yml
 
 # Local isolated miniprogram release-pack tree (inventory JSON is kept)
 reports/auth-identity-ai-001/release-pack/
+
+# MP-CURRENT-FULL-REGRESSION-001 secrets and operator backups
+reports/mp-current-full-regression/private/
+reports/mp-current-full-regression/accounts.local.json

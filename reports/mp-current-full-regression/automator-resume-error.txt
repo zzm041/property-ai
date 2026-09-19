@@ -1,0 +1,6 @@
+no pages/login/login last pages/home/home
+Error: no pages/login/login last pages/home/home
+    at waitPath (d:\property-ai\reports\mp-current-full-regression\run-mini.js:92:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async smsLogin (d:\property-ai\reports\mp-current-full-regression\run-mini.js:123:14)
+    at async d:\property-ai\reports\mp-current-full-regression\run-mini.js:221:10
