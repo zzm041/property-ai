@@ -1,0 +1,44 @@
+{
+  "task_id": "SLA-ACCEPT-RESPOND-REASSIGN-004",
+  "phase": "review",
+  "reviewed_head": "c90914ffecf4110e6fbabb4091b44c79af5dfc3e",
+  "decision": "NEEDS_CHANGES",
+  "actions_or_findings": [
+    {
+      "title": "SLA-004-B1 — CURRENT_TASK_BLOCKER — due-order starvation",
+      "path": "backend/app/repository/work_order.py:242",
+      "trigger": "At least 100 older ACCEPTED orders have already received their assignment-scoped response-timeout event and remain past respond_due_at.",
+      "rationale": "The query selects the first 100 due orders by ID on every sweep. The service skips repeat events only after selection, so later accept or response timeouts may never be processed. The saved order-13 duplicate sweep confirms an already handled ACCEPTED order remains selectable."
+    }
+  ],
+  "evidence_paths": [
+    "reports/project-handoff.md",
+    "backend/app/repository/work_order.py",
+    "backend/app/service/sla.py",
+    "backend/app/service/auto_dispatch.py",
+    "backend/app/service/analysis.py",
+    "backend/app/worker/tasks.py",
+    "backend/tests/unit/test_sla_notification_scheduler.py",
+    "reports/sla-accept-respond-reassign-004/test-evidence.json",
+    "reports/sla-accept-respond-reassign-004/runtime-evidence.json",
+    "reports/sla-accept-respond-reassign-004/run-runtime.py",
+    "docs/04-WORKORDER-STATE-MACHINE.md",
+    "docs/05-AI-DISPATCH-SPEC.md"
+  ],
+  "unverified": [
+    "Reviewer remained read-only and did not rerun tests, operate pages, send requests, or inspect private context.",
+    "Main-session results of 46 focused and 426 full unit tests are saved evidence; Ruff was not run.",
+    "No multi-order backlog, live concurrent scheduler, or wall-clock Beat run was evidenced.",
+    "A failed redispatch publish was not exercised. Code records failed tasks for explicit replay; the timeout sweep itself does not retry that publish.",
+    "Real providers, self-hosted Qwen/RAG, and production operation were not evidenced."
+  ],
+  "session_note": "Overall goal is frozen Production V1. This review covers only the approved 0009-compatible SLA slice on product commits d649d7d and b952016, with evidence HEAD c90914f. Migration 0010, ACCOUNT-MERGE-001 semantics, shared services, port 8082, and release are outside scope. The handoff still describes SLA-003 as the latest reviewed milestone.",
+  "task_result": "Order 13 supports the scoped local path: deadline restart, one accept timeout, load release, cooldown-based redispatch, staff acceptance, one response event, and eight development notification deliveries. The fixed-size sweep defect prevents PASS for this slice. Earlier accepted task evidence is unaffected.",
+  "product_gap_changes": [
+    "SLA accept/respond handling and timeout redispatch are implemented locally but remain unaccepted pending the backlog fix.",
+    "Account merge and recovery, SLA policy administration, real Embedding/RAG and self-hosted AI, production providers and storage, wall-clock operations, and release validation remain Production V1 gaps."
+  ],
+  "schedule_risk": "The original approximately 2026-09-21 one-week aim cannot support full Production V1: this scheduler blocker remains, Migration 0010 is unapproved, and several frozen features and production validations are still open.",
+  "next_action": "Main Codex should change the 0009-compatible due-order selection so handled ACCEPTED assignment cycles cannot consume the batch limit, add a test with more handled rows than the limit and a later due ASSIGNED order, rerun focused and full unit suites, capture isolated 8083/0009 evidence, and update reports/project-handoff.md. Ordinary source and test work needs no new approval; any migration or reserved environment operation does.",
+  "approval_requests": []
+}

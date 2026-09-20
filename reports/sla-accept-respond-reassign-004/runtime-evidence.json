@@ -1,7 +1,7 @@
 {
   "task_id": "SLA-ACCEPT-RESPOND-REASSIGN-004",
-  "captured_at": "2026-09-20T03:50:23.854107+00:00",
-  "head": "b952016c6d38b1aa8b84757b058d9b7d91e1674b",
+  "captured_at": "2026-09-20T04:00:58.153739+00:00",
+  "head": "9ab106b29b9761504fa229cc1bd97227daa6e6c9",
   "environment": {
     "api": "http://127.0.0.1:8083/api/v1",
     "database": "127.0.0.1:3307/property_ai_auth001_test",
@@ -12,7 +12,7 @@
     "notification_provider": "DEVELOPMENT"
   },
   "business_object": {
-    "work_order_id": 13,
+    "work_order_id": 14,
     "created_via": "resident SMS login plus POST /work-orders",
     "final_status": "ACCEPTED",
     "final_version": 6,
@@ -30,11 +30,11 @@
   "accept_timeout": {
     "first_assignment": {
       "work_order_version": 3,
-      "assignment_id": 15,
+      "assignment_id": 17,
       "employee_id": 7,
-      "assigned_at": "2026-09-20T03:50:21.594073+00:00"
+      "assigned_at": "2026-09-20T04:00:55.848471+00:00"
     },
-    "deadline": "2026-09-20T04:20:21.594073+00:00",
+    "deadline": "2026-09-20T04:30:55.848471+00:00",
     "deadline_seconds_from_assignment": 1800.0,
     "sweep": {
       "scanned": 1,
@@ -52,17 +52,17 @@
     },
     "second_assignment": {
       "work_order_version": 5,
-      "assignment_id": 16,
+      "assignment_id": 18,
       "employee_id": 10,
-      "assigned_at": "2026-09-20T03:50:23.350342+00:00"
+      "assigned_at": "2026-09-20T04:00:57.623060+00:00"
     },
-    "second_deadline": "2026-09-20T04:20:23.350342+00:00",
+    "second_deadline": "2026-09-20T04:30:57.623060+00:00",
     "second_deadline_restarted": true,
     "employee_changed": true
   },
   "response_timeout": {
-    "accepted_at": "2026-09-20T03:50:23.503657+00:00",
-    "deadline": "2026-09-20T04:20:23.503657+00:00",
+    "accepted_at": "2026-09-20T04:00:57.798852+00:00",
+    "deadline": "2026-09-20T04:30:57.798852+00:00",
     "deadline_seconds_from_accept": 1800.0,
     "sweep": {
       "scanned": 1,
@@ -72,7 +72,7 @@
       "redispatch_enqueued": 0
     },
     "duplicate_sweep": {
-      "scanned": 1,
+      "scanned": 0,
       "accept_timeouts": 0,
       "response_timeouts": 0,
       "notifications": 0,
@@ -84,24 +84,24 @@
   "persistence": {
     "assignments": [
       {
-        "id": 15,
+        "id": 17,
         "employee_id": 7,
         "status": "REASSIGNED",
         "assigned_source": "AUTO",
-        "assigned_at": "2026-09-20T03:50:21.594073",
+        "assigned_at": "2026-09-20T04:00:55.848471",
         "accept_at": null,
-        "timeout_at": "2026-09-20T04:20:21.594073",
-        "ended_at": "2026-09-20T04:20:21.594073",
+        "timeout_at": "2026-09-20T04:30:55.848471",
+        "ended_at": "2026-09-20T04:30:55.848471",
         "reason": "SLA_ACCEPT_TIMEOUT"
       },
       {
-        "id": 16,
+        "id": 18,
         "employee_id": 10,
         "status": "ACTIVE",
         "assigned_source": "AUTO",
-        "assigned_at": "2026-09-20T03:50:23.350342",
-        "accept_at": "2026-09-20T03:50:23.503657",
-        "timeout_at": null,
+        "assigned_at": "2026-09-20T04:00:57.623060",
+        "accept_at": "2026-09-20T04:00:57.798852",
+        "timeout_at": "2026-09-20T04:30:57.798852",
         "ended_at": null,
         "reason": "AUTO_DISPATCH"
       }
@@ -109,7 +109,7 @@
     "phase_logs": [
       {
         "event_code": "CREATE",
-        "request_id": "sla-create-aebf94d1b4",
+        "request_id": "sla-create-a0243687da",
         "from_status": null,
         "to_status": "PENDING_ANALYSIS",
         "reason_code": null,
@@ -117,7 +117,7 @@
       },
       {
         "event_code": "ANALYZE",
-        "request_id": "sla-create-aebf94d1b4",
+        "request_id": "sla-create-a0243687da",
         "from_status": "PENDING_ANALYSIS",
         "to_status": "PENDING_ASSIGNMENT",
         "reason_code": "AI_ANALYSIS",
@@ -125,7 +125,7 @@
       },
       {
         "event_code": "ASSIGN",
-        "request_id": "sla-create-aebf94d1b4",
+        "request_id": "sla-create-a0243687da",
         "from_status": "PENDING_ASSIGNMENT",
         "to_status": "ASSIGNED",
         "reason_code": "AUTO_ASSIGN",
@@ -133,7 +133,7 @@
       },
       {
         "event_code": "REASSIGN",
-        "request_id": "sla-assignment:15:accept-timeout",
+        "request_id": "sla-assignment:17:accept-timeout",
         "from_status": "ASSIGNED",
         "to_status": "PENDING_ASSIGNMENT",
         "reason_code": "SLA_ACCEPT_TIMEOUT",
@@ -141,7 +141,7 @@
       },
       {
         "event_code": "ASSIGN",
-        "request_id": "sla-assignment:15:accept-timeout",
+        "request_id": "sla-assignment:17:accept-timeout",
         "from_status": "PENDING_ASSIGNMENT",
         "to_status": "ASSIGNED",
         "reason_code": "AUTO_ASSIGN",
@@ -149,7 +149,7 @@
       },
       {
         "event_code": "ACCEPT",
-        "request_id": "sla-accept-aebf94d1b4",
+        "request_id": "sla-accept-a0243687da",
         "from_status": "ASSIGNED",
         "to_status": "ACCEPTED",
         "reason_code": "ACCEPTED",
@@ -157,7 +157,7 @@
       },
       {
         "event_code": "SLA_RESPONSE_TIMEOUT",
-        "request_id": "sla-assignment:16:response-timeout",
+        "request_id": "sla-assignment:18:response-timeout",
         "from_status": "ACCEPTED",
         "to_status": "ACCEPTED",
         "reason_code": null,
@@ -219,7 +219,7 @@
       },
       {
         "employee_id": 10,
-        "current_load": 2,
+        "current_load": 3,
         "on_duty": "ON_DUTY",
         "business_date": "2026-09-20"
       }

@@ -3,16 +3,17 @@
   "base_commit": "b7dd955169a08fb1e6bcbb74ce072ea48a9b2468",
   "implementation_commits": [
     "d649d7dbc99febecd6b92c0eac933ae8a8a467d8",
-    "b952016c6d38b1aa8b84757b058d9b7d91e1674b"
+    "b952016c6d38b1aa8b84757b058d9b7d91e1674b",
+    "9ab106b29b9761504fa229cc1bd97227daa6e6c9"
   ],
   "targeted_unit": {
     "command": ".venv\\Scripts\\python.exe -m pytest backend/tests/unit/test_sla_notification_scheduler.py backend/tests/unit/test_auto_reassign_exception.py backend/tests/unit/test_auto_dispatch.py backend/tests/unit/test_work_order_policy.py backend/tests/unit/test_work_order_authorization.py backend/tests/unit/test_celery_ai_task.py -q",
-    "result": "46 passed, 1 warning",
+    "result": "47 passed, 1 warning",
     "final_run_after_fix": true
   },
   "full_unit": {
     "command": ".venv\\Scripts\\python.exe -m pytest backend/tests/unit -q",
-    "result": "426 passed, 1 warning",
+    "result": "427 passed, 1 warning",
     "final_run_after_fix": true
   },
   "static_analysis": {
@@ -24,13 +25,13 @@
     "script": "reports/sla-accept-respond-reassign-004/run-runtime.py",
     "evidence": "reports/sla-accept-respond-reassign-004/runtime-evidence.json",
     "result": "PASS_SCOPED_LOCAL",
-    "work_order_id": 13,
-    "runtime_head": "b952016c6d38b1aa8b84757b058d9b7d91e1674b",
+    "work_order_id": 14,
+    "runtime_head": "9ab106b29b9761504fa229cc1bd97227daa6e6c9",
     "database_revision": "20260919_0009",
-    "api_log": "tmp/auth001-runtime/api-b952016.stdout.log",
-    "worker_log": "tmp/auth001-runtime/worker-b952016.stdout.log",
+    "api_log": "tmp/auth001-runtime/api-9ab106b.stdout.log",
+    "worker_log": "tmp/auth001-runtime/worker-9ab106b.stdout.log",
     "stderr_empty": true,
-    "note": "A first runtime on d649d7d created synthetic order 12 and exposed that response-timeout idempotency needed assignment scope. That run was not accepted as final evidence. The corrected code was committed, services were restarted, and final evidence was captured on a new order 13."
+    "note": "A first runtime on d649d7d created synthetic order 12 and exposed that response-timeout idempotency needed assignment scope. Order 13 on b952016 then supported the corrected assignment-scoped event but independent review found that handled ACCEPTED rows could still consume the query limit. Neither run was accepted as final evidence. Query-time exclusion and a persistent timeout marker were added in 9ab106b, suites reran, services restarted, and final evidence was captured on new order 14; both duplicate sweeps now report scanned=0."
   },
   "not_run": [
     "No generic integration fixture was run because existing integration setup clears business tables.",
