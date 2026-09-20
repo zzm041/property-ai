@@ -252,6 +252,12 @@ def test_response_timeout_escalates_once_without_reassignment(monkeypatch) -> No
     repository = MagicMock()
     repository.list_due_assignment_sla_work_orders_for_update.return_value = (record,)
     repository.get_sla_clock_for_update.return_value = clock
+    repository.get_active_assignment_for_update.return_value = SimpleNamespace(
+        id=72,
+        employee_id=82,
+        accept_at=now - timedelta(minutes=10),
+    )
+    record.current_assignment_id = 72
     repository.has_log_request_id.side_effect = [False, True]
     repository.list_sla_management_user_ids.return_value = (20, 21)
     repository.get_active_assignee_user_id.return_value = 21
@@ -270,7 +276,7 @@ def test_response_timeout_escalates_once_without_reassignment(monkeypatch) -> No
     assert record.status == "ACCEPTED"
     log = repository.add_log.call_args.args[0]
     assert log.event_code == "SLA_RESPONSE_TIMEOUT"
-    assert log.request_id == "sla-clock:52:response-timeout"
+    assert log.request_id == "sla-assignment:72:response-timeout"
     assert len(_Notifier.calls) == 2
 
 

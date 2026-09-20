@@ -383,7 +383,14 @@ class SlaService:
         clock,
         notifier: NotificationService,
     ) -> int | None:
-        request_id = f"sla-clock:{clock.id}:response-timeout"
+        assignment = self._repository.get_active_assignment_for_update(record.id)
+        if (
+            assignment is None
+            or record.current_assignment_id != assignment.id
+            or assignment.accept_at is None
+        ):
+            return None
+        request_id = f"sla-assignment:{assignment.id}:response-timeout"
         if self._repository.has_log_request_id(
             work_order_id=record.id,
             request_id=request_id,
@@ -403,6 +410,8 @@ class SlaService:
                 request_id=request_id,
                 payload_json={
                     "event_code": WorkOrderEvent.SLA_RESPONSE_TIMEOUT.value,
+                    "assignment_id": assignment.id,
+                    "employee_id": assignment.employee_id,
                     "respond_due_at": clock.respond_due_at.isoformat(),
                     "action": "SUPERVISOR_REVIEW",
                 },
