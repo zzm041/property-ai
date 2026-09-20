@@ -1,0 +1,42 @@
+{
+  "task_id": "PROPERTY-HOUSE-RELATION-006-FIX-1",
+  "run_id": "property-house-fix1-page-mu9gx741",
+  "code_sha_product": "05219fa8ee5255bc4e1302c3cddbeaaee4a33150",
+  "environment": "WeChat DevTools automator -> 127.0.0.1:8083/api/v1 -> isolated 0009",
+  "interaction": "actual mini-program controls with official SMS sessions",
+  "actors": {
+    "manager": "PROPERTY_ADMIN; non-SYSTEM",
+    "read_only": "SUPERVISOR; development fixture; non-SYSTEM",
+    "raw_phones_saved": false,
+    "tokens_saved": false
+  },
+  "assertions": {
+    "manager_updated_building_through_page": true,
+    "manager_restored_building_name_through_page": true,
+    "manager_updated_unit_through_page": true,
+    "manager_restored_unit_name_through_page": true,
+    "supervisor_entry_visible_from_home": true,
+    "supervisor_archive_loaded": true,
+    "supervisor_can_edit_false": true,
+    "supervisor_write_controls_absent": true
+  },
+  "supervisor_visible_buttons": [
+    "刷新当前档案"
+  ],
+  "observed_counts": {
+    "buildings": 5,
+    "units": 7,
+    "houses": 6,
+    "relations": 2
+  },
+  "screenshots": [
+    "fix1-01-building-edit.png",
+    "fix1-02-unit-edit.png",
+    "fix1-03-supervisor-readonly.png"
+  ],
+  "not_claimed": [
+    "real SMS",
+    "production",
+    "Production V1 acceptance"
+  ]
+}

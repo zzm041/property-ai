@@ -1,0 +1,70 @@
+{
+  "task_id": "PROPERTY-HOUSE-RELATION-006",
+  "phase": "review",
+  "reviewed_head": "e19f01bac095f95afbd30dc3eb4d79f272dd8e2c",
+  "decision": "NEEDS_CHANGES",
+  "actions_or_findings": [
+    {
+      "title": "PHR006-B1 CURRENT_TASK_BLOCKER — backend/app/service/property_admin.py:412-480 — a later CSV row can change a cached parent name without rejection",
+      "path": "backend/app/service/property_admin.py:412",
+      "trigger": "Import two distinct houses with the same building or unit code but different names for that building or unit.",
+      "rationale": "PHR006-B1 CURRENT_TASK_BLOCKER: name conflicts are checked only when a parent is first loaded. Later rows reuse the cached parent and can commit both houses under the first name, violating conflict rejection. The saved verifier uses matching parent names, so its passing import does not cover this trigger."
+    },
+    {
+      "title": "PHR006-B2 CURRENT_TASK_BLOCKER — backend/app/api/v1/admin_property.py:92-149 — building and unit corrections have no update action",
+      "path": "backend/app/api/v1/admin_property.py:92",
+      "trigger": "An administrator needs to correct a building or unit name or code after creation.",
+      "rationale": "PHR006-B2 CURRENT_TASK_BLOCKER: the API and miniprogram/pages/supervisor/properties.wxml:15-39 provide building and unit creation, while the only update route and editor target houses. CSV import rejects an existing parent with a changed name. The required building/unit maintenance workflow therefore leaves an operator unable to correct these records."
+    },
+    {
+      "title": "PHR006-B3 CURRENT_TASK_BLOCKER — miniprogram/pages/home/home.js:37 — read-only property users lack the normal page entry",
+      "path": "miniprogram/pages/home/home.js:37",
+      "trigger": "A SUPERVISOR with property:read and resident_relation:read, but without property:manage, opens the home page.",
+      "rationale": "PHR006-B3 CURRENT_TASK_BLOCKER: miniprogram/pages/home/home.wxml:30 hides the sole archive entry unless property:manage is present. The new page itself supports property:read with canEdit=false at miniprogram/pages/supervisor/properties.js:173-183, and backend/app/domain/dev_seed.py:139-142 grants the read permissions to SUPERVISOR. That user cannot reach the intended read-only archive and relation history through normal navigation; the saved page flow exercises an administrator only."
+    },
+    {
+      "title": "PHR006-N1 NON_BLOCKING — miniprogram/pages/supervisor/properties.js:84-126 — exported quoted newlines cannot be imported back",
+      "path": "miniprogram/pages/supervisor/properties.js:84",
+      "trigger": "An allowed building or unit name contains an embedded newline and its exported CSV is pasted into import.",
+      "rationale": "PHR006-N1 NON_BLOCKING: csvValue quotes newlines, but parseImport splits on newlines before parsing quotes. The round trip fails for that valid value. The saved page flow uses simple single-line names; this edge case has no saved coverage."
+    },
+    {
+      "title": "PHR006-R1 RELEASE_BLOCKER — reports/project-handoff.md:83 — shared RabbitMQ replay remains unresolved",
+      "path": "reports/project-handoff.md:83",
+      "trigger": "Formal release validation depends on the shared RabbitMQ vhost and queue.",
+      "rationale": "PHR006-R1 RELEASE_BLOCKER: the living handoff records an accidental replay task in the shared vhost, with seven ready messages and no consumers at its last read-only observation. That observation was not refreshed in this review. It remains a separate release issue and does not explain the local archive defects."
+    }
+  ],
+  "evidence_paths": [
+    "reports/project-handoff.md",
+    "backend/app/service/property_admin.py",
+    "backend/app/api/v1/admin_property.py",
+    "backend/app/service/resident.py",
+    "backend/app/repository/resident.py",
+    "backend/tests/unit/test_property_admin.py",
+    "scripts/ops/verify_property_house_relation_006.py",
+    "reports/property-house-relation-006/runtime-evidence.json",
+    "reports/property-house-relation-006/run-page-flow.js",
+    "reports/property-house-relation-006/page-flow-attempts.json",
+    "reports/property-house-relation-006/page-evidence.json",
+    "reports/property-house-relation-006/01-property-page-entry.png",
+    "reports/property-house-relation-006/02-created-house.png",
+    "reports/property-house-relation-006/03-import-export-complete.png"
+  ],
+  "unverified": [
+    "The reviewer did not rerun tests, send HTTP requests, inspect live business state, or independently verify the current 8083 process and database target.",
+    "The saved page flow did not exercise relation ending through the page; the API verifier covers the ending and retained history.",
+    "Production provider behavior, production role provisioning, self-hosted Qwen/RAG, and Production V1 acceptance remain unverified.",
+    "ruff and mypy were unavailable in the reported frozen environment."
+  ],
+  "session_note": "Independent read-only review of b603407d385be13be74aa5448b13fc195a54c3f5..e19f01bac095f95afbd30dc3eb4d79f272dd8e2c. I inspected all three PNGs: they show the archive page, a created house card, and an export notice. I made no edits and did not rerun tests or runtime flows. The handoff predates this product HEAD; the task prompt supplies the current slice. Prior scoped PASS results and closed security items have no contrary evidence in this diff.",
+  "task_result": "Round 1 NEEDS_CHANGES. Saved isolated evidence supports the reported successful administrator API and page paths, but three current-task blockers prevent acceptance of the completed slice.",
+  "product_gap_changes": [
+    "No product files were changed by this reviewer. PROPERTY-HOUSE-RELATION-006 remains pending remediation.",
+    "Migration 0010 and ACCOUNT-MERGE-001 remain unapproved and unimplemented. Recovery, real self-hosted AI and RAG, production providers, and other frozen V1 gaps remain in scope.",
+    "Earlier accepted order, media, dispatch, phone-change, and WeChat-rebind evidence is preserved."
+  ],
+  "schedule_risk": "As of 2026-09-20, the original approximately 2026-09-21 one-week aim cannot cover these fixes plus the remaining frozen Production V1 gaps. The last operator-confirmed actual development day was day 5 on 2026-09-18; DEVELOPMENT-Fake evidence is not formal delivery.",
+  "next_action": "Main Codex: fix PHR006-B1 through B3 in the existing 0009 schema, add focused failure-path coverage, then collect fresh official-session API and page evidence on the named isolated 8083 → property_ai_auth001_test target after verifying its process and target identity. Confirm conflicting parent names roll back the whole import, building/unit edits enforce scope and uniqueness with audit history, and a property:read-only supervisor reaches a view-only archive from home. Update reports/project-handoff.md and submit the exact new product HEAD for round-2 independent review. Ordinary source and isolated verification need no new approval; request explicit approval before any migration or shared-service operation.",
+  "approval_requests": []
+}

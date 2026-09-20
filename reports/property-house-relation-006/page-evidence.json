@@ -1,0 +1,55 @@
+{
+  "task_id": "PROPERTY-HOUSE-RELATION-006",
+  "run_id": "property-house-page-mu9fzn3y",
+  "code_sha_product": "e19f01bac095f95afbd30dc3eb4d79f272dd8e2c",
+  "environment": "WeChat DevTools automator -> 127.0.0.1:8083/api/v1 -> isolated 0009",
+  "interaction": "actual mini-program page controls with an official SMS session",
+  "provider_mode": "development SMS substitute; no real provider claim",
+  "actor": {
+    "role": "PROPERTY_ADMIN",
+    "scope_type": "PROPERTY",
+    "system_actor": false,
+    "phone_saved": false,
+    "token_saved": false
+  },
+  "assertions": {
+    "home_exposed_scoped_entry": true,
+    "archive_page_editable": true,
+    "building_created_through_page": true,
+    "unit_created_through_page": true,
+    "house_created_through_page": true,
+    "house_inactive_active_roundtrip_through_page": true,
+    "csv_import_through_page": true,
+    "csv_export_through_page": true,
+    "relation_history_loaded": true
+  },
+  "created_synthetic_codes": {
+    "building_code": "UIB9FZN3Y",
+    "unit_code": "UIU9FZN3Y",
+    "room_no": "UI-9FZN3Y",
+    "imported_building_code": "UIC9FZN3Y",
+    "imported_unit_code": "UIV9FZN3Y",
+    "imported_room_no": "IMP-9FZN3Y"
+  },
+  "observed_counts": {
+    "buildings": 5,
+    "units": 5,
+    "houses": 6,
+    "relations": 2,
+    "relation_statuses": {
+      "ACTIVE": 1,
+      "ENDED": 1
+    }
+  },
+  "screenshots": [
+    "01-property-page-entry.png",
+    "02-created-house.png",
+    "03-import-export-complete.png"
+  ],
+  "not_claimed": [
+    "real SMS provider",
+    "real self-hosted model",
+    "production environment",
+    "Production V1 acceptance"
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "task_id": "PROPERTY-HOUSE-RELATION-006",
+  "phase": "review",
+  "reviewed_head": "05219fa8ee5255bc4e1302c3cddbeaaee4a33150",
+  "decision": "NEEDS_CHANGES",
+  "actions_or_findings": [
+    {
+      "title": "PHR006-B4 CURRENT_TASK_BLOCKER — locked PATCH reads can retain stale values",
+      "path": "backend/app/service/property_admin.py:371",
+      "trigger": "Another transaction changes a building or unit after the new PATCH path loads it with Session.get but before its scoped SELECT FOR UPDATE completes.",
+      "rationale": "The locking queries in backend/app/repository/property.py:88 and :137 do not refresh an object already loaded in the session. A partial PATCH can therefore write an update audit containing an outdated code or name. The saved tests and runtime evidence cover sequential edits, not this interleaving. This directly affects the new maintenance and audit paths."
+    },
+    {
+      "title": "PHR006-N1 NON_BLOCKING — quoted-newline CSV round trip",
+      "path": "miniprogram/pages/supervisor/properties.js:84",
+      "trigger": "An exported building or unit name contains a quoted newline and is pasted back into import.",
+      "rationale": "The unchanged parser splits rows on newlines before processing CSV quotes, so that valid exported value cannot round trip. FIX-1 adds no severity evidence."
+    },
+    {
+      "title": "PHR006-R1 RELEASE_BLOCKER — shared RabbitMQ replay",
+      "path": "reports/project-handoff.md:83",
+      "trigger": "Formal release validation uses the shared RabbitMQ vhost and queue.",
+      "rationale": "The handoff records an unresolved replay task there. Its last recorded queue observation was not refreshed in this review. This issue is separate from the safe local property archive slice."
+    }
+  ],
+  "evidence_paths": [
+    "reports/project-handoff.md",
+    "reports/codex/PROPERTY-HOUSE-RELATION-006-review.json",
+    "backend/app/service/property_admin.py",
+    "backend/app/repository/property.py",
+    "backend/app/schema/property.py",
+    "backend/app/api/v1/admin_property.py",
+    "backend/app/domain/audit.py",
+    "backend/tests/unit/test_property_admin.py",
+    "miniprogram/pages/home/home.js",
+    "miniprogram/pages/home/home.wxml",
+    "miniprogram/pages/supervisor/properties.js",
+    "miniprogram/pages/supervisor/properties.wxml",
+    "miniprogram/services/api.js",
+    "scripts/ops/verify_property_house_relation_006_fix1.py",
+    "reports/property-house-relation-006/fix1-runtime-attempts.json",
+    "reports/property-house-relation-006/fix1-runtime-evidence.json",
+    "reports/property-house-relation-006/run-fix1-page-flow.js",
+    "reports/property-house-relation-006/fix1-page-attempts.json",
+    "reports/property-house-relation-006/fix1-page-evidence.json",
+    "reports/property-house-relation-006/fix1-01-building-edit.png",
+    "reports/property-house-relation-006/fix1-02-unit-edit.png",
+    "reports/property-house-relation-006/fix1-03-supervisor-readonly.png"
+  ],
+  "unverified": [
+    "The concurrent PATCH interleaving in PHR006-B4 has no saved execution evidence; the finding is based on the new read and lock order.",
+    "I did not independently probe the live 8083 process, database, queue, or worker, or rerun the reported 11 and 466 passing tests.",
+    "Development SMS and local page evidence do not establish real-provider, production, or full V1 acceptance."
+  ],
+  "session_note": "Independent read-only review of the specified FIX-1 diff and saved evidence. I made no edits, ran no tests, sent no HTTP or business requests, and did not operate pages or processes. I visually inspected all three PNGs: they show the building and unit editors with edited names, and the SUPERVISOR archive without visible edit controls. The page harness records edit/restore operations and finds only the refresh button for SUPERVISOR. The prior evidence standard informed how I separated saved assertions from live verification.\n",
+  "task_result": "Round 2: PHR006-B1, B2, and B3 are closed by the code and saved isolated evidence. Every import row now checks cached parent names; the two failure cases return stable conflicts with zero surviving new parent rows. Building and unit edits have scoped routes, locks, normalization, uniqueness mapping, audit actions, API wiring, and page edit/restore evidence. The home entry uses property:read, selected-property mutation controls use property:manage, and a SUPERVISOR PATCH returned 403. New blocker PHR006-B4 prevents PASS.",
+  "product_gap_changes": [
+    "PROPERTY-HOUSE-RELATION-006 remains pending the new PATCH concurrency and audit fix; this reviewer changed no files.",
+    "Migration 0010 and controlled account merge remain unapproved. Recovery, real self-hosted AI assignment, real Embedding/RAG, production providers and media, and other frozen V1 work remain in scope.",
+    "Previously accepted order, dispatch, media, phone-change, and WeChat-rebind evidence remains intact."
+  ],
+  "schedule_risk": "As of 2026-09-20, the approximately 2026-09-21 original one-week aim cannot cover this remaining fix and the frozen Production V1 gaps. The last operator-confirmed actual development day was day 5 on 2026-09-18; Development evidence is not formal delivery.",
+  "next_action": "Main Codex: refresh the scoped building and unit ORM rows when acquiring their locks, then add a controlled two-session interleaving check that compares committed code/name values with their update audits. Verify the focused failure and success paths on the named isolated 8083 → property_ai_auth001_test @ 20260919_0009 target, preserve the FIX-1 evidence, update reports/project-handoff.md, and submit the exact product HEAD for the final bounded review. Ordinary source and isolated verification are already authorized; obtain separate approval only if a migration or shared-service operation becomes necessary.",
+  "approval_requests": []
+}

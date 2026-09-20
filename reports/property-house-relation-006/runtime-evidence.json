@@ -1,0 +1,81 @@
+{
+  "task_id": "PROPERTY-HOUSE-RELATION-006",
+  "run_id": "d2c1805a0d",
+  "code_sha": "e19f01bac095f95afbd30dc3eb4d79f272dd8e2c",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "migration": "20260919_0009",
+    "mode": "official SMS sessions plus normal business APIs",
+    "model": "not involved"
+  },
+  "synthetic_identity": {
+    "manager_role": "PROPERTY_ADMIN",
+    "manager_phone_masked": "139****6188",
+    "resident_phone_masked": "139****4643"
+  },
+  "objects": {
+    "tenant_id": 4,
+    "property_id": 4,
+    "building_id": 7,
+    "unit_id": 7,
+    "house_id": 7,
+    "bind_request_id": 8,
+    "relation_id": 7
+  },
+  "import": {
+    "first": {
+      "created_buildings": 1,
+      "created_units": 1,
+      "created_houses": 2,
+      "unchanged_houses": 0
+    },
+    "retry": {
+      "created_buildings": 0,
+      "created_units": 0,
+      "created_houses": 0,
+      "unchanged_houses": 2
+    }
+  },
+  "audit_actions": [
+    "AUTH_SMS_TOKEN_ISSUED",
+    "DEV_SEED_PERMISSION_CREATED",
+    "DEV_SEED_PROPERTY_CREATED",
+    "DEV_SEED_ROLE_CREATED",
+    "DEV_SEED_TENANT_CREATED",
+    "DEV_SEED_USER_CREATED",
+    "IAM_ROLE_PERMISSION_GRANTED",
+    "IAM_USER_ROLE_GRANTED",
+    "PROPERTY_BUILDING_CREATED",
+    "PROPERTY_HOUSE_CREATED",
+    "PROPERTY_HOUSE_UPDATED",
+    "PROPERTY_UNIT_CREATED",
+    "RESIDENT_BIND_REQUEST_APPROVED",
+    "RESIDENT_BIND_REQUEST_CREATED",
+    "RESIDENT_HOUSE_RELATION_ENDED"
+  ],
+  "assertions": {
+    "migration_is_0009": true,
+    "manager_used_official_sms_session": true,
+    "manager_has_property_manage": true,
+    "property_admin_not_system": true,
+    "direct_house_status_round_trip": true,
+    "archive_contains_created_house": true,
+    "import_created_expected_hierarchy": true,
+    "import_retry_is_unchanged": true,
+    "conflicting_import_rolled_back_first_row": true,
+    "export_contains_imported_rows": true,
+    "cross_scope_denied": true,
+    "resident_used_official_sms_session": true,
+    "approved_relation_visible_to_resident": true,
+    "ended_relation_removed_from_current_view": true,
+    "same_relation_history_row_retained": true,
+    "property_and_relation_audits_present": true
+  },
+  "status": "PASS",
+  "notes": [
+    "No generic integration fixture, table cleanup, direct status SQL, or migration was used.",
+    "All business mutations used the 8083 API; SQL after the run was read-only evidence.",
+    "Synthetic records are retained for traceability and were not deleted after verification."
+  ]
+}

@@ -1538,10 +1538,42 @@
       }
     ]
   },
+  "property_house_relation_006": {
+    "task_id": "PROPERTY-HOUSE-RELATION-006",
+    "implementation_head": "e2bb791791f139918c83cf609a31724c49722289",
+    "independent_review": {
+      "result": "PASS_AFTER_FIX_2",
+      "path": "reports/codex/PROPERTY-HOUSE-RELATION-006-FIX-2-review.json",
+      "boundary": "scoped 0009 property archive maintenance, atomic CSV import/export, resident relation history and stale-identity-map lock regression; local DEVELOPMENT SMS/API/page/DB evidence only"
+    },
+    "current_status_overlays": [
+      {
+        "id": "HOUSE-IMPORT-EXPORT",
+        "implementation_status": "scoped_atomic_csv_import_export_and_building_unit_house_maintenance_wired",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "e19f01bac095f95afbd30dc3eb4d79f272dd8e2c / 05219fa8ee5255bc4e1302c3cddbeaaee4a33150 / e2bb791791f139918c83cf609a31724c49722289",
+        "remaining_gap": "quoted embedded-newline CSV parsing edge and production acceptance"
+      },
+      {
+        "id": "V1-RES-RELATION-HISTORY",
+        "implementation_status": "scoped_relation_history_and_normal_end_preserve_the_same_history_row",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "e19f01bac095f95afbd30dc3eb4d79f272dd8e2c / 05219fa8ee5255bc4e1302c3cddbeaaee4a33150 / e2bb791791f139918c83cf609a31724c49722289",
+        "remaining_gap": "broader relation lifecycle, production identity/provider and Production V1 acceptance"
+      },
+      {
+        "id": "V1-HOUSE-ARCHIVE-UI",
+        "implementation_status": "property_scoped_archive_maintenance_and_read_only_relation_history_page_wired",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "e19f01bac095f95afbd30dc3eb4d79f272dd8e2c / 05219fa8ee5255bc4e1302c3cddbeaaee4a33150 / e2bb791791f139918c83cf609a31724c49722289",
+        "remaining_gap": "formal resident public house-selection experience and production acceptance"
+      }
+    ]
+  },
   "current_effective_view": {
     "generated_at": "2026-09-20",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
-    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID)",
+    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced.",
     "row_count": 83,
     "rows": [
@@ -1899,11 +1931,11 @@
       },
       {
         "requirement_id": "HOUSE-IMPORT-EXPORT",
-        "current_implementation": "功能尚未实现",
-        "verification_mode_status": "none:NOT_IMPLEMENTED",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "房产导入导出",
-        "next_action": "按依赖顺序实施，保留本ID在分母中"
+        "current_implementation": "scoped_atomic_csv_import_export_and_building_unit_house_maintenance_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "e19f01bac095f95afbd30dc3eb4d79f272dd8e2c / 05219fa8ee5255bc4e1302c3cddbeaaee4a33150 / e2bb791791f139918c83cf609a31724c49722289",
+        "remaining_gap": "quoted embedded-newline CSV parsing edge and production acceptance",
+        "next_action": "preserve scoped evidence; fix the quoted-newline edge during later import UX hardening"
       },
       {
         "requirement_id": "STATS-CONFIG",
@@ -2003,11 +2035,11 @@
       },
       {
         "requirement_id": "V1-RES-RELATION-HISTORY",
-        "current_implementation": "只有API没有页面",
-        "verification_mode_status": "API:NOT_IMPLEMENTED",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "退租/变更保留历史关系，禁止覆盖历史行",
-        "next_action": "按依赖顺序实施，保留本ID在分母中"
+        "current_implementation": "scoped_relation_history_and_normal_end_preserve_the_same_history_row",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "e19f01bac095f95afbd30dc3eb4d79f272dd8e2c / 05219fa8ee5255bc4e1302c3cddbeaaee4a33150 / e2bb791791f139918c83cf609a31724c49722289",
+        "remaining_gap": "broader relation lifecycle, production identity/provider and Production V1 acceptance",
+        "next_action": "preserve scoped evidence; extend only when a later approved relation lifecycle requires it"
       },
       {
         "requirement_id": "V1-RES-APPEND",
@@ -2147,11 +2179,11 @@
       },
       {
         "requirement_id": "V1-HOUSE-ARCHIVE-UI",
-        "current_implementation": "功能尚未实现",
-        "verification_mode_status": "none:NOT_IMPLEMENTED",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "物业建楼栋房屋/导入导出页面",
-        "next_action": "按依赖顺序实施，保留本ID在分母中"
+        "current_implementation": "property_scoped_archive_maintenance_and_read_only_relation_history_page_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "e19f01bac095f95afbd30dc3eb4d79f272dd8e2c / 05219fa8ee5255bc4e1302c3cddbeaaee4a33150 / e2bb791791f139918c83cf609a31724c49722289",
+        "remaining_gap": "formal resident public house-selection experience and production acceptance",
+        "next_action": "preserve scoped evidence; complete the public resident selection experience in its own slice"
       },
       {
         "requirement_id": "V1-REAL-ASR-VLM",

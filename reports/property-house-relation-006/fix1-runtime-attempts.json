@@ -1,0 +1,23 @@
+{
+  "task_id": "PROPERTY-HOUSE-RELATION-006-FIX-1",
+  "attempts": [
+    {
+      "run_id": "729042694e",
+      "result": "PARTIAL_BEFORE_SUPERVISOR_FIXTURE",
+      "completed": [
+        "building and unit update APIs returned 200",
+        "duplicate building and unit codes returned 409",
+        "cached building-name and unit-name import conflicts returned 409",
+        "the deterministic synthetic supervisor account registered through official SMS APIs"
+      ],
+      "remaining_at_failure": "The SUPERVISOR development fixture was not granted because the first harness version did not use the repository owned-transaction wrapper.",
+      "business_effect": "The successful manager updates and one additional synthetic unit remain for traceability; conflict requests rolled back. No migration, table clearing, direct status write, or shared-service operation occurred."
+    },
+    {
+      "run_id": "ddae4bf558",
+      "result": "PASS",
+      "fix": "Used the project owned-transaction wrapper for the authorized development role fixture.",
+      "business_effect": "Final assertions and rollback counts are recorded in fix1-runtime-evidence.json; first-run synthetic records were retained."
+    }
+  ]
+}

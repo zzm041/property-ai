@@ -1,0 +1,63 @@
+{
+  "task_id": "PROPERTY-HOUSE-RELATION-006-FIX-2",
+  "run_id": "bfe6c72662",
+  "code_sha": "e2bb791791f139918c83cf609a31724c49722289",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "migration": "20260919_0009",
+    "provider": "development SMS substitute"
+  },
+  "method": "Each A operation used PropertyAdminService. Its repository callback ran and committed a separate B PropertyAdminService operation after A Session.get and immediately before A SELECT FOR UPDATE. No direct SQL business mutation was used.",
+  "objects": {
+    "tenant_id": 4,
+    "property_id": 4,
+    "building_id": 15,
+    "unit_id": 17
+  },
+  "building": {
+    "operation_a_return": {
+      "code": "CYBFE6C72662",
+      "name": "并发楼栋A名称"
+    },
+    "final": {
+      "code": "CYBFE6C72662",
+      "name": "并发楼栋A名称"
+    },
+    "operation_a_audit": {
+      "code": "CYBFE6C72662",
+      "name": "并发楼栋A名称"
+    }
+  },
+  "unit": {
+    "operation_a_return": {
+      "code": "UBFE6C72662",
+      "name": "并发单元A名称"
+    },
+    "final": {
+      "code": "UBFE6C72662",
+      "name": "并发单元A名称"
+    },
+    "operation_a_audit": {
+      "code": "UBFE6C72662",
+      "name": "并发单元A名称",
+      "building_id": 15
+    }
+  },
+  "assertions": {
+    "migration_is_0009": true,
+    "manager_official_sms_session": true,
+    "building_a_return_refreshed": true,
+    "building_final_combines_b_code_and_a_name": true,
+    "building_a_audit_matches_final": true,
+    "unit_a_return_refreshed": true,
+    "unit_final_combines_b_code_and_a_name": true,
+    "unit_a_audit_matches_final": true
+  },
+  "status": "PASS",
+  "not_claimed": [
+    "general database serializability proof",
+    "production environment",
+    "Production V1 acceptance"
+  ]
+}

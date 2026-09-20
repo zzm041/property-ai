@@ -1,0 +1,57 @@
+{
+  "task_id": "PROPERTY-HOUSE-RELATION-006-FIX-1",
+  "run_id": "ddae4bf558",
+  "code_sha": "05219fa8ee5255bc4e1302c3cddbeaaee4a33150",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "migration": "20260919_0009",
+    "provider": "development SMS substitute"
+  },
+  "actor_modes": {
+    "manager": "official SMS PROPERTY_ADMIN; not SYSTEM",
+    "read_only": "official SMS SUPERVISOR prepared by authorized development fixture",
+    "raw_phones_saved": false,
+    "tokens_saved": false
+  },
+  "objects": {
+    "tenant_id": 4,
+    "property_id": 4,
+    "updated_building_id": 10,
+    "updated_unit_id": 10,
+    "constraint_unit_id": 14
+  },
+  "rollback_counts": {
+    "building_name_conflict": 0,
+    "unit_name_conflict": 0
+  },
+  "audit_actions": [
+    "AUTH_SMS_TOKEN_ISSUED",
+    "IAM_USER_ROLE_GRANTED",
+    "PROPERTY_BUILDING_UPDATED",
+    "PROPERTY_UNIT_CREATED",
+    "PROPERTY_UNIT_UPDATED"
+  ],
+  "assertions": {
+    "migration_is_0009": true,
+    "manager_official_sms_session": true,
+    "building_update_succeeded": true,
+    "unit_update_succeeded": true,
+    "building_duplicate_code_rejected_without_change": true,
+    "unit_duplicate_code_rejected_without_change": true,
+    "cached_building_name_conflict_rolled_back": true,
+    "cached_unit_name_conflict_rolled_back": true,
+    "building_update_audited": true,
+    "unit_update_audited": true,
+    "supervisor_has_property_read": true,
+    "supervisor_lacks_property_manage": true,
+    "supervisor_read_archive": true,
+    "supervisor_write_denied": true
+  },
+  "status": "PASS",
+  "notes": [
+    "All business mutations used authenticated APIs except the explicitly labeled development role fixture.",
+    "SQL after API calls was read-only evidence; no tables were cleared and no migration ran.",
+    "This is local software evidence, not production-provider or Production V1 acceptance."
+  ]
+}

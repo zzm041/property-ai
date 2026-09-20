@@ -1,0 +1,17 @@
+{
+  "task_id": "PROPERTY-HOUSE-RELATION-006",
+  "attempts": [
+    {
+      "attempt": 1,
+      "result": "FAILED_BEFORE_PROPERTY_WRITE",
+      "cause": "The automator queried the development SMS inbox before the asynchronous send request completed, then submitted the older code.",
+      "business_effect": "Authentication returned 401; no property archive endpoint was called."
+    },
+    {
+      "attempt": 2,
+      "result": "PASS",
+      "fix": "Waited for challenge clearance and cooldown start before reading the development inbox.",
+      "business_effect": "Created only the synthetic archive records listed in page-evidence.json through page controls."
+    }
+  ]
+}

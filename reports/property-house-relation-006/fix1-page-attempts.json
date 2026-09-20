@@ -1,0 +1,23 @@
+{
+  "task_id": "PROPERTY-HOUSE-RELATION-006-FIX-1",
+  "attempts": [
+    {
+      "attempt": 1,
+      "result": "FAILED_BEFORE_PAGE_WRITE",
+      "cause": "The harness read selectedBuilding immediately after tapping a card; the page state update had not completed.",
+      "business_effect": "No building or unit update endpoint was called. The harness was changed to wait for the selected resource ID before reading or editing."
+    },
+    {
+      "attempt": 2,
+      "result": "BUSINESS_PASS_EVIDENCE_FRAME_INCOMPLETE",
+      "cause": "Building and unit edit/restore and SUPERVISOR read-only assertions passed, but the unit screenshot inherited the prior scroll position and did not show the unit editor.",
+      "business_effect": "Both synthetic names were restored through page controls; no archive record was duplicated. Screenshot positioning was changed to reset to the page top before locating each editor button."
+    },
+    {
+      "attempt": 3,
+      "result": "PASS",
+      "fix": "Reset page scroll to the top before locating each editor button for the final screenshots.",
+      "business_effect": "Building and unit names were edited and restored through page controls; SUPERVISOR remained read-only."
+    }
+  ]
+}

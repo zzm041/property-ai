@@ -1,0 +1,46 @@
+{
+  "task_id": "PROPERTY-HOUSE-RELATION-006",
+  "phase": "review",
+  "reviewed_head": "e2bb791791f139918c83cf609a31724c49722289",
+  "decision": "PASS",
+  "actions_or_findings": [
+    {
+      "title": "PHR006-N1 NON_BLOCKING — quoted-newline CSV round trip",
+      "path": "miniprogram/pages/supervisor/properties.js:84",
+      "trigger": "An exported building or unit name contains a quoted newline and is pasted into import.",
+      "rationale": "The prior finding remains open. FIX-2 does not change the parser or add evidence for this case."
+    },
+    {
+      "title": "PHR006-R1 RELEASE_BLOCKER — shared RabbitMQ replay",
+      "path": "reports/project-handoff.md:83",
+      "trigger": "Formal release validation uses the shared RabbitMQ queue.",
+      "rationale": "The handoff records an unresolved replay task. It is separate from this isolated property and house review; its queue state was not refreshed."
+    }
+  ],
+  "evidence_paths": [
+    "reports/project-handoff.md",
+    "reports/codex/PROPERTY-HOUSE-RELATION-006-review.json",
+    "reports/codex/PROPERTY-HOUSE-RELATION-006-FIX-1-review.json",
+    "backend/app/repository/property.py",
+    "backend/app/service/property_admin.py",
+    "backend/tests/unit/test_property_admin.py",
+    "scripts/ops/verify_property_house_relation_006_fix2.py",
+    "reports/property-house-relation-006/fix2-concurrency-evidence.json"
+  ],
+  "unverified": [
+    "I did not rerun the reported 12 focused or 467 full-suite tests, compile Python, inspect live runtime, send requests, or operate pages.",
+    "The saved interleaving demonstrates this building and unit sequence only; it is not a general serializability or production claim.",
+    "The 8083 runtime and its database, queue, and Redis targets were not independently rechecked in this review.",
+    "Development evidence does not establish production providers, real self-hosted AI/RAG, or full Production V1 acceptance."
+  ],
+  "session_note": "Independent read-only round-3 review of the specified FIX-2 diff and saved evidence. I made no edits and did not rerun tests or runtime. I inadvertently reran the read-only git diff --check; it reported no issue. No mini-program source changed in FIX-2, so the earlier page evidence remains on FIX-1.",
+  "task_result": "PHR006-B4 is closed. All three locking SELECTs use populate_existing=True. The added unit assertion checks that option. The verifier places a separate PropertyAdminService transaction B after A's Session.get and before A's locking SELECT, using independent Sessions. Saved evidence at the reviewed SHA shows A's returned object, final row, and A audit each contain B's committed code with A's name for both building and unit. B1–B3 remain closed; no new current-task blocker was found.",
+  "product_gap_changes": [
+    "PROPERTY-HOUSE-RELATION-006 passes this scoped independent review. This reviewer changed no files.",
+    "Controlled account merge and Migration 0010 remain unapproved; recovery, real self-hosted AI assignment, real Embedding/RAG, production providers and media, and release validation remain in Production V1 scope.",
+    "Earlier accepted order, dispatch, media, phone-change, and WeChat-rebind results remain scoped to their recorded evidence."
+  ],
+  "schedule_risk": "On 2026-09-20, the remaining frozen V1 gaps and approval-dependent 0010 work make the original approximately 2026-09-21 one-week aim unattainable as formal Production V1 delivery. Development evidence must retain its scoped label.",
+  "next_action": "Main Codex: preserve the untracked FIX-2 verifier and evidence, update reports/project-handoff.md with this scoped PASS at e2bb791, B4 closure, N1 and the separate shared-queue release blocker, then continue an authorized current-schema V1 slice. Completion requires the saved evidence and handoff to identify the same code SHA and scope. Ordinary evidence and handoff work needs no new approval; obtain explicit approval before creating or running 0010, operating the shared queue, using paid or real providers, or formally releasing.",
+  "approval_requests": []
+}
