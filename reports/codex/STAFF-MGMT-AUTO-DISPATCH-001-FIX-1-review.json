@@ -1,0 +1,57 @@
+{
+  "task_id": "STAFF-MGMT-AUTO-DISPATCH-001-FIX-1",
+  "phase": "review",
+  "reviewed_head": "8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
+  "decision": "PASS",
+  "actions_or_findings": [
+    {
+      "title": "STAFF-001 NON_BLOCKING — closed",
+      "path": "backend/app/repository/employee.py:203; miniprogram/pages/supervisor/staff.js:41",
+      "trigger": "An employee’s final effective property assignment ends.",
+      "rationale": "The explicit historical roster remains tenant and property scoped while the default API still requires a current effective assignment. The page can select and reassign the historical employee. Page and database evidence show employee 9’s assignment 9 ENDED and new assignment 113 ACTIVE for property 6."
+    },
+    {
+      "title": "STAFF-002 NON_BLOCKING — closed",
+      "path": "miniprogram/pages/supervisor/staff.js:41; miniprogram/services/api.js:401",
+      "trigger": "A roster or daily-status response has a next cursor.",
+      "rationale": "Both page loaders follow next_cursor. The retained page run reports 105 scoped employees and records a second employee request with after_id=106. The daily-status cursor loop is verified in code; this run did not need a second daily-status page."
+    },
+    {
+      "title": "STAFF-EVID-003 NON_BLOCKING — closed",
+      "path": "reports/staff-mgmt-auto-dispatch-001/remediation-page-evidence.json; reports/staff-mgmt-auto-dispatch-001/remediation-database-evidence.json",
+      "trigger": "Existing employee maintenance and added service-property assignment are assessed through the page.",
+      "rationale": "The page trace records two successful PATCH requests for employee 10 and successful assignment POST requests for employees 10 and 9. The database snapshot shows employee 10 at capacity 3, department 1, with INSPECTION and HVAC added and assignment 112 ACTIVE at property 7. Both specified detail PNGs were visually inspected."
+    },
+    {
+      "title": "STAFF-REL-004 RELEASE_BLOCKER — open",
+      "path": "reports/staff-mgmt-auto-dispatch-001/final-dispatch-evidence.json:95",
+      "trigger": "Production V1 release assessment.",
+      "rationale": "The retained AI call uses DEVELOPMENT mode and dev-llm-v1. This does not validate self-hosted Qwen inference or real Embedding/RAG. It does not block this DEVELOPMENT-mode staff remediation."
+    }
+  ],
+  "evidence_paths": [
+    "reports/project-handoff.md",
+    "reports/codex/STAFF-MGMT-AUTO-DISPATCH-001-review.json",
+    "reports/staff-mgmt-auto-dispatch-001/remediation-prepare-evidence.json",
+    "reports/staff-mgmt-auto-dispatch-001/remediation-page-evidence.json",
+    "reports/staff-mgmt-auto-dispatch-001/remediation-database-evidence.json",
+    "reports/staff-mgmt-auto-dispatch-001/runtime-identity-evidence.json",
+    "reports/staff-mgmt-auto-dispatch-001/fix1-ended-recovered-detail.png",
+    "reports/staff-mgmt-auto-dispatch-001/fix1-primary-maintained-detail.png",
+    "reports/staff-mgmt-auto-dispatch-001/final-dispatch-evidence.json"
+  ],
+  "unverified": [
+    "The main session reports 414 passed. I did not independently rerun tests; the named remediation artifacts contain no raw 414-test result.",
+    "A daily-status response requiring a second page was not exercised; cursor traversal was checked in code.",
+    "Runtime identity, schema, 8082 preservation, and the untouched pre-existing DLQ row were cross-checked against the retained snapshot, not re-probed live."
+  ],
+  "session_note": "Overall goal: frozen Production V1. This independent, read-only review covers only STAFF-MGMT-AUTO-DISPATCH-001 remediation from 78fdcedcef93b57ef0af19308d128d5947ba06da to actual HEAD 8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3. The retained runtime snapshot identifies API 8083, property_ai_auth001_test at schema 20260919_0009, isolated publisher and Worker queue property_ai.auth001, unchanged 8082, and an untouched pre-existing DLQ row. The scoped property-admin probe records 200 for property 6 and 403 for property 7; the service checks the requested property before querying. No product files, tests, business state, or services were changed in this review. miniprogram/project.config.json remains unrelated pre-existing state. ACCOUNT-MERGE-001/0010 was outside scope.",
+  "task_result": "PASS for the focused DEVELOPMENT-mode remediation: STAFF-001, STAFF-002, and STAFF-EVID-003 are closed without an identified direct regression. The earlier AUTO-dispatch evidence remains a separate historical run.",
+  "product_gap_changes": [
+    "The three staff-management blockers are closed for this local slice; no Production V1 requirement was removed.",
+    "Controlled merge, recovery, real self-hosted AI auto-assignment, real Embedding/RAG, production provider and media validation, and Day 4 release validation remain open."
+  ],
+  "schedule_risk": "On 2026-09-20, the original approximately 2026-09-21 one-week aim is not credible for full Production V1 while these release and product gaps remain. This PASS is not formal delivery acceptance.",
+  "next_action": "Main Codex: update reports/project-handoff.md with this reviewed head, the three closed staff blockers, the linked page/database/runtime evidence, the 414-pass result as main-session evidence, and STAFF-REL-004 as an open release blocker. Completion requires the handoff to distinguish this local PASS from Production V1 acceptance and preserve all remaining V1 gaps. This documentation step needs no new approval; migration, paid or real-provider operations, shared-service changes, and formal release still require separate approval.",
+  "approval_requests": []
+}

@@ -1,0 +1,46 @@
+{
+  "task_id": "STAFF-MGMT-AUTO-DISPATCH-001",
+  "phase": "fixture_prepared",
+  "captured_at": "2026-09-20T01:07:55.899309+00:00",
+  "head": "7107186b8ecf3fce32a7f94d691257e18ed0db83",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001",
+    "llm_provider": "DEVELOPMENT"
+  },
+  "org": {
+    "tenant_id": 6,
+    "property_id": 6,
+    "property_name": "人员闭环小区-3fb5da92",
+    "building_id": 6,
+    "unit_id": 6,
+    "house_id": 6,
+    "department_id": 1
+  },
+  "fixture_writes": [
+    "new synthetic tenant/property/building/unit/house",
+    "new property-scoped department",
+    "new SMS-authenticated manager user",
+    "TENANT_ADMIN fixture grant limited to new tenant"
+  ],
+  "business_state_left_for_pages": [
+    "duty and skill catalog",
+    "employees and invites",
+    "invite claims",
+    "attendance",
+    "resident binding and approval",
+    "work orders and automatic assignments"
+  ],
+  "boundaries": {
+    "additive_only": true,
+    "migration_run": false,
+    "tables_deleted_or_cleared": false,
+    "business_status_stamped_by_sql": false,
+    "shared_database_touched": false,
+    "real_model_verified": false
+  },
+  "private_context": "tmp/staff-mgmt-auto-dispatch-001/context.json",
+  "redaction": "No phone, token, password, secret, resident name, or credential is emitted."
+}

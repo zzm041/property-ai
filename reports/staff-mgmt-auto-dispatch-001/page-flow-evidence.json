@@ -1,0 +1,1406 @@
+{
+  "task_id": "STAFF-MGMT-AUTO-DISPATCH-001",
+  "run_id": "staff-mgmt-auto-dispatch-3fb5da92",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001",
+    "providers": "DEVELOPMENT"
+  },
+  "org": {
+    "tenant_id": 6,
+    "property_id": 6,
+    "property_name": "人员闭环小区-3fb5da92",
+    "building_id": 6,
+    "unit_id": 6,
+    "house_id": 6,
+    "department_id": 1
+  },
+  "objects": {
+    "employees": {
+      "full": {
+        "employee_id": 7,
+        "employee_no": "FULL-3fb5da92",
+        "max_capacity": 1,
+        "electrical": true,
+        "business_date": "2026-09-20",
+        "on_duty": "ON_DUTY"
+      },
+      "mismatch": {
+        "employee_id": 8,
+        "employee_no": "MISMATCH-3fb5da92",
+        "max_capacity": 2,
+        "electrical": false,
+        "business_date": "2026-09-20",
+        "on_duty": "ON_DUTY"
+      },
+      "ended": {
+        "employee_id": 9,
+        "employee_no": "ENDED-3fb5da92",
+        "max_capacity": 2,
+        "electrical": true,
+        "business_date": "2026-09-20",
+        "on_duty": "ON_DUTY"
+      },
+      "primary": {
+        "employee_id": 10,
+        "employee_no": "PRIMARY-3fb5da92",
+        "max_capacity": 2,
+        "electrical": true,
+        "business_date": "2026-09-20",
+        "on_duty": "ON_DUTY"
+      }
+    },
+    "bind_request_id": 7,
+    "fill_work_order_id": 9,
+    "final_work_order_id": 10,
+    "final_assignment": {
+      "employee_id": 10,
+      "assigned_by_user_id_is_null": true,
+      "reason": "AUTO_DISPATCH",
+      "status": "ACTIVE"
+    }
+  },
+  "results": [
+    {
+      "id": "STAFF-CATALOG-PAGE",
+      "status": "PASS",
+      "actual": "MAINTENANCE and ELECTRICAL created through manager page",
+      "evidence": []
+    },
+    {
+      "id": "STAFF-CREATE-FULL",
+      "status": "PASS",
+      "actual": "employee_id=7; department/duty/skill/capacity saved; invite issued",
+      "evidence": []
+    },
+    {
+      "id": "STAFF-CREATE-MISMATCH",
+      "status": "PASS",
+      "actual": "employee_id=8; department/duty/skill/capacity saved; invite issued",
+      "evidence": []
+    },
+    {
+      "id": "STAFF-CREATE-ENDED",
+      "status": "PASS",
+      "actual": "employee_id=9; department/duty/skill/capacity saved; invite issued",
+      "evidence": []
+    },
+    {
+      "id": "STAFF-CREATE-PRIMARY",
+      "status": "PASS",
+      "actual": "employee_id=10; department/duty/skill/capacity saved; invite issued",
+      "evidence": []
+    },
+    {
+      "id": "STAFF-INVITE-FULL",
+      "status": "PASS",
+      "actual": "employee_id=7; replacement invite issued through manager page",
+      "evidence": []
+    },
+    {
+      "id": "STAFF-INVITE-MISMATCH",
+      "status": "PASS",
+      "actual": "employee_id=8; replacement invite issued through manager page",
+      "evidence": []
+    },
+    {
+      "id": "STAFF-INVITE-ENDED",
+      "status": "PASS",
+      "actual": "employee_id=9; replacement invite issued through manager page",
+      "evidence": []
+    },
+    {
+      "id": "STAFF-INVITE-PRIMARY",
+      "status": "PASS",
+      "actual": "employee_id=10; replacement invite issued through manager page",
+      "evidence": []
+    },
+    {
+      "id": "STAFF-MANAGEMENT-PAGE",
+      "status": "PASS",
+      "actual": "current_employee_count=4; scoped_property_id=6",
+      "evidence": []
+    },
+    {
+      "id": "STAFF-CLAIM-CHECKIN-FULL",
+      "status": "PASS",
+      "actual": "employee_id=7; on_duty=ON_DUTY",
+      "evidence": []
+    },
+    {
+      "id": "RESIDENT-BIND-PAGE",
+      "status": "PASS",
+      "actual": "bind_request_id=7; status=PENDING",
+      "evidence": [
+        "resident-binding-pending.png"
+      ]
+    },
+    {
+      "id": "MANAGER-BIND-APPROVE-PAGE",
+      "status": "PASS",
+      "actual": "bind_request_id=7; approved",
+      "evidence": []
+    },
+    {
+      "id": "RESIDENT-FILL-AUTO-DISPATCH-PAGE",
+      "status": "PASS",
+      "actual": "work_order_id=9; employee_id=7; AUTO_DISPATCH visible",
+      "evidence": []
+    },
+    {
+      "id": "STAFF-CLAIM-CHECKIN-MISMATCH",
+      "status": "PASS",
+      "actual": "employee_id=8; on_duty=ON_DUTY",
+      "evidence": []
+    },
+    {
+      "id": "STAFF-CLAIM-CHECKIN-ENDED",
+      "status": "PASS",
+      "actual": "employee_id=9; on_duty=ON_DUTY",
+      "evidence": []
+    },
+    {
+      "id": "STAFF-CLAIM-CHECKIN-PRIMARY",
+      "status": "PASS",
+      "actual": "employee_id=10; on_duty=ON_DUTY",
+      "evidence": [
+        "attendance-primary.png"
+      ]
+    },
+    {
+      "id": "STAFF-END-ASSIGNMENT-PAGE",
+      "status": "PASS",
+      "actual": "employee_id=9; current effective assignment ended",
+      "evidence": [
+        "manager-ended-assignment.png"
+      ]
+    },
+    {
+      "id": "RESIDENT-FINAL-AUTO-DISPATCH-PAGE",
+      "status": "PASS",
+      "actual": "work_order_id=10; employee_id=10; AUTO_DISPATCH visible",
+      "evidence": []
+    },
+    {
+      "id": "AUTO-DISPATCH-WINNER",
+      "status": "PASS",
+      "actual": "expected_primary=10; actual=10",
+      "evidence": []
+    }
+  ],
+  "request_log": [
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employee-catalog",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:17:49.825Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employees",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:17:49.831Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/employees",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:17:50.005Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/supervisor/staff/daily",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:17:50.045Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employees",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:17:50.054Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employee-catalog",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:17:50.055Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/employees/9/invites",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:17:50.414Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:17:59.789Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:17:59.818Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:18:03.622Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:18:03.623Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/supervisor/staff/daily",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:18:03.664Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employee-catalog",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:18:03.666Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employees",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:18:03.685Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/employees",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:18:04.162Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/supervisor/staff/daily",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:18:04.201Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employee-catalog",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:18:04.207Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employees",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:18:04.223Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/employees/10/invites",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:18:04.553Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:18:13.623Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:18:13.647Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:18:17.469Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:18:17.469Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/supervisor/staff/daily",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:18:17.503Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employee-catalog",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:18:17.508Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employees",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:18:17.522Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:24.442Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:24.821Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:25.180Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:25.208Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:25.998Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:26.021Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:27.516Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:27.516Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/supervisor/staff/daily",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:27.557Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employee-catalog",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:27.558Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employees",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:27.582Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:37.521Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:37.545Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:41.450Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:41.453Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/supervisor/staff/daily",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:41.482Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employee-catalog",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:41.486Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employees",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:41.499Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/employees/7/invites",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:42.129Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:51.469Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:51.494Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:55.291Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:55.291Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/supervisor/staff/daily",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:55.324Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employee-catalog",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:55.331Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employees",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:55.346Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/employees/8/invites",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:27:55.820Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:05.310Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:05.334Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:09.234Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:09.234Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/supervisor/staff/daily",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:09.268Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employee-catalog",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:09.272Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employees",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:09.288Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/employees/9/invites",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:09.756Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:19.227Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:19.252Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:23.072Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:23.073Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/supervisor/staff/daily",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:23.107Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employee-catalog",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:23.113Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employees",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:23.126Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/employees/10/invites",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:23.604Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:33.072Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:33.098Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:36.965Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:36.965Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/supervisor/staff/daily",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:37.002Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employee-catalog",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:37.003Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employees",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:37.023Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:47.891Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:47.916Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:51.905Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:53.391Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:53.765Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:54.135Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:54.157Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:54.928Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/staff/employee-claim",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:28:56.561Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:06.428Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/staff/attendance/checkin",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:08.337Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:19.436Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:23.454Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:24.682Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:25.046Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:25.422Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:25.445Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:26.265Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:27.738Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/resident-bind-requests/mine",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:27.741Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me/houses",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:27.741Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties/1/buildings",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:27.774Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/buildings/1/units",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:27.810Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/units/1/houses",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:27.841Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties/6/buildings",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:27.866Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/buildings/6/units",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:27.892Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/units/6/houses",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:27.919Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/resident-bind-requests",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:28.217Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:28.244Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me/houses",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:28.246Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/resident-bind-requests/mine",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:28.247Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties/1/buildings",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:28.276Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/buildings/1/units",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:28.311Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/units/1/houses",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:28.339Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:39.146Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:43.119Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:44.350Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:44.724Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:45.070Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:45.093Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:45.866Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:45.888Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/resident-bind-requests",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:47.416Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/resident-bind-requests/7/approve",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:47.793Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/resident-bind-requests",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:47.818Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:58.890Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:29:58.908Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:02.898Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:04.175Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:04.524Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:04.863Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:04.884Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:05.646Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me/houses",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:07.148Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/resident-bind-requests/mine",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:07.151Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:07.152Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties/1/buildings",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:07.177Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/buildings/1/units",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:07.203Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/units/1/houses",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:07.231Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/work-orders",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:09.661Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/9",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:10.514Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:21.673Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:25.714Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:27.072Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:27.414Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:27.807Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:27.830Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:28.651Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/staff/employee-claim",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:30.274Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:40.173Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/staff/attendance/checkin",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:42.009Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:53.094Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:57.090Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:58.307Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:58.667Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:59.032Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:59.054Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:30:59.834Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/staff/employee-claim",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:31:01.461Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:31:11.344Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/staff/attendance/checkin",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:31:13.205Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:31:24.271Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:31:28.271Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:31:29.517Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:31:29.876Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:31:30.237Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:31:30.262Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:31:31.048Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/staff/employee-claim",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:31:32.713Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:31:42.617Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/staff/attendance/checkin",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:31:44.447Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:31:54.738Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:31:58.739Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:00.203Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:00.577Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:00.933Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:00.958Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:01.741Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:01.768Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:03.251Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:03.252Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/supervisor/staff/daily",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:03.286Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employee-catalog",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:03.291Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employees",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:03.314Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/employees/9/property-assignments/9/end",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:03.739Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/supervisor/staff/daily",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:03.787Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employees",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:03.789Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/employee-catalog",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:03.790Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:13.810Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:13.832Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:17.822Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:19.048Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:19.405Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:19.758Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:19.778Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:21.092Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me/houses",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:22.590Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/resident-bind-requests/mine",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:22.592Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:22.592Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties/1/buildings",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:22.621Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/buildings/1/units",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:22.648Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/units/1/houses",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:22.679Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/work-orders",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:25.132Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/10",
+      "status": 200,
+      "received_at_local": "2026-09-20T01:32:25.918Z"
+    }
+  ],
+  "boundaries": {
+    "page_interaction_used": true,
+    "official_sms_sessions_used": true,
+    "seed_login_used": false,
+    "system_role_used": false,
+    "direct_business_state_database_write_used": false,
+    "fake_model_only": true,
+    "real_qwen_verified": false,
+    "production_v1_passed": false
+  },
+  "redaction": "No phone, OTP, invite token, access token, refresh token, password, or credential is emitted."
+}

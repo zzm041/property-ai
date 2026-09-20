@@ -1,0 +1,166 @@
+{
+  "task_id": "STAFF-MGMT-AUTO-DISPATCH-001",
+  "review_round": 1,
+  "environment": {
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009"
+  },
+  "roster_distinct_employee_count_for_property_6": 105,
+  "employees": [
+    {
+      "id": 9,
+      "employee_no": "ENDED-3fb5da92",
+      "status": "ACTIVE",
+      "department_id": 1,
+      "department_name": "本轮维修组",
+      "max_capacity": 2
+    },
+    {
+      "id": 10,
+      "employee_no": "PRIMARY-3fb5da92",
+      "status": "ACTIVE",
+      "department_id": 1,
+      "department_name": "本轮维修组",
+      "max_capacity": 3
+    }
+  ],
+  "assignments": [
+    {
+      "id": 9,
+      "employee_id": 9,
+      "property_id": 6,
+      "status": "ENDED",
+      "valid_from": "2026-09-20 01:17:49.994210",
+      "valid_to": "2026-09-20 01:32:03.729198"
+    },
+    {
+      "id": 113,
+      "employee_id": 9,
+      "property_id": 6,
+      "status": "ACTIVE",
+      "valid_from": "2026-09-20 01:55:49.685805",
+      "valid_to": null
+    },
+    {
+      "id": 10,
+      "employee_id": 10,
+      "property_id": 6,
+      "status": "ACTIVE",
+      "valid_from": "2026-09-20 01:18:04.149248",
+      "valid_to": null
+    },
+    {
+      "id": 112,
+      "employee_id": 10,
+      "property_id": 7,
+      "status": "ACTIVE",
+      "valid_from": "2026-09-20 01:55:48.413877",
+      "valid_to": null
+    }
+  ],
+  "duties": [
+    {
+      "employee_id": 9,
+      "code": "MAINTENANCE",
+      "name": "维修职责"
+    },
+    {
+      "employee_id": 10,
+      "code": "MAINTENANCE",
+      "name": "维修职责"
+    },
+    {
+      "employee_id": 10,
+      "code": "INSPECTION_3FB5DA92",
+      "name": "巡检职责"
+    }
+  ],
+  "skills": [
+    {
+      "employee_id": 9,
+      "code": "ELECTRICAL",
+      "name": "电气技能"
+    },
+    {
+      "employee_id": 10,
+      "code": "ELECTRICAL",
+      "name": "电气技能"
+    },
+    {
+      "employee_id": 10,
+      "code": "HVAC_3FB5DA92",
+      "name": "暖通技能"
+    }
+  ],
+  "audits": [
+    {
+      "action": "EMPLOYEE_PROPERTY_ASSIGNED",
+      "resource_type": "EMPLOYEE_PROPERTY",
+      "resource_id": 9,
+      "request_id": "4d55dd550021456b931748ae0fcff2c2",
+      "details_json": "{\"employee_id\": 9, \"property_id\": 6}"
+    },
+    {
+      "action": "EMPLOYEE_CREATED",
+      "resource_type": "EMPLOYEE",
+      "resource_id": 10,
+      "request_id": "72dbe8f90db24ca596eac15e94f4d3c4",
+      "details_json": "{\"employee_no\": \"PRIMARY-3fb5da92\"}"
+    },
+    {
+      "action": "EMPLOYEE_PROPERTY_ASSIGNED",
+      "resource_type": "EMPLOYEE_PROPERTY",
+      "resource_id": 10,
+      "request_id": "72dbe8f90db24ca596eac15e94f4d3c4",
+      "details_json": "{\"employee_id\": 10, \"property_id\": 6}"
+    },
+    {
+      "action": "EMPLOYEE_CLAIMED",
+      "resource_type": "EMPLOYEE",
+      "resource_id": 10,
+      "request_id": "0e689b3ad5a04c258eb5dfc54c11dac0",
+      "details_json": "{\"user_id\": 45, \"employee_id\": 10}"
+    },
+    {
+      "action": "EMPLOYEE_PROPERTY_ENDED",
+      "resource_type": "EMPLOYEE_PROPERTY",
+      "resource_id": 9,
+      "request_id": "1e6fcfa06f7f4b5fa3998e376018e0d9",
+      "details_json": "{\"employee_id\": 9, \"property_id\": 6}"
+    },
+    {
+      "action": "EMPLOYEE_UPDATED",
+      "resource_type": "EMPLOYEE",
+      "resource_id": 10,
+      "request_id": "aa9fe723f2e64035977561bf15cca405",
+      "details_json": "{\"status\": \"ACTIVE\", \"max_capacity\": 3, \"department_id\": null, \"added_duty_ids\": [3], \"added_skill_ids\": [3]}"
+    },
+    {
+      "action": "EMPLOYEE_UPDATED",
+      "resource_type": "EMPLOYEE",
+      "resource_id": 10,
+      "request_id": "04a24de769ee4834a19ce463385cd11b",
+      "details_json": "{\"status\": \"ACTIVE\", \"department_id\": 1}"
+    },
+    {
+      "action": "EMPLOYEE_PROPERTY_ASSIGNED",
+      "resource_type": "EMPLOYEE_PROPERTY",
+      "resource_id": 112,
+      "request_id": "a4d89e73c1bc40caaf79d2d67da9a21a",
+      "details_json": "{\"employee_id\": 10, \"property_id\": 7}"
+    },
+    {
+      "action": "EMPLOYEE_PROPERTY_ASSIGNED",
+      "resource_type": "EMPLOYEE_PROPERTY",
+      "resource_id": 113,
+      "request_id": "4bc6f10115c44d7d944f8b69c2bf67ea",
+      "details_json": "{\"employee_id\": 9, \"property_id\": 6}"
+    }
+  ],
+  "boundaries": {
+    "read_only": true,
+    "business_state_changed": false,
+    "phones_or_credentials_emitted": false
+  },
+  "redaction": "No phone, token, credential, resident name, or work-order text is emitted."
+}

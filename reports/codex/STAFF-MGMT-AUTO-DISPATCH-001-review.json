@@ -1,0 +1,56 @@
+{
+  "task_id": "STAFF-MGMT-AUTO-DISPATCH-001",
+  "phase": "review",
+  "reviewed_head": "78fdcedcef93b57ef0af19308d128d5947ba06da",
+  "decision": "NEEDS_CHANGES",
+  "actions_or_findings": [
+    {
+      "title": "STAFF-001 CURRENT_TASK_BLOCKER — Employee becomes unreachable after the last assignment ends",
+      "path": "backend/app/repository/employee.py:203; miniprogram/pages/supervisor/staff.js:157",
+      "trigger": "A manager ends an employee’s only effective property assignment.",
+      "rationale": "The list excludes that employee, and the page has no lookup or reassignment route for a record no longer listed. The retained flow ends employee 9’s assignment through the page and then waits for employee 9 to disappear. The service API can assign a known employee ID, but the page cannot recover that ID for later maintenance."
+    },
+    {
+      "title": "STAFF-002 CURRENT_TASK_BLOCKER — Roster and duty state stop at 50 rows",
+      "path": "miniprogram/pages/supervisor/staff.js:154; miniprogram/services/api.js:398; backend/app/api/v1/admin_employee.py:154",
+      "trigger": "A property has more than 50 current employees or daily status rows.",
+      "rationale": "Both page requests fetch one default-sized page and ignore the returned cursor. Later employees cannot be listed or managed; their duty and load state may also be absent. The four-person evidence run does not exercise this boundary."
+    },
+    {
+      "title": "STAFF-EVID-003 CURRENT_TASK_BLOCKER — Existing-record maintenance lacks page evidence",
+      "path": "reports/staff-mgmt-auto-dispatch-001/page-flow-evidence.json; reports/staff-mgmt-auto-dispatch-001/screenshot-errors.log",
+      "trigger": "Assessing department, capacity, duty, skill, and added service-property maintenance.",
+      "rationale": "The retained request trace has no employee PATCH or property-assignment POST, and the automation flow does not perform those actions. Its create check confirms the employee number but does not read back every claimed field. The manager-list screenshot timed out. The current evidence therefore cannot establish that the full maintenance condition works through the page."
+    },
+    {
+      "title": "STAFF-REL-004 RELEASE_BLOCKER — Real model validation remains open",
+      "path": "reports/staff-mgmt-auto-dispatch-001/final-dispatch-evidence.json:92",
+      "trigger": "Production V1 release assessment.",
+      "rationale": "The persisted AI call is explicitly DEVELOPMENT with model version dev-llm-v1. This supports the local automatic-dispatch slice but does not validate self-hosted Qwen or real Embedding/RAG."
+    }
+  ],
+  "evidence_paths": [
+    "reports/project-handoff.md",
+    "reports/staff-mgmt-auto-dispatch-001/prepare-evidence.json",
+    "reports/staff-mgmt-auto-dispatch-001/page-flow-evidence.json",
+    "reports/staff-mgmt-auto-dispatch-001/final-dispatch-evidence.json",
+    "reports/staff-mgmt-auto-dispatch-001/run-page-flow.js",
+    "reports/staff-mgmt-auto-dispatch-001/manager-ended-assignment.png",
+    "reports/staff-mgmt-auto-dispatch-001/resident-binding-pending.png",
+    "reports/staff-mgmt-auto-dispatch-001/attendance-primary.png"
+  ],
+  "unverified": [
+    "No tests or business-state operations were run in this read-only review.",
+    "The three PNGs were visually inspected. They show the ended-assignment notice, pending resident binding, and attendance page; they do not independently show the final assigned order. That result is supported by the page-state trace, order 10 request, and matching database snapshot.",
+    "A live negative tenant/property access request and current process, publisher, and worker identities were not rechecked in this review."
+  ],
+  "session_note": "Overall goal: frozen Production V1. Current review: STAFF-MGMT-AUTO-DISPATCH-001 at actual Git HEAD 78fdced, against base 1fd26ba; ACCOUNT-MERGE-001 remains a separate mainline task. Scope was read-only code and retained evidence for 8083 and isolated 127.0.0.1:3307/property_ai_auth001_test at 20260919_0009. The source applies a target-property permission check and filters returned assignment history; no new access-control weakening was identified in the changed paths. The retained flow links bind request 7, work order 10, AUTO assignment to employee 10, and the three requested exclusion reasons. Closed security items were not reopened. miniprogram/project.config.json remains unrelated pre-existing state.",
+  "task_result": "The DEVELOPMENT-mode page-to-AUTO-dispatch chain is supported by matching request paths, object IDs, work-order logs, assignment history, and database rows. The staff-management completion conditions are not met because of the roster dead end, 50-row truncation, and missing maintenance evidence.",
+  "product_gap_changes": [
+    "No Production V1 feature was removed or relabeled as complete.",
+    "Controlled merge, recovery, real self-hosted AI and Embedding/RAG, production media, real providers, and Day 4 release validation remain open."
+  ],
+  "schedule_risk": "On 2026-09-20, the original approximately 2026-09-21 one-week aim cannot cover these staff fixes and the remaining frozen V1 gaps without deferring real validation or dropping scope.",
+  "next_action": "Main Codex: preserve the documented current-effective employee list contract while adding a scoped way to find and reassign an employee after their final assignment ends; consume all employee and daily-status cursor pages; then capture isolated 8083/0009 page and API evidence for editing an existing employee, adding a service-property assignment, the ended-employee recovery path, a roster above 50, and denied cross-scope access. Record process, code, schema, publisher, and worker identity alongside the run, then request another independent read-only review. Ordinary source, page, and named-isolation work is already authorized; migration, shared-database, paid-provider, or release operations require separate approval.",
+  "approval_requests": []
+}

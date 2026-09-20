@@ -1,0 +1,47 @@
+You are the same single independent read-only review role for focused remediation round 1 of STAFF-MGMT-AUTO-DISPATCH-001.
+
+Fixed review scope:
+- prior reviewed head: 78fdcedcef93b57ef0af19308d128d5947ba06da
+- remediation head: 8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3
+- prior review: reports/codex/STAFF-MGMT-AUTO-DISPATCH-001-review.json
+- Do not edit files, run tests, change business state, create another reviewer, or expand to the repository at large.
+- Do not review or implement ACCOUNT-MERGE-001/0010.
+- Preserve miniprogram/project.config.json as unrelated user-preexisting state.
+
+Recheck only the three prior CURRENT_TASK_BLOCKER findings and regressions directly caused by the remediation:
+1. STAFF-001: an employee whose final effective assignment ended was unreachable from the page and could not be reassigned.
+2. STAFF-002: roster and daily-state page calls stopped at the first 50 rows.
+3. STAFF-EVID-003: no page evidence existed for maintaining an existing employee or adding a service-property assignment.
+
+Read the remediation diff and directly relevant files:
+- backend/app/api/v1/admin_employee.py
+- backend/app/repository/employee.py
+- backend/app/service/employee.py
+- backend/tests/unit/test_employee_management_view.py
+- miniprogram/pages/supervisor/staff.js
+- miniprogram/pages/supervisor/staff.wxml
+- miniprogram/services/api.js
+- docs/06-API-CONTRACT.md
+
+Read and cross-check current evidence:
+- reports/staff-mgmt-auto-dispatch-001/remediation-prepare-evidence.json
+- reports/staff-mgmt-auto-dispatch-001/remediation-page-evidence.json
+- reports/staff-mgmt-auto-dispatch-001/remediation-database-evidence.json
+- reports/staff-mgmt-auto-dispatch-001/runtime-identity-evidence.json
+- reports/staff-mgmt-auto-dispatch-001/fix1-ended-recovered-detail.png
+- reports/staff-mgmt-auto-dispatch-001/fix1-primary-maintained-detail.png
+- reports/staff-mgmt-auto-dispatch-001/final-dispatch-evidence.json
+
+Evidence assertions to verify rather than trust:
+- API default still lists only current-effective employees; include_historical=true remains explicitly scoped to the requested tenant/property and returns only employees with a relation to that property.
+- The page consumes employee and daily-status cursors until next_cursor is absent.
+- The page showed 105 scoped employees and made a second employees request with after_id=106.
+- Employee 10 received two successful page PATCH requests, persisted capacity=3, restored department 1, added INSPECTION and HVAC, and gained an ACTIVE assignment to property 7.
+- Employee 9 was visible with historical assignment 9 ENDED and gained assignment 113 ACTIVE to property 6 through the page.
+- A PROPERTY-scoped admin for property 6 received 200 for property 6 and 403 for property 7.
+- Runtime identity is 8db1d2b / schema 0009 / API 8083 / isolated queue and Worker; 8082 and the pre-existing DLQ row were left untouched.
+- Main-session test evidence is 414 passed; you must state that you did not independently rerun tests.
+
+Inspect the two PNGs with an image-capable tool if available. If not, state that boundary. Retained first-attempt errors and screenshot timeouts are history and must not replace the final successful page/database evidence.
+
+Return PASS if the three prior current-task blockers are closed without a direct regression. Keep STAFF-REL-004 (real Qwen/self-hosted inference) as a RELEASE_BLOCKER, not a blocker for this DEVELOPMENT-mode slice. Findings must have a stable ID, classification (CURRENT_TASK_BLOCKER, RELEASE_BLOCKER, or NON_BLOCKING), path/location, trigger, impact, and concrete evidence. Do not reopen unrelated closed issues.

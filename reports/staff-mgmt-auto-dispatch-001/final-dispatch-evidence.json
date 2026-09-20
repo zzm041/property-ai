@@ -1,0 +1,267 @@
+{
+  "environment": {
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001",
+    "ai_auto_assign": true,
+    "ai_enqueue_on_create": true
+  },
+  "work_order": {
+    "id": 10,
+    "tenant_id": 6,
+    "property_id": 6,
+    "status": "ASSIGNED",
+    "process_reason": "NONE",
+    "category": "ELECTRICAL",
+    "priority": "HIGH",
+    "current_assignment_id": 10,
+    "version": 3,
+    "created_at": "2026-09-20 01:32:25.112763",
+    "business_date": "2026-09-20"
+  },
+  "assignment": {
+    "id": 10,
+    "employee_id": 10,
+    "assigned_by_user_id_is_null": true,
+    "assigned_source": "AUTO",
+    "status": "ACTIVE",
+    "reason": "AUTO_DISPATCH",
+    "score": 0.775,
+    "required_duty": "MAINTENANCE",
+    "required_skill": "ELECTRICAL",
+    "filter_candidate_count": 4,
+    "eligible_employee_ids": [
+      10
+    ],
+    "weights": {
+      "duty": 0.25,
+      "skill": 0.2,
+      "rating": 0.07,
+      "capacity": 0.2,
+      "response": 0.1,
+      "completion": 0.08,
+      "same_building": 0.1,
+      "response_reference_seconds": 900.0
+    }
+  },
+  "assignment_history": [
+    {
+      "id": 10,
+      "employee_id": 10,
+      "assigned_source": "AUTO",
+      "status": "ACTIVE",
+      "reason": "AUTO_DISPATCH",
+      "ended_at": null,
+      "assigned_by_user_id_is_null": true,
+      "score": 0.775,
+      "candidate_filters": [
+        {
+          "employee_id": 7,
+          "eligible": false,
+          "filter_reason": "CAPACITY_FULL"
+        },
+        {
+          "employee_id": 8,
+          "eligible": false,
+          "filter_reason": "SKILL_MISMATCH"
+        },
+        {
+          "employee_id": 9,
+          "eligible": false,
+          "filter_reason": "PROPERTY_NOT_EFFECTIVE"
+        },
+        {
+          "employee_id": 10,
+          "eligible": true,
+          "filter_reason": null
+        }
+      ]
+    }
+  ],
+  "analyses": [
+    {
+      "id": 10,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "priority": "HIGH",
+      "risk": "electric",
+      "required_skill": "ELECTRICAL",
+      "confidence": "0.860"
+    }
+  ],
+  "ai_calls": [
+    {
+      "provider_type": "LLM",
+      "provider_mode": "DEVELOPMENT",
+      "operation": "structured_completion",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS",
+      "prompt_version": "wo-analysis-v1"
+    }
+  ],
+  "dispatch_recommendations": [
+    {
+      "employee_id": 10,
+      "eligible": 1,
+      "filter_reason": null,
+      "score": "0.7750",
+      "reason_codes": "[\"DUTY_MATCH\", \"SKILL_MATCH\", \"LOAD_REMAINING\"]"
+    },
+    {
+      "employee_id": 7,
+      "eligible": 0,
+      "filter_reason": "CAPACITY_FULL",
+      "score": "0.0000",
+      "reason_codes": "[\"CAPACITY_FULL\"]"
+    },
+    {
+      "employee_id": 8,
+      "eligible": 0,
+      "filter_reason": "SKILL_MISMATCH",
+      "score": "0.0000",
+      "reason_codes": "[\"SKILL_MISMATCH\"]"
+    },
+    {
+      "employee_id": 9,
+      "eligible": 0,
+      "filter_reason": "PROPERTY_NOT_EFFECTIVE",
+      "score": "0.0000",
+      "reason_codes": "[\"PROPERTY_NOT_EFFECTIVE\"]"
+    }
+  ],
+  "work_order_logs": [
+    {
+      "actor_type": "RESIDENT",
+      "actor_is_system": 0,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "8bfbeee3f7ce43209ce84ae6520cf278",
+      "created_at": "2026-09-20 01:32:25.117259"
+    },
+    {
+      "actor_type": "SYSTEM",
+      "actor_is_system": 1,
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "8bfbeee3f7ce43209ce84ae6520cf278",
+      "created_at": "2026-09-20 01:32:25.193815"
+    },
+    {
+      "actor_type": "SYSTEM",
+      "actor_is_system": 1,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "8bfbeee3f7ce43209ce84ae6520cf278",
+      "created_at": "2026-09-20 01:32:25.460847"
+    }
+  ],
+  "audits": [
+    {
+      "action": "WORK_ORDER_CREATED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 10,
+      "request_id": "8bfbeee3f7ce43209ce84ae6520cf278",
+      "actor_is_system": 0
+    },
+    {
+      "action": "WORK_ORDER_AI_ANALYSIS_COMPLETED",
+      "resource_type": "WORK_ORDER_ANALYSIS",
+      "resource_id": 10,
+      "request_id": "8bfbeee3f7ce43209ce84ae6520cf278",
+      "actor_is_system": 1
+    },
+    {
+      "action": "WORK_ORDER_ASSIGNED",
+      "resource_type": "WORK_ORDER_ASSIGNMENT",
+      "resource_id": 10,
+      "request_id": "8bfbeee3f7ce43209ce84ae6520cf278",
+      "actor_is_system": 1
+    }
+  ],
+  "notifications": [
+    {
+      "id": 22,
+      "user_id": 45,
+      "resource_type": "WORK_ORDER",
+      "resource_id": 10,
+      "delivery_status": "SUCCEEDED"
+    }
+  ],
+  "processes": [],
+  "receipts": [],
+  "resident_feedbacks": [],
+  "lifecycle_identities": [
+    {
+      "reporter_user_id": 42,
+      "employee_id": 10,
+      "employee_user_id": 45
+    }
+  ],
+  "lifecycle_audits": [
+    {
+      "action": "WORK_ORDER_CREATED",
+      "actor_user_id": 42,
+      "request_id": "8bfbeee3f7ce43209ce84ae6520cf278"
+    }
+  ],
+  "employee_daily_statuses": [
+    {
+      "employee_id": 7,
+      "business_date": "2026-09-20",
+      "on_duty": "ON_DUTY",
+      "current_load": 1
+    },
+    {
+      "employee_id": 8,
+      "business_date": "2026-09-20",
+      "on_duty": "ON_DUTY",
+      "current_load": 0
+    },
+    {
+      "employee_id": 9,
+      "business_date": "2026-09-20",
+      "on_duty": "ON_DUTY",
+      "current_load": 0
+    },
+    {
+      "employee_id": 10,
+      "business_date": "2026-09-20",
+      "on_duty": "ON_DUTY",
+      "current_load": 1
+    }
+  ],
+  "attendance_records": [
+    {
+      "employee_id": 7,
+      "business_date": "2026-09-20",
+      "check_in_at": "2026-09-20 01:29:08.313972",
+      "check_out_at": null,
+      "currently_checked_in": 1
+    },
+    {
+      "employee_id": 8,
+      "business_date": "2026-09-20",
+      "check_in_at": "2026-09-20 01:30:41.992274",
+      "check_out_at": null,
+      "currently_checked_in": 1
+    },
+    {
+      "employee_id": 9,
+      "business_date": "2026-09-20",
+      "check_in_at": "2026-09-20 01:31:13.189007",
+      "check_out_at": null,
+      "currently_checked_in": 1
+    },
+    {
+      "employee_id": 10,
+      "business_date": "2026-09-20",
+      "check_in_at": "2026-09-20 01:31:44.431167",
+      "check_out_at": null,
+      "currently_checked_in": 1
+    }
+  ],
+  "redaction": "No phone, token, credential, resident name, or work-order text is emitted."
+}

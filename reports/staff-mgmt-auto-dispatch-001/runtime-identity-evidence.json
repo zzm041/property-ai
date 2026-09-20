@@ -1,0 +1,51 @@
+{
+  "task_id": "STAFF-MGMT-AUTO-DISPATCH-001",
+  "captured_at": "2026-09-20T02:04:02.5515677Z",
+  "code": {
+    "head": "8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3"
+  },
+  "schema": {
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009"
+  },
+  "publisher": {
+    "api_port": 8083,
+    "launcher_pid": 54912,
+    "process_pid": 56188,
+    "command": "D:\\property-ai\\scripts\\ops\\serve_auth001_isolated_api.py",
+    "queue": "property_ai.auth001",
+    "vhost": "property_ai_auth001",
+    "redis_db": 12,
+    "ai_auto_assign": true,
+    "ai_enqueue_on_create": true,
+    "health_status_code": 200,
+    "stderr_bytes": 0
+  },
+  "worker": {
+    "launcher_pid": 20776,
+    "process_pid": 43912,
+    "command": "D:\\property-ai\\scripts\\ops\\serve_auth001_isolated_worker.py",
+    "queue": "property_ai.auth001",
+    "pool": "solo",
+    "celery_version": "5.5.3",
+    "transport": "amqp://auth001:REDACTED@127.0.0.1:5672/property_ai_auth001"
+  },
+  "queue_state": {
+    "property_ai.auth001": {
+      "messages_ready": 0,
+      "messages_unacknowledged": 0,
+      "consumers": 1
+    },
+    "property_ai.auth001.dlq": {
+      "messages_ready": 1,
+      "messages_unacknowledged": 0,
+      "consumers": 0,
+      "action": "left_untouched"
+    }
+  },
+  "preserved_environment": {
+    "port_8082_pid": 40828,
+    "changed": false
+  },
+  "redaction": "Broker password and all credentials are omitted or redacted."
+}

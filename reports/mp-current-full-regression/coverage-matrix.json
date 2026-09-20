@@ -1347,10 +1347,70 @@
       "source password transfer versus explicit target-side password setup when target has no password"
     ]
   },
+  "staff_mgmt_auto_dispatch_001": {
+    "task_id": "STAFF-MGMT-AUTO-DISPATCH-001",
+    "implementation_head": "8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
+    "independent_review": {
+      "result": "PASS",
+      "path": "reports/codex/STAFF-MGMT-AUTO-DISPATCH-001-FIX-1-review.json",
+      "boundary": "scoped local DEVELOPMENT-mode staff-management and automatic-dispatch data loop; not real-model or Production V1 acceptance"
+    },
+    "current_status_overlays": [
+      {
+        "id": "STAFF-CLAIM",
+        "implementation_status": "normal_sms_claim_page_wired",
+        "verification_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "78fdcedcef93b57ef0af19308d128d5947ba06da / 8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
+        "remaining_gap": "production identity-provider acceptance"
+      },
+      {
+        "id": "STAFF-ATTENDANCE",
+        "implementation_status": "self_checkin_page_wired",
+        "verification_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "78fdcedcef93b57ef0af19308d128d5947ba06da / 8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
+        "remaining_gap": "broader attendance and production acceptance"
+      },
+      {
+        "id": "STAFF-INVITE-PAGE",
+        "implementation_status": "implemented_and_page_wired",
+        "verification_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
+        "remaining_gap": "production delivery and broader acceptance"
+      },
+      {
+        "id": "STAFF-DEPT-SKILL-UI",
+        "implementation_status": "implemented_and_page_wired_for_existing_department_duty_skill_property_capacity_and_history",
+        "verification_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
+        "remaining_gap": "broader production acceptance"
+      },
+      {
+        "id": "STAFF-DAILY-PAGE",
+        "implementation_status": "current_state_and_cursor_wired",
+        "verification_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
+        "remaining_gap": "second daily-status page not exercised in this run; cursor traversal reviewed in code"
+      },
+      {
+        "id": "WO-AUTO-DISPATCH",
+        "implementation_status": "implemented_with_managed_staff_data_in_isolated_runtime",
+        "verification_status": "PASS_SCOPED_FAKE_CROSS_PROCESS",
+        "evidence_version": "78fdcedcef93b57ef0af19308d128d5947ba06da / 8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
+        "remaining_gap": "operator-controlled real model and production runtime"
+      },
+      {
+        "id": "V1-AUTO-DISPATCH-FILTER",
+        "implementation_status": "managed_staff_constraints_drive_dispatch_snapshot",
+        "verification_status": "PASS_SCOPED_FAKE",
+        "evidence_version": "78fdcedcef93b57ef0af19308d128d5947ba06da / 8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
+        "remaining_gap": "real-model and full production-policy acceptance"
+      }
+    ]
+  },
   "current_effective_view": {
     "generated_at": "2026-09-20",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
-    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs)",
+    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced.",
     "row_count": 83,
     "rows": [
@@ -1508,19 +1568,19 @@
       },
       {
         "requirement_id": "STAFF-CLAIM",
-        "current_implementation": "已实现可测试",
-        "verification_mode_status": "UI:PASS",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
-        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+        "current_implementation": "normal_sms_claim_page_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "78fdcedcef93b57ef0af19308d128d5947ba06da / 8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
+        "remaining_gap": "production identity-provider acceptance",
+        "next_action": "preserve scoped evidence; revalidate after related identity or invitation changes"
       },
       {
         "requirement_id": "STAFF-ATTENDANCE",
-        "current_implementation": "已实现可测试",
-        "verification_mode_status": "UI:PASS",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
-        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+        "current_implementation": "self_checkin_page_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "78fdcedcef93b57ef0af19308d128d5947ba06da / 8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
+        "remaining_gap": "broader attendance and production acceptance",
+        "next_action": "preserve scoped evidence; revalidate after related attendance changes"
       },
       {
         "requirement_id": "STAFF-CLAIM-DUP",
@@ -1556,9 +1616,9 @@
       },
       {
         "requirement_id": "WO-AUTO-DISPATCH",
-        "current_implementation": "implemented_for_isolated_runtime",
+        "current_implementation": "implemented_with_managed_staff_data_in_isolated_runtime",
         "verification_mode_status": "PASS_SCOPED_FAKE_CROSS_PROCESS",
-        "evidence_version": "d144bcddcfc24e6e9eaf60509acd124711bc0561",
+        "evidence_version": "78fdcedcef93b57ef0af19308d128d5947ba06da / 8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
         "remaining_gap": "operator-controlled real model and production runtime",
         "next_action": "仅针对所列剩余缺口补实现或证据"
       },
@@ -1684,19 +1744,19 @@
       },
       {
         "requirement_id": "STAFF-INVITE-PAGE",
-        "current_implementation": "只有API没有页面",
-        "verification_mode_status": "API:NOT_IMPLEMENTED",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "页面创建员工并发邀请",
-        "next_action": "按依赖顺序实施，保留本ID在分母中"
+        "current_implementation": "implemented_and_page_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
+        "remaining_gap": "production delivery and broader acceptance",
+        "next_action": "preserve scoped evidence; revalidate after related invitation changes"
       },
       {
         "requirement_id": "STAFF-DEPT-SKILL-UI",
-        "current_implementation": "只有API没有页面",
-        "verification_mode_status": "API:NOT_IMPLEMENTED",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "员工/部门/岗位/技能/服务小区管理页面",
-        "next_action": "按依赖顺序实施，保留本ID在分母中"
+        "current_implementation": "implemented_and_page_wired_for_existing_department_duty_skill_property_capacity_and_history",
+        "verification_mode_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
+        "remaining_gap": "broader production acceptance",
+        "next_action": "preserve scoped evidence; revalidate after related staff-management changes"
       },
       {
         "requirement_id": "KNOWLEDGE-INGEST-UI",
@@ -1788,11 +1848,11 @@
       },
       {
         "requirement_id": "STAFF-DAILY-PAGE",
-        "current_implementation": "已实现可测试",
-        "verification_mode_status": "UI:PASS",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
-        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+        "current_implementation": "current_state_and_cursor_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
+        "remaining_gap": "second daily-status page not exercised in this run; cursor traversal reviewed in code",
+        "next_action": "add a second-page daily-status runtime case when a dependent slice needs it"
       },
       {
         "requirement_id": "AUTH-RESET-RELOGIN",
@@ -1996,9 +2056,9 @@
       },
       {
         "requirement_id": "V1-AUTO-DISPATCH-FILTER",
-        "current_implementation": "implemented_for_current_scoring_slice",
+        "current_implementation": "managed_staff_constraints_drive_dispatch_snapshot",
         "verification_mode_status": "PASS_SCOPED_FAKE",
-        "evidence_version": "d144bcddcfc24e6e9eaf60509acd124711bc0561",
+        "evidence_version": "78fdcedcef93b57ef0af19308d128d5947ba06da / 8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
         "remaining_gap": "real-model and full production-policy acceptance",
         "next_action": "仅针对所列剩余缺口补实现或证据"
       },

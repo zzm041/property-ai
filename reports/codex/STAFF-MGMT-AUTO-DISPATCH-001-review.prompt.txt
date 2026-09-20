@@ -1,0 +1,35 @@
+You are the single independent read-only reviewer for STAFF-MGMT-AUTO-DISPATCH-001.
+
+Review scope and fixed baseline:
+- base_sha: 1fd26ba6bc2ed5ac8903c5b00e295e0bc02eda05
+- head_sha: 78fdcedcef93b57ef0af19308d128d5947ba06da
+- task commits: 11e311f, 7107186, 78fdced
+- database evidence is limited to 127.0.0.1:3307/property_ai_auth001_test at 20260919_0009.
+- Do not edit files, run tests, change business state, create another reviewer, or review the whole repository.
+- Do not review ACCOUNT-MERGE-001 or propose migration 0010 in this task.
+- Preserve miniprogram/project.config.json as unrelated user-preexisting state.
+
+Review only the changed staff-management implementation and the direct automatic-dispatch call context. Inspect the relevant diff and files under:
+- backend/app/api/v1/admin_employee.py
+- backend/app/repository/employee.py
+- backend/app/schema/employee.py
+- backend/app/service/employee.py
+- backend/tests/unit/test_employee_management_view.py
+- miniprogram/pages/supervisor/staff.*
+- miniprogram/pages/home/home.*
+- miniprogram/services/api.js
+- docs/06-API-CONTRACT.md
+- reports/staff-mgmt-auto-dispatch-001/
+
+Completion conditions to assess:
+1. A property/tenant manager page can list and create scoped employees, issue invitations, maintain existing department/duty/skill/service-property/effective-assignment/capacity data, and see current duty/load state without SYSTEM access.
+2. Employees authenticate normally, claim their own invitation, and check in.
+3. A resident binds through normal pages, a manager approves through normal pages, and the resident creates work orders through normal pages.
+4. The normal work-order path automatically analyzes and persists an AUTO assignment without a human analyze/select/assign action.
+5. The final decision excludes one candidate for CAPACITY_FULL, one for SKILL_MISMATCH, one for PROPERTY_NOT_EFFECTIVE, and selects the remaining eligible employee.
+6. Evidence clearly labels DEVELOPMENT/dev-llm-v1 and does not claim real Qwen, production, or complete V1 validation.
+7. Tenant/property visibility and direct-object access controls are not weakened.
+
+Use real evidence, not the PASS labels alone. Cross-check page-flow-evidence.json request paths and object IDs against final-dispatch-evidence.json. Inspect the three PNG files with an image-capable tool if available; otherwise state that visual inspection was not performed. page-flow-error.txt and screenshot-errors.log are retained attempt history, not proof of the final successful steps.
+
+Return PASS only if the scoped product implementation and current evidence satisfy these conditions. Findings must use titles beginning with a stable ID and one classification: CURRENT_TASK_BLOCKER, RELEASE_BLOCKER, or NON_BLOCKING. Each finding must state path/location, trigger, impact, and concrete evidence. Do not reopen unrelated closed issues. Missing real-model validation is a RELEASE_BLOCKER, not a blocker for this DEVELOPMENT-mode local slice.

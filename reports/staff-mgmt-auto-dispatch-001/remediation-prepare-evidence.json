@@ -1,0 +1,36 @@
+{
+  "task_id": "STAFF-MGMT-AUTO-DISPATCH-001",
+  "phase": "review_round_1_fixture_prepared",
+  "captured_at": "2026-09-20T01:52:12.535354+00:00",
+  "head": "8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001"
+  },
+  "scope": {
+    "tenant_id": 6,
+    "primary_property_id": 6,
+    "secondary_property_id": 7
+  },
+  "roster": {
+    "requested_fixture_count": 101,
+    "created_this_run": 101,
+    "highest_employee_id": 111
+  },
+  "scope_probe": {
+    "property_admin_primary_status": 200,
+    "property_admin_secondary_status": 403
+  },
+  "boundaries": {
+    "additive_only": true,
+    "normal_services_used_for_property_and_employees": true,
+    "development_sms_used_for_identities": true,
+    "fixture_grants_limited_to_synthetic_scope": true,
+    "migration_run": false,
+    "tables_deleted_or_cleared": false,
+    "direct_business_status_write": false
+  },
+  "redaction": "No phone, OTP, token, password, secret, or credential is emitted."
+}
