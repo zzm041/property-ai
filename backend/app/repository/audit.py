@@ -84,6 +84,34 @@ class AuditRepository:
             request_id=request_id,
         )
 
+    def list_resource_history(
+        self,
+        *,
+        resource_type: str,
+        resource_id: int,
+        scope: OrganizationScope,
+        after_id: int = 0,
+        limit: int = 100,
+    ) -> Sequence[AuditLog]:
+        self._validate_pagination(after_id=after_id, limit=limit)
+        if not resource_type or not isinstance(resource_type, str):
+            raise ValueError("resource_type must be a non-empty string")
+        if (
+            not isinstance(resource_id, int)
+            or isinstance(resource_id, bool)
+            or resource_id <= 0
+        ):
+            raise ValueError("resource_id must be a positive integer")
+        statement = select(AuditLog).where(
+            AuditLog.resource_type == resource_type,
+            AuditLog.resource_id == resource_id,
+            AuditLog.id > after_id,
+        )
+        statement = self._apply_scope(statement, scope)
+        return self._session.scalars(
+            statement.order_by(AuditLog.id).limit(limit)
+        ).all()
+
     def _list_scope(
         self,
         scope: OrganizationScope,

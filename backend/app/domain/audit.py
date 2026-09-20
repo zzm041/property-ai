@@ -69,6 +69,9 @@ class AuditAction(StrEnum):
     INCIDENT_UPDATED = "INCIDENT_UPDATED"
     WORK_ORDER_LINKED_TO_INCIDENT = "WORK_ORDER_LINKED_TO_INCIDENT"
     ANNOUNCEMENT_DRAFT_CREATED = "ANNOUNCEMENT_DRAFT_CREATED"
+    ANNOUNCEMENT_UPDATED = "ANNOUNCEMENT_UPDATED"
+    ANNOUNCEMENT_SUBMITTED = "ANNOUNCEMENT_SUBMITTED"
+    ANNOUNCEMENT_REJECTED = "ANNOUNCEMENT_REJECTED"
     ANNOUNCEMENT_PUBLISHED = "ANNOUNCEMENT_PUBLISHED"
     KNOWLEDGE_DOCUMENT_CREATED = "KNOWLEDGE_DOCUMENT_CREATED"
     KNOWLEDGE_DOCUMENT_ARCHIVED = "KNOWLEDGE_DOCUMENT_ARCHIVED"
@@ -148,6 +151,18 @@ _PROPERTY_UNIT_DETAIL_KEYS = frozenset(
 )
 _PROPERTY_HOUSE_DETAIL_KEYS = frozenset(
     {"unit_id", "room_no", "floor", "status", "batch_import"}
+)
+_ANNOUNCEMENT_SNAPSHOT_DETAIL_KEYS = frozenset(
+    {
+        "announcement_id",
+        "status",
+        "title",
+        "content",
+        "target_scope_type",
+        "building_id",
+        "unit_id",
+        "audience",
+    }
 )
 _EMPLOYEE_CREATED_DETAIL_KEYS = frozenset({"employee_no", "user_id"})
 _EMPLOYEE_UPDATED_DETAIL_KEYS = frozenset(
@@ -581,18 +596,36 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
         ),
         AuditAction.ANNOUNCEMENT_DRAFT_CREATED: AuditActionPolicy(
             resource_type=AuditResourceType.ANNOUNCEMENT,
-            allowed_detail_keys=frozenset(
-                {"announcement_id", "status", "ai_draft"}
-            ),
-            required_detail_keys=frozenset(
-                {"announcement_id", "status", "ai_draft"}
-            ),
+            allowed_detail_keys=_ANNOUNCEMENT_SNAPSHOT_DETAIL_KEYS
+            | frozenset({"ai_draft"}),
+            required_detail_keys=_ANNOUNCEMENT_SNAPSHOT_DETAIL_KEYS
+            | frozenset({"ai_draft"}),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.ANNOUNCEMENT_UPDATED: AuditActionPolicy(
+            resource_type=AuditResourceType.ANNOUNCEMENT,
+            allowed_detail_keys=_ANNOUNCEMENT_SNAPSHOT_DETAIL_KEYS,
+            required_detail_keys=_ANNOUNCEMENT_SNAPSHOT_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.ANNOUNCEMENT_SUBMITTED: AuditActionPolicy(
+            resource_type=AuditResourceType.ANNOUNCEMENT,
+            allowed_detail_keys=_ANNOUNCEMENT_SNAPSHOT_DETAIL_KEYS,
+            required_detail_keys=_ANNOUNCEMENT_SNAPSHOT_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.ANNOUNCEMENT_REJECTED: AuditActionPolicy(
+            resource_type=AuditResourceType.ANNOUNCEMENT,
+            allowed_detail_keys=_ANNOUNCEMENT_SNAPSHOT_DETAIL_KEYS
+            | frozenset({"reason"}),
+            required_detail_keys=_ANNOUNCEMENT_SNAPSHOT_DETAIL_KEYS
+            | frozenset({"reason"}),
             allowed_scope_types=frozenset({ScopeType.PROPERTY}),
         ),
         AuditAction.ANNOUNCEMENT_PUBLISHED: AuditActionPolicy(
             resource_type=AuditResourceType.ANNOUNCEMENT,
-            allowed_detail_keys=frozenset({"announcement_id", "status"}),
-            required_detail_keys=frozenset({"announcement_id", "status"}),
+            allowed_detail_keys=_ANNOUNCEMENT_SNAPSHOT_DETAIL_KEYS,
+            required_detail_keys=_ANNOUNCEMENT_SNAPSHOT_DETAIL_KEYS,
             allowed_scope_types=frozenset({ScopeType.PROPERTY}),
         ),
         AuditAction.KNOWLEDGE_DOCUMENT_CREATED: AuditActionPolicy(

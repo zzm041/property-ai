@@ -367,6 +367,42 @@ class AuditService:
             elif key in {"overridden", "ai_draft"}:
                 if not isinstance(value, bool):
                     cls._raise_invalid_details(f"{key} is invalid")
+            elif key == "target_scope_type":
+                if value not in {
+                    "TENANT",
+                    "PROPERTY",
+                    "BUILDING",
+                    "UNIT",
+                    "AUDIENCE",
+                }:
+                    cls._raise_invalid_details("target_scope_type is invalid")
+            elif key == "audience":
+                if value not in {"RESIDENT", "OWNER", "TENANT", "STAFF"}:
+                    cls._raise_invalid_details("audience is invalid")
+            elif key == "title":
+                if (
+                    not isinstance(value, str)
+                    or not value.strip()
+                    or value != value.strip()
+                    or len(value) > 200
+                ):
+                    cls._raise_invalid_details("title is invalid")
+            elif key == "content":
+                if (
+                    not isinstance(value, str)
+                    or not value.strip()
+                    or value != value.strip()
+                    or len(value) > 4000
+                ):
+                    cls._raise_invalid_details("content is invalid")
+            elif key == "reason":
+                if (
+                    not isinstance(value, str)
+                    or not value.strip()
+                    or value != value.strip()
+                    or len(value) > 255
+                ):
+                    cls._raise_invalid_details("reason is invalid")
             elif key == "work_order_count":
                 if not isinstance(value, int) or value < 0:
                     cls._raise_invalid_details("work_order_count is invalid")

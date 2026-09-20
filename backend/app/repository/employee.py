@@ -178,6 +178,38 @@ class EmployeeRepository:
         ).all()
         return tuple(int(item) for item in rows)
 
+    def list_active_employee_user_ids(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int | None,
+        now: datetime,
+    ) -> tuple[int, ...]:
+        conditions = [
+            Employee.tenant_id == tenant_id,
+            Employee.status == "ACTIVE",
+            Employee.user_id.is_not(None),
+            EmployeeProperty.status == "ACTIVE",
+            EmployeeProperty.valid_from <= now,
+            or_(
+                EmployeeProperty.valid_to.is_(None),
+                EmployeeProperty.valid_to > now,
+            ),
+        ]
+        if property_id is not None:
+            conditions.append(EmployeeProperty.property_id == property_id)
+        rows = self._session.scalars(
+            select(Employee.user_id)
+            .join(
+                EmployeeProperty,
+                (EmployeeProperty.employee_id == Employee.id)
+                & (EmployeeProperty.tenant_id == Employee.tenant_id),
+            )
+            .where(*conditions)
+            .distinct()
+        ).all()
+        return tuple(int(item) for item in rows if item is not None)
+
     def get_assignment_for_update(
         self,
         assignment_id: int,

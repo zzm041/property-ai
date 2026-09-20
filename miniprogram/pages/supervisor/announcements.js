@@ -1,36 +1,261 @@
+const api = require("../../services/api");
+const { withLoading } = require("../../utils/ui");
+
+const SCOPE_OPTIONS = [
+  { value: "PROPERTY", label: "当前小区" },
+  { value: "BUILDING", label: "指定楼栋" },
+  { value: "UNIT", label: "指定单元" },
+  { value: "AUDIENCE", label: "当前小区指定人群" },
+  { value: "TENANT", label: "企业全部小区" },
+];
+
+const AUDIENCE_OPTIONS = [
+  { value: "RESIDENT", label: "全部住户" },
+  { value: "OWNER", label: "业主" },
+  { value: "TENANT", label: "租户" },
+  { value: "STAFF", label: "员工" },
+];
+
+function indexOfValue(items, value) {
+  const index = items.findIndex((item) => item.value === value);
+  return index < 0 ? 0 : index;
+}
+
+function decorate(item) {
+  const scope = (item.scopes || [])[0] || {};
+  const audience = AUDIENCE_OPTIONS.find((row) => row.value === scope.audience);
+  const target = SCOPE_OPTIONS.find((row) => row.value === scope.scope_type);
+  return {
+    ...item,
+    scope,
+    targetText: `${target ? target.label : scope.scope_type || "未配置"} · ${
+      audience ? audience.label : scope.audience || "未配置"
+    }`,
+  };
+}
+
 Page({
-  data: { title: "", content: "", propertyId: "", draftId: "", loading: false, error: "" },
+  data: {
+    propertyId: "",
+    title: "",
+    content: "",
+    reviewReason: "",
+    items: [],
+    selected: null,
+    selectedId: "",
+    loading: false,
+    error: "",
+    notice: "",
+    canPublish: false,
+    canTenant: false,
+    scopeOptions: SCOPE_OPTIONS,
+    scopeIndex: 0,
+    audienceOptions: AUDIENCE_OPTIONS,
+    audienceIndex: 0,
+    buildings: [],
+    buildingIndex: 0,
+    units: [],
+    unitIndex: 0,
+  },
   onLoad(query) {
-    if (query.propertyId) {
-      this.setData({ propertyId: query.propertyId });
-    }
+    this.setData({ propertyId: query.propertyId || "" });
+    this.load();
   },
   onField(e) {
     this.setData({ [e.currentTarget.dataset.field]: e.detail.value });
   },
-  create() {
-    const { withLoading } = require("../../utils/ui");
-    withLoading(this, () =>
-      require("../../services/api")
-        .createAnnouncement({
-          property_id: Number(this.data.propertyId),
-          title: this.data.title,
-          content: this.data.content,
-        })
-        .then((item) => this.setData({ draftId: item.id, error: "" }))
+  onScopeChange(e) {
+    this.setData({ scopeIndex: Number(e.detail.value) });
+  },
+  onAudienceChange(e) {
+    this.setData({ audienceIndex: Number(e.detail.value) });
+  },
+  onBuildingChange(e) {
+    const buildingIndex = Number(e.detail.value);
+    this.setData({ buildingIndex, unitIndex: 0 });
+    this.loadUnits(this.data.buildings[buildingIndex]);
+  },
+  onUnitChange(e) {
+    this.setData({ unitIndex: Number(e.detail.value) });
+  },
+  loadUnits(building) {
+    if (!building) {
+      this.setData({ units: [], unitIndex: 0 });
+      return Promise.resolve([]);
+    }
+    return api.catalogUnits(building.id).then((payload) => {
+      const units = (payload && payload.items) || [];
+      this.setData({ units, unitIndex: 0 });
+      return units;
+    });
+  },
+  load() {
+    if (!this.data.propertyId) {
+      this.setData({ error: "缺少有权管理的小区" });
+      return Promise.resolve();
+    }
+    return withLoading(this, () =>
+      Promise.all([
+        api.me(),
+        api.catalogBuildings(this.data.propertyId),
+        api.adminAnnouncements(this.data.propertyId),
+      ]).then(([me, buildingPayload, announcementPayload]) => {
+        const permissions = me.permissions || [];
+        const canTenant = (me.scopes || []).some(
+          (scope) =>
+            scope.scope_type === "TENANT" &&
+            (scope.permissions || []).indexOf("announcement:draft") >= 0
+        );
+        const buildings = (buildingPayload && buildingPayload.items) || [];
+        const items = ((announcementPayload && announcementPayload.items) || []).map(decorate);
+        this.setData({
+          canPublish: permissions.indexOf("announcement:publish") >= 0,
+          canTenant,
+          buildings,
+          items,
+          error: "",
+        });
+        if (buildings.length && !this.data.units.length) {
+          return this.loadUnits(buildings[0]);
+        }
+        return null;
+      })
     ).catch(() => {});
   },
-  publish() {
-    if (!this.data.draftId) {
-      this.setData({ error: "请先保存草稿" });
+  targetBody() {
+    const scope = SCOPE_OPTIONS[this.data.scopeIndex];
+    const audience = AUDIENCE_OPTIONS[this.data.audienceIndex];
+    const building = this.data.buildings[this.data.buildingIndex];
+    const unit = this.data.units[this.data.unitIndex];
+    if (scope.value === "TENANT" && !this.data.canTenant) {
+      throw new Error("当前身份只能管理授权小区，不能定向企业全部小区");
+    }
+    if ((scope.value === "BUILDING" || scope.value === "UNIT") && !building) {
+      throw new Error("请选择楼栋");
+    }
+    if (scope.value === "UNIT" && !unit) {
+      throw new Error("请选择单元");
+    }
+    return {
+      property_id: Number(this.data.propertyId),
+      title: this.data.title,
+      content: this.data.content,
+      scope_type: scope.value,
+      building_id:
+        scope.value === "BUILDING" || scope.value === "UNIT" ? building.id : undefined,
+      unit_id: scope.value === "UNIT" ? unit.id : undefined,
+      audience: audience.value,
+    };
+  },
+  create() {
+    let body;
+    try {
+      body = this.targetBody();
+    } catch (error) {
+      this.setData({ error: error.message });
       return;
     }
-    const { withLoading } = require("../../utils/ui");
-    const api = require("../../services/api");
+    withLoading(this, () =>
+      api.createAnnouncement(body).then((item) => {
+        this.setData({ selectedId: item.id, notice: `草稿 ${item.id} 已保存` });
+        return this.load();
+      })
+    ).catch(() => {});
+  },
+  update() {
+    if (!this.data.selectedId) {
+      this.setData({ error: "请先选择公告" });
+      return;
+    }
+    let body;
+    try {
+      body = this.targetBody();
+      delete body.property_id;
+    } catch (error) {
+      this.setData({ error: error.message });
+      return;
+    }
+    withLoading(this, () =>
+      api.updateAnnouncement(this.data.selectedId, body).then(() => {
+        this.setData({ notice: "草稿修改已保存" });
+        return this.loadSelected(this.data.selectedId);
+      })
+    ).catch(() => {});
+  },
+  select(e) {
+    this.loadSelected(Number(e.currentTarget.dataset.id));
+  },
+  loadSelected(id) {
+    return withLoading(this, () =>
+      api.adminAnnouncement(id).then((raw) => {
+        const item = decorate(raw);
+        const scopeIndex = indexOfValue(SCOPE_OPTIONS, item.scope.scope_type);
+        const audienceIndex = indexOfValue(AUDIENCE_OPTIONS, item.scope.audience);
+        const buildingIndex = Math.max(
+          0,
+          this.data.buildings.findIndex(
+            (row) => Number(row.id) === Number(item.scope.building_id)
+          )
+        );
+        const selectedBuilding = this.data.buildings[buildingIndex];
+        this.setData({
+          selected: item,
+          selectedId: item.id,
+          title: item.title,
+          content: item.content,
+          reviewReason: "",
+          scopeIndex,
+          audienceIndex,
+          buildingIndex,
+          error: "",
+        });
+        return this.loadUnits(selectedBuilding).then((units) => {
+          const unitIndex = Math.max(
+            0,
+            units.findIndex((row) => Number(row.id) === Number(item.scope.unit_id))
+          );
+          this.setData({ unitIndex });
+        });
+      })
+    ).catch(() => {});
+  },
+  submitReview() {
+    if (!this.data.selectedId) {
+      this.setData({ error: "请先选择公告" });
+      return;
+    }
+    withLoading(this, () =>
+      api.submitAnnouncementReview(this.data.selectedId).then(() => {
+        this.setData({ notice: "已提交审核，等待有发布权限的管理员决定" });
+        return this.loadSelected(this.data.selectedId);
+      })
+    ).catch(() => {});
+  },
+  approve() {
+    this.review("APPROVE");
+  },
+  reject() {
+    if (!String(this.data.reviewReason || "").trim()) {
+      this.setData({ error: "驳回必须填写原因" });
+      return;
+    }
+    this.review("REJECT");
+  },
+  review(decision) {
+    if (!this.data.selectedId || !this.data.canPublish) {
+      this.setData({ error: "当前身份没有审核发布权限" });
+      return;
+    }
     withLoading(this, () =>
       api
-        .submitAnnouncementReview(this.data.draftId)
-        .then(() => api.publishAnnouncement(this.data.draftId, { decision: "APPROVE" }))
+        .publishAnnouncement(this.data.selectedId, {
+          decision,
+          reason: this.data.reviewReason || undefined,
+        })
+        .then(() => {
+          this.setData({ notice: decision === "APPROVE" ? "公告已人工审核发布" : "公告已驳回" });
+          return this.loadSelected(this.data.selectedId);
+        })
     ).catch(() => {});
   },
 });

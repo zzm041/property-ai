@@ -21,6 +21,8 @@ class AnnouncementScopeType(StrEnum):
 
 class AnnouncementAudience(StrEnum):
     RESIDENT = "RESIDENT"
+    OWNER = "OWNER"
+    TENANT = "TENANT"
     STAFF = "STAFF"
 
 

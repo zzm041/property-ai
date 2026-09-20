@@ -167,9 +167,12 @@
 | GET | `/supervisor/incidents/{id}` |
 | POST | `/supervisor/incidents/{id}/summary` | 触发 AI 摘要 |
 | POST | `/admin/announcements` | 草稿，可带 ai_draft |
+| GET | `/admin/announcements` | 当前管理范围公告及定向、审核、审计历史 |
+| GET | `/admin/announcements/{id}` | 管理详情及历史 |
+| PATCH | `/admin/announcements/{id}` | 编辑草稿/被驳回公告及定向范围 |
 | POST | `/admin/announcements/{id}/submit-review` |
-| POST | `/admin/announcements/{id}/publish` | 未审核 409 |
-| GET | `/announcements` | 住户已发布 |
+| POST | `/admin/announcements/{id}/publish` | 人工批准或带原因驳回；未审核 409 |
+| GET | `/announcements` | 住户/员工仅获取已发布且命中房屋、任职及人群范围的公告 |
 | POST | `/assistant/query` | RAG 问答，返回 answer + citations |
 | GET/PUT | `/admin/sla-policies` |
 | GET | `/notifications` |

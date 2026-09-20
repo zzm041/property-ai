@@ -370,6 +370,11 @@ module.exports = {
     request({ path: `/supervisor/incidents?property_id=${propertyId}` }),
   createAnnouncement: (body) =>
     request({ path: "/admin/announcements", method: "POST", data: body }),
+  adminAnnouncements: (propertyId) =>
+    request({ path: `/admin/announcements?property_id=${propertyId}` }),
+  adminAnnouncement: (id) => request({ path: `/admin/announcements/${id}` }),
+  updateAnnouncement: (id, body) =>
+    request({ path: `/admin/announcements/${id}`, method: "PATCH", data: body }),
   submitAnnouncementReview: (id) =>
     request({
       path: `/admin/announcements/${id}/submit-review`,

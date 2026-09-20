@@ -212,6 +212,37 @@ class ResidentBindingRepository:
         ).all()
         return tuple(int(item) for item in rows)
 
+    def list_active_resident_targets(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int | None,
+        now: datetime,
+    ) -> tuple[tuple[ResidentHouseRelation, House], ...]:
+        conditions = [
+            ResidentHouseRelation.tenant_id == tenant_id,
+            ResidentHouseRelation.status == "ACTIVE",
+            ResidentHouseRelation.valid_from <= now,
+            or_(
+                ResidentHouseRelation.valid_to.is_(None),
+                ResidentHouseRelation.valid_to > now,
+            ),
+        ]
+        if property_id is not None:
+            conditions.append(ResidentHouseRelation.property_id == property_id)
+        rows = self._session.execute(
+            select(ResidentHouseRelation, House)
+            .join(
+                House,
+                (House.id == ResidentHouseRelation.house_id)
+                & (House.tenant_id == ResidentHouseRelation.tenant_id)
+                & (House.property_id == ResidentHouseRelation.property_id),
+            )
+            .where(*conditions)
+            .order_by(ResidentHouseRelation.id)
+        ).all()
+        return tuple((relation, house) for relation, house in rows)
+
     def list_relation_history_for_property(
         self,
         *,

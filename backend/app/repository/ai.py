@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import and_, delete, or_, select
 from sqlalchemy.orm import Session
 
 from app.model.ai import (
@@ -505,6 +505,7 @@ class AiRepository:
             select(Announcement)
             .where(Announcement.id == announcement_id)
             .with_for_update()
+            .execution_options(populate_existing=True)
         )
 
     def add_announcement_scope(self, record: AnnouncementScope) -> AnnouncementScope:
@@ -524,6 +525,21 @@ class AiRepository:
             ).all()
         )
 
+    def replace_announcement_scope(
+        self,
+        *,
+        announcement_id: int,
+        scope: AnnouncementScope,
+    ) -> AnnouncementScope:
+        self._session.execute(
+            delete(AnnouncementScope).where(
+                AnnouncementScope.announcement_id == announcement_id
+            )
+        )
+        self._session.add(scope)
+        self._session.flush()
+        return scope
+
     def add_announcement_review(
         self,
         record: AnnouncementReview,
@@ -532,7 +548,19 @@ class AiRepository:
         self._session.flush()
         return record
 
-    def list_published_announcements(
+    def list_announcement_reviews(
+        self,
+        announcement_id: int,
+    ) -> tuple[AnnouncementReview, ...]:
+        return tuple(
+            self._session.scalars(
+                select(AnnouncementReview)
+                .where(AnnouncementReview.announcement_id == announcement_id)
+                .order_by(AnnouncementReview.id)
+            ).all()
+        )
+
+    def list_announcements_for_management(
         self,
         *,
         tenant_id: int,
@@ -543,12 +571,87 @@ class AiRepository:
         return tuple(
             self._session.scalars(
                 select(Announcement)
+                .join(
+                    AnnouncementScope,
+                    AnnouncementScope.announcement_id == Announcement.id,
+                )
                 .where(
                     Announcement.tenant_id == tenant_id,
+                    Announcement.id > after_id,
+                    or_(
+                        AnnouncementScope.scope_type == "TENANT",
+                        Announcement.property_id == property_id,
+                    ),
+                )
+                .distinct()
+                .order_by(Announcement.id)
+                .limit(limit)
+            ).all()
+        )
+
+    def list_published_announcements(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int,
+        building_ids: tuple[int, ...],
+        unit_ids: tuple[int, ...],
+        audiences: tuple[str, ...],
+        after_id: int = 0,
+        limit: int = 50,
+    ) -> tuple[Announcement, ...]:
+        audience_condition = AnnouncementScope.audience.in_(audiences)
+        target_conditions = [
+            and_(
+                AnnouncementScope.scope_type == "TENANT",
+                audience_condition,
+            ),
+            and_(
+                Announcement.property_id == property_id,
+                AnnouncementScope.scope_type.in_(("PROPERTY", "AUDIENCE")),
+                audience_condition,
+            ),
+        ]
+        if "STAFF" in audiences:
+            target_conditions.append(
+                and_(
                     Announcement.property_id == property_id,
+                    AnnouncementScope.scope_type.in_(("BUILDING", "UNIT")),
+                    AnnouncementScope.audience == "STAFF",
+                )
+            )
+        if building_ids:
+            target_conditions.append(
+                and_(
+                    Announcement.property_id == property_id,
+                    AnnouncementScope.scope_type == "BUILDING",
+                    AnnouncementScope.building_id.in_(building_ids),
+                    audience_condition,
+                )
+            )
+        if unit_ids:
+            target_conditions.append(
+                and_(
+                    Announcement.property_id == property_id,
+                    AnnouncementScope.scope_type == "UNIT",
+                    AnnouncementScope.unit_id.in_(unit_ids),
+                    audience_condition,
+                )
+            )
+        return tuple(
+            self._session.scalars(
+                select(Announcement)
+                .join(
+                    AnnouncementScope,
+                    AnnouncementScope.announcement_id == Announcement.id,
+                )
+                .where(
+                    Announcement.tenant_id == tenant_id,
                     Announcement.status == "PUBLISHED",
                     Announcement.id > after_id,
+                    or_(*target_conditions),
                 )
+                .distinct()
                 .order_by(Announcement.id)
                 .limit(limit)
             ).all()

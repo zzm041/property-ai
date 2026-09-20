@@ -22,6 +22,20 @@ class CreateAnnouncementRequest(BaseModel):
     incident_id: int | None = Field(default=None, gt=0)
     ai_draft: bool = False
     tenant_id: int | None = Field(default=None, gt=0)
+    scope_type: str = Field(default="PROPERTY", max_length=32)
+    building_id: int | None = Field(default=None, gt=0)
+    unit_id: int | None = Field(default=None, gt=0)
+    audience: str = Field(default="RESIDENT", max_length=32)
+
+
+class UpdateAnnouncementRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    title: str = Field(min_length=1, max_length=200)
+    content: str = Field(min_length=1, max_length=4000)
+    scope_type: str = Field(default="PROPERTY", max_length=32)
+    building_id: int | None = Field(default=None, gt=0)
+    unit_id: int | None = Field(default=None, gt=0)
     audience: str = Field(default="RESIDENT", max_length=32)
 
 
@@ -97,6 +111,45 @@ class AnnouncementData(BaseModel):
     created_at: datetime
 
 
+class AnnouncementScopeData(BaseModel):
+    id: int
+    scope_type: str
+    building_id: int | None
+    unit_id: int | None
+    audience: str | None
+
+
+class AnnouncementReviewData(BaseModel):
+    id: int
+    reviewer_user_id: int
+    decision: str
+    reason: str | None
+    created_at: datetime
+
+
+class AnnouncementHistoryData(BaseModel):
+    id: int
+    action: str
+    actor_user_id: int | None
+    details: dict[str, object]
+    created_at: datetime
+
+
+class AdminAnnouncementData(AnnouncementData):
+    created_by_user_id: int
+    reviewed_by_user_id: int | None
+    published_by_user_id: int | None
+    updated_at: datetime
+    scopes: list[AnnouncementScopeData]
+    reviews: list[AnnouncementReviewData]
+    history: list[AnnouncementHistoryData]
+
+
 class AnnouncementListData(BaseModel):
     items: list[AnnouncementData]
+    next_cursor: int | None = None
+
+
+class AdminAnnouncementListData(BaseModel):
+    items: list[AdminAnnouncementData]
     next_cursor: int | None = None
