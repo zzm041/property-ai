@@ -1,0 +1,240 @@
+{
+  "task_id": "SLA-ACCEPT-RESPOND-REASSIGN-004",
+  "captured_at": "2026-09-20T03:50:23.854107+00:00",
+  "head": "b952016c6d38b1aa8b84757b058d9b7d91e1674b",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001",
+    "beat_started": false,
+    "analysis_provider": "DEVELOPMENT/Fake",
+    "notification_provider": "DEVELOPMENT"
+  },
+  "business_object": {
+    "work_order_id": 13,
+    "created_via": "resident SMS login plus POST /work-orders",
+    "final_status": "ACCEPTED",
+    "final_version": 6,
+    "accepted_version": 6
+  },
+  "capacity_precondition": {
+    "updated_via": "PATCH /admin/employees/{employee_id}",
+    "employee_ids": [
+      7,
+      10
+    ],
+    "max_capacity": 100,
+    "direct_sql_business_write": false
+  },
+  "accept_timeout": {
+    "first_assignment": {
+      "work_order_version": 3,
+      "assignment_id": 15,
+      "employee_id": 7,
+      "assigned_at": "2026-09-20T03:50:21.594073+00:00"
+    },
+    "deadline": "2026-09-20T04:20:21.594073+00:00",
+    "deadline_seconds_from_assignment": 1800.0,
+    "sweep": {
+      "scanned": 1,
+      "accept_timeouts": 1,
+      "response_timeouts": 0,
+      "notifications": 4,
+      "redispatch_enqueued": 1
+    },
+    "duplicate_sweep": {
+      "scanned": 0,
+      "accept_timeouts": 0,
+      "response_timeouts": 0,
+      "notifications": 0,
+      "redispatch_enqueued": 0
+    },
+    "second_assignment": {
+      "work_order_version": 5,
+      "assignment_id": 16,
+      "employee_id": 10,
+      "assigned_at": "2026-09-20T03:50:23.350342+00:00"
+    },
+    "second_deadline": "2026-09-20T04:20:23.350342+00:00",
+    "second_deadline_restarted": true,
+    "employee_changed": true
+  },
+  "response_timeout": {
+    "accepted_at": "2026-09-20T03:50:23.503657+00:00",
+    "deadline": "2026-09-20T04:20:23.503657+00:00",
+    "deadline_seconds_from_accept": 1800.0,
+    "sweep": {
+      "scanned": 1,
+      "accept_timeouts": 0,
+      "response_timeouts": 1,
+      "notifications": 4,
+      "redispatch_enqueued": 0
+    },
+    "duplicate_sweep": {
+      "scanned": 1,
+      "accept_timeouts": 0,
+      "response_timeouts": 0,
+      "notifications": 0,
+      "redispatch_enqueued": 0
+    },
+    "status_preserved": true,
+    "assignment_preserved": true
+  },
+  "persistence": {
+    "assignments": [
+      {
+        "id": 15,
+        "employee_id": 7,
+        "status": "REASSIGNED",
+        "assigned_source": "AUTO",
+        "assigned_at": "2026-09-20T03:50:21.594073",
+        "accept_at": null,
+        "timeout_at": "2026-09-20T04:20:21.594073",
+        "ended_at": "2026-09-20T04:20:21.594073",
+        "reason": "SLA_ACCEPT_TIMEOUT"
+      },
+      {
+        "id": 16,
+        "employee_id": 10,
+        "status": "ACTIVE",
+        "assigned_source": "AUTO",
+        "assigned_at": "2026-09-20T03:50:23.350342",
+        "accept_at": "2026-09-20T03:50:23.503657",
+        "timeout_at": null,
+        "ended_at": null,
+        "reason": "AUTO_DISPATCH"
+      }
+    ],
+    "phase_logs": [
+      {
+        "event_code": "CREATE",
+        "request_id": "sla-create-aebf94d1b4",
+        "from_status": null,
+        "to_status": "PENDING_ANALYSIS",
+        "reason_code": null,
+        "action": null
+      },
+      {
+        "event_code": "ANALYZE",
+        "request_id": "sla-create-aebf94d1b4",
+        "from_status": "PENDING_ANALYSIS",
+        "to_status": "PENDING_ASSIGNMENT",
+        "reason_code": "AI_ANALYSIS",
+        "action": null
+      },
+      {
+        "event_code": "ASSIGN",
+        "request_id": "sla-create-aebf94d1b4",
+        "from_status": "PENDING_ASSIGNMENT",
+        "to_status": "ASSIGNED",
+        "reason_code": "AUTO_ASSIGN",
+        "action": null
+      },
+      {
+        "event_code": "REASSIGN",
+        "request_id": "sla-assignment:15:accept-timeout",
+        "from_status": "ASSIGNED",
+        "to_status": "PENDING_ASSIGNMENT",
+        "reason_code": "SLA_ACCEPT_TIMEOUT",
+        "action": null
+      },
+      {
+        "event_code": "ASSIGN",
+        "request_id": "sla-assignment:15:accept-timeout",
+        "from_status": "PENDING_ASSIGNMENT",
+        "to_status": "ASSIGNED",
+        "reason_code": "AUTO_ASSIGN",
+        "action": null
+      },
+      {
+        "event_code": "ACCEPT",
+        "request_id": "sla-accept-aebf94d1b4",
+        "from_status": "ASSIGNED",
+        "to_status": "ACCEPTED",
+        "reason_code": "ACCEPTED",
+        "action": null
+      },
+      {
+        "event_code": "SLA_RESPONSE_TIMEOUT",
+        "request_id": "sla-assignment:16:response-timeout",
+        "from_status": "ACCEPTED",
+        "to_status": "ACCEPTED",
+        "reason_code": null,
+        "action": "SUPERVISOR_REVIEW"
+      }
+    ],
+    "notification_deliveries": [
+      {
+        "title": "Work order accept timeout",
+        "status": "SUCCEEDED",
+        "attempt": 1
+      },
+      {
+        "title": "Work order accept timeout",
+        "status": "SUCCEEDED",
+        "attempt": 1
+      },
+      {
+        "title": "Work order accept timeout",
+        "status": "SUCCEEDED",
+        "attempt": 1
+      },
+      {
+        "title": "Work order accept timeout",
+        "status": "SUCCEEDED",
+        "attempt": 1
+      },
+      {
+        "title": "Work order response timeout",
+        "status": "SUCCEEDED",
+        "attempt": 1
+      },
+      {
+        "title": "Work order response timeout",
+        "status": "SUCCEEDED",
+        "attempt": 1
+      },
+      {
+        "title": "Work order response timeout",
+        "status": "SUCCEEDED",
+        "attempt": 1
+      },
+      {
+        "title": "Work order response timeout",
+        "status": "SUCCEEDED",
+        "attempt": 1
+      }
+    ],
+    "manager_inbox_titles": [
+      "Work order accept timeout",
+      "Work order response timeout"
+    ],
+    "daily_status": [
+      {
+        "employee_id": 7,
+        "current_load": 1,
+        "on_duty": "ON_DUTY",
+        "business_date": "2026-09-20"
+      },
+      {
+        "employee_id": 10,
+        "current_load": 2,
+        "on_duty": "ON_DUTY",
+        "business_date": "2026-09-20"
+      }
+    ]
+  },
+  "boundaries": {
+    "synthetic_data_only": true,
+    "targeted_scheduler_work_order": true,
+    "historical_rows_swept": false,
+    "wall_clock_beat_observed": false,
+    "actual_page_automation": false,
+    "production_provider_verified": false,
+    "direct_business_status_sql": false,
+    "migration_run": false,
+    "port_8082_touched": false
+  },
+  "redaction": "No phone, OTP, token, password, secret, resident name, or user id is written to evidence."
+}
