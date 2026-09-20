@@ -100,6 +100,7 @@ class PropertyRepository:
                 Building.property_id == property_id,
             )
             .with_for_update()
+            .execution_options(populate_existing=True)
         )
 
     def get_unit(
@@ -149,6 +150,7 @@ class PropertyRepository:
                 Unit.property_id == property_id,
             )
             .with_for_update()
+            .execution_options(populate_existing=True)
         )
 
     def get_house(
@@ -181,6 +183,7 @@ class PropertyRepository:
                 House.property_id == property_id,
             )
             .with_for_update()
+            .execution_options(populate_existing=True)
         )
 
     def get_house_by_room(

@@ -368,6 +368,24 @@ def test_building_and_unit_updates_lock_scope_and_append_audit(monkeypatch) -> N
     ]
 
 
+def test_archive_locking_queries_refresh_identity_mapped_rows() -> None:
+    session = MagicMock()
+    repository = PropertyRepository(session)
+
+    repository.get_building_for_update(
+        tenant_id=1, property_id=10, building_id=20
+    )
+    building_statement = session.scalar.call_args.args[0]
+    repository.get_unit_for_update(tenant_id=1, property_id=10, unit_id=30)
+    unit_statement = session.scalar.call_args.args[0]
+    repository.get_house_for_update(tenant_id=1, property_id=10, house_id=40)
+    house_statement = session.scalar.call_args.args[0]
+
+    assert building_statement.get_execution_options()["populate_existing"] is True
+    assert unit_statement.get_execution_options()["populate_existing"] is True
+    assert house_statement.get_execution_options()["populate_existing"] is True
+
+
 def test_relation_history_requires_relation_read_permission() -> None:
     actor = _principal("property:manage")
     session = MagicMock()
