@@ -4,9 +4,12 @@ from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
+from sqlalchemy.dialects import mysql
+
 from app.core.config import Settings
 from app.core.errors import NotificationErrorCode
 from app.provider.errors import ProviderUnavailableError
+from app.repository.work_order import WorkOrderRepository
 from app.service.notification import (
     DELIVERY_MAX_ATTEMPTS,
     NotificationService,
@@ -252,11 +255,13 @@ def test_response_timeout_escalates_once_without_reassignment(monkeypatch) -> No
     repository = MagicMock()
     repository.list_due_assignment_sla_work_orders_for_update.return_value = (record,)
     repository.get_sla_clock_for_update.return_value = clock
-    repository.get_active_assignment_for_update.return_value = SimpleNamespace(
+    assignment = SimpleNamespace(
         id=72,
         employee_id=82,
         accept_at=now - timedelta(minutes=10),
+        timeout_at=None,
     )
+    repository.get_active_assignment_for_update.return_value = assignment
     record.current_assignment_id = 72
     repository.has_log_request_id.side_effect = [False, True]
     repository.list_sla_management_user_ids.return_value = (20, 21)
@@ -277,7 +282,35 @@ def test_response_timeout_escalates_once_without_reassignment(monkeypatch) -> No
     log = repository.add_log.call_args.args[0]
     assert log.event_code == "SLA_RESPONSE_TIMEOUT"
     assert log.request_id == "sla-assignment:72:response-timeout"
+    assert assignment.timeout_at == now
     assert len(_Notifier.calls) == 2
+
+
+def test_due_assignment_query_filters_handled_cycles_before_limit() -> None:
+    session = MagicMock()
+    session.scalars.return_value.all.return_value = []
+    repository = WorkOrderRepository(session)
+
+    assert repository.list_due_assignment_sla_work_orders_for_update(
+        now=datetime(2026, 9, 20, 8, 0, tzinfo=UTC),
+        limit=100,
+    ) == ()
+
+    statement = session.scalars.call_args.args[0]
+    sql = str(
+        statement.compile(
+            dialect=mysql.dialect(),
+            compile_kwargs={"literal_binds": True},
+        )
+    )
+    assert "work_order_assignments.id = work_orders.current_assignment_id" in sql
+    assert "work_order_assignments.timeout_at IS NULL" in sql
+    assert "work_order_assignments.ended_at IS NULL" in sql
+    assert "work_order_assignments.accept_at IS NULL" in sql
+    assert "work_order_assignments.accept_at IS NOT NULL" in sql
+    assert "NOT (EXISTS" in sql
+    assert "concat('sla-assignment:', work_order_assignments.id" in sql
+    assert "LIMIT 100 FOR UPDATE SKIP LOCKED" in sql
 
 
 def test_assignment_and_accept_restart_phase_deadlines() -> None:

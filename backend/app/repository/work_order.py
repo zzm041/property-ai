@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import and_, case, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.model.property import House, Property
@@ -246,10 +246,39 @@ class WorkOrderRepository:
         limit: int,
         work_order_id: int | None = None,
     ) -> tuple[WorkOrder, ...]:
+        handled_response_timeout = (
+            select(WorkOrderLog.id)
+            .where(
+                WorkOrderLog.work_order_id == WorkOrder.id,
+                WorkOrderLog.request_id
+                == func.concat(
+                    "sla-assignment:",
+                    WorkOrderAssignment.id,
+                    ":response-timeout",
+                ),
+            )
+            .exists()
+        )
+        active_assignment = and_(
+            WorkOrderAssignment.id == WorkOrder.current_assignment_id,
+            WorkOrderAssignment.work_order_id == WorkOrder.id,
+            WorkOrderAssignment.status == "ACTIVE",
+            WorkOrderAssignment.ended_at.is_(None),
+            WorkOrderAssignment.timeout_at.is_(None),
+        )
         filters = [
             or_(
-                (WorkOrder.status == "ASSIGNED") & (SlaClock.accept_due_at <= now),
-                (WorkOrder.status == "ACCEPTED") & (SlaClock.respond_due_at <= now),
+                and_(
+                    WorkOrder.status == "ASSIGNED",
+                    WorkOrderAssignment.accept_at.is_(None),
+                    SlaClock.accept_due_at <= now,
+                ),
+                and_(
+                    WorkOrder.status == "ACCEPTED",
+                    WorkOrderAssignment.accept_at.is_not(None),
+                    ~handled_response_timeout,
+                    SlaClock.respond_due_at <= now,
+                ),
             )
         ]
         if work_order_id is not None:
@@ -258,8 +287,18 @@ class WorkOrderRepository:
             self._session.scalars(
                 select(WorkOrder)
                 .join(SlaClock, SlaClock.work_order_id == WorkOrder.id)
+                .join(WorkOrderAssignment, active_assignment)
                 .where(*filters)
-                .order_by(WorkOrder.id)
+                .order_by(
+                    case(
+                        (
+                            WorkOrder.status == "ASSIGNED",
+                            SlaClock.accept_due_at,
+                        ),
+                        else_=SlaClock.respond_due_at,
+                    ),
+                    WorkOrder.id,
+                )
                 .limit(limit)
                 .with_for_update(skip_locked=True)
             ).all()

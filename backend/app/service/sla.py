@@ -261,6 +261,7 @@ class SlaService:
                     notification_count = self._escalate_response_timeout(
                         record=record,
                         clock=clock,
+                        now=effective_now,
                         notifier=notifier,
                     )
                     if notification_count is None:
@@ -381,6 +382,7 @@ class SlaService:
         *,
         record,
         clock,
+        now: datetime,
         notifier: NotificationService,
     ) -> int | None:
         assignment = self._repository.get_active_assignment_for_update(record.id)
@@ -396,6 +398,7 @@ class SlaService:
             request_id=request_id,
         ):
             return None
+        assignment.timeout_at = now
         self._repository.add_log(
             WorkOrderLog(
                 tenant_id=record.tenant_id,
