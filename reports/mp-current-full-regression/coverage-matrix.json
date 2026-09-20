@@ -1609,10 +1609,43 @@
       }
     ]
   },
+  "knowledge_mgmt_rag_008": {
+    "task_id": "KNOWLEDGE-MGMT-RAG-008",
+    "implementation_head": "d3de8de3a755c56fd478f9cdbc48173d7623d75e",
+    "status": "WIP_UNVERIFIED_BACKEND_RUNTIME",
+    "review_attempt": {
+      "result": "NO_VALID_RESULT_APPROVAL_TIMEOUT",
+      "prompt_path": "reports/codex/KNOWLEDGE-MGMT-RAG-008-review.prompt.md",
+      "boundary": "No independent review PASS exists. Two read-only CLI attempts produced no review session/result before the approval window ended."
+    },
+    "current_status_overlays": [
+      {
+        "id": "AST-QUERY",
+        "implementation_status": "authorized_property_picker_and_version_locator_excerpt_citation_ui_wired_on_existing_retrieval_service",
+        "verification_status": "STATIC_NODE_ONLY_BACKEND_RUNTIME_NOT_RUN",
+        "evidence_version": "d3de8de3a755c56fd478f9cdbc48173d7623d75e",
+        "remaining_gap": "Python unit/API/8083/Milvus/page verification and real self-hosted embedding/Qwen acceptance"
+      },
+      {
+        "id": "KNOWLEDGE-INGEST-UI",
+        "implementation_status": "scoped_create_version_archive_status_page_and_existing_0009_ingestion_wiring_saved_as_wip",
+        "verification_status": "STATIC_NODE_ONLY_BACKEND_RUNTIME_NOT_RUN",
+        "evidence_version": "d3de8de3a755c56fd478f9cdbc48173d7623d75e",
+        "remaining_gap": "Python unit/API/isolated-worker/Milvus/page verification and independent review"
+      },
+      {
+        "id": "V1-EMBEDDING-RAG",
+        "implementation_status": "development_provider_wiring_targets_named_auth001_collection_but_is_unverified",
+        "verification_status": "WIP_REAL_MODEL_BLOCKED",
+        "evidence_version": "d3de8de3a755c56fd478f9cdbc48173d7623d75e",
+        "remaining_gap": "real bge-m3/Qwen deployment, isolated runtime proof, retrieval quality, security and production acceptance"
+      }
+    ]
+  },
   "current_effective_view": {
     "generated_at": "2026-09-20",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
-    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs)",
+    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced.",
     "row_count": 83,
     "rows": [
@@ -1874,11 +1907,11 @@
       },
       {
         "requirement_id": "AST-QUERY",
-        "current_implementation": "已实现可测试",
-        "verification_mode_status": "UI:PARTIAL",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "知识助手提问/回答/引用（Fake 只验接线）",
-        "next_action": "补齐缺失接线及范围证据"
+        "current_implementation": "authorized_property_picker_and_version_locator_excerpt_citation_ui_wired_on_existing_retrieval_service",
+        "verification_mode_status": "STATIC_NODE_ONLY_BACKEND_RUNTIME_NOT_RUN",
+        "evidence_version": "d3de8de3a755c56fd478f9cdbc48173d7623d75e",
+        "remaining_gap": "Python unit/API/8083/Milvus/page verification and real self-hosted embedding/Qwen acceptance",
+        "next_action": "Restore an approved Python 3.12 runtime, then run focused unit, isolated API/worker/Milvus and actual page/citation verification"
       },
       {
         "requirement_id": "NTF-ROUND",
@@ -1962,11 +1995,11 @@
       },
       {
         "requirement_id": "KNOWLEDGE-INGEST-UI",
-        "current_implementation": "只有API没有页面",
-        "verification_mode_status": "API:NOT_IMPLEMENTED",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "文档维护/入库/归档页面",
-        "next_action": "按依赖顺序实施，保留本ID在分母中"
+        "current_implementation": "scoped_create_version_archive_status_page_and_existing_0009_ingestion_wiring_saved_as_wip",
+        "verification_mode_status": "STATIC_NODE_ONLY_BACKEND_RUNTIME_NOT_RUN",
+        "evidence_version": "d3de8de3a755c56fd478f9cdbc48173d7623d75e",
+        "remaining_gap": "Python unit/API/isolated-worker/Milvus/page verification and independent review",
+        "next_action": "Restore an approved Python 3.12 runtime, execute the scoped checks and fix only evidenced defects"
       },
       {
         "requirement_id": "HOUSE-IMPORT-EXPORT",
@@ -2242,11 +2275,11 @@
       },
       {
         "requirement_id": "V1-EMBEDDING-RAG",
-        "current_implementation": "缺环境或权限",
-        "verification_mode_status": "none:BLOCKED_ENV",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "真实 Embedding/RAG 引用，租户小区可见性过滤",
-        "next_action": "在受控环境或获批资源具备后验收；继续不依赖工作"
+        "current_implementation": "development_provider_wiring_targets_named_auth001_collection_but_is_unverified",
+        "verification_mode_status": "WIP_REAL_MODEL_BLOCKED",
+        "evidence_version": "d3de8de3a755c56fd478f9cdbc48173d7623d75e",
+        "remaining_gap": "real bge-m3/Qwen deployment, isolated runtime proof, retrieval quality, security and production acceptance",
+        "next_action": "Verify isolated development wiring after Python recovery; retain the separate real-model approval blocker"
       },
       {
         "requirement_id": "V1-AI-FAIL-CREATE",
