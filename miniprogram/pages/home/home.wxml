@@ -6,6 +6,7 @@
 <view class="card">
   <button class="btn" data-url="/pages/profile/profile" bindtap="go">账号与安全</button>
   <button class="btn" data-url="/pages/houses/houses" bindtap="go">房屋选择 / 绑定</button>
+  <button class="btn" data-url="/pages/employee-claim/employee-claim" bindtap="go">认领物业员工邀请</button>
 </view>
 <view class="card" wx:if="{{canResident}}">
   <button class="btn" data-url="/pages/work-orders/create" bindtap="go">报修</button>

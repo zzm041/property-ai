@@ -26,14 +26,27 @@ Page({
       api.me().then((me) => {
         const permissions = me.permissions || [];
         getApp().globalData.me = me;
-        this.setData({
-          me,
-          canResident: permissions.indexOf("work_order:create") >= 0,
-          canStaff: permissions.indexOf("work_order:process") >= 0,
-          canManage: permissions.indexOf("work_order:dispatch") >= 0,
-          canManageStaff: permissions.indexOf("employee:read") >= 0,
-          propertyId: firstPropertyId(me),
-          tenantId: firstTenantId(me),
+        const apply = (propertyId, tenantId) =>
+          this.setData({
+            me,
+            canResident: permissions.indexOf("work_order:create") >= 0,
+            canStaff: permissions.indexOf("work_order:process") >= 0,
+            canManage: permissions.indexOf("work_order:dispatch") >= 0,
+            canManageStaff: permissions.indexOf("employee:read") >= 0,
+            propertyId,
+            tenantId,
+          });
+        const scopedPropertyId = firstPropertyId(me);
+        const scopedTenantId = firstTenantId(me);
+        if (scopedPropertyId || !scopedTenantId) {
+          apply(scopedPropertyId, scopedTenantId);
+          return null;
+        }
+        return api.catalogProperties().then((payload) => {
+          const property = ((payload && payload.items) || []).find(
+            (item) => Number(item.tenant_id) === Number(scopedTenantId)
+          );
+          apply(property ? property.id : "", scopedTenantId);
         });
       })
     ).catch(() => {});

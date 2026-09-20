@@ -198,6 +198,9 @@ def test_miniprogram_staff_management_wires_existing_business_apis() -> None:
     api = (REPOSITORY_ROOT / "miniprogram" / "services" / "api.js").read_text(
         encoding="utf-8"
     )
+    home = (
+        REPOSITORY_ROOT / "miniprogram" / "pages" / "home" / "home.wxml"
+    ).read_text(encoding="utf-8")
 
     assert "employee:manage" in page
     assert ".createEmployee" in page
@@ -207,3 +210,4 @@ def test_miniprogram_staff_management_wires_existing_business_apis() -> None:
     assert "api.staffDaily" in page
     assert 'path: `/admin/employees?property_id=${propertyId}&tenant_id=${tenantId}`' in api
     assert 'path: "/admin/employees", method: "POST"' in api
+    assert "/pages/employee-claim/employee-claim" in home
