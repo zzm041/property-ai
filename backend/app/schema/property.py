@@ -17,6 +17,13 @@ class CreateBuildingRequest(BaseModel):
     name: str = Field(min_length=1, max_length=200)
 
 
+class UpdateBuildingRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    code: str | None = Field(default=None, min_length=1, max_length=64)
+    name: str | None = Field(default=None, min_length=1, max_length=200)
+
+
 class CreateUnitRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -25,6 +32,13 @@ class CreateUnitRequest(BaseModel):
     building_id: int = Field(gt=0)
     code: str = Field(min_length=1, max_length=64)
     name: str = Field(min_length=1, max_length=200)
+
+
+class UpdateUnitRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    code: str | None = Field(default=None, min_length=1, max_length=64)
+    name: str | None = Field(default=None, min_length=1, max_length=200)
 
 
 class CreateHouseRequest(BaseModel):

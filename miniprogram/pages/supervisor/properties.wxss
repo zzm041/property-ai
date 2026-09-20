@@ -37,7 +37,7 @@ input,
   margin: 16rpx 24rpx;
 }
 
-.house-card.selected {
+.archive-card.selected {
   border: 3rpx solid #1f4b99;
 }
 

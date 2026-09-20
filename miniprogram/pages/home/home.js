@@ -5,7 +5,7 @@ Page({
     canStaff: false,
     canManage: false,
     canManageStaff: false,
-    canManageProperty: false,
+    canViewProperty: false,
     propertyId: "",
     tenantId: "",
     loading: false,
@@ -34,7 +34,7 @@ Page({
             canStaff: permissions.indexOf("work_order:process") >= 0,
             canManage: permissions.indexOf("work_order:dispatch") >= 0,
             canManageStaff: permissions.indexOf("employee:read") >= 0,
-            canManageProperty: permissions.indexOf("property:manage") >= 0,
+            canViewProperty: permissions.indexOf("property:read") >= 0,
             propertyId,
             tenantId,
           });

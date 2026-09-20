@@ -47,9 +47,35 @@
   </view>
 </block>
 
+<view class="section-heading">楼栋档案</view>
+<view class="empty" wx:if="{{!loading && !buildings.length}}">当前小区暂无楼栋</view>
+<view class="card archive-card {{selectedBuildingId == item.id ? 'selected' : ''}}" wx:for="{{buildings}}" wx:key="id" data-id="{{item.id}}" bindtap="selectBuilding">
+  <view class="house-title">{{item.code}} · {{item.name}}</view>
+</view>
+
+<view class="card" wx:if="{{selectedBuilding && canEdit}}">
+  <view class="section-title">维护楼栋 · {{selectedBuilding.code}}</view>
+  <input placeholder="楼栋编码（维护）" value="{{editBuildingCode}}" data-field="editBuildingCode" bindinput="onTextInput" />
+  <input placeholder="楼栋名称（维护）" value="{{editBuildingName}}" data-field="editBuildingName" bindinput="onTextInput" />
+  <button class="btn" bindtap="updateBuilding">保存楼栋档案</button>
+</view>
+
+<view class="section-heading">单元档案</view>
+<view class="empty" wx:if="{{!loading && !units.length}}">当前小区暂无单元</view>
+<view class="card archive-card {{selectedUnitId == item.id ? 'selected' : ''}}" wx:for="{{units}}" wx:key="id" data-id="{{item.id}}" bindtap="selectUnit">
+  <view class="house-title">{{item.label}}</view>
+</view>
+
+<view class="card" wx:if="{{selectedUnit && canEdit}}">
+  <view class="section-title">维护单元 · {{selectedUnit.label}}</view>
+  <input placeholder="单元编码（维护）" value="{{editUnitCode}}" data-field="editUnitCode" bindinput="onTextInput" />
+  <input placeholder="单元名称（维护）" value="{{editUnitName}}" data-field="editUnitName" bindinput="onTextInput" />
+  <button class="btn" bindtap="updateUnit">保存单元档案</button>
+</view>
+
 <view class="section-heading">房屋档案</view>
 <view class="empty" wx:if="{{!loading && !houses.length}}">当前小区暂无房屋档案</view>
-<view class="card house-card {{selectedHouseId == item.id ? 'selected' : ''}}" wx:for="{{houses}}" wx:key="id" data-id="{{item.id}}" bindtap="selectHouse">
+<view class="card house-card archive-card {{selectedHouseId == item.id ? 'selected' : ''}}" wx:for="{{houses}}" wx:key="id" data-id="{{item.id}}" bindtap="selectHouse">
   <view class="house-title">{{item.label}}</view>
   <view>楼层：{{item.floor === null ? '未设置' : item.floor}}</view>
   <view>状态：{{item.status}}</view>

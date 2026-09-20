@@ -141,6 +141,14 @@ Page({
     unitOptions: [],
     buildingIndex: 0,
     unitIndex: 0,
+    selectedBuilding: null,
+    selectedBuildingId: "",
+    editBuildingCode: "",
+    editBuildingName: "",
+    selectedUnit: null,
+    selectedUnitId: "",
+    editUnitCode: "",
+    editUnitName: "",
     selectedHouse: null,
     selectedHouseId: "",
     selectedHouseStatusIndex: 0,
@@ -216,6 +224,10 @@ Page({
       canEdit: current.canEdit,
       selectedHouse: null,
       selectedHouseId: "",
+      selectedBuilding: null,
+      selectedBuildingId: "",
+      selectedUnit: null,
+      selectedUnitId: "",
       notice: "",
     });
     this.load();
@@ -277,6 +289,12 @@ Page({
         unitIndex: 0,
         error: "",
       });
+      if (this.data.selectedBuildingId) {
+        this.selectBuildingById(this.data.selectedBuildingId, buildings);
+      }
+      if (this.data.selectedUnitId) {
+        this.selectUnitById(this.data.selectedUnitId, unitsWithLabel);
+      }
       if (this.data.selectedHouseId) {
         this.selectHouseById(this.data.selectedHouseId, houses);
       }
@@ -312,8 +330,13 @@ Page({
           code: this.data.buildingCode.trim(),
           name: this.data.buildingName.trim(),
         })
-        .then(() => {
-          this.setData({ buildingCode: "", buildingName: "", notice: "楼栋已建立" });
+        .then((building) => {
+          this.setData({
+            buildingCode: "",
+            buildingName: "",
+            selectedBuildingId: String(building.id),
+            notice: "楼栋已建立",
+          });
           return this.loadData();
         })
     ).catch(() => {});
@@ -334,8 +357,107 @@ Page({
           code: this.data.unitCode.trim(),
           name: this.data.unitName.trim(),
         })
+        .then((unit) => {
+          this.setData({
+            unitCode: "",
+            unitName: "",
+            selectedUnitId: String(unit.id),
+            notice: "单元已建立",
+          });
+          return this.loadData();
+        })
+    ).catch(() => {});
+  },
+
+  selectBuilding(event) {
+    this.selectBuildingById(event.currentTarget.dataset.id);
+  },
+
+  selectBuildingById(buildingId, supplied) {
+    const buildings = supplied || this.data.buildings;
+    const building = buildings.find((item) => Number(item.id) === Number(buildingId));
+    if (!building) {
+      this.setData({ selectedBuilding: null, selectedBuildingId: "" });
+      return;
+    }
+    const buildingIndex = this.data.buildingOptions.findIndex(
+      (item) => Number(item.id) === Number(building.id)
+    );
+    this.setData({
+      selectedBuilding: building,
+      selectedBuildingId: String(building.id),
+      editBuildingCode: building.code,
+      editBuildingName: building.name,
+      buildingIndex: buildingIndex < 0 ? 0 : buildingIndex,
+    });
+  },
+
+  updateBuilding() {
+    if (
+      !this.data.selectedBuilding ||
+      !this.data.editBuildingCode.trim() ||
+      !this.data.editBuildingName.trim()
+    ) {
+      this.setData({ error: "请填写有效的楼栋编码和名称" });
+      return;
+    }
+    withLoading(this, () =>
+      api
+        .updateBuilding(this.data.selectedBuilding.id, {
+          code: this.data.editBuildingCode.trim(),
+          name: this.data.editBuildingName.trim(),
+        })
         .then(() => {
-          this.setData({ unitCode: "", unitName: "", notice: "单元已建立" });
+          this.setData({ notice: "楼栋档案已更新" });
+          return this.loadData();
+        })
+    ).catch(() => {});
+  },
+
+  selectUnit(event) {
+    this.selectUnitById(event.currentTarget.dataset.id);
+  },
+
+  selectUnitById(unitId, supplied) {
+    const units = supplied || this.data.units;
+    const unit = units.find((item) => Number(item.id) === Number(unitId));
+    if (!unit) {
+      this.setData({ selectedUnit: null, selectedUnitId: "" });
+      return;
+    }
+    const unitIndex = this.data.unitOptions.findIndex(
+      (item) => Number(item.id) === Number(unit.id)
+    );
+    const buildingIndex = this.data.buildingOptions.findIndex(
+      (item) => Number(item.id) === Number(unit.building_id)
+    );
+    this.setData({
+      selectedUnit: unit,
+      selectedUnitId: String(unit.id),
+      editUnitCode: unit.code,
+      editUnitName: unit.name,
+      unitIndex: unitIndex < 0 ? 0 : unitIndex,
+      buildingIndex: buildingIndex < 0 ? this.data.buildingIndex : buildingIndex,
+    });
+  },
+
+  updateUnit() {
+    if (
+      !this.data.selectedUnit ||
+      !this.data.editUnitCode.trim() ||
+      !this.data.editUnitName.trim()
+    ) {
+      this.setData({ error: "请填写有效的单元编码和名称" });
+      return;
+    }
+    withLoading(this, () =>
+      api
+        .updateUnit(this.data.selectedUnit.id, {
+          code: this.data.editUnitCode.trim(),
+          name: this.data.editUnitName.trim(),
+        })
+        .then(() => {
+          this.setData({ notice: "单元档案已更新" });
           return this.loadData();
         })
     ).catch(() => {});

@@ -440,8 +440,12 @@ module.exports = {
     }),
   createBuilding: (body) =>
     request({ path: "/admin/buildings", method: "POST", data: body }),
+  updateBuilding: (id, body) =>
+    request({ path: `/admin/buildings/${id}`, method: "PATCH", data: body }),
   createUnit: (body) =>
     request({ path: "/admin/units", method: "POST", data: body }),
+  updateUnit: (id, body) =>
+    request({ path: `/admin/units/${id}`, method: "PATCH", data: body }),
   createHouse: (body) =>
     request({ path: "/admin/houses", method: "POST", data: body }),
   updateHouse: (id, body) =>

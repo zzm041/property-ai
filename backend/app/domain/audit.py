@@ -36,7 +36,9 @@ class AuditAction(StrEnum):
     RESIDENT_BIND_REQUEST_REJECTED = "RESIDENT_BIND_REQUEST_REJECTED"
     RESIDENT_HOUSE_RELATION_ENDED = "RESIDENT_HOUSE_RELATION_ENDED"
     PROPERTY_BUILDING_CREATED = "PROPERTY_BUILDING_CREATED"
+    PROPERTY_BUILDING_UPDATED = "PROPERTY_BUILDING_UPDATED"
     PROPERTY_UNIT_CREATED = "PROPERTY_UNIT_CREATED"
+    PROPERTY_UNIT_UPDATED = "PROPERTY_UNIT_UPDATED"
     PROPERTY_HOUSE_CREATED = "PROPERTY_HOUSE_CREATED"
     PROPERTY_HOUSE_UPDATED = "PROPERTY_HOUSE_UPDATED"
     EMPLOYEE_CREATED = "EMPLOYEE_CREATED"
@@ -356,12 +358,24 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             required_detail_keys=frozenset({"code", "name", "batch_import"}),
             allowed_scope_types=frozenset({ScopeType.PROPERTY}),
         ),
+        AuditAction.PROPERTY_BUILDING_UPDATED: AuditActionPolicy(
+            resource_type=AuditResourceType.BUILDING,
+            allowed_detail_keys=_PROPERTY_BUILDING_DETAIL_KEYS,
+            required_detail_keys=frozenset({"code", "name"}),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
         AuditAction.PROPERTY_UNIT_CREATED: AuditActionPolicy(
             resource_type=AuditResourceType.UNIT,
             allowed_detail_keys=_PROPERTY_UNIT_DETAIL_KEYS,
             required_detail_keys=frozenset(
                 {"building_id", "code", "name", "batch_import"}
             ),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.PROPERTY_UNIT_UPDATED: AuditActionPolicy(
+            resource_type=AuditResourceType.UNIT,
+            allowed_detail_keys=_PROPERTY_UNIT_DETAIL_KEYS,
+            required_detail_keys=frozenset({"building_id", "code", "name"}),
             allowed_scope_types=frozenset({ScopeType.PROPERTY}),
         ),
         AuditAction.PROPERTY_HOUSE_CREATED: AuditActionPolicy(

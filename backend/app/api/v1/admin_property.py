@@ -22,7 +22,9 @@ from app.schema.property import (
     ImportHousesRequest,
     PropertyArchiveData,
     UnitData,
+    UpdateBuildingRequest,
     UpdateHouseRequest,
+    UpdateUnitRequest,
 )
 from app.service.property_admin import PropertyAdminService
 
@@ -107,6 +109,30 @@ def create_building(
     return success_envelope(request, _building_data(record).model_dump(mode="json"))
 
 
+@router.patch("/buildings/{building_id}")
+def update_building(
+    building_id: int,
+    body: UpdateBuildingRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[PropertyAdminService, Depends(get_property_admin_service)],
+) -> dict[str, object]:
+    if not body.model_fields_set:
+        raise AppError(
+            code=ResidentErrorCode.INVALID_INPUT,
+            message="At least one building field is required",
+            status_code=422,
+        )
+    record = service.update_building(
+        actor=actor,
+        building_id=building_id,
+        code=body.code,
+        name=body.name,
+        request_id=request_id_for(request),
+    )
+    return success_envelope(request, _building_data(record).model_dump(mode="json"))
+
+
 @router.post("/units")
 def create_unit(
     body: CreateUnitRequest,
@@ -119,6 +145,30 @@ def create_unit(
         tenant_id=body.tenant_id,
         property_id=body.property_id,
         building_id=body.building_id,
+        code=body.code,
+        name=body.name,
+        request_id=request_id_for(request),
+    )
+    return success_envelope(request, _unit_data(record).model_dump(mode="json"))
+
+
+@router.patch("/units/{unit_id}")
+def update_unit(
+    unit_id: int,
+    body: UpdateUnitRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[PropertyAdminService, Depends(get_property_admin_service)],
+) -> dict[str, object]:
+    if not body.model_fields_set:
+        raise AppError(
+            code=ResidentErrorCode.INVALID_INPUT,
+            message="At least one unit field is required",
+            status_code=422,
+        )
+    record = service.update_unit(
+        actor=actor,
+        unit_id=unit_id,
         code=body.code,
         name=body.name,
         request_id=request_id_for(request),

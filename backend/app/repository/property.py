@@ -85,6 +85,23 @@ class PropertyRepository:
             )
         )
 
+    def get_building_for_update(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int,
+        building_id: int,
+    ) -> Building | None:
+        return self._session.scalar(
+            select(Building)
+            .where(
+                Building.id == building_id,
+                Building.tenant_id == tenant_id,
+                Building.property_id == property_id,
+            )
+            .with_for_update()
+        )
+
     def get_unit(
         self,
         *,
@@ -115,6 +132,23 @@ class PropertyRepository:
                 Unit.building_id == building_id,
                 Unit.code == code,
             )
+        )
+
+    def get_unit_for_update(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int,
+        unit_id: int,
+    ) -> Unit | None:
+        return self._session.scalar(
+            select(Unit)
+            .where(
+                Unit.id == unit_id,
+                Unit.tenant_id == tenant_id,
+                Unit.property_id == property_id,
+            )
+            .with_for_update()
         )
 
     def get_house(

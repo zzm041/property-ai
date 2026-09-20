@@ -27,7 +27,7 @@
 <view class="card" wx:if="{{canManageStaff}}">
   <button class="btn" data-url="/pages/supervisor/staff" bindtap="go">员工管理与状态</button>
 </view>
-<view class="card" wx:if="{{canManageProperty}}">
+<view class="card" wx:if="{{canViewProperty}}">
   <button class="btn" data-url="/pages/supervisor/properties" bindtap="go">楼栋房屋与住户关系</button>
 </view>
 <button class="btn" data-url="/pages/notifications/list" bindtap="go">通知</button>

@@ -63,7 +63,9 @@ def test_frozen_admin_roles_receive_property_manage_permission() -> None:
 def test_property_archive_audit_actions_have_fixed_resources() -> None:
     expected = {
         AuditAction.PROPERTY_BUILDING_CREATED: AuditResourceType.BUILDING,
+        AuditAction.PROPERTY_BUILDING_UPDATED: AuditResourceType.BUILDING,
         AuditAction.PROPERTY_UNIT_CREATED: AuditResourceType.UNIT,
+        AuditAction.PROPERTY_UNIT_UPDATED: AuditResourceType.UNIT,
         AuditAction.PROPERTY_HOUSE_CREATED: AuditResourceType.HOUSE,
         AuditAction.PROPERTY_HOUSE_UPDATED: AuditResourceType.HOUSE,
     }
@@ -228,6 +230,142 @@ def test_import_rejects_existing_house_attribute_conflict(monkeypatch) -> None:
 
     assert captured.value.code == "RES.HIERARCHY_CONFLICT"
     assert captured.value.details == {"row": 1, "field": "house"}
+
+
+@pytest.mark.parametrize(
+    ("second_building_name", "second_unit_name", "expected_field"),
+    [
+        ("改名楼栋", "1单元", "building_name"),
+        ("1号楼", "改名单元", "unit_name"),
+    ],
+)
+def test_import_rejects_cached_parent_name_conflicts(
+    monkeypatch,
+    second_building_name: str,
+    second_unit_name: str,
+    expected_field: str,
+) -> None:
+    actor = _principal("property:manage")
+    service, _, repository, _ = _property_service(actor)
+    repository.get_property.return_value = Property(
+        id=10,
+        tenant_id=1,
+        name="Property",
+        address="Address",
+        timezone="Asia/Shanghai",
+    )
+    repository.get_building_by_code.return_value = Building(
+        id=20, tenant_id=1, property_id=10, code="B1", name="1号楼"
+    )
+    repository.get_unit_by_code.return_value = Unit(
+        id=30,
+        tenant_id=1,
+        property_id=10,
+        building_id=20,
+        code="U1",
+        name="1单元",
+    )
+    repository.get_house_by_room.return_value = House(
+        id=40,
+        tenant_id=1,
+        property_id=10,
+        unit_id=30,
+        room_no="101",
+        floor=1,
+        status="ACTIVE",
+    )
+    monkeypatch.setattr(
+        "app.core.database.run_owned_transaction", lambda session, operation: operation()
+    )
+
+    with pytest.raises(AppError) as captured:
+        service.import_houses(
+            actor=actor,
+            tenant_id=1,
+            property_id=10,
+            rows=(
+                HouseImportRow(
+                    building_code="B1",
+                    building_name="1号楼",
+                    unit_code="U1",
+                    unit_name="1单元",
+                    room_no="101",
+                    floor=1,
+                    status="ACTIVE",
+                ),
+                HouseImportRow(
+                    building_code="B1",
+                    building_name=second_building_name,
+                    unit_code="U1",
+                    unit_name=second_unit_name,
+                    room_no="102",
+                    floor=1,
+                    status="ACTIVE",
+                ),
+            ),
+            request_id="property-import-cached-parent-conflict",
+        )
+
+    assert captured.value.code == "RES.HIERARCHY_CONFLICT"
+    assert captured.value.details == {"row": 2, "field": expected_field}
+
+
+def test_building_and_unit_updates_lock_scope_and_append_audit(monkeypatch) -> None:
+    actor = _principal("property:manage")
+    service, session, repository, audit = _property_service(actor)
+    property_record = Property(
+        id=10,
+        tenant_id=1,
+        name="Property",
+        address="Address",
+        timezone="Asia/Shanghai",
+    )
+    building = Building(id=20, tenant_id=1, property_id=10, code="B1", name="1号楼")
+    unit = Unit(
+        id=30,
+        tenant_id=1,
+        property_id=10,
+        building_id=20,
+        code="U1",
+        name="1单元",
+    )
+    repository.get_property.return_value = property_record
+    repository.get_building_for_update.return_value = building
+    repository.get_unit_for_update.return_value = unit
+    session.get.side_effect = lambda model, resource_id: (
+        building if model is Building and resource_id == 20 else unit
+    )
+    monkeypatch.setattr(
+        "app.core.database.run_owned_transaction", lambda db, operation: operation()
+    )
+
+    updated_building = service.update_building(
+        actor=actor,
+        building_id=20,
+        code=" B2 ",
+        name=" 二号楼 ",
+        request_id="building-update",
+    )
+    updated_unit = service.update_unit(
+        actor=actor,
+        unit_id=30,
+        code=" U2 ",
+        name=" 二单元 ",
+        request_id="unit-update",
+    )
+
+    assert (updated_building.code, updated_building.name) == ("B2", "二号楼")
+    assert (updated_unit.code, updated_unit.name) == ("U2", "二单元")
+    repository.get_building_for_update.assert_called_once_with(
+        tenant_id=1, property_id=10, building_id=20
+    )
+    repository.get_unit_for_update.assert_called_once_with(
+        tenant_id=1, property_id=10, unit_id=30
+    )
+    assert [call.kwargs["action"] for call in audit.append.call_args_list] == [
+        AuditAction.PROPERTY_BUILDING_UPDATED,
+        AuditAction.PROPERTY_UNIT_UPDATED,
+    ]
 
 
 def test_relation_history_requires_relation_read_permission() -> None:

@@ -126,6 +126,44 @@ class PropertyAdminService:
             )
         )
 
+    def update_building(
+        self,
+        *,
+        actor: Principal,
+        building_id: int,
+        request_id: str,
+        code: str | None = None,
+        name: str | None = None,
+    ) -> Building:
+        return self._execute(
+            lambda: self._update_building(
+                actor=actor,
+                building_id=building_id,
+                request_id=request_id,
+                code=code,
+                name=name,
+            )
+        )
+
+    def update_unit(
+        self,
+        *,
+        actor: Principal,
+        unit_id: int,
+        request_id: str,
+        code: str | None = None,
+        name: str | None = None,
+    ) -> Unit:
+        return self._execute(
+            lambda: self._update_unit(
+                actor=actor,
+                unit_id=unit_id,
+                request_id=request_id,
+                code=code,
+                name=name,
+            )
+        )
+
     def create_house(
         self,
         *,
@@ -317,6 +355,100 @@ class PropertyAdminService:
         )
         return house
 
+    def _update_building(
+        self,
+        *,
+        actor: Principal,
+        building_id: int,
+        request_id: str,
+        code: str | None,
+        name: str | None,
+    ) -> Building:
+        self._positive_id(building_id, "building_id")
+        if code is None and name is None:
+            self._invalid("fields")
+        current = self._reload_actor(actor)
+        existing = self._session.get(Building, building_id)
+        if existing is None:
+            self._hierarchy_not_found("Building")
+        record = self._require_property(
+            current,
+            tenant_id=existing.tenant_id,
+            property_id=existing.property_id,
+            permission=PROPERTY_MANAGE,
+        )
+        building = self._repository.get_building_for_update(
+            tenant_id=record.tenant_id,
+            property_id=record.id,
+            building_id=building_id,
+        )
+        if building is None:
+            self._hierarchy_not_found("Building")
+        if code is not None:
+            building.code = self._normalized_text(code, "code", 64)
+        if name is not None:
+            building.name = self._normalized_text(name, "name", 200)
+        self._session.flush()
+        self._append_audit(
+            action=AuditAction.PROPERTY_BUILDING_UPDATED,
+            resource_type=AuditResourceType.BUILDING,
+            actor=current,
+            resource_id=building.id,
+            request_id=request_id,
+            property_record=record,
+            details={"code": building.code, "name": building.name},
+        )
+        return building
+
+    def _update_unit(
+        self,
+        *,
+        actor: Principal,
+        unit_id: int,
+        request_id: str,
+        code: str | None,
+        name: str | None,
+    ) -> Unit:
+        self._positive_id(unit_id, "unit_id")
+        if code is None and name is None:
+            self._invalid("fields")
+        current = self._reload_actor(actor)
+        existing = self._session.get(Unit, unit_id)
+        if existing is None:
+            self._hierarchy_not_found("Unit")
+        record = self._require_property(
+            current,
+            tenant_id=existing.tenant_id,
+            property_id=existing.property_id,
+            permission=PROPERTY_MANAGE,
+        )
+        unit = self._repository.get_unit_for_update(
+            tenant_id=record.tenant_id,
+            property_id=record.id,
+            unit_id=unit_id,
+        )
+        if unit is None:
+            self._hierarchy_not_found("Unit")
+        if code is not None:
+            unit.code = self._normalized_text(code, "code", 64)
+        if name is not None:
+            unit.name = self._normalized_text(name, "name", 200)
+        self._session.flush()
+        self._append_audit(
+            action=AuditAction.PROPERTY_UNIT_UPDATED,
+            resource_type=AuditResourceType.UNIT,
+            actor=current,
+            resource_id=unit.id,
+            request_id=request_id,
+            property_record=record,
+            details={
+                "building_id": unit.building_id,
+                "code": unit.code,
+                "name": unit.name,
+            },
+        )
+        return unit
+
     def _update_house(
         self,
         *,
@@ -438,9 +570,9 @@ class PropertyAdminService:
                             "batch_import": True,
                         },
                     )
-                elif building.name != building_name:
-                    self._import_conflict(index, "building_name")
                 buildings[building_code] = building
+            if building.name != building_name:
+                self._import_conflict(index, "building_name")
 
             unit_key = (building.id, unit_code)
             unit = units.get(unit_key)
@@ -475,9 +607,9 @@ class PropertyAdminService:
                             "batch_import": True,
                         },
                     )
-                elif unit.name != unit_name:
-                    self._import_conflict(index, "unit_name")
                 units[unit_key] = unit
+            if unit.name != unit_name:
+                self._import_conflict(index, "unit_name")
 
             status = row.status.value
             house = self._repository.get_house_by_room(
@@ -651,6 +783,23 @@ class PropertyAdminService:
                 message="Property archive operation could not be completed",
                 status_code=500,
             ) from exc
+
+    @staticmethod
+    def _hierarchy_not_found(label: str) -> None:
+        raise AppError(
+            code="RES.HIERARCHY_NOT_FOUND",
+            message=f"{label} was not found in the requested scope",
+            status_code=404,
+        )
+
+    @staticmethod
+    def _normalized_text(value: str, field: str, max_length: int) -> str:
+        if not isinstance(value, str):
+            PropertyAdminService._invalid(field)
+        normalized = value.strip()
+        if not normalized or len(normalized) > max_length:
+            PropertyAdminService._invalid(field)
+        return normalized
 
     @staticmethod
     def _house_status(value: str) -> str:
