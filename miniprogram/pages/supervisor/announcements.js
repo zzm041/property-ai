@@ -80,6 +80,32 @@ function loadAllAnnouncements(propertyId, afterId, collected) {
   });
 }
 
+function loadAllProperties(afterId, collected) {
+  const current = collected || [];
+  return api.catalogProperties(afterId || 0).then((response) => {
+    const items = (response && response.items) || [];
+    const next = current.concat(items);
+    if (items.length < 100) {
+      return next;
+    }
+    const nextCursor = Number(items[items.length - 1].id);
+    if (nextCursor <= Number(afterId || 0)) {
+      throw new Error("小区分页游标无效，请刷新后重试");
+    }
+    return loadAllProperties(nextCursor, next);
+  });
+}
+
+function verifiedProperty(properties, propertyId) {
+  const property = (properties || []).find(
+    (item) => Number(item.id) === Number(propertyId)
+  );
+  if (!property) {
+    throw new Error("当前身份没有该小区的管理权限");
+  }
+  return property;
+}
+
 Page({
   data: {
     propertyId: "",
@@ -110,7 +136,7 @@ Page({
   onLoad(query) {
     this.setData({
       propertyId: query.propertyId || "",
-      tenantId: query.tenantId || "",
+      tenantId: "",
     });
     this.load();
   },
@@ -148,18 +174,10 @@ Page({
       return Promise.resolve();
     }
     return withLoading(this, () =>
-      Promise.all([
-        api.me(),
-        api.catalogBuildings(this.data.propertyId),
-        loadAllAnnouncements(this.data.propertyId),
-      ]).then(([me, buildingPayload, announcements]) => {
+      Promise.all([api.me(), loadAllProperties()]).then(([me, properties]) => {
+        const property = verifiedProperty(properties, this.data.propertyId);
         const scopes = me.scopes || [];
-        const propertyGrant = scopes.find(
-          (scope) =>
-            scope.scope_type === "PROPERTY" &&
-            Number(scope.property_id) === Number(this.data.propertyId)
-        );
-        const tenantId = this.data.tenantId || (propertyGrant && propertyGrant.tenant_id) || "";
+        const tenantId = property.tenant_id;
         const canDraft = scopes.some((scope) =>
           scopeAllows(scope, "announcement:draft", tenantId, this.data.propertyId)
         );
@@ -172,25 +190,30 @@ Page({
         const canPublishTenant = scopes.some((scope) =>
           tenantScopeAllows(scope, "announcement:publish", tenantId)
         );
-        const buildings = (buildingPayload && buildingPayload.items) || [];
-        const items = announcements.map(decorate);
-        const selectedIsTenant =
-          this.data.selected && this.data.selected.scope.scope_type === "TENANT";
-        this.setData({
-          tenantId: String(tenantId || ""),
-          canDraft,
-          canPublish: selectedIsTenant ? canPublishTenant : canPublishProperty,
-          canPublishProperty,
-          canPublishTenant,
-          canTenant,
-          buildings,
-          items,
-          error: "",
+        return Promise.all([
+          api.catalogBuildings(this.data.propertyId),
+          loadAllAnnouncements(this.data.propertyId),
+        ]).then(([buildingPayload, announcements]) => {
+          const buildings = (buildingPayload && buildingPayload.items) || [];
+          const items = announcements.map(decorate);
+          const selectedIsTenant =
+            this.data.selected && this.data.selected.scope.scope_type === "TENANT";
+          this.setData({
+            tenantId: String(tenantId),
+            canDraft,
+            canPublish: selectedIsTenant ? canPublishTenant : canPublishProperty,
+            canPublishProperty,
+            canPublishTenant,
+            canTenant,
+            buildings,
+            items,
+            error: "",
+          });
+          if (buildings.length && !this.data.units.length) {
+            return this.loadUnits(buildings[0]);
+          }
+          return null;
         });
-        if (buildings.length && !this.data.units.length) {
-          return this.loadUnits(buildings[0]);
-        }
-        return null;
       })
     ).catch(() => {});
   },
@@ -338,3 +361,9 @@ Page({
     ).catch(() => {});
   },
 });
+
+module.exports = {
+  scopeAllows,
+  tenantScopeAllows,
+  verifiedProperty,
+};
