@@ -15,12 +15,20 @@ class WeChatLoginRequest(BaseModel):
 class CreateKnowledgeDocumentRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    property_id: int = Field(gt=0)
+    property_id: int | None = Field(default=None, gt=0)
     title: str = Field(min_length=1, max_length=200)
     document_type: str = Field(min_length=1, max_length=32)
     visibility: str = Field(min_length=1, max_length=32)
     source_text: str = Field(min_length=1, max_length=20000)
     tenant_id: int | None = Field(default=None, gt=0)
+
+
+class CreateKnowledgeVersionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    source_text: str = Field(min_length=1, max_length=20000)
+    tenant_id: int | None = Field(default=None, gt=0)
+    property_id: int | None = Field(default=None, gt=0)
 
 
 class ArchiveKnowledgeDocumentRequest(BaseModel):
@@ -69,6 +77,32 @@ class KnowledgeIngestionData(BaseModel):
     version: int
     job_status: str
     content_hash: str
+
+
+class KnowledgeVersionData(BaseModel):
+    version: int
+    status: str
+    content_hash: str
+    created_at: datetime
+
+
+class KnowledgeIngestionJobData(BaseModel):
+    version: int
+    status: str
+    error_code: str | None
+    attempt: int
+    started_at: datetime | None
+    finished_at: datetime | None
+
+
+class KnowledgeDocumentDetailData(KnowledgeDocumentData):
+    versions: list[KnowledgeVersionData]
+    ingestion_jobs: list[KnowledgeIngestionJobData]
+
+
+class KnowledgeDocumentListData(BaseModel):
+    items: list[KnowledgeDocumentDetailData]
+    next_cursor: int | None = None
 
 
 class NotificationData(BaseModel):

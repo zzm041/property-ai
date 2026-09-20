@@ -74,6 +74,8 @@ class AuditAction(StrEnum):
     ANNOUNCEMENT_REJECTED = "ANNOUNCEMENT_REJECTED"
     ANNOUNCEMENT_PUBLISHED = "ANNOUNCEMENT_PUBLISHED"
     KNOWLEDGE_DOCUMENT_CREATED = "KNOWLEDGE_DOCUMENT_CREATED"
+    KNOWLEDGE_DOCUMENT_VERSION_CREATED = "KNOWLEDGE_DOCUMENT_VERSION_CREATED"
+    KNOWLEDGE_DOCUMENT_ACTIVATED = "KNOWLEDGE_DOCUMENT_ACTIVATED"
     KNOWLEDGE_DOCUMENT_ARCHIVED = "KNOWLEDGE_DOCUMENT_ARCHIVED"
 
 
@@ -636,6 +638,18 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             required_detail_keys=frozenset(
                 {"document_id", "visibility", "document_type"}
             ),
+            allowed_scope_types=frozenset({ScopeType.TENANT, ScopeType.PROPERTY}),
+        ),
+        AuditAction.KNOWLEDGE_DOCUMENT_VERSION_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.KNOWLEDGE_DOCUMENT,
+            allowed_detail_keys=frozenset({"document_id", "version", "content_hash"}),
+            required_detail_keys=frozenset({"document_id", "version", "content_hash"}),
+            allowed_scope_types=frozenset({ScopeType.TENANT, ScopeType.PROPERTY}),
+        ),
+        AuditAction.KNOWLEDGE_DOCUMENT_ACTIVATED: AuditActionPolicy(
+            resource_type=AuditResourceType.KNOWLEDGE_DOCUMENT,
+            allowed_detail_keys=frozenset({"document_id", "version", "status"}),
+            required_detail_keys=frozenset({"document_id", "version", "status"}),
             allowed_scope_types=frozenset({ScopeType.TENANT, ScopeType.PROPERTY}),
         ),
         AuditAction.KNOWLEDGE_DOCUMENT_ARCHIVED: AuditActionPolicy(

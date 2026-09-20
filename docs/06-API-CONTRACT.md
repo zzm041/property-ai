@@ -174,6 +174,11 @@
 | POST | `/admin/announcements/{id}/publish` | 人工批准或带原因驳回；未审核 409 |
 | GET | `/announcements` | 住户/员工仅获取已发布且命中房屋、任职及人群范围的公告 |
 | POST | `/assistant/query` | RAG 问答，返回 answer + citations |
+| GET | `/admin/knowledge-documents` | List authorized tenant/property knowledge documents with version and ingestion status |
+| GET | `/admin/knowledge-documents/{id}` | Read one authorized knowledge document and its version history |
+| POST | `/admin/knowledge-documents` | Create tenant/property knowledge and enqueue version 1 ingestion |
+| POST | `/admin/knowledge-documents/{id}/versions` | Add a source-only version and enqueue ingestion |
+| POST | `/admin/knowledge-documents/{id}/archive` | Archive a document; archived content is excluded from retrieval |
 | GET/PUT | `/admin/sla-policies` |
 | GET | `/notifications` |
 | POST | `/notifications/{id}/read` |

@@ -349,6 +349,7 @@ def test_old_version_cannot_overwrite_newer_active_version(
         version=1,
         claimed_attempt=9,
         claimed_version=1,
+        request_id="d4-stale-version-finish",
     )
     persisted = fetch_independent(identity_session, KnowledgeDocument, document.id)
     assert persisted is not None

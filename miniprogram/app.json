@@ -21,6 +21,7 @@
     "pages/supervisor/bindings",
     "pages/supervisor/staff",
     "pages/supervisor/properties",
+    "pages/supervisor/knowledge",
     "pages/notifications/list",
     "pages/dev-login/dev-login"
   ],

@@ -318,6 +318,28 @@ module.exports = {
     request({ path: `/announcements?property_id=${propertyId}` }),
   queryAssistant: (body) =>
     request({ path: "/assistant/query", method: "POST", data: body }),
+  adminKnowledgeDocuments: (propertyId, afterId, includeArchived) =>
+    request({
+      path: `/admin/knowledge-documents?property_id=${propertyId}&limit=100${
+        afterId ? `&after_id=${afterId}` : ""
+      }${includeArchived ? "&include_archived=true" : ""}`,
+    }),
+  adminKnowledgeDocument: (id) =>
+    request({ path: `/admin/knowledge-documents/${id}` }),
+  createKnowledgeDocument: (body) =>
+    request({ path: "/admin/knowledge-documents", method: "POST", data: body }),
+  createKnowledgeVersion: (id, body) =>
+    request({
+      path: `/admin/knowledge-documents/${id}/versions`,
+      method: "POST",
+      data: body,
+    }),
+  archiveKnowledgeDocument: (id, body) =>
+    request({
+      path: `/admin/knowledge-documents/${id}/archive`,
+      method: "POST",
+      data: body,
+    }),
   notifications: () => request({ path: "/notifications" }),
   readNotification: (id) =>
     request({ path: `/notifications/${id}/read`, method: "POST", data: {} }),

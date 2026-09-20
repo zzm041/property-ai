@@ -48,6 +48,11 @@ from app.service.auth import AuthService
 from app.service.rbac import RbacService
 
 T = TypeVar("T")
+KnowledgeDetail = tuple[
+    KnowledgeDocument,
+    tuple[KnowledgeDocumentVersion, ...],
+    tuple[KnowledgeIngestionJob, ...],
+]
 logger = get_logger(__name__)
 INGEST_CLAIM_SECONDS = 120
 
@@ -77,7 +82,7 @@ class KnowledgeService:
         self,
         *,
         actor: Principal,
-        property_id: int,
+        property_id: int | None,
         title: str,
         document_type: str,
         visibility: str,
@@ -97,6 +102,91 @@ class KnowledgeService:
                 claimed_tenant_id=claimed_tenant_id,
             )
         )
+
+    def create_version(
+        self,
+        *,
+        actor: Principal,
+        document_id: int,
+        source_text: str,
+        request_id: str,
+        claimed_tenant_id: int | None = None,
+        claimed_property_id: int | None = None,
+    ) -> tuple[KnowledgeDocumentVersion, KnowledgeIngestionJob]:
+        return self._execute(
+            lambda: self._create_version(
+                actor=actor,
+                document_id=document_id,
+                source_text=source_text,
+                request_id=request_id,
+                claimed_tenant_id=claimed_tenant_id,
+                claimed_property_id=claimed_property_id,
+            )
+        )
+
+    def list_managed(
+        self,
+        *,
+        actor: Principal,
+        property_id: int,
+        include_archived: bool = False,
+        after_id: int = 0,
+        limit: int = 50,
+    ) -> tuple[KnowledgeDetail, ...]:
+        property_record = self._properties.get_property_by_id(property_id)
+        if property_record is None:
+            raise AppError(
+                code=KnowledgeErrorCode.NOT_FOUND,
+                message="Property was not found",
+                status_code=404,
+            )
+        property_scope = OrganizationScope(
+            ScopeType.PROPERTY,
+            tenant_id=property_record.tenant_id,
+            property_id=property_record.id,
+        )
+        tenant_scope = OrganizationScope(
+            ScopeType.TENANT,
+            tenant_id=property_record.tenant_id,
+        )
+        can_property = actor.has_permission(KNOWLEDGE_MANAGE, property_scope)
+        can_tenant = actor.has_permission(KNOWLEDGE_MANAGE, tenant_scope)
+        if not can_property and not can_tenant:
+            raise AppError(
+                code=IamErrorCode.FORBIDDEN,
+                message="Permission denied",
+                status_code=403,
+            )
+        records = self._repository.list_documents_for_management(
+            tenant_id=property_record.tenant_id,
+            property_id=property_record.id,
+            include_tenant_documents=can_tenant,
+            include_property_documents=can_property,
+            include_archived=include_archived,
+            after_id=after_id,
+            limit=limit,
+        )
+        return tuple(self._detail(record) for record in records)
+
+    def get_managed(
+        self,
+        *,
+        actor: Principal,
+        document_id: int,
+    ) -> KnowledgeDetail:
+        document = self._repository.get_document(document_id)
+        if document is None:
+            raise AppError(
+                code=KnowledgeErrorCode.NOT_FOUND,
+                message="Knowledge document was not found",
+                status_code=404,
+            )
+        RbacService.require_permission(
+            actor,
+            KNOWLEDGE_MANAGE,
+            self._document_scope(document),
+        )
+        return self._detail(document)
 
     def archive_document(
         self,
@@ -191,6 +281,7 @@ class KnowledgeService:
             version=version,
             claimed_attempt=int(prepared["attempt"]),
             claimed_version=int(prepared["version"]),
+            request_id=request_id,
         )
 
     def _claim_is_held(self, job: KnowledgeIngestionJob) -> bool:
@@ -332,13 +423,14 @@ class KnowledgeService:
         version: int,
         claimed_attempt: int,
         claimed_version: int,
+        request_id: str,
     ) -> str:
         with begin_owned_transaction(self._session):
             job = self._repository.get_ingestion_job_for_update(
                 document_id=document_id,
                 version=version,
             )
-            document = self._repository.get_document(document_id)
+            document = self._repository.get_document_for_update(document_id)
             version_row = self._repository.get_version(
                 document_id=document_id,
                 version=version,
@@ -349,7 +441,32 @@ class KnowledgeService:
                 return str(job.status)
             if job.status != KnowledgeIngestionStatus.PROCESSING.value:
                 return str(job.status)
+            already_active = (
+                document.status == KnowledgeDocumentStatus.ACTIVE.value
+                and document.current_version == version_row.version
+                and version_row.status == KnowledgeVersionStatus.ACTIVE.value
+            )
             self._activate_version(document, version_row, job)
+            if (
+                job.status == KnowledgeIngestionStatus.SUCCEEDED.value
+                and not already_active
+            ):
+                scope = self._document_scope(document)
+                self._audit.append(
+                    action=AuditAction.KNOWLEDGE_DOCUMENT_ACTIVATED,
+                    resource_type=AuditResourceType.KNOWLEDGE_DOCUMENT,
+                    actor_user_id=version_row.created_by_user_id,
+                    resource_id=document.id,
+                    request_id=request_id,
+                    scope_type=scope.scope_type,
+                    tenant_id=document.tenant_id,
+                    property_id=document.property_id,
+                    details={
+                        "document_id": document.id,
+                        "version": version_row.version,
+                        "status": document.status,
+                    },
+                )
             return str(job.status)
 
     def _fail_ingest(
@@ -404,7 +521,7 @@ class KnowledgeService:
         self,
         *,
         actor: Principal,
-        property_id: int,
+        property_id: int | None,
         title: str,
         document_type: str,
         visibility: str,
@@ -413,27 +530,45 @@ class KnowledgeService:
         claimed_tenant_id: int | None,
     ) -> tuple[KnowledgeDocument, KnowledgeIngestionJob]:
         current = self._reload(actor)
-        property_record = self._properties.get_property_by_id(property_id)
-        if property_record is None:
-            raise AppError(
-                code=KnowledgeErrorCode.NOT_FOUND,
-                message="Property was not found",
-                status_code=404,
+        if property_id is None:
+            if claimed_tenant_id is None:
+                raise AppError(
+                    code=KnowledgeErrorCode.INVALID_INPUT,
+                    message="Tenant is required for a tenant knowledge document",
+                    status_code=422,
+                )
+            tenant = self._properties.get_tenant(claimed_tenant_id)
+            if tenant is None or tenant.status != "ACTIVE":
+                raise AppError(
+                    code=KnowledgeErrorCode.NOT_FOUND,
+                    message="Tenant was not found",
+                    status_code=404,
+                )
+            tenant_id = tenant.id
+            scope = OrganizationScope(ScopeType.TENANT, tenant_id=tenant.id)
+        else:
+            property_record = self._properties.get_property_by_id(property_id)
+            if property_record is None:
+                raise AppError(
+                    code=KnowledgeErrorCode.NOT_FOUND,
+                    message="Property was not found",
+                    status_code=404,
+                )
+            if (
+                claimed_tenant_id is not None
+                and claimed_tenant_id != property_record.tenant_id
+            ):
+                raise AppError(
+                    code=KnowledgeErrorCode.SCOPE_MISMATCH,
+                    message="Property does not match claimed tenant",
+                    status_code=422,
+                )
+            tenant_id = property_record.tenant_id
+            scope = OrganizationScope(
+                ScopeType.PROPERTY,
+                tenant_id=property_record.tenant_id,
+                property_id=property_record.id,
             )
-        if (
-            claimed_tenant_id is not None
-            and claimed_tenant_id != property_record.tenant_id
-        ):
-            raise AppError(
-                code=KnowledgeErrorCode.SCOPE_MISMATCH,
-                message="Property does not match claimed tenant",
-                status_code=422,
-            )
-        scope = OrganizationScope(
-            ScopeType.PROPERTY,
-            tenant_id=property_record.tenant_id,
-            property_id=property_record.id,
-        )
         RbacService.require_permission(current, KNOWLEDGE_MANAGE, scope)
         try:
             parsed_type = KnowledgeDocumentType(document_type)
@@ -444,6 +579,13 @@ class KnowledgeService:
                 message="Document type or visibility is invalid",
                 status_code=422,
             ) from exc
+        normalized_title = title.strip()
+        if not normalized_title:
+            raise AppError(
+                code=KnowledgeErrorCode.INVALID_INPUT,
+                message="Document title is required",
+                status_code=422,
+            )
         try:
             text = self._parser.parse(filename=None, content=source_text)
         except KnowledgeParseError as exc:
@@ -454,9 +596,9 @@ class KnowledgeService:
             ) from exc
         document = self._repository.add_document(
             KnowledgeDocument(
-                tenant_id=property_record.tenant_id,
-                property_id=property_record.id,
-                title=title.strip(),
+                tenant_id=tenant_id,
+                property_id=property_id,
+                title=normalized_title,
                 document_type=parsed_type.value,
                 visibility=parsed_visibility.value,
                 status=KnowledgeDocumentStatus.DRAFT.value,
@@ -493,7 +635,7 @@ class KnowledgeService:
             actor_user_id=current.user_id,
             resource_id=document.id,
             request_id=request_id,
-            scope_type=ScopeType.PROPERTY,
+            scope_type=scope.scope_type,
             tenant_id=document.tenant_id,
             property_id=document.property_id,
             details={
@@ -503,6 +645,86 @@ class KnowledgeService:
             },
         )
         return document, job
+
+    def _create_version(
+        self,
+        *,
+        actor: Principal,
+        document_id: int,
+        source_text: str,
+        request_id: str,
+        claimed_tenant_id: int | None,
+        claimed_property_id: int | None,
+    ) -> tuple[KnowledgeDocumentVersion, KnowledgeIngestionJob]:
+        current = self._reload(actor)
+        document = self._repository.get_document_for_update(document_id)
+        if document is None:
+            raise AppError(
+                code=KnowledgeErrorCode.NOT_FOUND,
+                message="Knowledge document was not found",
+                status_code=404,
+            )
+        self._validate_claimed_scope(
+            document,
+            claimed_tenant_id=claimed_tenant_id,
+            claimed_property_id=claimed_property_id,
+        )
+        if document.status == KnowledgeDocumentStatus.ARCHIVED.value:
+            raise AppError(
+                code=KnowledgeErrorCode.ARCHIVED,
+                message="Archived knowledge document cannot receive a new version",
+                status_code=409,
+            )
+        scope = self._document_scope(document)
+        RbacService.require_permission(current, KNOWLEDGE_MANAGE, scope)
+        try:
+            text = self._parser.parse(filename=None, content=source_text)
+        except KnowledgeParseError as exc:
+            raise AppError(
+                code=KnowledgeErrorCode.INVALID_INPUT,
+                message="Source text is invalid",
+                status_code=422,
+            ) from exc
+        version_number = self._repository.next_version(document.id)
+        content_hash = hash_content(text)
+        version_row = self._repository.add_version(
+            KnowledgeDocumentVersion(
+                tenant_id=document.tenant_id,
+                property_id=document.property_id,
+                document_id=document.id,
+                version=version_number,
+                source_text=text,
+                content_hash=content_hash,
+                status=KnowledgeVersionStatus.PENDING.value,
+                created_by_user_id=current.user_id,
+            )
+        )
+        job = self._repository.add_job(
+            KnowledgeIngestionJob(
+                tenant_id=document.tenant_id,
+                property_id=document.property_id,
+                document_id=document.id,
+                version=version_row.version,
+                content_hash=content_hash,
+                status=KnowledgeIngestionStatus.PENDING.value,
+            )
+        )
+        self._audit.append(
+            action=AuditAction.KNOWLEDGE_DOCUMENT_VERSION_CREATED,
+            resource_type=AuditResourceType.KNOWLEDGE_DOCUMENT,
+            actor_user_id=current.user_id,
+            resource_id=document.id,
+            request_id=request_id,
+            scope_type=scope.scope_type,
+            tenant_id=document.tenant_id,
+            property_id=document.property_id,
+            details={
+                "document_id": document.id,
+                "version": version_row.version,
+                "content_hash": version_row.content_hash,
+            },
+        )
+        return version_row, job
 
     def _archive_document(
         self,
@@ -514,37 +736,22 @@ class KnowledgeService:
         claimed_property_id: int | None,
     ) -> KnowledgeDocument:
         current = self._reload(actor)
-        document = self._repository.get_document(document_id)
+        document = self._repository.get_document_for_update(document_id)
         if document is None:
             raise AppError(
                 code=KnowledgeErrorCode.NOT_FOUND,
                 message="Knowledge document was not found",
                 status_code=404,
             )
-        if (
-            claimed_tenant_id is not None
-            and claimed_tenant_id != document.tenant_id
-        ) or (
-            claimed_property_id is not None
-            and claimed_property_id != document.property_id
-        ):
-            raise AppError(
-                code=IamErrorCode.FORBIDDEN,
-                message="Permission denied",
-                status_code=403,
-            )
-        if document.property_id is None:
-            scope = OrganizationScope(
-                ScopeType.TENANT,
-                tenant_id=document.tenant_id,
-            )
-        else:
-            scope = OrganizationScope(
-                ScopeType.PROPERTY,
-                tenant_id=document.tenant_id,
-                property_id=document.property_id,
-            )
+        self._validate_claimed_scope(
+            document,
+            claimed_tenant_id=claimed_tenant_id,
+            claimed_property_id=claimed_property_id,
+        )
+        scope = self._document_scope(document)
         RbacService.require_permission(current, KNOWLEDGE_MANAGE, scope)
+        if document.status == KnowledgeDocumentStatus.ARCHIVED.value:
+            return document
         document.status = KnowledgeDocumentStatus.ARCHIVED.value
         self._audit.append(
             action=AuditAction.KNOWLEDGE_DOCUMENT_ARCHIVED,
@@ -558,6 +765,46 @@ class KnowledgeService:
             details={"document_id": document.id, "status": document.status},
         )
         return document
+
+    def _detail(self, document: KnowledgeDocument) -> KnowledgeDetail:
+        return (
+            document,
+            self._repository.list_versions(document.id),
+            self._repository.list_ingestion_jobs(document.id),
+        )
+
+    @staticmethod
+    def _document_scope(document: KnowledgeDocument) -> OrganizationScope:
+        if document.property_id is None:
+            return OrganizationScope(
+                ScopeType.TENANT,
+                tenant_id=document.tenant_id,
+            )
+        return OrganizationScope(
+            ScopeType.PROPERTY,
+            tenant_id=document.tenant_id,
+            property_id=document.property_id,
+        )
+
+    @staticmethod
+    def _validate_claimed_scope(
+        document: KnowledgeDocument,
+        *,
+        claimed_tenant_id: int | None,
+        claimed_property_id: int | None,
+    ) -> None:
+        if (
+            claimed_tenant_id is not None
+            and claimed_tenant_id != document.tenant_id
+        ) or (
+            claimed_property_id is not None
+            and claimed_property_id != document.property_id
+        ):
+            raise AppError(
+                code=IamErrorCode.FORBIDDEN,
+                message="Permission denied",
+                status_code=403,
+            )
 
     def _reload(self, actor: Principal) -> Principal:
         if actor.status != "ACTIVE":

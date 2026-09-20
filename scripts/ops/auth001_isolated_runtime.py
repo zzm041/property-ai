@@ -28,6 +28,7 @@ ISOLATED_BROKER_PASSWORD_FILE_ENV = "AUTH001_BROKER_PASSWORD_FILE"
 DEFAULT_BROKER_PASSWORD_FILE = REPO / "tmp" / "auth001-runtime" / "broker-password.txt"
 ISOLATED_REDIS_DB = 12
 ISOLATED_STORAGE_DIR = REPO / "tmp" / "auth001-objects"
+ISOLATED_MILVUS_COLLECTION = "knowledge_chunks_auth001"
 RABBIT_CONTAINER_FILTER = "property-ai-rabbitmq-1"
 
 
@@ -111,6 +112,11 @@ def build_isolated_settings(
         jwt_issuer="test-issuer",
         jwt_audience="test-audience",
         llm_provider="development",
+        embedding_provider="development",
+        reranker_provider="development",
+        milvus_uri=source.milvus_uri,
+        milvus_collection=ISOLATED_MILVUS_COLLECTION,
+        milvus_timeout_seconds=source.milvus_timeout_seconds,
         storage_provider="development",
         notification_provider="development",
         ai_auto_assign=True,
@@ -139,6 +145,12 @@ def apply_isolated_environ(settings: Settings) -> None:
     os.environ["WECHAT_PROVIDER"] = "development"
     os.environ["SMS_PROVIDER"] = "development"
     os.environ["LLM_PROVIDER"] = "development"
+    os.environ["EMBEDDING_PROVIDER"] = "development"
+    os.environ["RERANKER_PROVIDER"] = "development"
+    os.environ["MILVUS_URI"] = settings.milvus_uri
+    os.environ["MILVUS_COLLECTION"] = settings.milvus_collection
+    os.environ["MILVUS_TIMEOUT_SECONDS"] = str(settings.milvus_timeout_seconds)
+    os.environ["EMBEDDING_DIMENSIONS"] = str(settings.embedding_dimensions)
     os.environ["STORAGE_PROVIDER"] = "development"
     os.environ["AI_AUTO_ASSIGN"] = "true"
     os.environ["AI_ENQUEUE_ON_CREATE"] = "true" if settings.ai_enqueue_on_create else "false"
@@ -158,6 +170,7 @@ def describe_isolated_target(settings: Settings) -> str:
         f"queue={settings.celery_task_queue} "
         f"vhost={ISOLATED_VHOST} "
         f"redis_db={ISOLATED_REDIS_DB} "
+        f"milvus_collection={settings.milvus_collection} "
         f"ai_auto_assign={settings.ai_auto_assign} "
         f"ai_enqueue_on_create={settings.ai_enqueue_on_create}"
     )

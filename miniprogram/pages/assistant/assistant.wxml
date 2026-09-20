@@ -1,10 +1,26 @@
-<input placeholder="小区 ID" value="{{propertyId}}" bindinput="onProperty" />
-<input placeholder="例如：装修时间是什么？" bindinput="onQuestion" />
-<button class="btn" bindtap="ask">提问</button>
+<view class="card">
+  <view class="section-title">知识查询范围</view>
+  <picker range="{{properties}}" range-key="name" value="{{propertyIndex}}" bindchange="onPropertyChange">
+    <view class="picker">{{properties[propertyIndex].name || '请选择小区'}}</view>
+  </picker>
+  <view class="hint">只显示当前身份具有知识读取权限的小区。</view>
+</view>
+
+<view class="card">
+  <input placeholder="例如：装修时间有什么规定？" value="{{question}}" bindinput="onQuestion" />
+  <button class="btn" bindtap="ask">提问</button>
+</view>
+
 <view class="loading" wx:if="{{loading}}">检索中...</view>
-<view class="card" wx:if="{{answer}}">{{answer}}</view>
-<view class="empty" wx:if="{{!loading && !answer}}">输入问题后查询物业知识库</view>
+<view class="card" wx:if="{{answer}}">
+  <view class="status">状态：{{answerStatus}}</view>
+  <view>{{answer}}</view>
+</view>
+<view class="empty" wx:if="{{!loading && !answer}}">输入问题后查询当前小区可见的物业知识。</view>
+
 <view class="card" wx:for="{{citations}}" wx:key="document_id">
-  {{item.title}} {{item.source_locator}}
+  <view class="citation-title">{{item.title}} · v{{item.version}}</view>
+  <view class="locator">{{item.source_locator}}</view>
+  <view>{{item.excerpt}}</view>
 </view>
 <view class="error" wx:if="{{error}}">{{error}}</view>

@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import or_, select, update
+from sqlalchemy import func, or_, select, update
 from sqlalchemy.orm import Session
 
 from app.model.ai import Notification
@@ -22,6 +22,13 @@ class KnowledgeRepository:
 
     def get_document(self, document_id: int) -> KnowledgeDocument | None:
         return self._session.get(KnowledgeDocument, document_id)
+
+    def get_document_for_update(self, document_id: int) -> KnowledgeDocument | None:
+        return self._session.scalar(
+            select(KnowledgeDocument)
+            .where(KnowledgeDocument.id == document_id)
+            .with_for_update()
+        )
 
     def get_document_in_tenant(
         self,
@@ -142,6 +149,73 @@ class KnowledgeRepository:
     def get_user_wechat_by_unionid(self, unionid: str) -> UserWechat | None:
         return self._session.scalar(
             select(UserWechat).where(UserWechat.unionid == unionid)
+        )
+
+    def next_version(self, document_id: int) -> int:
+        current = self._session.scalar(
+            select(func.max(KnowledgeDocumentVersion.version)).where(
+                KnowledgeDocumentVersion.document_id == document_id
+            )
+        )
+        return int(current or 0) + 1
+
+    def list_versions(
+        self,
+        document_id: int,
+    ) -> tuple[KnowledgeDocumentVersion, ...]:
+        return tuple(
+            self._session.scalars(
+                select(KnowledgeDocumentVersion)
+                .where(KnowledgeDocumentVersion.document_id == document_id)
+                .order_by(KnowledgeDocumentVersion.version.desc())
+            ).all()
+        )
+
+    def list_ingestion_jobs(
+        self,
+        document_id: int,
+    ) -> tuple[KnowledgeIngestionJob, ...]:
+        return tuple(
+            self._session.scalars(
+                select(KnowledgeIngestionJob)
+                .where(KnowledgeIngestionJob.document_id == document_id)
+                .order_by(KnowledgeIngestionJob.version.desc())
+            ).all()
+        )
+
+    def list_documents_for_management(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int,
+        include_tenant_documents: bool,
+        include_property_documents: bool,
+        include_archived: bool = False,
+        after_id: int = 0,
+        limit: int = 50,
+    ) -> tuple[KnowledgeDocument, ...]:
+        targets = []
+        if include_tenant_documents:
+            targets.append(KnowledgeDocument.property_id.is_(None))
+        if include_property_documents:
+            targets.append(KnowledgeDocument.property_id == property_id)
+        if not targets:
+            return ()
+        status_filter = True
+        if not include_archived:
+            status_filter = KnowledgeDocument.status != "ARCHIVED"
+        return tuple(
+            self._session.scalars(
+                select(KnowledgeDocument)
+                .where(
+                    KnowledgeDocument.tenant_id == tenant_id,
+                    KnowledgeDocument.id > after_id,
+                    or_(*targets),
+                    status_filter,
+                )
+                .order_by(KnowledgeDocument.id)
+                .limit(limit)
+            ).all()
         )
 
     def list_user_wechat_rebind_candidates_for_update(
