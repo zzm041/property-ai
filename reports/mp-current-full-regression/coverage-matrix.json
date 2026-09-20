@@ -1611,34 +1611,34 @@
   },
   "knowledge_mgmt_rag_008": {
     "task_id": "KNOWLEDGE-MGMT-RAG-008",
-    "implementation_head": "bfbf436615b7875ca1ee24527ee335bfe21522e3",
-    "status": "CODE_REVIEW_PASS_RUNTIME_UNVERIFIED",
+    "implementation_head": "966142bfeac72c6e4ed6a34d440b9464bf859fd2",
+    "status": "RUNTIME_PAGE_EVIDENCE_READY_INDEPENDENT_REVIEW_PENDING",
     "independent_review": {
       "result": "PASS_CODE_ONLY_AFTER_FIX_2",
       "path": "reports/codex/KNOWLEDGE-MGMT-RAG-008-FIX-2-review.json",
-      "boundary": "Three bounded read-only rounds closed KB008-B1 through B4 and N1 by inspection. Python unit, 8083, Milvus, page, real model and production evidence remain unverified."
+      "boundary": "Three bounded read-only rounds closed KB008-B1 through B4 and N1 by inspection. The new runtime/page evidence at 966142b is saved and awaits its separate independent read-only review."
     },
     "current_status_overlays": [
       {
         "id": "AST-QUERY",
-        "implementation_status": "authorized_property_picker_and_version_locator_excerpt_citation_ui_wired_on_existing_retrieval_service",
-        "verification_status": "STATIC_AND_CODE_REVIEW_PASS_RUNTIME_NOT_RUN",
-        "evidence_version": "d3de8de3a755c56fd478f9cdbc48173d7623d75e / 7d242025618e6404c618aefcc82a2f8981487335 / bfbf436615b7875ca1ee24527ee335bfe21522e3",
-        "remaining_gap": "Python unit/API/8083/Milvus/page verification and real self-hosted embedding/Qwen acceptance"
+        "implementation_status": "authorized_property_picker_and_grounded_version_locator_excerpt_citation_ui_wired_on_existing_retrieval_service",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_PENDING_INDEPENDENT_REVIEW",
+        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / reports/knowledge-mgmt-rag-008",
+        "remaining_gap": "independent runtime-evidence review plus real self-hosted embedding/Qwen quality and production acceptance"
       },
       {
         "id": "KNOWLEDGE-INGEST-UI",
-        "implementation_status": "scoped_create_version_archive_status_page_and_existing_0009_ingestion_wiring_saved_as_wip",
-        "verification_status": "STATIC_AND_CODE_REVIEW_PASS_RUNTIME_NOT_RUN",
-        "evidence_version": "d3de8de3a755c56fd478f9cdbc48173d7623d75e / 7d242025618e6404c618aefcc82a2f8981487335 / bfbf436615b7875ca1ee24527ee335bfe21522e3",
-        "remaining_gap": "Python unit/API/isolated-worker/Milvus/page verification and independent review"
+        "implementation_status": "scoped_create_version_failure_preservation_worker_activation_archive_history_and_page_status_verified_on_0009",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_PENDING_INDEPENDENT_REVIEW",
+        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / reports/knowledge-mgmt-rag-008",
+        "remaining_gap": "independent runtime-evidence review and production runtime acceptance"
       },
       {
         "id": "V1-EMBEDDING-RAG",
-        "implementation_status": "development_provider_wiring_targets_named_auth001_collection_but_is_unverified",
-        "verification_status": "CODE_REVIEW_PASS_REAL_MODEL_AND_RUNTIME_BLOCKED",
-        "evidence_version": "d3de8de3a755c56fd478f9cdbc48173d7623d75e / 7d242025618e6404c618aefcc82a2f8981487335 / bfbf436615b7875ca1ee24527ee335bfe21522e3",
-        "remaining_gap": "real bge-m3/Qwen deployment, isolated runtime proof, retrieval quality, security and production acceptance"
+        "implementation_status": "development_embedding_llm_worker_and_named_auth001_collection_verified_with_grounded_citations",
+        "verification_status": "PASS_SCOPED_DEVELOPMENT_WIRING_REAL_MODEL_BLOCKED_PENDING_REVIEW",
+        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / reports/knowledge-mgmt-rag-008",
+        "remaining_gap": "real bge-m3/Qwen deployment and business-quality acceptance, production collection/runtime/security and formal release"
       }
     ]
   },
@@ -1907,11 +1907,11 @@
       },
       {
         "requirement_id": "AST-QUERY",
-        "current_implementation": "authorized_property_picker_and_version_locator_excerpt_citation_ui_wired_on_existing_retrieval_service",
-        "verification_mode_status": "STATIC_AND_CODE_REVIEW_PASS_RUNTIME_NOT_RUN",
-        "evidence_version": "d3de8de3a755c56fd478f9cdbc48173d7623d75e / 7d242025618e6404c618aefcc82a2f8981487335 / bfbf436615b7875ca1ee24527ee335bfe21522e3",
-        "remaining_gap": "Python unit/API/8083/Milvus/page verification and real self-hosted embedding/Qwen acceptance",
-        "next_action": "Restore an approved Python 3.12 runtime, then run focused unit, isolated API/worker/Milvus and actual page/citation verification"
+        "current_implementation": "authorized_property_picker_and_grounded_version_locator_excerpt_citation_ui_wired_on_existing_retrieval_service",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_PENDING_INDEPENDENT_REVIEW",
+        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / reports/knowledge-mgmt-rag-008",
+        "remaining_gap": "independent runtime-evidence review plus real self-hosted embedding/Qwen quality and production acceptance",
+        "next_action": "Complete the scoped independent evidence review; preserve real-model and production blockers"
       },
       {
         "requirement_id": "NTF-ROUND",
@@ -1995,11 +1995,11 @@
       },
       {
         "requirement_id": "KNOWLEDGE-INGEST-UI",
-        "current_implementation": "scoped_create_version_archive_status_page_and_existing_0009_ingestion_wiring_saved_as_wip",
-        "verification_mode_status": "STATIC_AND_CODE_REVIEW_PASS_RUNTIME_NOT_RUN",
-        "evidence_version": "d3de8de3a755c56fd478f9cdbc48173d7623d75e / 7d242025618e6404c618aefcc82a2f8981487335 / bfbf436615b7875ca1ee24527ee335bfe21522e3",
-        "remaining_gap": "Python unit/API/isolated-worker/Milvus/page verification and independent review",
-        "next_action": "Restore an approved Python 3.12 runtime, execute the scoped checks and fix only evidenced defects"
+        "current_implementation": "scoped_create_version_failure_preservation_worker_activation_archive_history_and_page_status_verified_on_0009",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_PENDING_INDEPENDENT_REVIEW",
+        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / reports/knowledge-mgmt-rag-008",
+        "remaining_gap": "independent runtime-evidence review and production runtime acceptance",
+        "next_action": "Complete the scoped independent evidence review, then retain the saved page/API/worker evidence until related changes"
       },
       {
         "requirement_id": "HOUSE-IMPORT-EXPORT",
@@ -2275,11 +2275,11 @@
       },
       {
         "requirement_id": "V1-EMBEDDING-RAG",
-        "current_implementation": "development_provider_wiring_targets_named_auth001_collection_but_is_unverified",
-        "verification_mode_status": "CODE_REVIEW_PASS_REAL_MODEL_AND_RUNTIME_BLOCKED",
-        "evidence_version": "d3de8de3a755c56fd478f9cdbc48173d7623d75e / 7d242025618e6404c618aefcc82a2f8981487335 / bfbf436615b7875ca1ee24527ee335bfe21522e3",
-        "remaining_gap": "real bge-m3/Qwen deployment, isolated runtime proof, retrieval quality, security and production acceptance",
-        "next_action": "Verify isolated development wiring after Python recovery; retain the separate real-model approval blocker"
+        "current_implementation": "development_embedding_llm_worker_and_named_auth001_collection_verified_with_grounded_citations",
+        "verification_mode_status": "PASS_SCOPED_DEVELOPMENT_WIRING_REAL_MODEL_BLOCKED_PENDING_REVIEW",
+        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / reports/knowledge-mgmt-rag-008",
+        "remaining_gap": "real bge-m3/Qwen deployment and business-quality acceptance, production collection/runtime/security and formal release",
+        "next_action": "Complete the independent software-evidence review; keep real-model deployment behind its separate resource approval"
       },
       {
         "requirement_id": "V1-AI-FAIL-CREATE",

@@ -1,0 +1,456 @@
+{
+  "task_id": "KNOWLEDGE-MGMT-RAG-008",
+  "recorded_at": "2026-09-20T12:10:25.122300+00:00",
+  "code_sha": "966142bfeac72c6e4ed6a34d440b9464bf859fd2",
+  "python": {
+    "executable": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+    "version": "3.12.10",
+    "architecture": "64-bit AMD64",
+    "user_site_enabled": false,
+    "dependency_reuse": "D:\\property-ai\\.venv\\Lib\\site-packages",
+    "packages": {
+      "fastapi": {
+        "version": "0.115.12",
+        "loaded_from": "D:\\property-ai\\.venv\\Lib\\site-packages\\fastapi\\__init__.py"
+      },
+      "pydantic": {
+        "version": "2.10.6",
+        "loaded_from": "D:\\property-ai\\.venv\\Lib\\site-packages\\pydantic\\__init__.py"
+      },
+      "sqlalchemy": {
+        "version": "2.0.36",
+        "loaded_from": "D:\\property-ai\\.venv\\Lib\\site-packages\\sqlalchemy\\__init__.py"
+      },
+      "pymysql": {
+        "version": "1.1.1",
+        "loaded_from": "D:\\property-ai\\.venv\\Lib\\site-packages\\pymysql\\__init__.py"
+      },
+      "cryptography": {
+        "version": "44.0.0",
+        "loaded_from": "D:\\property-ai\\.venv\\Lib\\site-packages\\cryptography\\__init__.py"
+      },
+      "pymilvus": {
+        "version": "2.5.14",
+        "loaded_from": "D:\\property-ai\\.venv\\Lib\\site-packages\\pymilvus\\__init__.py"
+      },
+      "grpcio": {
+        "version": "1.67.1",
+        "loaded_from": "D:\\property-ai\\.venv\\Lib\\site-packages\\grpc\\__init__.py"
+      },
+      "numpy": {
+        "version": "2.5.3",
+        "loaded_from": "D:\\property-ai\\.venv\\Lib\\site-packages\\numpy\\__init__.py"
+      }
+    }
+  },
+  "runtime": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "alembic": "20260919_0009",
+    "rabbit_vhost": "property_ai_auth001",
+    "rabbit_queue": "property_ai.auth001",
+    "milvus_collection": "knowledge_chunks_auth001",
+    "milvus_vector_dimension": 8,
+    "milvus_entities": 6,
+    "embedding_provider": "development",
+    "model_boundary": "DEVELOPMENT_FAKE; real bge-m3/Qwen not run"
+  },
+  "database_documents": [
+    {
+      "id": 1,
+      "tenant_id": 4,
+      "property_id": 4,
+      "title": "KB008-20260920-1933",
+      "visibility": "RESIDENT",
+      "status": "ARCHIVED",
+      "current_version": 3
+    },
+    {
+      "id": 2,
+      "tenant_id": 4,
+      "property_id": 4,
+      "title": "kb008-20260920T115828Z-99255a-internal",
+      "visibility": "STAFF_ONLY",
+      "status": "ARCHIVED",
+      "current_version": 1
+    },
+    {
+      "id": 3,
+      "tenant_id": 4,
+      "property_id": 4,
+      "title": "kb008-20260920T115828Z-99255a-concurrent",
+      "visibility": "RESIDENT",
+      "status": "ARCHIVED",
+      "current_version": 3
+    }
+  ],
+  "database_versions": [
+    {
+      "document_id": 1,
+      "version": 1,
+      "status": "SUPERSEDED",
+      "content_hash": "d0eb630c71ac96c3185dab6a745dc551b0d8980de531f03b9668937187f2f0f1",
+      "created_at": "2026-09-20 11:33:49.226802"
+    },
+    {
+      "document_id": 1,
+      "version": 2,
+      "status": "FAILED",
+      "content_hash": "44587a3a2d3a40ffa6767d08863a75da775517ab4251d78e4181e82ee6b5e81a",
+      "created_at": "2026-09-20 11:39:49.575245"
+    },
+    {
+      "document_id": 1,
+      "version": 3,
+      "status": "ACTIVE",
+      "content_hash": "ea270aac616e8f629578ba6de4003b5ba185f7611da88174ce7f2d40bdb5f20b",
+      "created_at": "2026-09-20 11:42:10.595978"
+    },
+    {
+      "document_id": 2,
+      "version": 1,
+      "status": "ACTIVE",
+      "content_hash": "5268e38e07c2cbfac716415b028443d462213b31035e38c2a6c2cb39f69215a8",
+      "created_at": "2026-09-20 11:58:35.627630"
+    },
+    {
+      "document_id": 3,
+      "version": 1,
+      "status": "SUPERSEDED",
+      "content_hash": "efe2aa8e333e3c9e374107905ac54135c6bc7f8bdb4c6075ad4d576cb1616c1c",
+      "created_at": "2026-09-20 11:58:40.231129"
+    },
+    {
+      "document_id": 3,
+      "version": 2,
+      "status": "SUPERSEDED",
+      "content_hash": "38b9ee25c72672c86a21270dd21061d382fcb02c9b2f4e5621738de04cb5324b",
+      "created_at": "2026-09-20 11:58:49.280367"
+    },
+    {
+      "document_id": 3,
+      "version": 3,
+      "status": "ACTIVE",
+      "content_hash": "dc3b77c8eb6d5f8cbf65d95a98a6bc13f6d29a5788d63538cb1b23c205016f2a",
+      "created_at": "2026-09-20 11:58:49.297910"
+    }
+  ],
+  "database_ingestion_jobs": [
+    {
+      "document_id": 1,
+      "version": 1,
+      "status": "SUCCEEDED",
+      "error_code": null,
+      "attempt": 2,
+      "started_at": "2026-09-20 11:33:49.395428",
+      "finished_at": "2026-09-20 11:33:52.754585"
+    },
+    {
+      "document_id": 1,
+      "version": 2,
+      "status": "FAILED",
+      "error_code": "KB.UNAVAILABLE",
+      "attempt": 2,
+      "started_at": "2026-09-20 11:39:49.709759",
+      "finished_at": "2026-09-20 11:39:49.731758"
+    },
+    {
+      "document_id": 1,
+      "version": 3,
+      "status": "SUCCEEDED",
+      "error_code": null,
+      "attempt": 2,
+      "started_at": "2026-09-20 11:42:10.728506",
+      "finished_at": "2026-09-20 11:42:13.836976"
+    },
+    {
+      "document_id": 2,
+      "version": 1,
+      "status": "SUCCEEDED",
+      "error_code": null,
+      "attempt": 2,
+      "started_at": "2026-09-20 11:58:35.771796",
+      "finished_at": "2026-09-20 11:58:38.852015"
+    },
+    {
+      "document_id": 3,
+      "version": 1,
+      "status": "SUCCEEDED",
+      "error_code": null,
+      "attempt": 2,
+      "started_at": "2026-09-20 11:58:40.290896",
+      "finished_at": "2026-09-20 11:58:48.355793"
+    },
+    {
+      "document_id": 3,
+      "version": 2,
+      "status": "SUCCEEDED",
+      "error_code": null,
+      "attempt": 2,
+      "started_at": "2026-09-20 11:58:49.326928",
+      "finished_at": "2026-09-20 11:58:57.386101"
+    },
+    {
+      "document_id": 3,
+      "version": 3,
+      "status": "SUCCEEDED",
+      "error_code": null,
+      "attempt": 2,
+      "started_at": "2026-09-20 11:58:57.477768",
+      "finished_at": "2026-09-20 11:59:08.037526"
+    }
+  ],
+  "database_audits": [
+    {
+      "action": "KNOWLEDGE_DOCUMENT_CREATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 1,
+      "actor_user_id": 19,
+      "request_id": "9589b9d476bd4e1985d344fb0b3a1728",
+      "created_at": "2026-09-20 11:33:49.241812"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_ACTIVATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 1,
+      "actor_user_id": 19,
+      "request_id": "9589b9d476bd4e1985d344fb0b3a1728",
+      "created_at": "2026-09-20 11:33:52.756085"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_VERSION_CREATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 1,
+      "actor_user_id": 19,
+      "request_id": "e7fdbe02470443ed84106a72793de7d1",
+      "created_at": "2026-09-20 11:39:49.579244"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_VERSION_CREATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 1,
+      "actor_user_id": 19,
+      "request_id": "f12c484a3d5f4ccb84f981b2632f3b1e",
+      "created_at": "2026-09-20 11:42:10.600980"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_ACTIVATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 1,
+      "actor_user_id": 19,
+      "request_id": "f12c484a3d5f4ccb84f981b2632f3b1e",
+      "created_at": "2026-09-20 11:42:13.837476"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_CREATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 2,
+      "actor_user_id": 19,
+      "request_id": "kb008-20260920T115828Z-99255a-create-b035f1",
+      "created_at": "2026-09-20 11:58:35.630629"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_ACTIVATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 2,
+      "actor_user_id": 19,
+      "request_id": "kb008-20260920T115828Z-99255a-create-b035f1",
+      "created_at": "2026-09-20 11:58:38.852515"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_CREATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 3,
+      "actor_user_id": 19,
+      "request_id": "kb008-20260920T115828Z-99255a-create-7a8a18",
+      "created_at": "2026-09-20 11:58:40.235272"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_ACTIVATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 3,
+      "actor_user_id": 19,
+      "request_id": "kb008-20260920T115828Z-99255a-create-7a8a18",
+      "created_at": "2026-09-20 11:58:48.356293"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_VERSION_CREATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 3,
+      "actor_user_id": 19,
+      "request_id": "kb008-20260920T115828Z-99255a-version-A",
+      "created_at": "2026-09-20 11:58:49.284367"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_VERSION_CREATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 3,
+      "actor_user_id": 19,
+      "request_id": "kb008-20260920T115828Z-99255a-version-B",
+      "created_at": "2026-09-20 11:58:49.301426"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_ACTIVATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 3,
+      "actor_user_id": 19,
+      "request_id": "kb008-20260920T115828Z-99255a-version-A",
+      "created_at": "2026-09-20 11:58:57.386602"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_ACTIVATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 3,
+      "actor_user_id": 19,
+      "request_id": "kb008-20260920T115828Z-99255a-version-B",
+      "created_at": "2026-09-20 11:59:08.037526"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_ARCHIVED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 2,
+      "actor_user_id": 19,
+      "request_id": "kb008-20260920T115828Z-99255a-archive-2",
+      "created_at": "2026-09-20 11:59:13.451804"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_ARCHIVED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 3,
+      "actor_user_id": 19,
+      "request_id": "kb008-20260920T115828Z-99255a-archive-3",
+      "created_at": "2026-09-20 11:59:13.764100"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_ARCHIVED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 1,
+      "actor_user_id": 19,
+      "request_id": "b29643f9c7ca4cc2a10feac787f1f84f",
+      "created_at": "2026-09-20 12:05:17.715373"
+    }
+  ],
+  "milvus_rows_retained_for_history": [
+    {
+      "document_id": 1,
+      "document_version": 1,
+      "tenant_id": 4,
+      "property_id": 4,
+      "visibility": "RESIDENT",
+      "chunk_id": 1
+    },
+    {
+      "document_id": 1,
+      "document_version": 3,
+      "tenant_id": 4,
+      "property_id": 4,
+      "visibility": "RESIDENT",
+      "chunk_id": 3
+    },
+    {
+      "document_id": 2,
+      "document_version": 1,
+      "tenant_id": 4,
+      "property_id": 4,
+      "visibility": "STAFF_ONLY",
+      "chunk_id": 4
+    },
+    {
+      "document_id": 3,
+      "document_version": 1,
+      "tenant_id": 4,
+      "property_id": 4,
+      "visibility": "RESIDENT",
+      "chunk_id": 5
+    },
+    {
+      "document_id": 3,
+      "document_version": 2,
+      "tenant_id": 4,
+      "property_id": 4,
+      "visibility": "RESIDENT",
+      "chunk_id": 6
+    },
+    {
+      "document_id": 3,
+      "document_version": 3,
+      "tenant_id": 4,
+      "property_id": 4,
+      "visibility": "RESIDENT",
+      "chunk_id": 7
+    }
+  ],
+  "page_acceptance": {
+    "positive_flow": [
+      "management page created document 1",
+      "worker activated version 1",
+      "failed version 2 did not replace version 1",
+      "worker activated version 3",
+      "resident query cited document 1 version 3 and grounded the Development answer",
+      "management page archived document 1 and displayed preserved history",
+      "resident re-login query returned insufficient_knowledge with zero citations"
+    ],
+    "archived_query_status": "insufficient_knowledge",
+    "archived_query_citations": [],
+    "screenshots": [
+      {
+        "file": "01-create-form.png",
+        "sha256": "7E130188D6CE1E1B5099B6CCD95D7466743873286D95FF20C6685B00887F9607",
+        "bytes": 100332
+      },
+      {
+        "file": "02-v1-succeeded.png",
+        "sha256": "4DC008CB43AA7133891D49C1FB7CBDD6FF20053F41CC414776474965B06268DE",
+        "bytes": 85972
+      },
+      {
+        "file": "03-v1-history.png",
+        "sha256": "7E2C6425601A4AFF84859350B6295279756865E48E8D46C6F3ED4FDA85EFDC10",
+        "bytes": 88142
+      },
+      {
+        "file": "04-v2-failed-v1-active.png",
+        "sha256": "143C913389695F897912D2790B477B3DF77951D46856AC343EDD149F2000DB1C",
+        "bytes": 99894
+      },
+      {
+        "file": "05-v3-active-history.png",
+        "sha256": "B5485D7B3531208A94CDC5361389E6F561B9F98B40A2949739D00AC7ABC5D349",
+        "bytes": 109226
+      },
+      {
+        "file": "06-resident-query-v3-citation.png",
+        "sha256": "0960E306D9A60035E55C9A1504B576BFE293C267A7C77EEAF29FE33C917545C2",
+        "bytes": 80241
+      },
+      {
+        "file": "07-resident-query-grounded-v3.png",
+        "sha256": "8F618CFDD4FC9E7C198FE47769D4C61A195119A1EAB7EB5EC9C088E3C2A038B7",
+        "bytes": 94691
+      },
+      {
+        "file": "08-archived-history.png",
+        "sha256": "44BE17D3226CB9D55E9527858A5459C4C6007B38FE6B82D97D7BC64C1AE09917",
+        "bytes": 147431
+      },
+      {
+        "file": "09-resident-query-after-archive.png",
+        "sha256": "7002F563A8A0DD8C3E4AC1FFA501C1CBD58DB6575BE69D7A11ABFBA4158DC4F6",
+        "bytes": 46162
+      }
+    ],
+    "actual_image_inspection": true
+  },
+  "test_results": {
+    "focused_after_fix": "20 passed, 1 warning",
+    "pure_unit_after_fix": "490 passed, 1 warning",
+    "integration_fixture_skipped": "forbidden broad DELETE and migration behavior was identified before execution"
+  },
+  "safety": {
+    "direct_database_business_writes": false,
+    "migration_run": false,
+    "shared_vhost_consumed": false,
+    "shared_services_rebuilt": false,
+    "credentials_recorded": false
+  }
+}

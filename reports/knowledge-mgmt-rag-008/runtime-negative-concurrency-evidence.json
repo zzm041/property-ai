@@ -1,0 +1,265 @@
+{
+  "task_id": "KNOWLEDGE-MGMT-RAG-008",
+  "run_tag": "kb008-20260920T115828Z-99255a",
+  "recorded_at": "2026-09-20T11:59:15.692343+00:00",
+  "code_sha": "966142bfeac72c6e4ed6a34d440b9464bf859fd2",
+  "runtime": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "alembic": "20260919_0009",
+    "rabbit_vhost": "property_ai_auth001",
+    "rabbit_queue": "property_ai.auth001",
+    "milvus_collection": "knowledge_chunks_auth001",
+    "embedding_provider": "development",
+    "embedding_dimensions": 8
+  },
+  "identities": {
+    "manager": {
+      "user_id": 19,
+      "roles": [
+        "PROPERTY_ADMIN"
+      ],
+      "scope_types": [
+        "PROPERTY"
+      ]
+    },
+    "resident": {
+      "user_id": 16,
+      "roles": [
+        "RESIDENT"
+      ],
+      "scope_types": [
+        "PROPERTY"
+      ]
+    },
+    "tenant_admin": {
+      "user_id": 18,
+      "roles": [
+        "TENANT_ADMIN"
+      ],
+      "scope_types": [
+        "TENANT"
+      ]
+    },
+    "credentials_recorded": false
+  },
+  "main_document": {
+    "document_id": 1,
+    "title": "KB008-20260920-1933",
+    "status_before_page_archive": "ACTIVE",
+    "current_version": 3
+  },
+  "authorization_negatives": {
+    "resident_create": {
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN"
+    },
+    "resident_view": {
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN"
+    },
+    "resident_archive": {
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN"
+    },
+    "claimed_tenant_mismatch": {
+      "status": 422,
+      "error_code": "KB.SCOPE_MISMATCH"
+    },
+    "missing_property": {
+      "status": 404,
+      "error_code": "KB.NOT_FOUND"
+    },
+    "mixed_role_runtime_candidates": [],
+    "mixed_role_boundary": "Runtime candidate details recorded when present; focused unit coverage remains the evidence for the two-tenant mixed-grant branch if this isolated dataset has none."
+  },
+  "staff_only": {
+    "document_id": 2,
+    "version": 1,
+    "job_status": "SUCCEEDED",
+    "resident_citation_ids": [
+      1
+    ],
+    "manager_citation_ids": [
+      1,
+      2
+    ],
+    "archived_status": "ARCHIVED"
+  },
+  "concurrency_and_repeat": {
+    "document_id": 3,
+    "first_version": 1,
+    "concurrent_results": [
+      {
+        "status": 200,
+        "version": 2,
+        "error_code": null
+      },
+      {
+        "status": 200,
+        "version": 3,
+        "error_code": null
+      }
+    ],
+    "allocated_versions": [
+      2,
+      3
+    ],
+    "current_version": 3,
+    "duplicate_task_ids": [
+      "bcaa5fbf-a8f1-4749-a938-3d55cd6fafb3",
+      "6bfe41cd-f107-438a-9eba-7b0459d5f82a"
+    ],
+    "attempt_before_after": [
+      2,
+      2
+    ],
+    "mysql_chunks_before_after": [
+      1,
+      1
+    ],
+    "milvus_rows": [
+      {
+        "chunk_id": 7,
+        "document_id": 3,
+        "document_version": 3,
+        "tenant_id": 4,
+        "property_id": 4,
+        "visibility": "RESIDENT"
+      }
+    ],
+    "archived_status": "ARCHIVED",
+    "archived_retrieval_citation_ids": [
+      1
+    ]
+  },
+  "milvus_schema": [
+    {
+      "name": "chunk_id",
+      "dtype": "5",
+      "params": {}
+    },
+    {
+      "name": "tenant_id",
+      "dtype": "5",
+      "params": {}
+    },
+    {
+      "name": "property_id",
+      "dtype": "5",
+      "params": {}
+    },
+    {
+      "name": "visibility",
+      "dtype": "21",
+      "params": {
+        "max_length": 32
+      }
+    },
+    {
+      "name": "document_id",
+      "dtype": "5",
+      "params": {}
+    },
+    {
+      "name": "document_version",
+      "dtype": "5",
+      "params": {}
+    },
+    {
+      "name": "vector",
+      "dtype": "101",
+      "params": {
+        "dim": 8
+      }
+    }
+  ],
+  "audit_rows": [
+    {
+      "action": "KNOWLEDGE_DOCUMENT_CREATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 1,
+      "request_id": "9589b9d476bd4e1985d344fb0b3a1728"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_ACTIVATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 1,
+      "request_id": "9589b9d476bd4e1985d344fb0b3a1728"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_VERSION_CREATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 1,
+      "request_id": "e7fdbe02470443ed84106a72793de7d1"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_VERSION_CREATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 1,
+      "request_id": "f12c484a3d5f4ccb84f981b2632f3b1e"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_ACTIVATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 1,
+      "request_id": "f12c484a3d5f4ccb84f981b2632f3b1e"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_CREATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 2,
+      "request_id": "kb008-20260920T115828Z-99255a-create-b035f1"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_ACTIVATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 2,
+      "request_id": "kb008-20260920T115828Z-99255a-create-b035f1"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_CREATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 3,
+      "request_id": "kb008-20260920T115828Z-99255a-create-7a8a18"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_ACTIVATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 3,
+      "request_id": "kb008-20260920T115828Z-99255a-create-7a8a18"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_VERSION_CREATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 3,
+      "request_id": "kb008-20260920T115828Z-99255a-version-A"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_VERSION_CREATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 3,
+      "request_id": "kb008-20260920T115828Z-99255a-version-B"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_ACTIVATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 3,
+      "request_id": "kb008-20260920T115828Z-99255a-version-A"
+    },
+    {
+      "action": "KNOWLEDGE_DOCUMENT_ACTIVATED",
+      "resource_type": "KNOWLEDGE_DOCUMENT",
+      "resource_id": 3,
+      "request_id": "kb008-20260920T115828Z-99255a-version-B"
+    }
+  ],
+  "boundary": {
+    "page_positive_flow": "separate DevTools evidence",
+    "api_negatives": true,
+    "direct_database_business_writes": false,
+    "migrations": false,
+    "model_mode": "DEVELOPMENT_FAKE",
+    "real_bge_m3_qwen": "NOT_RUN"
+  }
+}
