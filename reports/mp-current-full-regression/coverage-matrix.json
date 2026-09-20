@@ -1407,10 +1407,43 @@
       }
     ]
   },
+  "wo_receipt_reassign_002": {
+    "task_id": "WO-RECEIPT-REASSIGN-002",
+    "implementation_head": "75caa5e13535f6d5ed90ad695c2ebec19e0d4373",
+    "evidence_head": "406358da58f89741b973ca9ad299cf383d78e807",
+    "independent_review": {
+      "result": "PASS",
+      "path": "reports/codex/WO-RECEIPT-REASSIGN-002-review.json",
+      "boundary": "scoped isolated-local page, API and persistent-development-storage result; wx.chooseMedia input was mocked and DEVELOPMENT/Fake AI was inherited from the original AUTO assignment"
+    },
+    "current_status_overlays": [
+      {
+        "id": "WO-CANCEL-REJECT-REASSIGN-REOPEN",
+        "implementation_status": "exception_paths_wired_with_live_supervisor_reassign",
+        "verification_status": "PARTIAL",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016 / 75caa5e13535f6d5ed90ad695c2ebec19e0d4373 / 406358da58f89741b973ca9ad299cf383d78e807",
+        "remaining_gap": "composite requirement still needs broader cancellation/reopen and production exception acceptance; live supervisor REASSIGN is now closed locally"
+      },
+      {
+        "id": "V1-RECEIPT-COMPLETE",
+        "implementation_status": "complete_fields_and_explicit_before_after_media_wired",
+        "verification_status": "PASS_SCOPED_LOCAL_MOCKED_PICKER",
+        "evidence_version": "75caa5e13535f6d5ed90ad695c2ebec19e0d4373 / 406358da58f89741b973ca9ad299cf383d78e807",
+        "remaining_gap": "real-device native picker, production object storage and production scan finalization"
+      },
+      {
+        "id": "V1-MGR-EXCEPTION",
+        "implementation_status": "existing_decisions_and_supervisor_reassign_page_wired",
+        "verification_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016 / 75caa5e13535f6d5ed90ad695c2ebec19e0d4373 / 406358da58f89741b973ca9ad299cf383d78e807",
+        "remaining_gap": "broader production exception matrix; no real third-party contact was performed"
+      }
+    ]
+  },
   "current_effective_view": {
     "generated_at": "2026-09-20",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
-    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs)",
+    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced.",
     "row_count": 83,
     "rows": [
@@ -1808,10 +1841,10 @@
       },
       {
         "requirement_id": "WO-CANCEL-REJECT-REASSIGN-REOPEN",
-        "current_implementation": "implemented_and_wired_for_current_exception_slice",
+        "current_implementation": "exception_paths_wired_with_live_supervisor_reassign",
         "verification_mode_status": "PARTIAL",
-        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
-        "remaining_gap": "live supervisor REASSIGN page and full production matrix",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016 / 75caa5e13535f6d5ed90ad695c2ebec19e0d4373 / 406358da58f89741b973ca9ad299cf383d78e807",
+        "remaining_gap": "composite requirement still needs broader cancellation/reopen and production exception acceptance; live supervisor REASSIGN is now closed locally",
         "next_action": "仅针对所列剩余缺口补实现或证据"
       },
       {
@@ -1920,11 +1953,11 @@
       },
       {
         "requirement_id": "V1-RECEIPT-COMPLETE",
-        "current_implementation": "text_material_fee_fields_wired",
-        "verification_mode_status": "PARTIAL",
-        "evidence_version": "f2839370e493bc4c713f1e73edc9814bb9c419fb / f1de143a546912b0cefaa3aa6b50582feb466016",
-        "remaining_gap": "native before/after photo flow and production media",
-        "next_action": "仅针对所列剩余缺口补实现或证据"
+        "current_implementation": "complete_fields_and_explicit_before_after_media_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_MOCKED_PICKER",
+        "evidence_version": "75caa5e13535f6d5ed90ad695c2ebec19e0d4373 / 406358da58f89741b973ca9ad299cf383d78e807",
+        "remaining_gap": "real-device native picker, production object storage and production scan finalization",
+        "next_action": "保留本地软件机制证据；获批真机/生产资源后补发布验收"
       },
       {
         "requirement_id": "V1-RECEIPT-HISTORY",
@@ -1936,11 +1969,11 @@
       },
       {
         "requirement_id": "V1-MGR-EXCEPTION",
-        "current_implementation": "decision_paths_partially_wired",
-        "verification_mode_status": "PARTIAL",
-        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
-        "remaining_gap": "all decision types, external-coordination policy and page evidence",
-        "next_action": "仅针对所列剩余缺口补实现或证据"
+        "current_implementation": "existing_decisions_and_supervisor_reassign_page_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016 / 75caa5e13535f6d5ed90ad695c2ebec19e0d4373 / 406358da58f89741b973ca9ad299cf383d78e807",
+        "remaining_gap": "broader production exception matrix; no real third-party contact was performed",
+        "next_action": "无相关改动时保留证据；生产验收时补完整异常矩阵"
       },
       {
         "requirement_id": "V1-INCIDENT-AGGREGATE",

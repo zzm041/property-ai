@@ -1,0 +1,59 @@
+{
+  "task_id": "WO-RECEIPT-REASSIGN-002",
+  "phase": "review",
+  "reviewed_head": "406358da58f89741b973ca9ad299cf383d78e807",
+  "decision": "PASS",
+  "actions_or_findings": [
+    {
+      "title": "WO-RR-002-N1 | NON_BLOCKING | Photo controls are outside screenshot 05",
+      "path": "reports/work-order-receipt-reassign-002/05-receipt-media-ready.png",
+      "trigger": "Using screenshot 05 alone as visual proof that both photo controls were used.",
+      "rationale": "The image shows the populated receipt form but ends above the photo controls. The saved page flow waits for one BEFORE and one AFTER file ID, and the persistence snapshot records both phases with matching object size and hash. This limits the screenshot claim, not the scoped local result."
+    },
+    {
+      "title": "WO-RR-002-R1 | RELEASE_BLOCKER | Native picker and production media remain unverified",
+      "path": "reports/work-order-receipt-reassign-002/run-page-flow.js:289",
+      "trigger": "Claiming real-device photo selection or production media acceptance.",
+      "rationale": "The automator mocked wx.chooseMedia with a synthetic 68-byte PNG. Local upload and persistent development storage were exercised; a real native picker, production object storage, and production scan finalization were not."
+    },
+    {
+      "title": "WO-RR-002-R2 | RELEASE_BLOCKER | AUTO assignment used DEVELOPMENT AI",
+      "path": "reports/work-order-receipt-reassign-002/page-evidence.json",
+      "trigger": "Claiming real-model automatic dispatch or full Production V1 acceptance.",
+      "rationale": "Order 10 retained its earlier AUTO assignment, but that assignment used the DEVELOPMENT/Fake LLM. This slice did not verify self-hosted Qwen inference."
+    }
+  ],
+  "evidence_paths": [
+    "reports/project-handoff.md",
+    "backend/app/schema/work_order.py",
+    "backend/app/api/v1/staff_work_orders.py",
+    "backend/app/service/work_order.py",
+    "backend/tests/unit/test_work_order_receipt_media.py",
+    "backend/tests/unit/test_miniprogram_work_order_lifecycle.py",
+    "miniprogram/pages/staff-orders/detail.js",
+    "miniprogram/pages/staff-orders/detail.wxml",
+    "reports/work-order-receipt-reassign-002/page-evidence.json",
+    "reports/work-order-receipt-reassign-002/persistence-evidence.json",
+    "reports/work-order-receipt-reassign-002/01-primary-escalated.png",
+    "reports/work-order-receipt-reassign-002/02-supervisor-reassign-ready.png",
+    "reports/work-order-receipt-reassign-002/03-supervisor-after-reassign.png",
+    "reports/work-order-receipt-reassign-002/04-target-assigned.png",
+    "reports/work-order-receipt-reassign-002/05-receipt-media-ready.png",
+    "reports/work-order-receipt-reassign-002/06-receipt-submitted.png"
+  ],
+  "unverified": [
+    "The reviewer did not rerun the main session’s reported 7 targeted or 418 backend unit tests and sent no HTTP or business requests.",
+    "Foreign-file, uploader, scope, retry, and unresolved-receipt failure paths were reviewed in code and saved unit tests, not exercised live by this reviewer.",
+    "This review did not recheck live API, publisher, or worker process identity. The isolated 0009 conclusion rests on the saved page sequence and read-only database and storage snapshot.",
+    "Real-device native picker, real Qwen, production environment, and full Production V1 remain unverified."
+  ],
+  "session_note": "Independent read-only review of the focused slice at product commit 75caa5e13535f6d5ed90ad695c2ebec19e0d4373 and evidence HEAD 406358da58f89741b973ca9ad299cf383d78e807. No files were edited, tests rerun, pages operated, business requests sent, or secrets inspected. Scope used existing 0009 schema and APIs; migration 0010 remains unapproved and uncreated. The overall goal remains the frozen enterprise Production V1.",
+  "task_result": "Scoped local PASS. The API forwards explicit BEFORE and AFTER IDs; legacy file_ids remain AFTER. The service deduplicates within each phase, rejects cross-phase overlap with 422, and attaches both phases for resolved and unresolved receipts. Media checks enforce positive ID, tenant/property scope, uploader, MIME, ready storage content, size, and hash. Receipt, media, status log, and audit changes share the service-owned transaction; version conflicts and already-receipted retries return 409. The saved request sequence covers original employee accept/start/escalate, supervisor queue and reassign, target employee accept/start, two register/upload pairs, receipt POST, and final GET. The 0009 snapshot shows original AUTO assignment 10 reassigned, HUMAN assignment 11 active for employee 9, process cycles 10 then 9, target employee 9 mapped to user 44, two user-44 media rows in BEFORE/AFTER with existing objects and matching 68-byte size/hash, receipt on target cycle, matching logs and audits, and WAIT_CONFIRM. All six PNGs were visually inspected: 01 shows order 10 escalated to INTERNAL_UNRESOLVED; 02 shows supervisor selection of employee 9 and the reassign reason; 03 shows the queue cleared and load moved to employee 9; 04 shows the target’s ASSIGNED page and reassign history; 05 shows populated receipt fields but is cropped above photo controls; 06 shows WAIT_CONFIRM and RECEIPT_RESOLVED history. These establish actual page interaction and saved local API/storage persistence within the stated limits.",
+  "product_gap_changes": [
+    "Accept the receipt phase and supervisor reassignment software mechanism as a scoped isolated-local result; update the existing coverage matrix and handoff without marking native-photo or Production V1 complete.",
+    "Controlled account merge and recovery, real Embedding/RAG and self-hosted AI, SLA scheduling, notification retry/idempotency, production media, real providers, and release validation remain in Production V1 scope. ACCOUNT-MERGE-001 migration 0010 remains pending its separate decision."
+  ],
+  "schedule_risk": "On 2026-09-20, the original approximately 2026-09-21 one-week aim cannot cover the remaining frozen Production V1 gaps and formal release validation. Do not relabel this local PASS as delivery or remove features to meet the date.",
+  "next_action": "Main Codex should record this scoped PASS at HEAD 406358da58f89741b973ca9ad299cf383d78e807 in the existing coverage matrix and reports/project-handoff.md, citing the two JSON snapshots and six screenshots with the mocked-picker and Fake-AI limits. Then continue the next independent approved slice: implement and verify SLA scheduling and notification retry/idempotency within the existing schema, with targeted success and failure tests plus isolated 8083/0009 evidence and separate read-only review. Completion requires the matrix and handoff to reflect this decision and the next slice to have reviewable code and evidence; obtain separate approval only if that work requires a migration or another reserved operation.",
+  "approval_requests": []
+}
