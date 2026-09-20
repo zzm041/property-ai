@@ -71,3 +71,22 @@ def test_fake_llm_only_cites_prompt_chunk_ids() -> None:
     )
     assert payload["citation_chunk_ids"] == [11]
     assert payload["status"] == "answered"
+    assert payload["answer"] == "根据物业知识库，装修时间"
+
+
+def test_fake_llm_rag_answer_uses_selected_evidence_text() -> None:
+    llm = DevelopmentLLMProvider("success")
+    payload = llm.structured_completion(
+        prompt=(
+            "Evidence:\n"
+            "chunk-id:21 locator:visitor-guide#chunk-1\n"
+            "东门访客登记时间为工作日08:30至18:30。\n\n"
+            "Question: 东门访客登记时间是什么？"
+        ),
+        prompt_version=RAG_ANSWER_PROMPT_VERSION,
+    )
+    assert payload == {
+        "status": "answered",
+        "answer": "根据物业知识库，东门访客登记时间为工作日08:30至18:30。",
+        "citation_chunk_ids": [21],
+    }

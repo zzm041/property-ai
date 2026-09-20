@@ -92,28 +92,25 @@ class DevelopmentLLMProvider:
 
 
 def _rag_answer(prompt: str) -> dict[str, object]:
-    ids = tuple(
-        int(item)
-        for item in re.findall(r"chunk-id:(\d+)", prompt)
+    evidence = tuple(
+        (int(chunk_id), excerpt.strip())
+        for chunk_id, excerpt in re.findall(
+            r"chunk-id:(\d+)\s+locator:[^\n]*\n(.*?)(?=\nchunk-id:\d+\s+locator:|\n\nQuestion:|\Z)",
+            prompt,
+            flags=re.DOTALL,
+        )
+        if excerpt.strip()
     )
-    if not ids:
+    if not evidence:
         return {
             "status": "insufficient_knowledge",
             "answer": "",
             "citation_chunk_ids": [],
         }
-    question = prompt.rsplit("Question:", 1)[-1].strip()
-    if "忽略" in question or "ignore" in question.casefold():
-        answer = "装修施工时间为工作日 08:00-18:00，周末及法定节假日不得施工。"
-        return {
-            "status": "answered",
-            "answer": answer,
-            "citation_chunk_ids": list(ids[:2]),
-        }
     return {
         "status": "answered",
-        "answer": "根据物业知识库，装修施工时间为工作日 08:00-18:00。",
-        "citation_chunk_ids": list(ids[:2]),
+        "answer": f"根据物业知识库，{evidence[0][1]}",
+        "citation_chunk_ids": [chunk_id for chunk_id, _ in evidence[:2]],
     }
 
 
