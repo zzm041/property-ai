@@ -76,6 +76,10 @@ from app.repository.work_order import WorkOrderRepository
 from app.service.audit import AuditService
 from app.service.auth import AuthService
 from app.service.rbac import RbacService
+from app.service.sla import (
+    reset_assignment_sla_deadlines,
+    reset_response_sla_deadline,
+)
 
 T = TypeVar("T")
 logger = get_logger(__name__)
@@ -1615,6 +1619,11 @@ class WorkOrderService:
         record.accepted_at = None
         record.started_at = None
         record.resolved_at = None
+        reset_assignment_sla_deadlines(
+            self._repository,
+            work_order=record,
+            now=now,
+        )
         self._adjust_load(record, employee, delta=1)
         audit_action = (
             AuditAction.WORK_ORDER_ASSIGNED
@@ -1790,6 +1799,11 @@ class WorkOrderService:
             reason_code="ACCEPTED",
         )
         record.accepted_at = now
+        reset_response_sla_deadline(
+            self._repository,
+            work_order=record,
+            now=now,
+        )
         self._append_audit(
             action=AuditAction.WORK_ORDER_ACCEPTED,
             resource_type=AuditResourceType.WORK_ORDER,

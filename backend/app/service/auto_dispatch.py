@@ -37,6 +37,7 @@ from app.repository.employee import EmployeeRepository
 from app.repository.work_order import WorkOrderRepository
 from app.service.audit import AuditService
 from app.service.notification import NotificationService
+from app.service.sla import reset_assignment_sla_deadlines
 
 logger = get_logger(__name__)
 
@@ -413,6 +414,11 @@ class AutoDispatchService:
         record.accepted_at = None
         record.started_at = None
         record.resolved_at = None
+        reset_assignment_sla_deadlines(
+            self._work_orders,
+            work_order=record,
+            now=now,
+        )
         self._work_orders.add_log(
             WorkOrderLog(
                 tenant_id=record.tenant_id,
@@ -507,9 +513,15 @@ class AutoDispatchService:
         return frozenset(
             int(item.employee_id)
             for item in history
-            if item.status == AssignmentStatus.REJECTED.value
-            and item.ended_at is not None
+            if item.ended_at is not None
             and item.ended_at >= cutoff
+            and (
+                item.status == AssignmentStatus.REJECTED.value
+                or (
+                    item.status == AssignmentStatus.REASSIGNED.value
+                    and getattr(item, "timeout_at", None) is not None
+                )
+            )
         )
 
     def _insert_auto_assignment(

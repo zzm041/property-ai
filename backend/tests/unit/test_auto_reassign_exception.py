@@ -127,6 +127,13 @@ def test_recently_rejecting_employee_is_filtered_before_ranking() -> None:
             employee_id=7,
             status=AssignmentStatus.REJECTED.value,
             ended_at=rejected_at,
+            timeout_at=None,
+        ),
+        SimpleNamespace(
+            employee_id=9,
+            status=AssignmentStatus.REASSIGNED.value,
+            ended_at=rejected_at,
+            timeout_at=rejected_at,
         ),
     )
     service._work_orders.get_property.return_value = SimpleNamespace(
@@ -135,6 +142,7 @@ def test_recently_rejecting_employee_is_filtered_before_ranking() -> None:
     employees = (
         SimpleNamespace(id=7, user_id=17, status=EmployeeStatus.ACTIVE.value, max_capacity=8),
         SimpleNamespace(id=8, user_id=18, status=EmployeeStatus.ACTIVE.value, max_capacity=8),
+        SimpleNamespace(id=9, user_id=19, status=EmployeeStatus.ACTIVE.value, max_capacity=8),
     )
     service._ai.list_property_employees.return_value = employees
     service._ai.get_building_id.return_value = 9
@@ -174,6 +182,7 @@ def test_recently_rejecting_employee_is_filtered_before_ranking() -> None:
     assert [candidate.employee_id for candidate, _score, _reasons in ranked] == [8]
     by_employee = {item["employee_id"]: item for item in snapshot}
     assert by_employee[7]["eligible"] is False
+    assert by_employee[9]["eligible"] is False
     assert by_employee[7]["filter_reason"] == "RECENTLY_REJECTED"
     assert by_employee[8]["eligible"] is True
 

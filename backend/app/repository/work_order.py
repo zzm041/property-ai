@@ -232,6 +232,47 @@ class WorkOrderRepository:
             select(SlaClock).where(SlaClock.work_order_id == work_order_id)
         )
 
+    def get_sla_clock_for_update(self, work_order_id: int) -> SlaClock | None:
+        return self._session.scalar(
+            select(SlaClock)
+            .where(SlaClock.work_order_id == work_order_id)
+            .with_for_update()
+        )
+
+    def list_due_assignment_sla_work_orders_for_update(
+        self,
+        *,
+        now: datetime,
+        limit: int,
+        work_order_id: int | None = None,
+    ) -> tuple[WorkOrder, ...]:
+        filters = [
+            or_(
+                (WorkOrder.status == "ASSIGNED") & (SlaClock.accept_due_at <= now),
+                (WorkOrder.status == "ACCEPTED") & (SlaClock.respond_due_at <= now),
+            )
+        ]
+        if work_order_id is not None:
+            filters.append(WorkOrder.id == work_order_id)
+        return tuple(
+            self._session.scalars(
+                select(WorkOrder)
+                .join(SlaClock, SlaClock.work_order_id == WorkOrder.id)
+                .where(*filters)
+                .order_by(WorkOrder.id)
+                .limit(limit)
+                .with_for_update(skip_locked=True)
+            ).all()
+        )
+
+    def has_log_request_id(self, *, work_order_id: int, request_id: str) -> bool:
+        return self._session.scalar(
+            select(WorkOrderLog.id).where(
+                WorkOrderLog.work_order_id == work_order_id,
+                WorkOrderLog.request_id == request_id,
+            )
+        ) is not None
+
     def list_due_sla_clocks_for_update(
         self,
         *,

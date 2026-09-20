@@ -47,6 +47,7 @@ class WorkOrderEvent(StrEnum):
     APPEND = "APPEND"
     SLA_WARNING = "SLA_WARNING"
     SLA_OVERDUE = "SLA_OVERDUE"
+    SLA_RESPONSE_TIMEOUT = "SLA_RESPONSE_TIMEOUT"
 
 
 class WorkOrderCategory(StrEnum):

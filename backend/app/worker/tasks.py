@@ -236,7 +236,13 @@ def sweep_sla_task() -> dict[str, int]:
     try:
         from app.service.sla import SlaService
 
-        return SlaService(session, settings=settings).sweep_due().as_dict()
+        service = SlaService(session, settings=settings)
+        completion = service.sweep_due().as_dict()
+        assignment = service.sweep_assignment_deadlines().as_dict()
+        return {
+            **{f"completion_{key}": value for key, value in completion.items()},
+            **{f"assignment_{key}": value for key, value in assignment.items()},
+        }
     finally:
         session.close()
         engine.dispose()

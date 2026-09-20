@@ -4,6 +4,7 @@ from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
+from app.core.config import Settings
 from app.core.errors import NotificationErrorCode
 from app.provider.errors import ProviderUnavailableError
 from app.service.notification import (
@@ -11,7 +12,11 @@ from app.service.notification import (
     NotificationService,
     delivery_retry_delay_seconds,
 )
-from app.service.sla import SlaService
+from app.service.sla import (
+    SlaService,
+    reset_assignment_sla_deadlines,
+    reset_response_sla_deadline,
+)
 
 
 def _session() -> MagicMock:
@@ -144,6 +149,160 @@ def test_sla_sweep_stops_terminal_order_without_notification(monkeypatch) -> Non
     assert result.notifications == 0
     assert clock.state == "STOPPED"
     assert repository.logs == []
+
+
+def test_assignment_accept_timeout_releases_load_and_enqueues_once(monkeypatch) -> None:
+    now = datetime(2026, 9, 20, 8, 0, tzinfo=UTC)
+    clock = SimpleNamespace(
+        id=51,
+        work_order_id=61,
+        accept_due_at=now,
+        respond_due_at=now + timedelta(minutes=10),
+    )
+    record = SimpleNamespace(
+        id=61,
+        tenant_id=7,
+        property_id=9,
+        category="PLUMBING",
+        priority="MEDIUM",
+        status="ASSIGNED",
+        process_reason="NONE",
+        current_assignment_id=71,
+        version=3,
+    )
+    assignment = SimpleNamespace(
+        id=71,
+        employee_id=81,
+        status="ACTIVE",
+        timeout_at=None,
+        ended_at=None,
+        reason=None,
+    )
+    repository = MagicMock()
+    repository.list_due_assignment_sla_work_orders_for_update.side_effect = [
+        (record,),
+        (),
+    ]
+    repository.get_sla_clock_for_update.return_value = clock
+    repository.get_active_assignment_for_update.return_value = assignment
+    repository.get_active_assignee_user_id.return_value = 22
+    repository.get_property.return_value = SimpleNamespace(timezone="Asia/Shanghai")
+    repository.list_sla_management_user_ids.return_value = (20, 21)
+    employee_repository = MagicMock()
+    employee_repository.get_employee.return_value = SimpleNamespace(id=81)
+    daily = SimpleNamespace(current_load=2)
+    employee_repository.get_daily_status_for_update.return_value = daily
+    audit = MagicMock()
+    _Notifier.calls = []
+    monkeypatch.setattr("app.service.sla.NotificationService", _Notifier)
+    service = SlaService(
+        _session(),
+        repository=repository,
+        settings=Settings(app_env="test"),
+    )
+    service._employees = employee_repository
+    service._audit = audit
+    service._enqueue_redispatch = MagicMock(return_value=True)
+
+    first = service.sweep_assignment_deadlines(now=now)
+    duplicate = service.sweep_assignment_deadlines(now=now)
+
+    assert first.as_dict() == {
+        "scanned": 1,
+        "accept_timeouts": 1,
+        "response_timeouts": 0,
+        "notifications": 3,
+        "redispatch_enqueued": 1,
+    }
+    assert duplicate.scanned == 0
+    assert record.status == "PENDING_ASSIGNMENT"
+    assert record.current_assignment_id is None
+    assert record.version == 4
+    assert assignment.status == "REASSIGNED"
+    assert assignment.timeout_at == now
+    assert assignment.ended_at == now
+    assert assignment.reason == "SLA_ACCEPT_TIMEOUT"
+    assert daily.current_load == 1
+    log = repository.add_log.call_args.args[0]
+    assert log.event_code == "REASSIGN"
+    assert log.request_id == "sla-assignment:71:accept-timeout"
+    service._enqueue_redispatch.assert_called_once_with(
+        61,
+        "sla-assignment:71:accept-timeout",
+    )
+    assert {item["user_id"] for item in _Notifier.calls} == {20, 21, 22}
+    audit.append.assert_called_once()
+
+
+def test_response_timeout_escalates_once_without_reassignment(monkeypatch) -> None:
+    now = datetime(2026, 9, 20, 8, 0, tzinfo=UTC)
+    clock = SimpleNamespace(
+        id=52,
+        work_order_id=62,
+        accept_due_at=now - timedelta(minutes=10),
+        respond_due_at=now,
+    )
+    record = SimpleNamespace(
+        id=62,
+        tenant_id=7,
+        property_id=9,
+        status="ACCEPTED",
+        process_reason="NONE",
+    )
+    repository = MagicMock()
+    repository.list_due_assignment_sla_work_orders_for_update.return_value = (record,)
+    repository.get_sla_clock_for_update.return_value = clock
+    repository.has_log_request_id.side_effect = [False, True]
+    repository.list_sla_management_user_ids.return_value = (20, 21)
+    repository.get_active_assignee_user_id.return_value = 21
+    _Notifier.calls = []
+    monkeypatch.setattr("app.service.sla.NotificationService", _Notifier)
+    service = SlaService(_session(), repository=repository)
+
+    first = service.sweep_assignment_deadlines(now=now)
+    duplicate = service.sweep_assignment_deadlines(now=now)
+
+    assert first.response_timeouts == 1
+    assert first.notifications == 2
+    assert first.redispatch_enqueued == 0
+    assert duplicate.response_timeouts == 0
+    assert duplicate.notifications == 0
+    assert record.status == "ACCEPTED"
+    log = repository.add_log.call_args.args[0]
+    assert log.event_code == "SLA_RESPONSE_TIMEOUT"
+    assert log.request_id == "sla-clock:52:response-timeout"
+    assert len(_Notifier.calls) == 2
+
+
+def test_assignment_and_accept_restart_phase_deadlines() -> None:
+    assigned_at = datetime(2026, 9, 20, 8, 0, tzinfo=UTC)
+    accepted_at = assigned_at + timedelta(minutes=2)
+    clock = SimpleNamespace(accept_due_at=None, respond_due_at=None)
+    record = SimpleNamespace(
+        id=63,
+        tenant_id=7,
+        property_id=9,
+        category="PLUMBING",
+        priority="MEDIUM",
+    )
+    repository = MagicMock()
+    repository.get_sla_clock_for_update.return_value = clock
+    repository.find_sla_policy.return_value = SimpleNamespace(respond_minutes=5)
+
+    reset_assignment_sla_deadlines(
+        repository,
+        work_order=record,
+        now=assigned_at,
+    )
+    assert clock.accept_due_at == assigned_at + timedelta(minutes=5)
+    assert clock.respond_due_at == assigned_at + timedelta(minutes=5)
+
+    reset_response_sla_deadline(
+        repository,
+        work_order=record,
+        now=accepted_at,
+    )
+    assert clock.respond_due_at == accepted_at + timedelta(minutes=5)
 
 
 class _DeliveryRepository:
