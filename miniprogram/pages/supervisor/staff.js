@@ -26,6 +26,18 @@ function scopeAllows(scope, permission, property) {
   );
 }
 
+function loadAllProperties(afterId, collected) {
+  const current = collected || [];
+  return api.catalogProperties(afterId || 0).then((response) => {
+    const items = (response && response.items) || [];
+    const next = current.concat(items);
+    if (items.length < 100) {
+      return next;
+    }
+    return loadAllProperties(items[items.length - 1].id, next);
+  });
+}
+
 Page({
   data: {
     properties: [],
@@ -77,9 +89,9 @@ Page({
 
   bootstrap() {
     withLoading(this, () =>
-      Promise.all([api.me(), api.catalogProperties()]).then(([me, response]) => {
+      Promise.all([api.me(), loadAllProperties()]).then(([me, allProperties]) => {
         const scopes = me.scopes || [];
-        const properties = ((response && response.items) || [])
+        const properties = allProperties
           .filter((item) =>
             scopes.some((scope) => scopeAllows(scope, "employee:read", item))
           )

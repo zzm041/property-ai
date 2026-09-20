@@ -285,7 +285,10 @@ module.exports = {
     request({ path: "/auth/logout", method: "POST", data: { refresh_token: refreshToken || undefined } }),
   updateProfile: (displayName) =>
     request({ path: "/me/profile", method: "PATCH", data: { display_name: displayName } }),
-  catalogProperties: () => request({ path: "/properties?limit=100" }),
+  catalogProperties: (afterId) =>
+    request({
+      path: `/properties?limit=100${afterId ? `&after_id=${afterId}` : ""}`,
+    }),
   catalogBuildings: (propertyId) => request({ path: `/properties/${propertyId}/buildings` }),
   catalogUnits: (buildingId) => request({ path: `/buildings/${buildingId}/units` }),
   catalogHouses: (unitId) => request({ path: `/units/${unitId}/houses` }),
