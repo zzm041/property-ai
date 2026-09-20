@@ -669,14 +669,14 @@ class KnowledgeService:
             claimed_tenant_id=claimed_tenant_id,
             claimed_property_id=claimed_property_id,
         )
+        scope = self._document_scope(document)
+        RbacService.require_permission(current, KNOWLEDGE_MANAGE, scope)
         if document.status == KnowledgeDocumentStatus.ARCHIVED.value:
             raise AppError(
                 code=KnowledgeErrorCode.ARCHIVED,
                 message="Archived knowledge document cannot receive a new version",
                 status_code=409,
             )
-        scope = self._document_scope(document)
-        RbacService.require_permission(current, KNOWLEDGE_MANAGE, scope)
         try:
             text = self._parser.parse(filename=None, content=source_text)
         except KnowledgeParseError as exc:
@@ -685,7 +685,7 @@ class KnowledgeService:
                 message="Source text is invalid",
                 status_code=422,
             ) from exc
-        version_number = self._repository.next_version(document.id)
+        version_number = self._repository.next_version_for_update(document.id)
         content_hash = hash_content(text)
         version_row = self._repository.add_version(
             KnowledgeDocumentVersion(

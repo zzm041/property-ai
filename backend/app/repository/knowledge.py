@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import func, or_, select, update
+from sqlalchemy import or_, select, update
 from sqlalchemy.orm import Session
 
 from app.model.ai import Notification
@@ -151,11 +151,13 @@ class KnowledgeRepository:
             select(UserWechat).where(UserWechat.unionid == unionid)
         )
 
-    def next_version(self, document_id: int) -> int:
+    def next_version_for_update(self, document_id: int) -> int:
         current = self._session.scalar(
-            select(func.max(KnowledgeDocumentVersion.version)).where(
-                KnowledgeDocumentVersion.document_id == document_id
-            )
+            select(KnowledgeDocumentVersion.version)
+            .where(KnowledgeDocumentVersion.document_id == document_id)
+            .order_by(KnowledgeDocumentVersion.version.desc())
+            .limit(1)
+            .with_for_update()
         )
         return int(current or 0) + 1
 

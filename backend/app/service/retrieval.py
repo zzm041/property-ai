@@ -38,6 +38,7 @@ from app.provider.factory import (
 )
 from app.repository.employee import EmployeeRepository
 from app.repository.knowledge import KnowledgeRepository
+from app.repository.property import PropertyRepository
 from app.repository.resident import ResidentBindingRepository
 from app.service.rbac import RbacService
 
@@ -72,12 +73,14 @@ class RetrievalService:
         self,
         session: Session,
         repository: KnowledgeRepository | None = None,
+        property_repository: PropertyRepository | None = None,
         resident_repository: ResidentBindingRepository | None = None,
         employee_repository: EmployeeRepository | None = None,
         settings: Settings | None = None,
     ) -> None:
         self._session = session
         self._repository = repository or KnowledgeRepository(session)
+        self._properties = property_repository or PropertyRepository(session)
         self._residents = resident_repository or ResidentBindingRepository(session)
         self._employees = employee_repository or EmployeeRepository(session)
         self._settings = settings or get_settings()
@@ -256,6 +259,13 @@ class RetrievalService:
         property_ids.update(resident_property_ids)
         property_ids.update(employee_property_ids)
         if property_id is not None:
+            property_record = self._properties.get_property_by_id(property_id)
+            if property_record is None:
+                raise AppError(
+                    code=KnowledgeErrorCode.NOT_FOUND,
+                    message="Property was not found",
+                    status_code=404,
+                )
             if not allow_all and property_id not in property_ids:
                 raise AppError(
                     code=IamErrorCode.FORBIDDEN,
@@ -264,25 +274,21 @@ class RetrievalService:
                 )
             target = OrganizationScope(
                 ScopeType.PROPERTY,
-                tenant_id=next(iter(tenant_ids), claimed_tenant_id or 0),
+                tenant_id=property_record.tenant_id,
                 property_id=property_id,
             )
-            if target.tenant_id == 0:
-                raise AppError(
-                    code=IamErrorCode.FORBIDDEN,
-                    message="Permission denied",
-                    status_code=403,
-                )
-            RbacService.require_permission(actor, KNOWLEDGE_READ, target)
-            tenant_id = target.tenant_id
-            if claimed_tenant_id is not None and claimed_tenant_id != tenant_id:
+            if (
+                claimed_tenant_id is not None
+                and claimed_tenant_id != property_record.tenant_id
+            ):
                 raise AppError(
                     code=KnowledgeErrorCode.SCOPE_MISMATCH,
                     message="Property does not match claimed tenant",
                     status_code=422,
                 )
+            RbacService.require_permission(actor, KNOWLEDGE_READ, target)
             return RetrievalAcl(
-                tenant_id=tenant_id,
+                tenant_id=property_record.tenant_id,
                 property_ids=frozenset({property_id, 0}),
                 visibilities=frozenset(item.value for item in visibilities),
                 allow_all_properties=False,

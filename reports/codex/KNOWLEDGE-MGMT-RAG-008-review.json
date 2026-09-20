@@ -1,0 +1,69 @@
+{
+  "task_id": "KNOWLEDGE-MGMT-RAG-008",
+  "phase": "review",
+  "reviewed_head": "4a0f17b4c623d4db920fba47f016797e825df388",
+  "decision": "NEEDS_CHANGES",
+  "actions_or_findings": [
+    {
+      "title": "KB008-B1 CURRENT_TASK_BLOCKER: concurrent version allocation can collide",
+      "path": "D:\\property-ai\\backend\\app\\service\\knowledge.py:659",
+      "trigger": "Two requests create versions of the same document under MySQL repeatable-read isolation.",
+      "rationale": "Principal reload reads in the transaction before the document lock. After one request commits, the waiting request can retain an older snapshot for the plain MAX(version) query at repository/knowledge.py:154. Both can choose the same version; the unique constraint then rejects one with 409. The lock does not reliably serialize successful version creation. The mock test does not exercise two database sessions."
+    },
+    {
+      "title": "KB008-B2 CURRENT_TASK_BLOCKER: assistant can use the wrong tenant for a selected property",
+      "path": "D:\\property-ai\\backend\\app\\service\\retrieval.py:258",
+      "trigger": "A SYSTEM grant selects any property, or a user with grants in two tenants selects a property outside the tenant chosen from the grant set.",
+      "rationale": "The new picker offers properties matching grants, but the query sends only property_id. Retrieval derives tenant_id from next(iter(tenant_ids)) instead of the persisted property. SYSTEM-only grants have no tenant ID and receive 403; mixed tenant grants can search the wrong tenant's common knowledge. See miniprogram/pages/assistant/assistant.js:60-104 and retrieval.py:239-287."
+    },
+    {
+      "title": "KB008-B3 CURRENT_TASK_BLOCKER: archived status is disclosed before authorization",
+      "path": "D:\\property-ai\\backend\\app\\service\\knowledge.py:672",
+      "trigger": "An unauthorized caller posts a new version for a guessed archived document ID without optional scope claims.",
+      "rationale": "The endpoint returns KB.ARCHIVED/409 before knowledge:manage is checked at line 679. An active document returns 403, exposing the archived document's existence and state across scopes."
+    },
+    {
+      "title": "KB008-N1 NON_BLOCKING: list card shows the old ingestion job",
+      "path": "D:\\property-ai\\miniprogram\\pages\\supervisor\\knowledge.js:69",
+      "trigger": "Version 2 is pending while version 1 remains the active current_version.",
+      "rationale": "decorate() selects the job for current_version, so the list says v1 SUCCEEDED while v2 is pending. The selected document's history does show v2, limiting the impact."
+    },
+    {
+      "title": "KB008-R1 RELEASE_BLOCKER: real self-hosted RAG models remain unproven",
+      "path": "D:\\property-ai\\scripts\\ops\\auth001_isolated_runtime.py:114",
+      "trigger": "Production V1 release readiness is claimed from this isolated slice.",
+      "rationale": "AUTH001 explicitly uses DEVELOPMENT LLM, embedding, and reranker providers. This review provides no real bge-m3 or self-hosted Qwen execution evidence."
+    },
+    {
+      "title": "KB008-R2 RELEASE_BLOCKER: production storage and runtime remain unverified",
+      "path": "D:\\property-ai\\scripts\\ops\\auth001_isolated_runtime.py:118",
+      "trigger": "The isolated local wiring is treated as production deployment evidence.",
+      "rationale": "The script selects DEVELOPMENT storage and an isolated local runtime. Production storage, deployment, and operational validation remain separate release work."
+    }
+  ],
+  "evidence_paths": [
+    "D:\\property-ai\\backend\\app\\service\\knowledge.py",
+    "D:\\property-ai\\backend\\app\\repository\\knowledge.py",
+    "D:\\property-ai\\backend\\app\\service\\retrieval.py",
+    "D:\\property-ai\\backend\\tests\\unit\\test_knowledge_management.py",
+    "D:\\property-ai\\miniprogram\\pages\\assistant\\assistant.js",
+    "D:\\property-ai\\miniprogram\\pages\\supervisor\\knowledge.js",
+    "D:\\property-ai\\scripts\\ops\\auth001_isolated_runtime.py"
+  ],
+  "unverified": [
+    "Backend Python syntax and unit behavior",
+    "Two-session MySQL 0009 version concurrency and archived-ingestion races",
+    "8083/0009 ingestion, isolated Milvus collection writes and retrieval",
+    "Mini-program page behavior and citation rendering",
+    "Main-session Node, JSON, grant-helper, and diff checks were reported but were not rerun by this reviewer"
+  ],
+  "session_note": "Round 1 independent read-only review. I made no edits, ran no tests, started no processes, sent no HTTP or business requests, read no secrets or private configuration, and created no reviewer.",
+  "task_result": "Three current-task defects require changes. Static review cannot establish PASS without backend, runtime, and page evidence.",
+  "product_gap_changes": [
+    "Real self-hosted bge-m3/Qwen RAG readiness remains a release gap.",
+    "Production storage and runtime validation remain release gaps."
+  ],
+  "schedule_risk": "Python execution is currently unavailable, so the required backend and isolated runtime evidence cannot yet be completed.",
+  "next_action": "Main Codex: resolve the assistant's selected property through its persisted tenant before constructing the retrieval ACL.",
+  "approval_requests": []
+}

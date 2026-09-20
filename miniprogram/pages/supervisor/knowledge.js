@@ -68,15 +68,13 @@ function loadAllDocuments(propertyId, includeArchived, afterId, collected) {
 
 function decorate(item) {
   const jobs = item.ingestion_jobs || [];
-  const currentJob = jobs.find(
-    (job) => Number(job.version) === Number(item.current_version)
-  ) || jobs[0];
+  const latestJob = jobs[0];
   return {
     ...item,
     targetText: item.property_id ? "当前小区" : "企业全部小区",
-    jobText: currentJob
-      ? `v${currentJob.version} ${currentJob.status}${
-          currentJob.error_code ? ` · ${currentJob.error_code}` : ""
+    jobText: latestJob
+      ? `v${latestJob.version} ${latestJob.status}${
+          latestJob.error_code ? ` · ${latestJob.error_code}` : ""
         }`
       : "暂无导入任务",
   };

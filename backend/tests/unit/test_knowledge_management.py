@@ -163,7 +163,7 @@ def test_create_version_locks_document_and_records_pending_job() -> None:
         created_by_user_id=actor.user_id,
     )
     repository.get_document_for_update.return_value = document
-    repository.next_version.return_value = 2
+    repository.next_version_for_update.return_value = 2
 
     version, job = service._create_version(
         actor=actor,
@@ -181,6 +181,40 @@ def test_create_version_locks_document_and_records_pending_job() -> None:
     audit_call = audit.append.call_args.kwargs
     assert audit_call["action"] is AuditAction.KNOWLEDGE_DOCUMENT_VERSION_CREATED
     assert audit_call["details"]["version"] == 2
+
+
+def test_archived_status_is_checked_only_after_authorization() -> None:
+    actor = _principal(
+        OrganizationScope(
+            ScopeType.PROPERTY,
+            tenant_id=10,
+            property_id=99,
+        )
+    )
+    service, repository, _properties, _audit = _service(actor)
+    repository.get_document_for_update.return_value = KnowledgeDocument(
+        id=71,
+        tenant_id=10,
+        property_id=20,
+        title="archived",
+        document_type="GUIDE",
+        visibility="RESIDENT",
+        status="ARCHIVED",
+        current_version=1,
+        created_by_user_id=55,
+    )
+
+    with pytest.raises(AppError) as exc_info:
+        service._create_version(
+            actor=actor,
+            document_id=71,
+            source_text="Unauthorized content.",
+            request_id="knowledge-version-idor",
+            claimed_tenant_id=None,
+            claimed_property_id=None,
+        )
+
+    assert exc_info.value.code == IamErrorCode.FORBIDDEN
 
 
 def test_archived_document_rejects_new_version() -> None:
@@ -232,3 +266,18 @@ def test_repository_filters_authorized_targets_before_limit() -> None:
     assert "knowledge_documents.id > 100" in sql
     assert "knowledge_documents.status != 'ARCHIVED'" in sql
     assert "LIMIT 2" in sql
+
+
+def test_next_version_uses_a_current_locking_read() -> None:
+    session = MagicMock()
+    session.scalar.return_value = 4
+    repository = KnowledgeRepository(session)
+
+    assert repository.next_version_for_update(71) == 5
+
+    statement = session.scalar.call_args.args[0]
+    sql = str(statement.compile(compile_kwargs={"literal_binds": True}))
+    assert "knowledge_document_versions.document_id = 71" in sql
+    assert "ORDER BY knowledge_document_versions.version DESC" in sql
+    assert "LIMIT 1" in sql
+    assert "FOR UPDATE" in sql
