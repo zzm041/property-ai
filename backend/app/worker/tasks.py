@@ -1,5 +1,6 @@
 """Celery tasks delegate to domain services. Duplicate delivery is idempotent."""
 
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -17,6 +18,21 @@ from app.service.notification import delivery_retry_delay_seconds
 from app.worker.celery_app import celery_app
 
 logger = get_logger(__name__)
+
+_RETRYABLE_MYSQL_TRANSACTION_ERROR_CODES = frozenset({1205, 1213})
+
+
+def retryable_mysql_transaction_error_code(exc: OperationalError) -> int | None:
+    """Return the MySQL code only for transient lock/deadlock failures."""
+
+    args = getattr(getattr(exc, "orig", None), "args", ())
+    if not args:
+        return None
+    try:
+        code = int(args[0])
+    except (TypeError, ValueError):
+        return None
+    return code if code in _RETRYABLE_MYSQL_TRANSACTION_ERROR_CODES else None
 
 
 def raise_retryable_analysis_failure(analysis: object | None) -> None:
@@ -85,6 +101,18 @@ def analyze_work_order_task(self, work_order_id: int, request_id: str) -> None:
             "ai_analysis_retry",
             work_order_id=work_order_id,
             error_code=exc.error_code,
+        )
+        retries = int(getattr(self.request, "retries", 0))
+        raise self.retry(exc=exc, countdown=min(2 ** retries, 30))
+    except OperationalError as exc:
+        mysql_error_code = retryable_mysql_transaction_error_code(exc)
+        if mysql_error_code is None:
+            raise
+        session.rollback()
+        logger.warning(
+            "ai_analysis_transaction_retry",
+            work_order_id=work_order_id,
+            mysql_error_code=mysql_error_code,
         )
         retries = int(getattr(self.request, "retries", 0))
         raise self.retry(exc=exc, countdown=min(2 ** retries, 30))
