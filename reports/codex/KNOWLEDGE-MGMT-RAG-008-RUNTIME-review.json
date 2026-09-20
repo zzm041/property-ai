@@ -1,0 +1,63 @@
+{
+  "task_id": "KNOWLEDGE-MGMT-RAG-008",
+  "phase": "review",
+  "reviewed_head": "aef4fbe2d39655d0ac3dc259ef112e0f1bdcddcd",
+  "decision": "PASS",
+  "actions_or_findings": [
+    {
+      "title": "KB008-RUNTIME-01 — Scoped local Development PASS",
+      "path": "reports/knowledge-mgmt-rag-008/runtime-final-snapshot.json",
+      "trigger": "Review the saved 966142b page, API, Worker, database, and Milvus evidence.",
+      "rationale": "Inspected all nine screenshots and matched their hashes. They support v1 activation, failed v2 preserving v1, grounded v3 citation, retained archive history, and no citations after archive. Negative, concurrency, and duplicate-task records agree with the read-only SQL snapshot and isolated Worker log."
+    },
+    {
+      "title": "KB008-RUNTIME-N1 — NON_BLOCKING test-output limit",
+      "path": "reports/knowledge-mgmt-rag-008/runtime-final-snapshot.json:test_results",
+      "trigger": "Independently verify the reported 20 focused and 490 pure-unit passes.",
+      "rationale": "The exact outcomes are saved, but raw pytest output was not committed and this read-only review did not rerun tests. The other scoped runtime and page evidence is sufficient for this local verdict. Destructive integration and migration fixtures were correctly excluded."
+    },
+    {
+      "title": "KB008-RUNTIME-R1 — RELEASE_BLOCKER",
+      "path": "reports/knowledge-mgmt-rag-008/runtime-report.md:Boundaries and remaining gaps",
+      "trigger": "Claim real-model or production RAG acceptance.",
+      "rationale": "Evidence uses Development embedding and LLM with an eight-dimensional isolated collection. Real bge-m3, self-hosted Qwen, production retrieval quality and security, and Worker supervision remain unverified."
+    }
+  ],
+  "evidence_paths": [
+    "backend/app/provider/llm/__init__.py",
+    "backend/tests/unit/test_knowledge_policy.py",
+    "backend/app/service/knowledge.py",
+    "backend/app/worker/tasks.py",
+    "miniprogram/pages/supervisor/knowledge.js",
+    "miniprogram/pages/supervisor/knowledge.wxml",
+    "miniprogram/pages/assistant/assistant.js",
+    "miniprogram/pages/assistant/assistant.wxml",
+    "reports/knowledge-mgmt-rag-008/runtime-report.md",
+    "reports/knowledge-mgmt-rag-008/runtime-negative-concurrency-evidence.json",
+    "reports/knowledge-mgmt-rag-008/runtime-final-snapshot.json",
+    "reports/knowledge-mgmt-rag-008/verify-runtime.py",
+    "reports/knowledge-mgmt-rag-008/collect-final-snapshot.py",
+    "reports/knowledge-mgmt-rag-008/06-resident-query-v3-citation.png",
+    "reports/knowledge-mgmt-rag-008/07-resident-query-grounded-v3.png",
+    "reports/knowledge-mgmt-rag-008/08-archived-history.png",
+    "reports/knowledge-mgmt-rag-008/09-resident-query-after-archive.png",
+    "reports/mp-current-full-regression/coverage-matrix.json",
+    "reports/project-handoff.md"
+  ],
+  "unverified": [
+    "Raw pytest output was not separately committed; tests were not rerun.",
+    "The isolated dataset had no suitable mixed-role two-tenant runtime identity; focused unit coverage remains the evidence for that branch.",
+    "Real bge-m3, self-hosted Qwen, production RAG and Worker operation, and formal release were not verified.",
+    "The cause of the old base interpreter’s disappearance remains unknown."
+  ],
+  "session_note": "Production V1 remains the overall goal; this review covers KNOWLEDGE-MGMT-RAG-008 while ACCOUNT-MERGE-001 and its unapproved 0010 decision remain separate mainline work. The supplied evidence-commit hash does not resolve; actual HEAD is aef4fbe2d39655d0ac3dc259ef112e0f1bdcddcd. Reviewed target files are clean; unrelated working-tree changes remain. The recovered CPython 3.12.10 AMD64 executable and hash match the snapshot, which records isolated dependency reuse from .venv site-packages with user site disabled. The matrix retains 83 unique IDs and produces no completion percentage. Evidence files inspected contain no credential, token, phone, or OTP values.",
+  "task_result": "PASS for scoped local DEVELOPMENT page/API/Worker/Milvus verification on product commit 966142bfeac72c6e4ed6a34d440b9464bf859fd2. The Development RAG fix grounds its answer in selected evidence without changing Qwen or work-order analysis. This is not real-model, Production V1, Day 4, or release acceptance.",
+  "product_gap_changes": [
+    "AST-QUERY, KNOWLEDGE-INGEST-UI, and V1-EMBEDDING-RAG can move from pending independent review to scoped local Development PASS; keep real-model and production status blocked.",
+    "Real bge-m3, self-hosted Qwen, production retrieval quality/security, collection policy, and Worker supervision remain V1 release gaps.",
+    "Controlled account merge, recovery, password-change page, and the other frozen V1 gaps remain in scope."
+  ],
+  "schedule_risk": "On 2026-09-20, the original approximately 2026-09-21 one-week aim is not credible for full Production V1: 0010 decisions, real providers/models, remaining features, and production acceptance are outstanding. This scoped PASS does not change that.",
+  "next_action": "Main Codex should save this independent result, update reports/project-handoff.md and the three knowledge rows in reports/mp-current-full-regression/coverage-matrix.json to scoped local Development PASS tied to the actual evidence HEAD, preserving all 83 IDs and release blockers. Then continue an already approved current-schema software slice, such as the logged-in password-change page, through focused success/failure checks and official-session page/API evidence. Ordinary source, page, and scoped tests need no new permission; any 0010 migration or paid/real-provider operation still requires separate approval.",
+  "approval_requests": []
+}

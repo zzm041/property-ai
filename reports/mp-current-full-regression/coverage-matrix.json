@@ -1612,32 +1612,32 @@
   "knowledge_mgmt_rag_008": {
     "task_id": "KNOWLEDGE-MGMT-RAG-008",
     "implementation_head": "966142bfeac72c6e4ed6a34d440b9464bf859fd2",
-    "status": "RUNTIME_PAGE_EVIDENCE_READY_INDEPENDENT_REVIEW_PENDING",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
     "independent_review": {
-      "result": "PASS_CODE_ONLY_AFTER_FIX_2",
-      "path": "reports/codex/KNOWLEDGE-MGMT-RAG-008-FIX-2-review.json",
-      "boundary": "Three bounded read-only rounds closed KB008-B1 through B4 and N1 by inspection. The new runtime/page evidence at 966142b is saved and awaits its separate independent read-only review."
+      "result": "PASS_RUNTIME_PAGE_EVIDENCE",
+      "path": "reports/codex/KNOWLEDGE-MGMT-RAG-008-RUNTIME-review.json",
+      "boundary": "Independent read-only review at evidence HEAD aef4fbe2d39655d0ac3dc259ef112e0f1bdcddcd inspected code, all nine screenshot hashes/images, SQL/Milvus snapshots and isolated Worker evidence without rerunning tests or operating business state. Real-model and production acceptance remain excluded."
     },
     "current_status_overlays": [
       {
         "id": "AST-QUERY",
         "implementation_status": "authorized_property_picker_and_grounded_version_locator_excerpt_citation_ui_wired_on_existing_retrieval_service",
-        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_PENDING_INDEPENDENT_REVIEW",
-        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / reports/knowledge-mgmt-rag-008",
-        "remaining_gap": "independent runtime-evidence review plus real self-hosted embedding/Qwen quality and production acceptance"
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
+        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / aef4fbe2d39655d0ac3dc259ef112e0f1bdcddcd",
+        "remaining_gap": "real self-hosted embedding/Qwen quality and production acceptance"
       },
       {
         "id": "KNOWLEDGE-INGEST-UI",
         "implementation_status": "scoped_create_version_failure_preservation_worker_activation_archive_history_and_page_status_verified_on_0009",
-        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_PENDING_INDEPENDENT_REVIEW",
-        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / reports/knowledge-mgmt-rag-008",
-        "remaining_gap": "independent runtime-evidence review and production runtime acceptance"
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
+        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / aef4fbe2d39655d0ac3dc259ef112e0f1bdcddcd",
+        "remaining_gap": "production runtime acceptance"
       },
       {
         "id": "V1-EMBEDDING-RAG",
         "implementation_status": "development_embedding_llm_worker_and_named_auth001_collection_verified_with_grounded_citations",
-        "verification_status": "PASS_SCOPED_DEVELOPMENT_WIRING_REAL_MODEL_BLOCKED_PENDING_REVIEW",
-        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / reports/knowledge-mgmt-rag-008",
+        "verification_status": "PASS_SCOPED_DEVELOPMENT_WIRING_REAL_MODEL_BLOCKED",
+        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / aef4fbe2d39655d0ac3dc259ef112e0f1bdcddcd",
         "remaining_gap": "real bge-m3/Qwen deployment and business-quality acceptance, production collection/runtime/security and formal release"
       }
     ]
@@ -1908,10 +1908,10 @@
       {
         "requirement_id": "AST-QUERY",
         "current_implementation": "authorized_property_picker_and_grounded_version_locator_excerpt_citation_ui_wired_on_existing_retrieval_service",
-        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_PENDING_INDEPENDENT_REVIEW",
-        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / reports/knowledge-mgmt-rag-008",
-        "remaining_gap": "independent runtime-evidence review plus real self-hosted embedding/Qwen quality and production acceptance",
-        "next_action": "Complete the scoped independent evidence review; preserve real-model and production blockers"
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
+        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / aef4fbe2d39655d0ac3dc259ef112e0f1bdcddcd",
+        "remaining_gap": "real self-hosted embedding/Qwen quality and production acceptance",
+        "next_action": "preserve scoped local evidence; revalidate after related retrieval changes or when approved real-model resources are available"
       },
       {
         "requirement_id": "NTF-ROUND",
@@ -1996,10 +1996,10 @@
       {
         "requirement_id": "KNOWLEDGE-INGEST-UI",
         "current_implementation": "scoped_create_version_failure_preservation_worker_activation_archive_history_and_page_status_verified_on_0009",
-        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_PENDING_INDEPENDENT_REVIEW",
-        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / reports/knowledge-mgmt-rag-008",
-        "remaining_gap": "independent runtime-evidence review and production runtime acceptance",
-        "next_action": "Complete the scoped independent evidence review, then retain the saved page/API/worker evidence until related changes"
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
+        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / aef4fbe2d39655d0ac3dc259ef112e0f1bdcddcd",
+        "remaining_gap": "production runtime acceptance",
+        "next_action": "preserve scoped page/API/Worker evidence; revalidate after related knowledge-management changes"
       },
       {
         "requirement_id": "HOUSE-IMPORT-EXPORT",
@@ -2276,10 +2276,10 @@
       {
         "requirement_id": "V1-EMBEDDING-RAG",
         "current_implementation": "development_embedding_llm_worker_and_named_auth001_collection_verified_with_grounded_citations",
-        "verification_mode_status": "PASS_SCOPED_DEVELOPMENT_WIRING_REAL_MODEL_BLOCKED_PENDING_REVIEW",
-        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / reports/knowledge-mgmt-rag-008",
+        "verification_mode_status": "PASS_SCOPED_DEVELOPMENT_WIRING_REAL_MODEL_BLOCKED",
+        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / aef4fbe2d39655d0ac3dc259ef112e0f1bdcddcd",
         "remaining_gap": "real bge-m3/Qwen deployment and business-quality acceptance, production collection/runtime/security and formal release",
-        "next_action": "Complete the independent software-evidence review; keep real-model deployment behind its separate resource approval"
+        "next_action": "keep real-model deployment behind its separate resource approval; preserve the scoped Development wiring evidence"
       },
       {
         "requirement_id": "V1-AI-FAIL-CREATE",
