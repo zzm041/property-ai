@@ -158,7 +158,7 @@ Page({
     withLoading(this, () =>
       api.createAnnouncement(body).then((item) => {
         this.setData({ selectedId: item.id, notice: `草稿 ${item.id} 已保存` });
-        return this.load();
+        return this.reloadSelected(item.id);
       })
     ).catch(() => {});
   },
@@ -178,7 +178,7 @@ Page({
     withLoading(this, () =>
       api.updateAnnouncement(this.data.selectedId, body).then(() => {
         this.setData({ notice: "草稿修改已保存" });
-        return this.loadSelected(this.data.selectedId);
+        return this.reloadSelected(this.data.selectedId);
       })
     ).catch(() => {});
   },
@@ -219,6 +219,9 @@ Page({
       })
     ).catch(() => {});
   },
+  reloadSelected(id) {
+    return this.load().then(() => this.loadSelected(id));
+  },
   submitReview() {
     if (!this.data.selectedId) {
       this.setData({ error: "请先选择公告" });
@@ -227,7 +230,7 @@ Page({
     withLoading(this, () =>
       api.submitAnnouncementReview(this.data.selectedId).then(() => {
         this.setData({ notice: "已提交审核，等待有发布权限的管理员决定" });
-        return this.loadSelected(this.data.selectedId);
+        return this.reloadSelected(this.data.selectedId);
       })
     ).catch(() => {});
   },
@@ -254,7 +257,7 @@ Page({
         })
         .then(() => {
           this.setData({ notice: decision === "APPROVE" ? "公告已人工审核发布" : "公告已驳回" });
-          return this.loadSelected(this.data.selectedId);
+          return this.reloadSelected(this.data.selectedId);
         })
     ).catch(() => {});
   },
