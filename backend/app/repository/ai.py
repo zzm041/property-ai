@@ -438,7 +438,7 @@ class AiRepository:
                     WorkOrderAssignment.ended_at.is_(None),
                 )
                 .order_by(WorkOrder.created_at, WorkOrder.id)
-                .with_for_update(skip_locked=True)
+                .with_for_update()
             ).all()
         )
 

@@ -4,7 +4,9 @@ from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
+import pytest
 from sqlalchemy.dialects import mysql
+from sqlalchemy.exc import OperationalError
 
 from app.core.config import Settings
 from app.core.database import OWNED_TXN_KEY, OWNED_TXN_OBJ_KEY
@@ -115,6 +117,45 @@ def test_analysis_apply_uses_locking_content_read_before_aggregation() -> None:
     assert result is analysis
     service._work_orders.get_content_for_update.assert_called_once_with(record.id)
     service._work_orders.get_content.assert_not_called()
+
+
+def test_analysis_apply_propagates_mysql_deadlock_to_worker_retry_boundary() -> None:
+    session = MagicMock()
+    session.info = {}
+    session.in_transaction.return_value = False
+    session.get_transaction.return_value = MagicMock()
+    service = AnalysisService.__new__(AnalysisService)
+    service._session = session
+    service._work_orders = MagicMock()
+    service._ai = MagicMock()
+    deadlock = OperationalError("statement", {}, Exception(1213, "deadlock"))
+    service._work_orders.get_work_order_for_update.side_effect = deadlock
+
+    with pytest.raises(OperationalError) as raised:
+        service._apply(
+            snapshot=SimpleNamespace(work_order_id=41, analysis_id=51),
+            bundle=SimpleNamespace(asr_text=None, llm_payload=None),
+            request_id="analysis-deadlock",
+            attempt=1,
+        )
+
+    assert raised.value is deadlock
+
+
+def test_incident_capacity_query_waits_for_locked_followers() -> None:
+    session = MagicMock()
+    session.execute.return_value.all.return_value = ()
+    repository = AiRepository(session)
+
+    assert repository.list_active_incident_assignments_for_update(
+        incident_id=501,
+        exclude_assignment_id=11,
+    ) == ()
+
+    statement = session.execute.call_args.args[0]
+    sql = str(statement.compile(dialect=mysql.dialect()))
+    assert "FOR UPDATE" in sql
+    assert "SKIP LOCKED" not in sql
 
 
 def test_shared_0007_without_assignment_extensions_fails_closed() -> None:

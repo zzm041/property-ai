@@ -6,6 +6,7 @@ from unittest.mock import MagicMock
 import pytest
 from sqlalchemy.exc import OperationalError
 
+from app.core.database import retryable_mysql_transaction_error_code
 from app.core.errors import AiErrorCode
 from app.provider.errors import (
     ProviderRateLimitError,
@@ -18,7 +19,6 @@ from app.worker.tasks import (
     schedule_due_notification_deliveries_task,
     sweep_sla_task,
     raise_retryable_analysis_failure,
-    retryable_mysql_transaction_error_code,
     run_analyze_work_order,
     run_ingest_knowledge,
 )

@@ -4,7 +4,10 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
-from app.core.database import create_database_engine
+from app.core.database import (
+    create_database_engine,
+    retryable_mysql_transaction_error_code,
+)
 from app.core.errors import AiErrorCode
 from app.core.logging import get_logger
 from app.domain.ai import AnalysisStatus
@@ -18,22 +21,6 @@ from app.service.notification import delivery_retry_delay_seconds
 from app.worker.celery_app import celery_app
 
 logger = get_logger(__name__)
-
-_RETRYABLE_MYSQL_TRANSACTION_ERROR_CODES = frozenset({1205, 1213})
-
-
-def retryable_mysql_transaction_error_code(exc: OperationalError) -> int | None:
-    """Return the MySQL code only for transient lock/deadlock failures."""
-
-    args = getattr(getattr(exc, "orig", None), "args", ())
-    if not args:
-        return None
-    try:
-        code = int(args[0])
-    except (TypeError, ValueError):
-        return None
-    return code if code in _RETRYABLE_MYSQL_TRANSACTION_ERROR_CODES else None
-
 
 def raise_retryable_analysis_failure(analysis: object | None) -> None:
     """Surface retryable provider outcomes so Celery can retry and record failure."""

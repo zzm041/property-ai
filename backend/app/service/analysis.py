@@ -9,11 +9,15 @@ from time import perf_counter
 
 from pydantic import ValidationError
 from sqlalchemy import MetaData, Table, inspect as sa_inspect, update
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings, get_settings
-from app.core.database import begin_owned_transaction, require_owned_transaction
+from app.core.database import (
+    begin_owned_transaction,
+    require_owned_transaction,
+    retryable_mysql_transaction_error_code,
+)
 from app.core.errors import (
     AiErrorCode,
     AppError,
@@ -732,6 +736,14 @@ class AnalysisService:
                 return analysis
         except AppError:
             raise
+        except OperationalError as exc:
+            if retryable_mysql_transaction_error_code(exc) is not None:
+                raise
+            raise AppError(
+                code=ErrorCode.INTERNAL_ERROR,
+                message="AI analysis could not be stored",
+                status_code=500,
+            ) from exc
         except SQLAlchemyError as exc:
             raise AppError(
                 code=ErrorCode.INTERNAL_ERROR,

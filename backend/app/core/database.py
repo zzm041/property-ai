@@ -8,6 +8,7 @@ from typing import Any, Iterator, TypeVar
 
 from sqlalchemy import Engine, create_engine, event, text
 from sqlalchemy.engine import Connection, URL, make_url
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import Settings, get_settings
@@ -34,10 +35,24 @@ T = TypeVar("T")
 
 OWNED_TXN_KEY = "property_ai_owned_transaction"
 OWNED_TXN_OBJ_KEY = "property_ai_owned_transaction_obj"
+RETRYABLE_MYSQL_TRANSACTION_ERROR_CODES = frozenset({1205, 1213})
 
 
 class TransactionContractError(RuntimeError):
     """An open transaction exists without an owned outer unit, or composition lacks one."""
+
+
+def retryable_mysql_transaction_error_code(exc: OperationalError) -> int | None:
+    """Return the MySQL code only for transient lock/deadlock failures."""
+
+    args = getattr(getattr(exc, "orig", None), "args", ())
+    if not args:
+        return None
+    try:
+        code = int(args[0])
+    except (TypeError, ValueError):
+        return None
+    return code if code in RETRYABLE_MYSQL_TRANSACTION_ERROR_CODES else None
 
 
 def _owned_count(session: Session) -> int:
