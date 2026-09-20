@@ -1,0 +1,79 @@
+<view class="card">
+  <view class="section-title">管理范围</view>
+  <picker range="{{properties}}" range-key="name" value="{{propertyIndex}}" bindchange="onPropertyChange">
+    <view class="picker">{{properties[propertyIndex].name || '请选择小区'}}</view>
+  </picker>
+  <view class="hint">只显示当前身份有权查看的物业；修改操作还需 property:manage 权限。</view>
+</view>
+
+<view class="loading" wx:if="{{loading}}">加载中...</view>
+<view class="notice" wx:if="{{notice}}">{{notice}}</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>
+
+<block wx:if="{{canEdit}}">
+  <view class="card">
+    <view class="section-title">建立楼栋</view>
+    <input placeholder="楼栋编码" value="{{buildingCode}}" data-field="buildingCode" bindinput="onTextInput" />
+    <input placeholder="楼栋名称" value="{{buildingName}}" data-field="buildingName" bindinput="onTextInput" />
+    <button class="btn" bindtap="createBuilding">建立楼栋</button>
+  </view>
+
+  <view class="card">
+    <view class="section-title">建立单元</view>
+    <picker range="{{buildingOptions}}" range-key="name" value="{{buildingIndex}}" bindchange="onBuildingChange">
+      <view class="picker">{{buildingOptions[buildingIndex].name || '请先建立楼栋'}}</view>
+    </picker>
+    <input placeholder="单元编码" value="{{unitCode}}" data-field="unitCode" bindinput="onTextInput" />
+    <input placeholder="单元名称" value="{{unitName}}" data-field="unitName" bindinput="onTextInput" />
+    <button class="btn" bindtap="createUnit">建立单元</button>
+  </view>
+
+  <view class="card">
+    <view class="section-title">建立房屋</view>
+    <picker range="{{unitOptions}}" range-key="label" value="{{unitIndex}}" bindchange="onUnitChange">
+      <view class="picker">{{unitOptions[unitIndex].label || '请先建立单元'}}</view>
+    </picker>
+    <input placeholder="房号" value="{{roomNo}}" data-field="roomNo" bindinput="onTextInput" />
+    <input type="number" placeholder="楼层（可不填）" value="{{floor}}" data-field="floor" bindinput="onTextInput" />
+    <button class="btn" bindtap="createHouse">建立房屋档案</button>
+  </view>
+
+  <view class="card">
+    <view class="section-title">批量导入 / 导出</view>
+    <view class="hint">CSV 列：building_code,building_name,unit_code,unit_name,room_no,floor,status。导入整批校验并提交；冲突时不会只写入一部分。</view>
+    <textarea class="csv-box" value="{{importText}}" data-field="importText" bindinput="onTextInput" auto-height />
+    <button class="btn" bindtap="importHouses">导入 CSV 内容</button>
+    <button class="btn secondary" bindtap="exportHouses">导出并复制 CSV</button>
+  </view>
+</block>
+
+<view class="section-heading">房屋档案</view>
+<view class="empty" wx:if="{{!loading && !houses.length}}">当前小区暂无房屋档案</view>
+<view class="card house-card {{selectedHouseId == item.id ? 'selected' : ''}}" wx:for="{{houses}}" wx:key="id" data-id="{{item.id}}" bindtap="selectHouse">
+  <view class="house-title">{{item.label}}</view>
+  <view>楼层：{{item.floor === null ? '未设置' : item.floor}}</view>
+  <view>状态：{{item.status}}</view>
+</view>
+
+<view class="card" wx:if="{{selectedHouse && canEdit}}">
+  <view class="section-title">维护房屋 · {{selectedHouse.label}}</view>
+  <input placeholder="房号" value="{{editRoomNo}}" data-field="editRoomNo" bindinput="onTextInput" />
+  <input type="number" placeholder="楼层（留空表示未设置）" value="{{editFloor}}" data-field="editFloor" bindinput="onTextInput" />
+  <picker range="{{houseStatusOptions}}" value="{{selectedHouseStatusIndex}}" bindchange="onHouseStatusChange">
+    <view class="picker">状态：{{houseStatusOptions[selectedHouseStatusIndex]}}</view>
+  </picker>
+  <button class="btn" bindtap="updateHouse">保存房屋档案</button>
+</view>
+
+<view class="section-heading">住户关系历史</view>
+<view class="empty" wx:if="{{!loading && !relations.length}}">当前小区暂无住户关系记录</view>
+<view class="card" wx:for="{{relations}}" wx:key="id">
+  <view class="house-title">{{item.houseLabel}} · {{item.user_display_name}}</view>
+  <view class="hint">用户编号：{{item.user_id}}</view>
+  <view>关系：{{item.relation_type}} · {{item.status}}</view>
+  <view class="hint">生效：{{item.valid_from}}</view>
+  <view class="hint" wx:if="{{item.valid_to}}">结束：{{item.valid_to}}</view>
+  <button wx:if="{{canEdit && item.status == 'ACTIVE'}}" class="btn danger" data-id="{{item.id}}" bindtap="endRelation">结束关系并保留历史</button>
+</view>
+
+<button class="btn" bindtap="load">刷新当前档案</button>

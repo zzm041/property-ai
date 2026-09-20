@@ -119,6 +119,7 @@ class PropertyService:
         property_id: int,
         code: str,
         name: str,
+        composing: bool = False,
     ) -> Building:
         def operation() -> Building:
             property_record = self._repository.get_property(
@@ -136,7 +137,7 @@ class PropertyService:
                 )
             )
 
-        return self._execute(operation)
+        return self._execute(operation, composing=composing)
 
     def create_unit(
         self,
@@ -146,6 +147,7 @@ class PropertyService:
         building_id: int,
         code: str,
         name: str,
+        composing: bool = False,
     ) -> Unit:
         def operation() -> Unit:
             building = self._repository.get_building(
@@ -165,7 +167,7 @@ class PropertyService:
                 )
             )
 
-        return self._execute(operation)
+        return self._execute(operation, composing=composing)
 
     def create_house(
         self,
@@ -176,6 +178,7 @@ class PropertyService:
         room_no: str,
         floor: int | None = None,
         status: str = "ACTIVE",
+        composing: bool = False,
     ) -> House:
         def operation() -> House:
             unit = self._repository.get_unit(
@@ -196,7 +199,7 @@ class PropertyService:
                 )
             )
 
-        return self._execute(operation)
+        return self._execute(operation, composing=composing)
 
     @staticmethod
     def _raise_parent_not_found(parent: str) -> NoReturn:

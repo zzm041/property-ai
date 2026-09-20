@@ -1,0 +1,57 @@
+.section-title,
+.section-heading {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+}
+
+.section-heading {
+  margin: 28rpx 24rpx 12rpx;
+}
+
+.picker,
+input,
+.csv-box {
+  border: 1rpx solid #d0d5dd;
+  border-radius: 8rpx;
+  box-sizing: border-box;
+  margin: 12rpx 0;
+  padding: 18rpx;
+  width: 100%;
+}
+
+.csv-box {
+  font-family: monospace;
+  min-height: 190rpx;
+}
+
+.hint {
+  color: #667085;
+  font-size: 24rpx;
+  margin-top: 10rpx;
+  word-break: break-all;
+}
+
+.notice {
+  color: #067647;
+  margin: 16rpx 24rpx;
+}
+
+.house-card.selected {
+  border: 3rpx solid #1f4b99;
+}
+
+.house-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.secondary {
+  background: #eaf0ff;
+  color: #1f4b99;
+}
+
+.danger {
+  background: #b42318;
+}

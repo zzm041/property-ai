@@ -434,6 +434,36 @@ module.exports = {
       method: "POST",
       data: {},
     }),
+  propertyArchive: (propertyId, tenantId) =>
+    request({
+      path: `/admin/property-archive?property_id=${propertyId}&tenant_id=${tenantId}`,
+    }),
+  createBuilding: (body) =>
+    request({ path: "/admin/buildings", method: "POST", data: body }),
+  createUnit: (body) =>
+    request({ path: "/admin/units", method: "POST", data: body }),
+  createHouse: (body) =>
+    request({ path: "/admin/houses", method: "POST", data: body }),
+  updateHouse: (id, body) =>
+    request({ path: `/admin/houses/${id}`, method: "PATCH", data: body }),
+  importHouses: (body) =>
+    request({ path: "/admin/houses/import", method: "POST", data: body }),
+  exportHouses: (propertyId, tenantId) =>
+    request({
+      path: `/admin/houses/export?property_id=${propertyId}&tenant_id=${tenantId}`,
+    }),
+  residentRelationHistory: (propertyId, tenantId, afterId, houseId) =>
+    request({
+      path: `/admin/resident-house-relations?property_id=${propertyId}&tenant_id=${tenantId}&limit=100${
+        afterId ? `&after_id=${afterId}` : ""
+      }${houseId ? `&house_id=${houseId}` : ""}`,
+    }),
+  endResidentRelation: (id, status) =>
+    request({
+      path: `/admin/resident-house-relations/${id}/end`,
+      method: "POST",
+      data: { status: status || "ENDED" },
+    }),
   staffDaily: (propertyId, tenantId, afterId) =>
     request({
       path: `/supervisor/staff/daily?property_id=${propertyId}&tenant_id=${tenantId}&limit=100${

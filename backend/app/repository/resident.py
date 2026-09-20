@@ -6,6 +6,7 @@ from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.model.property import House
+from app.model.identity import User
 from app.model.resident import ResidentBindRequest, ResidentHouseRelation
 
 
@@ -43,6 +44,16 @@ class ResidentBindingRepository:
         return self._session.scalar(
             select(ResidentBindRequest)
             .where(ResidentBindRequest.id == request_id)
+            .with_for_update()
+        )
+
+    def get_relation_for_update(
+        self,
+        relation_id: int,
+    ) -> ResidentHouseRelation | None:
+        return self._session.scalar(
+            select(ResidentHouseRelation)
+            .where(ResidentHouseRelation.id == relation_id)
             .with_for_update()
         )
 
@@ -200,6 +211,40 @@ class ResidentBindingRepository:
             .distinct()
         ).all()
         return tuple(int(item) for item in rows)
+
+    def list_relation_history_for_property(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int,
+        after_id: int = 0,
+        limit: int = 50,
+        house_id: int | None = None,
+        user_id: int | None = None,
+    ) -> tuple[tuple[ResidentHouseRelation, House, User], ...]:
+        statement = (
+            select(ResidentHouseRelation, House, User)
+            .join(
+                House,
+                (House.id == ResidentHouseRelation.house_id)
+                & (House.tenant_id == ResidentHouseRelation.tenant_id)
+                & (House.property_id == ResidentHouseRelation.property_id),
+            )
+            .join(User, User.id == ResidentHouseRelation.user_id)
+            .where(
+                ResidentHouseRelation.tenant_id == tenant_id,
+                ResidentHouseRelation.property_id == property_id,
+                ResidentHouseRelation.id > after_id,
+            )
+        )
+        if house_id is not None:
+            statement = statement.where(ResidentHouseRelation.house_id == house_id)
+        if user_id is not None:
+            statement = statement.where(ResidentHouseRelation.user_id == user_id)
+        rows = self._session.execute(
+            statement.order_by(ResidentHouseRelation.id).limit(limit)
+        ).all()
+        return tuple((relation, house, user) for relation, house, user in rows)
 
     def add_bind_request(
         self,

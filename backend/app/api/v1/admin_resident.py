@@ -15,6 +15,11 @@ from app.schema.resident import (
     RejectResidentBindRequest,
     ResidentBindRequestData,
 )
+from app.schema.property import (
+    EndResidentRelationRequest,
+    ResidentRelationAdminData,
+    ResidentRelationHistoryData,
+)
 from app.service.resident import ResidentBindingService
 
 router = APIRouter(prefix="/admin", tags=["resident-binding-admin"])
@@ -138,4 +143,80 @@ def reject_resident_bind_request(
     return success_envelope(
         request,
         _request_data(record).model_dump(mode="json"),
+    )
+
+
+@router.get("/resident-house-relations")
+def list_resident_house_relations(
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[
+        ResidentBindingService, Depends(get_resident_binding_service)
+    ],
+    tenant_id: Annotated[int, Query(gt=0)],
+    property_id: Annotated[int, Query(gt=0)],
+    after_id: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=100)] = 50,
+    house_id: Annotated[int | None, Query(gt=0)] = None,
+    user_id: Annotated[int | None, Query(gt=0)] = None,
+) -> dict[str, object]:
+    pairs = service.list_property_relation_history(
+        actor=actor,
+        tenant_id=tenant_id,
+        property_id=property_id,
+        after_id=after_id,
+        limit=limit,
+        house_id=house_id,
+        user_id=user_id,
+    )
+    items = [
+        ResidentRelationAdminData(
+            id=relation.id,
+            user_id=relation.user_id,
+            user_display_name=user.display_name,
+            house_id=house.id,
+            tenant_id=house.tenant_id,
+            property_id=house.property_id,
+            unit_id=house.unit_id,
+            room_no=house.room_no,
+            relation_type=relation.relation_type,
+            status=relation.status,
+            valid_from=relation.valid_from,
+            valid_to=relation.valid_to,
+            bind_request_id=relation.bind_request_id,
+        )
+        for relation, house, user in pairs
+    ]
+    return success_envelope(
+        request,
+        ResidentRelationHistoryData(
+            items=items,
+            next_cursor=items[-1].id if len(items) == limit else None,
+        ).model_dump(mode="json"),
+    )
+
+
+@router.post("/resident-house-relations/{relation_id}/end")
+def end_resident_house_relation(
+    relation_id: int,
+    body: EndResidentRelationRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[
+        ResidentBindingService, Depends(get_resident_binding_service)
+    ],
+) -> dict[str, object]:
+    relation = service.end_relation_by_id(
+        actor=actor,
+        relation_id=relation_id,
+        status=body.status.value,
+        request_id=request_id_for(request),
+    )
+    return success_envelope(
+        request,
+        {
+            "id": relation.id,
+            "status": relation.status,
+            "valid_to": relation.valid_to,
+        },
     )

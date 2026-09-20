@@ -20,11 +20,12 @@ from app.domain.audit import AuditAction, AuditResourceType
 from app.domain.iam import OrganizationScope, Principal, ScopeType
 from app.domain.resident import (
     RESIDENT_BINDING_REVIEW,
+    RESIDENT_RELATION_READ,
     ResidentBindStatus,
     ResidentRelationStatus,
     ResidentRelationType,
 )
-from app.model.identity import Role, UserRole
+from app.model.identity import Role, User, UserRole
 from app.model.property import House
 from app.model.resident import ResidentBindRequest, ResidentHouseRelation
 from app.repository.identity import IdentityRepository
@@ -219,6 +220,87 @@ class ResidentBindingService:
             )
         return house
 
+    def list_property_relation_history(
+        self,
+        *,
+        actor: Principal,
+        tenant_id: int,
+        property_id: int,
+        after_id: int = 0,
+        limit: int = 50,
+        house_id: int | None = None,
+        user_id: int | None = None,
+    ) -> tuple[tuple[ResidentHouseRelation, House, User], ...]:
+        self._require_positive_id(tenant_id, "tenant_id")
+        self._require_positive_id(property_id, "property_id")
+        if house_id is not None:
+            self._require_positive_id(house_id, "house_id")
+        if user_id is not None:
+            self._require_positive_id(user_id, "user_id")
+        current = self._reload_actor(actor)
+        property_record = self._property_repository.get_property(
+            tenant_id=tenant_id,
+            property_id=property_id,
+        )
+        if property_record is None:
+            raise AppError(
+                code=IamErrorCode.FORBIDDEN,
+                message="Permission denied",
+                status_code=403,
+            )
+        RbacService.require_permission(
+            current,
+            RESIDENT_RELATION_READ,
+            OrganizationScope(
+                ScopeType.PROPERTY,
+                tenant_id=property_record.tenant_id,
+                property_id=property_record.id,
+            ),
+        )
+        return self._repository.list_relation_history_for_property(
+            tenant_id=property_record.tenant_id,
+            property_id=property_record.id,
+            after_id=max(after_id, 0),
+            limit=self._page_limit(limit),
+            house_id=house_id,
+            user_id=user_id,
+        )
+
+    def end_relation_by_id(
+        self,
+        *,
+        actor: Principal,
+        relation_id: int,
+        status: str,
+        request_id: str,
+    ) -> ResidentHouseRelation:
+        self._require_positive_id(relation_id, "relation_id")
+        self._validate_request_id(request_id)
+        try:
+            resolved_status = ResidentRelationStatus(status)
+        except ValueError as exc:
+            raise AppError(
+                code=ResidentErrorCode.INVALID_INPUT,
+                message="status is invalid",
+                status_code=422,
+                details={"field": "status"},
+            ) from exc
+        if resolved_status is ResidentRelationStatus.ACTIVE:
+            raise AppError(
+                code=ResidentErrorCode.INVALID_INPUT,
+                message="status is invalid",
+                status_code=422,
+                details={"field": "status"},
+            )
+        return self._execute(
+            lambda: self._end_relation_by_id(
+                actor=actor,
+                relation_id=relation_id,
+                status=resolved_status,
+                request_id=request_id,
+            )
+        )
+
     def end_relation(
         self,
         relation: ResidentHouseRelation,
@@ -237,6 +319,63 @@ class ResidentBindingService:
             ended_at=ended_at or utc_now(),
             status=status.value,
         )
+
+    def _end_relation_by_id(
+        self,
+        *,
+        actor: Principal,
+        relation_id: int,
+        status: ResidentRelationStatus,
+        request_id: str,
+    ) -> ResidentHouseRelation:
+        current = self._reload_actor(actor)
+        relation = self._repository.get_relation_for_update(relation_id)
+        if relation is None:
+            raise AppError(
+                code=ResidentErrorCode.HOUSE_NOT_FOUND,
+                message="House relation was not found",
+                status_code=404,
+            )
+        house = self._repository.get_house_in_scope(
+            tenant_id=relation.tenant_id,
+            property_id=relation.property_id,
+            house_id=relation.house_id,
+        )
+        if house is None:
+            raise AppError(
+                code=ResidentErrorCode.HOUSE_NOT_FOUND,
+                message="House relation was not found",
+                status_code=404,
+            )
+        RbacService.require_permission(
+            current,
+            RESIDENT_BINDING_REVIEW,
+            OrganizationScope(
+                ScopeType.PROPERTY,
+                tenant_id=house.tenant_id,
+                property_id=house.property_id,
+            ),
+        )
+        ended = self.end_relation(
+            relation,
+            ended_at=utc_now(),
+            status=status,
+        )
+        self._append_audit(
+            action=AuditAction.RESIDENT_HOUSE_RELATION_ENDED,
+            resource_type=AuditResourceType.RESIDENT_HOUSE_RELATION,
+            actor_user_id=current.user_id,
+            resource_id=ended.id,
+            request_id=request_id,
+            scope_type=ScopeType.PROPERTY,
+            tenant_id=ended.tenant_id,
+            property_id=ended.property_id,
+            details={
+                "house_id": ended.house_id,
+                "relation_type": ended.relation_type,
+            },
+        )
+        return ended
 
     def _create_bind_request(
         self,

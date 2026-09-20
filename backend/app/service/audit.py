@@ -214,14 +214,19 @@ class AuditService:
             cls._raise_invalid_details("details is missing required fields")
 
         sanitized = dict(candidate)
-        cls._validate_detail_values(sanitized)
+        cls._validate_detail_values(sanitized, action=action)
         scope_value = sanitized.get("scope_type")
         if scope_value is not None and scope_value != scope.scope_type.value:
             cls._raise_invalid_details("details scope_type does not match audit scope")
         return sanitized
 
     @classmethod
-    def _validate_detail_values(cls, details: dict[str, object]) -> None:
+    def _validate_detail_values(
+        cls,
+        details: dict[str, object],
+        *,
+        action: AuditAction,
+    ) -> None:
         for key, value in details.items():
             if key == "auth_method" and value not in {
                 "development",
@@ -269,6 +274,8 @@ class AuditService:
                 "user_id",
                 "employee_id",
                 "property_id",
+                "building_id",
+                "unit_id",
                 "work_order_id",
                 "analysis_id",
                 "incident_id",
@@ -318,8 +325,34 @@ class AuditService:
                     "OPEN",
                     "MONITORING",
                     "RESOLVED",
-                }:
+                } and not (
+                    value == "INACTIVE"
+                    and action
+                    in {
+                        AuditAction.PROPERTY_HOUSE_CREATED,
+                        AuditAction.PROPERTY_HOUSE_UPDATED,
+                    }
+                ):
                     cls._raise_invalid_details("status is invalid")
+            elif key in {"code", "name", "room_no"}:
+                max_length = 64 if key in {"code", "room_no"} else 200
+                if (
+                    not isinstance(value, str)
+                    or not value.strip()
+                    or value != value.strip()
+                    or len(value) > max_length
+                ):
+                    cls._raise_invalid_details(f"{key} is invalid")
+            elif key == "floor":
+                if value is not None and (
+                    not isinstance(value, int)
+                    or isinstance(value, bool)
+                    or value < -128
+                    or value > 127
+                ):
+                    cls._raise_invalid_details("floor is invalid")
+            elif key == "batch_import" and not isinstance(value, bool):
+                cls._raise_invalid_details("batch_import is invalid")
             elif key == "error_code":
                 if (
                     not isinstance(value, str)

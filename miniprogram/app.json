@@ -20,6 +20,7 @@
     "pages/supervisor/announcements",
     "pages/supervisor/bindings",
     "pages/supervisor/staff",
+    "pages/supervisor/properties",
     "pages/notifications/list",
     "pages/dev-login/dev-login"
   ],

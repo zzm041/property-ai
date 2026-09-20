@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from app.api.v1.admin_announcements import router as admin_announcements_router
 from app.api.v1.admin_employee import router as admin_employee_router
 from app.api.v1.admin_knowledge import router as admin_knowledge_router
+from app.api.v1.admin_property import router as admin_property_router
 from app.api.v1.admin_resident import router as admin_resident_router
 from app.api.v1.announcements import router as announcements_router
 from app.api.v1.assistant import router as assistant_router
@@ -36,6 +37,7 @@ def build_api_router(settings: Settings) -> APIRouter:
     router.include_router(property_catalog_router)
     router.include_router(resident_router)
     router.include_router(admin_resident_router)
+    router.include_router(admin_property_router)
     router.include_router(admin_employee_router)
     router.include_router(staff_attendance_router)
     router.include_router(employee_claim_router)

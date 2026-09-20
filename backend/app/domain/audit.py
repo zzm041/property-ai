@@ -35,6 +35,10 @@ class AuditAction(StrEnum):
     RESIDENT_BIND_REQUEST_APPROVED = "RESIDENT_BIND_REQUEST_APPROVED"
     RESIDENT_BIND_REQUEST_REJECTED = "RESIDENT_BIND_REQUEST_REJECTED"
     RESIDENT_HOUSE_RELATION_ENDED = "RESIDENT_HOUSE_RELATION_ENDED"
+    PROPERTY_BUILDING_CREATED = "PROPERTY_BUILDING_CREATED"
+    PROPERTY_UNIT_CREATED = "PROPERTY_UNIT_CREATED"
+    PROPERTY_HOUSE_CREATED = "PROPERTY_HOUSE_CREATED"
+    PROPERTY_HOUSE_UPDATED = "PROPERTY_HOUSE_UPDATED"
     EMPLOYEE_CREATED = "EMPLOYEE_CREATED"
     EMPLOYEE_UPDATED = "EMPLOYEE_UPDATED"
     EMPLOYEE_DUTY_CREATED = "EMPLOYEE_DUTY_CREATED"
@@ -78,6 +82,9 @@ class AuditResourceType(StrEnum):
     PERMISSION = "PERMISSION"
     RESIDENT_BIND_REQUEST = "RESIDENT_BIND_REQUEST"
     RESIDENT_HOUSE_RELATION = "RESIDENT_HOUSE_RELATION"
+    BUILDING = "BUILDING"
+    UNIT = "UNIT"
+    HOUSE = "HOUSE"
     EMPLOYEE = "EMPLOYEE"
     DUTY = "DUTY"
     SKILL = "SKILL"
@@ -131,6 +138,15 @@ _RESIDENT_APPROVE_DETAIL_KEYS = frozenset(
     {"house_id", "relation_type", "relation_id"}
 )
 _RESIDENT_RELATION_DETAIL_KEYS = frozenset({"house_id", "relation_type"})
+_PROPERTY_BUILDING_DETAIL_KEYS = frozenset(
+    {"code", "name", "batch_import"}
+)
+_PROPERTY_UNIT_DETAIL_KEYS = frozenset(
+    {"building_id", "code", "name", "batch_import"}
+)
+_PROPERTY_HOUSE_DETAIL_KEYS = frozenset(
+    {"unit_id", "room_no", "floor", "status", "batch_import"}
+)
 _EMPLOYEE_CREATED_DETAIL_KEYS = frozenset({"employee_no", "user_id"})
 _EMPLOYEE_UPDATED_DETAIL_KEYS = frozenset(
     {
@@ -332,6 +348,34 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             resource_type=AuditResourceType.RESIDENT_HOUSE_RELATION,
             allowed_detail_keys=_RESIDENT_RELATION_DETAIL_KEYS,
             required_detail_keys=_RESIDENT_RELATION_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.PROPERTY_BUILDING_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.BUILDING,
+            allowed_detail_keys=_PROPERTY_BUILDING_DETAIL_KEYS,
+            required_detail_keys=frozenset({"code", "name", "batch_import"}),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.PROPERTY_UNIT_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.UNIT,
+            allowed_detail_keys=_PROPERTY_UNIT_DETAIL_KEYS,
+            required_detail_keys=frozenset(
+                {"building_id", "code", "name", "batch_import"}
+            ),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.PROPERTY_HOUSE_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.HOUSE,
+            allowed_detail_keys=_PROPERTY_HOUSE_DETAIL_KEYS,
+            required_detail_keys=frozenset(
+                {"unit_id", "room_no", "floor", "status", "batch_import"}
+            ),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.PROPERTY_HOUSE_UPDATED: AuditActionPolicy(
+            resource_type=AuditResourceType.HOUSE,
+            allowed_detail_keys=_PROPERTY_HOUSE_DETAIL_KEYS,
+            required_detail_keys=frozenset({"unit_id", "room_no", "floor", "status"}),
             allowed_scope_types=frozenset({ScopeType.PROPERTY}),
         ),
         AuditAction.EMPLOYEE_CREATED: AuditActionPolicy(
