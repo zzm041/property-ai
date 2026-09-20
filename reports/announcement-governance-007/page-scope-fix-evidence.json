@@ -1,0 +1,21 @@
+{
+  "task_id": "ANNOUNCEMENT-GOVERNANCE-007-FIX-2",
+  "run_id": "ann007-scope-mu9jry6c",
+  "code_sha": "09e2253c176257ae03f32ed4338627835bbaccda",
+  "automator_ws": "ws://127.0.0.1:9435",
+  "api": "http://127.0.0.1:8083/api/v1",
+  "auth": "official SMS page controls with DEVELOPMENT SMS provider",
+  "verified_property_id": 4,
+  "verified_tenant_id": 4,
+  "checks": {
+    "property_id_only_tenant_admin_capabilities": true,
+    "selected_tenant_target_uses_tenant_grant": true,
+    "mismatched_route_tenant_ignored": true,
+    "property_admin_tenant_target_hidden": true,
+    "no_business_state_created": true
+  },
+  "screenshots": [
+    "04-property-id-only-tenant.png",
+    "05-mismatched-route-property.png"
+  ]
+}

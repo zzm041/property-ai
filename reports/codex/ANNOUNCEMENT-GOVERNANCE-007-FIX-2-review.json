@@ -1,0 +1,61 @@
+{
+  "task_id": "ANNOUNCEMENT-GOVERNANCE-007",
+  "phase": "review",
+  "reviewed_head": "09e2253c176257ae03f32ed4338627835bbaccda",
+  "decision": "PASS",
+  "actions_or_findings": [
+    {
+      "title": "ANN007-B3 [CURRENT_TASK_BLOCKER, CLOSED] Page uses the selected property's tenant and matching grants",
+      "path": "miniprogram/pages/supervisor/announcements.js:136",
+      "trigger": "A tenant administrator opens a propertyId-only route, or a route supplies a mismatched tenantId.",
+      "rationale": "The page ignores route tenantId, obtains tenant_id from the catalog property, and checks publish permission against the matching tenant or property grant. The saved helper cases and page automation support both routes. The first opened PNG shows TENANT-target announcement #10 selected with publish history; the second shows the property administrator form. Automation checks the full item array and confirms #10 is absent. Neither image shows resident private data."
+    },
+    {
+      "title": "ANN007-N2 [NON_BLOCKING] Catalog membership is not management authorization",
+      "path": "backend/app/service/property_catalog.py:18",
+      "trigger": "An authenticated user supplies a propertyId outside their management grants.",
+      "rationale": "The catalog ignores the actor and returns all properties under active tenants, so verifiedProperty confirms catalog presence, not management permission. Matching grant checks in the page and target-scope authorization on the server prevent this from reopening B3. The catalog should not be described as permission-filtered in the handoff."
+    },
+    {
+      "title": "ANN007-N1 [NON_BLOCKING] Cross-property tenant visibility remains unverified",
+      "path": "reports/announcement-governance-007/runtime-fix1-evidence.json",
+      "trigger": "A tenant-wide announcement must reach residents in a second property.",
+      "rationale": "The saved local runtime case does not establish delivery across two properties. This does not block the page-scope fix."
+    },
+    {
+      "title": "ANN007-R1 [RELEASE_BLOCKER] Shared RabbitMQ replay remains open",
+      "path": "reports/project-handoff.md:83",
+      "trigger": "Formal release disposition of the recorded shared-vhost replay.",
+      "rationale": "The handoff retains this release issue. No shared messages were inspected or operated; it does not block this local slice."
+    }
+  ],
+  "evidence_paths": [
+    "reports/project-handoff.md",
+    "miniprogram/pages/supervisor/announcements.js",
+    "miniprogram/services/api.js",
+    "miniprogram/pages/home/home.js",
+    "backend/app/domain/iam.py",
+    "backend/app/api/v1/property_catalog.py",
+    "backend/app/service/property_catalog.py",
+    "backend/app/repository/property.py",
+    "reports/announcement-governance-007/page-scope-helper-evidence.json",
+    "reports/announcement-governance-007/page-scope-fix-evidence.json",
+    "reports/announcement-governance-007/run-scope-route-page.js",
+    "reports/announcement-governance-007/04-property-id-only-tenant.png",
+    "reports/announcement-governance-007/05-mismatched-route-property.png"
+  ],
+  "unverified": [
+    "I did not rerun Node syntax, git diff --check, helper cases, or the reported 9 focused tests.",
+    "I did not operate pages, send requests, inspect live processes, or verify the saved 8083/0009 runtime live.",
+    "The mixed-grant case has pure helper evidence, not an actual mixed-grant page session. Cross-property resident visibility remains unverified."
+  ],
+  "session_note": "Independent read-only review of B3 and direct regression in 90752f3..09e2253. Actual HEAD is 09e2253. I read the bounded source, catalog call context, saved evidence and automation, and opened both required PNGs; I made no workspace or business-state changes. The overall goal remains frozen Production V1. B1, B2 and C1 remain closed with no new contrary evidence. Approval scope is the existing 0009 schema; 0010/account merge is separate and unapproved. The handoff predates this fix, so verified HEAD and task evidence supply the current slice result. Open issues are N1, N2 and R1.",
+  "task_result": "B3 is closed and ANNOUNCEMENT-GOVERNANCE-007 passes this bounded local review. Evidence is from DEVELOPMENT SMS with no AI use; it is not production or whole Production V1 acceptance.",
+  "product_gap_changes": [
+    "Announcement governance's B3 page-scope blocker is closed; B1, B2 and C1 stay closed. N1 remains nonblocking and R1 remains a release blocker.",
+    "Controlled merge and recovery, real self-hosted AI auto-assignment, real Embedding/RAG, production providers and storage, and release validation remain in Production V1 scope."
+  ],
+  "schedule_risk": "As of 2026-09-20, the approximate 2026-09-21 one-week aim cannot cover the remaining frozen Production V1 gaps. This local DEVELOPMENT result must not be presented as formal delivery.",
+  "next_action": "Main Codex: update reports/project-handoff.md with the scoped ANN007 PASS at HEAD 09e2253, links to the two page-scope evidence files and PNGs, and the N1/N2/R1 limits. Completion means the handoff accurately states that the catalog is authenticated but not permission-filtered and preserves the remaining V1 gaps. This documentation operation needs no new approval; do not perform the unapproved 0010 migration or shared RabbitMQ operation.",
+  "approval_requests": []
+}

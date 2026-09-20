@@ -1,0 +1,116 @@
+{
+  "task_id": "ANNOUNCEMENT-GOVERNANCE-007",
+  "run_id": "f125d864ec",
+  "code_sha": "0eb299c325572acea4fdd2e9f8252f82cdcd2cc8",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "migration": "20260919_0009",
+    "provider_boundary": "DEVELOPMENT SMS; no AI used"
+  },
+  "manager": {
+    "user_id": 5,
+    "role_code": "TENANT_ADMIN",
+    "phone_masked": "139****4447",
+    "official_sms_session": true
+  },
+  "primary_announcement": {
+    "id": 2,
+    "property_id": 1,
+    "matching_user_id": 4,
+    "matching_phone_masked": "139****7744",
+    "outside_target_available": false,
+    "outside_target_hidden": null,
+    "api_history_actions": [
+      "ANNOUNCEMENT_DRAFT_CREATED",
+      "ANNOUNCEMENT_SUBMITTED",
+      "ANNOUNCEMENT_REJECTED",
+      "ANNOUNCEMENT_UPDATED",
+      "ANNOUNCEMENT_SUBMITTED",
+      "ANNOUNCEMENT_PUBLISHED"
+    ],
+    "api_review_decisions": [
+      "REJECT",
+      "APPROVE"
+    ],
+    "persisted": {
+      "id": 2,
+      "status": "PUBLISHED",
+      "title": "ANN007 合成公告 f125d864ec 修订",
+      "reviewed_by_user_id": 5,
+      "published_by_user_id": 5
+    },
+    "scopes": [
+      {
+        "scope_type": "UNIT",
+        "building_id": 1,
+        "unit_id": 1,
+        "audience": "RESIDENT"
+      }
+    ],
+    "reviews": [
+      {
+        "decision": "REJECT",
+        "reason": "请缩小到本轮目标单元",
+        "reviewer_user_id": 5
+      },
+      {
+        "decision": "APPROVE",
+        "reason": null,
+        "reviewer_user_id": 5
+      }
+    ],
+    "audits": [
+      {
+        "action": "ANNOUNCEMENT_DRAFT_CREATED",
+        "request_id": "ann007-f125d864ec-draft"
+      },
+      {
+        "action": "ANNOUNCEMENT_SUBMITTED",
+        "request_id": "ann007-f125d864ec-submit-1"
+      },
+      {
+        "action": "ANNOUNCEMENT_REJECTED",
+        "request_id": "ann007-f125d864ec-reject"
+      },
+      {
+        "action": "ANNOUNCEMENT_UPDATED",
+        "request_id": "ann007-f125d864ec-edit"
+      },
+      {
+        "action": "ANNOUNCEMENT_SUBMITTED",
+        "request_id": "ann007-f125d864ec-submit-2"
+      },
+      {
+        "action": "ANNOUNCEMENT_PUBLISHED",
+        "request_id": "ann007-f125d864ec-approve"
+      }
+    ],
+    "notification_user_count": 1
+  },
+  "tenant_target": {
+    "id": 3,
+    "other_property_available": false,
+    "other_property_visible": null
+  },
+  "staff_target": {
+    "id": 4,
+    "staff_available": true,
+    "staff_visible": true,
+    "resident_hidden": true
+  },
+  "checks": {
+    "early_publish_rejected": true,
+    "reject_reason_required": true,
+    "reject_edit_resubmit_publish": true,
+    "review_history_preserved": true,
+    "edit_publish_audit_history_preserved": true,
+    "unit_target_matching_resident_visible": true,
+    "unit_target_outsider_hidden": null,
+    "tenant_scope_created": true,
+    "tenant_cross_property_verified": null,
+    "staff_audience_verified": true,
+    "business_state_writes_via_api_only": true,
+    "database_evidence_queries_read_only": true
+  }
+}

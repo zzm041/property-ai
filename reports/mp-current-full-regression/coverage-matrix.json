@@ -1570,10 +1570,49 @@
       }
     ]
   },
+  "announcement_governance_007": {
+    "task_id": "ANNOUNCEMENT-GOVERNANCE-007",
+    "implementation_head": "09e2253c176257ae03f32ed4338627835bbaccda",
+    "independent_review": {
+      "result": "PASS_AFTER_FIX_2",
+      "path": "reports/codex/ANNOUNCEMENT-GOVERNANCE-007-FIX-2-review.json",
+      "boundary": "scoped 0009 human-reviewed announcement targeting, rejection/edit/resubmit/publish history, target visibility, management pagination and grant-aware page capabilities; local DEVELOPMENT SMS/API/page/DB evidence only"
+    },
+    "current_status_overlays": [
+      {
+        "id": "ANN-PUBLISH",
+        "implementation_status": "human_review_reject_edit_resubmit_publish_and_targeted_management_page_wired",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "0eb299c325572acea4fdd2e9f8252f82cdcd2cc8 / 1218bcbe43e15d506adf2db364359e0fe02c1af7 / 90752f3694364e27fe212a43f31462bd82137ecb / 09e2253c176257ae03f32ed4338627835bbaccda",
+        "remaining_gap": "production provider/runtime and Production V1 acceptance"
+      },
+      {
+        "id": "ANN-READ",
+        "implementation_status": "published_target_visibility_for_active_resident_and_staff_relationships_wired",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "0eb299c325572acea4fdd2e9f8252f82cdcd2cc8 / 90752f3694364e27fe212a43f31462bd82137ecb / 09e2253c176257ae03f32ed4338627835bbaccda",
+        "remaining_gap": "cross-property tenant-wide resident runtime case and production acceptance"
+      },
+      {
+        "id": "V1-ANN-TARGET",
+        "implementation_status": "tenant_property_building_unit_and_audience_targeting_wired_with_scope_authorization",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "0eb299c325572acea4fdd2e9f8252f82cdcd2cc8 / 90752f3694364e27fe212a43f31462bd82137ecb / 09e2253c176257ae03f32ed4338627835bbaccda",
+        "remaining_gap": "cross-property tenant-wide resident runtime case, production provider/runtime and Production V1 acceptance"
+      },
+      {
+        "id": "V1-ANN-EDIT-HISTORY",
+        "implementation_status": "append_only_draft_edit_submit_reject_and_publish_history_wired",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "0eb299c325572acea4fdd2e9f8252f82cdcd2cc8 / 1218bcbe43e15d506adf2db364359e0fe02c1af7 / 90752f3694364e27fe212a43f31462bd82137ecb / 09e2253c176257ae03f32ed4338627835bbaccda",
+        "remaining_gap": "production acceptance"
+      }
+    ]
+  },
   "current_effective_view": {
     "generated_at": "2026-09-20",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
-    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs)",
+    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced.",
     "row_count": 83,
     "rows": [
@@ -1819,19 +1858,19 @@
       },
       {
         "requirement_id": "ANN-PUBLISH",
-        "current_implementation": "已实现可测试",
-        "verification_mode_status": "UI:PASS",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
-        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+        "current_implementation": "human_review_reject_edit_resubmit_publish_and_targeted_management_page_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "0eb299c325572acea4fdd2e9f8252f82cdcd2cc8 / 1218bcbe43e15d506adf2db364359e0fe02c1af7 / 90752f3694364e27fe212a43f31462bd82137ecb / 09e2253c176257ae03f32ed4338627835bbaccda",
+        "remaining_gap": "production provider/runtime and Production V1 acceptance",
+        "next_action": "preserve scoped evidence; revalidate after related announcement or authorization changes"
       },
       {
         "requirement_id": "ANN-READ",
-        "current_implementation": "已实现可测试",
-        "verification_mode_status": "UI:PASS",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
-        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+        "current_implementation": "published_target_visibility_for_active_resident_and_staff_relationships_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "0eb299c325572acea4fdd2e9f8252f82cdcd2cc8 / 90752f3694364e27fe212a43f31462bd82137ecb / 09e2253c176257ae03f32ed4338627835bbaccda",
+        "remaining_gap": "cross-property tenant-wide resident runtime case and production acceptance",
+        "next_action": "add the cross-property tenant-wide runtime case when a second isolated property is available"
       },
       {
         "requirement_id": "AST-QUERY",
@@ -2115,19 +2154,19 @@
       },
       {
         "requirement_id": "V1-ANN-TARGET",
-        "current_implementation": "功能尚未实现",
-        "verification_mode_status": "API:NOT_IMPLEMENTED",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "公告定向企业/小区/楼栋/单元/人群",
-        "next_action": "按依赖顺序实施，保留本ID在分母中"
+        "current_implementation": "tenant_property_building_unit_and_audience_targeting_wired_with_scope_authorization",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "0eb299c325572acea4fdd2e9f8252f82cdcd2cc8 / 90752f3694364e27fe212a43f31462bd82137ecb / 09e2253c176257ae03f32ed4338627835bbaccda",
+        "remaining_gap": "cross-property tenant-wide resident runtime case, production provider/runtime and Production V1 acceptance",
+        "next_action": "preserve scoped targeting evidence; add cross-property and production acceptance in their own environments"
       },
       {
         "requirement_id": "V1-ANN-EDIT-HISTORY",
-        "current_implementation": "功能尚未实现",
-        "verification_mode_status": "none:NOT_IMPLEMENTED",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "公告编辑与发布历史",
-        "next_action": "按依赖顺序实施，保留本ID在分母中"
+        "current_implementation": "append_only_draft_edit_submit_reject_and_publish_history_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "0eb299c325572acea4fdd2e9f8252f82cdcd2cc8 / 1218bcbe43e15d506adf2db364359e0fe02c1af7 / 90752f3694364e27fe212a43f31462bd82137ecb / 09e2253c176257ae03f32ed4338627835bbaccda",
+        "remaining_gap": "production acceptance",
+        "next_action": "preserve scoped history evidence; revalidate after related audit or announcement changes"
       },
       {
         "requirement_id": "V1-SLA-CONFIG",

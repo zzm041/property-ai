@@ -1,0 +1,86 @@
+{
+  "task_id": "ANNOUNCEMENT-GOVERNANCE-007-FIX-1",
+  "run_id": "c7d60b9d5c",
+  "code_sha": "90752f3",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "migration": "20260919_0009",
+    "provider_boundary": "DEVELOPMENT SMS; no AI used"
+  },
+  "tenant_manager": {
+    "user_id": 18,
+    "phone_masked": "139****8751",
+    "official_sms_session": true,
+    "announcement_scopes": [
+      {
+        "role_code": "TENANT_ADMIN",
+        "scope_type": "TENANT",
+        "tenant_id": 4,
+        "property_id": null,
+        "permissions": [
+          "announcement:draft",
+          "announcement:publish",
+          "announcement:read"
+        ]
+      }
+    ]
+  },
+  "property_manager": {
+    "user_id": 19,
+    "phone_masked": "139****6188",
+    "official_sms_session": true,
+    "announcement_scopes": [
+      {
+        "role_code": "PROPERTY_ADMIN",
+        "scope_type": "PROPERTY",
+        "tenant_id": 4,
+        "property_id": 4,
+        "permissions": [
+          "announcement:draft",
+          "announcement:publish",
+          "announcement:read"
+        ]
+      }
+    ]
+  },
+  "announcement": {
+    "id": 10,
+    "property_id": 4,
+    "persisted": {
+      "id": 10,
+      "status": "PUBLISHED",
+      "scope_type": "TENANT",
+      "published_by_user_id": 18
+    },
+    "audit_actions": [
+      "ANNOUNCEMENT_DRAFT_CREATED",
+      "ANNOUNCEMENT_SUBMITTED",
+      "ANNOUNCEMENT_PUBLISHED"
+    ]
+  },
+  "management_pagination": {
+    "limit": 2,
+    "tenant_item_count": 4,
+    "tenant_cursors": [
+      8,
+      10
+    ],
+    "property_item_count": 3,
+    "property_cursors": [
+      8
+    ],
+    "no_duplicates": true
+  },
+  "checks": {
+    "property_submit_tenant_target_denied": true,
+    "property_publish_tenant_target_denied": true,
+    "property_detail_tenant_target_denied": true,
+    "tenant_submit_and_publish_succeeded": true,
+    "property_list_excludes_tenant_target": true,
+    "tenant_list_contains_target_once": true,
+    "multiple_pages_verified": true,
+    "business_state_writes_via_api_only": true,
+    "database_evidence_queries_read_only": true
+  }
+}

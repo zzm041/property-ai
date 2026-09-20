@@ -1,0 +1,73 @@
+{
+  "task_id": "ANNOUNCEMENT-GOVERNANCE-007",
+  "phase": "review",
+  "reviewed_head": "1218bcbe43e15d506adf2db364359e0fe02c1af7",
+  "decision": "NEEDS_CHANGES",
+  "actions_or_findings": [
+    {
+      "title": "ANN007-B1 [CURRENT_TASK_BLOCKER] Tenant-wide approval accepts a property grant",
+      "path": "backend/app/service/announcement.py:328",
+      "trigger": "A tenant administrator creates a TENANT-targeted draft anchored to property A; a property A administrator submits or approves it.",
+      "rationale": "Impact: property authority can publish to every property in the tenant. _require_manage checks the anchor property's permission, while _resolve_target requires tenant scope only when creating or editing the target. Evidence: service lines 302, 328, 554–566 and 629–640; docs/02-ROLES-PERMISSIONS.md lines 84–100. Require target-scope authorization while the announcement is locked."
+    },
+    {
+      "title": "ANN007-B2 [CURRENT_TASK_BLOCKER] Management list can permanently hide announcements",
+      "path": "backend/app/repository/ai.py:573",
+      "trigger": "The first 50 rows include tenant-wide announcements anchored to another property, or a property accumulates more than 50 announcements.",
+      "rationale": "Impact: filtering occurs after the SQL limit, and the API derives next_cursor from the filtered count. The mini-program requests only the first page, so managers can lose access to later drafts and history after reopening the page. Evidence: repository lines 573–589; service lines 515–525; admin_announcements.py lines 100–113; miniprogram/pages/supervisor/announcements.js lines 97–123."
+    },
+    {
+      "title": "ANN007-B3 [CURRENT_TASK_BLOCKER] Page publish controls use permissions from other scopes",
+      "path": "miniprogram/pages/supervisor/announcements.js:102",
+      "trigger": "One user has publish permission for property A and draft-only permission for property B, then opens property B's announcement page.",
+      "rationale": "Impact: the page shows approval controls for B because canPublish reads the union in me.permissions; the API correctly rejects the action. canTenant likewise checks for any tenant grant without matching the selected property's tenant. This fails the requested role-capability page behavior. Evidence: page lines 102–113 and 247–260; backend/app/domain/iam.py lines 70–90."
+    },
+    {
+      "title": "ANN007-N1 [NON_BLOCKING] Cross-property tenant visibility lacks runtime evidence",
+      "path": "reports/announcement-governance-007/runtime-fix-evidence.json",
+      "trigger": "The saved synthetic tenant has one property.",
+      "rationale": "Impact: tenant-wide delivery to a second property is not established by local runtime evidence. The tenant-filtered query and active membership checks support the intended behavior in source, so this is an evidence gap rather than a demonstrated failure. The saved result records tenant_cross_property_verified as null."
+    },
+    {
+      "title": "ANN007-C1 [NON_BLOCKING, CLOSED] First-run stale list cards were fixed",
+      "path": "miniprogram/pages/supervisor/announcements.js:222",
+      "trigger": "The first page run showed DRAFT on the list card while its detail showed REJECTED or PUBLISHED.",
+      "rationale": "Impact in the first run: conflicting page states. Commit 1218bcb reloads the list after transitions. I opened both sets of screenshots: the final rejected and published images show list and detail in sync, with no visible resident information."
+    },
+    {
+      "title": "ANN007-R1 [RELEASE_BLOCKER] Shared RabbitMQ replay remains unresolved",
+      "path": "reports/project-handoff.md:83",
+      "trigger": "The handoff records an accidental replay in the shared vhost.",
+      "rationale": "Impact: release disposition remains open. This review did not inspect or operate shared messages; it is unrelated to announcement task acceptance."
+    }
+  ],
+  "evidence_paths": [
+    "reports/project-handoff.md",
+    "reports/announcement-governance-007/runtime-evidence.json",
+    "reports/announcement-governance-007/runtime-fix-evidence.json",
+    "reports/announcement-governance-007/page-attempt1-evidence.json",
+    "reports/announcement-governance-007/page-fix-attempts.json",
+    "reports/announcement-governance-007/page-evidence.json",
+    "reports/announcement-governance-007/attempt1-01-targeted-draft-form.png",
+    "reports/announcement-governance-007/attempt1-02-rejected-with-stale-list.png",
+    "reports/announcement-governance-007/attempt1-03-published-with-stale-list.png",
+    "reports/announcement-governance-007/01-targeted-draft-form.png",
+    "reports/announcement-governance-007/02-rejected-with-history.png",
+    "reports/announcement-governance-007/03-published-edit-review-history.png"
+  ],
+  "unverified": [
+    "I did not rerun tests, runtime operations, page automation, HTTP requests, or business requests. The reported 54 focused and 473 pure-unit passes are main-session results.",
+    "Tenant-wide visibility across two properties and runtime denial after a resident relation or employee assignment ends were not saved as passing runtime cases.",
+    "The first post-fix automator attempt timed out with business result UNKNOWN; only its bounded retry is recorded as PASS.",
+    "Production providers, self-hosted Qwen/RAG, and formal release remain unverified."
+  ],
+  "session_note": "Independent read-only review of the actual base-to-HEAD diff, frozen announcement clauses, current source, saved JSON, and all six page screenshots. No files, services, databases, or shared messages were changed. The unrelated operator project.config.json and model/ai.py line-ending dirt were excluded. Overall goal remains frozen Production V1. Current task is announcement governance within 0009; account merge/0010 is separate and unapproved. The handoff still describes the prior milestone, so task evidence and verified HEAD govern this scoped result. ",
+  "task_result": "Scoped announcement review NEEDS_CHANGES. Human review, rejection reason, edit/resubmit history, active resident/staff targeting, and the corrected list/detail state have supporting source and saved local evidence. Three current-task blockers remain; this is not Production V1 acceptance.",
+  "product_gap_changes": [
+    "ANNOUNCEMENT-GOVERNANCE-007 remains open until B1–B3 are fixed and independently re-reviewed.",
+    "Controlled merge and recovery, real self-hosted Qwen/RAG, real providers, production storage/notification, and Day 4 release validation remain V1 gaps. Previously accepted scoped work remains accepted."
+  ],
+  "schedule_risk": "On 2026-09-20, the original approximately 2026-09-21 one-week aim cannot cover the remaining frozen Production V1 gaps and these announcement fixes. Do not remove features or relabel local DEVELOPMENT evidence as formal delivery.",
+  "next_action": "Main Codex: within the approved 0009 scope, require tenant authorization for TENANT-targeted transitions, repair management pagination and page traversal, and derive page controls from grants covering the selected property. Add negative tests for all three triggers; then run the permitted focused and pure-unit checks and save isolated 8083/property_ai_auth001_test API/page evidence, including a two-property tenant case if available. Request independent re-review when the fixes and evidence agree. No new permission is needed for these source, test, and named isolated-environment steps; obtain separate approval before any migration or shared-service operation.",
+  "approval_requests": []
+}

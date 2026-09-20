@@ -1,0 +1,48 @@
+{
+  "task_id": "ANNOUNCEMENT-GOVERNANCE-007",
+  "run_id": "ann007-page-mu9imkx7",
+  "code_sha": "1218bcbe43e15d506adf2db364359e0fe02c1af7",
+  "automator_ws": "ws://127.0.0.1:9435",
+  "api": "http://127.0.0.1:8083/api/v1",
+  "auth": "official SMS page controls with DEVELOPMENT SMS provider",
+  "page": "pages/supervisor/announcements",
+  "announcement_id": 9,
+  "final_status": "PUBLISHED",
+  "final_title": "页面公告 ann007-page-mu9imkx7 修订",
+  "scope": {
+    "id": 13,
+    "scope_type": "UNIT",
+    "building_id": 4,
+    "unit_id": 4,
+    "audience": "OWNER"
+  },
+  "review_decisions": [
+    "REJECT",
+    "APPROVE"
+  ],
+  "review_reasons_present": [
+    true,
+    false
+  ],
+  "history_actions": [
+    "ANNOUNCEMENT_DRAFT_CREATED",
+    "ANNOUNCEMENT_SUBMITTED",
+    "ANNOUNCEMENT_REJECTED",
+    "ANNOUNCEMENT_UPDATED",
+    "ANNOUNCEMENT_SUBMITTED",
+    "ANNOUNCEMENT_PUBLISHED"
+  ],
+  "actual_controls": [
+    "保存新草稿",
+    "提交审核",
+    "驳回",
+    "保存所选公告修改",
+    "人工审核通过并发布"
+  ],
+  "picker_boundary": "scope/audience selected through supported automator change events",
+  "screenshots": [
+    "01-targeted-draft-form.png",
+    "02-rejected-with-history.png",
+    "03-published-edit-review-history.png"
+  ]
+}

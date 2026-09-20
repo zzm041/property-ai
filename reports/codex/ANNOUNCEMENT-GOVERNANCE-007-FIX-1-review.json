@@ -1,0 +1,77 @@
+{
+  "task_id": "ANNOUNCEMENT-GOVERNANCE-007",
+  "phase": "review",
+  "reviewed_head": "90752f3694364e27fe212a43f31462bd82137ecb",
+  "decision": "NEEDS_CHANGES",
+  "actions_or_findings": [
+    {
+      "title": "ANN007-B1 [CURRENT_TASK_BLOCKER, CLOSED] Persisted target governs authorization",
+      "path": "backend/app/service/announcement.py:555",
+      "trigger": "A property administrator attempts to submit, publish, or read a TENANT-targeted announcement.",
+      "rationale": "The service now checks the persisted target against a tenant grant after locking the announcement for mutation. Saved isolated API evidence records 403 for the property administrator and success for the tenant administrator."
+    },
+    {
+      "title": "ANN007-B2 [CURRENT_TASK_BLOCKER, CLOSED] Management pagination",
+      "path": "backend/app/repository/ai.py:563",
+      "trigger": "Authorized announcements appear after rows outside the actor's target scope or after the first page.",
+      "rationale": "SQL applies target permission filtering before LIMIT, orders by ID, and advances with after_id. The page follows returned cursors. Saved limit=2 evidence records multiple pages, no duplicate IDs, and exclusion of the TENANT target from the property list."
+    },
+    {
+      "title": "ANN007-B3 [CURRENT_TASK_BLOCKER] Page trusts an unverified route tenant ID",
+      "path": "miniprogram/pages/supervisor/announcements.js:162",
+      "trigger": "A tenant administrator opens a propertyId-only route, or a user with a tenant grant for A and a property grant for B opens property B with tenantId=A.",
+      "rationale": "The page prefers query.tenantId and can derive no tenant ID for a tenant-only grant. The first route hides authorized draft and publish controls; the mismatched route can show publish controls for B using A's tenant grant. The API still rejects unauthorized writes, but the required grant-level page capability behavior remains wrong. Evidence: announcements.js:37-65, 162-190, 279-282; home/home.js:86-97; backend/app/domain/iam.py:35-47. The saved page run does not exercise either route."
+    },
+    {
+      "title": "ANN007-C1 [NON_BLOCKING, CLOSED] List and detail status agree",
+      "path": "reports/announcement-governance-007/02-rejected-with-history.png",
+      "trigger": "The earlier page run showed stale list cards.",
+      "rationale": "I opened all three current PNGs. Screenshot 2 shows #11 REJECTED in list and detail; screenshot 3 shows #11 PUBLISHED in both. No resident private data is visible."
+    },
+    {
+      "title": "ANN007-N1 [NON_BLOCKING] Cross-property tenant visibility remains unexercised",
+      "path": "reports/announcement-governance-007/runtime-fix1-evidence.json",
+      "trigger": "The selected synthetic tenant has only one property.",
+      "rationale": "The saved runtime run cannot establish actual tenant-wide resident visibility across two properties. This evidence gap does not block the scoped fix."
+    },
+    {
+      "title": "ANN007-R1 [RELEASE_BLOCKER] Shared RabbitMQ replay remains open",
+      "path": "reports/project-handoff.md:83",
+      "trigger": "The handoff records a pending replay in the shared vhost.",
+      "rationale": "Its release disposition remains open. I did not inspect or operate shared messages; it does not block this local announcement slice."
+    }
+  ],
+  "evidence_paths": [
+    "reports/project-handoff.md",
+    "reports/announcement-governance-007/runtime-fix1-evidence.json",
+    "reports/announcement-governance-007/page-evidence.json",
+    "reports/announcement-governance-007/01-targeted-draft-form.png",
+    "reports/announcement-governance-007/02-rejected-with-history.png",
+    "reports/announcement-governance-007/03-published-edit-review-history.png",
+    "tmp/auth001-runtime/api-90752f3.stdout.log",
+    "backend/app/domain/iam.py",
+    "backend/app/repository/ai.py",
+    "backend/app/service/announcement.py",
+    "backend/app/api/v1/admin_announcements.py",
+    "backend/tests/unit/test_announcement_governance.py",
+    "miniprogram/services/api.js",
+    "miniprogram/pages/supervisor/announcements.js",
+    "miniprogram/pages/supervisor/announcements.wxml",
+    "miniprogram/pages/home/home.js",
+    "miniprogram/utils/ui.js"
+  ],
+  "unverified": [
+    "I did not rerun tests, open pages, send requests, inspect live processes, or change files. The reported 9 focused and 476 pure-unit passes, Node syntax check, and git diff --check are main-session results.",
+    "The saved 8083/0009 runtime identity and request outcomes were inspected as evidence, not verified live.",
+    "Cross-property tenant-wide resident visibility, real providers, self-hosted Qwen/RAG, and formal release remain unverified."
+  ],
+  "session_note": "Independent read-only review of the requested diff and current source at HEAD 90752f3, the saved JSON and log, and all three current PNGs. No files, databases, services, pages, or business state were changed. The approval scope is the existing 0009 schema; 0010/account merge is separate and unapproved. Overall goal remains frozen Production V1. The handoff predates this announcement fix, so the verified HEAD and task evidence govern this scoped result. Open issues are ANN007-B3, ANN007-N1, and ANN007-R1.",
+  "task_result": "B1 and B2 are closed; C1 remains closed. B3 prevents scoped PASS because page capability checks can use an absent or mismatched route tenant ID. Human review, rejection, edit history, and synchronized list/detail states have saved local evidence. This is DEVELOPMENT SMS evidence, with no AI used, and is not whole V1 acceptance.",
+  "product_gap_changes": [
+    "ANNOUNCEMENT-GOVERNANCE-007 remains open for the B3 page fix and independent re-review.",
+    "Controlled merge and recovery, real auto-assignment with self-hosted Qwen, real Embedding/RAG, production providers and storage, and Day 4 release validation remain Production V1 gaps. Previously accepted scoped slices remain accepted."
+  ],
+  "schedule_risk": "As of 2026-09-20, the approximately 2026-09-21 one-week aim cannot cover this remaining page blocker and the frozen Production V1 gaps. Local DEVELOPMENT evidence must not be relabeled as formal delivery.",
+  "next_action": "Main Codex: within the approved 0009 scope, bind announcement-page capability checks to the selected property's verified tenant ID, then verify propertyId-only and mismatched-tenant routes with mixed grants and the selected announcement target. Save focused tests and isolated 8083/property_ai_auth001_test page/API evidence, and request the final bounded independent re-review. No new permission is needed for this source, test, and named isolated-environment work; obtain separate approval if a migration or shared-service operation becomes necessary.",
+  "approval_requests": []
+}

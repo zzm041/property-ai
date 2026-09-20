@@ -1,0 +1,10 @@
+{
+  "task_id": "ANNOUNCEMENT-GOVERNANCE-007-FIX-2",
+  "verification": "pure Node helper test; no API or business writes",
+  "cases": {
+    "mixed_grant_uses_matching_property_grant": true,
+    "mismatched_tenant_grant_cannot_enable_tenant_target": true,
+    "matching_tenant_grant_covers_property_and_tenant_target": true,
+    "absent_verified_property_denied": true
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "task_id": "ANNOUNCEMENT-GOVERNANCE-007",
+  "fix_round": 1,
+  "code_sha": "1218bcbe43e15d506adf2db364359e0fe02c1af7",
+  "attempts": [
+    {
+      "attempt": 1,
+      "result": "TOOL_FAILURE",
+      "error": "timeout waiting for automator response",
+      "business_result": "UNKNOWN",
+      "artifacts": []
+    },
+    {
+      "attempt": 2,
+      "result": "PASS",
+      "run_id": "ann007-page-mu9imkx7",
+      "announcement_id": 9,
+      "final_status": "PUBLISHED",
+      "artifacts": [
+        "page-evidence.json",
+        "01-targeted-draft-form.png",
+        "02-rejected-with-history.png",
+        "03-published-edit-review-history.png"
+      ]
+    }
+  ]
+}
