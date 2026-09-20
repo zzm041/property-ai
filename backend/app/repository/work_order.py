@@ -2,10 +2,12 @@
 
 from datetime import datetime
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from app.model.property import House, Property
+from app.model.employee import Employee
+from app.model.identity import Permission, RolePermission, User, UserRole
 from app.model.work_order import (
     FileObject,
     IdempotencyRecord,
@@ -228,6 +230,77 @@ class WorkOrderRepository:
     def get_sla_clock(self, work_order_id: int) -> SlaClock | None:
         return self._session.scalar(
             select(SlaClock).where(SlaClock.work_order_id == work_order_id)
+        )
+
+    def list_due_sla_clocks_for_update(
+        self,
+        *,
+        now: datetime,
+        limit: int,
+        work_order_id: int | None = None,
+    ) -> tuple[SlaClock, ...]:
+        filters = [
+            or_(
+                (SlaClock.state == "OPEN") & (SlaClock.warning_at <= now),
+                (SlaClock.state == "WARNING")
+                & (SlaClock.complete_due_at <= now),
+            )
+        ]
+        if work_order_id is not None:
+            filters.append(SlaClock.work_order_id == work_order_id)
+        return tuple(
+            self._session.scalars(
+                select(SlaClock)
+                .where(*filters)
+                .order_by(SlaClock.complete_due_at, SlaClock.id)
+                .limit(limit)
+                .with_for_update(skip_locked=True)
+            ).all()
+        )
+
+    def list_sla_management_user_ids(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int,
+    ) -> tuple[int, ...]:
+        rows = self._session.scalars(
+            select(UserRole.user_id)
+            .join(User, User.id == UserRole.user_id)
+            .join(RolePermission, RolePermission.role_id == UserRole.role_id)
+            .join(Permission, Permission.id == RolePermission.permission_id)
+            .where(
+                User.status == "ACTIVE",
+                Permission.code == "work_order:decide",
+                or_(
+                    (UserRole.scope_type == "TENANT")
+                    & (UserRole.tenant_id == tenant_id),
+                    (UserRole.scope_type == "PROPERTY")
+                    & (UserRole.tenant_id == tenant_id)
+                    & (UserRole.property_id == property_id),
+                ),
+            )
+            .distinct()
+            .order_by(UserRole.user_id)
+        ).all()
+        return tuple(int(user_id) for user_id in rows)
+
+    def get_active_assignee_user_id(self, work_order_id: int) -> int | None:
+        return self._session.scalar(
+            select(Employee.user_id)
+            .join(
+                WorkOrderAssignment,
+                WorkOrderAssignment.employee_id == Employee.id,
+            )
+            .join(User, User.id == Employee.user_id)
+            .where(
+                WorkOrderAssignment.work_order_id == work_order_id,
+                WorkOrderAssignment.status == "ACTIVE",
+                WorkOrderAssignment.ended_at.is_(None),
+                Employee.status == "ACTIVE",
+                Employee.user_id.is_not(None),
+                User.status == "ACTIVE",
+            )
         )
 
     def list_queue_for_property(

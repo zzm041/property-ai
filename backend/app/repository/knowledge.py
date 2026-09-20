@@ -235,11 +235,26 @@ class KnowledgeRepository:
         self._session.flush()
         return record
 
-    def list_pending_deliveries(self, limit: int = 50) -> tuple[NotificationDelivery, ...]:
+    def list_pending_deliveries(
+        self,
+        *,
+        now: datetime | None = None,
+        limit: int = 50,
+    ) -> tuple[NotificationDelivery, ...]:
+        due_at = now
+        due_filter = True
+        if due_at is not None:
+            due_filter = or_(
+                NotificationDelivery.next_retry_at.is_(None),
+                NotificationDelivery.next_retry_at <= due_at,
+            )
         return tuple(
             self._session.scalars(
                 select(NotificationDelivery)
-                .where(NotificationDelivery.status == "PENDING")
+                .where(
+                    NotificationDelivery.status == "PENDING",
+                    due_filter,
+                )
                 .order_by(NotificationDelivery.id)
                 .limit(limit)
             ).all()

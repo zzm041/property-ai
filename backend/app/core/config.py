@@ -55,6 +55,12 @@ class Settings(BaseSettings):
         "amqp://property:change-me@127.0.0.1:5672/property_ai"
     )
     celery_task_queue: str = ""
+    sla_sweep_interval_seconds: int = Field(default=30, ge=5, le=3600)
+    notification_retry_sweep_interval_seconds: int = Field(
+        default=30,
+        ge=5,
+        le=3600,
+    )
     db_pool_size: int = Field(default=5, ge=1, le=32)
     db_max_overflow: int = Field(default=10, ge=0, le=32)
     db_pool_recycle_seconds: int = Field(default=1800, ge=60, le=7200)

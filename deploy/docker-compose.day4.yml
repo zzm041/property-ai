@@ -87,6 +87,31 @@ services:
       - property_ai
     restart: unless-stopped
 
+  beat-day4:
+    image: property-ai-worker:latest
+    command:
+      [
+        "celery",
+        "-A",
+        "app.worker.celery_app.celery_app",
+        "beat",
+        "--loglevel=info",
+        "--schedule=/tmp/celerybeat-schedule",
+      ]
+    environment:
+      APP_ENV: test
+      APP_SECRET_KEY: day4-e2e-secret-that-is-long-enough
+      DEV_AUTH_ENABLED: "true"
+      TEST_DATABASE_URL: mysql+pymysql://property_test:change-me-test@mysql-test:3306/property_ai_day4?charset=utf8mb4
+      REDIS_URL: redis://redis:6379/5
+      CELERY_BROKER_URL: amqp://day4:change-me-day4@rabbitmq:5672/property_ai_day4
+      CELERY_TASK_QUEUE: property_ai.day4
+      SLA_SWEEP_INTERVAL_SECONDS: "30"
+      NOTIFICATION_RETRY_SWEEP_INTERVAL_SECONDS: "30"
+    networks:
+      - property_ai
+    restart: unless-stopped
+
   nginx-day4:
     image: nginx:1.27.4-alpine
     ports:

@@ -54,6 +54,16 @@ def test_create_celery_app_listens_only_to_env_queue(monkeypatch) -> None:
     assert app.conf.broker_transport_options.get("confirm_publish") is True
     queue_names = {item.name for item in app.conf.task_queues}
     assert queue_names == {"property_ai.staging", "property_ai.staging.dlq"}
+    assert app.conf.beat_schedule["sla-sweep"] == {
+        "task": "app.worker.tasks.sweep_sla_task",
+        "schedule": settings.sla_sweep_interval_seconds,
+        "options": {"queue": "property_ai.staging"},
+    }
+    assert app.conf.beat_schedule["notification-retry-sweep"] == {
+        "task": "app.worker.tasks.schedule_due_notification_deliveries_task",
+        "schedule": settings.notification_retry_sweep_interval_seconds,
+        "options": {"queue": "property_ai.staging"},
+    }
 
 
 def test_production_enqueue_uses_isolated_queue(monkeypatch) -> None:

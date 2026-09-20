@@ -45,6 +45,8 @@ class WorkOrderEvent(StrEnum):
     ARCHIVE = "ARCHIVE"
     RATE = "RATE"
     APPEND = "APPEND"
+    SLA_WARNING = "SLA_WARNING"
+    SLA_OVERDUE = "SLA_OVERDUE"
 
 
 class WorkOrderCategory(StrEnum):

@@ -49,6 +49,19 @@ def create_celery_app() -> Celery:
             "app.worker.tasks.ingest_knowledge_task": {"max_retries": 2},
             "app.worker.tasks.deliver_notification_task": {"max_retries": 3},
         },
+        beat_schedule={
+            "sla-sweep": {
+                "task": "app.worker.tasks.sweep_sla_task",
+                "schedule": settings.sla_sweep_interval_seconds,
+                "options": {"queue": queue_name},
+            },
+            "notification-retry-sweep": {
+                "task": "app.worker.tasks.schedule_due_notification_deliveries_task",
+                "schedule": settings.notification_retry_sweep_interval_seconds,
+                "options": {"queue": queue_name},
+            },
+        },
+        timezone="UTC",
         imports=("app.worker.tasks",),
     )
     return app

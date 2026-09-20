@@ -13,6 +13,8 @@ from app.provider.errors import (
 from app.worker.tasks import (
     analyze_work_order_task,
     ingest_knowledge_task,
+    schedule_due_notification_deliveries_task,
+    sweep_sla_task,
     raise_retryable_analysis_failure,
     run_analyze_work_order,
     run_ingest_knowledge,
@@ -22,6 +24,10 @@ from app.worker.tasks import (
 def test_celery_task_is_registered() -> None:
     assert analyze_work_order_task.name == "app.worker.tasks.analyze_work_order_task"
     assert ingest_knowledge_task.name == "app.worker.tasks.ingest_knowledge_task"
+    assert sweep_sla_task.name == "app.worker.tasks.sweep_sla_task"
+    assert schedule_due_notification_deliveries_task.name == (
+        "app.worker.tasks.schedule_due_notification_deliveries_task"
+    )
     assert callable(run_analyze_work_order)
     assert callable(run_ingest_knowledge)
     assert analyze_work_order_task.max_retries == 2

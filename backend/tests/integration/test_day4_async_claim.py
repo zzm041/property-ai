@@ -155,10 +155,12 @@ def test_notification_provider_failure_and_uncertain_are_distinct(
     failed = NotificationService(identity_session, settings=failed_settings).deliver_pending(
         fail_id
     )
-    assert failed == "FAILED"
+    assert failed == "RETRY"
     persisted_fail = fetch_independent(identity_session, NotificationDelivery, fail_id)
     assert persisted_fail is not None
-    assert persisted_fail.status == "FAILED"
+    assert persisted_fail.status == "PENDING"
+    assert persisted_fail.attempt == 1
+    assert persisted_fail.next_retry_at is not None
     assert persisted_fail.last_error_code == NotificationErrorCode.PROVIDER_FAILED
 
     class BoomProvider(NotificationProvider):

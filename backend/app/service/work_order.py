@@ -2094,6 +2094,7 @@ class WorkOrderService:
                 resource_type="WORK_ORDER",
                 resource_id=record.id,
             )
+            self._stop_sla(record)
         else:
             if unresolved_reason is None or not unresolved_reason.strip():
                 raise AppError(

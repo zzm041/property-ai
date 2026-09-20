@@ -13,6 +13,7 @@ from app.provider.errors import (
     ProviderUnavailableError,
 )
 from app.service.analysis import AnalysisService
+from app.service.notification import delivery_retry_delay_seconds
 from app.worker.celery_app import celery_app
 
 logger = get_logger(__name__)
@@ -213,9 +214,46 @@ def deliver_notification_task(self, delivery_id: int) -> None:
 
         outcome = NotificationService(session, settings=settings).deliver_pending(delivery_id)
         _record_delivery_attempt_outcome(getattr(self.request, "id", None), outcome)
+        if outcome == "RETRY":
+            retries = int(getattr(self.request, "retries", 0))
+            raise self.retry(
+                exc=ProviderUnavailableError("Notification provider is unavailable"),
+                countdown=delivery_retry_delay_seconds(retries + 1),
+            )
     except (ProviderTimeoutError, ProviderUnavailableError, ProviderRateLimitError) as exc:
         retries = int(getattr(self.request, "retries", 0))
         raise self.retry(exc=exc, countdown=min(2 ** retries, 30))
+    finally:
+        session.close()
+        engine.dispose()
+
+
+@celery_app.task(name="app.worker.tasks.sweep_sla_task", acks_late=True)
+def sweep_sla_task() -> dict[str, int]:
+    settings = get_settings()
+    engine = create_database_engine(settings.active_database_url)
+    session = Session(bind=engine, autoflush=False, expire_on_commit=False)
+    try:
+        from app.service.sla import SlaService
+
+        return SlaService(session, settings=settings).sweep_due().as_dict()
+    finally:
+        session.close()
+        engine.dispose()
+
+
+@celery_app.task(
+    name="app.worker.tasks.schedule_due_notification_deliveries_task",
+    acks_late=True,
+)
+def schedule_due_notification_deliveries_task() -> int:
+    settings = get_settings()
+    engine = create_database_engine(settings.active_database_url)
+    session = Session(bind=engine, autoflush=False, expire_on_commit=False)
+    try:
+        from app.service.notification import NotificationService
+
+        return NotificationService(session, settings=settings).schedule_due_deliveries()
     finally:
         session.close()
         engine.dispose()

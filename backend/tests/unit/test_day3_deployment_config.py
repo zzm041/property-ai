@@ -17,11 +17,27 @@ def test_day4_nginx_uses_isolated_upstream() -> None:
     assert "proxy_pass http://api:8000" not in text
     assert "api-day4:" in compose
     assert "worker-day4:" in compose
+    assert "beat-day4:" in compose
     assert "CELERY_TASK_QUEUE: property_ai.day4" in compose
     assert "MILVUS_COLLECTION: knowledge_chunks_day4" in compose
     assert "property_ai_day4" in compose
     assert "DEV_AUTH_ENABLED: \"true\"" in compose
     assert "APP_ENV: test" in compose
+
+
+def test_all_compose_targets_run_isolated_celery_beat() -> None:
+    expected = {
+        "docker-compose.yml": "${CELERY_TASK_QUEUE:-property_ai.development}",
+        "docker-compose.prodlike.yml": "property_ai.staging",
+        "docker-compose.day4.yml": "property_ai.day4",
+    }
+    for filename, queue in expected.items():
+        compose = (REPO / "deploy" / filename).read_text(encoding="utf-8")
+        assert '"beat"' in compose
+        assert "app.worker.celery_app.celery_app" in compose
+        assert queue in compose
+        assert "SLA_SWEEP_INTERVAL_SECONDS" in compose
+        assert "NOTIFICATION_RETRY_SWEEP_INTERVAL_SECONDS" in compose
 
 
 def test_nginx_http_config_has_api_health_and_limits() -> None:
