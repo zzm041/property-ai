@@ -925,6 +925,8 @@ class WorkOrderService:
         fee_flag: str = "NONE",
         unresolved_reason: str | None = None,
         follow_up: str | None = None,
+        before_file_ids: tuple[int, ...] = (),
+        after_file_ids: tuple[int, ...] = (),
         file_ids: tuple[int, ...] = (),
         version: int | None = None,
     ) -> WorkOrder:
@@ -933,6 +935,14 @@ class WorkOrderService:
             raise AppError(
                 code=WorkOrderErrorCode.INVALID_INPUT,
                 message="Receipt required fields are missing",
+                status_code=422,
+            )
+        normalized_before_ids = tuple(dict.fromkeys(before_file_ids))
+        normalized_after_ids = tuple(dict.fromkeys((*after_file_ids, *file_ids)))
+        if set(normalized_before_ids).intersection(normalized_after_ids):
+            raise AppError(
+                code=WorkOrderErrorCode.INVALID_INPUT,
+                message="Receipt media cannot be both before and after",
                 status_code=422,
             )
         return self._execute(
@@ -948,7 +958,8 @@ class WorkOrderService:
                 fee_flag=fee_flag,
                 unresolved_reason=unresolved_reason,
                 follow_up=follow_up,
-                file_ids=file_ids,
+                before_file_ids=normalized_before_ids,
+                after_file_ids=normalized_after_ids,
                 version=version,
             )
         )
@@ -1986,7 +1997,8 @@ class WorkOrderService:
         fee_flag: str,
         unresolved_reason: str | None,
         follow_up: str | None,
-        file_ids: tuple[int, ...],
+        before_file_ids: tuple[int, ...],
+        after_file_ids: tuple[int, ...],
         version: int | None,
     ) -> WorkOrder:
         current, record, _assignment, _employee = self._lock_assignee_action(
@@ -2027,7 +2039,13 @@ class WorkOrderService:
             self._attach_media(
                 record,
                 actor=current,
-                file_ids=file_ids,
+                file_ids=before_file_ids,
+                taken_phase=MediaTakenPhase.BEFORE,
+            )
+            self._attach_media(
+                record,
+                actor=current,
+                file_ids=after_file_ids,
                 taken_phase=MediaTakenPhase.AFTER,
             )
             self._repository.add_receipt(
@@ -2084,6 +2102,18 @@ class WorkOrderService:
                     status_code=422,
                 )
             target_reason = ProcessReason.INTERNAL_UNRESOLVED
+            self._attach_media(
+                record,
+                actor=current,
+                file_ids=before_file_ids,
+                taken_phase=MediaTakenPhase.BEFORE,
+            )
+            self._attach_media(
+                record,
+                actor=current,
+                file_ids=after_file_ids,
+                taken_phase=MediaTakenPhase.AFTER,
+            )
             self._repository.add_receipt(
                 WorkOrderReceipt(
                     tenant_id=record.tenant_id,

@@ -80,7 +80,8 @@ def test_staff_page_submits_complete_receipt_and_versions_mutations() -> None:
         "fee_amount",
         "resolved",
         "follow_up",
-        "file_ids",
+        "before_file_ids",
+        "after_file_ids",
         "version",
     ):
         assert field in source
@@ -89,6 +90,13 @@ def test_staff_page_submits_complete_receipt_and_versions_mutations() -> None:
     assert "处理回执" in template
     assert "处理方式与过程" in template
     assert "产生费用" in template
+    assert "添加处理前照片" in template
+    assert "添加处理后照片" in template
+    assert "添加现场照片" in template
+    assert 'taken_phase: "ON_SITE"' in source
+    assert "file_ids: this.data.onSiteFileIds" in source
+    assert "before_file_ids: this.data.beforeFileIds" in source
+    assert "after_file_ids: this.data.afterFileIds" in source
 
 
 def test_resident_page_shows_receipt_and_versions_confirmation() -> None:

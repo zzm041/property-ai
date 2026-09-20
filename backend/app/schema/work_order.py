@@ -113,6 +113,10 @@ class StaffReceiptRequest(BaseModel):
     resolved: bool
     unresolved_reason: str | None = Field(default=None, max_length=255)
     follow_up: str | None = Field(default=None, max_length=255)
+    before_file_ids: tuple[int, ...] = ()
+    after_file_ids: tuple[int, ...] = ()
+    # Backward-compatible alias for clients that submitted completion media
+    # before the receipt contract exposed explicit before/after collections.
     file_ids: tuple[int, ...] = ()
     version: int | None = Field(default=None, ge=1)
 

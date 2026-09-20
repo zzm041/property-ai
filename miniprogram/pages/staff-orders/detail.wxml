@@ -37,9 +37,15 @@
       <switch checked="{{receiptResolved}}" bindchange="onReceiptResolved" />
     </view>
     <textarea wx:if="{{!receiptResolved}}" class="field" placeholder="未解决原因（必填）" value="{{unresolvedReason}}" bindinput="onUnresolvedReason" maxlength="255"></textarea>
-    <button class="btn" bindtap="chooseAfterImage">完工照片（可选）</button>
-    <view class="empty" wx:if="{{mediaHint}}">{{mediaHint}}</view>
-    <textarea placeholder="处理反馈（可选）" bindinput="onFeedback"></textarea>
+    <view class="field-label">处理前/后照片</view>
+    <button class="btn" bindtap="chooseBeforeImage">添加处理前照片（可选）</button>
+    <view class="empty" wx:if="{{beforeMediaHint}}">{{beforeMediaHint}}</view>
+    <button class="btn" bindtap="chooseAfterImage">添加处理后照片（可选）</button>
+    <view class="empty" wx:if="{{afterMediaHint}}">{{afterMediaHint}}</view>
+    <view class="field-label">过程反馈</view>
+    <button class="btn" bindtap="chooseOnSiteImage">添加现场照片（可选）</button>
+    <view class="empty" wx:if="{{onSiteMediaHint}}">{{onSiteMediaHint}}</view>
+    <textarea placeholder="处理反馈（可选）" value="{{feedback}}" bindinput="onFeedback"></textarea>
     <button class="btn" bindtap="feedback">提交反馈</button>
     <button class="btn" bindtap="resolve" disabled="{{loading}}">{{receiptResolved ? "提交完整回执并完成" : "提交未解决回执并上报"}}</button>
   </block>

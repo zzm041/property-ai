@@ -1,10 +1,10 @@
-function imageUploadType(type) {
+function imageUploadType(type, namePrefix) {
   const normalized = String(type || "").toLowerCase();
   return {
-    jpg: { mimeType: "image/jpeg", originalName: "after.jpg" },
-    jpeg: { mimeType: "image/jpeg", originalName: "after.jpg" },
-    png: { mimeType: "image/png", originalName: "after.png" },
-    webp: { mimeType: "image/webp", originalName: "after.webp" },
+    jpg: { mimeType: "image/jpeg", originalName: `${namePrefix}.jpg` },
+    jpeg: { mimeType: "image/jpeg", originalName: `${namePrefix}.jpg` },
+    png: { mimeType: "image/png", originalName: `${namePrefix}.png` },
+    webp: { mimeType: "image/webp", originalName: `${namePrefix}.webp` },
   }[normalized];
 }
 
@@ -38,8 +38,12 @@ Page({
     unresolvedReason: "",
     loading: false,
     error: "",
-    mediaHint: "",
-    fileIds: [],
+    onSiteMediaHint: "",
+    beforeMediaHint: "",
+    afterMediaHint: "",
+    onSiteFileIds: [],
+    beforeFileIds: [],
+    afterFileIds: [],
   },
   onLoad(query) {
     this.id = Number(query.id);
@@ -150,7 +154,16 @@ Page({
         .then(() => this.reload())
     ).catch(() => {});
   },
+  chooseOnSiteImage() {
+    this._chooseImage("onSiteFileIds", "onSiteMediaHint", "现场", "on-site");
+  },
+  chooseBeforeImage() {
+    this._chooseImage("beforeFileIds", "beforeMediaHint", "处理前", "before");
+  },
   chooseAfterImage() {
+    this._chooseImage("afterFileIds", "afterMediaHint", "处理后", "after");
+  },
+  _chooseImage(fileIdsKey, hintKey, label, namePrefix) {
     wx.chooseMedia({
       count: 1,
       mediaType: ["image"],
@@ -159,7 +172,7 @@ Page({
         wx.getImageInfo({
           src: file.tempFilePath,
           success: (info) => {
-            const uploadType = imageUploadType(info.type);
+            const uploadType = imageUploadType(info.type, namePrefix);
             if (!uploadType) {
               this.setData({ error: "不支持该图片格式" });
               return;
@@ -175,10 +188,10 @@ Page({
                   originalName: uploadType.originalName,
                 })
                 .then((record) => {
-                  const fileIds = this.data.fileIds.concat(record.id);
+                  const fileIds = this.data[fileIdsKey].concat(record.id);
                   this.setData({
-                    fileIds,
-                    mediaHint: `已添加 ${fileIds.length} 张完工照片`,
+                    [fileIdsKey]: fileIds,
+                    [hintKey]: `已添加 ${fileIds.length} 张${label}照片`,
                   });
                 })
             ).catch(() => {});
@@ -195,11 +208,14 @@ Page({
       require("../../services/api")
         .feedbackWorkOrder(this.id, {
           text: this.data.feedback,
-          file_ids: this.data.fileIds,
-          taken_phase: "AFTER",
+          file_ids: this.data.onSiteFileIds,
+          taken_phase: "ON_SITE",
           version: this.data.workOrder.version,
         })
-        .then(() => this.reload())
+        .then(() => {
+          this.setData({ feedback: "", onSiteFileIds: [], onSiteMediaHint: "" });
+          return this.reload();
+        })
     ).catch(() => {});
   },
   resolve() {
@@ -237,7 +253,8 @@ Page({
           resolved: this.data.receiptResolved,
           unresolved_reason: this.data.receiptResolved ? null : unresolvedReason,
           follow_up: followUp || null,
-          file_ids: this.data.fileIds,
+          before_file_ids: this.data.beforeFileIds,
+          after_file_ids: this.data.afterFileIds,
           version: this.data.workOrder.version,
         })
         .then(() => this.reload())
