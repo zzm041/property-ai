@@ -226,19 +226,6 @@ class RetrievalService:
                 now=now,
             )
         resident_property_ids = {house.property_id for _, house in relations}
-        staff_roles = {"STAFF", "SUPERVISOR", "PROPERTY_ADMIN", "TENANT_ADMIN"}
-        is_resident = bool(resident_property_ids) or "RESIDENT" in actor.roles
-        is_staff = bool(set(actor.roles) & staff_roles) or bool(employee_property_ids)
-        is_manager = bool({"SUPERVISOR", "PROPERTY_ADMIN"} & set(actor.roles))
-        is_tenant_admin = "TENANT_ADMIN" in actor.roles
-        is_system_admin = "SYSTEM_ADMIN" in actor.roles
-        visibilities = visibilities_for_principal(
-            is_resident=is_resident,
-            is_staff=is_staff,
-            is_manager=is_manager,
-            is_tenant_admin=is_tenant_admin,
-            is_system_admin=is_system_admin,
-        )
         tenant_ids: set[int] = set()
         property_ids: set[int] = {0}
         allow_all = False
@@ -287,6 +274,12 @@ class RetrievalService:
                     status_code=422,
                 )
             RbacService.require_permission(actor, KNOWLEDGE_READ, target)
+            visibilities = self._visibilities_for_target(
+                actor=actor,
+                target=target,
+                resident_property_ids=resident_property_ids,
+                employee_property_ids=frozenset(employee_property_ids),
+            )
             return RetrievalAcl(
                 tenant_id=property_record.tenant_id,
                 property_ids=frozenset({property_id, 0}),
@@ -313,11 +306,63 @@ class RetrievalService:
                 message="Permission denied",
                 status_code=403,
             )
+        visibilities = self._visibilities_for_target(
+            actor=actor,
+            target=scope,
+            resident_property_ids=resident_property_ids,
+            employee_property_ids=frozenset(employee_property_ids),
+        )
         return RetrievalAcl(
             tenant_id=tenant_id,
             property_ids=frozenset(property_ids),
             visibilities=frozenset(item.value for item in visibilities),
             allow_all_properties=allow_all,
+        )
+
+    @staticmethod
+    def _visibilities_for_target(
+        *,
+        actor: Principal,
+        target: OrganizationScope,
+        resident_property_ids: set[int],
+        employee_property_ids: frozenset[int],
+    ) -> frozenset[KnowledgeVisibility]:
+        matching_roles = {
+            grant.role_code
+            for grant in actor.grants
+            if KNOWLEDGE_READ in grant.permissions and grant.scope.allows(target)
+        }
+        tenant_scope = OrganizationScope(
+            ScopeType.TENANT,
+            tenant_id=target.tenant_id,
+        )
+        is_tenant_admin = any(
+            grant.role_code == "TENANT_ADMIN"
+            and KNOWLEDGE_READ in grant.permissions
+            and grant.scope.allows(tenant_scope)
+            for grant in actor.grants
+        )
+        property_id = target.property_id
+        is_resident = (
+            "RESIDENT" in matching_roles
+            or property_id is not None
+            and property_id in resident_property_ids
+        )
+        is_staff = bool(
+            matching_roles
+            & {"STAFF", "SUPERVISOR", "PROPERTY_ADMIN", "TENANT_ADMIN"}
+        ) or (
+            property_id is not None
+            and property_id in employee_property_ids
+        )
+        return visibilities_for_principal(
+            is_resident=is_resident,
+            is_staff=is_staff,
+            is_manager=bool(
+                matching_roles & {"SUPERVISOR", "PROPERTY_ADMIN"}
+            ),
+            is_tenant_admin=is_tenant_admin,
+            is_system_admin="SYSTEM_ADMIN" in matching_roles,
         )
 
     @staticmethod

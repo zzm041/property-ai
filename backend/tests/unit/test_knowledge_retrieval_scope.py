@@ -5,7 +5,7 @@ import pytest
 
 from app.core.errors import AppError, KnowledgeErrorCode
 from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
-from app.domain.knowledge import KNOWLEDGE_READ
+from app.domain.knowledge import KNOWLEDGE_READ, KnowledgeVisibility
 from app.service.retrieval import RetrievalService
 
 
@@ -65,6 +65,9 @@ def test_selected_property_uses_its_persisted_tenant_with_mixed_grants() -> None
     assert acl.tenant_id == 20
     assert acl.property_ids == frozenset({0, 200})
     assert acl.allow_all_properties is False
+    assert KnowledgeVisibility.PROPERTY.value in acl.visibilities
+    assert KnowledgeVisibility.TENANT.value not in acl.visibilities
+    assert KnowledgeVisibility.SYSTEM.value not in acl.visibilities
 
 
 def test_system_grant_resolves_selected_property_tenant() -> None:
@@ -86,6 +89,32 @@ def test_system_grant_resolves_selected_property_tenant() -> None:
 
     assert acl.tenant_id == 30
     assert acl.property_ids == frozenset({0, 300})
+    assert KnowledgeVisibility.SYSTEM.value in acl.visibilities
+    assert KnowledgeVisibility.TENANT.value in acl.visibilities
+
+
+def test_matching_tenant_admin_keeps_tenant_common_visibility() -> None:
+    actor = Principal(
+        user_id=42,
+        status="ACTIVE",
+        display_name="tenant manager",
+        grants=(
+            _grant(
+                "TENANT_ADMIN",
+                OrganizationScope(ScopeType.TENANT, tenant_id=20),
+            ),
+        ),
+    )
+    service = _service(SimpleNamespace(id=200, tenant_id=20))
+
+    acl = service._acl_for(
+        actor=actor,
+        property_id=200,
+        claimed_tenant_id=None,
+    )
+
+    assert KnowledgeVisibility.TENANT.value in acl.visibilities
+    assert KnowledgeVisibility.SYSTEM.value not in acl.visibilities
 
 
 def test_claimed_tenant_must_match_selected_persisted_property() -> None:

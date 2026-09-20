@@ -1,0 +1,59 @@
+{
+  "task_id": "KNOWLEDGE-MGMT-RAG-008",
+  "phase": "review",
+  "reviewed_head": "7d242025618e6404c618aefcc82a2f8981487335",
+  "decision": "NEEDS_CHANGES",
+  "actions_or_findings": [
+    {
+      "title": "KB008-B1 [CLOSED by inspection]",
+      "path": "backend/app/repository/knowledge.py:154",
+      "trigger": "Two version requests wait on the same document row.",
+      "rationale": "The ordered SELECT FOR UPDATE runs after the document lock and reads the latest committed version under MySQL repeatable read. Concurrency was not exercised."
+    },
+    {
+      "title": "KB008-B2 [CLOSED for tenant selection]",
+      "path": "backend/app/service/retrieval.py:261",
+      "trigger": "A SYSTEM grant or mixed-tenant grants select a property.",
+      "rationale": "The ACL uses the property's persisted tenant, checks knowledge:read against that exact scope, and retains property_id=0 for tenant-common knowledge."
+    },
+    {
+      "title": "KB008-B3 [CLOSED by inspection]",
+      "path": "backend/app/service/knowledge.py:672",
+      "trigger": "An unauthorized actor requests a version of an archived document.",
+      "rationale": "Persisted-scope permission is checked before KB.ARCHIVED is returned."
+    },
+    {
+      "title": "KB008-N1 [CLOSED by inspection]",
+      "path": "miniprogram/pages/supervisor/knowledge.js:69",
+      "trigger": "A newer ingestion job is pending while an older version remains active.",
+      "rationale": "The card uses the first job from the descending, version-unique job list; selected history remains intact."
+    },
+    {
+      "title": "KB008-B4 [BLOCKER] Mixed grants elevate retrieval visibility",
+      "path": "backend/app/service/retrieval.py:229",
+      "trigger": "An actor has TENANT_ADMIN in tenant 10 and PROPERTY_ADMIN for property 200 in tenant 20, then retrieves property 200.",
+      "rationale": "The new property branch correctly targets tenant 20, but visibility is still derived from all actor roles. The tenant 10 grant adds TENANT visibility to the tenant 20 ACL, whose property IDs include 0. The Milvus filter and MySQL postfilter can therefore admit tenant 20 tenant-common TENANT knowledge. The new mixed-grant test checks tenant and property IDs but does not check visibility."
+    }
+  ],
+  "evidence_paths": [
+    "git diff d3de8de3a755c56fd478f9cdbc48173d7623d75e..7d242025618e6404c618aefcc82a2f8981487335",
+    "backend/app/repository/knowledge.py",
+    "backend/app/service/knowledge.py",
+    "backend/app/service/retrieval.py",
+    "backend/tests/unit/test_knowledge_management.py",
+    "backend/tests/unit/test_knowledge_retrieval_scope.py",
+    "miniprogram/pages/supervisor/knowledge.js",
+    "backend/app/domain/knowledge.py"
+  ],
+  "unverified": [
+    "Python unit tests, concurrent MySQL behavior, and backend runtime were not run; the project venv's base Python executable is reported missing.",
+    "8083 requests, Milvus and self-hosted RAG, production storage, and mini-program page behavior were not exercised.",
+    "Main-session JavaScript syntax, grant-helper, and git diff --check results were reported after FIX-1 but were not rerun in this read-only review."
+  ],
+  "session_note": "Bounded round 2 static review only. No files were edited; no tests, processes, HTTP or business requests, secrets, or private configuration were accessed.",
+  "task_result": "Three initial findings are closed by inspection. The tenant-selection part of KB008-B2 is fixed, but a mixed-grant visibility defect remains. This is not task-level or Production V1 runtime acceptance.",
+  "product_gap_changes": [],
+  "schedule_risk": "A code fix is required before runtime validation. The missing Python executable and outstanding 8083, Milvus, page, and production storage evidence remain release risks.",
+  "next_action": "Main Codex: implement scope-aware visibility calculation for the selected property's persisted tenant in RetrievalService._acl_for.",
+  "approval_requests": []
+}
