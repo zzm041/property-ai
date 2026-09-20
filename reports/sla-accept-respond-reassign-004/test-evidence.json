@@ -16,6 +16,12 @@
     "result": "427 passed, 1 warning",
     "final_run_after_fix": true
   },
+  "post_review_assertions": {
+    "command": ".venv\\Scripts\\python.exe -m pytest backend/tests/unit/test_sla_notification_scheduler.py -q",
+    "result": "8 passed, 1 warning",
+    "commit": "d86c4bb",
+    "scope": "Explicitly asserts current ACTIVE assignment and WorkOrderLog-to-WorkOrder correlation in the MySQL compiled due-order query."
+  },
   "static_analysis": {
     "command": ".venv\\Scripts\\python.exe -m ruff check <changed files>",
     "result": "NOT_RUN",

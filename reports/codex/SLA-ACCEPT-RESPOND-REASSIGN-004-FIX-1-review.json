@@ -1,0 +1,46 @@
+{
+  "task_id": "SLA-ACCEPT-RESPOND-REASSIGN-004",
+  "phase": "review",
+  "reviewed_head": "55fe0a90b81ff8935d50cb8a7fa93c381e8ba92b",
+  "decision": "PASS",
+  "actions_or_findings": [
+    {
+      "title": "SLA-004-B1 — CLOSED — due-order starvation",
+      "path": "backend/app/repository/work_order.py:249",
+      "trigger": "Previously handled ACCEPTED assignment cycles remain past their response deadline.",
+      "rationale": "The query joins the current active assignment and excludes its timeout marker or matching assignment-scoped log before ordering and LIMIT. Missing or malformed assignments cannot enter the batch. The marker and log are written in one service-owned transaction. Saved order-14 evidence reports scanned=0 on both duplicate sweeps."
+    },
+    {
+      "title": "SLA-004-N1 — NON_BLOCKING_TEST_COVERAGE — incomplete predicate assertions",
+      "path": "backend/tests/unit/test_sla_notification_scheduler.py:306",
+      "trigger": "A future edit removes the ACTIVE-status predicate or the log-to-work-order correlation.",
+      "rationale": "Both predicates are present in the reviewed source, but the compiled-SQL test does not assert them and does not exercise a backlog exceeding 100 handled legacy rows. This weakens future regression detection; it does not reopen B1."
+    }
+  ],
+  "evidence_paths": [
+    "reports/project-handoff.md",
+    "reports/codex/SLA-ACCEPT-RESPOND-REASSIGN-004-review.json",
+    "backend/app/repository/work_order.py",
+    "backend/app/service/sla.py",
+    "backend/app/service/work_order.py",
+    "backend/app/service/auto_dispatch.py",
+    "backend/app/model/work_order.py",
+    "backend/tests/unit/test_sla_notification_scheduler.py",
+    "reports/sla-accept-respond-reassign-004/test-evidence.json",
+    "reports/sla-accept-respond-reassign-004/runtime-evidence.json"
+  ],
+  "unverified": [
+    "Reviewer stayed read-only and did not rerun tests, operate pages, send requests, or inspect private context.",
+    "47 focused and 427 full unit passes are main-session saved results, not reviewer reruns.",
+    "A greater-than-100-row legacy backlog, live scheduler concurrency, wall-clock Beat, and production providers were not exercised."
+  ],
+  "session_note": "Frozen Production V1 remains the overall goal. This review covers only SLA-004 FIX-1 on product commit 9ab106b29b9761504fa229cc1bd97227daa6e6c9 and evidence HEAD 55fe0a90b81ff8935d50cb8a7fa93c381e8ba92b. No direct FSM, supervisor reassignment, load, cooldown, or active-assignment uniqueness regression was found. The living handoff still names SLA-003 as the latest reviewed milestone. ACCOUNT-MERGE-001 and Migration 0010 remain unapproved and unimplemented.",
+  "task_result": "SLA-004-B1 is closed for the scoped 8083/0009 local slice. Saved order-14 evidence shows accept timeout, automatic reassignment to another employee, staff acceptance, one response timeout, and eight development notification deliveries. This is not Production V1 release acceptance.",
+  "product_gap_changes": [
+    "SLA accept/respond timeout and reassignment advance to scoped independent PASS.",
+    "Controlled account merge and recovery, SLA policy administration, real self-hosted AI and Embedding/RAG, production providers and storage, wall-clock operation, and release validation remain V1 gaps."
+  ],
+  "schedule_risk": "The approximately 2026-09-21 one-week aim cannot cover full Production V1: Migration 0010 is unapproved, and frozen features plus production validation remain open.",
+  "next_action": "Main Codex should update reports/project-handoff.md to record SLA-004 FIX-1 PASS at 55fe0a9, close B1, cite order 14 and the saved 47/427 results, and retain the V1 gap list. It should strengthen the SQL test to assert ACTIVE status and log-to-work-order correlation. Completion is an accurate handoff and those assertions passing without database mutation. Ordinary documentation and unit-test work needs no new approval; Migration 0010 or reserved environment operations require separate approval.",
+  "approval_requests": []
+}
