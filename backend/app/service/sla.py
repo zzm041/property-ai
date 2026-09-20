@@ -296,11 +296,16 @@ class SlaService:
         assignment.timeout_at = now
         assignment.ended_at = now
         assignment.reason = "SLA_ACCEPT_TIMEOUT"
-        shares_incident_capacity = (
-            self._repository.is_auto_incident_follow_assignment(assignment.id)
-            is True
+        from app.service.incident import IncidentCapacityService
+
+        release_load = IncidentCapacityService(
+            self._session,
+            work_order_repository=self._repository,
+        ).should_release_load(
+            work_order=record,
+            assignment=assignment,
         )
-        if employee is not None and not shares_incident_capacity:
+        if employee is not None and release_load:
             property_record = self._repository.get_property(record.property_id)
             if property_record is not None:
                 business_date = current_business_date(

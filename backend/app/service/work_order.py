@@ -1625,6 +1625,15 @@ class WorkOrderService:
             now=now,
         )
         self._adjust_load(record, employee, delta=1)
+        from app.service.incident import IncidentCapacityService
+
+        IncidentCapacityService(
+            self._session,
+            work_order_repository=self._repository,
+        ).adopt_assignment(
+            work_order=record,
+            assignment=assignment,
+        )
         audit_action = (
             AuditAction.WORK_ORDER_ASSIGNED
             if is_first
@@ -2408,11 +2417,16 @@ class WorkOrderService:
         if reason is not None:
             assignment.reason = reason
         employee = self._employees.get_employee(assignment.employee_id)
-        shares_incident_capacity = (
-            self._repository.is_auto_incident_follow_assignment(assignment.id)
-            is True
+        from app.service.incident import IncidentCapacityService
+
+        release_load = IncidentCapacityService(
+            self._session,
+            work_order_repository=self._repository,
+        ).should_release_load(
+            work_order=record,
+            assignment=assignment,
         )
-        if employee is not None and not shares_incident_capacity:
+        if employee is not None and release_load:
             self._adjust_load(record, employee, delta=-1)
         record.current_assignment_id = None
         self._session.flush()

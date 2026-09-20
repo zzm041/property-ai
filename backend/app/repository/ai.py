@@ -414,6 +414,34 @@ class AiRepository:
             select(Incident).where(Incident.id == incident_id).with_for_update()
         )
 
+    def list_active_incident_assignments_for_update(
+        self,
+        *,
+        incident_id: int,
+        exclude_assignment_id: int,
+    ) -> tuple[tuple[WorkOrder, WorkOrderAssignment], ...]:
+        return tuple(
+            self._session.execute(
+                select(WorkOrder, WorkOrderAssignment)
+                .join(
+                    IncidentWorkOrder,
+                    IncidentWorkOrder.work_order_id == WorkOrder.id,
+                )
+                .join(
+                    WorkOrderAssignment,
+                    WorkOrderAssignment.id == WorkOrder.current_assignment_id,
+                )
+                .where(
+                    IncidentWorkOrder.incident_id == incident_id,
+                    WorkOrderAssignment.id != exclude_assignment_id,
+                    WorkOrderAssignment.status == "ACTIVE",
+                    WorkOrderAssignment.ended_at.is_(None),
+                )
+                .order_by(WorkOrder.created_at, WorkOrder.id)
+                .with_for_update(skip_locked=True)
+            ).all()
+        )
+
     def add_incident(self, record: Incident) -> Incident:
         self._session.add(record)
         self._session.flush()

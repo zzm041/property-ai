@@ -1,8 +1,20 @@
 """Query/add/flush for WorkOrder aggregates. Service owns commits."""
 
+from dataclasses import dataclass
 from datetime import datetime
+import json
 
-from sqlalchemy import MetaData, Table, and_, case, func, inspect as sa_inspect, or_, select
+from sqlalchemy import (
+    MetaData,
+    Table,
+    and_,
+    case,
+    func,
+    inspect as sa_inspect,
+    or_,
+    select,
+    update,
+)
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -23,6 +35,13 @@ from app.model.work_order import (
     WorkOrderProcess,
     WorkOrderReceipt,
 )
+
+
+@dataclass(frozen=True, slots=True)
+class AutoAssignmentProvenance:
+    incident_id: int | None
+    incident_follow: bool
+    incident_capacity_owner: bool
 
 
 class WorkOrderRepository:
@@ -205,31 +224,109 @@ class WorkOrderRepository:
             select(WorkOrderReceipt).where(WorkOrderReceipt.process_id == process_id)
         )
 
-    def is_auto_incident_follow_assignment(self, assignment_id: int) -> bool:
-        """Read 0009 assignment provenance without mapping it onto shared 0007."""
+    def get_content_for_update(self, work_order_id: int) -> WorkOrderContent | None:
+        return self._session.scalar(
+            select(WorkOrderContent)
+            .where(WorkOrderContent.work_order_id == work_order_id)
+            .with_for_update()
+        )
 
+    def _assignment_extension_table(self) -> Table | None:
         bind = self._session.get_bind()
         if bind is None:
-            return False
+            return None
         try:
             columns = {
                 column["name"]
                 for column in sa_inspect(bind).get_columns("work_order_assignments")
             }
             if not {"assigned_source", "payload_json"} <= columns:
-                return False
-            table = Table("work_order_assignments", MetaData(), autoload_with=bind)
+                return None
+            return Table("work_order_assignments", MetaData(), autoload_with=bind)
+        except SQLAlchemyError:
+            return None
+
+    @staticmethod
+    def _payload_object(value: object) -> dict[str, object]:
+        if isinstance(value, dict):
+            return dict(value)
+        if isinstance(value, str):
+            try:
+                parsed = json.loads(value)
+            except json.JSONDecodeError:
+                return {}
+            if isinstance(parsed, dict):
+                return parsed
+        return {}
+
+    def get_auto_assignment_provenance(
+        self,
+        assignment_id: int,
+        *,
+        for_update: bool = False,
+    ) -> AutoAssignmentProvenance | None:
+        """Read 0009 AUTO provenance without mapping it onto shared 0007."""
+
+        table = self._assignment_extension_table()
+        if table is None:
+            return None
+        statement = select(table.c.assigned_source, table.c.payload_json).where(
+            table.c.id == assignment_id
+        )
+        if for_update:
+            statement = statement.with_for_update()
+        try:
+            row = self._session.execute(statement).mappings().one_or_none()
+        except SQLAlchemyError:
+            return None
+        if row is None or row["assigned_source"] != "AUTO":
+            return None
+        payload = self._payload_object(row["payload_json"])
+        raw_incident_id = payload.get("incident_id")
+        try:
+            incident_id = (
+                None if raw_incident_id is None else int(raw_incident_id)
+            )
+        except (TypeError, ValueError):
+            incident_id = None
+        return AutoAssignmentProvenance(
+            incident_id=incident_id,
+            incident_follow=payload.get("incident_follow") is True,
+            incident_capacity_owner=payload.get("incident_capacity_owner") is True,
+        )
+
+    def mark_auto_incident_capacity_owner(
+        self,
+        assignment_id: int,
+        *,
+        incident_id: int,
+    ) -> bool:
+        table = self._assignment_extension_table()
+        if table is None:
+            return False
+        try:
             row = self._session.execute(
-                select(table.c.assigned_source, table.c.payload_json).where(
-                    table.c.id == assignment_id
-                )
+                select(table.c.assigned_source, table.c.payload_json)
+                .where(table.c.id == assignment_id)
+                .with_for_update()
             ).mappings().one_or_none()
+            if row is None or row["assigned_source"] != "AUTO":
+                return False
+            payload = self._payload_object(row["payload_json"])
+            payload["incident_id"] = incident_id
+            payload["incident_capacity_owner"] = True
+            self._session.execute(
+                update(table)
+                .where(table.c.id == assignment_id)
+                .values(payload_json=payload)
+            )
         except SQLAlchemyError:
             return False
-        if row is None or row["assigned_source"] != "AUTO":
-            return False
-        payload = row["payload_json"]
-        return isinstance(payload, dict) and payload.get("incident_follow") is True
+        return True
+
+    def is_auto_incident_follow_assignment(self, assignment_id: int) -> bool:
+        provenance = self.get_auto_assignment_provenance(assignment_id)
+        return provenance is not None and provenance.incident_follow
 
     def list_work_orders_for_file(self, file_id: int) -> tuple[WorkOrder, ...]:
         return tuple(

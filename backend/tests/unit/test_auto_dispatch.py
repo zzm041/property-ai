@@ -285,6 +285,45 @@ def test_auto_dispatch_tries_next_ranked_candidate_when_winner_turns_ineligible(
     assert [call.kwargs["winner"].employee_id for call in commit.call_args_list] == [7, 8]
 
 
+def test_failed_savepoint_restores_only_outer_notification_intents(monkeypatch) -> None:
+    settings = Settings(_env_file=None, ai_auto_assign=True)
+    session = MagicMock()
+    session.info = {
+        "pending_notification_deliveries": [71],
+        "notification_settings": settings,
+    }
+    nested = MagicMock()
+    session.begin_nested.return_value = nested
+    service = AutoDispatchService(session, settings=settings)
+    service._work_orders = MagicMock()
+    service._work_orders.get_active_assignment.return_value = None
+    winner = _candidate()
+    monkeypatch.setattr(
+        "app.service.auto_dispatch.assignment_schema_ready",
+        lambda _session: True,
+    )
+    monkeypatch.setattr(
+        service,
+        "_evaluate_live_candidates",
+        lambda *_args, **_kwargs: (((winner, 0.9, ("SKILL_MATCH",)),), ()),
+    )
+
+    def fail_after_notification(**_kwargs):
+        session.info["pending_notification_deliveries"].append(72)
+        raise RuntimeError("candidate savepoint failed")
+
+    monkeypatch.setattr(service, "_commit_auto_assignment", fail_after_notification)
+
+    assert service.maybe_assign(
+        work_order=_pending_order(),
+        mapped=_mapped(),
+        request_id="r-savepoint-failure",
+    ) == "ASSIGN_FAILED"
+    nested.rollback.assert_called_once()
+    assert session.info["pending_notification_deliveries"] == [71]
+    assert session.info["notification_settings"] is settings
+
+
 def test_incident_follower_reuses_full_primary_without_duplicate_load(monkeypatch) -> None:
     settings = Settings(_env_file=None, app_env="test", ai_auto_assign=True)
     session = MagicMock()
@@ -328,7 +367,7 @@ def test_incident_follower_reuses_full_primary_without_duplicate_load(monkeypatc
     service._work_orders.get_sla_clock_for_update.return_value = None
     service._employees.get_employee.return_value = employee
     service._employees.get_daily_status_for_update.return_value = daily
-    service._ai.get_incident.return_value = incident
+    service._ai.get_incident_for_update.return_value = incident
     service._ai.get_attendance.return_value = SimpleNamespace(
         check_in_at=datetime.now(UTC)
     )
@@ -359,6 +398,7 @@ def test_incident_follower_reuses_full_primary_without_duplicate_load(monkeypatc
     payload = service._insert_auto_assignment.call_args.kwargs["payload"]
     assert payload["incident_id"] == 501
     assert payload["incident_follow"] is True
+    assert payload["incident_capacity_owner"] is False
     log = service._work_orders.add_log.call_args.args[0]
     assert log.payload_json["reason_code"] == "AUTO_INCIDENT_FOLLOW"
     assert incident.primary_work_order_id == 10

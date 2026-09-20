@@ -4,15 +4,24 @@ from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
+from sqlalchemy.dialects import mysql
+
 from app.core.config import Settings
 from app.core.database import OWNED_TXN_KEY, OWNED_TXN_OBJ_KEY
 from app.repository.ai import AiRepository
+from app.repository.work_order import AutoAssignmentProvenance, WorkOrderRepository
+from app.service.auto_dispatch import (
+    _notification_intent_snapshot,
+    _restore_notification_intents,
+)
 from app.service.incident import (
+    IncidentCapacityService,
     IncidentService,
     _clear_pending_incident_redispatch,
     _schedule_incident_redispatch,
 )
 from app.service.notification import (
+    _clear_pending_notification_deliveries,
     _schedule_notification_deliveries,
 )
 from app.service.work_order import WorkOrderService
@@ -59,6 +68,31 @@ def test_cluster_without_building_still_requires_matching_subcategory() -> None:
     assert result == (matching,)
     repository.get_current_analysis.assert_any_call(matching.id)
     repository.get_current_analysis.assert_any_call(other.id)
+
+
+def test_analysis_content_lookup_is_a_current_locking_read() -> None:
+    session = MagicMock()
+    session.scalar.return_value = None
+    repository = WorkOrderRepository(session)
+
+    assert repository.get_content_for_update(41) is None
+
+    statement = session.scalar.call_args.args[0]
+    sql = str(statement.compile(dialect=mysql.dialect()))
+    assert "work_order_contents.work_order_id = %s" in sql
+    assert "FOR UPDATE" in sql
+
+
+def test_shared_0007_without_assignment_extensions_fails_closed() -> None:
+    session = MagicMock()
+    session.get_bind.return_value = None
+    repository = WorkOrderRepository(session)
+
+    assert repository.get_auto_assignment_provenance(11) is None
+    assert (
+        repository.mark_auto_incident_capacity_owner(11, incident_id=501)
+        is False
+    )
 
 
 def test_aggregate_locks_property_and_wakes_prior_pending_member_after_commit() -> None:
@@ -111,7 +145,7 @@ def test_aggregate_locks_property_and_wakes_prior_pending_member_after_commit() 
         tenant_id=1,
     )
     service._work_orders.get_active_assignment.side_effect = lambda order_id: (
-        SimpleNamespace(employee_id=7) if order_id == assigned.id else None
+        SimpleNamespace(id=11, employee_id=7) if order_id == assigned.id else None
     )
     service._ai.get_building_id.return_value = 9
     service._ai.list_cluster_work_orders.return_value = cluster
@@ -201,6 +235,7 @@ def test_nested_transaction_events_preserve_outer_delivery_intents(monkeypatch) 
     _schedule_incident_redispatch(session)
     _schedule_notification_deliveries(session)
     _clear_pending_incident_redispatch(session)
+    _clear_pending_notification_deliveries(session)
 
     assert session.info["pending_incident_redispatch"] == {
         102: "incident:501:redispatch:102"
@@ -215,7 +250,190 @@ def test_nested_transaction_events_preserve_outer_delivery_intents(monkeypatch) 
     assert "pending_notification_deliveries" not in session.info
 
 
-def test_ending_incident_follower_does_not_release_shared_load() -> None:
+def test_nested_notification_rollback_restores_outer_intents_only() -> None:
+    session = MagicMock()
+    outer_settings = object()
+    inner_settings = object()
+    session.info = {
+        "pending_notification_deliveries": [71],
+        "notification_settings": outer_settings,
+    }
+    snapshot = _notification_intent_snapshot(session)
+    session.info["pending_notification_deliveries"].append(72)
+    session.info["notification_settings"] = inner_settings
+    session.in_nested_transaction.return_value = True
+
+    _clear_pending_notification_deliveries(session)
+    _restore_notification_intents(session, snapshot)
+
+    assert session.info["pending_notification_deliveries"] == [71]
+    assert session.info["notification_settings"] is outer_settings
+
+
+def test_primary_end_transfers_capacity_charge_to_active_follower() -> None:
+    session = MagicMock()
+    ai = MagicMock()
+    work_orders = MagicMock()
+    service = IncidentCapacityService(
+        session,
+        ai_repository=ai,
+        work_order_repository=work_orders,
+    )
+    incident = SimpleNamespace(
+        id=501,
+        tenant_id=1,
+        property_id=2,
+        primary_work_order_id=101,
+        primary_employee_id=7,
+    )
+    primary_order = SimpleNamespace(
+        id=101,
+        tenant_id=1,
+        property_id=2,
+        incident_id=501,
+    )
+    primary_assignment = SimpleNamespace(id=11, employee_id=7)
+    follower_order = SimpleNamespace(id=102)
+    follower_assignment = SimpleNamespace(id=12, employee_id=7)
+    ai.get_incident_for_update.return_value = incident
+    ai.list_active_incident_assignments_for_update.return_value = (
+        (follower_order, follower_assignment),
+    )
+    work_orders.get_auto_assignment_provenance.side_effect = (
+        AutoAssignmentProvenance(501, False, True),
+        AutoAssignmentProvenance(501, True, False),
+    )
+    work_orders.mark_auto_incident_capacity_owner.return_value = True
+
+    release = service.should_release_load(
+        work_order=primary_order,
+        assignment=primary_assignment,
+    )
+
+    assert release is False
+    assert incident.primary_work_order_id == follower_order.id
+    assert incident.primary_employee_id == follower_assignment.employee_id
+    work_orders.mark_auto_incident_capacity_owner.assert_called_once_with(
+        follower_assignment.id,
+        incident_id=incident.id,
+    )
+
+
+def test_last_transferred_owner_releases_capacity_without_changing_other_primary() -> None:
+    session = MagicMock()
+    ai = MagicMock()
+    work_orders = MagicMock()
+    service = IncidentCapacityService(
+        session,
+        ai_repository=ai,
+        work_order_repository=work_orders,
+    )
+    incident = SimpleNamespace(
+        id=501,
+        tenant_id=1,
+        property_id=2,
+        primary_work_order_id=201,
+        primary_employee_id=8,
+    )
+    old_follower = SimpleNamespace(
+        id=102,
+        tenant_id=1,
+        property_id=2,
+        incident_id=501,
+    )
+    assignment = SimpleNamespace(id=12, employee_id=7)
+    ai.get_incident_for_update.return_value = incident
+    ai.list_active_incident_assignments_for_update.return_value = ()
+    work_orders.get_auto_assignment_provenance.return_value = (
+        AutoAssignmentProvenance(501, True, True)
+    )
+
+    release = service.should_release_load(
+        work_order=old_follower,
+        assignment=assignment,
+    )
+
+    assert release is True
+    assert incident.primary_work_order_id == 201
+    assert incident.primary_employee_id == 8
+
+
+def test_primary_end_without_follower_promotes_live_incident_assignment() -> None:
+    session = MagicMock()
+    ai = MagicMock()
+    work_orders = MagicMock()
+    service = IncidentCapacityService(
+        session,
+        ai_repository=ai,
+        work_order_repository=work_orders,
+    )
+    incident = SimpleNamespace(
+        id=501,
+        tenant_id=1,
+        property_id=2,
+        primary_work_order_id=101,
+        primary_employee_id=7,
+    )
+    primary_order = SimpleNamespace(
+        id=101,
+        tenant_id=1,
+        property_id=2,
+        incident_id=501,
+    )
+    primary_assignment = SimpleNamespace(id=11, employee_id=7)
+    successor_order = SimpleNamespace(id=103)
+    successor_assignment = SimpleNamespace(id=13, employee_id=8)
+    ai.get_incident_for_update.return_value = incident
+    ai.list_active_incident_assignments_for_update.return_value = (
+        (successor_order, successor_assignment),
+    )
+    work_orders.get_auto_assignment_provenance.side_effect = (
+        AutoAssignmentProvenance(501, False, True),
+        None,
+    )
+
+    release = service.should_release_load(
+        work_order=primary_order,
+        assignment=primary_assignment,
+    )
+
+    assert release is True
+    assert incident.primary_work_order_id == successor_order.id
+    assert incident.primary_employee_id == successor_assignment.employee_id
+
+
+def test_new_assignment_adopts_empty_incident_primary() -> None:
+    session = MagicMock()
+    ai = MagicMock()
+    work_orders = MagicMock()
+    service = IncidentCapacityService(
+        session,
+        ai_repository=ai,
+        work_order_repository=work_orders,
+    )
+    incident = SimpleNamespace(
+        id=501,
+        tenant_id=1,
+        property_id=2,
+        primary_work_order_id=None,
+        primary_employee_id=None,
+    )
+    record = SimpleNamespace(
+        id=101,
+        tenant_id=1,
+        property_id=2,
+        incident_id=501,
+    )
+    assignment = SimpleNamespace(id=11, employee_id=7)
+    ai.get_incident_for_update.return_value = incident
+
+    service.adopt_assignment(work_order=record, assignment=assignment)
+
+    assert incident.primary_work_order_id == record.id
+    assert incident.primary_employee_id == assignment.employee_id
+
+
+def test_ending_incident_follower_does_not_release_shared_load(monkeypatch) -> None:
     service = WorkOrderService.__new__(WorkOrderService)
     service._session = MagicMock()
     service._repository = MagicMock()
@@ -230,8 +448,13 @@ def test_ending_incident_follower_does_not_release_shared_load() -> None:
         reason=None,
     )
     service._repository.get_active_assignment_for_update.return_value = assignment
-    service._repository.is_auto_incident_follow_assignment.return_value = True
     service._employees.get_employee.return_value = SimpleNamespace(id=7)
+    capacity = MagicMock()
+    capacity.should_release_load.return_value = False
+    monkeypatch.setattr(
+        "app.service.incident.IncidentCapacityService",
+        MagicMock(return_value=capacity),
+    )
     now = datetime(2026, 9, 20, 9, 10, tzinfo=UTC)
 
     service._end_active_assignment(
@@ -245,3 +468,7 @@ def test_ending_incident_follower_does_not_release_shared_load() -> None:
     assert assignment.ended_at == now
     assert record.current_assignment_id is None
     service._adjust_load.assert_not_called()
+    capacity.should_release_load.assert_called_once_with(
+        work_order=record,
+        assignment=assignment,
+    )

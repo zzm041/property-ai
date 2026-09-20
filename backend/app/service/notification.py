@@ -297,4 +297,6 @@ def _schedule_notification_deliveries(session: Session) -> None:
 
 @event.listens_for(Session, "after_rollback")
 def _clear_pending_notification_deliveries(session: Session) -> None:
+    if session.in_nested_transaction():
+        return
     session.info.pop("pending_notification_deliveries", None)

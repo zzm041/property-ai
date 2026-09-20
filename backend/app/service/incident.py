@@ -21,7 +21,7 @@ from app.domain.audit import AuditAction, AuditResourceType
 from app.domain.iam import OrganizationScope, Principal, ScopeType
 from app.domain.incident import IncidentStatus
 from app.model.ai import Incident, IncidentWorkOrder
-from app.model.work_order import WorkOrder
+from app.model.work_order import WorkOrder, WorkOrderAssignment
 from app.provider.factory import build_llm_provider
 from app.provider.llm import LLMProvider
 from app.repository.ai import AiRepository
@@ -117,6 +117,11 @@ class IncidentService:
                 )
             )
             created = True
+            if primary_assignment is not None:
+                self._work_orders.mark_auto_incident_capacity_owner(
+                    primary_assignment.id,
+                    incident_id=incident.id,
+                )
         for item in cluster:
             if item.property_id != incident.property_id or item.tenant_id != incident.tenant_id:
                 continue
@@ -175,6 +180,10 @@ class IncidentService:
             )
             if primary_assignment is not None:
                 incident.primary_employee_id = primary_assignment.employee_id
+                self._work_orders.mark_auto_incident_capacity_owner(
+                    primary_assignment.id,
+                    incident_id=incident.id,
+                )
         action = (
             AuditAction.INCIDENT_CREATED if created else AuditAction.INCIDENT_UPDATED
         )
@@ -315,6 +324,133 @@ class IncidentService:
                 },
             )
             return incident
+
+
+class IncidentCapacityService:
+    """Keep one transferable load charge for AUTO followers of one employee."""
+
+    def __init__(
+        self,
+        session: Session,
+        *,
+        ai_repository: AiRepository | None = None,
+        work_order_repository: WorkOrderRepository | None = None,
+    ) -> None:
+        self._ai = ai_repository or AiRepository(session)
+        self._work_orders = work_order_repository or WorkOrderRepository(session)
+
+    def adopt_assignment(
+        self,
+        *,
+        work_order: WorkOrder,
+        assignment: WorkOrderAssignment,
+    ) -> None:
+        incident_id = getattr(work_order, "incident_id", None)
+        if incident_id is None:
+            return
+        incident = self._ai.get_incident_for_update(incident_id)
+        if (
+            incident is None
+            or incident.tenant_id != work_order.tenant_id
+            or incident.property_id != work_order.property_id
+            or incident.primary_employee_id is not None
+        ):
+            return
+        incident.primary_work_order_id = work_order.id
+        incident.primary_employee_id = assignment.employee_id
+        self._work_orders.mark_auto_incident_capacity_owner(
+            assignment.id,
+            incident_id=incident.id,
+        )
+
+    def should_release_load(
+        self,
+        *,
+        work_order: WorkOrder,
+        assignment: WorkOrderAssignment,
+    ) -> bool:
+        incident_id = getattr(work_order, "incident_id", None)
+        if incident_id is None:
+            return True
+        incident = self._ai.get_incident_for_update(incident_id)
+        if (
+            incident is None
+            or incident.tenant_id != work_order.tenant_id
+            or incident.property_id != work_order.property_id
+        ):
+            return True
+        provenance = self._work_orders.get_auto_assignment_provenance(
+            assignment.id,
+            for_update=True,
+        )
+        is_primary_owner = (
+            incident.primary_work_order_id == work_order.id
+            and incident.primary_employee_id == assignment.employee_id
+        )
+        is_explicit_owner = (
+            provenance is not None and provenance.incident_capacity_owner
+        )
+        is_unowned_follower = (
+            provenance is not None
+            and provenance.incident_follow
+            and not is_explicit_owner
+            and not is_primary_owner
+        )
+        if is_unowned_follower:
+            return False
+        if not is_primary_owner and not is_explicit_owner:
+            return True
+
+        candidates = self._ai.list_active_incident_assignments_for_update(
+            incident_id=incident.id,
+            exclude_assignment_id=assignment.id,
+        )
+        same_employee_follower: tuple[WorkOrder, WorkOrderAssignment] | None = None
+        for candidate_work_order, candidate_assignment in candidates:
+            if candidate_assignment.employee_id != assignment.employee_id:
+                continue
+            candidate_provenance = (
+                self._work_orders.get_auto_assignment_provenance(
+                    candidate_assignment.id,
+                    for_update=True,
+                )
+            )
+            if (
+                candidate_provenance is not None
+                and candidate_provenance.incident_follow
+                and not candidate_provenance.incident_capacity_owner
+            ):
+                same_employee_follower = (
+                    candidate_work_order,
+                    candidate_assignment,
+                )
+                break
+        if same_employee_follower is not None:
+            successor_work_order, successor_assignment = same_employee_follower
+            transferred = self._work_orders.mark_auto_incident_capacity_owner(
+                successor_assignment.id,
+                incident_id=incident.id,
+            )
+            if transferred:
+                if is_primary_owner:
+                    incident.primary_work_order_id = successor_work_order.id
+                    incident.primary_employee_id = successor_assignment.employee_id
+                return False
+
+        if is_primary_owner:
+            successor = candidates[0] if candidates else None
+            if successor is None:
+                incident.primary_work_order_id = None
+                incident.primary_employee_id = None
+            else:
+                successor_work_order, successor_assignment = successor
+                incident.primary_work_order_id = successor_work_order.id
+                incident.primary_employee_id = successor_assignment.employee_id
+                self._work_orders.mark_auto_incident_capacity_owner(
+                    successor_assignment.id,
+                    incident_id=incident.id,
+                )
+        return True
 
 
 @event.listens_for(Session, "after_commit")

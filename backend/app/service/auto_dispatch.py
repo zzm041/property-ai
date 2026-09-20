@@ -51,6 +51,27 @@ AUTO_ASSIGN_SCHEMA_COLUMNS = frozenset({"assigned_source", "payload_json"})
 _STAFF_ROLES = frozenset({"STAFF", "SUPERVISOR", "PROPERTY_ADMIN", "TENANT_ADMIN"})
 
 
+def _notification_intent_snapshot(session: Session) -> tuple[list[int], bool, object]:
+    pending = list(session.info.get("pending_notification_deliveries", ()))
+    has_settings = "notification_settings" in session.info
+    return pending, has_settings, session.info.get("notification_settings")
+
+
+def _restore_notification_intents(
+    session: Session,
+    snapshot: tuple[list[int], bool, object],
+) -> None:
+    pending, has_settings, settings = snapshot
+    if pending:
+        session.info["pending_notification_deliveries"] = pending
+    else:
+        session.info.pop("pending_notification_deliveries", None)
+    if has_settings:
+        session.info["notification_settings"] = settings
+    else:
+        session.info.pop("notification_settings", None)
+
+
 def configured_dispatch_weights(settings: Settings) -> DispatchWeights:
     return DispatchWeights(
         duty=settings.dispatch_weight_duty,
@@ -121,6 +142,7 @@ class AutoDispatchService:
         if not ranked:
             return "NO_ELIGIBLE"
         for winner, score, reasons in ranked:
+            notification_snapshot = _notification_intent_snapshot(self._session)
             nested = self._session.begin_nested()
             try:
                 outcome = self._commit_auto_assignment(
@@ -137,6 +159,10 @@ class AutoDispatchService:
                     return outcome
             except IntegrityError:
                 nested.rollback()
+                _restore_notification_intents(
+                    self._session,
+                    notification_snapshot,
+                )
                 logger.warning(
                     "auto_dispatch_conflict",
                     work_order_id=record.id,
@@ -145,6 +171,10 @@ class AutoDispatchService:
                 return "ALREADY_ASSIGNED"
             except Exception:
                 nested.rollback()
+                _restore_notification_intents(
+                    self._session,
+                    notification_snapshot,
+                )
                 logger.exception(
                     "auto_dispatch_failed",
                     work_order_id=record.id,
@@ -331,7 +361,11 @@ class AutoDispatchService:
         )
         if daily is None or daily.on_duty != AttendanceOnDuty.ON_DUTY.value:
             return "NO_ELIGIBLE"
-        incident = self._ai.get_incident(record.incident_id) if record.incident_id else None
+        incident = (
+            self._ai.get_incident_for_update(record.incident_id)
+            if record.incident_id
+            else None
+        )
         incident_follow = (
             incident is not None
             and incident.primary_work_order_id != record.id
@@ -395,6 +429,7 @@ class AutoDispatchService:
             "risk": mapped.risk.value,
             "incident_id": None if incident is None else incident.id,
             "incident_follow": incident_follow,
+            "incident_capacity_owner": incident is not None and not incident_follow,
             "current_load": winner.current_load,
             "max_capacity": winner.max_capacity,
             "filter_snapshot": {
@@ -468,6 +503,15 @@ class AutoDispatchService:
             and not incident_follow
             and incident.primary_employee_id != employee.id
         ):
+            if incident.primary_work_order_id is not None:
+                previous = self._work_orders.get_active_assignment(
+                    incident.primary_work_order_id
+                )
+                if previous is not None:
+                    self._work_orders.mark_auto_incident_capacity_owner(
+                        previous.id,
+                        incident_id=incident.id,
+                    )
             incident.primary_work_order_id = record.id
             incident.primary_employee_id = employee.id
         self._session.flush()
