@@ -10,6 +10,7 @@ from sqlalchemy.exc import OperationalError
 
 from app.core.config import Settings
 from app.core.database import OWNED_TXN_KEY, OWNED_TXN_OBJ_KEY
+from app.core.errors import AppError, WorkOrderErrorCode
 from app.domain.ai import AnalysisStatus
 from app.repository.ai import AiRepository
 from app.repository.work_order import AutoAssignmentProvenance, WorkOrderRepository
@@ -156,6 +157,42 @@ def test_incident_capacity_query_waits_for_locked_followers() -> None:
     sql = str(statement.compile(dialect=mysql.dialect()))
     assert "FOR UPDATE" in sql
     assert "SKIP LOCKED" not in sql
+
+
+@pytest.mark.parametrize("code", [1205, 1213])
+def test_work_order_transaction_lock_failure_is_stable_retryable_conflict(
+    code: int,
+) -> None:
+    service = WorkOrderService.__new__(WorkOrderService)
+    session = MagicMock()
+    session.info = {}
+    session.in_transaction.return_value = False
+    session.get_transaction.return_value = MagicMock()
+    service._session = session
+    failure = OperationalError("statement", {}, Exception(code, "lock conflict"))
+
+    with pytest.raises(AppError) as raised:
+        service._execute(lambda: (_ for _ in ()).throw(failure))
+
+    assert raised.value.code == WorkOrderErrorCode.CONFLICT
+    assert raised.value.status_code == 409
+    assert raised.value.details == {"retryable": True}
+
+
+def test_work_order_other_operational_failure_remains_internal_error() -> None:
+    service = WorkOrderService.__new__(WorkOrderService)
+    session = MagicMock()
+    session.info = {}
+    session.in_transaction.return_value = False
+    session.get_transaction.return_value = MagicMock()
+    service._session = session
+    failure = OperationalError("statement", {}, Exception(1045, "access denied"))
+
+    with pytest.raises(AppError) as raised:
+        service._execute(lambda: (_ for _ in ()).throw(failure))
+
+    assert raised.value.code == "SYS.INTERNAL_ERROR"
+    assert raised.value.status_code == 500
 
 
 def test_shared_0007_without_assignment_extensions_fails_closed() -> None:

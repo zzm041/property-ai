@@ -7,10 +7,11 @@ from hashlib import sha256
 from pathlib import Path
 from typing import TypeVar
 
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings, get_settings
+from app.core.database import retryable_mysql_transaction_error_code
 from app.core.errors import (
     AppError,
     AuthErrorCode,
@@ -2709,6 +2710,19 @@ class WorkOrderService:
         except IntegrityError as exc:
             self._map_insert_error(exc)
             raise
+        except OperationalError as exc:
+            if retryable_mysql_transaction_error_code(exc) is not None:
+                raise AppError(
+                    code=WorkOrderErrorCode.CONFLICT,
+                    message="Work order is busy; retry the operation",
+                    status_code=409,
+                    details={"retryable": True},
+                ) from exc
+            raise AppError(
+                code=ErrorCode.INTERNAL_ERROR,
+                message="Work order operation could not be completed",
+                status_code=500,
+            ) from exc
         except SQLAlchemyError as exc:
             raise AppError(
                 code=ErrorCode.INTERNAL_ERROR,
