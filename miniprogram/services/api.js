@@ -398,9 +398,11 @@ module.exports = {
       method: "POST",
       data: { reason },
     }),
-  employees: (propertyId, tenantId) =>
+  employees: (propertyId, tenantId, afterId, includeHistorical) =>
     request({
-      path: `/admin/employees?property_id=${propertyId}&tenant_id=${tenantId}`,
+      path: `/admin/employees?property_id=${propertyId}&tenant_id=${tenantId}&limit=100${
+        afterId ? `&after_id=${afterId}` : ""
+      }${includeHistorical ? "&include_historical=true" : ""}`,
     }),
   employeeCatalog: (propertyId, tenantId) =>
     request({
@@ -432,8 +434,10 @@ module.exports = {
       method: "POST",
       data: {},
     }),
-  staffDaily: (propertyId, tenantId) =>
+  staffDaily: (propertyId, tenantId, afterId) =>
     request({
-      path: `/supervisor/staff/daily?property_id=${propertyId}&tenant_id=${tenantId}`,
+      path: `/supervisor/staff/daily?property_id=${propertyId}&tenant_id=${tenantId}&limit=100${
+        afterId ? `&after_id=${afterId}` : ""
+      }`,
     }),
 };

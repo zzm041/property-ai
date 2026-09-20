@@ -53,7 +53,7 @@ def test_list_employees_enforces_target_property_before_querying() -> None:
     assignments = (SimpleNamespace(id=51, property_id=8),)
     duties = (SimpleNamespace(id=61),)
     skills = (SimpleNamespace(id=71),)
-    repository.list_current_employees_for_property.return_value = (employee,)
+    repository.list_employees_for_property.return_value = (employee,)
     repository.list_assignments_for_employee.return_value = assignments
     repository.list_duties_for_employee.return_value = duties
     repository.list_skills_for_employee.return_value = skills
@@ -80,14 +80,51 @@ def test_list_employees_enforces_target_property_before_querying() -> None:
         property_id=8,
         permission="employee:read",
     )
-    repository.list_current_employees_for_property.assert_called_once_with(
+    repository.list_employees_for_property.assert_called_once_with(
         tenant_id=4,
         property_id=8,
         now=NOW,
         after_id=10,
         limit=25,
+        include_historical=False,
     )
     assert result == ((employee, assignments, duties, skills),)
+
+
+def test_list_employees_can_request_scoped_historical_roster() -> None:
+    repository = MagicMock()
+    employee = _employee()
+    historical = SimpleNamespace(id=52, property_id=8, status="ENDED")
+    repository.list_employees_for_property.return_value = (employee,)
+    repository.list_assignments_for_employee.return_value = (historical,)
+    repository.list_duties_for_employee.return_value = ()
+    repository.list_skills_for_employee.return_value = ()
+
+    service = EmployeeService.__new__(EmployeeService)
+    service._repository = repository
+    service._clock = MagicMock(return_value=NOW)
+    service._reload_actor = MagicMock(return_value=_actor())
+    service._require_managed_property = MagicMock(
+        return_value=SimpleNamespace(id=8, tenant_id=4)
+    )
+
+    result = service.list_employees(
+        actor=_actor(),
+        tenant_id=4,
+        property_id=8,
+        include_historical=True,
+    )
+
+    repository.list_employees_for_property.assert_called_once_with(
+        tenant_id=4,
+        property_id=8,
+        now=NOW,
+        after_id=0,
+        limit=50,
+        include_historical=True,
+    )
+    assert result[0][0] is employee
+    assert result[0][1] == (historical,)
 
 
 def test_property_scoped_employee_view_hides_other_property_assignments() -> None:
@@ -208,6 +245,9 @@ def test_miniprogram_staff_management_wires_existing_business_apis() -> None:
     assert ".assignEmployeeProperty" in page
     assert ".endEmployeeProperty" in page
     assert "api.staffDaily" in page
-    assert 'path: `/admin/employees?property_id=${propertyId}&tenant_id=${tenantId}`' in api
+    assert "function loadAllEmployees" in page
+    assert "function loadAllDaily" in page
+    assert "include_historical=true" in api
+    assert "limit=100" in api
     assert 'path: "/admin/employees", method: "POST"' in api
     assert "/pages/employee-claim/employee-claim" in home

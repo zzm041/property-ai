@@ -129,7 +129,7 @@
 
 职责、技能目录属于 Tenant，创建和查询时仍须以目标 Property 做 RBAC 范围校验。员工更新使用 `add_duty_ids` / `add_skill_ids` 追加当前能力关系；不得以修改接口删除既有历史证据。
 
-`GET /admin/employees` 必须携带 `tenant_id`、`property_id`，只返回该小区当前有效任职的员工，并按目标小区执行 `employee:read` 权限校验。目录响应可包含该 Tenant 全局部门及目标小区专属部门；其他小区专属部门不得显示。
+`GET /admin/employees` 必须携带 `tenant_id`、`property_id`，默认只返回该小区当前有效任职的员工；`include_historical=true` 时也返回曾在该小区任职、可重新建立任职的员工。接口按目标小区执行 `employee:read` 权限校验，支持 `after_id` / `limit` 游标分页。目录响应可包含该 Tenant 全局部门及目标小区专属部门；其他小区专属部门不得显示。
 
 ## 6. 工单
 

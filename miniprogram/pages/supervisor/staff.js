@@ -38,6 +38,42 @@ function loadAllProperties(afterId, collected) {
   });
 }
 
+function loadAllEmployees(propertyId, tenantId, afterId, collected) {
+  const current = collected || [];
+  return api
+    .employees(propertyId, tenantId, afterId || 0, true)
+    .then((response) => {
+      const items = (response && response.items) || [];
+      const next = current.concat(items);
+      if (!(response && response.next_cursor)) {
+        return next;
+      }
+      return loadAllEmployees(propertyId, tenantId, response.next_cursor, next);
+    });
+}
+
+function loadAllDaily(propertyId, tenantId, afterId, collected) {
+  const current = collected || [];
+  return api.staffDaily(propertyId, tenantId, afterId || 0).then((response) => {
+    const items = (response && response.items) || [];
+    const next = current.concat(items);
+    if (!(response && response.next_cursor)) {
+      return next;
+    }
+    return loadAllDaily(propertyId, tenantId, response.next_cursor, next);
+  });
+}
+
+function assignmentIsCurrent(assignment) {
+  if (!assignment || assignment.status !== "ACTIVE") {
+    return false;
+  }
+  const now = Date.now();
+  const from = assignment.valid_from ? Date.parse(assignment.valid_from) : NaN;
+  const to = assignment.valid_to ? Date.parse(assignment.valid_to) : NaN;
+  return (!Number.isFinite(from) || from <= now) && (!Number.isFinite(to) || to > now);
+}
+
 Page({
   data: {
     properties: [],
@@ -154,23 +190,28 @@ Page({
     }
     return Promise.all([
       api.employeeCatalog(propertyId, tenantId),
-      api.employees(propertyId, tenantId),
-      api.staffDaily(propertyId, tenantId),
-    ]).then(([catalog, employeeResponse, dailyResponse]) => {
+      loadAllEmployees(propertyId, tenantId),
+      loadAllDaily(propertyId, tenantId),
+    ]).then(([catalog, employeeItems, dailyItems]) => {
       const departments = (catalog && catalog.departments) || [];
       const duties = (catalog && catalog.duties) || [];
       const skills = (catalog && catalog.skills) || [];
       const dailyByEmployee = {};
-      ((dailyResponse && dailyResponse.items) || []).forEach((item) => {
+      dailyItems.forEach((item) => {
         dailyByEmployee[item.employee_id] = item;
       });
-      const items = ((employeeResponse && employeeResponse.items) || []).map(
+      const items = employeeItems.map(
         (detail) => {
           const employee = detail.employee;
           const department = departments.find(
             (item) => Number(item.id) === Number(employee.department_id)
           );
           const daily = dailyByEmployee[employee.id] || null;
+          const hasCurrentAssignment = (detail.assignments || []).some(
+            (assignment) =>
+              Number(assignment.property_id) === Number(propertyId) &&
+              assignmentIsCurrent(assignment)
+          );
           return {
             ...detail,
             id: employee.id,
@@ -178,6 +219,8 @@ Page({
             dutyNames: (detail.duties || []).map((item) => item.name).join("、") || "无",
             skillNames: (detail.skills || []).map((item) => item.name).join("、") || "无",
             daily,
+            hasCurrentAssignment,
+            assignmentText: hasCurrentAssignment ? "当前有效" : "历史任职，可重新建立",
             dutyText: daily ? `${daily.on_duty} / 负载 ${daily.current_load}` : "今日未签到",
           };
         }
@@ -226,7 +269,7 @@ Page({
         Number(property.tenant_id) === Number(detail.employee.tenant_id) &&
         !(detail.assignments || []).some(
           (assignment) =>
-            assignment.status === "ACTIVE" &&
+            assignmentIsCurrent(assignment) &&
             Number(assignment.property_id) === Number(property.id)
         )
     );

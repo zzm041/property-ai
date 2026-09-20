@@ -235,6 +235,7 @@ class EmployeeService:
         property_id: int,
         after_id: int = 0,
         limit: int = 50,
+        include_historical: bool = False,
     ) -> tuple[
         tuple[
             Employee,
@@ -253,12 +254,13 @@ class EmployeeService:
             property_id=property_id,
             permission=EMPLOYEE_READ,
         )
-        employees = self._repository.list_current_employees_for_property(
+        employees = self._repository.list_employees_for_property(
             tenant_id=property_record.tenant_id,
             property_id=property_record.id,
             now=self._clock(),
             after_id=max(after_id, 0),
             limit=self._page_limit(limit),
+            include_historical=include_historical,
         )
         return tuple(
             (

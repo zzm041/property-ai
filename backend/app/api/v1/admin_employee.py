@@ -159,6 +159,7 @@ def list_employees(
     service: Annotated[EmployeeService, Depends(get_employee_service)],
     after_id: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
+    include_historical: bool = False,
 ) -> dict[str, object]:
     rows = service.list_employees(
         actor=actor,
@@ -166,6 +167,7 @@ def list_employees(
         property_id=property_id,
         after_id=after_id,
         limit=limit,
+        include_historical=include_historical,
     )
     items = [
         _employee_detail_data(employee, assignments, duties, skills)

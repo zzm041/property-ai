@@ -200,7 +200,7 @@ class EmployeeRepository:
             ).all()
         )
 
-    def list_current_employees_for_property(
+    def list_employees_for_property(
         self,
         *,
         tenant_id: int,
@@ -208,7 +208,24 @@ class EmployeeRepository:
         now: datetime,
         after_id: int = 0,
         limit: int = 50,
+        include_historical: bool = False,
     ) -> tuple[Employee, ...]:
+        conditions = [
+            Employee.tenant_id == tenant_id,
+            Employee.id > after_id,
+            EmployeeProperty.property_id == property_id,
+        ]
+        if not include_historical:
+            conditions.extend(
+                [
+                    EmployeeProperty.status == "ACTIVE",
+                    EmployeeProperty.valid_from <= now,
+                    or_(
+                        EmployeeProperty.valid_to.is_(None),
+                        EmployeeProperty.valid_to > now,
+                    ),
+                ]
+            )
         return tuple(
             self._session.scalars(
                 select(Employee)
@@ -217,17 +234,8 @@ class EmployeeRepository:
                     (EmployeeProperty.employee_id == Employee.id)
                     & (EmployeeProperty.tenant_id == Employee.tenant_id),
                 )
-                .where(
-                    Employee.tenant_id == tenant_id,
-                    Employee.id > after_id,
-                    EmployeeProperty.property_id == property_id,
-                    EmployeeProperty.status == "ACTIVE",
-                    EmployeeProperty.valid_from <= now,
-                    or_(
-                        EmployeeProperty.valid_to.is_(None),
-                        EmployeeProperty.valid_to > now,
-                    ),
-                )
+                .where(*conditions)
+                .distinct()
                 .order_by(Employee.id)
                 .limit(limit)
             ).all()

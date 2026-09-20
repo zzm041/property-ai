@@ -46,13 +46,14 @@
   <button class="btn compact" bindtap="createSkill">新增技能</button>
 </view>
 
-<view class="empty" wx:if="{{!loading && !items.length}}">当前小区暂无有效任职员工</view>
+<view class="empty" wx:if="{{!loading && !items.length}}">当前小区暂无任职或历史任职员工</view>
 <view class="card employee-card {{selectedEmployeeId == item.employee.id ? 'selected' : ''}}" wx:for="{{items}}" wx:key="id" data-id="{{item.employee.id}}" bindtap="selectEmployee">
   <view class="employee-title">{{item.employee.employee_no}} · {{item.employee.status}}</view>
   <view>部门：{{item.departmentName}}</view>
   <view>职责：{{item.dutyNames}}</view>
   <view>技能：{{item.skillNames}}</view>
   <view>容量：{{item.employee.max_capacity}}</view>
+  <view>任职状态：{{item.assignmentText}}</view>
   <view>今日状态：{{item.dutyText}}</view>
 </view>
 
