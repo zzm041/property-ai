@@ -1,0 +1,65 @@
+{
+  "task_id": "SLA-NOTIFICATION-RETRY-003",
+  "phase": "review",
+  "reviewed_head": "a5433ffc1147c6ed73d259059dd78567131da4ac",
+  "decision": "PASS",
+  "actions_or_findings": [
+    {
+      "title": "SLA-003-N1 [NON_BLOCKING] Runtime evidence has a narrow boundary",
+      "path": "reports/sla-notification-retry-003/runtime-evidence.json:10",
+      "trigger": "Beat was not started; the saved run used a controlled clock and serial repeated sweeps. The changed SQL integration test was not run.",
+      "rationale": "The code uses an owned transaction and FOR UPDATE SKIP LOCKED; the saved order 11 result shows one warning log, one overdue log, six notification rows and no new rows on repeated sweeps. Concurrent MySQL sweeps and wall-clock operation remain unverified."
+    },
+    {
+      "title": "SLA-003-N2 [NON_BLOCKING] First-run compensation provenance is limited",
+      "path": "reports/sla-notification-retry-003/run-runtime.py:127",
+      "trigger": "The continued run selects existing PENDING delivery IDs, but the JSON retains their count rather than the IDs or the first-run error.",
+      "rationale": "The final six SUCCEEDED rows support recovery without recreated SLA events. The stated broker-environment cause and exact six-ID match remain reported details, not independently preserved evidence."
+    },
+    {
+      "title": "SLA-003-N3 [NON_BLOCKING] Provider calls retain at-least-once semantics",
+      "path": "backend/app/service/notification.py:120",
+      "trigger": "A provider can accept a push before local success is written, or remain active beyond the 120-second claim lease.",
+      "rationale": "A later claim could call that provider again. Ordinary duplicate tasks during the lease and tasks after SUCCEEDED are suppressed. This limit agrees with the frozen at-least-once requirement and does not invalidate the scoped local result."
+    },
+    {
+      "title": "SLA-003-R1 [RELEASE_BLOCKER] Full SLA behavior remains open",
+      "path": "docs/10-ACCEPTANCE.md:79",
+      "trigger": "The implementation schedules completion warning and overdue events only.",
+      "rationale": "Accept/respond deadlines, escalation behavior, timeout reassignment and policy administration still need implementation and acceptance. This PASS does not satisfy full B7 or Production V1."
+    },
+    {
+      "title": "SLA-003-R2 [RELEASE_BLOCKER] Production notification delivery remains open",
+      "path": "backend/app/provider/factory.py:131",
+      "trigger": "The provider factory still returns DevelopmentNotificationProvider, and the runtime report identifies a DEVELOPMENT provider.",
+      "rationale": "The six SUCCEEDED rows prove the local delivery-row path, not a real external notification. Production provider behavior and wall-clock deployment require separate evidence before release."
+    }
+  ],
+  "evidence_paths": [
+    "reports/project-handoff.md",
+    "reports/sla-notification-retry-003/test-evidence.json",
+    "reports/sla-notification-retry-003/runtime-evidence.json",
+    "reports/sla-notification-retry-003/run-runtime.py",
+    "backend/app/service/sla.py",
+    "backend/app/service/notification.py",
+    "backend/app/repository/work_order.py",
+    "backend/app/repository/knowledge.py",
+    "backend/app/worker/celery_app.py",
+    "backend/app/worker/tasks.py",
+    "backend/tests/unit/test_sla_notification_scheduler.py"
+  ],
+  "unverified": [
+    "The reported 18 focused and 423 full unit passes and three Compose expansions were not rerun.",
+    "Live concurrent SLA sweeps, Celery retry execution, wall-clock beat operation and production provider delivery were not observed.",
+    "The first-run broker error and the six individual compensated delivery IDs were not retained in the final JSON."
+  ],
+  "session_note": "Independent read-only review of the committed diff from aaf8a94e21c2e27bd3caa1f5cea5c014854ba9a9 through HEAD. No files were edited; no tests, processes, pages, HTTP requests or business operations were run.",
+  "task_result": "Scoped PASS for the 0009-schema completion-deadline scheduler and finite notification retry/idempotency work in product commit 2c2872fa0d7ccdeb8cc980802da14b212d31c8ea. The saved isolated-local evidence supports the bounded claim; it is not Production V1 acceptance.",
+  "product_gap_changes": [
+    "Completion warning/overdue scheduling and bounded notification retry now have scoped local evidence.",
+    "Controlled account merge and recovery, accept/respond SLA and escalation, timeout reassignment, policy administration, real self-hosted AI and Embedding/RAG, production notification and storage providers, and release validation remain in Production V1. Migration 0010 remains unapproved and uncreated."
+  ],
+  "schedule_risk": "High. It is 2026-09-20; the original one-week aim runs approximately through 2026-09-21. The remaining frozen V1 work prevents full delivery by that date without removing required features.",
+  "next_action": "Main Codex: update the existing coverage matrix and reports/project-handoff.md with this scoped PASS, both commit SHAs, evidence limits and remaining V1 gaps; then implement the next approved 0009-compatible accept/respond SLA and timeout-reassignment slice, with focused failure-path tests and isolated runtime evidence before separate read-only review. Ordinary source and isolated synthetic work needs no new permission; obtain user approval before any migration, shared-service operation, paid call or release.",
+  "approval_requests": []
+}

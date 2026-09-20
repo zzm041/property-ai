@@ -1440,10 +1440,57 @@
       }
     ]
   },
+  "sla_notification_retry_003": {
+    "task_id": "SLA-NOTIFICATION-RETRY-003",
+    "implementation_head": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea",
+    "evidence_head": "a5433ffc1147c6ed73d259059dd78567131da4ac",
+    "independent_review": {
+      "result": "PASS",
+      "path": "reports/codex/SLA-NOTIFICATION-RETRY-003-review.json",
+      "boundary": "scoped 0009 completion-deadline Warning/Overdue scheduling and finite DEVELOPMENT notification retry/idempotency; controlled clock and exact target work order were used, wall-clock beat and production provider were not verified"
+    },
+    "current_status_overlays": [
+      {
+        "id": "NTF-ROUND",
+        "implementation_status": "isolated_worker_delivery_and_due_compensation_wired",
+        "verification_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea / a5433ffc1147c6ed73d259059dd78567131da4ac",
+        "remaining_gap": "wall-clock beat, production provider and formal production delivery acceptance"
+      },
+      {
+        "id": "WO-TIMEOUT",
+        "implementation_status": "completion_warning_and_overdue_wired",
+        "verification_status": "PARTIAL",
+        "evidence_version": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea / a5433ffc1147c6ed73d259059dd78567131da4ac",
+        "remaining_gap": "accept/respond deadlines, escalation policy and timeout reassignment"
+      },
+      {
+        "id": "V1-SLA-CONFIG",
+        "implementation_status": "policy_lookup_and_completion_clock_scheduler_present",
+        "verification_status": "PARTIAL",
+        "evidence_version": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea / a5433ffc1147c6ed73d259059dd78567131da4ac",
+        "remaining_gap": "policy administration plus accept/respond/escalation acceptance; wall-clock production operation unverified"
+      },
+      {
+        "id": "V1-NTF-RETRY",
+        "implementation_status": "bounded_retry_claim_and_due_compensation_wired",
+        "verification_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea / a5433ffc1147c6ed73d259059dd78567131da4ac",
+        "remaining_gap": "production provider, live uncertain-delivery window and complete DLQ/replay acceptance"
+      },
+      {
+        "id": "V1-NTF-EVENTS",
+        "implementation_status": "sla_warning_and_overdue_events_added_to_existing_partial_event_set",
+        "verification_status": "PARTIAL",
+        "evidence_version": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea / a5433ffc1147c6ed73d259059dd78567131da4ac",
+        "remaining_gap": "complete create/accept/state/escalation/announcement event coverage and production acceptance"
+      }
+    ]
+  },
   "current_effective_view": {
     "generated_at": "2026-09-20",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
-    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs)",
+    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced.",
     "row_count": 83,
     "rows": [
@@ -1713,11 +1760,11 @@
       },
       {
         "requirement_id": "NTF-ROUND",
-        "current_implementation": "已实现可测试",
-        "verification_mode_status": "UI:PARTIAL",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "异步投递若无本轮 Worker 则 BLOCKED_ENV",
-        "next_action": "补齐缺失接线及范围证据"
+        "current_implementation": "isolated_worker_delivery_and_due_compensation_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea / a5433ffc1147c6ed73d259059dd78567131da4ac",
+        "remaining_gap": "wall-clock beat, production provider and formal production delivery acceptance",
+        "next_action": "保留本地投递证据；在生产等价环境验收墙钟调度与真实Provider"
       },
       {
         "requirement_id": "UX-NO-DEV-LEAK",
@@ -1833,11 +1880,11 @@
       },
       {
         "requirement_id": "WO-TIMEOUT",
-        "current_implementation": "不属于小程序页面、应单独后端验证",
-        "verification_mode_status": "API:NOT_IMPLEMENTED",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "超时提醒",
-        "next_action": "按依赖顺序实施，保留本ID在分母中"
+        "current_implementation": "completion_warning_and_overdue_wired",
+        "verification_mode_status": "PARTIAL",
+        "evidence_version": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea / a5433ffc1147c6ed73d259059dd78567131da4ac",
+        "remaining_gap": "接单/响应时限、升级策略和超时自动改派",
+        "next_action": "实施0009可兼容的接单/响应超时与幂等改派切片"
       },
       {
         "requirement_id": "WO-CANCEL-REJECT-REASSIGN-REOPEN",
@@ -2001,19 +2048,19 @@
       },
       {
         "requirement_id": "V1-SLA-CONFIG",
-        "current_implementation": "不属于小程序页面、应单独后端验证",
-        "verification_mode_status": "API:NOT_IMPLEMENTED",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "可配置 SLA Warning/Overdue/Escalation，禁止硬编码时限",
-        "next_action": "按依赖顺序实施，保留本ID在分母中"
+        "current_implementation": "policy_lookup_and_completion_clock_scheduler_present",
+        "verification_mode_status": "PARTIAL",
+        "evidence_version": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea / a5433ffc1147c6ed73d259059dd78567131da4ac",
+        "remaining_gap": "策略管理以及接单/响应/Escalation验收；墙钟生产运行未验证",
+        "next_action": "先补接单/响应超时与改派，再实现策略管理入口"
       },
       {
         "requirement_id": "V1-NTF-RETRY",
-        "current_implementation": "delivery_claim_retry_code_present",
-        "verification_mode_status": "PARTIAL",
-        "evidence_version": "f5a7b62d83303ab2c742bbd3baef27cf48f99999",
-        "remaining_gap": "production provider, uncertain-delivery and DLQ/replay acceptance",
-        "next_action": "仅针对所列剩余缺口补实现或证据"
+        "current_implementation": "bounded_retry_claim_and_due_compensation_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea / a5433ffc1147c6ed73d259059dd78567131da4ac",
+        "remaining_gap": "生产Provider、真实uncertain窗口和完整DLQ/replay验收",
+        "next_action": "保留有限重试证据；生产资源具备后补Provider与DLQ验收"
       },
       {
         "requirement_id": "V1-GOVERNANCE-IDOR",
@@ -2097,11 +2144,11 @@
       },
       {
         "requirement_id": "V1-NTF-EVENTS",
-        "current_implementation": "部分实现",
-        "verification_mode_status": "API:NOT_IMPLEMENTED",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "创建/派单/接单/状态/SLA/完成/公告通知事件覆盖",
-        "next_action": "按依赖顺序实施，保留本ID在分母中"
+        "current_implementation": "sla_warning_and_overdue_events_added_to_existing_partial_event_set",
+        "verification_mode_status": "PARTIAL",
+        "evidence_version": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea / a5433ffc1147c6ed73d259059dd78567131da4ac",
+        "remaining_gap": "创建/接单/完整状态/升级/公告通知事件覆盖及生产验收",
+        "next_action": "后续业务切片逐项补事件并保留本ID在分母中"
       },
       {
         "requirement_id": "V1-GOVERNANCE-OPS",
