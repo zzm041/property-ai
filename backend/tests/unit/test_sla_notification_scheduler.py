@@ -304,11 +304,13 @@ def test_due_assignment_query_filters_handled_cycles_before_limit() -> None:
         )
     )
     assert "work_order_assignments.id = work_orders.current_assignment_id" in sql
+    assert "work_order_assignments.status = 'ACTIVE'" in sql
     assert "work_order_assignments.timeout_at IS NULL" in sql
     assert "work_order_assignments.ended_at IS NULL" in sql
     assert "work_order_assignments.accept_at IS NULL" in sql
     assert "work_order_assignments.accept_at IS NOT NULL" in sql
     assert "NOT (EXISTS" in sql
+    assert "work_order_logs.work_order_id = work_orders.id" in sql
     assert "concat('sla-assignment:', work_order_assignments.id" in sql
     assert "LIMIT 100 FOR UPDATE SKIP LOCKED" in sql
 
