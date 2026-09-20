@@ -1,0 +1,299 @@
+{
+  "task_id": "WO-RECEIPT-REASSIGN-002",
+  "captured_at": "2026-09-20T02:33:48.733320+00:00",
+  "code_sha": "75caa5e13535f6d5ed90ad695c2ebec19e0d4373",
+  "environment": {
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "storage": "isolated persistent development storage"
+  },
+  "work_order": {
+    "id": 10,
+    "tenant_id": 6,
+    "property_id": 6,
+    "status": "WAIT_CONFIRM",
+    "process_reason": "NONE",
+    "current_assignment_id": 11,
+    "version": 11
+  },
+  "assignments": [
+    {
+      "id": 10,
+      "employee_id": 10,
+      "assigned_by_user_id": null,
+      "assigned_source": "AUTO",
+      "status": "REASSIGNED",
+      "reason": "原员工上报后由主管改派给本小区在岗合格员工",
+      "assigned_at": "2026-09-20 01:32:25.393331",
+      "accept_at": "2026-09-20 02:30:13.858197",
+      "ended_at": "2026-09-20 02:30:36.215671"
+    },
+    {
+      "id": 11,
+      "employee_id": 9,
+      "assigned_by_user_id": 40,
+      "assigned_source": "HUMAN",
+      "status": "ACTIVE",
+      "reason": "原员工上报后由主管改派给本小区在岗合格员工",
+      "assigned_at": "2026-09-20 02:30:36.215671",
+      "accept_at": "2026-09-20 02:30:58.422326",
+      "ended_at": null
+    }
+  ],
+  "processes": [
+    {
+      "id": 6,
+      "cycle_no": 1,
+      "assignee_id": 10,
+      "started_at": "2026-09-20 02:30:14.186511",
+      "ended_at": "2026-09-20 02:30:36.215671"
+    },
+    {
+      "id": 7,
+      "cycle_no": 2,
+      "assignee_id": 9,
+      "started_at": "2026-09-20 02:30:58.762040",
+      "ended_at": "2026-09-20 02:31:08.553495"
+    }
+  ],
+  "receipts": [
+    {
+      "id": 6,
+      "process_id": 7,
+      "problem_type": "电气维修",
+      "method": "检查接线端子并完成紧固复测",
+      "materials": "绝缘胶带",
+      "fee_flag": "NONE",
+      "resolved": 1,
+      "unresolved_reason": null,
+      "follow_up": null,
+      "finished_at": "2026-09-20 02:31:08.553495"
+    }
+  ],
+  "media": [
+    {
+      "id": 2,
+      "file_id": 2,
+      "kind": "IMAGE",
+      "taken_phase": "BEFORE",
+      "uploader_user_id": 44,
+      "mime_type": "image/png",
+      "size_bytes": 68,
+      "object_exists": true,
+      "size_matches": true,
+      "hash_matches": true
+    },
+    {
+      "id": 3,
+      "file_id": 3,
+      "kind": "IMAGE",
+      "taken_phase": "AFTER",
+      "uploader_user_id": 44,
+      "mime_type": "image/png",
+      "size_bytes": 68,
+      "object_exists": true,
+      "size_matches": true,
+      "hash_matches": true
+    }
+  ],
+  "target_identity": {
+    "employee_id": 9,
+    "user_id": 44
+  },
+  "logs": [
+    {
+      "actor_user_id": 42,
+      "actor_type": "RESIDENT",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "event_code": "CREATE",
+      "request_id": "8bfbeee3f7ce43209ce84ae6520cf278",
+      "created_at": "2026-09-20 01:32:25.117259"
+    },
+    {
+      "actor_user_id": null,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "process_reason": "NONE",
+      "event_code": "ANALYZE",
+      "request_id": "8bfbeee3f7ce43209ce84ae6520cf278",
+      "created_at": "2026-09-20 01:32:25.193815"
+    },
+    {
+      "actor_user_id": null,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "process_reason": "NONE",
+      "event_code": "ASSIGN",
+      "request_id": "8bfbeee3f7ce43209ce84ae6520cf278",
+      "created_at": "2026-09-20 01:32:25.460847"
+    },
+    {
+      "actor_user_id": 45,
+      "actor_type": "STAFF",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "process_reason": "NONE",
+      "event_code": "ACCEPT",
+      "request_id": "6ebed15705af44eea9524c081f1bfe9f",
+      "created_at": "2026-09-20 02:30:13.862694"
+    },
+    {
+      "actor_user_id": 45,
+      "actor_type": "STAFF",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "process_reason": "NONE",
+      "event_code": "START",
+      "request_id": "79ca9002bb8246588fd6bd314487e1a3",
+      "created_at": "2026-09-20 02:30:14.189012"
+    },
+    {
+      "actor_user_id": 45,
+      "actor_type": "STAFF",
+      "from_status": "PROCESSING",
+      "to_status": "PROCESSING",
+      "process_reason": "INTERNAL_UNRESOLVED",
+      "event_code": "ESCALATE",
+      "request_id": "794d2a2ec68e42a1a4c9bb05f46a5d3a",
+      "created_at": "2026-09-20 02:30:14.549406"
+    },
+    {
+      "actor_user_id": 40,
+      "actor_type": "SUPERVISOR",
+      "from_status": "PROCESSING",
+      "to_status": "PENDING_ASSIGNMENT",
+      "process_reason": "NONE",
+      "event_code": "REASSIGN",
+      "request_id": "45fbc4f149f94519b090a0be4277e6b8",
+      "created_at": "2026-09-20 02:30:36.236671"
+    },
+    {
+      "actor_user_id": 40,
+      "actor_type": "SUPERVISOR",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "process_reason": "NONE",
+      "event_code": "ASSIGN",
+      "request_id": "45fbc4f149f94519b090a0be4277e6b8",
+      "created_at": "2026-09-20 02:30:36.251672"
+    },
+    {
+      "actor_user_id": 44,
+      "actor_type": "STAFF",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "process_reason": "NONE",
+      "event_code": "ACCEPT",
+      "request_id": "a7eb86b2dacc48b29318f9c38e298259",
+      "created_at": "2026-09-20 02:30:58.426860"
+    },
+    {
+      "actor_user_id": 44,
+      "actor_type": "STAFF",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "process_reason": "NONE",
+      "event_code": "START",
+      "request_id": "3e974357727d4590b8366d1294fe0e06",
+      "created_at": "2026-09-20 02:30:58.764541"
+    },
+    {
+      "actor_user_id": 44,
+      "actor_type": "STAFF",
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "process_reason": "NONE",
+      "event_code": "RECEIPT_RESOLVED",
+      "request_id": "715de38687d84550bd3907bcff25de62",
+      "created_at": "2026-09-20 02:31:08.564995"
+    }
+  ],
+  "audits": [
+    {
+      "action": "WORK_ORDER_CREATED",
+      "actor_user_id": 42,
+      "resource_type": "WORK_ORDER",
+      "resource_id": 10,
+      "request_id": "8bfbeee3f7ce43209ce84ae6520cf278"
+    },
+    {
+      "action": "WORK_ORDER_ASSIGNED",
+      "actor_user_id": null,
+      "resource_type": "WORK_ORDER_ASSIGNMENT",
+      "resource_id": 10,
+      "request_id": "8bfbeee3f7ce43209ce84ae6520cf278"
+    },
+    {
+      "action": "WORK_ORDER_ACCEPTED",
+      "actor_user_id": 45,
+      "resource_type": "WORK_ORDER",
+      "resource_id": 10,
+      "request_id": "6ebed15705af44eea9524c081f1bfe9f"
+    },
+    {
+      "action": "WORK_ORDER_PROCESS_STARTED",
+      "actor_user_id": 45,
+      "resource_type": "WORK_ORDER",
+      "resource_id": 10,
+      "request_id": "79ca9002bb8246588fd6bd314487e1a3"
+    },
+    {
+      "action": "WORK_ORDER_PROCESS_UPDATED",
+      "actor_user_id": 45,
+      "resource_type": "WORK_ORDER",
+      "resource_id": 10,
+      "request_id": "794d2a2ec68e42a1a4c9bb05f46a5d3a"
+    },
+    {
+      "action": "WORK_ORDER_REASSIGNED",
+      "actor_user_id": 40,
+      "resource_type": "WORK_ORDER_ASSIGNMENT",
+      "resource_id": 11,
+      "request_id": "45fbc4f149f94519b090a0be4277e6b8"
+    },
+    {
+      "action": "WORK_ORDER_ACCEPTED",
+      "actor_user_id": 44,
+      "resource_type": "WORK_ORDER",
+      "resource_id": 10,
+      "request_id": "a7eb86b2dacc48b29318f9c38e298259"
+    },
+    {
+      "action": "WORK_ORDER_PROCESS_STARTED",
+      "actor_user_id": 44,
+      "resource_type": "WORK_ORDER",
+      "resource_id": 10,
+      "request_id": "3e974357727d4590b8366d1294fe0e06"
+    },
+    {
+      "action": "WORK_ORDER_RESOLVED",
+      "actor_user_id": 44,
+      "resource_type": "WORK_ORDER",
+      "resource_id": 10,
+      "request_id": "715de38687d84550bd3907bcff25de62"
+    }
+  ],
+  "checks": {
+    "wait_confirm": true,
+    "old_assignment_reassigned": true,
+    "target_assignment_active": true,
+    "process_assignee_history": true,
+    "resolved_receipt_for_target_cycle": true,
+    "before_and_after_media": true,
+    "media_uploader_is_target_user": true,
+    "media_objects_integral": true,
+    "reassign_audited": true,
+    "receipt_audited": true
+  },
+  "boundaries": {
+    "read_only": true,
+    "business_state_changed": false,
+    "storage_objects_read_only": true,
+    "credentials_emitted": false
+  },
+  "redaction": "Storage keys, phone numbers, tokens, passwords, names, work-order text, and credentials are omitted."
+}

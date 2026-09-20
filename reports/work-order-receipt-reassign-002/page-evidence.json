@@ -1,0 +1,150 @@
+{
+  "task_id": "WO-RECEIPT-REASSIGN-002",
+  "captured_at": "2026-09-20T02:31:17.577Z",
+  "code_sha": "75caa5e13535f6d5ed90ad695c2ebec19e0d4373",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001"
+  },
+  "work_order_id": 10,
+  "original_employee_id": 10,
+  "target_employee_id": 9,
+  "final_page_status": "WAIT_CONFIRM",
+  "page_actions": [
+    "original employee accepted and started existing AUTO assignment",
+    "original employee escalated through staff page",
+    "tenant administrator selected work order and eligible employee on supervisor page",
+    "tenant administrator tapped reassign with reason",
+    "target employee accepted and started through staff page",
+    "target employee tapped before/after photo controls",
+    "target employee submitted complete receipt through staff page"
+  ],
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/10",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/10/accept",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/10",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/10/start",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/10",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/10/escalate",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/10",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/supervisor/work-orders?property_id=6",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/supervisor/work-orders/10/decide",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/supervisor/work-orders?property_id=6",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/10",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/10/accept",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/10",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/10/start",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/10",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/files",
+      "status": 200
+    },
+    {
+      "method": "UPLOAD",
+      "path": "/api/v1/files/2/content",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/files",
+      "status": 200
+    },
+    {
+      "method": "UPLOAD",
+      "path": "/api/v1/files/3/content",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/10/receipts",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/10",
+      "status": 200
+    }
+  ],
+  "screenshots": [
+    "01-primary-escalated.png",
+    "02-supervisor-reassign-ready.png",
+    "03-supervisor-after-reassign.png",
+    "04-target-assigned.png",
+    "05-receipt-media-ready.png",
+    "06-receipt-submitted.png"
+  ],
+  "boundaries": {
+    "actual_page_actions": true,
+    "actual_http_and_storage": true,
+    "native_picker_verified": false,
+    "picker_input": "automator mock of wx.chooseMedia returning a synthetic local PNG",
+    "direct_database_write_used": false,
+    "fake_llm_used_for_existing_auto_assignment": true,
+    "real_model_verified": false,
+    "production_v1_passed": false
+  },
+  "redaction": "No phone, SMS code, token, password, resident name, file path, or credential is stored."
+}
