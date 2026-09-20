@@ -23,6 +23,7 @@ class UpdateEmployeeRequest(BaseModel):
 
     status: str | None = None
     department_id: int | None = Field(default=None, gt=0)
+    clear_department: bool = False
     max_capacity: int | None = Field(default=None, ge=1, le=100)
     add_duty_ids: tuple[int, ...] | None = None
     add_skill_ids: tuple[int, ...] | None = None
@@ -99,7 +100,12 @@ class EmployeeCatalogItemData(BaseModel):
     status: str
 
 
+class EmployeeDepartmentData(EmployeeCatalogItemData):
+    property_id: int | None
+
+
 class EmployeeCatalogData(BaseModel):
+    departments: list[EmployeeDepartmentData]
     duties: list[EmployeeCatalogItemData]
     skills: list[EmployeeCatalogItemData]
 
@@ -109,6 +115,11 @@ class EmployeeDetailData(BaseModel):
     assignments: list[EmployeePropertyData]
     duties: list[EmployeeCatalogItemData] = Field(default_factory=list)
     skills: list[EmployeeCatalogItemData] = Field(default_factory=list)
+
+
+class EmployeeListData(BaseModel):
+    items: list[EmployeeDetailData]
+    next_cursor: int | None
 
 
 class AttendanceRecordData(BaseModel):

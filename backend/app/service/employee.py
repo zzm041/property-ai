@@ -32,6 +32,7 @@ from app.domain.employee import (
 from app.domain.iam import OrganizationScope, Principal, ScopeType
 from app.model.employee import (
     AttendanceRecord,
+    Department,
     Employee,
     EmployeeDailyStatus,
     EmployeeDuty,
@@ -137,6 +138,7 @@ class EmployeeService:
         max_capacity: int | None = None,
         add_duty_ids: tuple[int, ...] | None = None,
         add_skill_ids: tuple[int, ...] | None = None,
+        clear_department: bool = False,
     ) -> Employee:
         self._require_positive_id(employee_id, "employee_id")
         self._validate_request_id(request_id)
@@ -150,6 +152,7 @@ class EmployeeService:
                 max_capacity=max_capacity,
                 add_duty_ids=add_duty_ids,
                 add_skill_ids=add_skill_ids,
+                clear_department=clear_department,
             )
         )
 
@@ -207,7 +210,7 @@ class EmployeeService:
         actor: Principal,
         tenant_id: int,
         property_id: int,
-    ) -> tuple[tuple[Duty, ...], tuple[Skill, ...]]:
+    ) -> tuple[tuple[Department, ...], tuple[Duty, ...], tuple[Skill, ...]]:
         current = self._reload_actor(actor)
         property_record = self._require_managed_property(
             current,
@@ -216,8 +219,60 @@ class EmployeeService:
             permission=EMPLOYEE_READ,
         )
         return (
+            self._repository.list_departments_for_property(
+                tenant_id=property_record.tenant_id,
+                property_id=property_record.id,
+            ),
             self._repository.list_duties_for_tenant(property_record.tenant_id),
             self._repository.list_skills_for_tenant(property_record.tenant_id),
+        )
+
+    def list_employees(
+        self,
+        *,
+        actor: Principal,
+        tenant_id: int,
+        property_id: int,
+        after_id: int = 0,
+        limit: int = 50,
+    ) -> tuple[
+        tuple[
+            Employee,
+            tuple[EmployeeProperty, ...],
+            tuple[Duty, ...],
+            tuple[Skill, ...],
+        ],
+        ...,
+    ]:
+        self._require_positive_id(tenant_id, "tenant_id")
+        self._require_positive_id(property_id, "property_id")
+        current = self._reload_actor(actor)
+        property_record = self._require_managed_property(
+            current,
+            tenant_id=tenant_id,
+            property_id=property_id,
+            permission=EMPLOYEE_READ,
+        )
+        employees = self._repository.list_current_employees_for_property(
+            tenant_id=property_record.tenant_id,
+            property_id=property_record.id,
+            now=self._clock(),
+            after_id=max(after_id, 0),
+            limit=self._page_limit(limit),
+        )
+        return tuple(
+            (
+                employee,
+                self._visible_employee_assignments(
+                    current,
+                    employee,
+                    self._repository.list_assignments_for_employee(employee.id),
+                    permission=EMPLOYEE_READ,
+                ),
+                self._repository.list_duties_for_employee(employee.id),
+                self._repository.list_skills_for_employee(employee.id),
+            )
+            for employee in employees
         )
 
     def get_employee(
@@ -242,7 +297,12 @@ class EmployeeService:
             employee,
             assignments,
         )
-        return employee, assignments
+        return employee, self._visible_employee_assignments(
+            current,
+            employee,
+            assignments,
+            permission=EMPLOYEE_READ,
+        )
 
     def get_employee_catalog_links(
         self,
@@ -553,6 +613,7 @@ class EmployeeService:
         max_capacity: int | None,
         add_duty_ids: tuple[int, ...] | None,
         add_skill_ids: tuple[int, ...] | None,
+        clear_department: bool = False,
     ) -> Employee:
         current = self._reload_actor(actor)
         employee = self._repository.get_employee(employee_id)
@@ -583,7 +644,18 @@ class EmployeeService:
             if employee.status != next_status:
                 employee.status = next_status
                 details["status"] = employee.status
-        if department_id is not None:
+        if clear_department and department_id is not None:
+            raise AppError(
+                code=EmployeeErrorCode.INVALID_INPUT,
+                message="department_id cannot be combined with clear_department",
+                status_code=422,
+                details={"field": "department_id"},
+            )
+        if clear_department:
+            if employee.department_id is not None:
+                employee.department_id = None
+                details["department_id"] = None
+        elif department_id is not None:
             self._require_positive_id(department_id, "department_id")
             department = self._repository.get_department_in_tenant(
                 tenant_id=employee.tenant_id,
@@ -1318,6 +1390,33 @@ class EmployeeService:
             code=IamErrorCode.FORBIDDEN,
             message="Permission denied",
             status_code=403,
+        )
+
+    @staticmethod
+    def _visible_employee_assignments(
+        actor: Principal,
+        employee: Employee,
+        assignments: tuple[EmployeeProperty, ...],
+        *,
+        permission: str,
+    ) -> tuple[EmployeeProperty, ...]:
+        tenant_scope = OrganizationScope(
+            ScopeType.TENANT,
+            tenant_id=employee.tenant_id,
+        )
+        if actor.has_permission(permission, tenant_scope):
+            return assignments
+        return tuple(
+            assignment
+            for assignment in assignments
+            if actor.has_permission(
+                permission,
+                OrganizationScope(
+                    ScopeType.PROPERTY,
+                    tenant_id=employee.tenant_id,
+                    property_id=assignment.property_id,
+                ),
+            )
         )
 
     def _require_effective_assignment(

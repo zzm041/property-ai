@@ -1346,5 +1346,678 @@
       "phone-free source proof or high-risk-recovery-only route",
       "source password transfer versus explicit target-side password setup when target has no password"
     ]
+  },
+  "current_effective_view": {
+    "generated_at": "2026-09-20",
+    "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
+    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs)",
+    "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced.",
+    "row_count": 83,
+    "rows": [
+      {
+        "requirement_id": "AUTH-LOGIN-DEFAULT",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "AUTH-NO-SEED",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "AUTH-PASSWORD-TOGGLE",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "AUTH-PHONE-KEEP",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "AUTH-CHALLENGE",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "AUTH-SMS-COOLDOWN",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "RES-UNBOUND-HOME",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "RES-PROFILE",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "AUTH-RESET-MISMATCH",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "AUTH-RESET",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "AUTH-PASSWORD-LOGIN",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "AUTH-RESET-REVOKE",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI + sidecar API:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "RES-HOUSE-CASCADE",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "RES-BIND-APPLY",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "MGR-TENANT-HOME",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "MGR-TENANT-VS-PROPERTY",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "MGR-BIND-APPROVE",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "MGR-BIND-REJECT",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "RES-AFTER-APPROVE",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "STAFF-CLAIM",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "STAFF-ATTENDANCE",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "STAFF-CLAIM-DUP",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "WO-CREATE",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "WO-MEDIA-NATIVE",
+        "current_implementation": "缺环境或权限",
+        "verification_mode_status": "UI:BLOCKED_ENV",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "automator 无法操作系统文件选择器/摄像头/麦克风",
+        "next_action": "在受控环境或获批资源具备后验收；继续不依赖工作"
+      },
+      {
+        "requirement_id": "WO-QUEUE-ASSIGN",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "WO-AUTO-DISPATCH",
+        "current_implementation": "implemented_for_isolated_runtime",
+        "verification_mode_status": "PASS_SCOPED_FAKE_CROSS_PROCESS",
+        "evidence_version": "d144bcddcfc24e6e9eaf60509acd124711bc0561",
+        "remaining_gap": "operator-controlled real model and production runtime",
+        "next_action": "仅针对所列剩余缺口补实现或证据"
+      },
+      {
+        "requirement_id": "WO-STAFF-PROCESS",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "WO-LIST-PAGING",
+        "current_implementation": "页面存在但无真实接线",
+        "verification_mode_status": "UI:PARTIAL",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "API 有 after_id；页面只拉第一页",
+        "next_action": "补齐缺失接线及范围证据"
+      },
+      {
+        "requirement_id": "WO-CONFIRM-CLOSED",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "WO-REENTER",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "ANN-PUBLISH",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "ANN-READ",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "AST-QUERY",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PARTIAL",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "知识助手提问/回答/引用（Fake 只验接线）",
+        "next_action": "补齐缺失接线及范围证据"
+      },
+      {
+        "requirement_id": "NTF-ROUND",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PARTIAL",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "异步投递若无本轮 Worker 则 BLOCKED_ENV",
+        "next_action": "补齐缺失接线及范围证据"
+      },
+      {
+        "requirement_id": "UX-NO-DEV-LEAK",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "DEV-LOGIN-ISOLATED",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "AUTH-PHONE-CHANGE",
+        "current_implementation": "implemented_and_page_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_SYNTHETIC",
+        "evidence_version": "893fd65cfd5c603ea7046c2639c71b076c3fd349 / a25ff332e05f3d6d069fd6b8c191817a9ce5fadf",
+        "remaining_gap": "real SMS and Production V1 acceptance",
+        "next_action": "仅针对所列剩余缺口补实现或证据"
+      },
+      {
+        "requirement_id": "AUTH-WECHAT-REBIND",
+        "current_implementation": "implemented_and_page_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_PROVIDER",
+        "evidence_version": "a42a7fbb646ee3b892c938fa9cb7cd8d6ab81584 / f5a7b62d83303ab2c742bbd3baef27cf48f99999",
+        "remaining_gap": "real WeChat and real SMS provider acceptance",
+        "next_action": "仅针对所列剩余缺口补实现或证据"
+      },
+      {
+        "requirement_id": "AUTH-MERGE",
+        "current_implementation": "功能尚未实现",
+        "verification_mode_status": "none:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "受控账号合并",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "AUTH-RECOVERY",
+        "current_implementation": "功能尚未实现",
+        "verification_mode_status": "none:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "高风险恢复（实名+活体）",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "AUTH-PASSWORD-CHANGE",
+        "current_implementation": "只有API没有页面",
+        "verification_mode_status": "API:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已登录改密",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "STAFF-INVITE-PAGE",
+        "current_implementation": "只有API没有页面",
+        "verification_mode_status": "API:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "页面创建员工并发邀请",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "STAFF-DEPT-SKILL-UI",
+        "current_implementation": "只有API没有页面",
+        "verification_mode_status": "API:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "员工/部门/岗位/技能/服务小区管理页面",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "KNOWLEDGE-INGEST-UI",
+        "current_implementation": "只有API没有页面",
+        "verification_mode_status": "API:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "文档维护/入库/归档页面",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "HOUSE-IMPORT-EXPORT",
+        "current_implementation": "功能尚未实现",
+        "verification_mode_status": "none:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "房产导入导出",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "STATS-CONFIG",
+        "current_implementation": "功能尚未实现",
+        "verification_mode_status": "none:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "统计与配置页面",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "SELFHOST-AI",
+        "current_implementation": "缺环境或权限",
+        "verification_mode_status": "none:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "自托管 Qwen 推理",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "REAL-SMS",
+        "current_implementation": "缺环境或权限",
+        "verification_mode_status": "none:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "真实短信投递",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "WO-TIMEOUT",
+        "current_implementation": "不属于小程序页面、应单独后端验证",
+        "verification_mode_status": "API:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "超时提醒",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "WO-CANCEL-REJECT-REASSIGN-REOPEN",
+        "current_implementation": "implemented_and_wired_for_current_exception_slice",
+        "verification_mode_status": "PARTIAL",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
+        "remaining_gap": "live supervisor REASSIGN page and full production matrix",
+        "next_action": "仅针对所列剩余缺口补实现或证据"
+      },
+      {
+        "requirement_id": "AUTH-WECHAT",
+        "current_implementation": "缺环境或权限",
+        "verification_mode_status": "UI:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "开发 WeChat provider；正式 jscode2session 未验证",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "AUTH-SMS-EXPIRE",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PARTIAL",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "OTP TTL 300s；页面等待过长则 NOT_RUN 并引用 isolated API",
+        "next_action": "补齐缺失接线及范围证据"
+      },
+      {
+        "requirement_id": "AUTH-SMS-REUSE",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "INCIDENT-UI",
+        "current_implementation": "页面存在但无真实接线",
+        "verification_mode_status": "UI:PARTIAL",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "仅列表；无创建/处理按钮",
+        "next_action": "补齐缺失接线及范围证据"
+      },
+      {
+        "requirement_id": "STAFF-DAILY-PAGE",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "AUTH-RESET-RELOGIN",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PASS",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
+        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+      },
+      {
+        "requirement_id": "AUTH-PASSWORD-POLICY",
+        "current_implementation": "已实现可测试",
+        "verification_mode_status": "UI:PARTIAL",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "不强制大写；最少 8 字符；禁止纯数字/纯小写字母",
+        "next_action": "补齐缺失接线及范围证据"
+      },
+      {
+        "requirement_id": "V1-RES-RELATION-HISTORY",
+        "current_implementation": "只有API没有页面",
+        "verification_mode_status": "API:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "退租/变更保留历史关系，禁止覆盖历史行",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "V1-RES-APPEND",
+        "current_implementation": "implemented_and_page_wired",
+        "verification_mode_status": "UNIT_AND_CODE_SCOPED",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
+        "remaining_gap": "dedicated real-page evidence",
+        "next_action": "仅针对所列剩余缺口补实现或证据"
+      },
+      {
+        "requirement_id": "V1-RES-CANCEL",
+        "current_implementation": "implemented_and_page_wired",
+        "verification_mode_status": "UNIT_AND_CODE_SCOPED",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
+        "remaining_gap": "dedicated real-page evidence",
+        "next_action": "仅针对所列剩余缺口补实现或证据"
+      },
+      {
+        "requirement_id": "V1-RES-RATING",
+        "current_implementation": "implemented_and_page_wired",
+        "verification_mode_status": "UNIT_AND_CODE_SCOPED",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
+        "remaining_gap": "dedicated real-page evidence",
+        "next_action": "仅针对所列剩余缺口补实现或证据"
+      },
+      {
+        "requirement_id": "V1-STAFF-REJECT",
+        "current_implementation": "implemented_and_page_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
+        "remaining_gap": "broader production exception matrix",
+        "next_action": "仅针对所列剩余缺口补实现或证据"
+      },
+      {
+        "requirement_id": "V1-STAFF-ESCALATE",
+        "current_implementation": "implemented_and_page_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
+        "remaining_gap": "broader production exception matrix",
+        "next_action": "仅针对所列剩余缺口补实现或证据"
+      },
+      {
+        "requirement_id": "V1-RECEIPT-COMPLETE",
+        "current_implementation": "text_material_fee_fields_wired",
+        "verification_mode_status": "PARTIAL",
+        "evidence_version": "f2839370e493bc4c713f1e73edc9814bb9c419fb / f1de143a546912b0cefaa3aa6b50582feb466016",
+        "remaining_gap": "native before/after photo flow and production media",
+        "next_action": "仅针对所列剩余缺口补实现或证据"
+      },
+      {
+        "requirement_id": "V1-RECEIPT-HISTORY",
+        "current_implementation": "multi_cycle_receipts_preserved",
+        "verification_mode_status": "PASS_SCOPED_LOCAL",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
+        "remaining_gap": "broader concurrency and production acceptance",
+        "next_action": "仅针对所列剩余缺口补实现或证据"
+      },
+      {
+        "requirement_id": "V1-MGR-EXCEPTION",
+        "current_implementation": "decision_paths_partially_wired",
+        "verification_mode_status": "PARTIAL",
+        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
+        "remaining_gap": "all decision types, external-coordination policy and page evidence",
+        "next_action": "仅针对所列剩余缺口补实现或证据"
+      },
+      {
+        "requirement_id": "V1-INCIDENT-AGGREGATE",
+        "current_implementation": "功能尚未实现",
+        "verification_mode_status": "API:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "同楼同类短时多单聚合，避免重复派人",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "V1-ANN-TARGET",
+        "current_implementation": "功能尚未实现",
+        "verification_mode_status": "API:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "公告定向企业/小区/楼栋/单元/人群",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "V1-ANN-EDIT-HISTORY",
+        "current_implementation": "功能尚未实现",
+        "verification_mode_status": "none:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "公告编辑与发布历史",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "V1-SLA-CONFIG",
+        "current_implementation": "不属于小程序页面、应单独后端验证",
+        "verification_mode_status": "API:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "可配置 SLA Warning/Overdue/Escalation，禁止硬编码时限",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "V1-NTF-RETRY",
+        "current_implementation": "delivery_claim_retry_code_present",
+        "verification_mode_status": "PARTIAL",
+        "evidence_version": "f5a7b62d83303ab2c742bbd3baef27cf48f99999",
+        "remaining_gap": "production provider, uncertain-delivery and DLQ/replay acceptance",
+        "next_action": "仅针对所列剩余缺口补实现或证据"
+      },
+      {
+        "requirement_id": "V1-GOVERNANCE-IDOR",
+        "current_implementation": "scoped_checks_and_tests_present",
+        "verification_mode_status": "PARTIAL",
+        "evidence_version": "f5a7b62d83303ab2c742bbd3baef27cf48f99999",
+        "remaining_gap": "complete cross-module IDOR/security acceptance",
+        "next_action": "仅针对所列剩余缺口补实现或证据"
+      },
+      {
+        "requirement_id": "V1-WORKER-ASYNC",
+        "current_implementation": "isolated_worker_present",
+        "verification_mode_status": "PARTIAL",
+        "evidence_version": "d144bcddcfc24e6e9eaf60509acd124711bc0561",
+        "remaining_gap": "production reliability, real providers and complete DLQ/replay acceptance",
+        "next_action": "仅针对所列剩余缺口补实现或证据"
+      },
+      {
+        "requirement_id": "V1-BACKUP-RESTORE",
+        "current_implementation": "不属于小程序页面、应单独后端验证",
+        "verification_mode_status": "none:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "备份与恢复验收",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "V1-PERF-RELEASE",
+        "current_implementation": "缺环境或权限",
+        "verification_mode_status": "none:BLOCKED_ENV",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "性能与正式发布验证",
+        "next_action": "在受控环境或获批资源具备后验收；继续不依赖工作"
+      },
+      {
+        "requirement_id": "V1-HOUSE-ARCHIVE-UI",
+        "current_implementation": "功能尚未实现",
+        "verification_mode_status": "none:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "物业建楼栋房屋/导入导出页面",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "V1-REAL-ASR-VLM",
+        "current_implementation": "缺环境或权限",
+        "verification_mode_status": "none:BLOCKED_ENV",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "真实 ASR/VLM 参与工单理解",
+        "next_action": "在受控环境或获批资源具备后验收；继续不依赖工作"
+      },
+      {
+        "requirement_id": "V1-AUTH-LOCKOUT",
+        "current_implementation": "不属于小程序页面、应单独后端验证",
+        "verification_mode_status": "API:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "密码/验证码失败计数与锁定窗口",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "V1-EMBEDDING-RAG",
+        "current_implementation": "缺环境或权限",
+        "verification_mode_status": "none:BLOCKED_ENV",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "真实 Embedding/RAG 引用，租户小区可见性过滤",
+        "next_action": "在受控环境或获批资源具备后验收；继续不依赖工作"
+      },
+      {
+        "requirement_id": "V1-AI-FAIL-CREATE",
+        "current_implementation": "fallback_code_and_unit_coverage_present",
+        "verification_mode_status": "PARTIAL",
+        "evidence_version": "d144bcddcfc24e6e9eaf60509acd124711bc0561",
+        "remaining_gap": "current live failure-path evidence with production-equivalent worker/provider",
+        "next_action": "仅针对所列剩余缺口补实现或证据"
+      },
+      {
+        "requirement_id": "V1-AUTO-DISPATCH-FILTER",
+        "current_implementation": "implemented_for_current_scoring_slice",
+        "verification_mode_status": "PASS_SCOPED_FAKE",
+        "evidence_version": "d144bcddcfc24e6e9eaf60509acd124711bc0561",
+        "remaining_gap": "real-model and full production-policy acceptance",
+        "next_action": "仅针对所列剩余缺口补实现或证据"
+      },
+      {
+        "requirement_id": "V1-NTF-EVENTS",
+        "current_implementation": "部分实现",
+        "verification_mode_status": "API:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "创建/派单/接单/状态/SLA/完成/公告通知事件覆盖",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      },
+      {
+        "requirement_id": "V1-GOVERNANCE-OPS",
+        "current_implementation": "不属于小程序页面、应单独后端验证",
+        "verification_mode_status": "API:NOT_IMPLEMENTED",
+        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
+        "remaining_gap": "健康检查、结构化日志、request_id、上传校验、幂等、并发接单",
+        "next_action": "按依赖顺序实施，保留本ID在分母中"
+      }
+    ]
   }
 }

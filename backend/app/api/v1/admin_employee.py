@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Header, Request
+from fastapi import APIRouter, Depends, Header, Query, Request
 from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_principal
@@ -18,7 +18,9 @@ from app.schema.employee import (
     EmployeeCatalogData,
     EmployeeCatalogItemData,
     EmployeeData,
+    EmployeeDepartmentData,
     EmployeeDetailData,
+    EmployeeListData,
     EmployeePropertyData,
     IssueEmployeeInviteRequest,
     UpdateEmployeeRequest,
@@ -78,6 +80,31 @@ def _catalog_item_data(record) -> EmployeeCatalogItemData:
     )
 
 
+def _department_data(record) -> EmployeeDepartmentData:
+    return EmployeeDepartmentData(
+        id=record.id,
+        tenant_id=record.tenant_id,
+        property_id=record.property_id,
+        code=record.code,
+        name=record.name,
+        status=record.status,
+    )
+
+
+def _employee_detail_data(
+    employee,
+    assignments,
+    duties,
+    skills,
+) -> EmployeeDetailData:
+    return EmployeeDetailData(
+        employee=_employee_data(employee),
+        assignments=[_assignment_data(item) for item in assignments],
+        duties=[_catalog_item_data(item) for item in duties],
+        skills=[_catalog_item_data(item) for item in skills],
+    )
+
+
 def _reject_header_mismatch(*, property_id: int, x_property_id: str | None) -> None:
     if x_property_id is None or x_property_id == "":
         return
@@ -123,6 +150,36 @@ def create_employee(
     return success_envelope(request, _employee_data(record).model_dump(mode="json"))
 
 
+@router.get("/employees")
+def list_employees(
+    tenant_id: int,
+    property_id: int,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[EmployeeService, Depends(get_employee_service)],
+    after_id: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=100)] = 50,
+) -> dict[str, object]:
+    rows = service.list_employees(
+        actor=actor,
+        tenant_id=tenant_id,
+        property_id=property_id,
+        after_id=after_id,
+        limit=limit,
+    )
+    items = [
+        _employee_detail_data(employee, assignments, duties, skills)
+        for employee, assignments, duties, skills in rows
+    ]
+    return success_envelope(
+        request,
+        EmployeeListData(
+            items=items,
+            next_cursor=items[-1].employee.id if len(items) == limit else None,
+        ).model_dump(mode="json"),
+    )
+
+
 @router.patch("/employees/{employee_id}")
 def update_employee(
     employee_id: int,
@@ -140,6 +197,7 @@ def update_employee(
         max_capacity=body.max_capacity,
         add_duty_ids=body.add_duty_ids,
         add_skill_ids=body.add_skill_ids,
+        clear_department=body.clear_department,
     )
     return success_envelope(request, _employee_data(record).model_dump(mode="json"))
 
@@ -158,12 +216,9 @@ def get_employee(
     )
     return success_envelope(
         request,
-        EmployeeDetailData(
-            employee=_employee_data(employee),
-            assignments=[_assignment_data(item) for item in assignments],
-            duties=[_catalog_item_data(item) for item in duties],
-            skills=[_catalog_item_data(item) for item in skills],
-        ).model_dump(mode="json"),
+        _employee_detail_data(employee, assignments, duties, skills).model_dump(
+            mode="json"
+        ),
     )
 
 
@@ -175,7 +230,7 @@ def list_employee_catalog(
     actor: Annotated[Principal, Depends(get_current_principal)],
     service: Annotated[EmployeeService, Depends(get_employee_service)],
 ) -> dict[str, object]:
-    duties, skills = service.list_catalog(
+    departments, duties, skills = service.list_catalog(
         actor=actor,
         tenant_id=tenant_id,
         property_id=property_id,
@@ -183,6 +238,7 @@ def list_employee_catalog(
     return success_envelope(
         request,
         EmployeeCatalogData(
+            departments=[_department_data(item) for item in departments],
             duties=[_catalog_item_data(item) for item in duties],
             skills=[_catalog_item_data(item) for item in skills],
         ).model_dump(mode="json"),

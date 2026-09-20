@@ -200,6 +200,39 @@ class EmployeeRepository:
             ).all()
         )
 
+    def list_current_employees_for_property(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int,
+        now: datetime,
+        after_id: int = 0,
+        limit: int = 50,
+    ) -> tuple[Employee, ...]:
+        return tuple(
+            self._session.scalars(
+                select(Employee)
+                .join(
+                    EmployeeProperty,
+                    (EmployeeProperty.employee_id == Employee.id)
+                    & (EmployeeProperty.tenant_id == Employee.tenant_id),
+                )
+                .where(
+                    Employee.tenant_id == tenant_id,
+                    Employee.id > after_id,
+                    EmployeeProperty.property_id == property_id,
+                    EmployeeProperty.status == "ACTIVE",
+                    EmployeeProperty.valid_from <= now,
+                    or_(
+                        EmployeeProperty.valid_to.is_(None),
+                        EmployeeProperty.valid_to > now,
+                    ),
+                )
+                .order_by(Employee.id)
+                .limit(limit)
+            ).all()
+        )
+
     def list_duties_for_employee(self, employee_id: int) -> tuple[Duty, ...]:
         return tuple(
             self._session.scalars(
@@ -234,6 +267,27 @@ class EmployeeRepository:
                 select(Duty)
                 .where(Duty.tenant_id == tenant_id, Duty.status == "ACTIVE")
                 .order_by(Duty.code, Duty.id)
+            ).all()
+        )
+
+    def list_departments_for_property(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int,
+    ) -> tuple[Department, ...]:
+        return tuple(
+            self._session.scalars(
+                select(Department)
+                .where(
+                    Department.tenant_id == tenant_id,
+                    Department.status == "ACTIVE",
+                    or_(
+                        Department.property_id.is_(None),
+                        Department.property_id == property_id,
+                    ),
+                )
+                .order_by(Department.code, Department.id)
             ).all()
         )
 

@@ -1,0 +1,72 @@
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+}
+
+.field-title {
+  color: #475467;
+  margin-top: 20rpx;
+  margin-bottom: 10rpx;
+}
+
+.picker,
+input {
+  border: 1rpx solid #d0d5dd;
+  border-radius: 8rpx;
+  margin: 12rpx 0;
+  padding: 18rpx;
+}
+
+.choice {
+  display: inline-block;
+  margin: 8rpx 22rpx 8rpx 0;
+}
+
+.employee-card.selected {
+  border: 3rpx solid #1f4b99;
+}
+
+.employee-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.assignment {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin: 10rpx 0;
+}
+
+.inline-row {
+  display: flex;
+  gap: 12rpx;
+}
+
+.input-box {
+  min-width: 0;
+}
+
+.inline-button {
+  margin: 0;
+}
+
+.compact {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.hint,
+.token {
+  color: #667085;
+  font-size: 24rpx;
+  margin-top: 12rpx;
+  word-break: break-all;
+}
+
+.notice {
+  color: #067647;
+  margin: 16rpx 24rpx;
+}

@@ -285,7 +285,7 @@ module.exports = {
     request({ path: "/auth/logout", method: "POST", data: { refresh_token: refreshToken || undefined } }),
   updateProfile: (displayName) =>
     request({ path: "/me/profile", method: "PATCH", data: { display_name: displayName } }),
-  catalogProperties: () => request({ path: "/properties" }),
+  catalogProperties: () => request({ path: "/properties?limit=100" }),
   catalogBuildings: (propertyId) => request({ path: `/properties/${propertyId}/buildings` }),
   catalogUnits: (buildingId) => request({ path: `/buildings/${buildingId}/units` }),
   catalogHouses: (unitId) => request({ path: `/units/${unitId}/houses` }),
@@ -394,6 +394,40 @@ module.exports = {
       path: `/admin/resident-bind-requests/${id}/reject`,
       method: "POST",
       data: { reason },
+    }),
+  employees: (propertyId, tenantId) =>
+    request({
+      path: `/admin/employees?property_id=${propertyId}&tenant_id=${tenantId}`,
+    }),
+  employeeCatalog: (propertyId, tenantId) =>
+    request({
+      path: `/admin/employee-catalog?property_id=${propertyId}&tenant_id=${tenantId}`,
+    }),
+  createEmployee: (body) =>
+    request({ path: "/admin/employees", method: "POST", data: body }),
+  updateEmployee: (id, body) =>
+    request({ path: `/admin/employees/${id}`, method: "PATCH", data: body }),
+  createDuty: (body) =>
+    request({ path: "/admin/duties", method: "POST", data: body }),
+  createSkill: (body) =>
+    request({ path: "/admin/skills", method: "POST", data: body }),
+  issueEmployeeInvite: (id, phone) =>
+    request({
+      path: `/admin/employees/${id}/invites`,
+      method: "POST",
+      data: { phone },
+    }),
+  assignEmployeeProperty: (id, propertyId) =>
+    request({
+      path: `/admin/employees/${id}/property-assignments`,
+      method: "POST",
+      data: { property_id: propertyId },
+    }),
+  endEmployeeProperty: (employeeId, assignmentId) =>
+    request({
+      path: `/admin/employees/${employeeId}/property-assignments/${assignmentId}/end`,
+      method: "POST",
+      data: {},
     }),
   staffDaily: (propertyId, tenantId) =>
     request({

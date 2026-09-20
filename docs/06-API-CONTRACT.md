@@ -108,6 +108,7 @@
 | PATCH | `/staff/attendance/status` |
 | GET | `/staff/attendance/today` |
 | GET | `/supervisor/staff/daily` |
+| GET | `/admin/employees` |
 | POST | `/admin/employees` |
 | PATCH | `/admin/employees/{id}` |
 | GET | `/admin/employees/{id}` |
@@ -127,6 +128,8 @@
 签到失败（不在有效服务范围、篡改 property_id、重复签到）返回 `EMP.CHECKIN_DENIED`。签到写入 `AttendanceRecord` 与更新 `EmployeeDailyStatus` 必须处于同一 Service 事务。
 
 职责、技能目录属于 Tenant，创建和查询时仍须以目标 Property 做 RBAC 范围校验。员工更新使用 `add_duty_ids` / `add_skill_ids` 追加当前能力关系；不得以修改接口删除既有历史证据。
+
+`GET /admin/employees` 必须携带 `tenant_id`、`property_id`，只返回该小区当前有效任职的员工，并按目标小区执行 `employee:read` 权限校验。目录响应可包含该 Tenant 全局部门及目标小区专属部门；其他小区专属部门不得显示。
 
 ## 6. 工单
 
