@@ -1,0 +1,150 @@
+{
+  "task_id": "SLA-NOTIFICATION-RETRY-003",
+  "captured_at": "2026-09-20T03:16:18.901949+00:00",
+  "head": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001",
+    "beat_started": false,
+    "provider": "DEVELOPMENT"
+  },
+  "business_object": {
+    "work_order_id": 11,
+    "created_via": "resident SMS login plus POST /work-orders",
+    "resumed_after_delivery_wait_timeout": true,
+    "assignment_source": "AUTO",
+    "clock_final_state": "OVERDUE"
+  },
+  "sla": {
+    "warning": {
+      "persisted_event_count_before_resume": 1
+    },
+    "duplicate_warning": {
+      "scanned": 0,
+      "warnings": 0,
+      "overdue": 0,
+      "stopped": 0,
+      "notifications": 0
+    },
+    "overdue": {
+      "persisted_event_count_before_resume": 1
+    },
+    "duplicate_overdue": {
+      "scanned": 0,
+      "warnings": 0,
+      "overdue": 0,
+      "stopped": 0,
+      "notifications": 0
+    },
+    "target_delivery_tasks_scheduled": 6,
+    "log_events": [
+      "SLA_WARNING",
+      "SLA_OVERDUE"
+    ],
+    "log_request_ids": [
+      "sla-clock:11:warning",
+      "sla-clock:11:overdue"
+    ],
+    "notification_rows": 6,
+    "unique_recipient_count": 3,
+    "delivery_states": [
+      {
+        "title": "工单 SLA 即将超时",
+        "status": "SUCCEEDED",
+        "attempt": 1
+      },
+      {
+        "title": "工单 SLA 即将超时",
+        "status": "SUCCEEDED",
+        "attempt": 1
+      },
+      {
+        "title": "工单 SLA 即将超时",
+        "status": "SUCCEEDED",
+        "attempt": 1
+      },
+      {
+        "title": "工单 SLA 已超时",
+        "status": "SUCCEEDED",
+        "attempt": 1
+      },
+      {
+        "title": "工单 SLA 已超时",
+        "status": "SUCCEEDED",
+        "attempt": 1
+      },
+      {
+        "title": "工单 SLA 已超时",
+        "status": "SUCCEEDED",
+        "attempt": 1
+      }
+    ],
+    "manager_inbox_titles": [
+      "工单 SLA 即将超时",
+      "工单 SLA 已超时"
+    ]
+  },
+  "retry": {
+    "terminal_outcomes": [
+      "RETRY",
+      "RETRY",
+      "RETRY",
+      "FAILED"
+    ],
+    "terminal_snapshots": [
+      {
+        "status": "PENDING",
+        "attempt": 1,
+        "last_error_code": "NTF.PROVIDER_FAILED",
+        "delivered_at_present": false
+      },
+      {
+        "status": "PENDING",
+        "attempt": 2,
+        "last_error_code": "NTF.PROVIDER_FAILED",
+        "delivered_at_present": false
+      },
+      {
+        "status": "PENDING",
+        "attempt": 3,
+        "last_error_code": "NTF.PROVIDER_FAILED",
+        "delivered_at_present": false
+      },
+      {
+        "status": "FAILED",
+        "attempt": 4,
+        "last_error_code": "NTF.PROVIDER_FAILED",
+        "delivered_at_present": false
+      }
+    ],
+    "recovery_outcomes": [
+      "RETRY",
+      "SUCCEEDED",
+      "SUCCEEDED"
+    ],
+    "recovery_final": {
+      "status": "SUCCEEDED",
+      "attempt": 2,
+      "last_error_code": null,
+      "delivered_at_present": true
+    },
+    "duplicate_final": {
+      "status": "SUCCEEDED",
+      "attempt": 2,
+      "last_error_code": null,
+      "delivered_at_present": true
+    }
+  },
+  "boundaries": {
+    "synthetic_data_only": true,
+    "historical_rows_swept": false,
+    "targeted_scheduler_clock": true,
+    "wall_clock_beat_observed": false,
+    "production_notification_provider_verified": false,
+    "direct_business_status_sql": false,
+    "migration_run": false
+  },
+  "redaction": "No phone, OTP, token, password, secret, resident name, or user id is written to evidence."
+}
