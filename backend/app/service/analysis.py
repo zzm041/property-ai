@@ -299,11 +299,7 @@ class AnalysisService:
                 record = self._work_orders.get_work_order_for_update(work_order_id)
                 if record is None:
                     return None
-                # Keep all reads before the property serialization lock as
-                # current/locking reads under MySQL REPEATABLE READ. Otherwise
-                # this content lookup can establish a stale consistent snapshot
-                # that later cluster/link reads retain after waiting on the lock.
-                content = self._work_orders.get_content_for_update(record.id)
+                content = self._work_orders.get_content(record.id)
                 media_files = self._ai.list_media_with_files(record.id)
                 images = tuple(
                     MediaRef(file_object.storage_key, file_object.mime_type, media.kind)
@@ -667,7 +663,11 @@ class AnalysisService:
                     return analysis
                 if analysis.status != AnalysisStatus.PROCESSING.value:
                     return analysis
-                content = self._work_orders.get_content(record.id)
+                # Keep all reads before the property serialization lock as
+                # current/locking reads under MySQL REPEATABLE READ. Otherwise
+                # this content lookup can establish a stale consistent snapshot
+                # that later cluster/link reads retain after waiting on the lock.
+                content = self._work_orders.get_content_for_update(record.id)
                 if content is not None and bundle.asr_text:
                     content.asr_text = bundle.asr_text
                 stale = record.status != WorkOrderStatus.PENDING_ANALYSIS.value

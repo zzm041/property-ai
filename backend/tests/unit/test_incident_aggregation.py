@@ -8,12 +8,14 @@ from sqlalchemy.dialects import mysql
 
 from app.core.config import Settings
 from app.core.database import OWNED_TXN_KEY, OWNED_TXN_OBJ_KEY
+from app.domain.ai import AnalysisStatus
 from app.repository.ai import AiRepository
 from app.repository.work_order import AutoAssignmentProvenance, WorkOrderRepository
 from app.service.auto_dispatch import (
     _notification_intent_snapshot,
     _restore_notification_intents,
 )
+from app.service.analysis import AnalysisService
 from app.service.incident import (
     IncidentCapacityService,
     IncidentService,
@@ -81,6 +83,38 @@ def test_analysis_content_lookup_is_a_current_locking_read() -> None:
     sql = str(statement.compile(dialect=mysql.dialect()))
     assert "work_order_contents.work_order_id = %s" in sql
     assert "FOR UPDATE" in sql
+
+
+def test_analysis_apply_uses_locking_content_read_before_aggregation() -> None:
+    session = MagicMock()
+    session.info = {}
+    session.in_transaction.return_value = False
+    session.get_transaction.return_value = MagicMock()
+    service = AnalysisService.__new__(AnalysisService)
+    service._session = session
+    service._work_orders = MagicMock()
+    service._ai = MagicMock()
+    service._append_failure_audit = MagicMock()
+    service._validate_payload = MagicMock(return_value=(None, None))
+    record = SimpleNamespace(id=41, status="CANCELLED")
+    analysis = SimpleNamespace(
+        id=51,
+        status=AnalysisStatus.PROCESSING.value,
+        error_code=None,
+    )
+    service._work_orders.get_work_order_for_update.return_value = record
+    service._ai.get_current_analysis_for_update.return_value = analysis
+
+    result = service._apply(
+        snapshot=SimpleNamespace(work_order_id=41, analysis_id=51),
+        bundle=SimpleNamespace(asr_text=None, llm_payload=None),
+        request_id="analysis-current-read",
+        attempt=1,
+    )
+
+    assert result is analysis
+    service._work_orders.get_content_for_update.assert_called_once_with(record.id)
+    service._work_orders.get_content.assert_not_called()
 
 
 def test_shared_0007_without_assignment_extensions_fails_closed() -> None:
