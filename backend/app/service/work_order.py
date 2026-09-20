@@ -2408,7 +2408,11 @@ class WorkOrderService:
         if reason is not None:
             assignment.reason = reason
         employee = self._employees.get_employee(assignment.employee_id)
-        if employee is not None:
+        shares_incident_capacity = (
+            self._repository.is_auto_incident_follow_assignment(assignment.id)
+            is True
+        )
+        if employee is not None and not shares_incident_capacity:
             self._adjust_load(record, employee, delta=-1)
         record.current_assignment_id = None
         self._session.flush()

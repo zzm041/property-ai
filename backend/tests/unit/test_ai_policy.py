@@ -139,6 +139,31 @@ def test_hard_filter_rejects_full_capacity() -> None:
     )
 
 
+def test_incident_follow_reuses_primary_handler_at_capacity() -> None:
+    follower = DispatchCandidate(
+        employee_id=4,
+        duty_codes=frozenset({"MAINTENANCE"}),
+        skill_codes=frozenset({"ELECTRICAL"}),
+        current_load=2,
+        max_capacity=2,
+        on_duty=True,
+        employee_active=True,
+        property_effective=True,
+        has_staff_role=True,
+        primary_incident_handler=True,
+        incident_follow=True,
+    )
+
+    assert (
+        hard_filter_candidate(
+            follower,
+            required_skill="ELECTRICAL",
+            required_duty="MAINTENANCE",
+        )
+        is None
+    )
+
+
 def test_hard_filter_requires_active_user_and_live_check_in() -> None:
     candidate = DispatchCandidate(
         employee_id=5,

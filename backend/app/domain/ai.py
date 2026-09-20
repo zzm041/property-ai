@@ -228,6 +228,7 @@ class DispatchCandidate:
     check_in_at: datetime | None = None
     same_building_history: int = 0
     primary_incident_handler: bool = False
+    incident_follow: bool = False
     average_response_seconds: float | None = None
     completion_rate: float | None = None
     average_rating: float | None = None
@@ -279,7 +280,7 @@ def hard_filter_candidate(
         return FilterReason.DUTY_MISMATCH
     if required_skill and required_skill not in candidate.skill_codes:
         return FilterReason.SKILL_MISMATCH
-    if candidate.current_load >= candidate.max_capacity:
+    if candidate.current_load >= candidate.max_capacity and not candidate.incident_follow:
         return FilterReason.CAPACITY_FULL
     return None
 
@@ -337,6 +338,8 @@ def score_candidate(
         reasons.append("RATING_HISTORY")
     if candidate.primary_incident_handler:
         reasons.append("PRIMARY_INCIDENT_HANDLER")
+    if candidate.incident_follow:
+        reasons.append("INCIDENT_FOLLOW")
     return round(score, 4), tuple(reasons)
 
 

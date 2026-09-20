@@ -4,6 +4,7 @@ from collections.abc import Callable
 from datetime import datetime, timedelta
 
 from pydantic import ValidationError
+from sqlalchemy import event
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings, get_settings
@@ -46,8 +47,20 @@ class IncidentService:
         self._work_orders = WorkOrderRepository(session)
         self._audit = AuditService(session)
 
-    def aggregate_locked(self, record: WorkOrder, *, request_id: str) -> Incident | None:
+    def aggregate_locked(
+        self,
+        record: WorkOrder,
+        *,
+        subcategory: str,
+        request_id: str,
+    ) -> Incident | None:
         require_owned_transaction(self._session)
+        property_record = self._work_orders.get_property_for_update(record.property_id)
+        if (
+            property_record is None
+            or property_record.tenant_id != record.tenant_id
+        ):
+            return None
         window = timedelta(minutes=self._settings.incident_window_minutes)
         building_id = self._ai.get_building_id(record.house_id)
         cluster = self._ai.list_cluster_work_orders(
@@ -55,6 +68,7 @@ class IncidentService:
             property_id=record.property_id,
             building_id=building_id,
             category=record.category,
+            subcategory=subcategory,
             since=record.created_at - window,
             until=record.created_at + window,
         )
@@ -65,14 +79,23 @@ class IncidentService:
             property_id=record.property_id,
             building_id=building_id,
             category=record.category,
+            subcategory=subcategory,
+            seen_after=record.created_at - window,
+            seen_before=record.created_at + window,
         )
         created = False
-        now = self._clock()
         if incident is None:
             primary_work_order = cluster[0]
-            primary_assignment = self._work_orders.get_active_assignment(
-                primary_work_order.id
-            )
+            primary_assignment = None
+            for candidate in cluster:
+                candidate_assignment = self._work_orders.get_active_assignment(
+                    candidate.id
+                )
+                if candidate_assignment is None:
+                    continue
+                primary_work_order = candidate
+                primary_assignment = candidate_assignment
+                break
             incident = self._ai.add_incident(
                 Incident(
                     tenant_id=record.tenant_id,
@@ -80,7 +103,7 @@ class IncidentService:
                     building_id=building_id,
                     status=IncidentStatus.OPEN.value,
                     category=record.category,
-                    subcategory=None,
+                    subcategory=subcategory,
                     summary=None,
                     first_seen_at=min(item.created_at for item in cluster),
                     last_seen_at=max(item.created_at for item in cluster),
@@ -123,9 +146,27 @@ class IncidentService:
                     "work_order_id": item.id,
                 },
             )
+            if (
+                item.id != record.id
+                and item.status == "PENDING_ASSIGNMENT"
+                and item.current_assignment_id is None
+            ):
+                pending = self._session.info.setdefault(
+                    "pending_incident_redispatch",
+                    {},
+                )
+                pending[item.id] = f"incident:{incident.id}:redispatch:{item.id}"
+                self._session.info["incident_redispatch_settings"] = self._settings
         links = self._ai.list_incident_work_orders(incident.id)
         incident.work_order_count = len(links)
-        incident.last_seen_at = now
+        incident.first_seen_at = min(
+            incident.first_seen_at,
+            *(item.created_at for item in cluster),
+        )
+        incident.last_seen_at = max(
+            incident.last_seen_at,
+            *(item.created_at for item in cluster),
+        )
         if incident.primary_work_order_id is None and cluster:
             incident.primary_work_order_id = cluster[0].id
         if incident.primary_employee_id is None and incident.primary_work_order_id:
@@ -274,3 +315,34 @@ class IncidentService:
                 },
             )
             return incident
+
+
+@event.listens_for(Session, "after_commit")
+def _schedule_incident_redispatch(session: Session) -> None:
+    # ``after_commit`` also fires when the auto-dispatch SAVEPOINT is released.
+    # Keep the intent buffered until the owning business transaction commits.
+    if session.in_nested_transaction():
+        return
+    pending = session.info.pop("pending_incident_redispatch", None)
+    if not pending:
+        return
+    settings = session.info.pop("incident_redispatch_settings", None) or get_settings()
+    from app.worker.enqueue import enqueue_celery_task
+    from app.worker.tasks import analyze_work_order_task
+
+    for work_order_id, request_id in sorted(pending.items()):
+        enqueue_celery_task(
+            settings=settings,
+            celery_task=analyze_work_order_task,
+            args=(int(work_order_id), str(request_id)),
+            event="ai_enqueue_failed",
+            extra={"work_order_id": int(work_order_id), "incident_redispatch": True},
+        )
+
+
+@event.listens_for(Session, "after_rollback")
+def _clear_pending_incident_redispatch(session: Session) -> None:
+    if session.in_nested_transaction():
+        return
+    session.info.pop("pending_incident_redispatch", None)
+    session.info.pop("incident_redispatch_settings", None)

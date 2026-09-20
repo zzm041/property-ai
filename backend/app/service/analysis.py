@@ -703,6 +703,7 @@ class AnalysisService:
 
                     IncidentService(self._session, settings=self._settings).aggregate_locked(
                         record,
+                        subcategory=mapped.subcategory,
                         request_id=request_id,
                     )
                 self._write_recommendations(record, analysis, mapped, snapshot.building_id)

@@ -2,7 +2,8 @@
 
 from datetime import datetime
 
-from sqlalchemy import and_, case, func, or_, select
+from sqlalchemy import MetaData, Table, and_, case, func, inspect as sa_inspect, or_, select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.model.property import House, Property
@@ -43,6 +44,11 @@ class WorkOrderRepository:
 
     def get_property(self, property_id: int) -> Property | None:
         return self._session.get(Property, property_id)
+
+    def get_property_for_update(self, property_id: int) -> Property | None:
+        return self._session.scalar(
+            select(Property).where(Property.id == property_id).with_for_update()
+        )
 
     def get_file(self, file_id: int) -> FileObject | None:
         return self._session.get(FileObject, file_id)
@@ -198,6 +204,32 @@ class WorkOrderRepository:
         return self._session.scalar(
             select(WorkOrderReceipt).where(WorkOrderReceipt.process_id == process_id)
         )
+
+    def is_auto_incident_follow_assignment(self, assignment_id: int) -> bool:
+        """Read 0009 assignment provenance without mapping it onto shared 0007."""
+
+        bind = self._session.get_bind()
+        if bind is None:
+            return False
+        try:
+            columns = {
+                column["name"]
+                for column in sa_inspect(bind).get_columns("work_order_assignments")
+            }
+            if not {"assigned_source", "payload_json"} <= columns:
+                return False
+            table = Table("work_order_assignments", MetaData(), autoload_with=bind)
+            row = self._session.execute(
+                select(table.c.assigned_source, table.c.payload_json).where(
+                    table.c.id == assignment_id
+                )
+            ).mappings().one_or_none()
+        except SQLAlchemyError:
+            return False
+        if row is None or row["assigned_source"] != "AUTO":
+            return False
+        payload = row["payload_json"]
+        return isinstance(payload, dict) and payload.get("incident_follow") is True
 
     def list_work_orders_for_file(self, file_id: int) -> tuple[WorkOrder, ...]:
         return tuple(

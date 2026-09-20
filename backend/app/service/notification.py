@@ -285,6 +285,8 @@ class NotificationService:
 
 @event.listens_for(Session, "after_commit")
 def _schedule_notification_deliveries(session: Session) -> None:
+    if session.in_nested_transaction():
+        return
     pending = session.info.pop("pending_notification_deliveries", None)
     if not pending:
         return

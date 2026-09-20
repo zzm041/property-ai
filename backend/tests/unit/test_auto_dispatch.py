@@ -283,3 +283,84 @@ def test_auto_dispatch_tries_next_ranked_candidate_when_winner_turns_ineligible(
         request_id="r-next",
     ) == "ASSIGNED"
     assert [call.kwargs["winner"].employee_id for call in commit.call_args_list] == [7, 8]
+
+
+def test_incident_follower_reuses_full_primary_without_duplicate_load(monkeypatch) -> None:
+    settings = Settings(_env_file=None, app_env="test", ai_auto_assign=True)
+    session = MagicMock()
+    service = AutoDispatchService(session, settings=settings)
+    service._work_orders = MagicMock()
+    service._employees = MagicMock()
+    service._ai = MagicMock()
+    service._audit = MagicMock()
+    service._insert_auto_assignment = MagicMock(return_value=91)
+    record = _pending_order()
+    record.incident_id = 501
+    employee = SimpleNamespace(
+        id=7,
+        user_id=17,
+        status="ACTIVE",
+        max_capacity=2,
+    )
+    daily = SimpleNamespace(current_load=2, on_duty="ON_DUTY")
+    incident = SimpleNamespace(
+        id=501,
+        primary_work_order_id=10,
+        primary_employee_id=7,
+    )
+    winner = DispatchCandidate(
+        employee_id=7,
+        duty_codes=frozenset({"MAINTENANCE"}),
+        skill_codes=frozenset({"ELECTRICAL"}),
+        current_load=2,
+        max_capacity=2,
+        on_duty=True,
+        employee_active=True,
+        property_effective=True,
+        has_staff_role=True,
+        primary_incident_handler=True,
+        incident_follow=True,
+    )
+    service._work_orders.list_assignments.return_value = ()
+    service._work_orders.get_property.return_value = SimpleNamespace(
+        timezone="Asia/Shanghai"
+    )
+    service._work_orders.get_sla_clock_for_update.return_value = None
+    service._employees.get_employee.return_value = employee
+    service._employees.get_daily_status_for_update.return_value = daily
+    service._ai.get_incident.return_value = incident
+    service._ai.get_attendance.return_value = SimpleNamespace(
+        check_in_at=datetime.now(UTC)
+    )
+    service._ai.get_effective_property.return_value = SimpleNamespace(id=1)
+    service._ai.list_employee_role_codes.return_value = frozenset({"STAFF"})
+    service._ai.list_employee_duties.return_value = frozenset({"MAINTENANCE"})
+    service._ai.list_employee_skills.return_value = frozenset({"ELECTRICAL"})
+    service._ai.get_user_status.return_value = "ACTIVE"
+    service._ai.list_recommendations.return_value = ()
+    notifier = MagicMock()
+    monkeypatch.setattr(
+        "app.service.auto_dispatch.NotificationService",
+        MagicMock(return_value=notifier),
+    )
+
+    outcome = service._commit_auto_assignment(
+        record=record,
+        mapped=_mapped(),
+        winner=winner,
+        score=0.9,
+        reasons=("INCIDENT_FOLLOW",),
+        filter_snapshot=(),
+        request_id="incident-follow-11",
+    )
+
+    assert outcome == "ASSIGNED"
+    assert daily.current_load == 2
+    payload = service._insert_auto_assignment.call_args.kwargs["payload"]
+    assert payload["incident_id"] == 501
+    assert payload["incident_follow"] is True
+    log = service._work_orders.add_log.call_args.args[0]
+    assert log.payload_json["reason_code"] == "AUTO_INCIDENT_FOLLOW"
+    assert incident.primary_work_order_id == 10
+    assert incident.primary_employee_id == 7
+    notifier.enqueue.assert_called_once()

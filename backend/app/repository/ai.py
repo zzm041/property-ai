@@ -348,6 +348,7 @@ class AiRepository:
         property_id: int,
         building_id: int | None,
         category: str,
+        subcategory: str,
         since: datetime,
         until: datetime,
     ) -> tuple[WorkOrder, ...]:
@@ -360,12 +361,21 @@ class AiRepository:
             WorkOrder.status.notin_(("CANCELLED", "CLOSED")),
         )
         records = tuple(self._session.scalars(query.order_by(WorkOrder.id)).all())
-        if building_id is None:
-            return records
         matched: list[WorkOrder] = []
         for record in records:
-            if self.get_building_id(record.house_id) == building_id:
-                matched.append(record)
+            if (
+                building_id is not None
+                and self.get_building_id(record.house_id) != building_id
+            ):
+                continue
+            analysis = self.get_current_analysis(record.id)
+            if (
+                analysis is None
+                or analysis.status != "COMPLETED"
+                or analysis.subcategory != subcategory
+            ):
+                continue
+            matched.append(record)
         return tuple(matched)
 
     def find_open_incident(
@@ -375,6 +385,9 @@ class AiRepository:
         property_id: int,
         building_id: int | None,
         category: str,
+        subcategory: str,
+        seen_after: datetime,
+        seen_before: datetime,
     ) -> Incident | None:
         return self._session.scalar(
             select(Incident)
@@ -383,10 +396,14 @@ class AiRepository:
                 Incident.property_id == property_id,
                 Incident.building_id == building_id,
                 Incident.category == category,
+                Incident.subcategory == subcategory,
                 Incident.status.in_(("OPEN", "MONITORING")),
+                Incident.last_seen_at >= seen_after,
+                Incident.first_seen_at <= seen_before,
             )
             .order_by(Incident.id)
             .limit(1)
+            .with_for_update()
         )
 
     def get_incident(self, incident_id: int) -> Incident | None:

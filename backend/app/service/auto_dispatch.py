@@ -228,6 +228,11 @@ class AutoDispatchService:
                     property_id=record.property_id,
                 ),
                 primary_incident_handler=employee.id == primary_employee_id,
+                incident_follow=(
+                    incident is not None
+                    and incident.primary_work_order_id != record.id
+                    and employee.id == primary_employee_id
+                ),
                 average_response_seconds=response,
                 completion_rate=completion,
                 average_rating=rating,
@@ -285,6 +290,7 @@ class AutoDispatchService:
                     ),
                     "same_building_history": candidate.same_building_history,
                     "primary_incident_handler": candidate.primary_incident_handler,
+                    "incident_follow": candidate.incident_follow,
                     "average_response_seconds": candidate.average_response_seconds,
                     "completion_rate": candidate.completion_rate,
                     "average_rating": candidate.average_rating,
@@ -325,7 +331,13 @@ class AutoDispatchService:
         )
         if daily is None or daily.on_duty != AttendanceOnDuty.ON_DUTY.value:
             return "NO_ELIGIBLE"
-        if daily.current_load >= employee.max_capacity:
+        incident = self._ai.get_incident(record.incident_id) if record.incident_id else None
+        incident_follow = (
+            incident is not None
+            and incident.primary_work_order_id != record.id
+            and incident.primary_employee_id == employee.id
+        )
+        if daily.current_load >= employee.max_capacity and not incident_follow:
             return "NO_ELIGIBLE"
         attendance = self._ai.get_attendance(
             employee_id=employee.id,
@@ -359,6 +371,9 @@ class AutoDispatchService:
             has_staff_role=bool(roles & _STAFF_ROLES),
             checked_in=attendance is not None,
             check_in_at=None if attendance is None else attendance.check_in_at,
+            primary_incident_handler=incident is not None
+            and incident.primary_employee_id == employee.id,
+            incident_follow=incident_follow,
         )
         if hard_filter_candidate(
             current_candidate,
@@ -378,6 +393,8 @@ class AutoDispatchService:
             "required_duty": mapped.required_duty,
             "confidence": mapped.confidence,
             "risk": mapped.risk.value,
+            "incident_id": None if incident is None else incident.id,
+            "incident_follow": incident_follow,
             "current_load": winner.current_load,
             "max_capacity": winner.max_capacity,
             "filter_snapshot": {
@@ -433,21 +450,26 @@ class AutoDispatchService:
                 request_id=request_id,
                 payload_json={
                     "event_code": WorkOrderEvent.ASSIGN.value,
-                    "reason_code": "AUTO_ASSIGN",
+                    "reason_code": (
+                        "AUTO_INCIDENT_FOLLOW"
+                        if incident_follow
+                        else "AUTO_ASSIGN"
+                    ),
                     "assigned_source": "AUTO",
                     "employee_id": employee.id,
+                    "incident_id": None if incident is None else incident.id,
                 },
             )
         )
-        daily.current_load = daily.current_load + 1
-        if record.incident_id is not None:
-            incident = self._ai.get_incident(record.incident_id)
-            if (
-                incident is not None
-                and incident.primary_work_order_id == record.id
-                and incident.primary_employee_id is None
-            ):
-                incident.primary_employee_id = employee.id
+        if not incident_follow:
+            daily.current_load = daily.current_load + 1
+        if (
+            incident is not None
+            and not incident_follow
+            and incident.primary_employee_id != employee.id
+        ):
+            incident.primary_work_order_id = record.id
+            incident.primary_employee_id = employee.id
         self._session.flush()
         for item in self._ai.list_recommendations(record.id):
             item.selected = 1 if item.employee_id == employee.id else 0
@@ -544,7 +566,11 @@ class AutoDispatchService:
             payload_json=payload,
             status=AssignmentStatus.ACTIVE.value,
             assigned_at=assigned_at,
-            reason="AUTO_DISPATCH",
+            reason=(
+                "AUTO_INCIDENT_FOLLOW"
+                if payload.get("incident_follow") is True
+                else "AUTO_DISPATCH"
+            ),
         )
         result = self._session.execute(stmt)
         self._session.flush()
