@@ -565,9 +565,23 @@ class AiRepository:
         *,
         tenant_id: int,
         property_id: int,
+        include_tenant_targets: bool,
+        include_property_targets: bool,
         after_id: int = 0,
         limit: int = 50,
     ) -> tuple[Announcement, ...]:
+        target_conditions = []
+        if include_tenant_targets:
+            target_conditions.append(AnnouncementScope.scope_type == "TENANT")
+        if include_property_targets:
+            target_conditions.append(
+                and_(
+                    Announcement.property_id == property_id,
+                    AnnouncementScope.scope_type != "TENANT",
+                )
+            )
+        if not target_conditions:
+            return ()
         return tuple(
             self._session.scalars(
                 select(Announcement)
@@ -578,10 +592,7 @@ class AiRepository:
                 .where(
                     Announcement.tenant_id == tenant_id,
                     Announcement.id > after_id,
-                    or_(
-                        AnnouncementScope.scope_type == "TENANT",
-                        Announcement.property_id == property_id,
-                    ),
+                    or_(*target_conditions),
                 )
                 .distinct()
                 .order_by(Announcement.id)

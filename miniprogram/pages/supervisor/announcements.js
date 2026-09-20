@@ -34,9 +34,56 @@ function decorate(item) {
   };
 }
 
+function scopeAllows(scope, permission, tenantId, propertyId) {
+  if ((scope.permissions || []).indexOf(permission) < 0) {
+    return false;
+  }
+  if (scope.scope_type === "SYSTEM") {
+    return true;
+  }
+  if (Number(scope.tenant_id) !== Number(tenantId)) {
+    return false;
+  }
+  return (
+    scope.scope_type === "TENANT" ||
+    (scope.scope_type === "PROPERTY" &&
+      Number(scope.property_id) === Number(propertyId))
+  );
+}
+
+function tenantScopeAllows(scope, permission, tenantId) {
+  if ((scope.permissions || []).indexOf(permission) < 0) {
+    return false;
+  }
+  if (scope.scope_type === "SYSTEM") {
+    return true;
+  }
+  return (
+    scope.scope_type === "TENANT" &&
+    Number(scope.tenant_id) === Number(tenantId)
+  );
+}
+
+function loadAllAnnouncements(propertyId, afterId, collected) {
+  const current = collected || [];
+  return api.adminAnnouncements(propertyId, afterId || 0).then((response) => {
+    const items = (response && response.items) || [];
+    const next = current.concat(items);
+    const nextCursor = response && response.next_cursor;
+    if (!nextCursor) {
+      return next;
+    }
+    if (Number(nextCursor) <= Number(afterId || 0)) {
+      throw new Error("公告分页游标无效，请刷新后重试");
+    }
+    return loadAllAnnouncements(propertyId, nextCursor, next);
+  });
+}
+
 Page({
   data: {
     propertyId: "",
+    tenantId: "",
     title: "",
     content: "",
     reviewReason: "",
@@ -46,7 +93,10 @@ Page({
     loading: false,
     error: "",
     notice: "",
+    canDraft: false,
     canPublish: false,
+    canPublishProperty: false,
+    canPublishTenant: false,
     canTenant: false,
     scopeOptions: SCOPE_OPTIONS,
     scopeIndex: 0,
@@ -58,7 +108,10 @@ Page({
     unitIndex: 0,
   },
   onLoad(query) {
-    this.setData({ propertyId: query.propertyId || "" });
+    this.setData({
+      propertyId: query.propertyId || "",
+      tenantId: query.tenantId || "",
+    });
     this.load();
   },
   onField(e) {
@@ -98,18 +151,37 @@ Page({
       Promise.all([
         api.me(),
         api.catalogBuildings(this.data.propertyId),
-        api.adminAnnouncements(this.data.propertyId),
-      ]).then(([me, buildingPayload, announcementPayload]) => {
-        const permissions = me.permissions || [];
-        const canTenant = (me.scopes || []).some(
+        loadAllAnnouncements(this.data.propertyId),
+      ]).then(([me, buildingPayload, announcements]) => {
+        const scopes = me.scopes || [];
+        const propertyGrant = scopes.find(
           (scope) =>
-            scope.scope_type === "TENANT" &&
-            (scope.permissions || []).indexOf("announcement:draft") >= 0
+            scope.scope_type === "PROPERTY" &&
+            Number(scope.property_id) === Number(this.data.propertyId)
+        );
+        const tenantId = this.data.tenantId || (propertyGrant && propertyGrant.tenant_id) || "";
+        const canDraft = scopes.some((scope) =>
+          scopeAllows(scope, "announcement:draft", tenantId, this.data.propertyId)
+        );
+        const canPublishProperty = scopes.some((scope) =>
+          scopeAllows(scope, "announcement:publish", tenantId, this.data.propertyId)
+        );
+        const canTenant = scopes.some((scope) =>
+          tenantScopeAllows(scope, "announcement:draft", tenantId)
+        );
+        const canPublishTenant = scopes.some((scope) =>
+          tenantScopeAllows(scope, "announcement:publish", tenantId)
         );
         const buildings = (buildingPayload && buildingPayload.items) || [];
-        const items = ((announcementPayload && announcementPayload.items) || []).map(decorate);
+        const items = announcements.map(decorate);
+        const selectedIsTenant =
+          this.data.selected && this.data.selected.scope.scope_type === "TENANT";
         this.setData({
-          canPublish: permissions.indexOf("announcement:publish") >= 0,
+          tenantId: String(tenantId || ""),
+          canDraft,
+          canPublish: selectedIsTenant ? canPublishTenant : canPublishProperty,
+          canPublishProperty,
+          canPublishTenant,
           canTenant,
           buildings,
           items,
@@ -207,6 +279,10 @@ Page({
           scopeIndex,
           audienceIndex,
           buildingIndex,
+          canPublish:
+            item.scope.scope_type === "TENANT"
+              ? this.data.canPublishTenant
+              : this.data.canPublishProperty,
           error: "",
         });
         return this.loadUnits(selectedBuilding).then((units) => {

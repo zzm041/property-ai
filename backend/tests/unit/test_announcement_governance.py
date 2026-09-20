@@ -212,6 +212,7 @@ def test_rejected_announcement_can_be_edited_without_losing_review_history(
     actor = _principal(ANNOUNCEMENT_DRAFT)
     record = _announcement("REJECTED")
     service._ai.get_announcement_for_update.return_value = record
+    service._ai.list_announcement_scopes.return_value = (_scope(),)
     monkeypatch.setattr(
         "app.service.announcement.begin_owned_transaction",
         lambda session: nullcontext(),
@@ -272,6 +273,101 @@ def test_rejection_requires_reason_and_appends_review_and_audit(monkeypatch) -> 
     audit = service._audit.append.call_args.kwargs
     assert audit["action"] is AuditAction.ANNOUNCEMENT_REJECTED
     assert audit["details"]["reason"] == "范围需要缩小"
+
+
+def test_existing_tenant_target_requires_tenant_scope_for_all_manage_actions() -> None:
+    service, _ = _service()
+    record = _announcement("PENDING_REVIEW")
+    service._ai.get_announcement_for_update.return_value = record
+    service._ai.list_announcement_scopes.return_value = (_scope(scope_type="TENANT"),)
+    property_actor = _principal(ANNOUNCEMENT_DRAFT, ANNOUNCEMENT_PUBLISH)
+
+    for permission in (ANNOUNCEMENT_DRAFT, ANNOUNCEMENT_PUBLISH):
+        with pytest.raises(AppError) as captured:
+            service._require_manage(property_actor, record.id, permission)
+        assert captured.value.code == IamErrorCode.FORBIDDEN
+
+    tenant_actor = _principal(
+        ANNOUNCEMENT_DRAFT,
+        ANNOUNCEMENT_PUBLISH,
+        scope_type=ScopeType.TENANT,
+        role_code="TENANT_ADMIN",
+    )
+    assert service._require_manage(tenant_actor, record.id, ANNOUNCEMENT_DRAFT) is record
+    assert service._require_manage(tenant_actor, record.id, ANNOUNCEMENT_PUBLISH) is record
+
+
+def test_management_list_pushes_actor_target_scope_into_repository_query() -> None:
+    service, _ = _service()
+    service._work_orders.get_property.return_value = Property(
+        id=10,
+        tenant_id=1,
+        name="Property",
+        address="Address",
+        timezone="Asia/Shanghai",
+    )
+    service._ai.list_announcements_for_management.return_value = ()
+
+    service.list_managed(
+        actor=_principal(ANNOUNCEMENT_DRAFT),
+        property_id=10,
+        after_id=100,
+        limit=25,
+    )
+    property_query = service._ai.list_announcements_for_management.call_args.kwargs
+    assert property_query == {
+        "tenant_id": 1,
+        "property_id": 10,
+        "include_tenant_targets": False,
+        "include_property_targets": True,
+        "after_id": 100,
+        "limit": 25,
+    }
+
+    service.list_managed(
+        actor=_principal(
+            ANNOUNCEMENT_DRAFT,
+            scope_type=ScopeType.TENANT,
+            role_code="TENANT_ADMIN",
+        ),
+        property_id=10,
+    )
+    tenant_query = service._ai.list_announcements_for_management.call_args.kwargs
+    assert tenant_query["include_tenant_targets"] is True
+    assert tenant_query["include_property_targets"] is True
+
+
+def test_management_repository_applies_target_filter_before_limit() -> None:
+    session = MagicMock()
+    session.scalars.return_value.all.return_value = []
+    repository = AiRepository(session)
+
+    assert (
+        repository.list_announcements_for_management(
+            tenant_id=1,
+            property_id=10,
+            include_tenant_targets=False,
+            include_property_targets=False,
+            limit=7,
+        )
+        == ()
+    )
+    session.scalars.assert_not_called()
+
+    repository.list_announcements_for_management(
+        tenant_id=1,
+        property_id=10,
+        include_tenant_targets=False,
+        include_property_targets=True,
+        after_id=20,
+        limit=7,
+    )
+    statement = session.scalars.call_args.args[0]
+    sql = str(statement.compile(compile_kwargs={"literal_binds": True}))
+    assert "announcements.property_id = 10" in sql
+    assert "announcement_scopes.scope_type != 'TENANT'" in sql
+    assert "announcements.id > 20" in sql
+    assert "LIMIT 7" in sql
 
 
 def test_resident_visibility_passes_house_and_audience_targets_to_repository() -> None:

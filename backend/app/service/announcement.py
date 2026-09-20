@@ -507,22 +507,29 @@ class AnnouncementService:
             tenant_id=property_record.tenant_id,
             property_id=property_record.id,
         )
-        if not (
-            actor.has_permission(ANNOUNCEMENT_DRAFT, target_scope)
-            or actor.has_permission(ANNOUNCEMENT_PUBLISH, target_scope)
-        ):
+        tenant_scope = OrganizationScope(
+            ScopeType.TENANT,
+            tenant_id=property_record.tenant_id,
+        )
+        can_property = any(
+            actor.has_permission(permission, target_scope)
+            for permission in (ANNOUNCEMENT_DRAFT, ANNOUNCEMENT_PUBLISH)
+        )
+        can_tenant = any(
+            actor.has_permission(permission, tenant_scope)
+            for permission in (ANNOUNCEMENT_DRAFT, ANNOUNCEMENT_PUBLISH)
+        )
+        if not can_property and not can_tenant:
             RbacService.require_permission(actor, ANNOUNCEMENT_READ, target_scope)
         records = self._ai.list_announcements_for_management(
             tenant_id=property_record.tenant_id,
             property_id=property_record.id,
+            include_tenant_targets=can_tenant,
+            include_property_targets=can_property,
             after_id=after_id,
             limit=limit,
         )
-        details: list[AnnouncementDetail] = []
-        for record in records:
-            if self._can_read_management_record(actor, record):
-                details.append(self._announcement_detail(record))
-        return tuple(details)
+        return tuple(self._announcement_detail(record) for record in records)
 
     def get_managed(
         self,
@@ -558,11 +565,8 @@ class AnnouncementService:
                 message="Announcement was not found",
                 status_code=404,
             )
-        scope = OrganizationScope(
-            ScopeType.PROPERTY,
-            tenant_id=record.tenant_id,
-            property_id=record.property_id,
-        )
+        target = self._require_single_target(record.id)
+        scope = self._target_organization_scope(record, target)
         RbacService.require_permission(actor, permission, scope)
         return record
 
@@ -571,17 +575,27 @@ class AnnouncementService:
         actor: Principal,
         record: Announcement,
     ) -> bool:
-        scope = OrganizationScope(
-            ScopeType.PROPERTY,
-            tenant_id=record.tenant_id,
-            property_id=record.property_id,
-        )
+        target = self._require_single_target(record.id)
+        scope = self._target_organization_scope(record, target)
         return any(
             actor.has_permission(permission, scope)
             for permission in (
                 ANNOUNCEMENT_DRAFT,
                 ANNOUNCEMENT_PUBLISH,
             )
+        )
+
+    @staticmethod
+    def _target_organization_scope(
+        record: Announcement,
+        target: AnnouncementTarget,
+    ) -> OrganizationScope:
+        if target.scope_type == AnnouncementScopeType.TENANT.value:
+            return OrganizationScope(ScopeType.TENANT, tenant_id=record.tenant_id)
+        return OrganizationScope(
+            ScopeType.PROPERTY,
+            tenant_id=record.tenant_id,
+            property_id=record.property_id,
         )
 
     def _announcement_detail(self, record: Announcement) -> AnnouncementDetail:

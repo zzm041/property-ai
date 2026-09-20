@@ -7,7 +7,7 @@
 <view class="notice" wx:if="{{notice}}">{{notice}}</view>
 <view class="error" wx:if="{{error}}">{{error}}</view>
 
-<view class="card">
+<view class="card" wx:if="{{canDraft}}">
   <view class="section-title">公告草稿</view>
   <input placeholder="标题" value="{{title}}" data-field="title" bindinput="onField" />
   <textarea placeholder="内容" value="{{content}}" data-field="content" bindinput="onField"></textarea>
@@ -27,6 +27,7 @@
   <button class="btn" wx:if="{{selected && (selected.status == 'DRAFT' || selected.status == 'REJECTED')}}" bindtap="update">保存所选公告修改</button>
   <button class="btn" wx:if="{{selected && selected.status == 'DRAFT'}}" bindtap="submitReview">提交审核</button>
 </view>
+<view class="empty" wx:else>当前身份仅可审核或查看此范围公告，不能编辑草稿。</view>
 
 <view class="empty" wx:if="{{!loading && !items.length}}">当前范围暂无公告</view>
 <view class="card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="select">
