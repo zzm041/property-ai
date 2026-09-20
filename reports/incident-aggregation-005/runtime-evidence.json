@@ -1,0 +1,268 @@
+{
+  "task_id": "INCIDENT-AGGREGATION-005",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001",
+    "commit": "1046f1003847120ceddbbc1666a1aa920ae6ae0e",
+    "model_mode": "development_fake"
+  },
+  "created_work_order_ids": [
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
+  ],
+  "incident": {
+    "id": 1,
+    "status": "OPEN",
+    "category": "ELECTRICAL",
+    "subcategory": "outlet_spark",
+    "primary_work_order_id": 15,
+    "primary_employee_id": 7,
+    "work_order_count": 6,
+    "first_seen_at": "2026-09-20 04:32:17.515535",
+    "last_seen_at": "2026-09-20 04:32:30.625533"
+  },
+  "links": [
+    {
+      "work_order_id": 15
+    },
+    {
+      "work_order_id": 16
+    },
+    {
+      "work_order_id": 17
+    },
+    {
+      "work_order_id": 18
+    },
+    {
+      "work_order_id": 19
+    },
+    {
+      "work_order_id": 20
+    }
+  ],
+  "analyses": [
+    {
+      "work_order_id": 15,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "subcategory": "outlet_spark",
+      "prompt_version": "wo-analysis-v1"
+    },
+    {
+      "work_order_id": 16,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "subcategory": "outlet_spark",
+      "prompt_version": "wo-analysis-v1"
+    },
+    {
+      "work_order_id": 17,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "subcategory": "outlet_spark",
+      "prompt_version": "wo-analysis-v1"
+    },
+    {
+      "work_order_id": 18,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "subcategory": "outlet_spark",
+      "prompt_version": "wo-analysis-v1"
+    },
+    {
+      "work_order_id": 19,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "subcategory": "outlet_spark",
+      "prompt_version": "wo-analysis-v1"
+    },
+    {
+      "work_order_id": 20,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "subcategory": "outlet_spark",
+      "prompt_version": "wo-analysis-v1"
+    }
+  ],
+  "ai_calls": [
+    {
+      "work_order_id": 15,
+      "provider_type": "LLM",
+      "provider_mode": "DEVELOPMENT",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS",
+      "prompt_version": "wo-analysis-v1"
+    },
+    {
+      "work_order_id": 16,
+      "provider_type": "LLM",
+      "provider_mode": "DEVELOPMENT",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS",
+      "prompt_version": "wo-analysis-v1"
+    },
+    {
+      "work_order_id": 17,
+      "provider_type": "LLM",
+      "provider_mode": "DEVELOPMENT",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS",
+      "prompt_version": "wo-analysis-v1"
+    },
+    {
+      "work_order_id": 18,
+      "provider_type": "LLM",
+      "provider_mode": "DEVELOPMENT",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS",
+      "prompt_version": "wo-analysis-v1"
+    },
+    {
+      "work_order_id": 19,
+      "provider_type": "LLM",
+      "provider_mode": "DEVELOPMENT",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS",
+      "prompt_version": "wo-analysis-v1"
+    },
+    {
+      "work_order_id": 20,
+      "provider_type": "LLM",
+      "provider_mode": "DEVELOPMENT",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS",
+      "prompt_version": "wo-analysis-v1"
+    }
+  ],
+  "assignments": [
+    {
+      "work_order_id": 15,
+      "assignment_id": 19,
+      "employee_id": 7,
+      "assigned_source": "AUTO",
+      "reason": "AUTO_DISPATCH",
+      "incident_id": 1,
+      "incident_follow": false,
+      "payload_load": 1,
+      "payload_capacity": 100
+    },
+    {
+      "work_order_id": 16,
+      "assignment_id": 20,
+      "employee_id": 7,
+      "assigned_source": "AUTO",
+      "reason": "AUTO_DISPATCH",
+      "incident_id": 1,
+      "incident_follow": false,
+      "payload_load": 2,
+      "payload_capacity": 100
+    },
+    {
+      "work_order_id": 17,
+      "assignment_id": 21,
+      "employee_id": 7,
+      "assigned_source": "AUTO",
+      "reason": "AUTO_DISPATCH",
+      "incident_id": 1,
+      "incident_follow": false,
+      "payload_load": 3,
+      "payload_capacity": 100
+    },
+    {
+      "work_order_id": 18,
+      "assignment_id": 22,
+      "employee_id": 7,
+      "assigned_source": "AUTO",
+      "reason": "AUTO_DISPATCH",
+      "incident_id": 1,
+      "incident_follow": false,
+      "payload_load": 4,
+      "payload_capacity": 100
+    },
+    {
+      "work_order_id": 19,
+      "assignment_id": 23,
+      "employee_id": 7,
+      "assigned_source": "AUTO",
+      "reason": "AUTO_INCIDENT_FOLLOW",
+      "incident_id": 1,
+      "incident_follow": true,
+      "payload_load": 5,
+      "payload_capacity": 100
+    },
+    {
+      "work_order_id": 20,
+      "assignment_id": 24,
+      "employee_id": 7,
+      "assigned_source": "AUTO",
+      "reason": "AUTO_INCIDENT_FOLLOW",
+      "incident_id": 1,
+      "incident_follow": true,
+      "payload_load": 5,
+      "payload_capacity": 5
+    }
+  ],
+  "capacity_proof": {
+    "primary_employee_id": 7,
+    "max_capacity_during_sixth": 5,
+    "load_at_threshold_assignment": 5,
+    "load_at_sixth_assignment": 5,
+    "load_after_sixth": 5,
+    "current_restored_max_capacity": 100,
+    "restore_audits": [
+      {
+        "request_id": "incident-capacity-restore-f97548aebb-7",
+        "action": "EMPLOYEE_UPDATED",
+        "resource_id": 7
+      }
+    ]
+  },
+  "audit": {
+    "incident_link_actions": 6
+  },
+  "notification_deliveries": [
+    {
+      "work_order_id": 15,
+      "status": "SUCCEEDED"
+    },
+    {
+      "work_order_id": 16,
+      "status": "SUCCEEDED"
+    },
+    {
+      "work_order_id": 17,
+      "status": "SUCCEEDED"
+    },
+    {
+      "work_order_id": 18,
+      "status": "SUCCEEDED"
+    },
+    {
+      "work_order_id": 19,
+      "status": "SUCCEEDED"
+    },
+    {
+      "work_order_id": 20,
+      "status": "SUCCEEDED"
+    }
+  ],
+  "assertions": {
+    "one_incident_for_six_orders": true,
+    "same_completed_subcategory": true,
+    "fake_provider_explicit": true,
+    "threshold_and_later_follow_primary": true,
+    "full_primary_reused": true,
+    "shared_load_not_duplicated": true,
+    "capacities_restored_by_business_api": true,
+    "notification_delivery_settled": true,
+    "business_api_only_mutations": true,
+    "no_real_model_claim": true
+  }
+}

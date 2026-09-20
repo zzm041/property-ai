@@ -1284,8 +1284,8 @@
         "pages": ["pages/notifications/list", "pages/supervisor/incidents"],
         "code": ["backend/app/service/notification.py", "backend/app/service/incident.py", "backend/app/model/ai.py", "backend/app/model/knowledge.py", "backend/app/worker/tasks.py"],
         "dependencies": "MySQL outbox/delivery, Celery, notification provider and scheduled SLA runner",
-        "tests_and_runtime": "code/unit evidence and prior page slices; isolated Worker present",
-        "gap_and_next": "running SLA loop, duplicate-dispatch-safe incident aggregation, complete event coverage and production delivery acceptance"
+        "tests_and_runtime": "scoped SLA and incident code/unit evidence; isolated Worker plus DEVELOPMENT-Fake incident API/DB concurrency evidence",
+        "gap_and_next": "incident management-page completion, wall-clock SLA operation, complete event coverage and production delivery acceptance"
       },
       {
         "module": "announcements",
@@ -1520,10 +1520,28 @@
       }
     ]
   },
+  "incident_aggregation_005": {
+    "task_id": "INCIDENT-AGGREGATION-005",
+    "implementation_head": "e58829a4d52cd94ff8bf62027e2081da7a8ca1bf",
+    "independent_review": {
+      "result": "PASS_AFTER_FIX_3",
+      "path": "reports/codex/INCIDENT-AGGREGATION-005-FIX-3-review.json",
+      "boundary": "scoped 0009 common-incident aggregation, shared capacity ownership, two-worker convergence and stable opposing-closure conflict; DEVELOPMENT Fake and local API/DB evidence only"
+    },
+    "current_status_overlays": [
+      {
+        "id": "V1-INCIDENT-AGGREGATE",
+        "implementation_status": "current_schema_rule_aggregation_shared_auto_dispatch_and_transferable_capacity_wired",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE",
+        "evidence_version": "1046f1003847120ceddbbc1666a1aa920ae6ae0e / e58829a4d52cd94ff8bf62027e2081da7a8ca1bf",
+        "remaining_gap": "incident management-page completion, real self-hosted model, production runtime and Production V1 acceptance"
+      }
+    ]
+  },
   "current_effective_view": {
     "generated_at": "2026-09-20",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
-    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs)",
+    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced.",
     "row_count": 83,
     "rows": [
@@ -2057,11 +2075,11 @@
       },
       {
         "requirement_id": "V1-INCIDENT-AGGREGATE",
-        "current_implementation": "功能尚未实现",
-        "verification_mode_status": "API:NOT_IMPLEMENTED",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "同楼同类短时多单聚合，避免重复派人",
-        "next_action": "按依赖顺序实施，保留本ID在分母中"
+        "current_implementation": "current_schema_rule_aggregation_shared_auto_dispatch_and_transferable_capacity_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE",
+        "evidence_version": "1046f1003847120ceddbbc1666a1aa920ae6ae0e / e58829a4d52cd94ff8bf62027e2081da7a8ca1bf",
+        "remaining_gap": "incident management-page completion, real self-hosted model, production runtime and Production V1 acceptance",
+        "next_action": "retain scoped evidence; finish incident management UI and production/real-model acceptance in their own slices"
       },
       {
         "requirement_id": "V1-ANN-TARGET",

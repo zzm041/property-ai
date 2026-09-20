@@ -1,0 +1,48 @@
+{
+  "task_id": "INCIDENT-AGGREGATION-005",
+  "phase": "review",
+  "reviewed_head": "52f8018614ae91612324db3237f339386dcb16e9",
+  "decision": "NEEDS_CHANGES",
+  "actions_or_findings": [
+    {
+      "title": "IA005-F2-C3 CURRENT_TASK_BLOCKER: concurrent closures can deadlock",
+      "path": "backend/app/repository/ai.py:417-442; backend/app/service/incident.py:375-407; backend/app/service/work_order.py:1314-1342,2412-2428,2701-2717",
+      "trigger": "A primary order closes while a real follower closure holds that follower's assignment lock and seeks the incident lock.",
+      "rationale": "The primary can hold the incident lock and wait for the follower assignment; the follower can hold that assignment and wait for the incident. MySQL may abort either transaction with 1213. WorkOrderService then returns a generic 500 without retry, so a valid business action fails. The saved contention run held a follower lock without a competing business action; it does not cover this cycle. Transaction rollback protects data, but the concurrency path remains unfinished."
+    },
+    {
+      "title": "IA005-F1-R1 RELEASE_BLOCKER: shared replay message remains unresolved",
+      "path": "reports/incident-aggregation-005/fix1-concurrency-evidence.json:28; reports/codex/INCIDENT-AGGREGATION-005-FIX-1-review.json:27",
+      "trigger": "A consumer starts on shared vhost /property_ai, queue property_ai.auth001.",
+      "rationale": "The last read-only observation recorded the accidental replay task with 7 ready messages and 0 consumers. Current queue state is unverified. Targeted reconciliation requires explicit approval and must preserve unrelated messages."
+    }
+  ],
+  "evidence_paths": [
+    "reports/project-handoff.md",
+    "reports/codex/INCIDENT-AGGREGATION-005-review.json",
+    "reports/codex/INCIDENT-AGGREGATION-005-FIX-1-review.json",
+    "reports/incident-aggregation-005/fix2-concurrency-evidence.json",
+    "reports/incident-aggregation-005/fix2-contention-lifecycle-evidence.json",
+    "reports/incident-aggregation-005/run-fix1-concurrency.py",
+    "reports/incident-aggregation-005/run-fix2-contention-lifecycle.py",
+    "backend/tests/unit/test_celery_ai_task.py",
+    "backend/tests/unit/test_incident_aggregation.py"
+  ],
+  "unverified": [
+    "No 1205 or 1213 occurred in the fresh runtime run; automatic retry is supported by code and focused unit coverage, not a runtime trigger.",
+    "The competing primary and follower business-action deadlock has not been run in the isolated environment.",
+    "The current shared-queue state, page behavior, real Qwen/RAG, production providers, and wall-clock Beat were not checked in this review."
+  ],
+  "session_note": "Independent read-only FIX-2 review. I inspected the specified diff, focused tests, and saved evidence; I did not edit files, rerun tests or runtime, operate pages, or send requests. Main Codex reports 27 focused and 452 full-unit passes; those counts were not independently rerun. IA005-F1-C1 and IA005-F1-C2 are closed by the reviewed code; IA005-B1/B4 remain closed. _apply rolls back through its owned transaction, propagates only MySQL 1205/1213 to the worker, and still maps other OperationalError cases to AppError at the service boundary. The worker allows at most two additional attempts. The follower query has no SKIP LOCKED. Saved local Development Fake evidence shows six orders converging without replay, capacity transfer after a locked follower was released, and four original charges released once.",
+  "task_result": "Production V1 remains the overall goal. FIX-2 resolves both prior incident blockers, but the new opposing lock order prevents this scoped incident task from passing. Migration 0010 remains unapproved and was not needed for this review or the identified code fix.",
+  "product_gap_changes": [
+    "IA005-F1-C1 and IA005-F1-C2 are closed; IA005-F2-C3 is a new current-task concurrency blocker.",
+    "The local API/DB result does not establish full UI, real self-hosted AI, production runtime, or Production V1 acceptance.",
+    "Controlled account merge, recovery, real Embedding/RAG, production media and providers, broader UI, and release validation remain in scope."
+  ],
+  "schedule_risk": "On 2026-09-20, the original approximately 2026-09-21 full Production V1 aim is not credible: this concurrency blocker, the unresolved shared message, unapproved merge policy/Migration 0010, and substantial frozen V1 gaps remain.",
+  "next_action": "Main Codex should resolve the primary/follower lock cycle or provide bounded transaction retry with a stable concurrency outcome, then verify simultaneous authenticated closures on the named isolated 8083 → 127.0.0.1:3307/property_ai_auth001_test @ 20260919_0009 target. Completion requires no lost or double capacity charge, valid incident ownership, exactly-once logs/audit, and a successful retry or explicit stable conflict instead of a generic 500. Run focused failure-path and full-unit gates in the main session, save API/DB evidence, update reports/project-handoff.md, and request the final FIX-3 read-only review. Ordinary scoped code and isolated tests need no new approval; do not touch shared messages without separate approval.",
+  "approval_requests": [
+    "Authorize main Codex to identify and reconcile only accidental task replay-875fd38782864137a8a77cbdf95370a2 on shared vhost /property_ai, queue property_ai.auth001, after verifying message identities and consumers. Preserve unrelated messages; do not purge the queue."
+  ]
+}

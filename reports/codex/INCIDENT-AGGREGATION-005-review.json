@@ -1,0 +1,60 @@
+{
+  "task_id": "INCIDENT-AGGREGATION-005",
+  "phase": "review",
+  "reviewed_head": "1046f1003847120ceddbbc1666a1aa920ae6ae0e",
+  "decision": "NEEDS_CHANGES",
+  "actions_or_findings": [
+    {
+      "title": "IA005-B1 CURRENT_TASK_BLOCKER: property lock can follow a stale cluster snapshot",
+      "path": "backend/app/service/analysis.py:668; backend/app/service/incident.py:58; backend/app/repository/ai.py:355",
+      "trigger": "Two analyses for one property overlap under MySQL REPEATABLE READ. Each reads content before waiting for the property lock.",
+      "rationale": "The later plain cluster and link reads can retain the earlier snapshot after the lock is acquired. A threshold can be missed, or a committed link can appear absent and cause a duplicate-link failure. The saved run is sequential."
+    },
+    {
+      "title": "IA005-B2 CURRENT_TASK_BLOCKER: shared capacity charge can disappear",
+      "path": "backend/app/service/work_order.py:2395; backend/app/service/sla.py:299",
+      "trigger": "The charged primary assignment ends or times out while incident-follow assignments remain active.",
+      "rationale": "Ending the primary decrements daily load; ending followers does not. The incident can therefore retain assigned reports without its shared capacity charge."
+    },
+    {
+      "title": "IA005-B3 CURRENT_TASK_BLOCKER: replacement can leave a stale primary",
+      "path": "backend/app/service/work_order.py:1502; backend/app/service/sla.py:277; backend/app/service/auto_dispatch.py:334",
+      "trigger": "A supervisor reassigns the primary order, or its assignment times out before automatic replacement.",
+      "rationale": "These paths leave the incident primary pointing to the former employee. A new member can follow that employee and bypass nominal capacity despite the changed or ended response."
+    },
+    {
+      "title": "IA005-B4 CURRENT_TASK_BLOCKER: nested rollback clears outer notification intents",
+      "path": "backend/app/service/notification.py:298",
+      "trigger": "An auto-dispatch SAVEPOINT rolls back after an outer transaction has buffered notification deliveries.",
+      "rationale": "The new commit guard protects notification intents on SAVEPOINT release, but after_rollback still clears the entire outer pending list. The new event test checks incident rollback handling, not notification rollback handling."
+    }
+  ],
+  "evidence_paths": [
+    "reports/project-handoff.md",
+    "docs/01-PRD.md",
+    "docs/10-ACCEPTANCE.md",
+    "backend/app/service/incident.py",
+    "backend/app/service/auto_dispatch.py",
+    "backend/app/service/notification.py",
+    "backend/tests/unit/test_incident_aggregation.py",
+    "backend/tests/unit/test_ai_policy.py",
+    "backend/tests/unit/test_auto_dispatch.py",
+    "reports/incident-aggregation-005/runtime-evidence.json",
+    "reports/incident-aggregation-005/run-runtime.py",
+    "reports/incident-aggregation-005/collect-existing-runtime.py"
+  ],
+  "unverified": [
+    "The reviewer did not rerun the main session's reported 37 focused and 434 full unit passes.",
+    "The saved 8083/0009 run proves sequential orders 15–20 shared one incident and that the sixth followed the primary at load 5; it does not exercise concurrent analyses, an earlier pending member's redispatch, primary termination, or nested rollback.",
+    "Live process identity, real self-hosted Qwen/RAG, wall-clock Beat, production providers, and full UI/release acceptance were not verified."
+  ],
+  "session_note": "Independent read-only review of the specified diff and saved evidence. No files were edited; no tests, pages, processes, HTTP or business requests, or database operations were run.",
+  "task_result": "Frozen enterprise Production V1 remains the overall goal. This approved current-schema incident slice has credible sequential Development Fake evidence on 8083 → 127.0.0.1:3307/property_ai_auth001_test at 20260919_0009, including six links, AUTO follow provenance, unchanged sixth-assignment load, restored capacity, and succeeded development notifications. Tenant/property, completed subcategory, eligibility checks, and the shared-0007 assignment-column guard are present in code. Four current-task blockers prevent PASS. ACCOUNT-MERGE-001 and unapproved Migration 0010 are unchanged.",
+  "product_gap_changes": [
+    "INCIDENT-AGGREGATION-005 remains open pending the four fixes; its sequential local result is retained as scoped evidence.",
+    "Controlled merge, recovery, real self-hosted AI and Embedding/RAG, production media/providers, broader UI and release validation, and other frozen V1 features remain in scope."
+  ],
+  "schedule_risk": "On 2026-09-20, the original approximately 2026-09-21 full-V1 aim is not credible: this slice needs fixes and the handoff still lists substantial frozen release gaps. Do not relabel Development Fake evidence as formal delivery.",
+  "next_action": "Main Codex should make FIX-1 within the existing 0009 schema: ensure cluster and link reads see commits made before the property lock is acquired; preserve one incident capacity charge while followers remain; update or invalidate the primary on manual reassignment and timeout; and handle notification intents by outer transaction and SAVEPOINT outcome. Add focused failure-path and two-session concurrency tests, verify the shared-0007 guard, collect scoped isolated 8083/0009 evidence, update reports/project-handoff.md, then request independent round-1 re-review. Ordinary source work needs no new approval; any migration or reserved environment operation requires separate approval.",
+  "approval_requests": []
+}

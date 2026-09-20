@@ -1,0 +1,234 @@
+{
+  "task_id": "INCIDENT-AGGREGATION-005-FIX-3-SETUP",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001",
+    "worker_consumers_during_concurrent_create": 1,
+    "worker_consumers_during_recovery": 1,
+    "commit": "e58829a4d52cd94ff8bf62027e2081da7a8ca1bf",
+    "model_mode": "development_fake"
+  },
+  "concurrent_work_order_ids": [
+    33,
+    34,
+    35,
+    36,
+    37,
+    38
+  ],
+  "recovery": {
+    "collected_existing_only": false,
+    "replayed_record_id": null,
+    "isolated_record_status": null,
+    "isolated_replay_task_id": null,
+    "isolated_replayed": false,
+    "erroneous_shared_publish": {
+      "task_id": null,
+      "vhost": null,
+      "queue": null,
+      "observed_messages_ready": null,
+      "observed_consumers": null,
+      "cleanup_status": null
+    }
+  },
+  "orders": [
+    {
+      "id": 33,
+      "status": "ASSIGNED",
+      "incident_id": 4,
+      "current_assignment_id": 39
+    },
+    {
+      "id": 34,
+      "status": "ASSIGNED",
+      "incident_id": 4,
+      "current_assignment_id": 42
+    },
+    {
+      "id": 35,
+      "status": "ASSIGNED",
+      "incident_id": 4,
+      "current_assignment_id": 37
+    },
+    {
+      "id": 36,
+      "status": "ASSIGNED",
+      "incident_id": 4,
+      "current_assignment_id": 40
+    },
+    {
+      "id": 37,
+      "status": "ASSIGNED",
+      "incident_id": 4,
+      "current_assignment_id": 38
+    },
+    {
+      "id": 38,
+      "status": "ASSIGNED",
+      "incident_id": 4,
+      "current_assignment_id": 41
+    }
+  ],
+  "incident": {
+    "id": 4,
+    "status": "OPEN",
+    "category": "ELECTRICAL",
+    "subcategory": "outlet_spark",
+    "primary_work_order_id": 33,
+    "primary_employee_id": 7,
+    "work_order_count": 6
+  },
+  "links": [
+    {
+      "work_order_id": 33
+    },
+    {
+      "work_order_id": 34
+    },
+    {
+      "work_order_id": 35
+    },
+    {
+      "work_order_id": 36
+    },
+    {
+      "work_order_id": 37
+    },
+    {
+      "work_order_id": 38
+    }
+  ],
+  "analyses": [
+    {
+      "work_order_id": 33,
+      "status": "COMPLETED",
+      "subcategory": "outlet_spark"
+    },
+    {
+      "work_order_id": 34,
+      "status": "COMPLETED",
+      "subcategory": "outlet_spark"
+    },
+    {
+      "work_order_id": 35,
+      "status": "COMPLETED",
+      "subcategory": "outlet_spark"
+    },
+    {
+      "work_order_id": 36,
+      "status": "COMPLETED",
+      "subcategory": "outlet_spark"
+    },
+    {
+      "work_order_id": 37,
+      "status": "COMPLETED",
+      "subcategory": "outlet_spark"
+    },
+    {
+      "work_order_id": 38,
+      "status": "COMPLETED",
+      "subcategory": "outlet_spark"
+    }
+  ],
+  "assignments": [
+    {
+      "work_order_id": 33,
+      "employee_id": 7,
+      "assigned_source": "AUTO",
+      "reason": "AUTO_DISPATCH",
+      "incident_follow": "false",
+      "capacity_owner": "true"
+    },
+    {
+      "work_order_id": 34,
+      "employee_id": 7,
+      "assigned_source": "AUTO",
+      "reason": "AUTO_INCIDENT_FOLLOW",
+      "incident_follow": "true",
+      "capacity_owner": "false"
+    },
+    {
+      "work_order_id": 35,
+      "employee_id": 7,
+      "assigned_source": "AUTO",
+      "reason": "AUTO_DISPATCH",
+      "incident_follow": "false",
+      "capacity_owner": "false"
+    },
+    {
+      "work_order_id": 36,
+      "employee_id": 7,
+      "assigned_source": "AUTO",
+      "reason": "AUTO_DISPATCH",
+      "incident_follow": "false",
+      "capacity_owner": "false"
+    },
+    {
+      "work_order_id": 37,
+      "employee_id": 7,
+      "assigned_source": "AUTO",
+      "reason": "AUTO_DISPATCH",
+      "incident_follow": "false",
+      "capacity_owner": "false"
+    },
+    {
+      "work_order_id": 38,
+      "employee_id": 7,
+      "assigned_source": "AUTO",
+      "reason": "AUTO_INCIDENT_FOLLOW",
+      "incident_follow": "true",
+      "capacity_owner": "false"
+    }
+  ],
+  "ai_calls": [
+    {
+      "work_order_id": 33,
+      "provider_mode": "DEVELOPMENT",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS"
+    },
+    {
+      "work_order_id": 34,
+      "provider_mode": "DEVELOPMENT",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS"
+    },
+    {
+      "work_order_id": 35,
+      "provider_mode": "DEVELOPMENT",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS"
+    },
+    {
+      "work_order_id": 36,
+      "provider_mode": "DEVELOPMENT",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS"
+    },
+    {
+      "work_order_id": 37,
+      "provider_mode": "DEVELOPMENT",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS"
+    },
+    {
+      "work_order_id": 38,
+      "provider_mode": "DEVELOPMENT",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS"
+    }
+  ],
+  "assertions": {
+    "six_concurrent_api_creates": true,
+    "one_incident_only": true,
+    "six_unique_links": true,
+    "incident_count_is_six": true,
+    "all_analysis_completed_same_subcategory": true,
+    "all_auto_assigned_once": true,
+    "primary_is_live_member": true,
+    "fake_provider_explicit": true,
+    "no_real_model_claim": true
+  }
+}

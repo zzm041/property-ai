@@ -1,0 +1,49 @@
+{
+  "task_id": "INCIDENT-AGGREGATION-005",
+  "phase": "review",
+  "reviewed_head": "e58829a4d52cd94ff8bf62027e2081da7a8ca1bf",
+  "decision": "PASS",
+  "actions_or_findings": [
+    {
+      "title": "IA005-F1-R1 RELEASE_BLOCKER: shared replay message remains unresolved",
+      "path": "reports/incident-aggregation-005/fix1-concurrency-evidence.json:28-33",
+      "trigger": "A consumer starts on shared vhost /property_ai, queue property_ai.auth001.",
+      "rationale": "The last saved observation shows task replay-875fd38782864137a8a77cbdf95370a2 with 7 ready messages and 0 consumers. Current queue state is unverified. Targeted reconciliation needs explicit approval and must preserve unrelated messages."
+    },
+    {
+      "title": "IA005-F3-N1 NON_BLOCKING: project handoff has not recorded this result",
+      "path": "reports/project-handoff.md:16,60,82",
+      "trigger": "Main Codex uses the living handoff to plan the next slice.",
+      "rationale": "It still names the earlier SLA review as latest and lists incident aggregation as missing. This can misstate progress; update it with the scoped FIX-3 result while retaining the Production V1 gaps."
+    }
+  ],
+  "evidence_paths": [
+    "reports/project-handoff.md",
+    "reports/codex/INCIDENT-AGGREGATION-005-FIX-2-review.json",
+    "backend/app/core/database.py",
+    "backend/app/service/work_order.py",
+    "backend/tests/unit/test_incident_aggregation.py",
+    "reports/incident-aggregation-005/fix3-setup-evidence.json",
+    "reports/incident-aggregation-005/fix3-opposing-closures-evidence.json",
+    "reports/incident-aggregation-005/run-fix3-opposing-closures.py",
+    "reports/incident-aggregation-005/fix1-concurrency-evidence.json"
+  ],
+  "unverified": [
+    "The main session reported 30 focused and 455 full-unit passes; this reviewer did not rerun them.",
+    "The saved HTTP evidence does not expose the underlying MySQL error number. Code and unit coverage establish the 1205/1213 mapping; the saved API result establishes the retryable 409 and successful retry.",
+    "Current process, queue and database state were not rechecked. Page behavior, real Qwen/RAG, production providers, wall-clock Beat and full V1 acceptance remain unverified."
+  ],
+  "session_note": "Independent read-only FIX-3 review. I inspected the requested commit diff, focused tests, saved evidence and script. I did not edit files, run tests or runtime, operate pages, send requests, or inspect private context.",
+  "task_result": "Scoped incident aggregation PASS; IA005-F2-C3 is closed. The top-level owned transaction rolls back before _execute maps MySQL 1205/1213 OperationalError to WO.CONFLICT HTTP 409 with retryable=true. Other OperationalError remains internal 500, and IntegrityError handling is unchanged. Saved isolated Development Fake API/DB evidence shows one 200, one retryable 409, a successful authenticated retry, six CLOSED orders, no active assignments, daily load 5 to 1 matching four initial charges, a cleared incident primary, and one CLOSED log and confirmation per order. ACCOUNT-MERGE-001 and full Production V1 remain open.",
+  "product_gap_changes": [
+    "IA005-F2-C3 is closed; no current-task blocker remains.",
+    "This scoped API/DB result does not establish full UI or production AI/runtime acceptance.",
+    "Controlled account merge and recovery, real self-hosted AI and Embedding/RAG, production media and providers, broader UI, and release validation remain in Production V1. Migration 0010 remains unapproved, uncreated and unexecuted."
+  ],
+  "schedule_risk": "On 2026-09-20, the original approximately 2026-09-21 full Production V1 aim is not credible. The shared replay message, unapproved account-merge policy and Migration 0010, and substantial frozen V1 and release gaps remain despite this scoped PASS.",
+  "next_action": "Main Codex should update reports/project-handoff.md and the relevant progress record with IA005 PASS at e58829a4d52cd94ff8bf62027e2081da7a8ca1bf, citing both FIX-3 evidence files and distinguishing Development Fake API/DB acceptance from release acceptance. Completion requires the handoff to close IA005-F2-C3, retain the shared-message blocker and remaining V1 gaps, and identify ACCOUNT-MERGE-001 as pending its existing 0010 policy approval. This record update needs no new permission; shared-queue reconciliation and creating or executing Migration 0010 require separate explicit approvals.",
+  "approval_requests": [
+    "Authorize main Codex to identify and reconcile only accidental task replay-875fd38782864137a8a77cbdf95370a2 on shared vhost /property_ai, queue property_ai.auth001, after verifying message identities and consumers. Preserve unrelated messages; do not purge the queue.",
+    "For ACCOUNT-MERGE-001, decide and explicitly approve the consolidated policy package in reports/account-merge-001-preapproval/review.md before main Codex creates or executes Migration 0010: ENDED-number reuse, merged-source credential and number reuse, proof for a source without an ACTIVE phone, target-side password setup, and the concurrency guard and isolation-test policy."
+  ]
+}

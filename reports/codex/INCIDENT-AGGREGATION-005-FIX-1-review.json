@@ -1,0 +1,65 @@
+{
+  "task_id": "INCIDENT-AGGREGATION-005",
+  "phase": "review",
+  "reviewed_head": "2b8fa21771c4b45ad269556e0bcfdb630bbe28c4",
+  "decision": "NEEDS_CHANGES",
+  "actions_or_findings": [
+    {
+      "title": "IA005-F1-C1 CURRENT_TASK_BLOCKER: deadlocks in _apply bypass the new retry",
+      "path": "backend/app/service/analysis.py:735; backend/app/worker/tasks.py:107; backend/tests/unit/test_celery_ai_task.py:94",
+      "trigger": "MySQL 1205 or 1213 occurs while _apply stores analysis or aggregates an incident.",
+      "rationale": "_apply converts SQLAlchemyError, including OperationalError, to AppError. The worker retries only a raw OperationalError, so this path fails without either of the two additional attempts. The new task test injects a raw error at the service boundary and misses this conversion. The saved concurrency result required an operator replay; it does not prove automatic recovery."
+    },
+    {
+      "title": "IA005-F1-C2 CURRENT_TASK_BLOCKER: a locked follower can lose its shared capacity charge",
+      "path": "backend/app/repository/ai.py:417; backend/app/service/incident.py:404; backend/app/service/work_order.py:2237",
+      "trigger": "A staff action locks the sole active follower while the primary assignment ends or times out.",
+      "rationale": "The successor query uses SKIP LOCKED and can omit that still-active follower. The primary is then cleared and its load released. When the staff action commits, the follower remains active without a capacity owner; its later close also skips load release. Sequential lifecycle evidence and the creation-only concurrency probe do not cover this overlap."
+    },
+    {
+      "title": "IA005-F1-R1 RELEASE_BLOCKER: accidental message remains in the shared queue",
+      "path": "reports/incident-aggregation-005/fix1-concurrency-evidence.json:27; reports/incident-aggregation-005/run-fix1-concurrency.py:255",
+      "trigger": "A consumer later starts on shared vhost /property_ai, queue property_ai.auth001.",
+      "rationale": "Saved evidence identifies an accidentally published replay task and records seven ready messages with zero consumers at observation time. No shared message was consumed or deleted. The current queue state and the other messages' identities are unverified, so targeted reconciliation needs separate approval before shared runtime use. This is operator residue, separate from the product-code blockers."
+    }
+  ],
+  "evidence_paths": [
+    "reports/project-handoff.md",
+    "reports/codex/INCIDENT-AGGREGATION-005-review.json",
+    "backend/app/service/analysis.py",
+    "backend/app/service/incident.py",
+    "backend/app/service/auto_dispatch.py",
+    "backend/app/service/notification.py",
+    "backend/app/service/work_order.py",
+    "backend/app/service/sla.py",
+    "backend/app/repository/ai.py",
+    "backend/app/repository/work_order.py",
+    "backend/app/worker/tasks.py",
+    "backend/tests/unit/test_incident_aggregation.py",
+    "backend/tests/unit/test_celery_ai_task.py",
+    "reports/incident-aggregation-005/runtime-evidence.json",
+    "reports/incident-aggregation-005/fix1-lifecycle-evidence.json",
+    "reports/incident-aggregation-005/fix1-concurrency-evidence.json",
+    "reports/incident-aggregation-005/run-runtime.py",
+    "reports/incident-aggregation-005/run-fix1-lifecycle.py",
+    "reports/incident-aggregation-005/run-fix1-concurrency.py",
+    "reports/incident-aggregation-005/collect-existing-runtime.py"
+  ],
+  "unverified": [
+    "I did not rerun the main session's reported 25 focused or 450 full unit passes.",
+    "No saved evidence demonstrates automatic retry after a deadlock inside _apply or concurrent primary closure with a locked active follower.",
+    "The shared queue's current contents, manual reassignment and timeout runtime paths, real Qwen and Embedding/RAG, production providers, wall-clock Beat, full UI, and full V1 acceptance were not verified."
+  ],
+  "session_note": "Independent read-only focused re-review. No files were edited; no tests or runtime were run; no pages, processes, HTTP or business requests, or database operations were performed.",
+  "task_result": "Production V1 remains the goal. At FIX-1 HEAD, IA005-B1 is addressed by a locking content read in _apply before the property lock and later cluster/link reads. IA005-B4 is addressed by SAVEPOINT guards and notification snapshot restoration. The saved isolated Development Fake evidence covers orders 15–20 closing with capacity transfer and orders 21–26 ending with one incident, six links, and six AUTO assignments after one operator replay. The retry-path and locked-follower blockers prevent this incident slice from passing. ACCOUNT-MERGE-001 and unapproved Migration 0010 remain separate open work.",
+  "product_gap_changes": [
+    "IA005-B1 and IA005-B4 are closed for this code review; IA005-B2/B3 improve sequential ownership handling but retain the concurrent follower blocker.",
+    "INCIDENT-AGGREGATION-005 remains open. The Development Fake result does not establish real AI, production runtime, or V1 acceptance.",
+    "Controlled merge, recovery, real self-hosted AI and Embedding/RAG, production media and providers, broader UI, and release validation remain in scope."
+  ],
+  "schedule_risk": "On 2026-09-20, the original approximately 2026-09-21 full Production V1 aim is not credible: two current-slice code blockers remain, the shared queue needs approved reconciliation, and the handoff lists substantial frozen V1 gaps.",
+  "next_action": "Main Codex should fix the _apply-to-worker 1205/1213 propagation so a rolled-back analysis gets at most two additional attempts while permanent errors still fail, and replace or guard SKIP LOCKED so an active follower cannot disappear from capacity transfer. Add focused boundary and concurrent lifecycle failure tests, then collect fresh evidence on the verified isolated 8083 → 127.0.0.1:3307/property_ai_auth001_test @ 20260919_0009 runtime without operator replay. Update reports/project-handoff.md and request independent FIX-2 review. Ordinary scoped source and isolated test work needs no new approval; shared-queue cleanup requires explicit approval.",
+  "approval_requests": [
+    "Authorize main Codex to prepare and execute targeted reconciliation of the accidentally published replay task replay-875fd38782864137a8a77cbdf95370a2 on shared vhost /property_ai, queue property_ai.auth001, after identifying the queued messages and confirming no consumers. Preserve unrelated messages; do not purge the queue."
+  ]
+}

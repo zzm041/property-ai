@@ -1,0 +1,898 @@
+{
+  "task_id": "INCIDENT-AGGREGATION-005-FIX-2-CONTENTION",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001",
+    "commit": "52f8018614ae91612324db3237f339386dcb16e9",
+    "model_mode": "development_fake"
+  },
+  "reused_existing_work_order_ids": [
+    27,
+    28,
+    29,
+    30,
+    31,
+    32
+  ],
+  "contention": {
+    "locked_follower_work_order_id": 31,
+    "locked_follower_assignment_id": 35,
+    "ending_primary_work_order_id": 27,
+    "ending_primary_assignment_id": 31,
+    "confirm_blocked_before_lock_release": true,
+    "lock_only_no_direct_state_mutation": true
+  },
+  "before": {
+    "incident": {
+      "primary_work_order_id": 27,
+      "primary_employee_id": 7,
+      "work_order_count": 6
+    },
+    "daily": {
+      "business_date": "2026-09-20",
+      "current_load": 5
+    },
+    "orders": [
+      {
+        "id": 27,
+        "status": "ASSIGNED",
+        "version": 3,
+        "current_assignment_id": 31
+      },
+      {
+        "id": 28,
+        "status": "ASSIGNED",
+        "version": 3,
+        "current_assignment_id": 32
+      },
+      {
+        "id": 29,
+        "status": "ASSIGNED",
+        "version": 3,
+        "current_assignment_id": 33
+      },
+      {
+        "id": 30,
+        "status": "ASSIGNED",
+        "version": 3,
+        "current_assignment_id": 34
+      },
+      {
+        "id": 31,
+        "status": "ASSIGNED",
+        "version": 3,
+        "current_assignment_id": 35
+      },
+      {
+        "id": 32,
+        "status": "ASSIGNED",
+        "version": 3,
+        "current_assignment_id": 36
+      }
+    ],
+    "assignments": [
+      {
+        "id": 31,
+        "work_order_id": 27,
+        "employee_id": 7,
+        "status": "ACTIVE",
+        "reason": "AUTO_DISPATCH",
+        "incident_follow": "false",
+        "capacity_owner": "true"
+      },
+      {
+        "id": 32,
+        "work_order_id": 28,
+        "employee_id": 7,
+        "status": "ACTIVE",
+        "reason": "AUTO_DISPATCH",
+        "incident_follow": "false",
+        "capacity_owner": "false"
+      },
+      {
+        "id": 33,
+        "work_order_id": 29,
+        "employee_id": 7,
+        "status": "ACTIVE",
+        "reason": "AUTO_DISPATCH",
+        "incident_follow": "false",
+        "capacity_owner": "false"
+      },
+      {
+        "id": 34,
+        "work_order_id": 30,
+        "employee_id": 7,
+        "status": "ACTIVE",
+        "reason": "AUTO_DISPATCH",
+        "incident_follow": "false",
+        "capacity_owner": "false"
+      },
+      {
+        "id": 35,
+        "work_order_id": 31,
+        "employee_id": 7,
+        "status": "ACTIVE",
+        "reason": "AUTO_INCIDENT_FOLLOW",
+        "incident_follow": "true",
+        "capacity_owner": "false"
+      },
+      {
+        "id": 36,
+        "work_order_id": 32,
+        "employee_id": 7,
+        "status": "ACTIVE",
+        "reason": "AUTO_INCIDENT_FOLLOW",
+        "incident_follow": "true",
+        "capacity_owner": "false"
+      }
+    ]
+  },
+  "timeline": [
+    {
+      "closed_work_order_id": 27,
+      "state": {
+        "incident": {
+          "primary_work_order_id": 31,
+          "primary_employee_id": 7,
+          "work_order_count": 6
+        },
+        "daily": {
+          "business_date": "2026-09-20",
+          "current_load": 5
+        },
+        "orders": [
+          {
+            "id": 27,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 28,
+            "status": "ASSIGNED",
+            "version": 3,
+            "current_assignment_id": 32
+          },
+          {
+            "id": 29,
+            "status": "ASSIGNED",
+            "version": 3,
+            "current_assignment_id": 33
+          },
+          {
+            "id": 30,
+            "status": "ASSIGNED",
+            "version": 3,
+            "current_assignment_id": 34
+          },
+          {
+            "id": 31,
+            "status": "ASSIGNED",
+            "version": 3,
+            "current_assignment_id": 35
+          },
+          {
+            "id": 32,
+            "status": "ASSIGNED",
+            "version": 3,
+            "current_assignment_id": 36
+          }
+        ],
+        "assignments": [
+          {
+            "id": 31,
+            "work_order_id": 27,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "true"
+          },
+          {
+            "id": 32,
+            "work_order_id": 28,
+            "employee_id": 7,
+            "status": "ACTIVE",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "false"
+          },
+          {
+            "id": 33,
+            "work_order_id": 29,
+            "employee_id": 7,
+            "status": "ACTIVE",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "false"
+          },
+          {
+            "id": 34,
+            "work_order_id": 30,
+            "employee_id": 7,
+            "status": "ACTIVE",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "false"
+          },
+          {
+            "id": 35,
+            "work_order_id": 31,
+            "employee_id": 7,
+            "status": "ACTIVE",
+            "reason": "AUTO_INCIDENT_FOLLOW",
+            "incident_follow": "true",
+            "capacity_owner": "true"
+          },
+          {
+            "id": 36,
+            "work_order_id": 32,
+            "employee_id": 7,
+            "status": "ACTIVE",
+            "reason": "AUTO_INCIDENT_FOLLOW",
+            "incident_follow": "true",
+            "capacity_owner": "false"
+          }
+        ]
+      }
+    },
+    {
+      "closed_work_order_id": 28,
+      "state": {
+        "incident": {
+          "primary_work_order_id": 31,
+          "primary_employee_id": 7,
+          "work_order_count": 6
+        },
+        "daily": {
+          "business_date": "2026-09-20",
+          "current_load": 4
+        },
+        "orders": [
+          {
+            "id": 27,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 28,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 29,
+            "status": "ASSIGNED",
+            "version": 3,
+            "current_assignment_id": 33
+          },
+          {
+            "id": 30,
+            "status": "ASSIGNED",
+            "version": 3,
+            "current_assignment_id": 34
+          },
+          {
+            "id": 31,
+            "status": "ASSIGNED",
+            "version": 3,
+            "current_assignment_id": 35
+          },
+          {
+            "id": 32,
+            "status": "ASSIGNED",
+            "version": 3,
+            "current_assignment_id": 36
+          }
+        ],
+        "assignments": [
+          {
+            "id": 31,
+            "work_order_id": 27,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "true"
+          },
+          {
+            "id": 32,
+            "work_order_id": 28,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "false"
+          },
+          {
+            "id": 33,
+            "work_order_id": 29,
+            "employee_id": 7,
+            "status": "ACTIVE",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "false"
+          },
+          {
+            "id": 34,
+            "work_order_id": 30,
+            "employee_id": 7,
+            "status": "ACTIVE",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "false"
+          },
+          {
+            "id": 35,
+            "work_order_id": 31,
+            "employee_id": 7,
+            "status": "ACTIVE",
+            "reason": "AUTO_INCIDENT_FOLLOW",
+            "incident_follow": "true",
+            "capacity_owner": "true"
+          },
+          {
+            "id": 36,
+            "work_order_id": 32,
+            "employee_id": 7,
+            "status": "ACTIVE",
+            "reason": "AUTO_INCIDENT_FOLLOW",
+            "incident_follow": "true",
+            "capacity_owner": "false"
+          }
+        ]
+      }
+    },
+    {
+      "closed_work_order_id": 29,
+      "state": {
+        "incident": {
+          "primary_work_order_id": 31,
+          "primary_employee_id": 7,
+          "work_order_count": 6
+        },
+        "daily": {
+          "business_date": "2026-09-20",
+          "current_load": 3
+        },
+        "orders": [
+          {
+            "id": 27,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 28,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 29,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 30,
+            "status": "ASSIGNED",
+            "version": 3,
+            "current_assignment_id": 34
+          },
+          {
+            "id": 31,
+            "status": "ASSIGNED",
+            "version": 3,
+            "current_assignment_id": 35
+          },
+          {
+            "id": 32,
+            "status": "ASSIGNED",
+            "version": 3,
+            "current_assignment_id": 36
+          }
+        ],
+        "assignments": [
+          {
+            "id": 31,
+            "work_order_id": 27,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "true"
+          },
+          {
+            "id": 32,
+            "work_order_id": 28,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "false"
+          },
+          {
+            "id": 33,
+            "work_order_id": 29,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "false"
+          },
+          {
+            "id": 34,
+            "work_order_id": 30,
+            "employee_id": 7,
+            "status": "ACTIVE",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "false"
+          },
+          {
+            "id": 35,
+            "work_order_id": 31,
+            "employee_id": 7,
+            "status": "ACTIVE",
+            "reason": "AUTO_INCIDENT_FOLLOW",
+            "incident_follow": "true",
+            "capacity_owner": "true"
+          },
+          {
+            "id": 36,
+            "work_order_id": 32,
+            "employee_id": 7,
+            "status": "ACTIVE",
+            "reason": "AUTO_INCIDENT_FOLLOW",
+            "incident_follow": "true",
+            "capacity_owner": "false"
+          }
+        ]
+      }
+    },
+    {
+      "closed_work_order_id": 30,
+      "state": {
+        "incident": {
+          "primary_work_order_id": 31,
+          "primary_employee_id": 7,
+          "work_order_count": 6
+        },
+        "daily": {
+          "business_date": "2026-09-20",
+          "current_load": 2
+        },
+        "orders": [
+          {
+            "id": 27,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 28,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 29,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 30,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 31,
+            "status": "ASSIGNED",
+            "version": 3,
+            "current_assignment_id": 35
+          },
+          {
+            "id": 32,
+            "status": "ASSIGNED",
+            "version": 3,
+            "current_assignment_id": 36
+          }
+        ],
+        "assignments": [
+          {
+            "id": 31,
+            "work_order_id": 27,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "true"
+          },
+          {
+            "id": 32,
+            "work_order_id": 28,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "false"
+          },
+          {
+            "id": 33,
+            "work_order_id": 29,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "false"
+          },
+          {
+            "id": 34,
+            "work_order_id": 30,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "false"
+          },
+          {
+            "id": 35,
+            "work_order_id": 31,
+            "employee_id": 7,
+            "status": "ACTIVE",
+            "reason": "AUTO_INCIDENT_FOLLOW",
+            "incident_follow": "true",
+            "capacity_owner": "true"
+          },
+          {
+            "id": 36,
+            "work_order_id": 32,
+            "employee_id": 7,
+            "status": "ACTIVE",
+            "reason": "AUTO_INCIDENT_FOLLOW",
+            "incident_follow": "true",
+            "capacity_owner": "false"
+          }
+        ]
+      }
+    },
+    {
+      "closed_work_order_id": 31,
+      "state": {
+        "incident": {
+          "primary_work_order_id": 32,
+          "primary_employee_id": 7,
+          "work_order_count": 6
+        },
+        "daily": {
+          "business_date": "2026-09-20",
+          "current_load": 2
+        },
+        "orders": [
+          {
+            "id": 27,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 28,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 29,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 30,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 31,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 32,
+            "status": "ASSIGNED",
+            "version": 3,
+            "current_assignment_id": 36
+          }
+        ],
+        "assignments": [
+          {
+            "id": 31,
+            "work_order_id": 27,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "true"
+          },
+          {
+            "id": 32,
+            "work_order_id": 28,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "false"
+          },
+          {
+            "id": 33,
+            "work_order_id": 29,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "false"
+          },
+          {
+            "id": 34,
+            "work_order_id": 30,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "false"
+          },
+          {
+            "id": 35,
+            "work_order_id": 31,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_INCIDENT_FOLLOW",
+            "incident_follow": "true",
+            "capacity_owner": "true"
+          },
+          {
+            "id": 36,
+            "work_order_id": 32,
+            "employee_id": 7,
+            "status": "ACTIVE",
+            "reason": "AUTO_INCIDENT_FOLLOW",
+            "incident_follow": "true",
+            "capacity_owner": "true"
+          }
+        ]
+      }
+    },
+    {
+      "closed_work_order_id": 32,
+      "state": {
+        "incident": {
+          "primary_work_order_id": null,
+          "primary_employee_id": null,
+          "work_order_count": 6
+        },
+        "daily": {
+          "business_date": "2026-09-20",
+          "current_load": 1
+        },
+        "orders": [
+          {
+            "id": 27,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 28,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 29,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 30,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 31,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          },
+          {
+            "id": 32,
+            "status": "CLOSED",
+            "version": 8,
+            "current_assignment_id": null
+          }
+        ],
+        "assignments": [
+          {
+            "id": 31,
+            "work_order_id": 27,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "true"
+          },
+          {
+            "id": 32,
+            "work_order_id": 28,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "false"
+          },
+          {
+            "id": 33,
+            "work_order_id": 29,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "false"
+          },
+          {
+            "id": 34,
+            "work_order_id": 30,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_DISPATCH",
+            "incident_follow": "false",
+            "capacity_owner": "false"
+          },
+          {
+            "id": 35,
+            "work_order_id": 31,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_INCIDENT_FOLLOW",
+            "incident_follow": "true",
+            "capacity_owner": "true"
+          },
+          {
+            "id": 36,
+            "work_order_id": 32,
+            "employee_id": 7,
+            "status": "ENDED",
+            "reason": "AUTO_INCIDENT_FOLLOW",
+            "incident_follow": "true",
+            "capacity_owner": "true"
+          }
+        ]
+      }
+    }
+  ],
+  "after": {
+    "incident": {
+      "primary_work_order_id": null,
+      "primary_employee_id": null,
+      "work_order_count": 6
+    },
+    "daily": {
+      "business_date": "2026-09-20",
+      "current_load": 1
+    },
+    "orders": [
+      {
+        "id": 27,
+        "status": "CLOSED",
+        "version": 8,
+        "current_assignment_id": null
+      },
+      {
+        "id": 28,
+        "status": "CLOSED",
+        "version": 8,
+        "current_assignment_id": null
+      },
+      {
+        "id": 29,
+        "status": "CLOSED",
+        "version": 8,
+        "current_assignment_id": null
+      },
+      {
+        "id": 30,
+        "status": "CLOSED",
+        "version": 8,
+        "current_assignment_id": null
+      },
+      {
+        "id": 31,
+        "status": "CLOSED",
+        "version": 8,
+        "current_assignment_id": null
+      },
+      {
+        "id": 32,
+        "status": "CLOSED",
+        "version": 8,
+        "current_assignment_id": null
+      }
+    ],
+    "assignments": [
+      {
+        "id": 31,
+        "work_order_id": 27,
+        "employee_id": 7,
+        "status": "ENDED",
+        "reason": "AUTO_DISPATCH",
+        "incident_follow": "false",
+        "capacity_owner": "true"
+      },
+      {
+        "id": 32,
+        "work_order_id": 28,
+        "employee_id": 7,
+        "status": "ENDED",
+        "reason": "AUTO_DISPATCH",
+        "incident_follow": "false",
+        "capacity_owner": "false"
+      },
+      {
+        "id": 33,
+        "work_order_id": 29,
+        "employee_id": 7,
+        "status": "ENDED",
+        "reason": "AUTO_DISPATCH",
+        "incident_follow": "false",
+        "capacity_owner": "false"
+      },
+      {
+        "id": 34,
+        "work_order_id": 30,
+        "employee_id": 7,
+        "status": "ENDED",
+        "reason": "AUTO_DISPATCH",
+        "incident_follow": "false",
+        "capacity_owner": "false"
+      },
+      {
+        "id": 35,
+        "work_order_id": 31,
+        "employee_id": 7,
+        "status": "ENDED",
+        "reason": "AUTO_INCIDENT_FOLLOW",
+        "incident_follow": "true",
+        "capacity_owner": "true"
+      },
+      {
+        "id": 36,
+        "work_order_id": 32,
+        "employee_id": 7,
+        "status": "ENDED",
+        "reason": "AUTO_INCIDENT_FOLLOW",
+        "incident_follow": "true",
+        "capacity_owner": "true"
+      }
+    ]
+  },
+  "assertions": {
+    "all_state_mutations_used_authenticated_business_apis": true,
+    "confirm_waited_for_locked_follower": true,
+    "capacity_preserved_after_contended_primary_close": true,
+    "active_follower_promoted": true,
+    "all_six_orders_closed": true,
+    "no_active_assignment_left": true,
+    "all_initial_charges_released_once": true,
+    "incident_primary_cleared": true,
+    "no_real_model_claim": true
+  }
+}

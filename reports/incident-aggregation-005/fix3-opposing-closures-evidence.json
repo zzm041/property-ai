@@ -1,0 +1,343 @@
+{
+  "task_id": "INCIDENT-AGGREGATION-005-FIX-3",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001",
+    "commit": "e58829a4d52cd94ff8bf62027e2081da7a8ca1bf",
+    "model_mode": "development_fake"
+  },
+  "work_order_ids": [
+    33,
+    34,
+    35,
+    36,
+    37,
+    38
+  ],
+  "opposing_lock_setup": {
+    "external_incident_lock_only_no_state_mutation": true,
+    "primary_work_order_id": 33,
+    "follower_work_order_id": 38,
+    "primary_waited_for_incident": true,
+    "follower_waited_for_incident": true
+  },
+  "opposing_results": [
+    {
+      "work_order_id": 33,
+      "status_code": 200,
+      "body": {
+        "request_id": "incident-fix3-confirm-primary",
+        "data": {
+          "id": 33,
+          "tenant_id": 6,
+          "property_id": 6,
+          "house_id": 6,
+          "reporter_user_id": 42,
+          "status": "CLOSED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 8,
+          "current_assignment_id": null,
+          "sla_due_at": "2026-09-20T13:49:42.552405Z",
+          "assigned_at": "2026-09-20T05:49:50.026497Z",
+          "accepted_at": "2026-09-20T05:51:52.784072Z",
+          "started_at": "2026-09-20T05:51:52.834958Z",
+          "resolved_at": "2026-09-20T05:51:52.882512Z",
+          "closed_at": "2026-09-20T05:51:55.470640Z",
+          "created_at": "2026-09-20T05:49:42.558906Z",
+          "updated_at": "2026-09-20T05:51:55.474140Z",
+          "sla_overdue": false
+        }
+      }
+    },
+    {
+      "work_order_id": 38,
+      "status_code": 409,
+      "body": {
+        "request_id": "incident-fix3-confirm-follower",
+        "error": {
+          "code": "WO.CONFLICT",
+          "message": "Work order is busy; retry the operation",
+          "details": {
+            "retryable": true
+          }
+        }
+      }
+    }
+  ],
+  "retry_result": {
+    "work_order_id": 38,
+    "status_code": 200,
+    "body": {
+      "request_id": "incident-fix3-confirm-retry",
+      "data": {
+        "id": 38,
+        "tenant_id": 6,
+        "property_id": 6,
+        "house_id": 6,
+        "reporter_user_id": 42,
+        "status": "CLOSED",
+        "process_reason": "NONE",
+        "category": "ELECTRICAL",
+        "severity": "HIGH",
+        "priority": "HIGH",
+        "version": 8,
+        "current_assignment_id": null,
+        "sla_due_at": "2026-09-20T13:49:42.599434Z",
+        "assigned_at": "2026-09-20T05:49:54.882732Z",
+        "accepted_at": "2026-09-20T05:51:52.936021Z",
+        "started_at": "2026-09-20T05:51:52.977213Z",
+        "resolved_at": "2026-09-20T05:51:53.020236Z",
+        "closed_at": "2026-09-20T05:51:55.887991Z",
+        "created_at": "2026-09-20T05:49:42.607433Z",
+        "updated_at": "2026-09-20T05:51:55.892181Z",
+        "sla_overdue": false
+      }
+    }
+  },
+  "before": {
+    "incident": {
+      "primary_work_order_id": 33,
+      "primary_employee_id": 7,
+      "work_order_count": 6
+    },
+    "daily": {
+      "business_date": "2026-09-20",
+      "current_load": 5
+    },
+    "orders": [
+      {
+        "id": 33,
+        "status": "ASSIGNED",
+        "version": 3,
+        "current_assignment_id": 39
+      },
+      {
+        "id": 34,
+        "status": "ASSIGNED",
+        "version": 3,
+        "current_assignment_id": 42
+      },
+      {
+        "id": 35,
+        "status": "ASSIGNED",
+        "version": 3,
+        "current_assignment_id": 37
+      },
+      {
+        "id": 36,
+        "status": "ASSIGNED",
+        "version": 3,
+        "current_assignment_id": 40
+      },
+      {
+        "id": 37,
+        "status": "ASSIGNED",
+        "version": 3,
+        "current_assignment_id": 38
+      },
+      {
+        "id": 38,
+        "status": "ASSIGNED",
+        "version": 3,
+        "current_assignment_id": 41
+      }
+    ],
+    "assignments": [
+      {
+        "id": 37,
+        "work_order_id": 35,
+        "employee_id": 7,
+        "status": "ACTIVE",
+        "reason": "AUTO_DISPATCH",
+        "incident_follow": "false",
+        "capacity_owner": "false"
+      },
+      {
+        "id": 38,
+        "work_order_id": 37,
+        "employee_id": 7,
+        "status": "ACTIVE",
+        "reason": "AUTO_DISPATCH",
+        "incident_follow": "false",
+        "capacity_owner": "false"
+      },
+      {
+        "id": 39,
+        "work_order_id": 33,
+        "employee_id": 7,
+        "status": "ACTIVE",
+        "reason": "AUTO_DISPATCH",
+        "incident_follow": "false",
+        "capacity_owner": "true"
+      },
+      {
+        "id": 40,
+        "work_order_id": 36,
+        "employee_id": 7,
+        "status": "ACTIVE",
+        "reason": "AUTO_DISPATCH",
+        "incident_follow": "false",
+        "capacity_owner": "false"
+      },
+      {
+        "id": 41,
+        "work_order_id": 38,
+        "employee_id": 7,
+        "status": "ACTIVE",
+        "reason": "AUTO_INCIDENT_FOLLOW",
+        "incident_follow": "true",
+        "capacity_owner": "false"
+      },
+      {
+        "id": 42,
+        "work_order_id": 34,
+        "employee_id": 7,
+        "status": "ACTIVE",
+        "reason": "AUTO_INCIDENT_FOLLOW",
+        "incident_follow": "true",
+        "capacity_owner": "false"
+      }
+    ],
+    "closed_log_counts": {},
+    "confirmation_counts": {}
+  },
+  "after": {
+    "incident": {
+      "primary_work_order_id": null,
+      "primary_employee_id": null,
+      "work_order_count": 6
+    },
+    "daily": {
+      "business_date": "2026-09-20",
+      "current_load": 1
+    },
+    "orders": [
+      {
+        "id": 33,
+        "status": "CLOSED",
+        "version": 8,
+        "current_assignment_id": null
+      },
+      {
+        "id": 34,
+        "status": "CLOSED",
+        "version": 8,
+        "current_assignment_id": null
+      },
+      {
+        "id": 35,
+        "status": "CLOSED",
+        "version": 8,
+        "current_assignment_id": null
+      },
+      {
+        "id": 36,
+        "status": "CLOSED",
+        "version": 8,
+        "current_assignment_id": null
+      },
+      {
+        "id": 37,
+        "status": "CLOSED",
+        "version": 8,
+        "current_assignment_id": null
+      },
+      {
+        "id": 38,
+        "status": "CLOSED",
+        "version": 8,
+        "current_assignment_id": null
+      }
+    ],
+    "assignments": [
+      {
+        "id": 37,
+        "work_order_id": 35,
+        "employee_id": 7,
+        "status": "ENDED",
+        "reason": "AUTO_DISPATCH",
+        "incident_follow": "false",
+        "capacity_owner": "true"
+      },
+      {
+        "id": 38,
+        "work_order_id": 37,
+        "employee_id": 7,
+        "status": "ENDED",
+        "reason": "AUTO_DISPATCH",
+        "incident_follow": "false",
+        "capacity_owner": "true"
+      },
+      {
+        "id": 39,
+        "work_order_id": 33,
+        "employee_id": 7,
+        "status": "ENDED",
+        "reason": "AUTO_DISPATCH",
+        "incident_follow": "false",
+        "capacity_owner": "true"
+      },
+      {
+        "id": 40,
+        "work_order_id": 36,
+        "employee_id": 7,
+        "status": "ENDED",
+        "reason": "AUTO_DISPATCH",
+        "incident_follow": "false",
+        "capacity_owner": "true"
+      },
+      {
+        "id": 41,
+        "work_order_id": 38,
+        "employee_id": 7,
+        "status": "ENDED",
+        "reason": "AUTO_INCIDENT_FOLLOW",
+        "incident_follow": "true",
+        "capacity_owner": "false"
+      },
+      {
+        "id": 42,
+        "work_order_id": 34,
+        "employee_id": 7,
+        "status": "ENDED",
+        "reason": "AUTO_INCIDENT_FOLLOW",
+        "incident_follow": "true",
+        "capacity_owner": "true"
+      }
+    ],
+    "closed_log_counts": {
+      "33": 1,
+      "34": 1,
+      "35": 1,
+      "36": 1,
+      "37": 1,
+      "38": 1
+    },
+    "confirmation_counts": {
+      "33": 1,
+      "34": 1,
+      "35": 1,
+      "36": 1,
+      "37": 1,
+      "38": 1
+    }
+  },
+  "assertions": {
+    "all_state_mutations_used_authenticated_business_apis": true,
+    "both_requests_waited_before_lock_release": true,
+    "one_success_one_retryable_conflict": true,
+    "conflicted_request_retry_succeeded": true,
+    "all_six_orders_closed": true,
+    "no_active_assignment_left": true,
+    "all_initial_charges_released_once": true,
+    "incident_primary_cleared": true,
+    "one_closed_log_per_order": true,
+    "one_confirmation_per_order": true,
+    "no_real_model_claim": true
+  }
+}

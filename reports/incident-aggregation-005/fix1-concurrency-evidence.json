@@ -1,0 +1,234 @@
+{
+  "task_id": "INCIDENT-AGGREGATION-005-FIX-1-CONCURRENCY",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "queue": "property_ai.auth001",
+    "worker_consumers_during_concurrent_create": 2,
+    "worker_consumers_during_recovery": 1,
+    "commit": "2b8fa21771c4b45ad269556e0bcfdb630bbe28c4",
+    "model_mode": "development_fake"
+  },
+  "concurrent_work_order_ids": [
+    21,
+    22,
+    23,
+    24,
+    25,
+    26
+  ],
+  "recovery": {
+    "collected_existing_only": true,
+    "replayed_record_id": "719c4667-b660-455a-a4ef-3e024d582dd8",
+    "isolated_record_status": "SUCCEEDED",
+    "isolated_replay_task_id": "replay-97035843b9184a8586dc5cd5a658e0a7",
+    "isolated_replayed": true,
+    "erroneous_shared_publish": {
+      "task_id": "replay-875fd38782864137a8a77cbdf95370a2",
+      "vhost": "/property_ai",
+      "queue": "property_ai.auth001",
+      "observed_messages_ready": 7,
+      "observed_consumers": 0,
+      "cleanup_status": "PENDING_EXPLICIT_APPROVAL"
+    }
+  },
+  "orders": [
+    {
+      "id": 21,
+      "status": "ASSIGNED",
+      "incident_id": 2,
+      "current_assignment_id": 30
+    },
+    {
+      "id": 22,
+      "status": "ASSIGNED",
+      "incident_id": 2,
+      "current_assignment_id": 25
+    },
+    {
+      "id": 23,
+      "status": "ASSIGNED",
+      "incident_id": 2,
+      "current_assignment_id": 29
+    },
+    {
+      "id": 24,
+      "status": "ASSIGNED",
+      "incident_id": 2,
+      "current_assignment_id": 27
+    },
+    {
+      "id": 25,
+      "status": "ASSIGNED",
+      "incident_id": 2,
+      "current_assignment_id": 26
+    },
+    {
+      "id": 26,
+      "status": "ASSIGNED",
+      "incident_id": 2,
+      "current_assignment_id": 28
+    }
+  ],
+  "incident": {
+    "id": 2,
+    "status": "OPEN",
+    "category": "ELECTRICAL",
+    "subcategory": "outlet_spark",
+    "primary_work_order_id": 22,
+    "primary_employee_id": 7,
+    "work_order_count": 6
+  },
+  "links": [
+    {
+      "work_order_id": 21
+    },
+    {
+      "work_order_id": 22
+    },
+    {
+      "work_order_id": 23
+    },
+    {
+      "work_order_id": 24
+    },
+    {
+      "work_order_id": 25
+    },
+    {
+      "work_order_id": 26
+    }
+  ],
+  "analyses": [
+    {
+      "work_order_id": 21,
+      "status": "COMPLETED",
+      "subcategory": "outlet_spark"
+    },
+    {
+      "work_order_id": 22,
+      "status": "COMPLETED",
+      "subcategory": "outlet_spark"
+    },
+    {
+      "work_order_id": 23,
+      "status": "COMPLETED",
+      "subcategory": "outlet_spark"
+    },
+    {
+      "work_order_id": 24,
+      "status": "COMPLETED",
+      "subcategory": "outlet_spark"
+    },
+    {
+      "work_order_id": 25,
+      "status": "COMPLETED",
+      "subcategory": "outlet_spark"
+    },
+    {
+      "work_order_id": 26,
+      "status": "COMPLETED",
+      "subcategory": "outlet_spark"
+    }
+  ],
+  "assignments": [
+    {
+      "work_order_id": 21,
+      "employee_id": 7,
+      "assigned_source": "AUTO",
+      "reason": "AUTO_INCIDENT_FOLLOW",
+      "incident_follow": "true",
+      "capacity_owner": "false"
+    },
+    {
+      "work_order_id": 22,
+      "employee_id": 7,
+      "assigned_source": "AUTO",
+      "reason": "AUTO_DISPATCH",
+      "incident_follow": "false",
+      "capacity_owner": "true"
+    },
+    {
+      "work_order_id": 23,
+      "employee_id": 7,
+      "assigned_source": "AUTO",
+      "reason": "AUTO_INCIDENT_FOLLOW",
+      "incident_follow": "true",
+      "capacity_owner": "false"
+    },
+    {
+      "work_order_id": 24,
+      "employee_id": 7,
+      "assigned_source": "AUTO",
+      "reason": "AUTO_DISPATCH",
+      "incident_follow": "false",
+      "capacity_owner": "false"
+    },
+    {
+      "work_order_id": 25,
+      "employee_id": 7,
+      "assigned_source": "AUTO",
+      "reason": "AUTO_DISPATCH",
+      "incident_follow": "false",
+      "capacity_owner": "false"
+    },
+    {
+      "work_order_id": 26,
+      "employee_id": 7,
+      "assigned_source": "AUTO",
+      "reason": "AUTO_DISPATCH",
+      "incident_follow": "false",
+      "capacity_owner": "false"
+    }
+  ],
+  "ai_calls": [
+    {
+      "work_order_id": 21,
+      "provider_mode": "DEVELOPMENT",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS"
+    },
+    {
+      "work_order_id": 22,
+      "provider_mode": "DEVELOPMENT",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS"
+    },
+    {
+      "work_order_id": 23,
+      "provider_mode": "DEVELOPMENT",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS"
+    },
+    {
+      "work_order_id": 24,
+      "provider_mode": "DEVELOPMENT",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS"
+    },
+    {
+      "work_order_id": 25,
+      "provider_mode": "DEVELOPMENT",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS"
+    },
+    {
+      "work_order_id": 26,
+      "provider_mode": "DEVELOPMENT",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS"
+    }
+  ],
+  "assertions": {
+    "six_concurrent_api_creates": true,
+    "one_incident_only": true,
+    "six_unique_links": true,
+    "incident_count_is_six": true,
+    "all_analysis_completed_same_subcategory": true,
+    "all_auto_assigned_once": true,
+    "primary_is_live_member": true,
+    "fake_provider_explicit": true,
+    "no_real_model_claim": true
+  }
+}
