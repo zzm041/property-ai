@@ -420,7 +420,9 @@
       "page": null,
       "impl": "功能尚未实现",
       "ui_or_api": "none",
-      "result_status": "NOT_IMPLEMENTED"
+      "result_status": "NOT_IMPLEMENTED",
+      "historical_baseline": true,
+      "current_status_pointer": "stats_config_ui_011.current_status_overlays / current_effective_view"
     },
     {
       "id": "SELFHOST-AI",
@@ -1709,10 +1711,31 @@
       }
     ]
   },
+  "stats_config_ui_011": {
+    "task_id": "STATS-CONFIG-UI-011",
+    "implementation_head": "01785a0a76a3c849f7f4d88fd27fbcb3162929dd",
+    "evidence_head": "cb055439c96e2937cb3abe5cbbec13bf47c5d788",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+    "independent_review": {
+      "result": "PASS",
+      "path": "reports/codex/STATS-CONFIG-UI-011-review.json",
+      "boundary": "Independent read-only review inspected the scoped product diff, redacted API/read-only-DB/page evidence and all nine screenshots without rerunning tests, operating pages, sending requests, reading private contexts or touching services/databases."
+    },
+    "current_status_overlays": [
+      {
+        "id": "STATS-CONFIG",
+        "implementation_status": "current_schema_tenant_and_property_operations_snapshot_with_scope_authorization_race_protection_and_existing_config_links_wired",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "8a64cb356608174ffbb7153dacbb9a3715c13c5d / dee53380a89cbca10783fea0f51ca3950c284e31 / 01785a0a76a3c849f7f4d88fd27fbcb3162929dd / cb055439c96e2937cb3abe5cbbec13bf47c5d788",
+        "remaining_gap": "historical KPI periods and denominators, stored reports/exports, production deployment/provider configuration semantics, production RBAC/performance/real-device operation and formal release",
+        "next_action": "preserve scoped current-snapshot evidence; define the remaining report/config semantics before implementation and revalidate in production-equivalent scope"
+      }
+    ]
+  },
   "current_effective_view": {
     "generated_at": "2026-09-22",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
-    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID)",
+    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced.",
     "row_count": 83,
     "rows": [
@@ -2078,11 +2101,11 @@
       },
       {
         "requirement_id": "STATS-CONFIG",
-        "current_implementation": "功能尚未实现",
-        "verification_mode_status": "none:NOT_IMPLEMENTED",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "统计与配置页面",
-        "next_action": "按依赖顺序实施，保留本ID在分母中"
+        "current_implementation": "current_schema_tenant_and_property_operations_snapshot_with_scope_authorization_race_protection_and_existing_config_links_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "8a64cb356608174ffbb7153dacbb9a3715c13c5d / dee53380a89cbca10783fea0f51ca3950c284e31 / 01785a0a76a3c849f7f4d88fd27fbcb3162929dd / cb055439c96e2937cb3abe5cbbec13bf47c5d788",
+        "remaining_gap": "historical KPI periods and denominators, stored reports/exports, production deployment/provider configuration semantics, production RBAC/performance/real-device operation and formal release",
+        "next_action": "preserve scoped current-snapshot evidence; define remaining report/config semantics before implementation and revalidate in production-equivalent scope"
       },
       {
         "requirement_id": "SELFHOST-AI",
@@ -2274,7 +2297,7 @@
         "verification_mode_status": "PARTIAL_SCOPED_LOCAL_DEVELOPMENT",
         "evidence_version": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea / 9ab106b29b9761504fa229cc1bd97227daa6e6c9 / 55fe0a90b81ff8935d50cb8a7fa93c381e8ba92b / 7814d45531a91efb6a63c63df261415fa446a1c4 / 39a58f3c9be053ddc5f90ec6f5613f1a32585a5f",
         "remaining_gap": "separate accept/respond and editable warning/escalation policy fields, immutable applied-policy provenance, production RBAC/scheduler/provider operation and formal release",
-        "next_action": "preserve scoped policy-management evidence; continue stats/config independently, and request schema approval before richer SLA policy/versioning work"
+        "next_action": "preserve scoped policy-management evidence and request schema approval before richer SLA policy/versioning work"
       },
       {
         "requirement_id": "V1-NTF-RETRY",
