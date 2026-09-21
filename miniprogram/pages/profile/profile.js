@@ -1,3 +1,5 @@
+const { strength, meetsCurrentPolicy } = require("../../utils/password");
+
 function maskPhone(value) {
   let digits = String(value || "").replace(/\D/g, "");
   if (/^861[3-9]\d{9}$/.test(digits)) {
@@ -29,6 +31,12 @@ Page({
     wechatChallengePrompt: "",
     wechatChallengeAnswer: "",
     wechatNotice: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+    showPassword: false,
+    passwordStrength: "未输入",
+    passwordNotice: "",
     loading: false,
     error: "",
   },
@@ -38,6 +46,54 @@ Page({
   },
   onName(e) {
     this.setData({ displayName: e.detail.value });
+  },
+  onPasswordField(e) {
+    const field = e.currentTarget.dataset.field;
+    const value = e.detail.value;
+    const updates = { [field]: value, error: "", passwordNotice: "" };
+    if (field === "newPassword") {
+      updates.passwordStrength = strength(value);
+    }
+    this.setData(updates);
+  },
+  togglePassword() {
+    this.setData({ showPassword: !this.data.showPassword });
+  },
+  changePassword() {
+    if (this.data.loading) {
+      return;
+    }
+    if (!this.data.currentPassword) {
+      this.setData({ error: "请输入当前密码", passwordNotice: "" });
+      return;
+    }
+    if (this.data.newPassword !== this.data.confirmPassword) {
+      this.setData({ error: "两次密码不一致", passwordNotice: "" });
+      return;
+    }
+    if (!meetsCurrentPolicy(this.data.newPassword)) {
+      this.setData({ error: "新密码不符合当前策略", passwordNotice: "" });
+      return;
+    }
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, async () => {
+      const token = await require("../../services/api").changePassword(
+        this.data.currentPassword,
+        this.data.newPassword,
+        this.data.confirmPassword
+      );
+      const auth = require("../../services/auth");
+      auth.setToken(token.access_token);
+      auth.setRefreshToken(token.refresh_token);
+      this.setData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+        passwordStrength: "未输入",
+        passwordNotice: "密码已修改，其他旧会话已失效",
+      });
+      wx.showToast({ title: "密码已修改", icon: "success" });
+    }).catch(() => {});
   },
   onPhoneField(e) {
     const field = e.currentTarget.dataset.field;

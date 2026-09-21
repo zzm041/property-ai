@@ -4,6 +4,18 @@
   <button class="btn" bindtap="save" disabled="{{loading}}">保存</button>
 </view>
 <view class="card">
+  <view>修改密码</view>
+  <view class="password-row">
+    <input class="grow" placeholder="当前密码" value="{{currentPassword}}" data-field="currentPassword" bindinput="onPasswordField" password="{{!showPassword}}" />
+    <button class="link" bindtap="togglePassword">{{showPassword ? "隐藏" : "显示"}}</button>
+  </view>
+  <input placeholder="新密码" value="{{newPassword}}" data-field="newPassword" bindinput="onPasswordField" password="{{!showPassword}}" />
+  <input placeholder="确认新密码" value="{{confirmPassword}}" data-field="confirmPassword" bindinput="onPasswordField" password="{{!showPassword}}" />
+  <view class="empty">强度：{{passwordStrength}}（至少 8 个字符，不强制大写；不能是纯数字或纯小写字母）</view>
+  <button class="btn" bindtap="changePassword" disabled="{{loading}}">确认修改密码</button>
+  <view class="empty" wx:if="{{passwordNotice}}">{{passwordNotice}}</view>
+</view>
+<view class="card">
   <button class="btn" bindtap="bindWechat" disabled="{{loading}}">绑定当前微信</button>
   <view class="empty">微信只是同一账号的凭证，不会新建另一套身份。</view>
 </view>

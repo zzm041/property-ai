@@ -362,12 +362,14 @@ class CredentialAuthService:
         user_id: int,
         old_password: str,
         new_password: str,
+        confirm_password: str,
         request_id: str,
     ) -> IssuedSession:
         issued_box: list[IssuedSession] = []
 
         def _persist() -> None:
-            credential = self._repository.get_password(user_id)
+            self._lock_active_user(user_id)
+            credential = self._repository.get_password_for_update(user_id)
             if credential is None or not verify_password(
                 credential.password_hash, old_password
             ):
@@ -375,6 +377,12 @@ class CredentialAuthService:
                     code=AuthErrorCode.INVALID_PASSWORD,
                     message="Current password is incorrect",
                     status_code=401,
+                )
+            if new_password != confirm_password:
+                raise AppError(
+                    code=AuthErrorCode.PASSWORD_MISMATCH,
+                    message="New password confirmation does not match",
+                    status_code=422,
                 )
             require_new_password(new_password)
             credential.password_hash = hash_password(new_password)
@@ -560,8 +568,9 @@ class CredentialAuthService:
                 status["value"] = "invalid"
                 return
             ticket.consumed_at = now
+            self._lock_active_user(ticket.user_id)
             hashed = hash_password(new_password)
-            credential = self._repository.get_password(ticket.user_id)
+            credential = self._repository.get_password_for_update(ticket.user_id)
             if credential is None:
                 self._repository.add_password(
                     UserPassword(

@@ -76,6 +76,14 @@ class CredentialRepository:
             select(UserPassword).where(UserPassword.user_id == user_id)
         )
 
+    def get_password_for_update(self, user_id: int) -> UserPassword | None:
+        return self._session.scalar(
+            select(UserPassword)
+            .where(UserPassword.user_id == user_id)
+            .execution_options(populate_existing=True)
+            .with_for_update()
+        )
+
     def add_password(self, record: UserPassword) -> UserPassword:
         self._session.add(record)
         self._session.flush()

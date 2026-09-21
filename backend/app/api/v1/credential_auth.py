@@ -108,6 +108,7 @@ def password_change(
         user_id=actor.user_id,
         old_password=body.old_password,
         new_password=body.new_password,
+        confirm_password=body.confirm_password,
         request_id=request_id_for(request),
     )
     return success_envelope(request, issued.as_schema().model_dump(mode="json"))
