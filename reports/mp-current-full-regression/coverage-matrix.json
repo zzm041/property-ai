@@ -1534,7 +1534,7 @@
         "implementation_status": "current_schema_rule_aggregation_shared_auto_dispatch_and_transferable_capacity_wired",
         "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE",
         "evidence_version": "1046f1003847120ceddbbc1666a1aa920ae6ae0e / e58829a4d52cd94ff8bf62027e2081da7a8ca1bf",
-        "remaining_gap": "incident management-page completion, real self-hosted model, production runtime and Production V1 acceptance"
+        "remaining_gap": "scope-filtered management page is supplied by INCIDENT-MGMT-UI-009; formal Incident disposition policy, real self-hosted model, production runtime and Production V1 acceptance remain"
       }
     ]
   },
@@ -1662,10 +1662,37 @@
       }
     ]
   },
+  "incident_management_009": {
+    "task_id": "INCIDENT-MGMT-UI-009",
+    "implementation_head": "9033caae493f120789f07f919d69666afc33625b",
+    "evidence_head": "77fd1f8009db4057b2d36bc4e4a5d518e23f5634",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE",
+    "independent_review": {
+      "result": "PASS",
+      "path": "reports/codex/INCIDENT-MGMT-UI-009-review.json",
+      "boundary": "Independent read-only review inspected the scoped product diff, redacted API/page/read-only-DB evidence and all six screenshots without rerunning tests, operating pages or sending requests."
+    },
+    "current_status_overlays": [
+      {
+        "id": "INCIDENT-UI",
+        "implementation_status": "scope_filtered_list_detail_status_filter_paging_development_summary_draft_and_staff_current_participant_view_wired",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE",
+        "evidence_version": "9033caae493f120789f07f919d69666afc33625b / 77fd1f8009db4057b2d36bc4e4a5d518e23f5634",
+        "remaining_gap": "formal Incident status-disposition API and transition policy, real self-hosted model, production runtime and Production V1 acceptance"
+      },
+      {
+        "id": "V1-INCIDENT-AGGREGATE",
+        "implementation_status": "current_schema_rule_aggregation_shared_auto_dispatch_transferable_capacity_and_scope_filtered_management_visibility_wired",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE",
+        "evidence_version": "1046f1003847120ceddbbc1666a1aa920ae6ae0e / e58829a4d52cd94ff8bf62027e2081da7a8ca1bf / 9033caae493f120789f07f919d69666afc33625b / 77fd1f8009db4057b2d36bc4e4a5d518e23f5634",
+        "remaining_gap": "formal Incident status-disposition API and transition policy, real self-hosted model, production runtime and Production V1 acceptance"
+      }
+    ]
+  },
   "current_effective_view": {
     "generated_at": "2026-09-21",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
-    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID)",
+    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced.",
     "row_count": 83,
     "rows": [
@@ -2095,11 +2122,11 @@
       },
       {
         "requirement_id": "INCIDENT-UI",
-        "current_implementation": "页面存在但无真实接线",
-        "verification_mode_status": "UI:PARTIAL",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "仅列表；无创建/处理按钮",
-        "next_action": "补齐缺失接线及范围证据"
+        "current_implementation": "scope_filtered_list_detail_status_filter_paging_development_summary_draft_and_staff_current_participant_view_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE",
+        "evidence_version": "9033caae493f120789f07f919d69666afc33625b / 77fd1f8009db4057b2d36bc4e4a5d518e23f5634",
+        "remaining_gap": "formal Incident status-disposition API and transition policy, real self-hosted model, production runtime and Production V1 acceptance",
+        "next_action": "retain scoped evidence; define and approve the frozen disposition contract before implementation, then complete real-model and production acceptance"
       },
       {
         "requirement_id": "STAFF-DAILY-PAGE",
@@ -2199,11 +2226,11 @@
       },
       {
         "requirement_id": "V1-INCIDENT-AGGREGATE",
-        "current_implementation": "current_schema_rule_aggregation_shared_auto_dispatch_and_transferable_capacity_wired",
+        "current_implementation": "current_schema_rule_aggregation_shared_auto_dispatch_transferable_capacity_and_scope_filtered_management_visibility_wired",
         "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE",
-        "evidence_version": "1046f1003847120ceddbbc1666a1aa920ae6ae0e / e58829a4d52cd94ff8bf62027e2081da7a8ca1bf",
-        "remaining_gap": "incident management-page completion, real self-hosted model, production runtime and Production V1 acceptance",
-        "next_action": "retain scoped evidence; finish incident management UI and production/real-model acceptance in their own slices"
+        "evidence_version": "1046f1003847120ceddbbc1666a1aa920ae6ae0e / e58829a4d52cd94ff8bf62027e2081da7a8ca1bf / 9033caae493f120789f07f919d69666afc33625b / 77fd1f8009db4057b2d36bc4e4a5d518e23f5634",
+        "remaining_gap": "formal Incident status-disposition API and transition policy, real self-hosted model, production runtime and Production V1 acceptance",
+        "next_action": "retain scoped aggregation and UI evidence; implement disposition only after a frozen contract, then complete real-model and production acceptance"
       },
       {
         "requirement_id": "V1-ANN-TARGET",
