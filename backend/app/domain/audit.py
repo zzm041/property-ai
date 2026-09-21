@@ -77,6 +77,7 @@ class AuditAction(StrEnum):
     KNOWLEDGE_DOCUMENT_VERSION_CREATED = "KNOWLEDGE_DOCUMENT_VERSION_CREATED"
     KNOWLEDGE_DOCUMENT_ACTIVATED = "KNOWLEDGE_DOCUMENT_ACTIVATED"
     KNOWLEDGE_DOCUMENT_ARCHIVED = "KNOWLEDGE_DOCUMENT_ARCHIVED"
+    SLA_POLICY_CHANGED = "SLA_POLICY_CHANGED"
 
 
 class AuditResourceType(StrEnum):
@@ -105,6 +106,7 @@ class AuditResourceType(StrEnum):
     INCIDENT = "INCIDENT"
     ANNOUNCEMENT = "ANNOUNCEMENT"
     KNOWLEDGE_DOCUMENT = "KNOWLEDGE_DOCUMENT"
+    SLA_POLICY = "SLA_POLICY"
     USER_WECHAT = "USER_WECHAT"
     AUTH_SESSION = "AUTH_SESSION"
     EMPLOYEE_INVITE = "EMPLOYEE_INVITE"
@@ -201,6 +203,9 @@ _WORK_ORDER_PROCESS_DETAIL_KEYS = frozenset(
 )
 _WORK_ORDER_DECIDED_DETAIL_KEYS = frozenset(
     {"work_order_id", "status", "process_reason", "reason_code"}
+)
+_SLA_POLICY_CHANGED_DETAIL_KEYS = frozenset(
+    {"scope_type", "property_id", "category", "priority", "before", "after"}
 )
 
 AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyType(
@@ -656,6 +661,12 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             resource_type=AuditResourceType.KNOWLEDGE_DOCUMENT,
             allowed_detail_keys=frozenset({"document_id", "status"}),
             required_detail_keys=frozenset({"document_id", "status"}),
+            allowed_scope_types=frozenset({ScopeType.TENANT, ScopeType.PROPERTY}),
+        ),
+        AuditAction.SLA_POLICY_CHANGED: AuditActionPolicy(
+            resource_type=AuditResourceType.SLA_POLICY,
+            allowed_detail_keys=_SLA_POLICY_CHANGED_DETAIL_KEYS,
+            required_detail_keys=_SLA_POLICY_CHANGED_DETAIL_KEYS,
             allowed_scope_types=frozenset({ScopeType.TENANT, ScopeType.PROPERTY}),
         ),
     }

@@ -44,6 +44,14 @@ class PropertyRepository:
             select(Tenant).where(Tenant.id == tenant_id)
         )
 
+    def get_tenant_for_update(self, tenant_id: int) -> Tenant | None:
+        return self._session.scalar(
+            select(Tenant)
+            .where(Tenant.id == tenant_id)
+            .with_for_update()
+            .execution_options(populate_existing=True)
+        )
+
     def get_property(self, *, tenant_id: int, property_id: int) -> Property | None:
         return self._session.scalar(
             select(Property).where(
@@ -54,6 +62,14 @@ class PropertyRepository:
 
     def get_property_by_id(self, property_id: int) -> Property | None:
         return self._session.get(Property, property_id)
+
+    def get_property_by_id_for_update(self, property_id: int) -> Property | None:
+        return self._session.scalar(
+            select(Property)
+            .where(Property.id == property_id)
+            .with_for_update()
+            .execution_options(populate_existing=True)
+        )
 
     def get_building(
         self,

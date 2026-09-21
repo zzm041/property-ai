@@ -143,6 +143,11 @@ class KnowledgeErrorCode:
     ARCHIVED = "KB.ARCHIVED"
 
 
+class SlaErrorCode:
+    INVALID_INPUT = "SLA.INVALID_INPUT"
+    CONFLICT = "SLA.CONFLICT"
+
+
 class NotificationErrorCode:
     NOT_FOUND = "NTF.NOT_FOUND"
     PROVIDER_FAILED = "NTF.PROVIDER_FAILED"

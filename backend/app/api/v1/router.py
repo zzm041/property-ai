@@ -7,6 +7,7 @@ from app.api.v1.admin_employee import router as admin_employee_router
 from app.api.v1.admin_knowledge import router as admin_knowledge_router
 from app.api.v1.admin_property import router as admin_property_router
 from app.api.v1.admin_resident import router as admin_resident_router
+from app.api.v1.admin_sla import router as admin_sla_router
 from app.api.v1.announcements import router as announcements_router
 from app.api.v1.assistant import router as assistant_router
 from app.api.v1.auth import router as development_auth_router
@@ -51,6 +52,7 @@ def build_api_router(settings: Settings) -> APIRouter:
     router.include_router(admin_announcements_router)
     router.include_router(announcements_router)
     router.include_router(admin_knowledge_router)
+    router.include_router(admin_sla_router)
     router.include_router(assistant_router)
     router.include_router(notifications_router)
     router.include_router(wechat_auth_router)

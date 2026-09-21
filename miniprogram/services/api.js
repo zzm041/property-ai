@@ -521,6 +521,12 @@ module.exports = {
       method: "POST",
       data: { status: status || "ENDED" },
     }),
+  slaPolicies: (propertyId, tenantId) =>
+    request({
+      path: `/admin/sla-policies?property_id=${propertyId}&tenant_id=${tenantId}`,
+    }),
+  putSlaPolicy: (body) =>
+    request({ path: "/admin/sla-policies", method: "PUT", data: body }),
   staffDaily: (propertyId, tenantId, afterId) =>
     request({
       path: `/supervisor/staff/daily?property_id=${propertyId}&tenant_id=${tenantId}&limit=100${

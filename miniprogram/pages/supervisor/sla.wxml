@@ -1,0 +1,66 @@
+<view class="card">
+  <view class="section-title">SLA 管理范围</view>
+  <picker range="{{properties}}" range-key="name" value="{{propertyIndex}}" bindchange="onPropertyChange">
+    <view class="picker">{{properties[propertyIndex].name || '请选择小区'}}</view>
+  </picker>
+  <view class="hint">只显示当前身份获授权配置 SLA 的小区。小区管理员不能修改企业默认。</view>
+</view>
+
+<view class="loading" wx:if="{{loading}}">处理中...</view>
+<view class="notice" wx:if="{{notice}}">{{notice}}</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>
+
+<view class="card">
+  <view class="section-title">编辑现有 SLA 策略</view>
+  <picker range="{{scopeOptions}}" range-key="label" value="{{scopeIndex}}" bindchange="onScopeChange">
+    <view class="picker">作用范围：{{scopeOptions[scopeIndex].label}}</view>
+  </picker>
+  <picker range="{{categoryOptions}}" range-key="label" value="{{categoryIndex}}" bindchange="onCategoryChange">
+    <view class="picker">工单类型：{{categoryOptions[categoryIndex].label}}</view>
+  </picker>
+  <picker range="{{priorityOptions}}" range-key="label" value="{{priorityIndex}}" bindchange="onPriorityChange">
+    <view class="picker">优先级：{{priorityOptions[priorityIndex].label}}</view>
+  </picker>
+  <picker range="{{visibleStatusOptions}}" range-key="label" value="{{statusIndex}}" bindchange="onStatusChange">
+    <view class="picker">状态：{{visibleStatusOptions[statusIndex].label}}</view>
+  </picker>
+  <view class="field-label">接单 / 响应共用时限（分钟）</view>
+  <input type="number" value="{{respondMinutes}}" data-field="respondMinutes" bindinput="onField" />
+  <view class="field-label">完成时限（分钟）</view>
+  <input type="number" value="{{completeMinutes}}" data-field="completeMinutes" bindinput="onField" />
+  <view class="hint" wx:if="{{editingId}}">正在编辑策略 #{{editingId}}</view>
+  <view class="hint" wx:else>该层尚无策略，保存后建立。字段初值来自当前生效策略。</view>
+  <view class="hint" wx:if="{{scopeOptions[scopeIndex].value == 'TENANT'}}">企业默认必须保持启用；禁用只适用于小区覆盖。</view>
+  <button class="btn" disabled="{{loading}}" bindtap="save">保存并重新读取</button>
+</view>
+
+<view class="card warning-card">
+  <view class="section-title">生效边界</view>
+  <view>0009 结构中接单和响应共用一个时限；完成时限独立。</view>
+  <view>禁用小区覆盖会回退企业默认；企业默认不能通过本页禁用。</view>
+  <view>若企业默认因异常数据缺失或禁用，后端会使用代码兜底值保障工单创建；这不是可交付的正常配置，必须修复企业默认。</view>
+  <view>策略变更影响后续新工单；既有完成截止时间不会批量重算，后续重新派单/接单会按当时有效的接单/响应时限重置。</view>
+</view>
+
+<view class="card">
+  <view class="section-title">当前固定升级行为（不可在本页编辑）</view>
+  <view>完成时限临近会产生 Warning，超过完成时限会产生 Overdue。</view>
+  <view>员工未在接单时限内接单时，系统结束当前派单，按独立/共享容量规则释放或转移负载，并尝试 AUTO 重派。</view>
+  <view>员工已接单但未在响应时限内开始处理时，系统记录响应超时并通知主管。</view>
+</view>
+
+<view class="section-heading">当前最终生效值</view>
+<view class="card policy-row" wx:for="{{effective}}" wx:key="key">
+  <view>{{item.category}} / {{item.priority}}</view>
+  <view>{{item.sourceText}} · 接单/响应 {{item.respond_minutes}} 分钟 · 完成 {{item.complete_minutes}} 分钟</view>
+</view>
+
+<view class="section-heading">已保存策略层</view>
+<view class="empty" wx:if="{{!loading && !items.length}}">当前小区没有已保存策略</view>
+<view class="card policy-row" wx:for="{{items}}" wx:key="id">
+  <view>#{{item.id}} · {{item.scopeText}} · {{item.status}}</view>
+  <view>{{item.category}} / {{item.priority}} · 接单/响应 {{item.respond_minutes}} 分钟 · 完成 {{item.complete_minutes}} 分钟</view>
+  <view class="hint">最后更新：{{item.updated_at}}</view>
+</view>
+
+<button class="btn" disabled="{{loading}}" bindtap="load">刷新服务端策略</button>

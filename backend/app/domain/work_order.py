@@ -98,6 +98,11 @@ class SlaClockState(StrEnum):
     STOPPED = "STOPPED"
 
 
+class SlaPolicyStatus(StrEnum):
+    ACTIVE = "ACTIVE"
+    DISABLED = "DISABLED"
+
+
 class WorkOrderActorType(StrEnum):
     RESIDENT = "RESIDENT"
     STAFF = "STAFF"
@@ -121,6 +126,7 @@ WORK_ORDER_PROCESS = "work_order:process"
 WORK_ORDER_RESOLVE = "work_order:resolve"
 WORK_ORDER_DECIDE = "work_order:decide"
 WORK_ORDER_CANCEL = "work_order:cancel"
+SLA_POLICY_MANAGE = "sla:manage"
 
 WAITING_PROCESS_REASONS = frozenset(
     {
@@ -361,6 +367,14 @@ def compute_sla_due_at(
     if minutes is None:
         minutes = DEFAULT_SLA_COMPLETE_MINUTES[WorkOrderPriority(priority)]
     return created_at + timedelta(minutes=minutes)
+
+
+def sla_warning_lead_minutes(complete_minutes: int) -> int:
+    """Return a warning lead that never predates a positive SLA window."""
+
+    if isinstance(complete_minutes, bool) or complete_minutes < 1:
+        raise ValueError("complete_minutes must be a positive integer")
+    return min(complete_minutes, max(complete_minutes // 4, 15))
 
 
 def sla_is_overdue(*, due_at: datetime | None, now: datetime) -> bool:

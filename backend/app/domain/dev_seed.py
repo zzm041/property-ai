@@ -70,6 +70,7 @@ SEED_PERMISSIONS = (
     SeedCodeDefinition("announcement:publish", "Publish announcements"),
     SeedCodeDefinition("knowledge:read", "Read property knowledge"),
     SeedCodeDefinition("knowledge:manage", "Manage property knowledge"),
+    SeedCodeDefinition("sla:manage", "Manage SLA policies"),
 )
 
 SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
@@ -105,6 +106,7 @@ SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
             "announcement:publish",
             "knowledge:read",
             "knowledge:manage",
+            "sla:manage",
         ),
         "PROPERTY_ADMIN": (
             "role:read",
@@ -135,6 +137,7 @@ SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
             "announcement:publish",
             "knowledge:read",
             "knowledge:manage",
+            "sla:manage",
         ),
         "SUPERVISOR": (
             "property:read",

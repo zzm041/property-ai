@@ -22,6 +22,7 @@
     "pages/supervisor/staff",
     "pages/supervisor/properties",
     "pages/supervisor/knowledge",
+    "pages/supervisor/sla",
     "pages/notifications/list",
     "pages/dev-login/dev-login"
   ],

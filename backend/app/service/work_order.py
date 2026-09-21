@@ -51,6 +51,7 @@ from app.domain.work_order import (
     employee_is_capacity_available,
     require_legal_transition,
     sla_is_overdue,
+    sla_warning_lead_minutes,
     sla_windows_for_priority,
     staff_may_submit_resolved_receipt,
 )
@@ -1146,7 +1147,7 @@ class WorkOrderService:
             file_ids=file_ids,
             taken_phase=MediaTakenPhase.REPORT,
         )
-        warning_delta = max(complete_minutes // 4, 15)
+        warning_delta = sla_warning_lead_minutes(complete_minutes)
         self._repository.add_sla_clock(
             SlaClock(
                 tenant_id=record.tenant_id,

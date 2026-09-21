@@ -224,6 +224,55 @@ class WorkOrderRepository:
             select(WorkOrderReceipt).where(WorkOrderReceipt.process_id == process_id)
         )
 
+    def list_sla_policies_for_property(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int,
+    ) -> tuple[SlaPolicy, ...]:
+        return tuple(
+            self._session.scalars(
+                select(SlaPolicy)
+                .where(
+                    SlaPolicy.tenant_id == tenant_id,
+                    or_(
+                        SlaPolicy.property_id == property_id,
+                        SlaPolicy.property_id.is_(None),
+                    ),
+                )
+                .order_by(
+                    SlaPolicy.category,
+                    SlaPolicy.priority,
+                    SlaPolicy.property_scope_key,
+                )
+            ).all()
+        )
+
+    def get_sla_policy_for_update(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int | None,
+        category: str,
+        priority: str,
+    ) -> SlaPolicy | None:
+        property_clause = (
+            SlaPolicy.property_id.is_(None)
+            if property_id is None
+            else SlaPolicy.property_id == property_id
+        )
+        return self._session.scalar(
+            select(SlaPolicy)
+            .where(
+                SlaPolicy.tenant_id == tenant_id,
+                property_clause,
+                SlaPolicy.category == category,
+                SlaPolicy.priority == priority,
+            )
+            .with_for_update()
+            .execution_options(populate_existing=True)
+        )
+
     def get_content_for_update(self, work_order_id: int) -> WorkOrderContent | None:
         return self._session.scalar(
             select(WorkOrderContent)
@@ -637,4 +686,8 @@ class WorkOrderRepository:
     def add_sla_policy(self, record: SlaPolicy) -> SlaPolicy:
         self._session.add(record)
         self._session.flush()
+        return record
+
+    def flush_sla_policy(self, record: SlaPolicy) -> SlaPolicy:
+        self._session.flush((record,))
         return record
