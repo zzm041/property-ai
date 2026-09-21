@@ -1,0 +1,49 @@
+{
+  "task_id": "STATS-CONFIG-UI-011",
+  "captured_at": "2026-09-21T17:02:22.0891157Z",
+  "product_base_sha": "942777e10d2421db34897761f0dfab895b3464fc",
+  "product_head_sha": "01785a0a76a3c849f7f4d88fd27fbcb3162929dd",
+  "api_launch_sha": "dee53380a89cbca10783fea0f51ca3950c284e31",
+  "api": {
+    "pid": 42520,
+    "python": "D:/property-ai/tmp/uv-python/cpython-3.12.10-windows-x86_64-none/python.exe",
+    "healthz": "ok",
+    "readyz_http": 200,
+    "bind": "127.0.0.1:8083/api/v1",
+    "backend_app_changed_after_launch": false,
+    "note": "The two commits after API launch changed only miniprogram code and the focused unit test; backend/app is identical to product HEAD."
+  },
+  "worker": {
+    "wrapper_pid": 35540,
+    "child_pid": 38268,
+    "python": "D:/property-ai/tmp/uv-python/cpython-3.12.10-windows-x86_64-none/python.exe",
+    "changed_or_restarted_for_this_slice": false,
+    "required_for_operations_overview": false
+  },
+  "database": {
+    "container_name": "property-ai-mysql-test-1",
+    "container_id": "fa78177adc270834bd1c25e63cb86b1d6a7fd3f7cfb2faa66c5ac4f67ab0d66f",
+    "image": "mysql:8.0.41",
+    "state": "running",
+    "health": "healthy",
+    "bind": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "data_mount": "/var/lib/mysql tmpfs",
+    "other_schema_operated": false
+  },
+  "isolated_dependencies": {
+    "rabbit_vhost": "property_ai_auth001",
+    "rabbit_queue": "property_ai.auth001",
+    "redis_db": 12,
+    "milvus_collection": "knowledge_chunks_auth001"
+  },
+  "startup_line_redacted": "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True",
+  "boundaries": {
+    "migration_run": false,
+    "migration_0010_created_or_executed": false,
+    "shared_vhost_read_consumed_replayed_or_cleared": false,
+    "shared_service_rebuilt_or_cleared": false,
+    "worker_business_task_enqueued_by_stats_slice": false,
+    "external_fee_incurred": false
+  }
+}

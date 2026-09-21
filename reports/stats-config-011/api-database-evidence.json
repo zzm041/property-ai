@@ -1,0 +1,164 @@
+{
+  "task_id": "STATS-CONFIG-UI-011",
+  "phase": "api_and_database_read_only",
+  "captured_at": "2026-09-21T16:51:55.810690+00:00",
+  "code_sha": "01785a0a76a3c849f7f4d88fd27fbcb3162929dd",
+  "run_id": "stats-config-api-7d3c79a5a22e",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "rabbit_vhost": "property_ai_auth001",
+    "rabbit_queue": "property_ai.auth001",
+    "provider": "DEVELOPMENT_SMS_AND_FAKE_AI"
+  },
+  "objects": {
+    "tenant_id": 1,
+    "property_id": 1
+  },
+  "identities": {
+    "manager": 5,
+    "property_admin": 12,
+    "primary": 3,
+    "staff": 6
+  },
+  "checks": {
+    "normal_development_sms_sessions": true,
+    "seed_or_dev_token_login_used": false,
+    "runtime_permission_roles_exact": [
+      "PROPERTY_ADMIN",
+      "TENANT_ADMIN"
+    ],
+    "tenant_admin_tenant_and_property_overviews": true,
+    "property_admin_property_overview": true,
+    "resident_and_staff_stats_permission_absent": true,
+    "api_matches_same_scope_read_only_database": true,
+    "read_requests_created_no_audit": true,
+    "negative_paths": {
+      "property-admin-tenant-denied": {
+        "status": 403,
+        "error_code": "IAM.FORBIDDEN"
+      },
+      "resident-denied": {
+        "status": 403,
+        "error_code": "IAM.FORBIDDEN"
+      },
+      "staff-denied": {
+        "status": 403,
+        "error_code": "IAM.FORBIDDEN"
+      },
+      "cross-tenant-denied": {
+        "status": 403,
+        "error_code": "IAM.FORBIDDEN"
+      },
+      "tenant-property-shape-rejected": {
+        "status": 422,
+        "error_code": "STATS.INVALID_INPUT"
+      }
+    }
+  },
+  "snapshot": {
+    "generated_at": "2026-09-21T16:51:55.425202Z",
+    "business_date": "2026-09-22",
+    "property_count": 1,
+    "work_orders": {
+      "total": 6,
+      "open": 6,
+      "terminal": 0,
+      "by_status": {
+        "PENDING_ANALYSIS": 0,
+        "PENDING_ASSIGNMENT": 0,
+        "ASSIGNED": 6,
+        "ACCEPTED": 0,
+        "PROCESSING": 0,
+        "WAIT_CONFIRM": 0,
+        "COMPLETED": 0,
+        "CANCELLED": 0,
+        "CLOSED": 0
+      },
+      "by_category": {
+        "PLUMBING": 0,
+        "ELECTRICAL": 6,
+        "HVAC": 0,
+        "CLEANING": 0,
+        "SECURITY": 0,
+        "OTHER": 0
+      },
+      "by_priority": {
+        "LOW": 0,
+        "MEDIUM": 0,
+        "HIGH": 6,
+        "URGENT": 0
+      }
+    },
+    "incidents": {
+      "total": 1,
+      "active": 1,
+      "by_status": {
+        "OPEN": 1,
+        "MONITORING": 0,
+        "RESOLVED": 0,
+        "CLOSED": 0
+      }
+    },
+    "sla_clocks": {
+      "warning": 0,
+      "overdue": 0,
+      "by_state": {
+        "OPEN": 6,
+        "WARNING": 0,
+        "OVERDUE": 0,
+        "STOPPED": 0
+      }
+    },
+    "staffing": {
+      "active_property_assignments": 1,
+      "current_status_records": 0,
+      "unreported_status": 1,
+      "on_duty": 0,
+      "available": 0,
+      "current_load": 0,
+      "on_duty_capacity": 0
+    }
+  },
+  "request_id_hashes": {
+    "manager-challenge": "329e451de1572891",
+    "manager-sms-send": "4c867e965e251a1c",
+    "manager-sms-inbox": "b9eb0b1074ee8b18",
+    "manager-sms-login": "37a75cb36c98e961",
+    "property_admin-challenge": "7e99bfa4a56b6a0f",
+    "property_admin-sms-send": "c62d7128672d7ba2",
+    "property_admin-sms-inbox": "79067e2cd882fcea",
+    "property_admin-sms-login": "c91e9bf20584324b",
+    "primary-challenge": "b07588f13b60fd42",
+    "primary-sms-send": "e5930e67badc06a9",
+    "primary-sms-inbox": "849aeed1155ca9ff",
+    "primary-sms-login": "7370d4eeaba4a99f",
+    "staff-challenge": "ea7380d5aba72e5a",
+    "staff-sms-send": "a4665b3464dcfebd",
+    "staff-sms-inbox": "69d6f8b56383909e",
+    "staff-sms-login": "352870f2216360cb",
+    "manager-me": "54179213cc3b6365",
+    "property_admin-me": "1bc519598a40722c",
+    "primary-me": "c208f3d403549605",
+    "staff-me": "f300938809be8797",
+    "property-admin-overview": "8e3a2913b799db0f",
+    "tenant-admin-overview": "48189c2fdb9417b9",
+    "tenant-admin-property-overview": "074714174d60cd3d",
+    "property-admin-tenant-denied": "598b0bbe67ff72cf",
+    "resident-denied": "20c9a95e61e5daf4",
+    "staff-denied": "7128a1ac136582fe",
+    "cross-tenant-denied": "087d1310dbbb5494",
+    "tenant-property-shape-rejected": "453568d949d8bc79"
+  },
+  "boundaries": {
+    "database_queries_read_only": true,
+    "direct_database_business_write": false,
+    "migration_run": false,
+    "shared_vhost_read_consumed_replayed_or_cleared": false,
+    "development_ai_claimed_as_real": false,
+    "ui_claimed": false
+  },
+  "private_context": "tmp/stats-config-011/context.json",
+  "redaction": "No phone, OTP, token, password, resident text, employee identity, or full request ID is emitted."
+}

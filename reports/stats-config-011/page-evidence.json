@@ -1,0 +1,125 @@
+{
+  "task_id": "STATS-CONFIG-UI-011",
+  "phase": "wechat_devtools_page_read_only",
+  "captured_at": "2026-09-21T16:58:08.852Z",
+  "code_sha": "01785a0a76a3c849f7f4d88fd27fbcb3162929dd",
+  "run_id": "stats-config-api-7d3c79a5a22e",
+  "environment": {
+    "interaction": "WeChat DevTools miniprogram-automator through actual page controls",
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "provider": "DEVELOPMENT_SMS_AND_FAKE_AI",
+    "automator_endpoint": "ws://127.0.0.1:9420",
+    "api_log": "tmp/stats-config-011/api-dee5338.stdout.log"
+  },
+  "objects": {
+    "tenant_id": 1,
+    "property_id": 1
+  },
+  "checks": {
+    "tenant_admin_normal_sms_identity": 5,
+    "tenant_admin_home_entry": true,
+    "tenant_admin_property_snapshot_matches_api_and_database": true,
+    "tenant_admin_aggregate_snapshot_matches_api_and_database": true,
+    "current_snapshot_language_and_sla_labels": true,
+    "existing_config_links_only": [
+      "/pages/supervisor/knowledge",
+      "/pages/supervisor/properties",
+      "/pages/supervisor/sla",
+      "/pages/supervisor/staff"
+    ],
+    "config_link_preserved_tenant_and_property": true,
+    "property_admin_normal_sms_identity": 12,
+    "property_admin_has_property_scope_only": true,
+    "resident_normal_sms_identity": 3,
+    "resident_home_has_no_stats_entry": true,
+    "staff_normal_sms_identity": 6,
+    "staff_home_has_no_stats_entry": true,
+    "reload_preserved_same_scope_and_snapshot": true
+  },
+  "requests": {
+    "tenant_admin_property": [
+      {
+        "status": 200,
+        "error": null,
+        "request_id_hash": "ea85231cee69f826"
+      }
+    ],
+    "tenant_admin_aggregate": [
+      {
+        "status": 200,
+        "error": null,
+        "request_id_hash": "a4ea53c8fb60efd3"
+      }
+    ],
+    "sla_link": [
+      {
+        "status": 200,
+        "error": null,
+        "request_id_hash": "6799daec42bdd78c"
+      }
+    ],
+    "property_admin_property": [
+      {
+        "status": 200,
+        "error": null,
+        "request_id_hash": "7875929b57b0eaa9"
+      }
+    ],
+    "reload": [
+      {
+        "status": 200,
+        "error": null,
+        "request_id_hash": "7310f7ad8528826d"
+      }
+    ],
+    "manager_login": {
+      "status": 200,
+      "error": null,
+      "request_id_hash": "3c9a80b2208bc98d"
+    },
+    "property_admin_login": {
+      "status": 200,
+      "error": null,
+      "request_id_hash": "20cf400da5f255c4"
+    },
+    "resident_login": {
+      "status": 200,
+      "error": null,
+      "request_id_hash": "5fb204397854daef"
+    },
+    "staff_login": {
+      "status": 200,
+      "error": null,
+      "request_id_hash": "03ce56987c73e844"
+    },
+    "reload_login": {
+      "status": 200,
+      "error": null,
+      "request_id_hash": "cd180c9c5abc3e23"
+    }
+  },
+  "screenshots": [
+    "01-tenant-admin-home-entry.png",
+    "02-tenant-property-snapshot.png",
+    "03-tenant-aggregate-snapshot.png",
+    "04-config-links.png",
+    "05-sla-linked-scope.png",
+    "06-property-admin-property-only.png",
+    "07-resident-no-stats-entry.png",
+    "08-staff-no-stats-entry.png",
+    "09-reload-current-snapshot.png"
+  ],
+  "boundaries": {
+    "seed_login_used": false,
+    "dev_auth_used": false,
+    "development_sms_test_inbox_used": true,
+    "page_state_faked": false,
+    "direct_database_business_write": false,
+    "config_write_sent": false,
+    "picker_boundary": "supported automator change event; not native system picker overlay",
+    "real_model_claimed": false,
+    "production_claimed": false
+  }
+}

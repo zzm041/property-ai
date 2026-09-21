@@ -1,0 +1,51 @@
+{
+  "task_id": "STATS-CONFIG-UI-011",
+  "code_sha": "01785a0a76a3c849f7f4d88fd27fbcb3162929dd",
+  "inspected_at": "2026-09-21T17:00:08.9798519Z",
+  "inspector": "main Codex implementation session",
+  "method": "Each original PNG was opened with supported local image input; file paths alone were not treated as visual evidence.",
+  "screenshots": [
+    {
+      "path": "reports/stats-config-011/01-tenant-admin-home-entry.png",
+      "observed": "Tenant administrator Home visibly includes Operations statistics and configuration beside the existing management entries."
+    },
+    {
+      "path": "reports/stats-config-011/02-tenant-property-snapshot.png",
+      "observed": "Property snapshot visibly identifies the selected property, current-snapshot semantics, six assigned electrical high-priority orders, one open incident, six running SLA clocks, and current staffing counts."
+    },
+    {
+      "path": "reports/stats-config-011/03-tenant-aggregate-snapshot.png",
+      "observed": "Tenant aggregate visibly changes the scope label to enterprise aggregate while retaining the same one-property fixture totals."
+    },
+    {
+      "path": "reports/stats-config-011/04-config-links.png",
+      "observed": "The lower page visibly shows the property breakdown, generated timestamp, and only the four existing staff, SLA, property, and knowledge configuration links."
+    },
+    {
+      "path": "reports/stats-config-011/05-sla-linked-scope.png",
+      "observed": "Navigation reaches the existing SLA management page for the same synthetic property without writing a policy."
+    },
+    {
+      "path": "reports/stats-config-011/06-property-admin-property-only.png",
+      "observed": "Property administrator sees the authorized property snapshot; page-state evidence separately proves no tenant aggregate option."
+    },
+    {
+      "path": "reports/stats-config-011/07-resident-no-stats-entry.png",
+      "observed": "Resident Home visibly contains resident capabilities and no operations statistics entry."
+    },
+    {
+      "path": "reports/stats-config-011/08-staff-no-stats-entry.png",
+      "observed": "Staff Home visibly contains attendance, task, incident-participation and notification capabilities and no operations statistics entry."
+    },
+    {
+      "path": "reports/stats-config-011/09-reload-current-snapshot.png",
+      "observed": "A fresh page launch visibly reloads the same authorized property and current snapshot values."
+    }
+  ],
+  "result": "PASS",
+  "limitations": [
+    "Screenshots show the local WeChat simulator, not a real device or production deployment.",
+    "The property-admin screenshot cannot display the closed native picker choices; the automator page-state assertion proves its single PROPERTY option.",
+    "The DEVELOPMENT fixture and Fake AI label are not real Qwen, bge-m3, provider, or Production V1 acceptance."
+  ]
+}

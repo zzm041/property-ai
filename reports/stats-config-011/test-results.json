@@ -1,0 +1,42 @@
+{
+  "task_id": "STATS-CONFIG-UI-011",
+  "code_sha": "01785a0a76a3c849f7f4d88fd27fbcb3162929dd",
+  "recorded_at": "2026-09-21T17:00:08.9798519Z",
+  "run_timestamp": "NOT_RECORDED_IN_TERMINAL_SUMMARY",
+  "python": {
+    "executable": "D:/property-ai/tmp/uv-python/cpython-3.12.10-windows-x86_64-none/python.exe",
+    "version": "3.12.10",
+    "architecture": "AMD64",
+    "dependency_reuse": "D:/property-ai/.venv/Lib/site-packages with isolated interpreter startup and PYTHONNOUSERSITE=1"
+  },
+  "focused_unit": {
+    "command_scope": "backend/tests/unit/test_stats_config_overview.py",
+    "result": "11 passed, 1 warning",
+    "coverage": [
+      "role provisioning limited to PROPERTY_ADMIN and TENANT_ADMIN",
+      "property and tenant snapshot aggregation with stable zero-filled enums",
+      "tenant/property and mixed-role authorization negatives",
+      "single-instant employment and timezone semantics",
+      "query parsing and invalid tenant/property shape",
+      "miniprogram scope switching, stale response suppression, old snapshot clearing, and existing config links"
+    ],
+    "database_or_service_writes": false
+  },
+  "pure_unit_regression": {
+    "command_scope": "backend/tests/unit",
+    "result": "539 passed, 1 warning",
+    "database_or_service_writes": false,
+    "note": "The first attempt only encountered Windows temporary-directory permission errors; the controlled rerun used a repository-local --basetemp and completed cleanly."
+  },
+  "static_checks": {
+    "miniprogram_node_syntax": "PASS",
+    "git_diff_check_product_base_to_head": "PASS"
+  },
+  "warning": "Existing Starlette/pytest-asyncio deprecation warning; no test failure.",
+  "boundaries": {
+    "migration_run": false,
+    "integration_fixture_reset_run": false,
+    "real_provider_tested": false,
+    "production_claimed": false
+  }
+}
