@@ -22,10 +22,14 @@ from app.domain.iam import OrganizationScope, Principal, ScopeType
 from app.domain.incident import IncidentStatus
 from app.model.ai import Incident, IncidentWorkOrder
 from app.model.work_order import WorkOrder, WorkOrderAssignment
+from app.provider.errors import ProviderError
 from app.provider.factory import build_llm_provider
 from app.provider.llm import LLMProvider
 from app.repository.ai import AiRepository
+from app.repository.employee import EmployeeRepository
+from app.repository.identity import IdentityRepository
 from app.repository.work_order import WorkOrderRepository
+from app.service.auth import AuthService
 from app.service.audit import AuditService
 from app.service.rbac import RbacService
 
@@ -38,14 +42,20 @@ class IncidentService:
         settings: Settings | None = None,
         llm: LLMProvider | None = None,
         clock: Callable[[], datetime] = utc_now,
+        principal_loader: Callable[[int], Principal] | None = None,
     ) -> None:
         self._session = session
         self._settings = settings or get_settings()
         self._llm = llm or build_llm_provider(self._settings)
         self._clock = clock
         self._ai = AiRepository(session)
+        self._employees = EmployeeRepository(session)
         self._work_orders = WorkOrderRepository(session)
         self._audit = AuditService(session)
+        self._principal_loader = principal_loader or AuthService(
+            session,
+            IdentityRepository(session),
+        ).load_principal
 
     def aggregate_locked(
         self,
@@ -210,6 +220,7 @@ class IncidentService:
         actor: Principal,
         property_id: int,
         tenant_id: int | None = None,
+        status: str | None = None,
         after_id: int = 0,
         limit: int = 50,
     ) -> tuple[Incident, ...]:
@@ -232,9 +243,22 @@ class IncidentService:
             property_id=property_record.id,
         )
         RbacService.require_permission(actor, INCIDENT_READ, scope)
+        if not actor.has_permission(INCIDENT_MANAGE, scope):
+            employee = self._employees.get_employee_for_user(actor.user_id)
+            if employee is None or employee.tenant_id != property_record.tenant_id:
+                return ()
+            return self._ai.list_incidents_for_participant(
+                tenant_id=property_record.tenant_id,
+                property_id=property_record.id,
+                employee_id=employee.id,
+                status=status,
+                after_id=after_id,
+                limit=limit,
+            )
         return self._ai.list_incidents(
             tenant_id=property_record.tenant_id,
             property_id=property_record.id,
+            status=status,
             after_id=after_id,
             limit=limit,
         )
@@ -253,6 +277,23 @@ class IncidentService:
             property_id=incident.property_id,
         )
         RbacService.require_permission(actor, INCIDENT_READ, scope)
+        if not actor.has_permission(INCIDENT_MANAGE, scope):
+            employee = self._employees.get_employee_for_user(actor.user_id)
+            if (
+                employee is None
+                or employee.tenant_id != incident.tenant_id
+                or not self._ai.is_incident_participant(
+                    incident_id=incident.id,
+                    tenant_id=incident.tenant_id,
+                    property_id=incident.property_id,
+                    employee_id=employee.id,
+                )
+            ):
+                raise AppError(
+                    code=IamErrorCode.FORBIDDEN,
+                    message="Permission denied",
+                    status_code=403,
+                )
         return incident
 
     def summarize(
@@ -263,6 +304,7 @@ class IncidentService:
         request_id: str,
     ) -> Incident:
         with begin_owned_transaction(self._session):
+            current_actor = self._reload_actor(actor)
             incident = self._ai.get_incident_for_update(incident_id)
             if incident is None:
                 raise AppError(
@@ -275,11 +317,15 @@ class IncidentService:
                 tenant_id=incident.tenant_id,
                 property_id=incident.property_id,
             )
-            RbacService.require_permission(actor, INCIDENT_MANAGE, scope)
+            RbacService.require_permission(current_actor, INCIDENT_MANAGE, scope)
             snapshot = {
                 "id": incident.id,
+                "tenant_id": incident.tenant_id,
+                "property_id": incident.property_id,
                 "category": incident.category,
                 "count": incident.work_order_count,
+                "last_seen_at": incident.last_seen_at,
+                "updated_at": incident.updated_at,
             }
         if self._session.in_transaction():
             from app.core.database import TransactionContractError
@@ -293,8 +339,20 @@ class IncidentService:
                 prompt_version=INCIDENT_SUMMARY_PROMPT_VERSION,
             )
             output = IncidentSummaryOutput.model_validate(payload)
-        except (ValidationError, ValueError, Exception):
-            output = None
+        except ProviderError as exc:
+            raise AppError(
+                code=exc.error_code,
+                message="Incident summary provider is unavailable",
+                status_code=503,
+            ) from exc
+        except (ValidationError, ValueError) as exc:
+            from app.core.errors import AiErrorCode
+
+            raise AppError(
+                code=AiErrorCode.INVALID_OUTPUT,
+                message="Incident summary provider returned invalid output",
+                status_code=502,
+            ) from exc
         with begin_owned_transaction(self._session):
             incident = self._ai.get_incident_for_update(incident_id)
             if incident is None:
@@ -303,11 +361,31 @@ class IncidentService:
                     message="Incident was not found",
                     status_code=404,
                 )
-            if output is not None:
-                incident.ai_summary = output.summary
-                incident.affected_scope = output.affected_scope
-                if incident.summary is None:
-                    incident.summary = output.summary
+            current_actor = self._reload_actor(actor)
+            scope = OrganizationScope(
+                ScopeType.PROPERTY,
+                tenant_id=incident.tenant_id,
+                property_id=incident.property_id,
+            )
+            RbacService.require_permission(current_actor, INCIDENT_MANAGE, scope)
+            if (
+                incident.tenant_id != snapshot["tenant_id"]
+                or incident.property_id != snapshot["property_id"]
+                or incident.category != snapshot["category"]
+                or incident.work_order_count != snapshot["count"]
+                or incident.last_seen_at != snapshot["last_seen_at"]
+                or incident.updated_at != snapshot["updated_at"]
+            ):
+                raise AppError(
+                    code=IncidentErrorCode.CONFLICT,
+                    message="Incident changed while its summary was generated",
+                    status_code=409,
+                    details={"retryable": True},
+                )
+            incident.ai_summary = output.summary
+            incident.affected_scope = output.affected_scope
+            if incident.summary is None:
+                incident.summary = output.summary
             self._audit.append(
                 action=AuditAction.INCIDENT_UPDATED,
                 resource_type=AuditResourceType.INCIDENT,
@@ -324,6 +402,29 @@ class IncidentService:
                 },
             )
             return incident
+
+    def _reload_actor(self, actor: Principal) -> Principal:
+        if not isinstance(actor, Principal) or actor.user_id <= 0:
+            raise AppError(
+                code=IamErrorCode.FORBIDDEN,
+                message="Permission denied",
+                status_code=403,
+            )
+        try:
+            current = self._principal_loader(actor.user_id)
+        except AppError as exc:
+            raise AppError(
+                code=IamErrorCode.FORBIDDEN,
+                message="Permission denied",
+                status_code=403,
+            ) from exc
+        if current.user_id != actor.user_id or current.status != "ACTIVE":
+            raise AppError(
+                code=IamErrorCode.FORBIDDEN,
+                message="Permission denied",
+                status_code=403,
+            )
+        return current
 
 
 class IncidentCapacityService:

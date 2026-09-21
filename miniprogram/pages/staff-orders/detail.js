@@ -97,6 +97,15 @@ Page({
         })
     ).catch(() => {});
   },
+  openIncident() {
+    const workOrder = this.data.workOrder;
+    if (!workOrder || !workOrder.incident_id) {
+      return;
+    }
+    wx.navigateTo({
+      url: `/pages/supervisor/incidents?propertyId=${workOrder.property_id}&incidentId=${workOrder.incident_id}`,
+    });
+  },
   start() {
     this._act("startWorkOrder");
   },

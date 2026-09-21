@@ -411,7 +411,10 @@ class AiRepository:
 
     def get_incident_for_update(self, incident_id: int) -> Incident | None:
         return self._session.scalar(
-            select(Incident).where(Incident.id == incident_id).with_for_update()
+            select(Incident)
+            .where(Incident.id == incident_id)
+            .with_for_update()
+            .execution_options(populate_existing=True)
         )
 
     def list_active_incident_assignments_for_update(
@@ -473,20 +476,105 @@ class AiRepository:
         *,
         tenant_id: int,
         property_id: int,
+        status: str | None = None,
         after_id: int = 0,
         limit: int = 50,
     ) -> tuple[Incident, ...]:
+        query = select(Incident).where(
+            Incident.tenant_id == tenant_id,
+            Incident.property_id == property_id,
+            Incident.id > after_id,
+        )
+        if status is not None:
+            query = query.where(Incident.status == status)
         return tuple(
             self._session.scalars(
-                select(Incident)
-                .where(
-                    Incident.tenant_id == tenant_id,
-                    Incident.property_id == property_id,
-                    Incident.id > after_id,
-                )
-                .order_by(Incident.id)
-                .limit(limit)
+                query.order_by(Incident.id).limit(limit)
             ).all()
+        )
+
+    def list_incidents_for_participant(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int,
+        employee_id: int,
+        status: str | None = None,
+        after_id: int = 0,
+        limit: int = 50,
+    ) -> tuple[Incident, ...]:
+        query = (
+            select(Incident)
+            .join(
+                IncidentWorkOrder,
+                IncidentWorkOrder.incident_id == Incident.id,
+            )
+            .join(
+                WorkOrder,
+                WorkOrder.id == IncidentWorkOrder.work_order_id,
+            )
+            .join(
+                WorkOrderAssignment,
+                WorkOrderAssignment.id == WorkOrder.current_assignment_id,
+            )
+            .where(
+                Incident.tenant_id == tenant_id,
+                Incident.property_id == property_id,
+                Incident.id > after_id,
+                IncidentWorkOrder.tenant_id == tenant_id,
+                IncidentWorkOrder.property_id == property_id,
+                WorkOrder.tenant_id == tenant_id,
+                WorkOrder.property_id == property_id,
+                WorkOrderAssignment.tenant_id == tenant_id,
+                WorkOrderAssignment.property_id == property_id,
+                WorkOrderAssignment.employee_id == employee_id,
+                WorkOrderAssignment.status == "ACTIVE",
+                WorkOrderAssignment.ended_at.is_(None),
+            )
+            .distinct()
+        )
+        if status is not None:
+            query = query.where(Incident.status == status)
+        return tuple(
+            self._session.scalars(
+                query.order_by(Incident.id).limit(limit)
+            ).all()
+        )
+
+    def is_incident_participant(
+        self,
+        *,
+        incident_id: int,
+        tenant_id: int,
+        property_id: int,
+        employee_id: int,
+    ) -> bool:
+        return (
+            self._session.scalar(
+                select(IncidentWorkOrder.id)
+                .join(
+                    WorkOrder,
+                    WorkOrder.id == IncidentWorkOrder.work_order_id,
+                )
+                .join(
+                    WorkOrderAssignment,
+                    WorkOrderAssignment.id == WorkOrder.current_assignment_id,
+                )
+                .where(
+                    IncidentWorkOrder.incident_id == incident_id,
+                    IncidentWorkOrder.tenant_id == tenant_id,
+                    IncidentWorkOrder.property_id == property_id,
+                    WorkOrder.tenant_id == tenant_id,
+                    WorkOrder.property_id == property_id,
+                    WorkOrderAssignment.tenant_id == tenant_id,
+                    WorkOrderAssignment.property_id == property_id,
+                    WorkOrderAssignment.employee_id == employee_id,
+                    WorkOrderAssignment.status == "ACTIVE",
+                    WorkOrderAssignment.ended_at.is_(None),
+                )
+                .limit(1)
+            )
+            is not None
         )
 
     def add_announcement(self, record: Announcement) -> Announcement:

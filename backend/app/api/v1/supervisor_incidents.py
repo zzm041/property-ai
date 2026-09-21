@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.api.dependencies.auth import get_current_principal
 from app.api.dependencies.db import get_db_session
 from app.domain.iam import Principal
+from app.domain.incident import IncidentStatus
 from app.schema.ai import IncidentData, IncidentListData
 from app.schema.common import request_id_for, success_envelope
 from app.service.incident import IncidentService
@@ -29,13 +30,16 @@ def incident_data(record) -> IncidentData:
         building_id=record.building_id,
         status=record.status,
         category=record.category,
+        subcategory=getattr(record, "subcategory", None),
         summary=record.summary,
         ai_summary=record.ai_summary,
         affected_scope=record.affected_scope,
         primary_work_order_id=record.primary_work_order_id,
+        primary_employee_id=getattr(record, "primary_employee_id", None),
         work_order_count=record.work_order_count,
         first_seen_at=record.first_seen_at,
         last_seen_at=record.last_seen_at,
+        updated_at=getattr(record, "updated_at", record.last_seen_at),
     )
 
 
@@ -46,6 +50,7 @@ def list_incidents(
     service: Annotated[IncidentService, Depends(get_incident_service)],
     property_id: Annotated[int, Query(gt=0)],
     tenant_id: Annotated[int | None, Query(gt=0)] = None,
+    status: IncidentStatus | None = None,
     after_id: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
 ) -> dict[str, object]:
@@ -53,6 +58,7 @@ def list_incidents(
         actor=actor,
         property_id=property_id,
         tenant_id=tenant_id,
+        status=None if status is None else status.value,
         after_id=after_id,
         limit=limit,
     )

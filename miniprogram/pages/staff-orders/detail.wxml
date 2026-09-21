@@ -3,6 +3,7 @@
   <view>工单 {{workOrder.id}}</view>
   <view>状态 {{workOrder.status}}</view>
   <view wx:if="{{workOrder.process_reason != 'NONE'}}">处理原因 {{workOrder.process_reason}}</view>
+  <button class="btn" wx:if="{{workOrder.incident_id}}" bindtap="openIncident">查看本人参与的集中事件</button>
   <button class="btn" wx:if="{{canAccept}}" bindtap="accept">接单</button>
   <block wx:if="{{canReject}}">
     <textarea class="field" placeholder="拒单原因（必填）" value="{{rejectReason}}" bindinput="onRejectReason" maxlength="255"></textarea>

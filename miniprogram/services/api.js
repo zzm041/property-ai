@@ -399,8 +399,19 @@ module.exports = {
     request({ path: `/supervisor/work-orders/${id}/analyze`, method: "POST", data: {} }),
   workOrderRecommendations: (id) =>
     request({ path: `/supervisor/work-orders/${id}/recommendations` }),
-  incidents: (propertyId) =>
-    request({ path: `/supervisor/incidents?property_id=${propertyId}` }),
+  incidents: (propertyId, tenantId, afterId, status) =>
+    request({
+      path: `/supervisor/incidents?property_id=${propertyId}&tenant_id=${tenantId}&limit=50${
+        afterId ? `&after_id=${afterId}` : ""
+      }${status ? `&status=${encodeURIComponent(status)}` : ""}`,
+    }),
+  incident: (id) => request({ path: `/supervisor/incidents/${id}` }),
+  summarizeIncident: (id) =>
+    request({
+      path: `/supervisor/incidents/${id}/summary`,
+      method: "POST",
+      data: {},
+    }),
   createAnnouncement: (body) =>
     request({ path: "/admin/announcements", method: "POST", data: body }),
   adminAnnouncements: (propertyId, afterId) =>

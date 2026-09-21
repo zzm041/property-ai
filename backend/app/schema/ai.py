@@ -84,13 +84,16 @@ class IncidentData(BaseModel):
     building_id: int | None
     status: str
     category: str
+    subcategory: str | None
     summary: str | None
     ai_summary: str | None
     affected_scope: str | None
     primary_work_order_id: int | None
+    primary_employee_id: int | None
     work_order_count: int
     first_seen_at: datetime
     last_seen_at: datetime
+    updated_at: datetime
 
 
 class IncidentListData(BaseModel):

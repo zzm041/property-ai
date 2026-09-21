@@ -20,9 +20,11 @@
 </view>
 <view class="card" wx:if="{{canManage}}">
   <button class="btn" data-url="/pages/supervisor/queue" bindtap="go">待派工单</button>
-  <button class="btn" data-url="/pages/supervisor/incidents" bindtap="go">事件</button>
   <button class="btn" data-url="/pages/supervisor/announcements" bindtap="go">公告审核</button>
   <button class="btn" data-url="/pages/supervisor/bindings" bindtap="go">绑定审核</button>
+</view>
+<view class="card" wx:if="{{canViewIncidents}}">
+  <button class="btn" data-url="/pages/supervisor/incidents" bindtap="go">{{canManageIncidents ? '事件管理' : '我参与的事件'}}</button>
 </view>
 <view class="card" wx:if="{{canManageStaff}}">
   <button class="btn" data-url="/pages/supervisor/staff" bindtap="go">员工管理与状态</button>

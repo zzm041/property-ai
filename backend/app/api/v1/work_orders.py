@@ -52,6 +52,7 @@ def work_order_data(record, *, overdue: bool = False) -> WorkOrderData:
         priority=record.priority,
         version=record.version,
         current_assignment_id=record.current_assignment_id,
+        incident_id=getattr(record, "incident_id", None),
         sla_due_at=record.sla_due_at,
         assigned_at=record.assigned_at,
         accepted_at=record.accepted_at,

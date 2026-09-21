@@ -220,6 +220,7 @@ class WorkOrderData(BaseModel):
     priority: str
     version: int
     current_assignment_id: int | None
+    incident_id: int | None
     sla_due_at: datetime | None
     assigned_at: datetime | None
     accepted_at: datetime | None

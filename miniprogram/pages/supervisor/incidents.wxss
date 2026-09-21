@@ -1,0 +1,21 @@
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+}
+
+.picker {
+  border: 1rpx solid #d0d5dd;
+  border-radius: 8rpx;
+  margin-top: 16rpx;
+  padding: 18rpx;
+}
+
+.incident-card {
+  border-left: 8rpx solid #1f4b99;
+}
+
+.notice {
+  color: #067647;
+  margin: 16rpx 24rpx;
+}
