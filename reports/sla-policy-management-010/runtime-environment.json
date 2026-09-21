@@ -1,0 +1,51 @@
+{
+  "task_id": "SLA-POLICY-MGMT-010",
+  "phase": "post_evidence_runtime_snapshot",
+  "captured_at": "2026-09-21T16:05:52.868870Z",
+  "code_sha": "7814d45531a91efb6a63c63df261415fa446a1c4",
+  "api": {
+    "pid": 37832,
+    "command": "D:/property-ai/tmp/uv-python/cpython-3.12.10-windows-x86_64-none/python.exe -I D:/property-ai/tmp/run_auth001_recovered.py api",
+    "base_url": "http://127.0.0.1:8083/api/v1",
+    "healthz": "ok",
+    "readyz": "ready",
+    "log": "tmp/auth001-runtime/api-7814d45-sla.stdout.log"
+  },
+  "worker": {
+    "parent_pid": 35540,
+    "child_pid": 38268,
+    "command": "D:/property-ai/tmp/uv-python/cpython-3.12.10-windows-x86_64-none/python.exe -m celery -A app.worker.celery_app:celery_app worker -Q property_ai.auth001 --pool=solo --loglevel=info --hostname=auth001@%h",
+    "log": "tmp/auth001-runtime/worker-7814d45-sla.stdout.log"
+  },
+  "database": {
+    "target": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009"
+  },
+  "rabbitmq": {
+    "vhost": "property_ai_auth001",
+    "queue": "property_ai.auth001",
+    "messages_ready": 0,
+    "messages_unacknowledged": 0,
+    "consumers": 1,
+    "dlq_messages_ready": 2,
+    "dlq_action": "NOT_READ_NOT_CONSUMED_NOT_REPLAYED_NOT_CLEARED"
+  },
+  "dependencies": {
+    "mysql": "up",
+    "redis": "up",
+    "rabbitmq": "up",
+    "milvus": "up",
+    "llm": "not_checked_live_vendor",
+    "vlm": "not_checked_live_vendor",
+    "asr": "not_checked_live_vendor",
+    "embedding": "not_checked_live_vendor",
+    "reranker": "not_checked_live_vendor",
+    "storage": "not_checked_live_vendor"
+  },
+  "boundaries": {
+    "shared_infrastructure_rebuilt_or_cleared": false,
+    "port_8082_touched": false,
+    "migration_run": false,
+    "production_claimed": false
+  }
+}

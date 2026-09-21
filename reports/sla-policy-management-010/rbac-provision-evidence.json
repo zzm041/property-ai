@@ -1,0 +1,51 @@
+{
+  "task_id": "SLA-POLICY-MGMT-010",
+  "phase": "guarded_rbac_provision",
+  "captured_at": "2026-09-21T15:46:07.442824+00:00",
+  "code_sha": "7814d45531a91efb6a63c63df261415fa446a1c4",
+  "run_id": "sla-policy-rbac-b0ea2f1594",
+  "environment": {
+    "host": "127.0.0.1",
+    "port": 3307,
+    "database": "property_ai_auth001_test",
+    "app_env": "test",
+    "allow_destructive_test_database": true,
+    "queue": "property_ai.auth001",
+    "vhost": "property_ai_auth001",
+    "revision": "20260919_0009"
+  },
+  "method": {
+    "mutation": "existing guarded idempotent Development Seed service",
+    "request_id": "sla-policy-rbac-b0ea2f1594-development-seed",
+    "direct_sql_business_write": false,
+    "migration_run": false
+  },
+  "before": {
+    "revision": "20260919_0009",
+    "permission_row_count": 0,
+    "role_codes": [],
+    "duplicate_role_permission_pairs": 0
+  },
+  "after": {
+    "revision": "20260919_0009",
+    "permission_row_count": 1,
+    "role_codes": [
+      "PROPERTY_ADMIN",
+      "TENANT_ADMIN"
+    ],
+    "duplicate_role_permission_pairs": 0
+  },
+  "checks": {
+    "revision_remained_0009": true,
+    "sla_permission_unique": true,
+    "administrator_role_mapping_exact": true,
+    "other_frozen_roles_not_mapped": true
+  },
+  "boundaries": {
+    "database": "property_ai_auth001_test only",
+    "property_ai_test_touched": false,
+    "shared_vhost_read_consumed_replayed_or_cleared": false,
+    "seed_login_used": false,
+    "production_provisioning_claimed": false
+  }
+}

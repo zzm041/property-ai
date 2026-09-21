@@ -1,0 +1,128 @@
+{
+  "task_id": "SLA-POLICY-MGMT-010",
+  "phase": "page_database_and_audit_read_only",
+  "captured_at": "2026-09-21T16:05:11.952338+00:00",
+  "code_sha": "7814d45531a91efb6a63c63df261415fa446a1c4",
+  "run_id": "sla-policy-api-ff03f07ab3",
+  "environment": {
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "database_name": "property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "transaction_mode": "READ ONLY"
+  },
+  "policies": [
+    {
+      "id": 3,
+      "tenant_id": 1,
+      "property_id": null,
+      "category": "OTHER",
+      "priority": "LOW",
+      "respond_minutes": 19,
+      "complete_minutes": 49,
+      "status": "ACTIVE",
+      "updated_at": "2026-09-21T16:02:23.319029"
+    },
+    {
+      "id": 4,
+      "tenant_id": 1,
+      "property_id": 1,
+      "category": "OTHER",
+      "priority": "LOW",
+      "respond_minutes": 12,
+      "complete_minutes": 42,
+      "status": "DISABLED",
+      "updated_at": "2026-09-21T16:03:11.165714"
+    }
+  ],
+  "audit": [
+    {
+      "id": 163,
+      "action": "SLA_POLICY_CHANGED",
+      "resource_type": "SLA_POLICY",
+      "actor_user_id": 5,
+      "resource_id": 3,
+      "tenant_id": 1,
+      "property_id": null,
+      "request_id_hash": "d5ee14c6fc89498a",
+      "details": {
+        "after": {
+          "status": "ACTIVE",
+          "respond_minutes": 19,
+          "complete_minutes": 49
+        },
+        "before": null,
+        "category": "OTHER",
+        "priority": "LOW",
+        "scope_type": "TENANT",
+        "property_id": null
+      },
+      "created_at": "2026-09-21T16:02:23.320250"
+    },
+    {
+      "id": 165,
+      "action": "SLA_POLICY_CHANGED",
+      "resource_type": "SLA_POLICY",
+      "actor_user_id": 12,
+      "resource_id": 4,
+      "tenant_id": 1,
+      "property_id": 1,
+      "request_id_hash": "bfb39d92e5a26041",
+      "details": {
+        "after": {
+          "status": "ACTIVE",
+          "respond_minutes": 12,
+          "complete_minutes": 42
+        },
+        "before": null,
+        "category": "OTHER",
+        "priority": "LOW",
+        "scope_type": "PROPERTY",
+        "property_id": 1
+      },
+      "created_at": "2026-09-21T16:02:56.622133"
+    },
+    {
+      "id": 166,
+      "action": "SLA_POLICY_CHANGED",
+      "resource_type": "SLA_POLICY",
+      "actor_user_id": 12,
+      "resource_id": 4,
+      "tenant_id": 1,
+      "property_id": 1,
+      "request_id_hash": "bf363207ffab77e8",
+      "details": {
+        "after": {
+          "status": "DISABLED",
+          "respond_minutes": 12,
+          "complete_minutes": 42
+        },
+        "before": {
+          "status": "ACTIVE",
+          "respond_minutes": 12,
+          "complete_minutes": 42
+        },
+        "category": "OTHER",
+        "priority": "LOW",
+        "scope_type": "PROPERTY",
+        "property_id": 1
+      },
+      "created_at": "2026-09-21T16:03:11.168684"
+    }
+  ],
+  "checks": {
+    "three_page_put_hashes_match_three_audits": true,
+    "tenant_page_actor_matches_normal_manager_session": true,
+    "property_page_actor_matches_normal_property_admin_session": true,
+    "tenant_default_persisted_active": true,
+    "property_override_persisted_disabled": true,
+    "disable_audit_preserves_active_to_disabled_transition": true
+  },
+  "boundaries": {
+    "database_session_read_only": true,
+    "direct_database_business_write": false,
+    "migration_run": false,
+    "page_writes_replayed": false,
+    "production_claimed": false
+  },
+  "redaction": "No phone, token, OTP, password, or full request ID is emitted."
+}

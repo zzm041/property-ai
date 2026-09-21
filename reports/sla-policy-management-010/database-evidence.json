@@ -1,0 +1,266 @@
+{
+  "task_id": "SLA-POLICY-MGMT-010",
+  "phase": "database_and_audit_read_only",
+  "captured_at": "2026-09-21T15:55:34.844255+00:00",
+  "code_sha": "7814d45531a91efb6a63c63df261415fa446a1c4",
+  "run_id": "sla-policy-api-ff03f07ab3",
+  "environment": {
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "database_name": "property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "transaction_mode": "READ ONLY",
+    "rabbit_vhost": "property_ai_auth001",
+    "rabbit_queue": "property_ai.auth001"
+  },
+  "rbac": {
+    "permission_id": 32,
+    "role_codes": [
+      "PROPERTY_ADMIN",
+      "TENANT_ADMIN"
+    ],
+    "normal_session_grants": [
+      {
+        "user_id": 5,
+        "role_code": "TENANT_ADMIN",
+        "scope_type": "TENANT",
+        "tenant_id": 1,
+        "property_id": null
+      },
+      {
+        "user_id": 12,
+        "role_code": "PROPERTY_ADMIN",
+        "scope_type": "PROPERTY",
+        "tenant_id": 1,
+        "property_id": 1
+      }
+    ]
+  },
+  "policies": [
+    {
+      "id": 1,
+      "tenant_id": 1,
+      "property_id": null,
+      "category": "ELECTRICAL",
+      "priority": "HIGH",
+      "respond_minutes": 17,
+      "complete_minutes": 47,
+      "status": "ACTIVE",
+      "updated_at": "2026-09-21T15:53:27.457711"
+    },
+    {
+      "id": 2,
+      "tenant_id": 1,
+      "property_id": 1,
+      "category": "ELECTRICAL",
+      "priority": "HIGH",
+      "respond_minutes": 21,
+      "complete_minutes": 51,
+      "status": "ACTIVE",
+      "updated_at": "2026-09-21T15:53:28.817478"
+    }
+  ],
+  "audit": {
+    "tenant-default-create": [
+      {
+        "id": 152,
+        "action": "SLA_POLICY_CHANGED",
+        "resource_type": "SLA_POLICY",
+        "actor_user_id": 5,
+        "resource_id": 1,
+        "tenant_id": 1,
+        "property_id": null,
+        "request_id_hash": "01a44df2162ce39b",
+        "details": {
+          "after": {
+            "status": "ACTIVE",
+            "respond_minutes": 17,
+            "complete_minutes": 47
+          },
+          "before": null,
+          "category": "ELECTRICAL",
+          "priority": "HIGH",
+          "scope_type": "TENANT",
+          "property_id": null
+        },
+        "created_at": "2026-09-21T15:53:27.459450"
+      }
+    ],
+    "property-override-create": [
+      {
+        "id": 153,
+        "action": "SLA_POLICY_CHANGED",
+        "resource_type": "SLA_POLICY",
+        "actor_user_id": 12,
+        "resource_id": 2,
+        "tenant_id": 1,
+        "property_id": 1,
+        "request_id_hash": "213011a82afdcac8",
+        "details": {
+          "after": {
+            "status": "ACTIVE",
+            "respond_minutes": 13,
+            "complete_minutes": 43
+          },
+          "before": null,
+          "category": "ELECTRICAL",
+          "priority": "HIGH",
+          "scope_type": "PROPERTY",
+          "property_id": 1
+        },
+        "created_at": "2026-09-21T15:53:27.488995"
+      }
+    ],
+    "property-override-same-value-replay": [],
+    "property-override-first-update": [
+      {
+        "id": 154,
+        "action": "SLA_POLICY_CHANGED",
+        "resource_type": "SLA_POLICY",
+        "actor_user_id": 12,
+        "resource_id": 2,
+        "tenant_id": 1,
+        "property_id": 1,
+        "request_id_hash": "f319d75668f811fa",
+        "details": {
+          "after": {
+            "status": "ACTIVE",
+            "respond_minutes": 14,
+            "complete_minutes": 44
+          },
+          "before": {
+            "status": "ACTIVE",
+            "respond_minutes": 13,
+            "complete_minutes": 43
+          },
+          "category": "ELECTRICAL",
+          "priority": "HIGH",
+          "scope_type": "PROPERTY",
+          "property_id": 1
+        },
+        "created_at": "2026-09-21T15:53:27.547649"
+      }
+    ],
+    "property-override-stale-update": [],
+    "concurrent-1": [
+      {
+        "id": 155,
+        "action": "SLA_POLICY_CHANGED",
+        "resource_type": "SLA_POLICY",
+        "actor_user_id": 12,
+        "resource_id": 2,
+        "tenant_id": 1,
+        "property_id": 1,
+        "request_id_hash": "395e5d0a95506e86",
+        "details": {
+          "after": {
+            "status": "ACTIVE",
+            "respond_minutes": 16,
+            "complete_minutes": 46
+          },
+          "before": {
+            "status": "ACTIVE",
+            "respond_minutes": 14,
+            "complete_minutes": 44
+          },
+          "category": "ELECTRICAL",
+          "priority": "HIGH",
+          "scope_type": "PROPERTY",
+          "property_id": 1
+        },
+        "created_at": "2026-09-21T15:53:28.016595"
+      }
+    ],
+    "concurrent-2": [],
+    "policy-change-after-work-order": [
+      {
+        "id": 159,
+        "action": "SLA_POLICY_CHANGED",
+        "resource_type": "SLA_POLICY",
+        "actor_user_id": 12,
+        "resource_id": 2,
+        "tenant_id": 1,
+        "property_id": 1,
+        "request_id_hash": "7aecb16a002aa9da",
+        "details": {
+          "after": {
+            "status": "ACTIVE",
+            "respond_minutes": 21,
+            "complete_minutes": 51
+          },
+          "before": {
+            "status": "ACTIVE",
+            "respond_minutes": 16,
+            "complete_minutes": 46
+          },
+          "category": "ELECTRICAL",
+          "priority": "HIGH",
+          "scope_type": "PROPERTY",
+          "property_id": 1
+        },
+        "created_at": "2026-09-21T15:53:28.819614"
+      }
+    ],
+    "fixture-property-admin-grant": [
+      {
+        "id": 150,
+        "action": "IAM_USER_ROLE_GRANTED",
+        "resource_type": "USER_ROLE",
+        "actor_user_id": null,
+        "resource_id": 10,
+        "tenant_id": 1,
+        "property_id": 1,
+        "request_id_hash": "d2257b183a00ed0b",
+        "details": {
+          "source": "DEVELOPMENT_SEED",
+          "role_code": "PROPERTY_ADMIN",
+          "scope_type": "PROPERTY",
+          "target_user_id": 12
+        },
+        "created_at": "2026-09-21T15:53:27.219550"
+      }
+    ]
+  },
+  "work_order": {
+    "id": 6,
+    "tenant_id": 1,
+    "property_id": 1,
+    "house_id": 1,
+    "status": "ASSIGNED",
+    "category": "ELECTRICAL",
+    "priority": "HIGH",
+    "sla_policy_id": 2,
+    "created_at": "2026-09-21T15:53:28.133940",
+    "assigned_at": "2026-09-21T15:53:28.488799",
+    "sla_due_at": "2026-09-21T16:39:28.132313",
+    "accept_due_at": "2026-09-21T16:09:28.488799",
+    "respond_due_at": "2026-09-21T16:09:28.488799",
+    "complete_due_at": "2026-09-21T16:39:28.132313",
+    "warning_at": "2026-09-21T16:24:28.132313",
+    "clock_state": "OPEN",
+    "current_assignment_id": 6,
+    "automatic_assignment": true,
+    "applied_respond_minutes": 16,
+    "applied_complete_minutes": 46,
+    "warning_lead_minutes": 15,
+    "existing_completion_deadline_unchanged": true,
+    "policy_row_now_differs_from_applied_snapshot": true
+  },
+  "checks": {
+    "permission_unique_and_role_mapping_exact": true,
+    "normal_accounts_have_expected_scoped_grants": true,
+    "same_value_and_stale_writes_have_no_audit": true,
+    "concurrent_pair_has_one_audit": true,
+    "all_successful_policy_changes_audited": true,
+    "work_order_uses_selected_policy": true,
+    "completion_and_warning_deadlines_match_applied_policy": true,
+    "later_policy_change_did_not_rewrite_existing_completion_deadline": true
+  },
+  "boundaries": {
+    "database_session_read_only": true,
+    "direct_database_business_write": false,
+    "migration_run": false,
+    "real_model_claimed": false,
+    "production_provisioning_claimed": false
+  },
+  "redaction": "No phone, token, OTP, password, resident text, or full request ID is emitted."
+}

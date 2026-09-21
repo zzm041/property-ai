@@ -1,0 +1,39 @@
+{
+  "task_id": "SLA-POLICY-MGMT-010",
+  "code_sha": "7814d45531a91efb6a63c63df261415fa446a1c4",
+  "recorded_at": "2026-09-21T16:08:21.6970492Z",
+  "run_timestamp": "NOT_RECORDED_IN_TERMINAL_SUMMARY",
+  "python": {
+    "executable": "D:/property-ai/tmp/uv-python/cpython-3.12.10-windows-x86_64-none/python.exe",
+    "version": "3.12.10",
+    "architecture": "x86_64",
+    "dependency_reuse": "D:/property-ai/.venv/Lib/site-packages with -I and PYTHONNOUSERSITE=1"
+  },
+  "focused_unit": {
+    "result": "67 passed, 1 warning",
+    "scope": [
+      "SLA policy management schema/service/repository/audit/page wiring",
+      "existing SLA notification and assignment scheduling",
+      "work-order policy and authorization",
+      "audit validation/repository behavior",
+      "Development Seed/RBAC and employee authorization regressions"
+    ],
+    "database_or_service_writes": false
+  },
+  "pure_unit_regression": {
+    "command": "pytest tests/unit -q",
+    "result": "528 passed, 1 warning",
+    "database_or_service_writes": false
+  },
+  "static_checks": {
+    "miniprogram_node_syntax": "PASS",
+    "git_diff_check_base_to_product_commit": "PASS"
+  },
+  "warning": "Existing Starlette/pytest-asyncio deprecation warning; no test failure.",
+  "boundaries": {
+    "migration_run": false,
+    "integration_fixture_reset_run": false,
+    "real_provider_tested": false,
+    "production_claimed": false
+  }
+}

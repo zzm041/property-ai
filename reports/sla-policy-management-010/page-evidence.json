@@ -1,0 +1,150 @@
+{
+  "task_id": "SLA-POLICY-MGMT-010",
+  "phase": "wechat_devtools_page",
+  "captured_at": "2026-09-21T16:01:57.411Z",
+  "code_sha": "7814d45531a91efb6a63c63df261415fa446a1c4",
+  "run_id": "sla-policy-api-ff03f07ab3",
+  "environment": {
+    "interaction": "WeChat DevTools miniprogram-automator through actual page controls",
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "provider": "DEVELOPMENT_SMS_AND_FAKE_AI",
+    "automator_endpoint": "ws://127.0.0.1:9437",
+    "api_log": "tmp/auth001-runtime/api-7814d45-sla.stdout.log"
+  },
+  "objects": {
+    "tenant_id": 1,
+    "property_id": 1,
+    "tenant_policy_id": 3,
+    "property_policy_id": 4
+  },
+  "checks": {
+    "tenant_admin_normal_sms_identity": 5,
+    "tenant_admin_home_entry": true,
+    "tenant_admin_scope_and_effective_matrix": true,
+    "tenant_default_saved_via_page": {
+      "category": "OTHER",
+      "priority": "LOW",
+      "respond_minutes": 19,
+      "complete_minutes": 49,
+      "policy_id": 3
+    },
+    "property_admin_normal_sms_identity": 12,
+    "property_admin_has_no_tenant_editor": true,
+    "property_override_saved_via_page": {
+      "respond_minutes": 12,
+      "complete_minutes": 42,
+      "policy_id": 4
+    },
+    "disabled_property_override_persisted": true,
+    "effective_fallback_after_disable": {
+      "source": "TENANT",
+      "policy_id": 3,
+      "respond_minutes": 19,
+      "complete_minutes": 49
+    },
+    "reload_preserved_same_policy_and_fallback": true,
+    "staff_home_has_no_sla_entry": true
+  },
+  "requests": {
+    "tenant_save": {
+      "put": {
+        "status": 200,
+        "error": null,
+        "request_id_hash": "d5ee14c6fc89498a"
+      },
+      "get": [
+        {
+          "status": 200,
+          "error": null,
+          "request_id_hash": "9903dd88e1eed525"
+        }
+      ]
+    },
+    "property_save": {
+      "put": {
+        "status": 200,
+        "error": null,
+        "request_id_hash": "bfb39d92e5a26041"
+      },
+      "get": [
+        {
+          "status": 200,
+          "error": null,
+          "request_id_hash": "41e9ea8d9f409c60"
+        }
+      ]
+    },
+    "property_disable": {
+      "put": {
+        "status": 200,
+        "error": null,
+        "request_id_hash": "bf363207ffab77e8"
+      },
+      "get": [
+        {
+          "status": 200,
+          "error": null,
+          "request_id_hash": "9746a3ecd525f956"
+        }
+      ]
+    },
+    "manager_open": [
+      {
+        "status": 200,
+        "error": null,
+        "request_id_hash": "109008c3288efc64"
+      }
+    ],
+    "property_open": [
+      {
+        "status": 200,
+        "error": null,
+        "request_id_hash": "e96b8176dbf2aaee"
+      }
+    ],
+    "reload": [
+      {
+        "status": 200,
+        "error": null,
+        "request_id_hash": "cce9fe0fd62b9bd6"
+      }
+    ],
+    "manager_login": {
+      "status": 200,
+      "resumed_existing_normal_sms_session": true
+    },
+    "property_admin_login": {
+      "status": 200,
+      "error": null,
+      "request_id_hash": "dbbc199d596bafb4"
+    },
+    "staff_login": {
+      "status": 200,
+      "error": null,
+      "request_id_hash": "be568e5210983a96"
+    }
+  },
+  "screenshots": [
+    "01-tenant-admin-home-entry.png",
+    "02-tenant-default-editor.png",
+    "03-tenant-default-saved.png",
+    "04-property-admin-property-only.png",
+    "05-property-override-active.png",
+    "06-property-disabled-tenant-fallback.png",
+    "07-reload-persisted-fallback.png",
+    "08-staff-no-sla-entry.png"
+  ],
+  "boundaries": {
+    "seed_login_used": false,
+    "dev_auth_used": false,
+    "development_sms_test_inbox_used": true,
+    "page_state_faked": false,
+    "direct_database_business_write": false,
+    "picker_boundary": "supported automator change event; not native system picker overlay",
+    "real_model_claimed": false,
+    "production_claimed": false,
+    "manager_session_resume": "same-task page SMS session from the prior screenshot-timeout attempt"
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "task_id": "SLA-POLICY-MGMT-010",
+  "phase": "api_runtime",
+  "captured_at": "2026-09-21T15:53:28.829952+00:00",
+  "code_sha": "7814d45531a91efb6a63c63df261415fa446a1c4",
+  "run_id": "sla-policy-api-ff03f07ab3",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "rabbit_vhost": "property_ai_auth001",
+    "rabbit_queue": "property_ai.auth001",
+    "provider": "DEVELOPMENT_FAKE_AI"
+  },
+  "objects": {
+    "tenant_id": 1,
+    "property_id": 1,
+    "house_id": 1,
+    "tenant_policy_id": 1,
+    "property_policy_id": 2,
+    "work_order_id": 6,
+    "property_admin_user_id": 12
+  },
+  "checks": {
+    "normal_development_sms_sessions": true,
+    "tenant_admin_me_scoped_sla_manage": true,
+    "property_admin_me_scoped_sla_manage": true,
+    "resident_staff_permission_absent": true,
+    "effective_matrix_entries": 24,
+    "property_admin_list_entries": 24,
+    "resident_and_staff_denied": {
+      "primary": {
+        "status": 403,
+        "error_code": "IAM.FORBIDDEN"
+      },
+      "staff": {
+        "status": 403,
+        "error_code": "IAM.FORBIDDEN"
+      }
+    },
+    "claimed_tenant_mismatch": {
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN"
+    },
+    "property_admin_tenant_default_denied": {
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN"
+    },
+    "invalid_requests": {
+      "response-after-completion": {
+        "status": 422,
+        "error_code": "SYS.VALIDATION_ERROR"
+      },
+      "tenant-disabled": {
+        "status": 422,
+        "error_code": "SLA.INVALID_INPUT"
+      },
+      "boolean-minutes": {
+        "status": 422,
+        "error_code": "SYS.VALIDATION_ERROR"
+      },
+      "unexpected-field": {
+        "status": 422,
+        "error_code": "SYS.VALIDATION_ERROR"
+      }
+    },
+    "same_value_replay_same_id": true,
+    "stale_update": {
+      "status": 409,
+      "error_code": "SLA.CONFLICT"
+    },
+    "concurrent_statuses": [
+      200,
+      409
+    ],
+    "concurrent_winner": {
+      "respond_minutes": 16,
+      "complete_minutes": 46
+    },
+    "new_work_order_bound_property_policy": true,
+    "existing_completion_deadline_unchanged_after_policy_update": true,
+    "work_order_runtime_status": "ASSIGNED"
+  },
+  "request_id_hashes": {
+    "primary-challenge": "f0a2a77d187a4e7a",
+    "primary-sms-send": "5483027f81dc86e4",
+    "primary-sms-inbox": "54c01e7e91e7e3d9",
+    "primary-sms-login": "3c2309b08f61f8f9",
+    "secondary-challenge": "2c9e86e18fb1bf41",
+    "secondary-sms-send": "0d2fa1fb402169a1",
+    "secondary-sms-inbox": "a563758a34820b00",
+    "secondary-sms-login": "32166b347c9bc9d5",
+    "manager-challenge": "8d5f3cae3b83997e",
+    "manager-sms-send": "e08c6b7a82014bf5",
+    "manager-sms-inbox": "783ad99cce8d1574",
+    "manager-sms-login": "1708699f83ab7c63",
+    "staff-challenge": "f4fc52bef4e83858",
+    "staff-sms-send": "1aacfbec1f257dea",
+    "staff-sms-inbox": "259677319d922610",
+    "staff-sms-login": "1b813bb724a4f398",
+    "property-admin-before-grant-challenge": "315beff7e7fb0d4b",
+    "property-admin-before-grant-sms-send": "7419e67a7b3b09a8",
+    "property-admin-before-grant-sms-inbox": "7defbda499c46b8e",
+    "property-admin-before-grant-sms-login": "86f8bb4b918c383c",
+    "property-admin-profile": "5c2619057dfa9ad1",
+    "property-admin-after-grant-challenge": "54acf9fdb4c185c7",
+    "property-admin-after-grant-sms-send": "bfa9d357bb01df0c",
+    "property-admin-after-grant-sms-inbox": "e88e70bdab07e5b2",
+    "property-admin-after-grant-sms-login": "20f00200f1cc8d83",
+    "primary-me": "ee9e954ee0c9eff4",
+    "secondary-me": "d3896ba212c2185f",
+    "manager-me": "0a6eafea91c46cc6",
+    "staff-me": "23fecececdf59f4e",
+    "property_admin-me": "796fe1114e3830da",
+    "tenant-admin-list-baseline": "b5df6e09168a19b7",
+    "property-admin-list": "3dd617988cac166c",
+    "primary-list-denied": "3f5935447ea1aa3d",
+    "staff-list-denied": "2b08863ba537c886",
+    "claimed-tenant-mismatch": "923369192f7d1201",
+    "invalid-response-after-completion": "7d23f89435d2d74e",
+    "invalid-tenant-disabled": "eef85f7e6225c755",
+    "invalid-boolean-minutes": "a5add0c739447be1",
+    "invalid-unexpected-field": "46f242f5360ed339",
+    "property-admin-tenant-default-denied": "2988b9aabbf55867",
+    "tenant-default-create": "01a44df2162ce39b",
+    "property-override-create": "213011a82afdcac8",
+    "property-override-same-value-replay": "430b043c90011dff",
+    "property-override-first-update": "f319d75668f811fa",
+    "property-override-stale-update": "8bf3660e29cdc0a2",
+    "list-after-concurrency": "f5f8802139053a5f",
+    "resident-houses": "0d6fb48ca4855665",
+    "resident-create-work-order": "ef9abd5496e6f1ba",
+    "work-order-poll-0": "9c0fba6b60577d8f",
+    "work-order-poll-1": "9681571b17b2eb15",
+    "work-order-poll-2": "324f9a29c9d37b03",
+    "policy-change-after-work-order": "7aecb16a002aa9da",
+    "concurrent-1": "395e5d0a95506e86",
+    "concurrent-2": "eacfa3f60778cdf6"
+  },
+  "boundaries": {
+    "seed_login_used": false,
+    "dev_auth_used": false,
+    "development_sms_test_inbox_used": true,
+    "fixture_only_change": "audited Property Admin grant for a fresh normal SMS identity",
+    "direct_sql_business_write": false,
+    "migration_run": false,
+    "shared_vhost_read_consumed_replayed_or_cleared": false,
+    "real_model_claimed": false,
+    "ui_claimed": false
+  },
+  "private_context": "tmp/sla-policy-management-010/context.json",
+  "redaction": "No phone, OTP, token, password, resident text, or full request ID is emitted."
+}

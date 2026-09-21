@@ -1,0 +1,33 @@
+{
+  "task_id": "SLA-POLICY-MGMT-010",
+  "phase": "wechat_devtools_final_visual_read_only",
+  "captured_at": "2026-09-21T16:07:12.667Z",
+  "code_sha": "7814d45531a91efb6a63c63df261415fa446a1c4",
+  "run_id": "sla-policy-api-ff03f07ab3",
+  "objects": {
+    "tenant_id": 1,
+    "property_id": 1,
+    "tenant_policy_id": 3,
+    "property_policy_id": 4
+  },
+  "checks": {
+    "normal_property_admin_sms_login": true,
+    "selected_category": "OTHER",
+    "selected_priority": "LOW",
+    "persisted_property_status": "DISABLED",
+    "effective_source": "TENANT",
+    "effective_respond_minutes": 19,
+    "effective_complete_minutes": 49
+  },
+  "screenshots": [
+    "09-disabled-editor-after-relogin.png",
+    "10-effective-and-saved-layers.png"
+  ],
+  "boundaries": {
+    "policy_write_sent": false,
+    "page_state_faked": false,
+    "seed_login_used": false,
+    "development_sms_test_inbox_used": true,
+    "production_claimed": false
+  }
+}
