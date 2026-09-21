@@ -355,6 +355,8 @@ def test_miniprogram_exposes_only_scoped_snapshot_and_existing_config_links() ->
     assert 'scope.scope_type === "TENANT"' in page
     assert "scopeAllows(scope, entry.permission" in page
     assert "当前状态快照，不是今日新增或期间绩效报表" in template
+    assert "事件总数" in template
+    assert 'const SLA_LABELS = { OPEN: "计时中" }' in page
     assert "不会在本页保存另一套配置" in template
     assert "/pages/supervisor/staff" in page
     assert "/pages/supervisor/sla" in page

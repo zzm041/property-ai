@@ -32,7 +32,7 @@
 
   <view class="card">
     <view class="section-title">SLA 与共同事件</view>
-    <view>当前事件：{{overview.incidents.total}}，开放/观察：{{overview.incidents.active}}</view>
+    <view>事件总数：{{overview.incidents.total}}，开放/观察：{{overview.incidents.active}}</view>
     <view class="chips"><text wx:for="{{incidentStatuses}}" wx:key="code">{{item.label}} {{item.count}}</text></view>
     <view>SLA 预警：{{overview.sla_clocks.warning}}，逾期：{{overview.sla_clocks.overdue}}</view>
     <view class="chips"><text wx:for="{{slaStates}}" wx:key="code">{{item.label}} {{item.count}}</text></view>

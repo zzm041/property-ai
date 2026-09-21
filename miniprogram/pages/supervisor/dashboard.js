@@ -28,6 +28,7 @@ const LABELS = {
   OVERDUE: "逾期",
   STOPPED: "已停止",
 };
+const SLA_LABELS = { OPEN: "计时中" };
 
 function scopeAllows(scope, permission, tenantId, propertyId) {
   if ((scope.permissions || []).indexOf(permission) < 0) {
@@ -59,10 +60,10 @@ function loadAllProperties(afterId, collected) {
   });
 }
 
-function labelled(items) {
+function labelled(items, overrides) {
   return (items || []).map((item) => ({
     ...item,
-    label: LABELS[item.code] || item.code,
+    label: (overrides && overrides[item.code]) || LABELS[item.code] || item.code,
   }));
 }
 
@@ -268,7 +269,7 @@ Page({
           workOrderCategories: labelled(overview.work_orders.by_category),
           workOrderPriorities: labelled(overview.work_orders.by_priority),
           incidentStatuses: labelled(overview.incidents.by_status),
-          slaStates: labelled(overview.sla_clocks.by_state),
+          slaStates: labelled(overview.sla_clocks.by_state, SLA_LABELS),
           error: "",
         });
       })
