@@ -1689,10 +1689,30 @@
       }
     ]
   },
+  "sla_policy_management_010": {
+    "task_id": "SLA-POLICY-MGMT-010",
+    "implementation_head": "7814d45531a91efb6a63c63df261415fa446a1c4",
+    "evidence_head": "39a58f3c9be053ddc5f90ec6f5613f1a32585a5f",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
+    "independent_review": {
+      "result": "PASS",
+      "path": "reports/codex/SLA-POLICY-MGMT-010-review.json",
+      "boundary": "Independent read-only review inspected the scoped product diff, redacted API/page/read-only-DB/concurrency evidence and all ten screenshots without rerunning tests, operating pages, sending requests or reading private contexts."
+    },
+    "current_status_overlays": [
+      {
+        "id": "V1-SLA-CONFIG",
+        "implementation_status": "current_schema_scoped_policy_administration_effective_resolution_concurrency_audit_and_schedulers_wired",
+        "verification_status": "PARTIAL_SCOPED_LOCAL_DEVELOPMENT",
+        "evidence_version": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea / 9ab106b29b9761504fa229cc1bd97227daa6e6c9 / 55fe0a90b81ff8935d50cb8a7fa93c381e8ba92b / 7814d45531a91efb6a63c63df261415fa446a1c4 / 39a58f3c9be053ddc5f90ec6f5613f1a32585a5f",
+        "remaining_gap": "separate accept/respond and editable warning/escalation policy fields, immutable applied-policy provenance, production RBAC/scheduler/provider operation and formal release"
+      }
+    ]
+  },
   "current_effective_view": {
-    "generated_at": "2026-09-21",
+    "generated_at": "2026-09-22",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
-    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs)",
+    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced.",
     "row_count": 83,
     "rows": [
@@ -2250,11 +2270,11 @@
       },
       {
         "requirement_id": "V1-SLA-CONFIG",
-        "current_implementation": "policy_lookup_completion_and_assignment_phase_schedulers_present",
-        "verification_mode_status": "PARTIAL",
-        "evidence_version": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea / 9ab106b29b9761504fa229cc1bd97227daa6e6c9 / 55fe0a90b81ff8935d50cb8a7fa93c381e8ba92b",
-        "remaining_gap": "策略管理入口、墙钟生产运行与生产验收",
-        "next_action": "实现现有结构内策略管理入口；生产等价环境补运行验收"
+        "current_implementation": "current_schema_scoped_policy_administration_effective_resolution_concurrency_audit_and_schedulers_wired",
+        "verification_mode_status": "PARTIAL_SCOPED_LOCAL_DEVELOPMENT",
+        "evidence_version": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea / 9ab106b29b9761504fa229cc1bd97227daa6e6c9 / 55fe0a90b81ff8935d50cb8a7fa93c381e8ba92b / 7814d45531a91efb6a63c63df261415fa446a1c4 / 39a58f3c9be053ddc5f90ec6f5613f1a32585a5f",
+        "remaining_gap": "separate accept/respond and editable warning/escalation policy fields, immutable applied-policy provenance, production RBAC/scheduler/provider operation and formal release",
+        "next_action": "preserve scoped policy-management evidence; continue stats/config independently, and request schema approval before richer SLA policy/versioning work"
       },
       {
         "requirement_id": "V1-NTF-RETRY",
