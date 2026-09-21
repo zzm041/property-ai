@@ -1,0 +1,72 @@
+{
+  "task_id": "SLA-POLICY-MGMT-010",
+  "phase": "first_create_concurrency_api_and_database",
+  "captured_at": "2026-09-21T16:12:10.034020+00:00",
+  "code_sha": "7814d45531a91efb6a63c63df261415fa446a1c4",
+  "run_id": "sla-policy-api-ff03f07ab3-first-create",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009"
+  },
+  "checks": {
+    "same_body_statuses": [
+      200,
+      200
+    ],
+    "same_body_same_policy_id": 5,
+    "same_body_single_audit": true,
+    "different_body_statuses": [
+      200,
+      409
+    ],
+    "different_body_loser_error": "SLA.CONFLICT",
+    "different_body_winner": {
+      "respond_minutes": 24,
+      "complete_minutes": 84
+    },
+    "different_body_single_audit": true
+  },
+  "policies": [
+    {
+      "id": 5,
+      "tenant_id": 1,
+      "property_id": 1,
+      "category": "CLEANING",
+      "priority": "URGENT",
+      "respond_minutes": 22,
+      "complete_minutes": 82,
+      "status": "ACTIVE"
+    },
+    {
+      "id": 6,
+      "tenant_id": 1,
+      "property_id": 1,
+      "category": "SECURITY",
+      "priority": "URGENT",
+      "respond_minutes": 24,
+      "complete_minutes": 84,
+      "status": "ACTIVE"
+    }
+  ],
+  "request_id_hashes": [
+    "1ce305143fe2e4f8",
+    "8db2cfd84b1d7331",
+    "a35cf7122319951f",
+    "4b6a73ba94625161"
+  ],
+  "audit_request_id_hashes": [
+    "8db2cfd84b1d7331",
+    "4b6a73ba94625161"
+  ],
+  "boundaries": {
+    "normal_session_reused": true,
+    "seed_login_used": false,
+    "direct_database_business_write": false,
+    "database_verification_read_only": true,
+    "migration_run": false,
+    "production_claimed": false
+  },
+  "private_context": "tmp/sla-policy-management-010/first-create-context.json",
+  "redaction": "No token, phone, password, OTP, or full request ID is emitted."
+}
