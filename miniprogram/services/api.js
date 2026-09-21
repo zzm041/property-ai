@@ -527,6 +527,14 @@ module.exports = {
     }),
   putSlaPolicy: (body) =>
     request({ path: "/admin/sla-policies", method: "PUT", data: body }),
+  operationsOverview: (scopeType, tenantId, propertyId) =>
+    request({
+      path: `/admin/operations-overview?scope_type=${encodeURIComponent(
+        scopeType
+      )}&tenant_id=${encodeURIComponent(tenantId)}${
+        propertyId ? `&property_id=${encodeURIComponent(propertyId)}` : ""
+      }`,
+    }),
   staffDaily: (propertyId, tenantId, afterId) =>
     request({
       path: `/supervisor/staff/daily?property_id=${propertyId}&tenant_id=${tenantId}&limit=100${

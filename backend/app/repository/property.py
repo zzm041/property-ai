@@ -272,6 +272,13 @@ class PropertyRepository:
             .limit(limit)
         ).all()
 
+    def list_all_properties(self, *, tenant_id: int) -> Sequence[Property]:
+        return self._session.scalars(
+            select(Property)
+            .where(Property.tenant_id == tenant_id)
+            .order_by(Property.id)
+        ).all()
+
     def list_all_buildings(
         self,
         *,

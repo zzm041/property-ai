@@ -49,6 +49,7 @@
 | `ANN` | 公告 |
 | `KB` | 知识助手 |
 | `SLA` | SLA |
+| `STATS` | 运营统计 |
 | `NTF` | 通知 |
 | `FILE` | 上传 |
 | `SYS` | 健康、限流、校验 |
@@ -180,6 +181,7 @@
 | POST | `/admin/knowledge-documents/{id}/versions` | Add a source-only version and enqueue ingestion |
 | POST | `/admin/knowledge-documents/{id}/archive` | Archive a document; archived content is excluded from retrieval |
 | GET/PUT | `/admin/sla-policies` |
+| GET | `/admin/operations-overview` | Property/Tenant 管理员按获授权范围读取当前状态快照；不返回业务正文、人员身份或部署配置 |
 | GET | `/notifications` |
 | POST | `/notifications/{id}/read` |
 | POST | `/files` | 注册文件元数据，取得 `file_id` |

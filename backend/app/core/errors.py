@@ -148,6 +148,10 @@ class SlaErrorCode:
     CONFLICT = "SLA.CONFLICT"
 
 
+class StatsErrorCode:
+    INVALID_INPUT = "STATS.INVALID_INPUT"
+
+
 class NotificationErrorCode:
     NOT_FOUND = "NTF.NOT_FOUND"
     PROVIDER_FAILED = "NTF.PROVIDER_FAILED"

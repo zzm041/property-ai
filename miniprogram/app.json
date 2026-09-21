@@ -23,6 +23,7 @@
     "pages/supervisor/properties",
     "pages/supervisor/knowledge",
     "pages/supervisor/sla",
+    "pages/supervisor/dashboard",
     "pages/notifications/list",
     "pages/dev-login/dev-login"
   ],

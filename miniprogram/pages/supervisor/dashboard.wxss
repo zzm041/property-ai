@@ -1,0 +1,64 @@
+.section-title,
+.section-heading {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+}
+
+.section-heading {
+  margin: 24rpx;
+}
+
+.hint,
+.snapshot {
+  color: #667085;
+  font-size: 24rpx;
+  margin-top: 12rpx;
+}
+
+.snapshot {
+  margin: 24rpx;
+}
+
+.metrics {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+}
+
+.metrics view {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.metric {
+  color: #1f4b99;
+  font-size: 44rpx;
+  font-weight: 600;
+}
+
+.subheading,
+.row-title {
+  font-weight: 600;
+  margin-top: 16rpx;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 8rpx;
+}
+
+.chips text {
+  background: #eef4ff;
+  border-radius: 999rpx;
+  color: #1849a9;
+  font-size: 24rpx;
+  margin: 6rpx 10rpx 6rpx 0;
+  padding: 8rpx 14rpx;
+}
+
+.property-row view + view {
+  margin-top: 8rpx;
+}

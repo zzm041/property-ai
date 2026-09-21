@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from app.api.v1.admin_announcements import router as admin_announcements_router
 from app.api.v1.admin_employee import router as admin_employee_router
 from app.api.v1.admin_knowledge import router as admin_knowledge_router
+from app.api.v1.admin_operations import router as admin_operations_router
 from app.api.v1.admin_property import router as admin_property_router
 from app.api.v1.admin_resident import router as admin_resident_router
 from app.api.v1.admin_sla import router as admin_sla_router
@@ -52,6 +53,7 @@ def build_api_router(settings: Settings) -> APIRouter:
     router.include_router(admin_announcements_router)
     router.include_router(announcements_router)
     router.include_router(admin_knowledge_router)
+    router.include_router(admin_operations_router)
     router.include_router(admin_sla_router)
     router.include_router(assistant_router)
     router.include_router(notifications_router)
