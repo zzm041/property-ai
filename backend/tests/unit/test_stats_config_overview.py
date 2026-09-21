@@ -458,9 +458,15 @@ const page = {
 };
 page.onPropertyChange({ detail: { value: "1" } });
 if (page.data.overview !== null) process.exit(2);
-page.data.overview = { scope_type: "PROPERTY", tenant_id: 1, property_id: 20 };
+const tenantOverview = { scope_type: "TENANT", tenant_id: 1, property_id: null };
+page.data.scopeIndex = 1;
+page.data.overview = tenantOverview;
+page.onPropertyChange({ detail: { value: "0" } });
+if (page.data.overview !== tenantOverview) process.exit(3);
+page.data.scopeIndex = 0;
+page.data.overview = { scope_type: "PROPERTY", tenant_id: 1, property_id: 10 };
 page.onScopeChange({ detail: { value: "1" } });
-if (page.data.overview !== null) process.exit(3);
+if (page.data.overview !== null) process.exit(4);
 """
     completed = subprocess.run(
         ["node", "-e", script, str(REPO_ROOT)],

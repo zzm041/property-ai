@@ -221,13 +221,14 @@ Page({
     if (!property) {
       return;
     }
+    const propertyScoped = this.currentScope() === "PROPERTY";
     this.setData({
       propertyIndex,
       propertyId: String(property.id),
       configEntries: this.configEntries(property.tenant_id, property.id),
-      overview: null,
+      overview: propertyScoped ? null : this.data.overview,
     });
-    if (this.currentScope() === "PROPERTY") {
+    if (propertyScoped) {
       this.fetchOverview().catch(() => {});
     }
   },
