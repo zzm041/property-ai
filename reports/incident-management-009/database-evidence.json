@@ -1,0 +1,323 @@
+{
+  "task_id": "INCIDENT-MGMT-UI-009",
+  "phase": "read_only_database",
+  "captured_at": "2026-09-21T14:52:58.858105+00:00",
+  "code_sha": "9033caae493f120789f07f919d69666afc33625b",
+  "run_id": "incident-mgmt-d6605d3f5e",
+  "target": {
+    "host": "127.0.0.1",
+    "port": 3307,
+    "database": "property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "app_env": "test"
+  },
+  "incident": {
+    "id": 1,
+    "tenant_id": 1,
+    "property_id": 1,
+    "building_id": 1,
+    "status": "OPEN",
+    "category": "ELECTRICAL",
+    "subcategory": "outlet_spark",
+    "primary_work_order_id": 1,
+    "primary_employee_id": 1,
+    "work_order_count": 5,
+    "summary_present": 1,
+    "ai_summary_present": 1,
+    "affected_scope_present": 1,
+    "created_at": "2026-09-21 14:44:36.220350",
+    "updated_at": "2026-09-21 14:50:51.756707"
+  },
+  "incident_work_orders": [
+    {
+      "incident_id": 1,
+      "work_order_id": 1,
+      "tenant_id": 1,
+      "property_id": 1
+    },
+    {
+      "incident_id": 1,
+      "work_order_id": 2,
+      "tenant_id": 1,
+      "property_id": 1
+    },
+    {
+      "incident_id": 1,
+      "work_order_id": 3,
+      "tenant_id": 1,
+      "property_id": 1
+    },
+    {
+      "incident_id": 1,
+      "work_order_id": 4,
+      "tenant_id": 1,
+      "property_id": 1
+    },
+    {
+      "incident_id": 1,
+      "work_order_id": 5,
+      "tenant_id": 1,
+      "property_id": 1
+    }
+  ],
+  "work_orders_and_current_assignments": [
+    {
+      "id": 1,
+      "status": "ASSIGNED",
+      "incident_id": 1,
+      "current_assignment_id": 1,
+      "employee_id": 1,
+      "assigned_by_user_id": null,
+      "assignment_status": "ACTIVE",
+      "reason": "AUTO_DISPATCH",
+      "assigned_source": "AUTO",
+      "ended_at": null
+    },
+    {
+      "id": 2,
+      "status": "ASSIGNED",
+      "incident_id": 1,
+      "current_assignment_id": 2,
+      "employee_id": 1,
+      "assigned_by_user_id": null,
+      "assignment_status": "ACTIVE",
+      "reason": "AUTO_DISPATCH",
+      "assigned_source": "AUTO",
+      "ended_at": null
+    },
+    {
+      "id": 3,
+      "status": "ASSIGNED",
+      "incident_id": 1,
+      "current_assignment_id": 3,
+      "employee_id": 1,
+      "assigned_by_user_id": null,
+      "assignment_status": "ACTIVE",
+      "reason": "AUTO_DISPATCH",
+      "assigned_source": "AUTO",
+      "ended_at": null
+    },
+    {
+      "id": 4,
+      "status": "ASSIGNED",
+      "incident_id": 1,
+      "current_assignment_id": 4,
+      "employee_id": 1,
+      "assigned_by_user_id": null,
+      "assignment_status": "ACTIVE",
+      "reason": "AUTO_DISPATCH",
+      "assigned_source": "AUTO",
+      "ended_at": null
+    },
+    {
+      "id": 5,
+      "status": "ASSIGNED",
+      "incident_id": 1,
+      "current_assignment_id": 5,
+      "employee_id": 1,
+      "assigned_by_user_id": null,
+      "assignment_status": "ACTIVE",
+      "reason": "AUTO_INCIDENT_FOLLOW",
+      "assigned_source": "AUTO",
+      "ended_at": null
+    }
+  ],
+  "analyses": [
+    {
+      "work_order_id": 1,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "subcategory": "outlet_spark",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v1",
+      "error_code": null
+    },
+    {
+      "work_order_id": 2,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "subcategory": "outlet_spark",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v1",
+      "error_code": null
+    },
+    {
+      "work_order_id": 3,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "subcategory": "outlet_spark",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v1",
+      "error_code": null
+    },
+    {
+      "work_order_id": 4,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "subcategory": "outlet_spark",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v1",
+      "error_code": null
+    },
+    {
+      "work_order_id": 5,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "subcategory": "outlet_spark",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v1",
+      "error_code": null
+    }
+  ],
+  "provider_calls": [
+    {
+      "work_order_id": 1,
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS",
+      "error_code": null
+    },
+    {
+      "work_order_id": 2,
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS",
+      "error_code": null
+    },
+    {
+      "work_order_id": 3,
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS",
+      "error_code": null
+    },
+    {
+      "work_order_id": 4,
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS",
+      "error_code": null
+    },
+    {
+      "work_order_id": 5,
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "model_version": "dev-llm-v1",
+      "status": "SUCCESS",
+      "error_code": null
+    }
+  ],
+  "current_participant_user_ids": [
+    6
+  ],
+  "announcement": {
+    "id": 1,
+    "tenant_id": 1,
+    "property_id": 1,
+    "incident_id": 1,
+    "status": "DRAFT",
+    "ai_draft": 1,
+    "created_by_user_id": 5,
+    "reviewed_by_user_id": null,
+    "published_by_user_id": null,
+    "published_at": null,
+    "created_at": "2026-09-21 14:50:53.210695",
+    "updated_at": "2026-09-21 14:50:53.210695"
+  },
+  "announcement_scopes": [
+    {
+      "scope_type": "PROPERTY",
+      "building_id": null,
+      "unit_id": null,
+      "audience": "RESIDENT"
+    }
+  ],
+  "announcement_review_count": 0,
+  "audit_rows": [
+    {
+      "action": "WORK_ORDER_LINKED_TO_INCIDENT",
+      "resource_type": "INCIDENT",
+      "resource_id": 1,
+      "actor_user_id": null,
+      "created_at": "2026-09-21 14:44:36.288884",
+      "request_id_hash": "e97b0ca8f926ebfa"
+    },
+    {
+      "action": "WORK_ORDER_LINKED_TO_INCIDENT",
+      "resource_type": "INCIDENT",
+      "resource_id": 1,
+      "actor_user_id": null,
+      "created_at": "2026-09-21 14:44:36.295320",
+      "request_id_hash": "e97b0ca8f926ebfa"
+    },
+    {
+      "action": "WORK_ORDER_LINKED_TO_INCIDENT",
+      "resource_type": "INCIDENT",
+      "resource_id": 1,
+      "actor_user_id": null,
+      "created_at": "2026-09-21 14:44:36.299516",
+      "request_id_hash": "e97b0ca8f926ebfa"
+    },
+    {
+      "action": "WORK_ORDER_LINKED_TO_INCIDENT",
+      "resource_type": "INCIDENT",
+      "resource_id": 1,
+      "actor_user_id": null,
+      "created_at": "2026-09-21 14:44:36.303126",
+      "request_id_hash": "e97b0ca8f926ebfa"
+    },
+    {
+      "action": "WORK_ORDER_LINKED_TO_INCIDENT",
+      "resource_type": "INCIDENT",
+      "resource_id": 1,
+      "actor_user_id": null,
+      "created_at": "2026-09-21 14:44:36.306693",
+      "request_id_hash": "e97b0ca8f926ebfa"
+    },
+    {
+      "action": "INCIDENT_CREATED",
+      "resource_type": "INCIDENT",
+      "resource_id": 1,
+      "actor_user_id": null,
+      "created_at": "2026-09-21 14:44:36.311744",
+      "request_id_hash": "e97b0ca8f926ebfa"
+    },
+    {
+      "action": "INCIDENT_UPDATED",
+      "resource_type": "INCIDENT",
+      "resource_id": 1,
+      "actor_user_id": 5,
+      "created_at": "2026-09-21 14:50:51.758060",
+      "request_id_hash": "07479b8098dfc650"
+    },
+    {
+      "action": "ANNOUNCEMENT_DRAFT_CREATED",
+      "resource_type": "ANNOUNCEMENT",
+      "resource_id": 1,
+      "actor_user_id": 5,
+      "created_at": "2026-09-21 14:50:53.216073",
+      "request_id_hash": "5dbcb2beb6afa6b6"
+    }
+  ],
+  "checks": {
+    "same_incident_and_five_work_orders": true,
+    "all_current_assignments_are_auto": true,
+    "all_current_assignments_match_staff_employee": true,
+    "development_analyses_completed": true,
+    "current_participant_matches_staff": true,
+    "ai_summary_persisted": true,
+    "announcement_remains_unreviewed_draft": true,
+    "incident_and_draft_audited": true
+  },
+  "boundaries": {
+    "transaction_mode": "READ ONLY",
+    "business_state_written": false,
+    "development_provider_only": true,
+    "real_qwen_or_production_ai_claimed": false
+  },
+  "redaction": "No phone, token, OTP, password, resident text, or raw request ID is emitted."
+}

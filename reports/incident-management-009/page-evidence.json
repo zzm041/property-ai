@@ -1,0 +1,119 @@
+{
+  "task_id": "INCIDENT-MGMT-UI-009",
+  "phase": "wechat_devtools_page",
+  "captured_at": "2026-09-21T14:50:45.051Z",
+  "code_sha": "9033caae493f120789f07f919d69666afc33625b",
+  "run_id": "incident-mgmt-d6605d3f5e",
+  "environment": {
+    "interaction": "WeChat DevTools miniprogram-automator through actual page controls",
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "ai_provider": "DEVELOPMENT_FAKE_AI",
+    "automator_endpoint": "ws://127.0.0.1:9437"
+  },
+  "objects": {
+    "tenant_id": 1,
+    "property_id": 1,
+    "employee_id": 1,
+    "incident_id": 1,
+    "work_order_ids": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "announcement_draft_id": 1
+  },
+  "checks": {
+    "manager": {
+      "status": "PASS",
+      "official_sms_page_login": {
+        "status": 200,
+        "error": null,
+        "request_id_hash": "469df67da99bc470"
+      },
+      "home_entry_visible": true,
+      "scoped_property_picker": true,
+      "same_incident_list_and_detail": true,
+      "work_order_count": 5,
+      "primary_employee_matches": true,
+      "ai_summary_page_state_present": true,
+      "ai_summary_request": {
+        "status": 200,
+        "error": null,
+        "request_id_hash": "07479b8098dfc650"
+      },
+      "announcement_draft_page_state_present": true,
+      "announcement_draft_request": {
+        "status": 200,
+        "error": null,
+        "request_id_hash": "5dbcb2beb6afa6b6"
+      },
+      "incident_page_requests": {
+        "list": [
+          {
+            "status": 200,
+            "error": null,
+            "request_id_hash": "6ff9200e9f288c0d"
+          }
+        ],
+        "detail": [
+          {
+            "status": 200,
+            "error": null,
+            "request_id_hash": "da566ec825a4bf72"
+          }
+        ]
+      }
+    },
+    "staff": {
+      "status": "PASS",
+      "official_sms_page_login": {
+        "status": 200,
+        "error": null,
+        "request_id_hash": "b2adfce92ae588f2"
+      },
+      "participant_entry_visible": true,
+      "same_incident_visible": true,
+      "unrelated_incident_count": 0,
+      "management_controls_hidden": true,
+      "participant_notice_visible": true,
+      "incident_page_requests": {
+        "list": [
+          {
+            "status": 200,
+            "error": null,
+            "request_id_hash": "4a2a5d53d93ff9bb"
+          }
+        ],
+        "detail": [
+          {
+            "status": 200,
+            "error": null,
+            "request_id_hash": "7cc959ef585b9633"
+          }
+        ]
+      }
+    }
+  },
+  "screenshots": [
+    "01-manager-incident-list.png",
+    "02-manager-incident-detail.png",
+    "03-manager-ai-summary.png",
+    "04-manager-announcement-draft.png",
+    "05-staff-participant-list.png",
+    "06-staff-participant-detail.png"
+  ],
+  "boundaries": {
+    "seed_login_used": false,
+    "dev_auth_used": false,
+    "page_state_faked": false,
+    "direct_database_business_write": false,
+    "real_qwen_claimed": false,
+    "announcement_auto_published": false
+  },
+  "completed_at": "2026-09-21T14:51:01.265Z",
+  "redaction": "No phone, password, OTP, token, raw request ID, resident text, or secret is emitted."
+}
