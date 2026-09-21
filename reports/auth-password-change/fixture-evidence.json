@@ -1,0 +1,45 @@
+{
+  "task_id": "AUTH-PASSWORD-CHANGE",
+  "phase": "fresh_auth001_fixture_prepared",
+  "run_id": "auth-password-change-c44796ef23",
+  "captured_at": "2026-09-21T13:46:41.373307+00:00",
+  "head": "63ad2d54b9341b280a066ce539c22dbb102159b0",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "rabbit_vhost": "property_ai_auth001",
+    "rabbit_queue": "property_ai.auth001",
+    "provider": "DEVELOPMENT_SMS"
+  },
+  "objects": {
+    "tenant_id": 1,
+    "property_id": 1,
+    "building_id": 1,
+    "unit_id": 1,
+    "house_id": 1,
+    "primary_user_id": 3,
+    "secondary_user_id": 4,
+    "manager_user_id": 5,
+    "staff_user_id": 6,
+    "employee_id": 1
+  },
+  "methods": {
+    "hierarchy": "authorized additive Development fixture using PropertyService",
+    "identities": "official Development-SMS challenge/send/login API",
+    "passwords": "official password-reset API followed by password login",
+    "profiles": "authenticated PATCH /me/profile with run marker",
+    "employee": "authenticated tenant-admin POST /admin/employees",
+    "rbac": "audited Development fixture grants limited to the new tenant/property"
+  },
+  "boundaries": {
+    "additive_only": true,
+    "migration_run": false,
+    "tables_deleted_or_cleared": false,
+    "property_ai_test_touched": false,
+    "seed_login_used": false,
+    "real_sms_used": false
+  },
+  "private_context": "tmp/auth-password-change/context.json",
+  "redaction": "No phone, password, token, OTP, or secret is emitted."
+}

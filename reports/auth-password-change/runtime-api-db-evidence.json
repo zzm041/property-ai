@@ -1,0 +1,240 @@
+{
+  "task_id": "AUTH-PASSWORD-CHANGE",
+  "phase": "runtime_api_db",
+  "run_marker_hash": "f70e708c8c2b49bd",
+  "captured_at": "2026-09-21T13:54:47.226149+00:00",
+  "head": "63ad2d54b9341b280a066ce539c22dbb102159b0",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "provider": "DEVELOPMENT_SMS"
+  },
+  "identity": {
+    "primary_user_id": 3,
+    "secondary_user_id": 4,
+    "same_user_after_new_password_login": true
+  },
+  "negative_paths": {
+    "wrong_current": {
+      "method": "POST",
+      "path": "/api/v1/auth/password/change",
+      "status": 401,
+      "error": "AUTH.INVALID_PASSWORD"
+    },
+    "confirmation_mismatch": {
+      "method": "POST",
+      "path": "/api/v1/auth/password/change",
+      "status": 422,
+      "error": "AUTH.PASSWORD_MISMATCH"
+    },
+    "weak_password": {
+      "method": "POST",
+      "path": "/api/v1/auth/password/change",
+      "status": 422,
+      "error": "AUTH.WEAK_PASSWORD"
+    },
+    "cross_account": {
+      "method": "POST",
+      "path": "/api/v1/auth/password/change",
+      "status": 401,
+      "error": "AUTH.INVALID_PASSWORD"
+    }
+  },
+  "concurrency": {
+    "requests": [
+      {
+        "label": "A",
+        "method": "POST",
+        "path": "/api/v1/auth/password/change",
+        "status": 200,
+        "error": null
+      },
+      {
+        "label": "B",
+        "method": "POST",
+        "path": "/api/v1/auth/password/change",
+        "status": 401,
+        "error": "AUTH.INVALID_PASSWORD"
+      }
+    ],
+    "success_count": 1,
+    "failure_count": 1,
+    "password_change_audit_count": 1,
+    "winning_request_label": "A",
+    "audits": [
+      {
+        "action": "AUTH_SESSION_REVOKED",
+        "resource_type": "AUTH_SESSION",
+        "resource_id": 7,
+        "request_label": "A",
+        "reason_code": "PASSWORD_CHANGE"
+      },
+      {
+        "action": "AUTH_SESSION_REVOKED",
+        "resource_type": "AUTH_SESSION",
+        "resource_id": 9,
+        "request_label": "A",
+        "reason_code": "PASSWORD_CHANGE"
+      },
+      {
+        "action": "AUTH_SESSION_REVOKED",
+        "resource_type": "AUTH_SESSION",
+        "resource_id": 10,
+        "request_label": "A",
+        "reason_code": "PASSWORD_CHANGE"
+      },
+      {
+        "action": "AUTH_PASSWORD_CHANGED",
+        "resource_type": "USER",
+        "resource_id": 3,
+        "request_label": "A",
+        "reason_code": null
+      }
+    ]
+  },
+  "session_and_login": {
+    "candidate_login_statuses": [
+      200,
+      401
+    ],
+    "same_user_me": {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "error": null
+    },
+    "pre_change_access": {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 401,
+      "error": "AUTH.SESSION_REVOKED"
+    },
+    "pre_change_refresh": {
+      "method": "POST",
+      "path": "/api/v1/auth/token/refresh",
+      "status": 401,
+      "error": "AUTH.INVALID_TOKEN"
+    },
+    "old_password_login": {
+      "method": "POST",
+      "path": "/api/v1/auth/password/login",
+      "status": 401,
+      "error": "AUTH.INVALID_PASSWORD"
+    },
+    "case_variant_login": {
+      "method": "POST",
+      "path": "/api/v1/auth/password/login",
+      "status": 401,
+      "error": "AUTH.INVALID_PASSWORD"
+    },
+    "successful_password_contains_uppercase": false
+  },
+  "database": {
+    "primary_after_probe": {
+      "credential_updated_at": "2026-09-21T13:48:54.820048",
+      "sessions": [
+        {
+          "id": 3,
+          "auth_method": "sms",
+          "active": false,
+          "created_at": "2026-09-21T13:46:40.891473",
+          "revoked_at": "2026-09-21T13:46:41.193235"
+        },
+        {
+          "id": 7,
+          "auth_method": "password",
+          "active": false,
+          "created_at": "2026-09-21T13:46:41.240126",
+          "revoked_at": "2026-09-21T13:48:54.815775"
+        },
+        {
+          "id": 9,
+          "auth_method": "password",
+          "active": false,
+          "created_at": "2026-09-21T13:48:53.941073",
+          "revoked_at": "2026-09-21T13:48:54.815775"
+        },
+        {
+          "id": 10,
+          "auth_method": "password",
+          "active": false,
+          "created_at": "2026-09-21T13:48:53.992956",
+          "revoked_at": "2026-09-21T13:48:54.815775"
+        },
+        {
+          "id": 12,
+          "auth_method": "password",
+          "active": true,
+          "created_at": "2026-09-21T13:48:54.830412",
+          "revoked_at": null
+        },
+        {
+          "id": 13,
+          "auth_method": "password",
+          "active": true,
+          "created_at": "2026-09-21T13:52:05.282015",
+          "revoked_at": null
+        }
+      ],
+      "active_session_ids": [
+        12,
+        13
+      ],
+      "password_change_audit_count": 1
+    },
+    "secondary_after_cross_account_rejection": {
+      "credential_updated_at": "2026-09-21T13:46:41.303677",
+      "sessions": [
+        {
+          "id": 4,
+          "auth_method": "sms",
+          "active": false,
+          "created_at": "2026-09-21T13:46:40.951802",
+          "revoked_at": "2026-09-21T13:46:41.304781"
+        },
+        {
+          "id": 8,
+          "auth_method": "password",
+          "active": true,
+          "created_at": "2026-09-21T13:46:41.348051",
+          "revoked_at": null
+        },
+        {
+          "id": 11,
+          "auth_method": "password",
+          "active": true,
+          "created_at": "2026-09-21T13:48:54.045619",
+          "revoked_at": null
+        }
+      ],
+      "active_session_ids": [
+        8,
+        11
+      ],
+      "password_change_audit_count": 0
+    }
+  },
+  "evidence_continuity": {
+    "successful_change_replayed": false,
+    "probe_requests_replayed_after_error": false,
+    "resume_reason": "prior run reached final audit serialization; MySQL JSON was returned as text",
+    "in_process_assertions_completed_before_serialization_error": [
+      "negative statuses and stable primary/secondary credential snapshots",
+      "same-user /me",
+      "pre-change access and refresh rejection",
+      "old-password and case-variant rejection"
+    ],
+    "status_source": "sanitized API structured log",
+    "database_source": "read-only SQL"
+  },
+  "boundaries": {
+    "business_mutations_via_api_only": true,
+    "finalizer_business_requests": 0,
+    "finalizer_sql_read_only": true,
+    "seed_login_used": false,
+    "real_sms_used": false,
+    "password_hash_exported": false
+  },
+  "redaction": "No phone, password, token, OTP, hash, or secret is emitted."
+}

@@ -1,0 +1,126 @@
+{
+  "task_id": "AUTH-PASSWORD-CHANGE",
+  "phase": "wechat_devtools_page",
+  "captured_at": "2026-09-21T14:01:52.443Z",
+  "environment": {
+    "interaction": "WeChat DevTools miniprogram-automator through actual page controls",
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "provider": "DEVELOPMENT_SMS",
+    "automator_endpoint": "ws://127.0.0.1:9437"
+  },
+  "identity": {
+    "user_id": 3
+  },
+  "checks": {
+    "initial_page_login": {
+      "status": "PASS",
+      "resumed_after_navigation_ack_timeout": true,
+      "same_user_id": true
+    },
+    "form": {
+      "status": "PASS",
+      "fields_empty": true,
+      "masked": true,
+      "policy_mentions_minimum_8": true,
+      "policy_does_not_require_uppercase": true
+    },
+    "empty_current": {
+      "status": "PASS",
+      "page_error_present": true,
+      "change_request_count": 0
+    },
+    "confirmation_mismatch": {
+      "status": "PASS",
+      "page_error_present": true,
+      "change_request_count": 0
+    },
+    "weak_password": {
+      "status": "PASS",
+      "page_error_present": true,
+      "change_request_count": 0
+    },
+    "wrong_current": {
+      "status": "PASS",
+      "page_stayed_on_profile": true,
+      "page_error_present": true,
+      "token_storage_unchanged": true,
+      "request": {
+        "status": 401,
+        "error": "AUTH.INVALID_PASSWORD",
+        "request_id_hash": "5fdd1b32ccd07fb7"
+      }
+    },
+    "success": {
+      "status": "PASS",
+      "rapid_tap_attempts": 2,
+      "actual_change_request_count": 1,
+      "request": {
+        "status": 200,
+        "error": null,
+        "request_id_hash": "d438029422fdfd37"
+      },
+      "fields_cleared": true,
+      "form_masked": true,
+      "password_contains_uppercase": false,
+      "access_token_changed": true,
+      "refresh_token_changed": true,
+      "replacement_me_status": 200,
+      "replacement_identity_matches": true
+    },
+    "session_policy": {
+      "status": "PASS",
+      "pre_change_access_status": 401,
+      "pre_change_access_error": "AUTH.SESSION_REVOKED",
+      "pre_change_refresh_status": 401,
+      "pre_change_refresh_error": "AUTH.INVALID_TOKEN"
+    },
+    "relogin": {
+      "status": "PASS",
+      "old_password_page_error_present": true,
+      "old_password_request": {
+        "status": 401,
+        "error": "AUTH.INVALID_PASSWORD",
+        "request_id_hash": "33668f21b9df3050"
+      },
+      "new_password_request": {
+        "status": 200,
+        "error": null,
+        "request_id_hash": "c295da30ca193e0a"
+      },
+      "same_user_id": true
+    }
+  },
+  "screenshots": [
+    "01-password-change-form.png",
+    "02-password-change-success-cleared.png",
+    "03-new-password-relogin-home.png"
+  ],
+  "visual_inspection": {
+    "performed": true,
+    "01-password-change-form.png": {
+      "sha256": "E4BC262579DFEAD6698E60579AFEB31F26C7FE611987FF585154FB04992B6DF4",
+      "observed": "Empty masked password form; visible policy says minimum 8 characters and uppercase is not required; synthetic display marker only."
+    },
+    "02-password-change-success-cleared.png": {
+      "sha256": "E0E0BA3938273FE0ABEEEC91996C18FC31C35DF2CD4BEDE0CAF95912D4E9C2CA",
+      "observed": "Visible success notice says the password changed and other sessions are invalid; viewport is below the password inputs, so field clearing is established by the captured same-page state rather than this screenshot alone."
+    },
+    "03-new-password-relogin-home.png": {
+      "sha256": "38C78F040887AAB120AF4DA58BCFFA7C1B95925BEC591DC4534781983D26B110",
+      "observed": "Home page after password relogin shows the same synthetic display marker and Development environment banner."
+    },
+    "private_resident_data_visible": false,
+    "credential_visible": false
+  },
+  "boundaries": {
+    "seed_login_used": false,
+    "backend_mocked": false,
+    "direct_business_sql": false,
+    "credentials_emitted": false,
+    "real_sms_used": false
+  },
+  "completed_at": "2026-09-21T14:02:26.530Z",
+  "redaction": "No phone, password, token, OTP, password hash, raw request ID, or secret is emitted."
+}

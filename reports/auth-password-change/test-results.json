@@ -1,0 +1,48 @@
+{
+  "task_id": "AUTH-PASSWORD-CHANGE",
+  "captured_at": "2026-09-21T14:13:56.6388333Z",
+  "runtime": {
+    "interpreter": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+    "package_reuse": "PYTHONNOUSERSITE=1 with only the existing project .venv site-packages and backend on PYTHONPATH"
+  },
+  "focused": {
+    "command_scope": "backend/tests/unit/test_password_change.py",
+    "result": "PASS",
+    "passed": 9,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 3,
+    "duration_seconds": 0.59
+  },
+  "pure_unit_first_attempt": {
+    "command_scope": "backend/tests/unit",
+    "result": "ENVIRONMENT_ERROR",
+    "passed": 497,
+    "failed": 0,
+    "errors": 2,
+    "reason": "pytest could not enumerate C:/Users/lmj/AppData/Local/Temp/pytest-of-lmj; both errors occurred during tmp_path setup before test logic"
+  },
+  "pure_unit_controlled_rerun": {
+    "command_scope": "backend/tests/unit",
+    "basetemp": "D:\\property-ai\\tmp\\pytest-auth-password-20260921-1405",
+    "cache_provider": "disabled",
+    "result": "PASS",
+    "passed": 499,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 1,
+    "duration_seconds": 3.73
+  },
+  "static_checks": {
+    "node_syntax": [
+      "miniprogram/services/api.js",
+      "miniprogram/pages/profile/profile.js"
+    ],
+    "wechat_devtools_compiled_and_operated_page": true
+  },
+  "boundaries": {
+    "integration_fixture_run": false,
+    "migration_run": false,
+    "shared_service_mutation": false
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "task_id": "AUTH-PASSWORD-CHANGE",
+  "phase": "approved_auth001_environment_recovery",
+  "captured_at": "2026-09-21T14:13:56.6388333Z",
+  "authorization_boundary": {
+    "container": "property-ai-mysql-test-1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "target_revision": "20260919_0009",
+    "old_tmpfs_business_objects_treated_as_lost": true,
+    "migration_0010_allowed": false,
+    "other_database_business_operations_allowed": false
+  },
+  "container_before_and_after": {
+    "container_id": "fa78177adc270834bd1c25e63cb86b1d6a7fd3f7cfb2faa66c5ac4f67ab0d66f",
+    "image": "mysql:8.0.41",
+    "image_id": "sha256:bf577825b52ab281d6281fb281eabbfdc73507eda8f2c2745790251533ef0306",
+    "mysql_data_mount": {
+      "type": "tmpfs",
+      "target": "/var/lib/mysql"
+    },
+    "port": "Docker HostIp is empty (all host interfaces) on host port 3307 -> container 3306; all approved clients in this run used 127.0.0.1:3307",
+    "network": "property-ai_property_ai",
+    "restart_policy": "no",
+    "current_state": "running/healthy"
+  },
+  "provisioner_review": {
+    "path": "scripts/ops/provision_auth001_isolated_db.py",
+    "sha256": "9D325DD989B5F0FDCD0D591FC7EFFD958B3DBBC66F89583C9694ED22516A79F3",
+    "destructive_target_only": "property_ai_auth001_test",
+    "flow": "drop/create approved target, migrate to 0007 baseline, then migrate forward to 0009",
+    "guard_requires": {
+      "host": "127.0.0.1",
+      "port": 3307,
+      "database": "property_ai_auth001_test",
+      "app_env": "test",
+      "explicit_destructive_flag": true
+    },
+    "guard_rejected": [
+      "wrong database",
+      "wrong port",
+      "wrong host",
+      "development mode for destructive provision",
+      "destructive flag disabled",
+      "shared or persistent database names"
+    ]
+  },
+  "provision_result": {
+    "revision": "20260919_0009",
+    "core_tables_present": true,
+    "constraints_present": [
+      "uq_user_phones_active_e164",
+      "uq_user_passwords_user_id"
+    ],
+    "isolated_auth_runtime_tests": "6 passed, 1 warning",
+    "property_ai_test_table_count_after_container_initialization": 0,
+    "property_ai_test_migrated_seeded_or_used": false,
+    "fresh_synthetic_fixture": "reports/auth-password-change/fixture-evidence.json",
+    "public_run_marker_hash": "f70e708c8c2b49bd",
+    "old_object_ids_reused_as_evidence": false
+  },
+  "python_runtime": {
+    "executable": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+    "version": "3.12.10",
+    "architecture": "AMD64/64bit",
+    "dependency_reuse": "PYTHONNOUSERSITE=1 with explicit existing .venv site-packages and project module paths",
+    "global_path_or_registry_changed": false,
+    "old_venv_modified": false
+  },
+  "runtime": {
+    "api": {
+      "pid": 38936,
+      "listen": "127.0.0.1:8083",
+      "database": "127.0.0.1:3307/property_ai_auth001_test"
+    },
+    "worker": {
+      "launcher_pid": 37940,
+      "celery_pid": 40484,
+      "vhost": "property_ai_auth001",
+      "queue": "property_ai.auth001",
+      "pool": "solo",
+      "state": "ready"
+    },
+    "redis_db": 12,
+    "milvus_collection": "knowledge_chunks_auth001",
+    "shared_vhost_messages_read_consumed_replayed_or_cleared": false,
+    "port_8082_operated": false
+  },
+  "boundaries": {
+    "migration_0010_created_or_run": false,
+    "historical_migration_modified": false,
+    "shared_container_rebuilt": false,
+    "shared_queue_or_cache_cleared": false,
+    "other_database_migrated_or_written": false,
+    "production_operation": false
+  }
+}

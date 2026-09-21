@@ -1,0 +1,11 @@
+Error: timeout waiting for automator response
+    at Connection.onMessage (C:\Users\lmj\AppData\Local\Temp\mp-automator-npm\node_modules\miniprogram-automator\out\Connection.js:1:985)
+    at Transport.emit (node:events:509:28)
+    at WebSocket.<anonymous> (C:\Users\lmj\AppData\Local\Temp\mp-automator-npm\node_modules\miniprogram-automator\out\Transport.js:1:220)
+    at WebSocket.onMessage (C:\Users\lmj\AppData\Local\Temp\mp-automator-npm\node_modules\ws\lib\event-target.js:120:16)
+    at WebSocket.emit (node:events:509:28)
+    at Receiver.receiverOnMessage (C:\Users\lmj\AppData\Local\Temp\mp-automator-npm\node_modules\ws\lib\websocket.js:807:20)
+    at Receiver.emit (node:events:509:28)
+    at Receiver.dataMessage (C:\Users\lmj\AppData\Local\Temp\mp-automator-npm\node_modules\ws\lib\receiver.js:448:14)
+    at Receiver.getData (C:\Users\lmj\AppData\Local\Temp\mp-automator-npm\node_modules\ws\lib\receiver.js:377:17)
+    at Receiver.startLoop (C:\Users\lmj\AppData\Local\Temp\mp-automator-npm\node_modules\ws\lib\receiver.js:158:22)

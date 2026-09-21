@@ -1,0 +1,131 @@
+{
+  "task_id": "AUTH-PASSWORD-CHANGE",
+  "phase": "wechat_page_database",
+  "captured_at": "2026-09-21T14:03:35.317517+00:00",
+  "environment": {
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "query_mode": "read-only SQL evidence"
+  },
+  "identity": {
+    "user_id": 3
+  },
+  "page_request_link": {
+    "request_id_hash": "d438029422fdfd37",
+    "matches_page_evidence": true
+  },
+  "credential": {
+    "updated_at": "2026-09-21T14:02:04.150128",
+    "password_hash_exported": false
+  },
+  "sessions": {
+    "rows": [
+      {
+        "id": 3,
+        "auth_method": "sms",
+        "created_at": "2026-09-21T13:46:40.891473",
+        "active": false,
+        "revoked_at": "2026-09-21T13:46:41.193235"
+      },
+      {
+        "id": 7,
+        "auth_method": "password",
+        "created_at": "2026-09-21T13:46:41.240126",
+        "active": false,
+        "revoked_at": "2026-09-21T13:48:54.815775"
+      },
+      {
+        "id": 9,
+        "auth_method": "password",
+        "created_at": "2026-09-21T13:48:53.941073",
+        "active": false,
+        "revoked_at": "2026-09-21T13:48:54.815775"
+      },
+      {
+        "id": 10,
+        "auth_method": "password",
+        "created_at": "2026-09-21T13:48:53.992956",
+        "active": false,
+        "revoked_at": "2026-09-21T13:48:54.815775"
+      },
+      {
+        "id": 12,
+        "auth_method": "password",
+        "created_at": "2026-09-21T13:48:54.830412",
+        "active": false,
+        "revoked_at": "2026-09-21T14:02:04.146001"
+      },
+      {
+        "id": 13,
+        "auth_method": "password",
+        "created_at": "2026-09-21T13:52:05.282015",
+        "active": false,
+        "revoked_at": "2026-09-21T14:02:04.146001"
+      },
+      {
+        "id": 14,
+        "auth_method": "password",
+        "created_at": "2026-09-21T14:00:24.237028",
+        "active": false,
+        "revoked_at": "2026-09-21T14:02:04.146001"
+      },
+      {
+        "id": 15,
+        "auth_method": "password",
+        "created_at": "2026-09-21T14:02:04.157005",
+        "active": true,
+        "revoked_at": null
+      },
+      {
+        "id": 16,
+        "auth_method": "password",
+        "created_at": "2026-09-21T14:02:16.373018",
+        "active": true,
+        "revoked_at": null
+      }
+    ],
+    "active_session_ids_after_page_relogin": [
+      15,
+      16
+    ],
+    "page_request_revoked_session_count": 3
+  },
+  "audit": {
+    "all_password_change_count_for_synthetic_user": 2,
+    "latest_password_change_created_at": "2026-09-21T14:02:04.158672",
+    "latest_request_password_change_count": 1,
+    "latest_request_rows": [
+      {
+        "action": "AUTH_SESSION_REVOKED",
+        "resource_type": "AUTH_SESSION",
+        "resource_id": 12,
+        "reason_code": "PASSWORD_CHANGE"
+      },
+      {
+        "action": "AUTH_SESSION_REVOKED",
+        "resource_type": "AUTH_SESSION",
+        "resource_id": 13,
+        "reason_code": "PASSWORD_CHANGE"
+      },
+      {
+        "action": "AUTH_SESSION_REVOKED",
+        "resource_type": "AUTH_SESSION",
+        "resource_id": 14,
+        "reason_code": "PASSWORD_CHANGE"
+      },
+      {
+        "action": "AUTH_PASSWORD_CHANGED",
+        "resource_type": "USER",
+        "resource_id": 3,
+        "reason_code": null
+      }
+    ]
+  },
+  "assertions": {
+    "revision_is_0009": true,
+    "one_change_audit_for_page_request": true,
+    "prior_sessions_revoked_with_password_change_reason": true,
+    "page_request_matches_database_audit": true
+  },
+  "redaction": "No phone, password, token, OTP, password hash, or raw request ID is emitted."
+}
