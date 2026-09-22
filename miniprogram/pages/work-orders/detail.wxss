@@ -1,0 +1,12 @@
+.field {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 76rpx;
+  padding: 16rpx;
+  border: 1rpx solid #d0d5dd;
+  border-radius: 8rpx;
+}
+
+textarea.field {
+  min-height: 160rpx;
+}

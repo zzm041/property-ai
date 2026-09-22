@@ -5,6 +5,10 @@
   <view wx:if="{{autoDispatched}}">系统已自动派单</view>
   <view wx:if="{{workOrder.process_reason && workOrder.process_reason != 'NONE'}}">原因 {{workOrder.process_reason}}</view>
   <view class="empty" wx:if="{{item.text}}">{{item.text}}</view>
+  <view wx:if="{{item.extra_notes}}">
+    <view>补充说明</view>
+    <view class="empty">{{item.extra_notes}}</view>
+  </view>
 </view>
 <view class="card" wx:if="{{media.length}}">
   <view>附件</view>
@@ -13,6 +17,18 @@
     <button class="btn" wx:if="{{item.kind === 'IMAGE'}}" data-file-id="{{item.file_id}}" bindtap="previewMedia">查看图片</button>
     <button class="btn" wx:if="{{item.kind === 'AUDIO'}}" data-file-id="{{item.file_id}}" bindtap="playMedia">播放语音</button>
   </view>
+</view>
+<view class="card" wx:if="{{canAppend}}">
+  <view>补充问题</view>
+  <textarea class="field" data-field="appendText" placeholder="补充现场情况或新的问题信息" value="{{appendText}}" bindinput="onAppendText" maxlength="4000"></textarea>
+  <button class="btn btn-secondary" bindtap="chooseAppendImage" disabled="{{loading}}">添加补充图片</button>
+  <view class="empty" wx:if="{{appendMediaHint}}">{{appendMediaHint}}</view>
+  <button class="btn" data-action="append" bindtap="appendContent" disabled="{{loading}}">提交补充</button>
+</view>
+<view class="card" wx:if="{{canCancel}}">
+  <view>撤销工单</view>
+  <textarea class="field" data-field="cancelReason" placeholder="撤销原因（可选）" value="{{cancelReason}}" bindinput="onCancelReason" maxlength="255"></textarea>
+  <button class="btn btn-secondary" data-action="cancel" bindtap="cancel" disabled="{{loading}}">撤销工单</button>
 </view>
 <view class="card" wx:if="{{latestReceipt}}">
   <view>处理回执</view>
@@ -25,13 +41,31 @@
   <view>完成时间 {{latestReceipt.finished_at}}</view>
 </view>
 <view class="card" wx:if="{{canConfirm || canReopen}}">
-  <button class="btn" wx:if="{{canConfirm}}" bindtap="confirm">确认解决</button>
-  <button class="btn" wx:if="{{canReopen}}" bindtap="reopen">未解决重开</button>
+  <button class="btn" data-action="confirm" wx:if="{{canConfirm}}" bindtap="confirm" disabled="{{loading}}">确认解决</button>
+  <button class="btn" data-action="reopen" wx:if="{{canReopen}}" bindtap="reopen" disabled="{{loading}}">未解决重开</button>
+</view>
+<view class="card" wx:if="{{canRate}}">
+  <view>服务评价</view>
+  <picker data-field="rating" mode="selector" range="{{ratingOptions}}" value="{{ratingIndex}}" bindchange="onRatingChange">
+    <view class="field">评分：{{ratingOptions[ratingIndex]}} 分</view>
+  </picker>
+  <textarea class="field" data-field="ratingComment" placeholder="评价内容（可选）" value="{{ratingComment}}" bindinput="onRatingComment" maxlength="500"></textarea>
+  <button class="btn" data-action="rate" bindtap="rate" disabled="{{loading}}">提交评价</button>
+</view>
+<view class="card" wx:if="{{latestRating}}">
+  <view>我的评价</view>
+  <view>{{latestRating.rating}} 分</view>
+  <view class="empty" wx:if="{{latestRating.comment}}">{{latestRating.comment}}</view>
+  <view class="empty">评价时间 {{latestRating.created_at}}</view>
 </view>
 <view class="card" wx:if="{{logs.length}}">
   <view>历史</view>
-  <view wx:for="{{logs}}" wx:key="id">{{item.from_status}} → {{item.to_status}} {{item.event_code}}</view>
+  <view wx:for="{{logs}}" wx:key="id">
+    {{item.from_status || "创建"}} → {{item.to_status}} {{item.event_code}}
+    <text wx:if="{{item.reason}}">（{{item.reason}}）</text>
+  </view>
 </view>
 <view class="empty" wx:if="{{!loading && !workOrder}}">工单不存在或无权查看</view>
-<button class="btn" bindtap="reload">刷新</button>
+<view class="empty" wx:if="{{actionNotice}}">{{actionNotice}}</view>
+<button class="btn" data-action="refresh" bindtap="reload" disabled="{{loading}}">刷新</button>
 <view class="error" wx:if="{{error}}">{{error}}</view>

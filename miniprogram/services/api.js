@@ -319,12 +319,21 @@ module.exports = {
       data: body,
       headers: { "Idempotency-Key": `mp-${Date.now()}-${Math.random().toString(16).slice(2)}` },
     }),
-  listWorkOrders: () => request({ path: "/work-orders" }),
+  listWorkOrders: (afterId, limit = 20) =>
+    request({
+      path: `/work-orders?limit=${limit}${afterId ? `&after_id=${afterId}` : ""}`,
+    }),
   workOrder: (id) => request({ path: `/work-orders/${id}` }),
+  appendWorkOrder: (id, body) =>
+    request({ path: `/work-orders/${id}/append`, method: "POST", data: body }),
+  cancelWorkOrder: (id, body) =>
+    request({ path: `/work-orders/${id}/cancel`, method: "POST", data: body }),
   confirmWorkOrder: (id, body = {}) =>
     request({ path: `/work-orders/${id}/confirm`, method: "POST", data: body }),
   reopenWorkOrder: (id, body) =>
     request({ path: `/work-orders/${id}/reopen`, method: "POST", data: body }),
+  rateWorkOrder: (id, body) =>
+    request({ path: `/work-orders/${id}/rate`, method: "POST", data: body }),
   announcements: (propertyId) =>
     request({ path: `/announcements?property_id=${propertyId}` }),
   queryAssistant: (body) =>

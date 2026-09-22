@@ -177,6 +177,7 @@ class WorkOrderLogData(BaseModel):
     to_status: str
     process_reason: str
     event_code: str
+    reason: str | None = None
     created_at: datetime
 
 
@@ -205,6 +206,16 @@ class WorkOrderReceiptData(BaseModel):
     unresolved_reason: str | None
     follow_up: str | None
     finished_at: datetime
+
+
+class WorkOrderFeedbackData(BaseModel):
+    id: int
+    actor_user_id: int
+    confirmed: bool | None
+    rating: int | None
+    comment: str | None
+    unresolved_flag: bool
+    created_at: datetime
 
 
 class WorkOrderData(BaseModel):
@@ -240,6 +251,7 @@ class WorkOrderDetailData(BaseModel):
     media: list[WorkOrderMediaData] = Field(default_factory=list)
     assignments: list[WorkOrderAssignmentData] = Field(default_factory=list)
     receipts: list[WorkOrderReceiptData] = Field(default_factory=list)
+    feedbacks: list[WorkOrderFeedbackData] = Field(default_factory=list)
     logs: list[WorkOrderLogData] = Field(default_factory=list)
 
 

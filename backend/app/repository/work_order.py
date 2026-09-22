@@ -405,6 +405,24 @@ class WorkOrderRepository:
             ).all()
         )
 
+    def get_rating_for_update(
+        self,
+        *,
+        work_order_id: int,
+        actor_user_id: int,
+    ) -> WorkOrderFeedback | None:
+        return self._session.scalar(
+            select(WorkOrderFeedback)
+            .where(
+                WorkOrderFeedback.work_order_id == work_order_id,
+                WorkOrderFeedback.actor_user_id == actor_user_id,
+                WorkOrderFeedback.rating.is_not(None),
+            )
+            .order_by(WorkOrderFeedback.id.desc())
+            .limit(1)
+            .with_for_update()
+        )
+
     def get_sla_clock(self, work_order_id: int) -> SlaClock | None:
         return self._session.scalar(
             select(SlaClock).where(SlaClock.work_order_id == work_order_id)

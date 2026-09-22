@@ -513,10 +513,13 @@ class WorkOrderService:
         limit: int = 50,
     ) -> tuple[WorkOrder, ...]:
         current = self._reload_actor(actor)
+        page_limit = self._page_limit(limit)
         return self._repository.list_for_reporter(
             user_id=current.user_id,
             after_id=after_id,
-            limit=self._page_limit(limit),
+            # The resident endpoint consumes one look-ahead record so it can
+            # distinguish an exact final page from a page that has more data.
+            limit=page_limit + 1,
         )
 
     def create_work_order(
@@ -590,6 +593,7 @@ class WorkOrderService:
         tuple[WorkOrderMedia, ...],
         tuple[WorkOrderAssignment, ...],
         tuple[WorkOrderReceipt, ...],
+        tuple[WorkOrderFeedback, ...],
         tuple[WorkOrderLog, ...],
     ]:
         record = self.get_work_order(actor=actor, work_order_id=work_order_id)
@@ -599,6 +603,7 @@ class WorkOrderService:
             self._repository.list_media(record.id),
             self._repository.list_assignments(record.id),
             self._repository.list_receipts(record.id),
+            self._repository.list_feedbacks(record.id),
             self._repository.list_logs(record.id),
         )
 
@@ -675,7 +680,7 @@ class WorkOrderService:
         taken_phase: str | None = None,
     ) -> WorkOrder:
         self._validate_request_id(request_id)
-        return self._execute(
+        record = self._execute(
             lambda: self._append_content(
                 actor=actor,
                 work_order_id=work_order_id,
@@ -685,6 +690,9 @@ class WorkOrderService:
                 taken_phase=taken_phase,
             )
         )
+        if record.status == WorkOrderStatus.PENDING_ANALYSIS.value:
+            self._enqueue_analysis(record.id, request_id)
+        return record
 
     def cancel(
         self,
@@ -1233,10 +1241,6 @@ class WorkOrderService:
                 message="Append requires text or media",
                 status_code=422,
             )
-        content = self._repository.get_content(record.id)
-        if content is not None and cleaned is not None:
-            notes = content.extra_notes or ""
-            content.extra_notes = f"{notes}\n{cleaned}".strip() if notes else cleaned
         phase = MediaTakenPhase.REPORT
         if taken_phase is not None:
             phase = self._parse_enum(
@@ -1245,7 +1249,20 @@ class WorkOrderService:
                 MediaTakenPhase.REPORT,
                 "taken_phase",
             )
+            if phase is not MediaTakenPhase.REPORT:
+                raise AppError(
+                    code=WorkOrderErrorCode.INVALID_INPUT,
+                    message="Resident append media must use the report phase",
+                    status_code=422,
+                )
+        content = self._repository.get_content(record.id)
+        if content is not None and cleaned is not None:
+            notes = content.extra_notes or ""
+            content.extra_notes = f"{notes}\n{cleaned}".strip() if notes else cleaned
         self._attach_media(record, actor=current, file_ids=file_ids, taken_phase=phase)
+        # Content mutations participate in optimistic concurrency and make an
+        # in-flight analysis snapshot stale before its result can be applied.
+        record.version += 1
         self._write_log(
             record,
             actor=current,
@@ -1274,7 +1291,10 @@ class WorkOrderService:
         is_reporter = record.reporter_user_id == current.user_id
         if is_reporter:
             RbacService.require_permission(current, WORK_ORDER_CANCEL, scope)
-            if record.status != WorkOrderStatus.PENDING_ANALYSIS.value:
+            if record.status not in {
+                WorkOrderStatus.PENDING_ANALYSIS.value,
+                WorkOrderStatus.PENDING_ASSIGNMENT.value,
+            }:
                 raise AppError(
                     code=WorkOrderErrorCode.INVALID_TRANSITION,
                     message="Resident may cancel only before assignment",
@@ -1290,6 +1310,7 @@ class WorkOrderService:
             actor_type=self._actor_type(current, record),
             request_id=request_id,
             reason_code="CANCELLED",
+            reason_detail=self._optional_text(reason),
         )
         self._stop_sla(record)
         self._append_audit(
@@ -1475,6 +1496,15 @@ class WorkOrderService:
             raise AppError(
                 code=WorkOrderErrorCode.INVALID_TRANSITION,
                 message="Work order is not ready for rating",
+                status_code=409,
+            )
+        if self._repository.get_rating_for_update(
+            work_order_id=record.id,
+            actor_user_id=current.user_id,
+        ) is not None:
+            raise AppError(
+                code=WorkOrderErrorCode.ALREADY_PROCESSED,
+                message="Work order has already been rated",
                 status_code=409,
             )
         process = self._repository.get_current_process(record.id)

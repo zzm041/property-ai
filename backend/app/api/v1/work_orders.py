@@ -21,6 +21,7 @@ from app.schema.work_order import (
     WorkOrderAssignmentData,
     WorkOrderData,
     WorkOrderDetailData,
+    WorkOrderFeedbackData,
     WorkOrderListData,
     WorkOrderLogData,
     WorkOrderMediaData,
@@ -117,8 +118,12 @@ def list_my_work_orders(
         after_id=after_id,
         limit=limit,
     )
-    items = [work_order_data(item, overdue=service.is_overdue(item)) for item in records]
-    next_cursor = items[-1].id if len(items) == limit else None
+    page_records = records[:limit]
+    items = [
+        work_order_data(item, overdue=service.is_overdue(item))
+        for item in page_records
+    ]
+    next_cursor = items[-1].id if len(records) > limit else None
     return success_envelope(
         request,
         WorkOrderListData(items=items, next_cursor=next_cursor).model_dump(mode="json"),
@@ -138,6 +143,7 @@ def get_work_order(
         media,
         assignments,
         receipts,
+        feedbacks,
         logs,
     ) = service.get_work_order_detail(actor=actor, work_order_id=work_order_id)
     detail = WorkOrderDetailData(
@@ -184,6 +190,18 @@ def get_work_order(
             )
             for item in receipts
         ],
+        feedbacks=[
+            WorkOrderFeedbackData(
+                id=item.id,
+                actor_user_id=item.actor_user_id,
+                confirmed=None if item.confirmed is None else bool(item.confirmed),
+                rating=item.rating,
+                comment=item.comment,
+                unresolved_flag=bool(item.unresolved_flag),
+                created_at=item.created_at,
+            )
+            for item in feedbacks
+        ],
         logs=[
             WorkOrderLogData(
                 id=item.id,
@@ -193,6 +211,7 @@ def get_work_order(
                 to_status=item.to_status,
                 process_reason=item.process_reason,
                 event_code=item.event_code,
+                reason=(item.payload_json or {}).get("reason"),
                 created_at=item.created_at,
             )
             for item in logs

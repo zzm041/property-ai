@@ -317,16 +317,27 @@ class AnalysisService:
                     if media.kind == MediaKind.AUDIO.value
                     and media.taken_phase == "REPORT"
                 )
-                text = (None if content is None else content.text) or ""
+                original_text = (None if content is None else content.text) or ""
+                extra_notes = (None if content is None else content.extra_notes) or ""
+                text = original_text
+                if extra_notes:
+                    text = f"{original_text}\nResident updates:\n{extra_notes}".strip()
                 existing_asr = None if content is None else content.asr_text
+                media_identity = "|".join(
+                    f"{item.kind}:{item.mime_type}:{item.storage_key}"
+                    for item in (*images, *audio)
+                )
                 input_hash = sha256(
-                    f"{record.id}|{text}|{existing_asr or ''}|{len(images)}|{len(audio)}".encode()
+                    f"{record.id}|{text}|{existing_asr or ''}|{media_identity}".encode()
                 ).hexdigest()
                 current = self._ai.get_current_analysis_for_update(record.id)
                 if current is not None and current.status in {
                     AnalysisStatus.COMPLETED.value,
                     AnalysisStatus.LOW_CONFIDENCE.value,
-                }:
+                } and (
+                    current.input_hash == input_hash
+                    or record.status != WorkOrderStatus.PENDING_ANALYSIS.value
+                ):
                     return AnalysisSnapshot(
                         work_order_id=record.id,
                         tenant_id=record.tenant_id,
@@ -344,8 +355,32 @@ class AnalysisService:
                         skipped=True,
                         skip_reason="already_final",
                     )
-                if current is not None and current.status == AnalysisStatus.PROCESSING.value:
-                    current.input_hash = input_hash
+                if current is not None and (
+                    (
+                        current.status == AnalysisStatus.PROCESSING.value
+                        and current.input_hash != input_hash
+                    )
+                    or current.status
+                    in {
+                        AnalysisStatus.COMPLETED.value,
+                        AnalysisStatus.LOW_CONFIDENCE.value,
+                    }
+                ):
+                    current.status = AnalysisStatus.STALE.value
+                    current.error_code = AiErrorCode.STALE_RESULT
+                    self._session.flush()
+                    analysis = self._ai.add_analysis(
+                        WorkOrderAnalysis(
+                            tenant_id=record.tenant_id,
+                            property_id=record.property_id,
+                            work_order_id=record.id,
+                            analysis_version=current.analysis_version + 1,
+                            status=AnalysisStatus.PROCESSING.value,
+                            input_hash=input_hash,
+                            prompt_version=WORK_ORDER_ANALYSIS_PROMPT_VERSION,
+                        )
+                    )
+                elif current is not None and current.status == AnalysisStatus.PROCESSING.value:
                     analysis = current
                 elif current is not None and current.status == AnalysisStatus.FAILED.value:
                     current.status = AnalysisStatus.PROCESSING.value
@@ -674,7 +709,11 @@ class AnalysisService:
                 content = self._work_orders.get_content_for_update(record.id)
                 if content is not None and bundle.asr_text:
                     content.asr_text = bundle.asr_text
-                stale = record.status != WorkOrderStatus.PENDING_ANALYSIS.value
+                stale = (
+                    record.status != WorkOrderStatus.PENDING_ANALYSIS.value
+                    or record.version != snapshot.work_order_version
+                    or analysis.input_hash != snapshot.input_hash
+                )
                 mapped, mapped_error = self._validate_payload(bundle.llm_payload)
                 if stale:
                     analysis.status = AnalysisStatus.STALE.value
