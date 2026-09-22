@@ -10,7 +10,7 @@ import pytest
 from fastapi import Request
 
 from app.api.v1.work_orders import get_work_order, list_my_work_orders
-from app.core.errors import AppError, WorkOrderErrorCode
+from app.core.errors import AppError, IamErrorCode, WorkOrderErrorCode
 from app.core.errors import AiErrorCode
 from app.domain.ai import AnalysisStatus
 from app.domain.work_order import MediaTakenPhase, WorkOrderStatus
@@ -190,6 +190,36 @@ def test_pending_append_enqueues_fresh_analysis_after_commit() -> None:
         text="visible to assigned staff",
     )
     service._enqueue_analysis.assert_not_called()
+
+
+def test_cancel_rejects_other_resident_even_with_resident_cancel_permission() -> None:
+    service = WorkOrderService.__new__(WorkOrderService)
+    current = MagicMock()
+    current.user_id = 8
+    current.has_permission.side_effect = (
+        lambda permission, _scope: permission in {"work_order:read", "work_order:cancel"}
+    )
+    record = _record(45, WorkOrderStatus.PENDING_ASSIGNMENT.value)
+    service._reload_actor = MagicMock(return_value=current)
+    service._lock_work_order = MagicMock(return_value=record)
+    service._assert_version = MagicMock()
+    service._repository = MagicMock()
+    service._repository.get_active_assignment.return_value = None
+    service._employees = MagicMock()
+    service._employees.get_employee_for_user.return_value = None
+    service._apply_transition = MagicMock()
+
+    with pytest.raises(AppError) as captured:
+        service._cancel(
+            actor=MagicMock(),
+            work_order_id=record.id,
+            request_id="wo012-cancel-other-resident",
+            reason="not mine",
+            version=record.version,
+        )
+
+    assert captured.value.code == IamErrorCode.FORBIDDEN
+    service._apply_transition.assert_not_called()
 
 
 def test_changed_pending_content_creates_new_analysis_version(

@@ -1301,6 +1301,12 @@ class WorkOrderService:
                     status_code=409,
                 )
         else:
+            # WORK_ORDER_CANCEL is also granted to residents so they can
+            # withdraw their own pending reports.  It is not, by itself, an
+            # ownership grant for another resident's work order.  Reuse the
+            # existing read/assignment/management policy before allowing a
+            # non-reporter cancellation.
+            self._authorize_read(current, record)
             RbacService.require_permission(current, WORK_ORDER_CANCEL, scope)
         self._apply_transition(
             record,
