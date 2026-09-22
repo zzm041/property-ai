@@ -1,0 +1,45 @@
+{
+  "task_id": "NOTIFICATION-EVENTS-INBOX-013",
+  "captured_at": "2026-09-22T07:54:54.2373631Z",
+  "code_sha": "93838c1a624b6c03bf0f3982ebee09b48f727a60",
+  "runs": [
+    {
+      "scope": "task-focused notification events and inbox",
+      "command": "pytest -q backend/tests/unit/test_notification_events_inbox.py",
+      "result": "14 passed, 3 warnings in 0.05s",
+      "status": "PASS"
+    },
+    {
+      "scope": "backend pure unit suite first attempt",
+      "command": "pytest -q backend/tests/unit",
+      "result": "564 passed, 2 setup errors, 4 warnings in 4.29s",
+      "status": "ENVIRONMENT_RETRY",
+      "reason": "Two tmp_path fixtures could not enumerate C:/Users/lmj/AppData/Local/Temp/pytest-of-lmj because of WinError 5; no test assertion failed."
+    },
+    {
+      "scope": "backend pure unit suite with isolated writable basetemp",
+      "command": "pytest -q -p no:cacheprovider --basetemp=D:/property-ai/tmp/pytest-ntf013-full-20260922-0754 backend/tests/unit",
+      "result": "566 passed, 1 warning in 3.71s",
+      "status": "PASS"
+    },
+    {
+      "scope": "changed and evidence JavaScript syntax",
+      "command": "node --check on seven JavaScript files",
+      "result": "all syntax checks exited 0",
+      "status": "PASS"
+    },
+    {
+      "scope": "committed product diff and new evidence whitespace",
+      "command": "git diff --check",
+      "result": "no errors",
+      "status": "PASS"
+    }
+  ],
+  "boundaries": {
+    "database_fixture_used": false,
+    "integration_fixture_used": false,
+    "migration_run": false,
+    "shared_service_operation": false,
+    "first_full_run_counted_as_product_failure": false
+  }
+}

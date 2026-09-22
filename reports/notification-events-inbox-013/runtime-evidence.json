@@ -1,0 +1,1249 @@
+{
+  "task_id": "NOTIFICATION-EVENTS-INBOX-013",
+  "captured_at": "2026-09-22T07:42:41.735460+00:00",
+  "code_sha": "93838c1a624b6c03bf0f3982ebee09b48f727a60",
+  "run_id": "ntf013-feaff1e125c8",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "rabbit_vhost": "property_ai_auth001",
+    "rabbit_queue": "property_ai.auth001",
+    "providers": "DEVELOPMENT_SMS_AND_FAKE_AI_AND_DEVELOPMENT_NOTIFICATION",
+    "health": {
+      "status": "ok"
+    },
+    "ready_status": "ready"
+  },
+  "identities": {
+    "primary": 3,
+    "staff": 6,
+    "manager": 5
+  },
+  "objects": {
+    "work_order_id": 23,
+    "announcement_id": 2,
+    "resident_read_notification_id": 26,
+    "marker_hash": "164c7579ea372f18"
+  },
+  "attendance": {
+    "business_date": "2026-09-22",
+    "on_duty": "ON_DUTY"
+  },
+  "lifecycle": {
+    "auto_assignment_employee_id": 1,
+    "final_status": "CLOSED",
+    "announcement_status": "PUBLISHED",
+    "log_events": [
+      "CREATE",
+      "ANALYZE",
+      "ASSIGN",
+      "ACCEPT",
+      "START",
+      "ESCALATE",
+      "DECIDE",
+      "RECEIPT_RESOLVED",
+      "CONFIRM",
+      "ARCHIVE"
+    ]
+  },
+  "new_notifications": {
+    "primary": [
+      {
+        "id": 40,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "Notification verification ntf013-feaff1e125c8",
+        "resource_type": "ANNOUNCEMENT",
+        "resource_id": 2,
+        "read": false
+      },
+      {
+        "id": 37,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单已完成",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read": false
+      },
+      {
+        "id": 36,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单待确认",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read": false
+      },
+      {
+        "id": 34,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单处理方案已更新",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read": false
+      },
+      {
+        "id": 31,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单异常升级",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read": false
+      },
+      {
+        "id": 30,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单开始处理",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read": false
+      },
+      {
+        "id": 29,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单已接单",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read": false
+      },
+      {
+        "id": 27,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单已派单",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read": false
+      },
+      {
+        "id": 26,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单已创建",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read": false
+      }
+    ],
+    "staff": [
+      {
+        "id": 35,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单处理方案已更新",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read": false
+      },
+      {
+        "id": 28,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单已派单",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read": false
+      }
+    ],
+    "manager": [
+      {
+        "id": 38,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单已完成",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read": false
+      },
+      {
+        "id": 32,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单异常升级",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read": false
+      }
+    ]
+  },
+  "pagination": {
+    "first_ids": [
+      35,
+      28,
+      25,
+      24,
+      23,
+      22,
+      21,
+      20,
+      19,
+      18,
+      17,
+      16,
+      15,
+      14,
+      13,
+      11,
+      9,
+      7,
+      6,
+      5
+    ],
+    "first_cursor": 5,
+    "second_ids": [
+      4,
+      3,
+      2
+    ],
+    "second_cursor": null,
+    "no_overlap": true,
+    "strictly_descending": true
+  },
+  "read_state": {
+    "anti_idor_status": 404,
+    "concurrent_statuses": [
+      200,
+      200
+    ],
+    "same_timestamp": true,
+    "repeat_timestamp_stable": true,
+    "relogin_persisted": true
+  },
+  "validation": [
+    {
+      "case": "after-negative",
+      "status": 422,
+      "code": "SYS.VALIDATION_ERROR"
+    },
+    {
+      "case": "limit-zero",
+      "status": 422,
+      "code": "SYS.VALIDATION_ERROR"
+    },
+    {
+      "case": "limit-too-large",
+      "status": 422,
+      "code": "SYS.VALIDATION_ERROR"
+    }
+  ],
+  "database": {
+    "revision": "20260919_0009",
+    "work_order": {
+      "id": 23,
+      "tenant_id": 1,
+      "property_id": 1,
+      "reporter_user_id": 3,
+      "status": "CLOSED",
+      "process_reason": "NONE",
+      "version": 10,
+      "current_assignment_id": null,
+      "closed_at": "2026-09-22 07:42:40.777274"
+    },
+    "logs": [
+      {
+        "id": 85,
+        "actor_user_id": 3,
+        "actor_type": "RESIDENT",
+        "from_status": null,
+        "to_status": "PENDING_ANALYSIS",
+        "process_reason": "NONE",
+        "event_code": "CREATE",
+        "request_id": "ntf013-feaff1e125c8-work-order-create",
+        "created_at": "2026-09-22 07:42:39.796194"
+      },
+      {
+        "id": 86,
+        "actor_user_id": null,
+        "actor_type": "SYSTEM",
+        "from_status": "PENDING_ANALYSIS",
+        "to_status": "PENDING_ASSIGNMENT",
+        "process_reason": "NONE",
+        "event_code": "ANALYZE",
+        "request_id": "ntf013-feaff1e125c8-work-order-create",
+        "created_at": "2026-09-22 07:42:40.130987"
+      },
+      {
+        "id": 87,
+        "actor_user_id": null,
+        "actor_type": "SYSTEM",
+        "from_status": "PENDING_ASSIGNMENT",
+        "to_status": "ASSIGNED",
+        "process_reason": "NONE",
+        "event_code": "ASSIGN",
+        "request_id": "ntf013-feaff1e125c8-work-order-create",
+        "created_at": "2026-09-22 07:42:40.321150"
+      },
+      {
+        "id": 88,
+        "actor_user_id": 6,
+        "actor_type": "STAFF",
+        "from_status": "ASSIGNED",
+        "to_status": "ACCEPTED",
+        "process_reason": "NONE",
+        "event_code": "ACCEPT",
+        "request_id": "ntf013-feaff1e125c8-work-order-accept",
+        "created_at": "2026-09-22 07:42:40.510630"
+      },
+      {
+        "id": 89,
+        "actor_user_id": 6,
+        "actor_type": "STAFF",
+        "from_status": "ACCEPTED",
+        "to_status": "PROCESSING",
+        "process_reason": "NONE",
+        "event_code": "START",
+        "request_id": "ntf013-feaff1e125c8-work-order-start",
+        "created_at": "2026-09-22 07:42:40.557196"
+      },
+      {
+        "id": 90,
+        "actor_user_id": 6,
+        "actor_type": "STAFF",
+        "from_status": "PROCESSING",
+        "to_status": "PROCESSING",
+        "process_reason": "WAITING_PARTS",
+        "event_code": "ESCALATE",
+        "request_id": "ntf013-feaff1e125c8-work-order-escalate",
+        "created_at": "2026-09-22 07:42:40.601456"
+      },
+      {
+        "id": 91,
+        "actor_user_id": 5,
+        "actor_type": "SUPERVISOR",
+        "from_status": "PROCESSING",
+        "to_status": "PROCESSING",
+        "process_reason": "NONE",
+        "event_code": "DECIDE",
+        "request_id": "ntf013-feaff1e125c8-work-order-decide-continue",
+        "created_at": "2026-09-22 07:42:40.656657"
+      },
+      {
+        "id": 92,
+        "actor_user_id": 6,
+        "actor_type": "STAFF",
+        "from_status": "PROCESSING",
+        "to_status": "WAIT_CONFIRM",
+        "process_reason": "NONE",
+        "event_code": "RECEIPT_RESOLVED",
+        "request_id": "ntf013-feaff1e125c8-work-order-receipt",
+        "created_at": "2026-09-22 07:42:40.711249"
+      },
+      {
+        "id": 93,
+        "actor_user_id": 3,
+        "actor_type": "RESIDENT",
+        "from_status": "WAIT_CONFIRM",
+        "to_status": "COMPLETED",
+        "process_reason": "NONE",
+        "event_code": "CONFIRM",
+        "request_id": "ntf013-feaff1e125c8-work-order-confirm",
+        "created_at": "2026-09-22 07:42:40.758255"
+      },
+      {
+        "id": 94,
+        "actor_user_id": 3,
+        "actor_type": "SYSTEM",
+        "from_status": "COMPLETED",
+        "to_status": "CLOSED",
+        "process_reason": "NONE",
+        "event_code": "ARCHIVE",
+        "request_id": "ntf013-feaff1e125c8-work-order-confirm",
+        "created_at": "2026-09-22 07:42:40.775160"
+      }
+    ],
+    "assignments": [
+      {
+        "id": 22,
+        "employee_id": 1,
+        "assigned_by_user_id": null,
+        "status": "ENDED",
+        "assigned_at": "2026-09-22 07:42:40.249268",
+        "accept_at": "2026-09-22 07:42:40.507343",
+        "ended_at": "2026-09-22 07:42:40.760407",
+        "reason": "AUTO_DISPATCH"
+      }
+    ],
+    "notifications": [
+      {
+        "id": 26,
+        "user_id": 3,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单已创建",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read_at": "2026-09-22 07:42:41.410950",
+        "created_at": "2026-09-22 07:42:39.803175",
+        "delivery_id": 26,
+        "channel": "IN_APP",
+        "delivery_status": "SUCCEEDED",
+        "attempt": 1,
+        "delivered_at": "2026-09-22 07:42:39.951737"
+      },
+      {
+        "id": 27,
+        "user_id": 3,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单已派单",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read_at": null,
+        "created_at": "2026-09-22 07:42:40.329278",
+        "delivery_id": 27,
+        "channel": "IN_APP",
+        "delivery_status": "SUCCEEDED",
+        "attempt": 1,
+        "delivered_at": "2026-09-22 07:42:40.442468"
+      },
+      {
+        "id": 28,
+        "user_id": 6,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单已派单",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read_at": null,
+        "created_at": "2026-09-22 07:42:40.333538",
+        "delivery_id": 28,
+        "channel": "IN_APP",
+        "delivery_status": "SUCCEEDED",
+        "attempt": 1,
+        "delivered_at": "2026-09-22 07:42:40.512179"
+      },
+      {
+        "id": 29,
+        "user_id": 3,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单已接单",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read_at": null,
+        "created_at": "2026-09-22 07:42:40.520721",
+        "delivery_id": 29,
+        "channel": "IN_APP",
+        "delivery_status": "SUCCEEDED",
+        "attempt": 1,
+        "delivered_at": "2026-09-22 07:42:40.591798"
+      },
+      {
+        "id": 30,
+        "user_id": 3,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单开始处理",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read_at": null,
+        "created_at": "2026-09-22 07:42:40.568249",
+        "delivery_id": 30,
+        "channel": "IN_APP",
+        "delivery_status": "SUCCEEDED",
+        "attempt": 1,
+        "delivered_at": "2026-09-22 07:42:40.666457"
+      },
+      {
+        "id": 31,
+        "user_id": 3,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单异常升级",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read_at": null,
+        "created_at": "2026-09-22 07:42:40.607806",
+        "delivery_id": 31,
+        "channel": "IN_APP",
+        "delivery_status": "SUCCEEDED",
+        "attempt": 1,
+        "delivered_at": "2026-09-22 07:42:40.746129"
+      },
+      {
+        "id": 32,
+        "user_id": 5,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单异常升级",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read_at": null,
+        "created_at": "2026-09-22 07:42:40.609916",
+        "delivery_id": 32,
+        "channel": "IN_APP",
+        "delivery_status": "SUCCEEDED",
+        "attempt": 1,
+        "delivered_at": "2026-09-22 07:42:40.807160"
+      },
+      {
+        "id": 33,
+        "user_id": 12,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单异常升级",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read_at": null,
+        "created_at": "2026-09-22 07:42:40.612490",
+        "delivery_id": 33,
+        "channel": "IN_APP",
+        "delivery_status": "SUCCEEDED",
+        "attempt": 1,
+        "delivered_at": "2026-09-22 07:42:40.878847"
+      },
+      {
+        "id": 34,
+        "user_id": 3,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单处理方案已更新",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read_at": null,
+        "created_at": "2026-09-22 07:42:40.662435",
+        "delivery_id": 34,
+        "channel": "IN_APP",
+        "delivery_status": "SUCCEEDED",
+        "attempt": 1,
+        "delivered_at": "2026-09-22 07:42:40.935829"
+      },
+      {
+        "id": 35,
+        "user_id": 6,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单处理方案已更新",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read_at": null,
+        "created_at": "2026-09-22 07:42:40.665428",
+        "delivery_id": 35,
+        "channel": "IN_APP",
+        "delivery_status": "SUCCEEDED",
+        "attempt": 1,
+        "delivered_at": "2026-09-22 07:42:41.001302"
+      },
+      {
+        "id": 36,
+        "user_id": 3,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单待确认",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read_at": null,
+        "created_at": "2026-09-22 07:42:40.715417",
+        "delivery_id": 36,
+        "channel": "IN_APP",
+        "delivery_status": "SUCCEEDED",
+        "attempt": 1,
+        "delivered_at": "2026-09-22 07:42:41.068384"
+      },
+      {
+        "id": 37,
+        "user_id": 3,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单已完成",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read_at": null,
+        "created_at": "2026-09-22 07:42:40.784749",
+        "delivery_id": 37,
+        "channel": "IN_APP",
+        "delivery_status": "SUCCEEDED",
+        "attempt": 1,
+        "delivered_at": "2026-09-22 07:42:41.163994"
+      },
+      {
+        "id": 38,
+        "user_id": 5,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单已完成",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read_at": null,
+        "created_at": "2026-09-22 07:42:40.787925",
+        "delivery_id": 38,
+        "channel": "IN_APP",
+        "delivery_status": "SUCCEEDED",
+        "attempt": 1,
+        "delivered_at": "2026-09-22 07:42:41.256249"
+      },
+      {
+        "id": 39,
+        "user_id": 12,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "工单已完成",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "read_at": null,
+        "created_at": "2026-09-22 07:42:40.791256",
+        "delivery_id": 39,
+        "channel": "IN_APP",
+        "delivery_status": "SUCCEEDED",
+        "attempt": 1,
+        "delivered_at": "2026-09-22 07:42:41.317747"
+      },
+      {
+        "id": 40,
+        "user_id": 3,
+        "tenant_id": 1,
+        "property_id": 1,
+        "title": "Notification verification ntf013-feaff1e125c8",
+        "resource_type": "ANNOUNCEMENT",
+        "resource_id": 2,
+        "read_at": null,
+        "created_at": "2026-09-22 07:42:40.894229",
+        "delivery_id": 40,
+        "channel": "IN_APP",
+        "delivery_status": "SUCCEEDED",
+        "attempt": 1,
+        "delivered_at": "2026-09-22 07:42:41.391359"
+      }
+    ],
+    "announcement": {
+      "id": 2,
+      "tenant_id": 1,
+      "property_id": 1,
+      "title": "Notification verification ntf013-feaff1e125c8",
+      "status": "PUBLISHED",
+      "ai_draft": 0,
+      "created_by_user_id": 5,
+      "reviewed_by_user_id": 5,
+      "published_by_user_id": 5,
+      "published_at": "2026-09-22 07:42:40.889964"
+    },
+    "audits": [
+      {
+        "id": 289,
+        "actor_user_id": 3,
+        "tenant_id": 1,
+        "property_id": 1,
+        "action": "WORK_ORDER_CREATED",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "request_id": "ntf013-feaff1e125c8-work-order-create",
+        "created_at": "2026-09-22 07:42:39.800969"
+      },
+      {
+        "id": 292,
+        "actor_user_id": 6,
+        "tenant_id": 1,
+        "property_id": 1,
+        "action": "WORK_ORDER_ACCEPTED",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "request_id": "ntf013-feaff1e125c8-work-order-accept",
+        "created_at": "2026-09-22 07:42:40.516017"
+      },
+      {
+        "id": 293,
+        "actor_user_id": 6,
+        "tenant_id": 1,
+        "property_id": 1,
+        "action": "WORK_ORDER_PROCESS_STARTED",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "request_id": "ntf013-feaff1e125c8-work-order-start",
+        "created_at": "2026-09-22 07:42:40.565605"
+      },
+      {
+        "id": 294,
+        "actor_user_id": 6,
+        "tenant_id": 1,
+        "property_id": 1,
+        "action": "WORK_ORDER_PROCESS_UPDATED",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "request_id": "ntf013-feaff1e125c8-work-order-escalate",
+        "created_at": "2026-09-22 07:42:40.603553"
+      },
+      {
+        "id": 295,
+        "actor_user_id": 5,
+        "tenant_id": 1,
+        "property_id": 1,
+        "action": "WORK_ORDER_DECIDED",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "request_id": "ntf013-feaff1e125c8-work-order-decide-continue",
+        "created_at": "2026-09-22 07:42:40.661378"
+      },
+      {
+        "id": 296,
+        "actor_user_id": 6,
+        "tenant_id": 1,
+        "property_id": 1,
+        "action": "WORK_ORDER_RESOLVED",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "request_id": "ntf013-feaff1e125c8-work-order-receipt",
+        "created_at": "2026-09-22 07:42:40.714413"
+      },
+      {
+        "id": 297,
+        "actor_user_id": 3,
+        "tenant_id": 1,
+        "property_id": 1,
+        "action": "WORK_ORDER_CLOSED",
+        "resource_type": "WORK_ORDER",
+        "resource_id": 23,
+        "request_id": "ntf013-feaff1e125c8-work-order-confirm",
+        "created_at": "2026-09-22 07:42:40.780024"
+      },
+      {
+        "id": 298,
+        "actor_user_id": 5,
+        "tenant_id": 1,
+        "property_id": 1,
+        "action": "ANNOUNCEMENT_DRAFT_CREATED",
+        "resource_type": "ANNOUNCEMENT",
+        "resource_id": 2,
+        "request_id": "ntf013-feaff1e125c8-announcement-create",
+        "created_at": "2026-09-22 07:42:40.839975"
+      },
+      {
+        "id": 299,
+        "actor_user_id": 5,
+        "tenant_id": 1,
+        "property_id": 1,
+        "action": "ANNOUNCEMENT_SUBMITTED",
+        "resource_type": "ANNOUNCEMENT",
+        "resource_id": 2,
+        "request_id": "ntf013-feaff1e125c8-announcement-submit-review",
+        "created_at": "2026-09-22 07:42:40.864927"
+      },
+      {
+        "id": 300,
+        "actor_user_id": 5,
+        "tenant_id": 1,
+        "property_id": 1,
+        "action": "ANNOUNCEMENT_PUBLISHED",
+        "resource_type": "ANNOUNCEMENT",
+        "resource_id": 2,
+        "request_id": "ntf013-feaff1e125c8-announcement-publish",
+        "created_at": "2026-09-22 07:42:40.897398"
+      }
+    ],
+    "read_row": {
+      "id": 26,
+      "user_id": 3,
+      "read_at": "2026-09-22 07:42:41.410950"
+    },
+    "cross_scope_count": 0
+  },
+  "requests": [
+    {
+      "label": "healthz",
+      "method": "GET",
+      "path": "/healthz",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "7a59825f44e3ad0b"
+    },
+    {
+      "label": "readyz",
+      "method": "GET",
+      "path": "/readyz",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "15a239fd2335fabd"
+    },
+    {
+      "label": "primary-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c95f20fe6478be91"
+    },
+    {
+      "label": "primary-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "78d551a865023940"
+    },
+    {
+      "label": "primary-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "bf55568e23767f77"
+    },
+    {
+      "label": "primary-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2fe3a2a5d3bb9eb9"
+    },
+    {
+      "label": "staff-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "091b832ce59ab54b"
+    },
+    {
+      "label": "staff-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "30148521b4673b98"
+    },
+    {
+      "label": "staff-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "3cc72130ca5a0988"
+    },
+    {
+      "label": "staff-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9ff637bc787744bf"
+    },
+    {
+      "label": "manager-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "aac3b94dc0406256"
+    },
+    {
+      "label": "manager-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1ac3c141862d24c9"
+    },
+    {
+      "label": "manager-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "37d29836d1cbe84c"
+    },
+    {
+      "label": "manager-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d62f287cd8602ab7"
+    },
+    {
+      "label": "primary-me",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1b774b1c78ac41e6"
+    },
+    {
+      "label": "staff-me",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2d56dd2487fd8eeb"
+    },
+    {
+      "label": "manager-me",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2665647e9cad3c96"
+    },
+    {
+      "label": "staff-attendance-before",
+      "method": "GET",
+      "path": "/staff/attendance/today",
+      "params": [
+        "property_id",
+        "tenant_id"
+      ],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a5a9d255566448e0"
+    },
+    {
+      "label": "primary-notifications-before",
+      "method": "GET",
+      "path": "/notifications",
+      "params": [
+        "after_id",
+        "limit"
+      ],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d92e77359432bd08"
+    },
+    {
+      "label": "staff-notifications-before",
+      "method": "GET",
+      "path": "/notifications",
+      "params": [
+        "after_id",
+        "limit"
+      ],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "56de5ac5fa5a48e1"
+    },
+    {
+      "label": "manager-notifications-before",
+      "method": "GET",
+      "path": "/notifications",
+      "params": [
+        "after_id",
+        "limit"
+      ],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6ca881556e2fbed8"
+    },
+    {
+      "label": "work-order-create",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2275eea47d6d3094"
+    },
+    {
+      "label": "assigned-poll-0",
+      "method": "GET",
+      "path": "/work-orders/23",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "3725315227dca622"
+    },
+    {
+      "label": "assigned-poll-1",
+      "method": "GET",
+      "path": "/work-orders/23",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9a6e1b8ae0a12d26"
+    },
+    {
+      "label": "assigned-poll-2",
+      "method": "GET",
+      "path": "/work-orders/23",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "5a5118df029d4771"
+    },
+    {
+      "label": "work-order-accept",
+      "method": "POST",
+      "path": "/staff/work-orders/23/accept",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e20c673de3723268"
+    },
+    {
+      "label": "work-order-start",
+      "method": "POST",
+      "path": "/staff/work-orders/23/start",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1c0658c6a401ec2b"
+    },
+    {
+      "label": "work-order-escalate",
+      "method": "POST",
+      "path": "/staff/work-orders/23/escalate",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d7572d53deb4ec8e"
+    },
+    {
+      "label": "work-order-decide-continue",
+      "method": "POST",
+      "path": "/supervisor/work-orders/23/decide",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d37243e8fe2f9bc1"
+    },
+    {
+      "label": "work-order-receipt",
+      "method": "POST",
+      "path": "/staff/work-orders/23/receipts",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "36cbe4553c302d23"
+    },
+    {
+      "label": "work-order-confirm",
+      "method": "POST",
+      "path": "/work-orders/23/confirm",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69c5a7856f18fb4d"
+    },
+    {
+      "label": "announcement-create",
+      "method": "POST",
+      "path": "/admin/announcements",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "94740cd4f38235db"
+    },
+    {
+      "label": "announcement-submit-review",
+      "method": "POST",
+      "path": "/admin/announcements/2/submit-review",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "884a1a253cd809c1"
+    },
+    {
+      "label": "announcement-publish",
+      "method": "POST",
+      "path": "/admin/announcements/2/publish",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6dfb549c7ed0a29d"
+    },
+    {
+      "label": "primary-notifications-after-0",
+      "method": "GET",
+      "path": "/notifications",
+      "params": [
+        "after_id",
+        "limit"
+      ],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2467a034bc539265"
+    },
+    {
+      "label": "staff-notifications-after-0",
+      "method": "GET",
+      "path": "/notifications",
+      "params": [
+        "after_id",
+        "limit"
+      ],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2c761f31b48ef677"
+    },
+    {
+      "label": "manager-notifications-after-0",
+      "method": "GET",
+      "path": "/notifications",
+      "params": [
+        "after_id",
+        "limit"
+      ],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c14701293c8a40fe"
+    },
+    {
+      "label": "manager-read-resident-notification-denied",
+      "method": "POST",
+      "path": "/notifications/26/read",
+      "params": [],
+      "status": 404,
+      "error_code": "NTF.NOT_FOUND",
+      "request_id_hash": "292579f424ccb04d"
+    },
+    {
+      "label": "resident-read-repeat",
+      "method": "POST",
+      "path": "/notifications/26/read",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "74b06230b27dc417"
+    },
+    {
+      "label": "staff-pagination-first",
+      "method": "GET",
+      "path": "/notifications",
+      "params": [
+        "after_id",
+        "limit"
+      ],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "cb804f12939821a9"
+    },
+    {
+      "label": "staff-pagination-second",
+      "method": "GET",
+      "path": "/notifications",
+      "params": [
+        "after_id",
+        "limit"
+      ],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9bf6b3925bd5ad44"
+    },
+    {
+      "label": "notification-validation-after-negative",
+      "method": "GET",
+      "path": "/notifications",
+      "params": [
+        "after_id",
+        "limit"
+      ],
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR",
+      "request_id_hash": "0276b9b73f1ae420"
+    },
+    {
+      "label": "notification-validation-limit-zero",
+      "method": "GET",
+      "path": "/notifications",
+      "params": [
+        "after_id",
+        "limit"
+      ],
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR",
+      "request_id_hash": "eed5ed8688fce900"
+    },
+    {
+      "label": "notification-validation-limit-too-large",
+      "method": "GET",
+      "path": "/notifications",
+      "params": [
+        "after_id",
+        "limit"
+      ],
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR",
+      "request_id_hash": "a6f4a04dc545725a"
+    },
+    {
+      "label": "primary-relogin-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "18c113f98292cd7c"
+    },
+    {
+      "label": "primary-relogin-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9bf29098f4ed8bf1"
+    },
+    {
+      "label": "primary-relogin-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "5f28bcdc56b61683"
+    },
+    {
+      "label": "primary-relogin-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "aa4f59a4568677c4"
+    },
+    {
+      "label": "primary-notifications-after-relogin",
+      "method": "GET",
+      "path": "/notifications",
+      "params": [
+        "after_id",
+        "limit"
+      ],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9ecd8215b1765f14"
+    }
+  ],
+  "checks": {
+    "normal_sms_login": true,
+    "automatic_dispatch_not_manual": true,
+    "same_work_order_lifecycle_closed": true,
+    "announcement_governance_published": true,
+    "resource_scope_consistent": true,
+    "deliveries_terminal": true,
+    "pagination_boundary_valid": true,
+    "anti_idor_and_idempotent_read": true,
+    "refresh_relogin_history_consistent": true
+  },
+  "boundaries": {
+    "page_evidence_in_separate_artifact": true,
+    "direct_database_business_write": false,
+    "seed_or_dev_token_login": false,
+    "migration_run": false,
+    "shared_vhost_touched": false,
+    "external_provider_exactly_once_claimed": false,
+    "real_qwen_or_bge_m3_claimed": false,
+    "production_claimed": false,
+    "phones_tokens_and_otp_persisted_publicly": false
+  }
+}

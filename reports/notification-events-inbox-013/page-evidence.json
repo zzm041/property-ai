@@ -1,0 +1,224 @@
+{
+  "task_id": "NOTIFICATION-EVENTS-INBOX-013",
+  "captured_at": "2026-09-22T07:49:36.323Z",
+  "code_sha": "93838c1a624b6c03bf0f3982ebee09b48f727a60",
+  "run_id": "ntf013-feaff1e125c8",
+  "environment": {
+    "interaction": "WeChat DevTools miniprogram-automator through actual page controls",
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "rabbit_vhost": "property_ai_auth001",
+    "rabbit_queue": "property_ai.auth001",
+    "provider": "DEVELOPMENT_SMS_AND_FAKE_AI_AND_DEVELOPMENT_NOTIFICATION",
+    "automator_endpoint": "ws://127.0.0.1:9440"
+  },
+  "objects": {
+    "work_order_id": 23,
+    "work_order_notification_id": 37,
+    "announcement_id": 2,
+    "announcement_notification_id": 40
+  },
+  "checks": {
+    "staff_identity": 6,
+    "resident_identity": 3,
+    "first_page_count": 20,
+    "first_page_cursor": 5,
+    "loaded_total_count": 23,
+    "second_page_count": 3,
+    "descending_unique_without_overlap": true,
+    "final_page_has_no_cursor": true,
+    "work_order_mark_read_request_count": 1,
+    "work_order_resource_id_matches": true,
+    "work_order_history_status": "CLOSED",
+    "announcement_mark_read_request_count": 1,
+    "announcement_resource_id_matches": true,
+    "announcement_status": "PUBLISHED",
+    "read_state_refresh_persisted": true,
+    "read_state_relogin_persisted": true,
+    "project_config_sha256_before": "342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F",
+    "project_config_sha256_after": "342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F"
+  },
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:49:39.766Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:49:39.789Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:49:40.449Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:49:41.600Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "GET",
+      "path": "/notifications?limit=20",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:49:41.600Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "GET",
+      "path": "/notifications?limit=20&after_id=5",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:49:43.333Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:49:47.332Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:49:47.359Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:49:48.045Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:49:48.968Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "GET",
+      "path": "/notifications?limit=20",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:49:48.971Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "POST",
+      "path": "/notifications/37/read",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:49:50.530Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/23",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:49:50.569Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/23",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:49:51.301Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:49:52.993Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "GET",
+      "path": "/notifications?limit=20",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:49:52.998Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "POST",
+      "path": "/notifications/40/read",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:49:56.039Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "GET",
+      "path": "/announcements?property_id=1&after_id=1&limit=1",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:49:56.702Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:50:00.496Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:50:00.526Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:50:01.164Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:50:01.913Z",
+      "source": "wx.request proxy forwarding the actual request"
+    },
+    {
+      "method": "GET",
+      "path": "/notifications?limit=20",
+      "status": 200,
+      "received_at_local": "2026-09-22T07:50:01.916Z",
+      "source": "wx.request proxy forwarding the actual request"
+    }
+  ],
+  "screenshots": [
+    "01-staff-notifications-first-page.png",
+    "02-staff-notifications-loaded-all.png",
+    "03-resident-notifications-unread.png",
+    "04-resident-work-order-from-notification.png",
+    "05-resident-announcement-from-notification.png",
+    "06-resident-read-state-after-relogin.png"
+  ],
+  "boundaries": {
+    "normal_sms_page_login": true,
+    "development_sms_test_inbox_used": true,
+    "seed_or_dev_token_login": false,
+    "page_state_faked": false,
+    "wx_request_forwarded_to_real_api": true,
+    "direct_database_business_write": false,
+    "shared_vhost_touched": false,
+    "real_model_claimed": false,
+    "production_claimed": false
+  }
+}

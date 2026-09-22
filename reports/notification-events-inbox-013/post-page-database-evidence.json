@@ -1,0 +1,139 @@
+{
+  "task_id": "NOTIFICATION-EVENTS-INBOX-013",
+  "captured_at": "2026-09-22T07:52:59.287122+00:00",
+  "code_sha": "93838c1a624b6c03bf0f3982ebee09b48f727a60",
+  "run_id": "ntf013-feaff1e125c8",
+  "environment": {
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "access": "SET TRANSACTION READ ONLY",
+    "rabbit_vhost": "property_ai_auth001",
+    "rabbit_queue": "property_ai.auth001"
+  },
+  "notifications": [
+    {
+      "id": 37,
+      "user_id": 3,
+      "tenant_id": 1,
+      "property_id": 1,
+      "resource_type": "WORK_ORDER",
+      "resource_id": 23,
+      "read_at": "2026-09-22 07:49:50.521066",
+      "created_at": "2026-09-22 07:42:40.784749"
+    },
+    {
+      "id": 40,
+      "user_id": 3,
+      "tenant_id": 1,
+      "property_id": 1,
+      "resource_type": "ANNOUNCEMENT",
+      "resource_id": 2,
+      "read_at": "2026-09-22 07:49:56.029106",
+      "created_at": "2026-09-22 07:42:40.894229"
+    }
+  ],
+  "work_order": {
+    "id": 23,
+    "tenant_id": 1,
+    "property_id": 1,
+    "reporter_user_id": 3,
+    "status": "CLOSED",
+    "version": 10,
+    "closed_at": "2026-09-22 07:42:40.777274"
+  },
+  "announcement": {
+    "id": 2,
+    "tenant_id": 1,
+    "property_id": 1,
+    "status": "PUBLISHED",
+    "published_at": "2026-09-22 07:42:40.889964"
+  },
+  "work_order_history": [
+    {
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "actor_user_id": 3,
+      "created_at": "2026-09-22 07:42:39.796194"
+    },
+    {
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "actor_user_id": null,
+      "created_at": "2026-09-22 07:42:40.130987"
+    },
+    {
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "actor_user_id": null,
+      "created_at": "2026-09-22 07:42:40.321150"
+    },
+    {
+      "event_code": "ACCEPT",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "actor_user_id": 6,
+      "created_at": "2026-09-22 07:42:40.510630"
+    },
+    {
+      "event_code": "START",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "actor_user_id": 6,
+      "created_at": "2026-09-22 07:42:40.557196"
+    },
+    {
+      "event_code": "ESCALATE",
+      "from_status": "PROCESSING",
+      "to_status": "PROCESSING",
+      "actor_user_id": 6,
+      "created_at": "2026-09-22 07:42:40.601456"
+    },
+    {
+      "event_code": "DECIDE",
+      "from_status": "PROCESSING",
+      "to_status": "PROCESSING",
+      "actor_user_id": 5,
+      "created_at": "2026-09-22 07:42:40.656657"
+    },
+    {
+      "event_code": "RECEIPT_RESOLVED",
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "actor_user_id": 6,
+      "created_at": "2026-09-22 07:42:40.711249"
+    },
+    {
+      "event_code": "CONFIRM",
+      "from_status": "WAIT_CONFIRM",
+      "to_status": "COMPLETED",
+      "actor_user_id": 3,
+      "created_at": "2026-09-22 07:42:40.758255"
+    },
+    {
+      "event_code": "ARCHIVE",
+      "from_status": "COMPLETED",
+      "to_status": "CLOSED",
+      "actor_user_id": 3,
+      "created_at": "2026-09-22 07:42:40.775160"
+    }
+  ],
+  "checks": {
+    "same_page_run": true,
+    "both_read_at_persisted": true,
+    "same_resident_owner": true,
+    "same_tenant_property_scope": true,
+    "work_order_notification_resource_matches": true,
+    "announcement_notification_resource_matches": true,
+    "work_order_remains_closed": true,
+    "announcement_remains_published": true
+  },
+  "boundaries": {
+    "database_business_write": false,
+    "migration_run": false,
+    "shared_vhost_touched": false,
+    "production_claimed": false
+  }
+}
