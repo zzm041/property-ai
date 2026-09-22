@@ -213,6 +213,25 @@ def test_mark_read_is_anti_idor_and_repeat_is_idempotent(monkeypatch) -> None:
     assert record.read_at == datetime(2026, 9, 22, 8, 1, tzinfo=UTC)
 
 
+def test_mark_read_repository_locks_owned_notification() -> None:
+    session = MagicMock()
+    session.scalar.return_value = None
+    repository = KnowledgeRepository(session)
+
+    repository.get_notification_for_user(notification_id=100, user_id=7)
+
+    statement = session.scalar.call_args.args[0]
+    sql = str(
+        statement.compile(
+            dialect=mysql.dialect(),
+            compile_kwargs={"literal_binds": True},
+        )
+    )
+    assert "notifications.id = 100" in sql
+    assert "notifications.user_id = 7" in sql
+    assert "FOR UPDATE" in sql
+
+
 def test_work_order_recipient_helper_deduplicates_and_scopes() -> None:
     service = WorkOrderService.__new__(WorkOrderService)
     service._notify = MagicMock()

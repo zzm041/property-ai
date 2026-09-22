@@ -295,10 +295,12 @@ class KnowledgeRepository:
         user_id: int,
     ) -> Notification | None:
         return self._session.scalar(
-            select(Notification).where(
+            select(Notification)
+            .where(
                 Notification.id == notification_id,
                 Notification.user_id == user_id,
             )
+            .with_for_update()
         )
 
     def add_notification(self, record: Notification) -> Notification:
