@@ -107,6 +107,8 @@ class KnowledgeDocumentListData(BaseModel):
 
 class NotificationData(BaseModel):
     id: int
+    tenant_id: int
+    property_id: int
     title: str
     body: str
     resource_type: str

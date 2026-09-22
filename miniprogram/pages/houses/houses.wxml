@@ -22,7 +22,10 @@
 </view>
 <view class="card" wx:if="{{requests.length}}">
   <view>我的申请</view>
-  <view wx:for="{{requests}}" wx:key="id">申请 {{item.status}}</view>
+  <view wx:for="{{requests}}" wx:key="id" id="bind-request-{{item.id}}">
+    申请 {{item.id}} {{item.status}}
+    <text wx:if="{{item.id === focusedRequestId}}">（当前通知）</text>
+  </view>
 </view>
 <button class="btn" bindtap="retry">重试</button>
 <view class="error" wx:if="{{error}}">{{error}}</view>

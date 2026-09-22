@@ -309,7 +309,12 @@ module.exports = {
     request({ path: "/auth/dev/token", method: "POST", data: { seed_key: seedKey } }),
   me: () => request({ path: "/me" }),
   houses: () => request({ path: "/me/houses" }),
-  myBindRequests: () => request({ path: "/resident-bind-requests/mine" }),
+  myBindRequests: (afterId, limit = 50) =>
+    request({
+      path: `/resident-bind-requests/mine?limit=${limit}${
+        afterId ? `&after_id=${afterId}` : ""
+      }`,
+    }),
   createBindRequest: (body) =>
     request({ path: "/resident-bind-requests", method: "POST", data: body }),
   createWorkOrder: (body) =>
@@ -334,8 +339,27 @@ module.exports = {
     request({ path: `/work-orders/${id}/reopen`, method: "POST", data: body }),
   rateWorkOrder: (id, body) =>
     request({ path: `/work-orders/${id}/rate`, method: "POST", data: body }),
-  announcements: (propertyId) =>
-    request({ path: `/announcements?property_id=${propertyId}` }),
+  announcements: (propertyId, afterId, limit = 50) =>
+    request({
+      path: `/announcements?property_id=${propertyId}&limit=${limit}${
+        afterId ? `&after_id=${afterId}` : ""
+      }`,
+    }),
+  announcement: (propertyId, id) =>
+    request({
+      path: `/announcements?property_id=${propertyId}&after_id=${Math.max(
+        Number(id) - 1,
+        0
+      )}&limit=1`,
+    }).then((payload) => {
+      const item = ((payload && payload.items) || []).find(
+        (row) => Number(row.id) === Number(id)
+      );
+      if (!item) {
+        throw new Error("公告不存在、未发布或无权查看");
+      }
+      return item;
+    }),
   queryAssistant: (body) =>
     request({ path: "/assistant/query", method: "POST", data: body }),
   adminKnowledgeDocuments: (propertyId, afterId, includeArchived) =>
@@ -360,7 +384,10 @@ module.exports = {
       method: "POST",
       data: body,
     }),
-  notifications: () => request({ path: "/notifications" }),
+  notifications: (afterId, limit = 20) =>
+    request({
+      path: `/notifications?limit=${limit}${afterId ? `&after_id=${afterId}` : ""}`,
+    }),
   readNotification: (id) =>
     request({ path: `/notifications/${id}/read`, method: "POST", data: {} }),
   checkIn: (propertyId) =>
@@ -375,7 +402,10 @@ module.exports = {
       method: "POST",
       data: { property_id: propertyId },
     }),
-  staffWorkOrders: () => request({ path: "/staff/work-orders" }),
+  staffWorkOrders: (afterId, limit = 50) =>
+    request({
+      path: `/staff/work-orders?limit=${limit}${afterId ? `&after_id=${afterId}` : ""}`,
+    }),
   acceptWorkOrder: (id, body = {}) =>
     request({ path: `/staff/work-orders/${id}/accept`, method: "POST", data: body }),
   rejectWorkOrder: (id, body) =>

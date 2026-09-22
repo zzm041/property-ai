@@ -84,24 +84,24 @@ class NotificationService:
         actor: Principal,
         after_id: int = 0,
         limit: int = 50,
-    ) -> tuple[tuple[Notification, ...], int]:
-        if actor.status != "ACTIVE":
-            raise AppError(
-                code=IamErrorCode.FORBIDDEN,
-                message="Permission denied",
-                status_code=403,
-            )
-        items = self._repository.list_notifications(
+    ) -> tuple[tuple[Notification, ...], int, int | None]:
+        self._require_active(actor)
+        page_limit = min(max(limit, 1), 100)
+        rows = self._repository.list_notifications(
             user_id=actor.user_id,
             after_id=max(after_id, 0),
-            limit=min(max(limit, 1), 100),
+            limit=page_limit + 1,
         )
+        has_more = len(rows) > page_limit
+        items = rows[:page_limit]
         unread = self._repository.count_unread(actor.user_id)
-        return items, unread
+        next_cursor = items[-1].id if has_more and items else None
+        return items, unread, next_cursor
 
     def mark_read(self, *, actor: Principal, notification_id: int) -> Notification:
         from app.core.database import begin_owned_transaction
 
+        self._require_active(actor)
         with begin_owned_transaction(self._session):
             record = self._repository.get_notification_for_user(
                 notification_id=notification_id,
@@ -116,6 +116,15 @@ class NotificationService:
             if record.read_at is None:
                 record.read_at = utc_now()
             return record
+
+    @staticmethod
+    def _require_active(actor: Principal) -> None:
+        if actor.status != "ACTIVE":
+            raise AppError(
+                code=IamErrorCode.FORBIDDEN,
+                message="Permission denied",
+                status_code=403,
+            )
 
     def deliver_pending(self, delivery_id: int) -> str:
         """Claim one PENDING row, push outside the transaction, then write back.

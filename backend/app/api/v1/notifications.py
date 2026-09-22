@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_principal
@@ -26,14 +26,20 @@ def list_notifications(
     request: Request,
     actor: Annotated[Principal, Depends(get_current_principal)],
     service: Annotated[NotificationService, Depends(get_notification_service)],
-    after_id: int = 0,
-    limit: int = 50,
+    after_id: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=100)] = 50,
 ) -> dict[str, object]:
-    items, unread = service.list_mine(actor=actor, after_id=after_id, limit=limit)
+    items, unread, next_cursor = service.list_mine(
+        actor=actor,
+        after_id=after_id,
+        limit=limit,
+    )
     data = NotificationListData(
         items=[
             NotificationData(
                 id=item.id,
+                tenant_id=item.tenant_id,
+                property_id=item.property_id,
                 title=item.title,
                 body=item.body,
                 resource_type=item.resource_type,
@@ -44,7 +50,7 @@ def list_notifications(
             for item in items
         ],
         unread_count=unread,
-        next_cursor=items[-1].id if items else None,
+        next_cursor=next_cursor,
     )
     return success_envelope(request, data.model_dump(mode="json"))
 
@@ -59,6 +65,8 @@ def mark_notification_read(
     record = service.mark_read(actor=actor, notification_id=notification_id)
     data = NotificationData(
         id=record.id,
+        tenant_id=record.tenant_id,
+        property_id=record.property_id,
         title=record.title,
         body=record.body,
         resource_type=record.resource_type,

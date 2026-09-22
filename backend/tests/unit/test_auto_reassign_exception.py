@@ -227,6 +227,7 @@ def test_supervisor_continue_requires_plan_and_clears_exception(monkeypatch) -> 
         id=41,
         tenant_id=1,
         property_id=2,
+        reporter_user_id=7,
         status="PROCESSING",
         process_reason="ESCALATED",
         version=7,
@@ -239,6 +240,9 @@ def test_supervisor_continue_requires_plan_and_clears_exception(monkeypatch) -> 
     service._apply_transition = MagicMock()
     service._append_audit = MagicMock()
     service._resume_receipted_process = MagicMock()
+    service._repository = MagicMock()
+    service._repository.get_active_assignee_user_id.return_value = 23
+    service._notify_users = MagicMock()
     monkeypatch.setattr(
         "app.service.work_order.RbacService.require_permission",
         lambda *_args, **_kwargs: None,
@@ -273,6 +277,13 @@ def test_supervisor_continue_requires_plan_and_clears_exception(monkeypatch) -> 
     service._resume_receipted_process.assert_called_once_with(
         record,
         now=fixed_now,
+    )
+    service._notify_users.assert_called_once_with(
+        record,
+        user_ids=(7, 23),
+        exclude_user_ids=(22,),
+        title="工单处理方案已更新",
+        body="主管已更新工单处理方案，请查看详情",
     )
 
 

@@ -1,8 +1,12 @@
-<view class="card">未读 {{unread}}</view>
+<view class="card" id="notification-unread-count">未读 {{unread}}</view>
 <view class="loading" wx:if="{{loading}}">加载中...</view>
 <view class="empty" wx:if="{{!loading && !items.length}}">暂无通知</view>
-<view class="card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="read">
-  {{item.title}} {{item.read_at ? "已读" : "未读"}}
+<view class="card notification-item" wx:for="{{items}}" wx:key="id" id="notification-{{item.id}}" data-id="{{item.id}}" bindtap="open">
+  <view>{{item.title}} <text>{{item.read_at ? "已读" : "未读"}}</text></view>
+  <view>{{item.body}}</view>
+  <view class="empty">{{item.created_at}}</view>
 </view>
-<button class="btn" bindtap="onShow">重试</button>
-<view class="error" wx:if="{{error}}">{{error}}</view>
+<button class="btn" id="notification-load-more" wx:if="{{hasMore}}" bindtap="loadMore" disabled="{{loading || openingId}}">加载更多</button>
+<view class="empty" id="notification-end" wx:if="{{!loading && items.length && !hasMore}}">已加载全部通知</view>
+<button class="btn" bindtap="retry" disabled="{{loading || openingId}}">刷新</button>
+<view class="error" id="notification-error" wx:if="{{error}}">{{error}}</view>

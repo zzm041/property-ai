@@ -1,6 +1,6 @@
 """WorkOrder create, FSM, manual dispatch, processing, and receipt use cases."""
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from datetime import datetime, timedelta
 from decimal import Decimal
 from hashlib import sha256
@@ -1205,6 +1205,12 @@ class WorkOrderService:
                 "category": record.category,
             },
         )
+        self._notify_users(
+            record,
+            user_ids=(record.reporter_user_id,),
+            title="工单已创建",
+            body="工单已提交，系统正在分析并安排处理",
+        )
         return record, True
 
     def _append_content(
@@ -1293,6 +1299,7 @@ class WorkOrderService:
         self._assert_version(record, version)
         scope = self._property_scope(record)
         is_reporter = record.reporter_user_id == current.user_id
+        active_assignee_user_id = None
         if is_reporter:
             RbacService.require_permission(current, WORK_ORDER_CANCEL, scope)
             if record.status not in {
@@ -1312,6 +1319,9 @@ class WorkOrderService:
             # non-reporter cancellation.
             self._authorize_read(current, record)
             RbacService.require_permission(current, WORK_ORDER_CANCEL, scope)
+            active_assignee_user_id = self._repository.get_active_assignee_user_id(
+                record.id
+            )
         self._apply_transition(
             record,
             event=WorkOrderEvent.CANCEL,
@@ -1332,6 +1342,13 @@ class WorkOrderService:
             tenant_id=record.tenant_id,
             property_id=record.property_id,
             details={"work_order_id": record.id, "status": record.status},
+        )
+        self._notify_users(
+            record,
+            user_ids=(record.reporter_user_id, active_assignee_user_id),
+            exclude_user_ids=(current.user_id,),
+            title="工单已撤销",
+            body="工单已撤销，请查看详情",
         )
         return record
 
@@ -1393,6 +1410,18 @@ class WorkOrderService:
             tenant_id=record.tenant_id,
             property_id=record.property_id,
             details={"work_order_id": record.id, "status": record.status},
+        )
+        self._notify_users(
+            record,
+            user_ids=(
+                record.reporter_user_id,
+                *self._repository.list_sla_management_user_ids(
+                    tenant_id=record.tenant_id,
+                    property_id=record.property_id,
+                ),
+            ),
+            title="工单已完成",
+            body="住户已确认处理结果，工单已完成",
         )
         return record
 
@@ -1484,6 +1513,20 @@ class WorkOrderService:
                 "status": record.status,
                 "reason_code": "REOPEN",
             },
+        )
+        if eligible and employee is not None:
+            recipients: Iterable[int | None] = (employee.user_id,)
+        else:
+            recipients = self._repository.list_sla_management_user_ids(
+                tenant_id=record.tenant_id,
+                property_id=record.property_id,
+            )
+        self._notify_users(
+            record,
+            user_ids=recipients,
+            exclude_user_ids=(current.user_id,),
+            title="工单已重开",
+            body="住户已重开工单，请查看并继续处理",
         )
         return record
 
@@ -1706,14 +1749,11 @@ class WorkOrderService:
             actor_user_id=current.user_id,
             request_id=request_id,
         )
-        self._notify(
-            tenant_id=record.tenant_id,
-            property_id=record.property_id,
-            user_id=employee.user_id,
+        self._notify_users(
+            record,
+            user_ids=(employee.user_id, record.reporter_user_id),
             title="工单已派单",
-            body="You have a new assigned work order",
-            resource_type="WORK_ORDER",
-            resource_id=record.id,
+            body="工单已安排处理，请查看最新进度",
         )
         return record
 
@@ -1757,6 +1797,7 @@ class WorkOrderService:
                 message=f"reason is required for {code.value}",
                 status_code=422,
             )
+        active_assignee_user_id = None
         if code is SupervisorDecision.REASSIGN:
             if employee_id is None:
                 now = self._clock()
@@ -1788,6 +1829,9 @@ class WorkOrderService:
                     claimed_property_id=None,
                 )
         else:
+            active_assignee_user_id = self._repository.get_active_assignee_user_id(
+                record.id
+            )
             reason_map = {
                 SupervisorDecision.WAIT_PARTS: ProcessReason.WAITING_PARTS,
                 SupervisorDecision.WAIT_OWNER: ProcessReason.WAITING_OWNER,
@@ -1824,6 +1868,21 @@ class WorkOrderService:
                 "process_reason": record.process_reason,
                 "reason_code": code.value,
             },
+        )
+        if code is SupervisorDecision.REASSIGN:
+            recipients: Iterable[int | None] = (record.reporter_user_id,)
+            title = "工单待重新安排"
+            body = "主管已将工单转回待派单队列"
+        else:
+            recipients = (record.reporter_user_id, active_assignee_user_id)
+            title = "工单处理方案已更新"
+            body = "主管已更新工单处理方案，请查看详情"
+        self._notify_users(
+            record,
+            user_ids=recipients,
+            exclude_user_ids=(current.user_id,),
+            title=title,
+            body=body,
         )
         return record
 
@@ -1868,6 +1927,12 @@ class WorkOrderService:
                 "employee_id": employee.id,
                 "status": record.status,
             },
+        )
+        self._notify_users(
+            record,
+            user_ids=(record.reporter_user_id,),
+            title="工单已接单",
+            body="工作人员已接单，请留意后续进度",
         )
         return record
 
@@ -1916,6 +1981,12 @@ class WorkOrderService:
                 "reason_code": "REJECTED",
             },
         )
+        self._notify_users(
+            record,
+            user_ids=(record.reporter_user_id,),
+            title="工单待重新安排",
+            body="原处理人员无法接单，系统正在重新安排",
+        )
         return record
 
     def _start(
@@ -1962,6 +2033,12 @@ class WorkOrderService:
             tenant_id=record.tenant_id,
             property_id=record.property_id,
             details={"work_order_id": record.id, "status": record.status},
+        )
+        self._notify_users(
+            record,
+            user_ids=(record.reporter_user_id,),
+            title="工单开始处理",
+            body="工作人员已开始处理工单",
         )
         return record
 
@@ -2222,6 +2299,19 @@ class WorkOrderService:
                     "process_reason": record.process_reason,
                 },
             )
+            self._notify_users(
+                record,
+                user_ids=(
+                    record.reporter_user_id,
+                    *self._repository.list_sla_management_user_ids(
+                        tenant_id=record.tenant_id,
+                        property_id=record.property_id,
+                    ),
+                ),
+                exclude_user_ids=(current.user_id,),
+                title="工单异常待处理",
+                body="工单未解决并已上报，请查看详情",
+            )
         return record
 
     def _escalate(
@@ -2273,6 +2363,19 @@ class WorkOrderService:
                 "status": record.status,
                 "process_reason": record.process_reason,
             },
+        )
+        self._notify_users(
+            record,
+            user_ids=(
+                record.reporter_user_id,
+                *self._repository.list_sla_management_user_ids(
+                    tenant_id=record.tenant_id,
+                    property_id=record.property_id,
+                ),
+            ),
+            exclude_user_ids=(current.user_id,),
+            title="工单异常升级",
+            body="工单已上报异常，请查看处理进度",
         )
         return record
 
@@ -2713,6 +2816,32 @@ class WorkOrderService:
             resource_type=resource_type,
             resource_id=resource_id,
         )
+
+    def _notify_users(
+        self,
+        record: WorkOrder,
+        *,
+        user_ids: Iterable[int | None],
+        title: str,
+        body: str,
+        exclude_user_ids: Iterable[int] = (),
+    ) -> None:
+        excluded = {int(user_id) for user_id in exclude_user_ids}
+        recipients = {
+            int(user_id)
+            for user_id in user_ids
+            if user_id is not None and int(user_id) not in excluded
+        }
+        for user_id in sorted(recipients):
+            self._notify(
+                tenant_id=record.tenant_id,
+                property_id=record.property_id,
+                user_id=user_id,
+                title=title,
+                body=body,
+                resource_type="WORK_ORDER",
+                resource_id=record.id,
+            )
 
     def _actor_can_see_file_tenant(self, actor: Principal, tenant_id: int) -> bool:
         for grant in actor.grants:

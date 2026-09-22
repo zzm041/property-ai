@@ -265,13 +265,13 @@ class KnowledgeRepository:
         after_id: int = 0,
         limit: int = 50,
     ) -> tuple[Notification, ...]:
+        filters = [Notification.user_id == user_id]
+        if after_id > 0:
+            filters.append(Notification.id < after_id)
         return tuple(
             self._session.scalars(
                 select(Notification)
-                .where(
-                    Notification.user_id == user_id,
-                    Notification.id > after_id,
-                )
+                .where(*filters)
                 .order_by(Notification.id.desc())
                 .limit(limit)
             ).all()

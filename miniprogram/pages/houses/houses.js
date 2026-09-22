@@ -15,8 +15,15 @@ Page({
     unitIndex: 0,
     houseIndex: 0,
     selectedHouseId: 0,
+    focusedRequestId: 0,
     loading: false,
     error: "",
+  },
+  onLoad(query) {
+    const requestId = Number(query.requestId || 0);
+    if (Number.isInteger(requestId) && requestId > 0) {
+      this.setData({ focusedRequestId: requestId });
+    }
   },
   onShow() {
     this.reload();
@@ -28,12 +35,12 @@ Page({
     const { withLoading } = require("../../utils/ui");
     const api = require("../../services/api");
     withLoading(this, () =>
-      Promise.all([api.houses(), api.myBindRequests(), api.catalogProperties()]).then(
+      Promise.all([api.houses(), this.loadBindRequests(), api.catalogProperties()]).then(
         ([houses, requests, catalog]) => {
           const properties = (catalog && catalog.items) || [];
           this.setData({
             items: (houses && houses.items) || [],
-            requests: (requests && requests.items) || [],
+            requests,
             properties,
             propertyNames: this.names(properties, "name"),
           });
@@ -44,6 +51,33 @@ Page({
         }
       )
     ).catch(() => {});
+  },
+  loadBindRequests(afterId = 0, existing = [], page = 0) {
+    if (page >= 20) {
+      throw new Error("申请记录过多，请稍后重试");
+    }
+    return require("../../services/api")
+      .myBindRequests(afterId, 100)
+      .then((payload) => {
+        const incoming = (payload && payload.items) || [];
+        const byId = {};
+        const items = existing.concat(incoming).filter((item) => {
+          const key = String(item.id);
+          if (byId[key]) {
+            return false;
+          }
+          byId[key] = true;
+          return true;
+        });
+        const nextCursor = Number((payload && payload.next_cursor) || 0);
+        if (!nextCursor) {
+          return items;
+        }
+        if (nextCursor <= Number(afterId || 0)) {
+          throw new Error("申请记录分页游标无效");
+        }
+        return this.loadBindRequests(nextCursor, items, page + 1);
+      });
   },
   loadBuildings(propertyId) {
     return require("../../services/api")

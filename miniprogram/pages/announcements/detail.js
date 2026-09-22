@@ -13,13 +13,8 @@ Page({
     const { withLoading } = require("../../utils/ui");
     withLoading(this, () =>
       require("../../services/api")
-        .announcements(this.propertyId)
-        .then((data) => {
-          const items = (data && data.items) || [];
-          const item = items.find((row) => row.id === this.id);
-          if (!item) {
-            throw new Error("公告不存在、未发布或无权查看");
-          }
+        .announcement(this.propertyId, this.id)
+        .then((item) => {
           this.setData({
             title: item.title || "",
             content: item.content || "",

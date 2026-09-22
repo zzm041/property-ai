@@ -540,13 +540,19 @@ class AutoDispatchService:
             property_id=record.property_id,
             details=audit_details,
         )
-        if employee.user_id:
+        for user_id in sorted(
+            {
+                int(user_id)
+                for user_id in (employee.user_id, record.reporter_user_id)
+                if user_id is not None
+            }
+        ):
             NotificationService(self._session, settings=self._settings).enqueue(
                 tenant_id=record.tenant_id,
                 property_id=record.property_id,
-                user_id=employee.user_id,
+                user_id=user_id,
                 title="工单已派单",
-                body="You have a new assigned work order",
+                body="工单已安排处理，请查看最新进度",
                 resource_type="WORK_ORDER",
                 resource_id=record.id,
             )

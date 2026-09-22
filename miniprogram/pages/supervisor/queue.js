@@ -10,6 +10,7 @@ Page({
     selectedStatus: "",
     selectedProcessReason: "",
     selectedVersion: "",
+    targetWorkOrderId: 0,
     decisionReason: "",
     recommendations: [],
     loading: false,
@@ -21,6 +22,10 @@ Page({
     }
     if (query.tenantId) {
       this.setData({ tenantId: query.tenantId });
+    }
+    const workOrderId = Number(query.workOrderId || 0);
+    if (Number.isInteger(workOrderId) && workOrderId > 0) {
+      this.setData({ targetWorkOrderId: workOrderId });
     }
   },
   onShow() {
@@ -45,17 +50,49 @@ Page({
     const api = require("../../services/api");
     const propertyId = this.data.propertyId;
     const afterId = reset ? 0 : this.data.nextCursor;
+    const targetPromise =
+      reset && this.data.targetWorkOrderId
+        ? api.workOrder(this.data.targetWorkOrderId)
+        : Promise.resolve(null);
     withLoading(this, () =>
       Promise.all([
         api.supervisorQueue(propertyId, afterId),
         api.staffDaily(propertyId, this.data.tenantId),
-      ]).then(([queue, daily]) => {
+        targetPromise,
+      ]).then(([queue, daily, targetDetail]) => {
         const incoming = (queue && queue.items) || [];
-        this.setData({
-          items: reset ? incoming : this.data.items.concat(incoming),
+        let items = reset ? incoming : this.data.items.concat(incoming);
+        const target = targetDetail
+          ? require("../../utils/ui").workOrderOf(targetDetail)
+          : null;
+        if (target) {
+          if (
+            Number(target.property_id) !== Number(propertyId) ||
+            (this.data.tenantId &&
+              Number(target.tenant_id) !== Number(this.data.tenantId))
+          ) {
+            throw new Error("通知与工单管理范围不一致");
+          }
+          if (!items.some((item) => Number(item.id) === Number(target.id))) {
+            items = [target].concat(items);
+          }
+        }
+        const updates = {
+          items,
           staff: (daily && daily.items) || [],
           nextCursor: (queue && queue.next_cursor) || "",
-        });
+        };
+        if (target) {
+          Object.assign(updates, {
+            selectedId: target.id,
+            selectedStatus: target.status,
+            selectedProcessReason: target.process_reason,
+            selectedVersion: target.version,
+            recommendations: [],
+            decisionReason: "",
+          });
+        }
+        this.setData(updates);
       })
     ).catch(() => {});
   },
