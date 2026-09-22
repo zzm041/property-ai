@@ -1,5 +1,7 @@
 # Evidence boundary — AUTH-IDENTITY-AI-001
 
+> Historical snapshot. For current implementation/runtime status use `reports/project-handoff.md` and `reports/mp-current-full-regression/coverage-matrix.json`; for the current approval-ready real-model plan use `reports/auth-identity-ai-001/self-host-recommendation.md`. In particular, the 0009/AUTO-dispatch/knowledge statements below have been superseded by later scoped evidence and must not be presented as current facts. The real-model and production-release limitations remain valid.
+
 VIS-001..004 remain local visualization only. They used DevAuth seed login and Fake providers.
 
 | Claim | Status |

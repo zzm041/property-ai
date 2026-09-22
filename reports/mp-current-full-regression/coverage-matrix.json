@@ -1732,10 +1732,55 @@
       }
     ]
   },
+  "resident_wo_paging_actions_012": {
+    "task_id": "RESIDENT-WO-PAGING-ACTIONS-012",
+    "implementation_head": "76cb7f36e99a57ffa31e70b935e2cb4aea105634",
+    "evidence_head": "6956d0b04d45bd7305108878d0f29b84d7489469",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+    "independent_review": {
+      "result": "PASS",
+      "path": "reports/codex/RESIDENT-WO-PAGING-ACTIONS-012-review.json",
+      "boundary": "Independent read-only review inspected the scoped product diff, redacted page/API/read-only-DB/concurrency evidence and all twelve supplied screenshots without rerunning tests, operating pages, sending requests, reading the private context or touching services/databases."
+    },
+    "current_status_overlays": [
+      {
+        "id": "WO-LIST-PAGING",
+        "implementation_status": "resident_cursor_paging_load_more_append_deduplicate_and_terminal_cursor_wired",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "76cb7f36e99a57ffa31e70b935e2cb4aea105634 / 6956d0b04d45bd7305108878d0f29b84d7489469",
+        "remaining_gap": "production performance, physical-device UX and formal release acceptance",
+        "next_action": "preserve scoped cursor evidence; revalidate paging under production-scale data and on a physical device"
+      },
+      {
+        "id": "V1-RES-APPEND",
+        "implementation_status": "owner_only_report_phase_nonterminal_append_with_analysis_input_persistence_and_optimistic_concurrency_page_wired",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "76cb7f36e99a57ffa31e70b935e2cb4aea105634 / 6956d0b04d45bd7305108878d0f29b84d7489469",
+        "remaining_gap": "native supplemental-image picker, production storage/scanning, real-model consumption and formal release acceptance",
+        "next_action": "preserve scoped text/concurrency evidence; validate native supplemental media, real analysis and production storage in their approved environments"
+      },
+      {
+        "id": "V1-RES-CANCEL",
+        "implementation_status": "owner_only_preassignment_cancel_with_reason_history_optimistic_concurrency_and_anti_idor_page_wired",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "76cb7f36e99a57ffa31e70b935e2cb4aea105634 / 6956d0b04d45bd7305108878d0f29b84d7489469",
+        "remaining_gap": "native modal and physical-device visual acceptance, broader assigned-work manager cancellation policy/cleanup, production and formal release acceptance",
+        "next_action": "preserve resident pre-assignment evidence; validate the native modal on device and handle manager cancellation only under a separately frozen policy"
+      },
+      {
+        "id": "V1-RES-RATING",
+        "implementation_status": "owner_only_terminal_once_only_rating_with_refresh_relogin_rendering_and_concurrency_guard_page_wired",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "76cb7f36e99a57ffa31e70b935e2cb4aea105634 / 6956d0b04d45bd7305108878d0f29b84d7489469",
+        "remaining_gap": "native picker overlay, physical-device UX, production concurrency and formal release acceptance",
+        "next_action": "preserve scoped once-only evidence; revalidate native picker and production concurrency in their approved environments"
+      }
+    ]
+  },
   "current_effective_view": {
     "generated_at": "2026-09-22",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
-    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID)",
+    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced.",
     "row_count": 83,
     "rows": [
@@ -1957,11 +2002,11 @@
       },
       {
         "requirement_id": "WO-LIST-PAGING",
-        "current_implementation": "页面存在但无真实接线",
-        "verification_mode_status": "UI:PARTIAL",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "API 有 after_id；页面只拉第一页",
-        "next_action": "补齐缺失接线及范围证据"
+        "current_implementation": "resident_cursor_paging_load_more_append_deduplicate_and_terminal_cursor_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "76cb7f36e99a57ffa31e70b935e2cb4aea105634 / 6956d0b04d45bd7305108878d0f29b84d7489469",
+        "remaining_gap": "production performance, physical-device UX and formal release acceptance",
+        "next_action": "preserve scoped cursor evidence; revalidate paging under production-scale data and on a physical device"
       },
       {
         "requirement_id": "WO-CONFIRM-CLOSED",
@@ -2205,27 +2250,27 @@
       },
       {
         "requirement_id": "V1-RES-APPEND",
-        "current_implementation": "implemented_and_page_wired",
-        "verification_mode_status": "UNIT_AND_CODE_SCOPED",
-        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
-        "remaining_gap": "dedicated real-page evidence",
-        "next_action": "仅针对所列剩余缺口补实现或证据"
+        "current_implementation": "owner_only_report_phase_nonterminal_append_with_analysis_input_persistence_and_optimistic_concurrency_page_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "76cb7f36e99a57ffa31e70b935e2cb4aea105634 / 6956d0b04d45bd7305108878d0f29b84d7489469",
+        "remaining_gap": "native supplemental-image picker, production storage/scanning, real-model consumption and formal release acceptance",
+        "next_action": "preserve scoped text/concurrency evidence; validate native supplemental media, real analysis and production storage in their approved environments"
       },
       {
         "requirement_id": "V1-RES-CANCEL",
-        "current_implementation": "implemented_and_page_wired",
-        "verification_mode_status": "UNIT_AND_CODE_SCOPED",
-        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
-        "remaining_gap": "dedicated real-page evidence",
-        "next_action": "仅针对所列剩余缺口补实现或证据"
+        "current_implementation": "owner_only_preassignment_cancel_with_reason_history_optimistic_concurrency_and_anti_idor_page_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "76cb7f36e99a57ffa31e70b935e2cb4aea105634 / 6956d0b04d45bd7305108878d0f29b84d7489469",
+        "remaining_gap": "native modal and physical-device visual acceptance, broader assigned-work manager cancellation policy/cleanup, production and formal release acceptance",
+        "next_action": "preserve resident pre-assignment evidence; validate the native modal on device and handle manager cancellation only under a separately frozen policy"
       },
       {
         "requirement_id": "V1-RES-RATING",
-        "current_implementation": "implemented_and_page_wired",
-        "verification_mode_status": "UNIT_AND_CODE_SCOPED",
-        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
-        "remaining_gap": "dedicated real-page evidence",
-        "next_action": "仅针对所列剩余缺口补实现或证据"
+        "current_implementation": "owner_only_terminal_once_only_rating_with_refresh_relogin_rendering_and_concurrency_guard_page_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
+        "evidence_version": "76cb7f36e99a57ffa31e70b935e2cb4aea105634 / 6956d0b04d45bd7305108878d0f29b84d7489469",
+        "remaining_gap": "native picker overlay, physical-device UX, production concurrency and formal release acceptance",
+        "next_action": "preserve scoped once-only evidence; revalidate native picker and production concurrency in their approved environments"
       },
       {
         "requirement_id": "V1-STAFF-REJECT",
