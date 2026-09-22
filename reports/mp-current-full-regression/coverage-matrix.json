@@ -1777,10 +1777,47 @@
       }
     ]
   },
+  "notification_events_inbox_013": {
+    "task_id": "NOTIFICATION-EVENTS-INBOX-013",
+    "implementation_head": "93838c1a624b6c03bf0f3982ebee09b48f727a60",
+    "evidence_head": "ba510cbc554ddb4f893c1a6e67ed9a00bc83ecec",
+    "runtime_run_id": "ntf013-feaff1e125c8",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+    "next_slice": {
+      "task_id": "WO-REOPEN-RECEIPT-HISTORY-014",
+      "base_sha": "93838c1a624b6c03bf0f3982ebee09b48f727a60",
+      "requirement_ids": ["WO-CANCEL-REJECT-REASSIGN-REOPEN", "V1-RECEIPT-HISTORY"],
+      "scope": "Current-schema resident unresolved-feedback/reopen and all-cycle receipt/history page closure using the existing FSM, Process/Receipt records, qualification rules and automatic dispatch path; no new manager-cancellation or dispatch policy.",
+      "completion": "Still-qualified and no-longer-qualified assignee branches; preserved prior receipt/media; exact cycle progression; ownership/state/reason/version/double-submit/concurrent-confirm negatives; refresh/relogin consistency; focused tests, normal page/API/read-only-DB evidence and independent read-only review."
+    },
+    "independent_review": {
+      "result": "PASS",
+      "path": "reports/codex/NOTIFICATION-EVENTS-INBOX-013-review.json",
+      "boundary": "Round-1 independent read-only review inspected the scoped product diff, focused/full-unit result records, sanitized API/DB/queue/page evidence and all six supplied screenshots without rerunning tests, operating pages, sending business requests or touching services/databases."
+    },
+    "current_status_overlays": [
+      {
+        "id": "NTF-ROUND",
+        "implementation_status": "descending_inbox_paging_load_more_serialized_read_state_and_grant_aware_resource_navigation_wired",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "93838c1a624b6c03bf0f3982ebee09b48f727a60 / ba510cbc554ddb4f893c1a6e67ed9a00bc83ecec",
+        "remaining_gap": "branch-specific runtime/page evidence for every supported target, production provider, physical-device UX, production-scale operation and formal release acceptance",
+        "next_action": "preserve scoped inbox evidence; exercise additional branches when a dependent approved slice changes them and complete production/provider/device acceptance separately"
+      },
+      {
+        "id": "V1-NTF-EVENTS",
+        "implementation_status": "meaningful_work_order_lifecycle_sla_and_governed_announcement_events_wired_with_scoped_deduplicated_recipients",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "93838c1a624b6c03bf0f3982ebee09b48f727a60 / ba510cbc554ddb4f893c1a6e67ed9a00bc83ecec",
+        "remaining_gap": "branch-specific runtime evidence, real notification providers, external delivery semantics, production operation and formal release acceptance",
+        "next_action": "preserve scoped event evidence; do not promote Development delivery to production acceptance"
+      }
+    ]
+  },
   "current_effective_view": {
     "generated_at": "2026-09-22",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
-    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs)",
+    "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs), then notification_events_inbox_013.current_status_overlays (2 IDs)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced.",
     "row_count": 83,
     "rows": [
@@ -2050,11 +2087,11 @@
       },
       {
         "requirement_id": "NTF-ROUND",
-        "current_implementation": "isolated_worker_delivery_and_due_compensation_wired",
-        "verification_mode_status": "PASS_SCOPED_LOCAL",
-        "evidence_version": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea / a5433ffc1147c6ed73d259059dd78567131da4ac",
-        "remaining_gap": "wall-clock beat, production provider and formal production delivery acceptance",
-        "next_action": "保留本地投递证据；在生产等价环境验收墙钟调度与真实Provider"
+        "current_implementation": "descending_inbox_paging_load_more_serialized_read_state_and_grant_aware_resource_navigation_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "93838c1a624b6c03bf0f3982ebee09b48f727a60 / ba510cbc554ddb4f893c1a6e67ed9a00bc83ecec",
+        "remaining_gap": "branch-specific runtime/page evidence for every supported target, production provider, physical-device UX, production-scale operation and formal release acceptance",
+        "next_action": "preserve scoped inbox evidence; exercise additional branches when a dependent approved slice changes them and complete production/provider/device acceptance separately"
       },
       {
         "requirement_id": "UX-NO-DEV-LEAK",
@@ -2434,11 +2471,11 @@
       },
       {
         "requirement_id": "V1-NTF-EVENTS",
-        "current_implementation": "completion_warning_overdue_accept_timeout_and_response_timeout_events_wired",
-        "verification_mode_status": "PARTIAL",
-        "evidence_version": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea / 9ab106b29b9761504fa229cc1bd97227daa6e6c9 / 55fe0a90b81ff8935d50cb8a7fa93c381e8ba92b",
-        "remaining_gap": "完整创建/状态/升级/公告通知事件覆盖及生产验收",
-        "next_action": "后续业务切片逐项补事件并保留本ID在分母中"
+        "current_implementation": "meaningful_work_order_lifecycle_sla_and_governed_announcement_events_wired_with_scoped_deduplicated_recipients",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "93838c1a624b6c03bf0f3982ebee09b48f727a60 / ba510cbc554ddb4f893c1a6e67ed9a00bc83ecec",
+        "remaining_gap": "branch-specific runtime evidence, real notification providers, external delivery semantics, production operation and formal release acceptance",
+        "next_action": "preserve scoped event evidence; do not promote Development delivery to production acceptance"
       },
       {
         "requirement_id": "V1-GOVERNANCE-OPS",

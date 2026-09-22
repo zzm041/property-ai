@@ -3,7 +3,7 @@
   "review_round": 1,
   "base_sha": "ada791429ca460871cf1e9d6aee036d51ee09ffc",
   "product_head": "93838c1a624b6c03bf0f3982ebee09b48f727a60",
-  "status": "PAUSED_NO_VALID_INDEPENDENT_REVIEW_RESULT",
+  "status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
   "attempts": [
     {
       "attempt": 0,
@@ -25,10 +25,17 @@
       "result": "NO_OUTPUT_BEFORE_900_SECOND_REVIEW_TIMEOUT",
       "evidence": "No result/call JSON was produced because the wrapper was terminated by the outer 984-second command limit.",
       "cleanup": "Only the exact orphan processes started at 2026-09-22 16:12:12 (codex PID 44080 and node PID 41592) were stopped."
+    },
+    {
+      "attempt": 3,
+      "mode": "existing codex_exec_readonly.py in approved host environment with read-only sandbox, fixed schema and all six saved screenshots",
+      "result": "PASS_JSON_AFTER_829.5_SECONDS",
+      "evidence": "reports/codex/NOTIFICATION-EVENTS-INBOX-013-review.json",
+      "cleanup": "No cleanup was required; the wrapper and reviewer exited normally with return code 0."
     }
   ],
-  "result_file_present": false,
-  "independent_pass_claimed": false,
+  "result_file_present": true,
+  "independent_pass_claimed": true,
   "repair_rounds_used": 0,
   "completed_before_pause": {
     "product_commits": [
@@ -45,5 +52,14 @@
     "page_screenshots_visually_inspected_by_main_session": 6,
     "evidence_directory": "reports/notification-events-inbox-013"
   },
-  "resume_action": "Resume the same task and review round against product HEAD 93838c1 using the saved prompt/evidence. Do not rerun the business flow, page run, or tests unless product code changes. A valid independent JSON result is required before PASS, matrix promotion, final evidence commit, or the next slice."
+  "review_result": {
+    "decision": "PASS",
+    "reviewed_product_head": "93838c1a624b6c03bf0f3982ebee09b48f727a60",
+    "evidence_checkpoint": "ba510cbc554ddb4f893c1a6e67ed9a00bc83ecec",
+    "path": "reports/codex/NOTIFICATION-EVENTS-INBOX-013-review.json",
+    "current_task_blockers": 0,
+    "non_blocking_findings": 3,
+    "release_blockers": 2
+  },
+  "resume_action": "The same round-1 review is complete. Preserve the saved product/business/page/test evidence, record the scoped PASS in the living handoff and current matrix overlay, commit only intended 013 review/tracking artifacts, then continue with the next approved current-schema slice."
 }

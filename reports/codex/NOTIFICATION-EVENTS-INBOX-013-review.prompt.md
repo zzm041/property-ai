@@ -16,7 +16,12 @@ Review current source plus saved sanitized evidence and the six attached images.
   release action.
 - Base SHA: `ada791429ca460871cf1e9d6aee036d51ee09ffc`.
 - Product commits: `afa8cfd` and concurrency fix `93838c1`.
-- Expected current HEAD: `93838c1a624b6c03bf0f3982ebee09b48f727a60`.
+- Product HEAD under review: `93838c1a624b6c03bf0f3982ebee09b48f727a60`.
+- The repository may currently be at evidence-only checkpoint
+  `ba510cbc554ddb4f893c1a6e67ed9a00bc83ecec`; that child commit adds only saved
+  review/runtime/page evidence and a WIP handoff note. Review product behavior from
+  the fixed base-to-product diff above, while using the checkpointed evidence as
+  read-only support. Do not treat the evidence checkpoint as a newer product change.
 - Migration 0010 / ACCOUNT-MERGE-001 remains unapproved, uncreated and unexecuted.
 - Known unrelated dirty/pre-existing files include `backend/app/model/ai.py`,
   `miniprogram/project.config.json`, earlier AUTH review outputs and numerous old
