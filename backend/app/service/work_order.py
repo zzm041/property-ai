@@ -678,6 +678,7 @@ class WorkOrderService:
         text: str | None = None,
         file_ids: tuple[int, ...] = (),
         taken_phase: str | None = None,
+        version: int | None = None,
     ) -> WorkOrder:
         self._validate_request_id(request_id)
         record = self._execute(
@@ -688,6 +689,7 @@ class WorkOrderService:
                 text=text,
                 file_ids=file_ids,
                 taken_phase=taken_phase,
+                version=version,
             )
         )
         if record.status == WorkOrderStatus.PENDING_ANALYSIS.value:
@@ -1214,9 +1216,11 @@ class WorkOrderService:
         text: str | None,
         file_ids: tuple[int, ...],
         taken_phase: str | None,
+        version: int | None = None,
     ) -> WorkOrder:
         current = self._reload_actor(actor)
         record = self._lock_work_order(work_order_id)
+        self._assert_version(record, version)
         self._authorize_read(current, record)
         if record.reporter_user_id != current.user_id:
             raise AppError(

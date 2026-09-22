@@ -26,6 +26,7 @@ class AppendWorkOrderRequest(BaseModel):
     text: str | None = Field(default=None, max_length=4000)
     file_ids: tuple[int, ...] = ()
     taken_phase: str | None = Field(default=None, max_length=16)
+    version: int | None = Field(default=None, ge=1)
 
 
 class CancelWorkOrderRequest(BaseModel):

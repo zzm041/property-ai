@@ -154,6 +154,9 @@ Page({
     });
   },
   appendContent() {
+    if (this.data.loading) {
+      return;
+    }
     const text = this.data.appendText.trim();
     if (!text && !this.data.appendFileIds.length) {
       this.setData({ error: "请填写补充说明或添加图片" });
@@ -167,6 +170,7 @@ Page({
           text: text || null,
           file_ids: this.data.appendFileIds,
           taken_phase: "REPORT",
+          version: this.data.workOrder.version,
         })
         .then(() => {
           this.setData({
@@ -228,6 +232,9 @@ Page({
     this.setData({ ratingComment: e.detail.value });
   },
   rate() {
+    if (this.data.loading) {
+      return;
+    }
     this._stopPendingRefresh();
     const rating = this.data.ratingOptions[this.data.ratingIndex];
     const comment = this.data.ratingComment.trim();

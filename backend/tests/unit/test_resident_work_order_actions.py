@@ -192,6 +192,33 @@ def test_pending_append_enqueues_fresh_analysis_after_commit() -> None:
     service._enqueue_analysis.assert_not_called()
 
 
+def test_resident_append_rejects_stale_version_before_mutation() -> None:
+    service = WorkOrderService.__new__(WorkOrderService)
+    current = SimpleNamespace(user_id=7)
+    record = _record(44)
+    service._reload_actor = MagicMock(return_value=current)
+    service._lock_work_order = MagicMock(return_value=record)
+    service._authorize_read = MagicMock()
+    service._repository = MagicMock()
+    service._attach_media = MagicMock()
+
+    with pytest.raises(AppError) as captured:
+        service._append_content(
+            actor=MagicMock(),
+            work_order_id=record.id,
+            request_id="wo012-append-stale",
+            text="duplicate click",
+            file_ids=(),
+            taken_phase="REPORT",
+            version=record.version - 1,
+        )
+
+    assert captured.value.code == WorkOrderErrorCode.CONFLICT
+    service._authorize_read.assert_not_called()
+    service._repository.get_content.assert_not_called()
+    service._attach_media.assert_not_called()
+
+
 def test_cancel_rejects_other_resident_even_with_resident_cancel_permission() -> None:
     service = WorkOrderService.__new__(WorkOrderService)
     current = MagicMock()

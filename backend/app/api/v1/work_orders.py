@@ -235,6 +235,7 @@ def append_work_order(
         text=body.text,
         file_ids=body.file_ids,
         taken_phase=body.taken_phase,
+        version=body.version,
     )
     return success_envelope(request, work_order_data(record).model_dump(mode="json"))
 
