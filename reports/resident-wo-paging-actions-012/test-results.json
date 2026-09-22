@@ -1,0 +1,55 @@
+{
+  "task_id": "RESIDENT-WO-PAGING-ACTIONS-012",
+  "code_sha": "76cb7f36e99a57ffa31e70b935e2cb4aea105634",
+  "captured_at": "2026-09-22T05:29:40Z",
+  "interpreter": "D:/property-ai/tmp/uv-python/cpython-3.12.10-windows-x86_64-none/python.exe",
+  "dependency_reuse": "D:/property-ai/.venv/Lib/site-packages with isolated interpreter startup",
+  "results": [
+    {
+      "scope": "backend/tests/unit/test_resident_work_order_actions.py",
+      "result": "13 passed, 1 warning",
+      "duration_seconds": 0.06,
+      "basetemp": "D:/property-ai/tmp/pytest-wo012-concurrency-r2b"
+    },
+    {
+      "scope": "backend/tests/unit",
+      "result": "552 passed, 1 warning",
+      "duration_seconds": 3.90,
+      "basetemp": "D:/property-ai/tmp/pytest-wo012-unit-final"
+    },
+    {
+      "scope": "JavaScript syntax",
+      "result": "PASS",
+      "files": [
+        "miniprogram/pages/work-orders/list.js",
+        "miniprogram/pages/work-orders/detail.js",
+        "miniprogram/services/api.js",
+        "reports/resident-wo-paging-actions-012/run-page-evidence.js"
+      ]
+    },
+    {
+      "scope": "Evidence Python syntax",
+      "result": "PASS",
+      "files": [
+        "reports/resident-wo-paging-actions-012/prepare-runtime.py",
+        "reports/resident-wo-paging-actions-012/verify-runtime.py",
+        "scripts/ops/codex_exec_readonly.py"
+      ]
+    },
+    {
+      "scope": "git diff --check",
+      "result": "PASS",
+      "note": "Only CRLF conversion warnings were emitted for pre-existing backend/app/model/ai.py and the edited review helper; no whitespace errors."
+    }
+  ],
+  "warnings": [
+    "Starlette TestClient anyio BlockingPortal alias deprecation warning.",
+    "pytest-asyncio default fixture loop scope deprecation warning."
+  ],
+  "boundaries": {
+    "database_fixture_run": false,
+    "migration_run": false,
+    "integration_database_reset": false,
+    "production_claimed": false
+  }
+}

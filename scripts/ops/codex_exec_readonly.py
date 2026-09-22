@@ -22,6 +22,12 @@ def main() -> int:
     parser.add_argument("--out", required=True)
     parser.add_argument("--log", required=True)
     parser.add_argument("--timeout", type=int, default=300)
+    parser.add_argument(
+        "--image",
+        action="append",
+        default=[],
+        help="Attach a local image to the independent review (repeatable)",
+    )
     args = parser.parse_args()
     prompt_path = Path(args.prompt_file)
     out_path = Path(args.out)
@@ -46,8 +52,13 @@ def main() -> int:
         str(SCHEMA),
         "--output-last-message",
         str(out_path),
-        "-",
     ]
+    for image in args.image:
+        image_path = Path(image).resolve()
+        if not image_path.is_file():
+            raise FileNotFoundError(f"Review image does not exist: {image_path}")
+        command.extend(["--image", str(image_path)])
+    command.append("-")
     completed = subprocess.run(
         command,
         input=prompt,

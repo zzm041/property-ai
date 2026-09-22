@@ -1,0 +1,62 @@
+{
+  "task_id": "RESIDENT-WO-PAGING-ACTIONS-012",
+  "inspected_at": "2026-09-22T05:25:30Z",
+  "inspector": "main Codex implementation session",
+  "method": "All twelve PNG files were opened at original detail with the local image viewer; paths alone were not treated as inspection.",
+  "screenshots": [
+    {
+      "path": "01-list-first-page.png",
+      "observed": "Resident My Work Orders page visibly shows the first ascending records and mixed persisted states."
+    },
+    {
+      "path": "02-list-loaded-all.png",
+      "observed": "The same page visibly retains IDs 17-20, appends IDs 21-22, and shows the loaded-all message."
+    },
+    {
+      "path": "03-append-form.png",
+      "observed": "Work order 11 is PENDING_ANALYSIS and the unique synthetic append marker is visibly entered in the supplement field."
+    },
+    {
+      "path": "04-append-saved.png",
+      "observed": "Work order 11 visibly renders the saved supplement and clears the input after the real request."
+    },
+    {
+      "path": "05-cancel-form.png",
+      "observed": "Work order 12 is PENDING_ANALYSIS and the unique synthetic cancel reason is visibly entered before the cancel button."
+    },
+    {
+      "path": "06-cancelled-history.png",
+      "observed": "Work order 12 visibly shows CANCELLED, the CREATE-to-CANCEL history and the same cancellation reason; the success toast is visible."
+    },
+    {
+      "path": "07-rating-form.png",
+      "observed": "Work order 9 visibly shows CLOSED, its receipt, a selected 3-point rating and the unique synthetic comment before submission."
+    },
+    {
+      "path": "08-rating-saved.png",
+      "observed": "The saved 3-point rating/comment, RATE history and success toast are visible."
+    },
+    {
+      "path": "09-relogin-append.png",
+      "observed": "After a fresh SMS page login, work order 11 still visibly contains the same supplement."
+    },
+    {
+      "path": "10-relogin-cancelled.png",
+      "observed": "After relogin, work order 12 remains CANCELLED with its reason and history."
+    },
+    {
+      "path": "11-relogin-rating.png",
+      "observed": "After relogin, work order 9 remains CLOSED and visibly shows the persisted rating/comment without another rating form."
+    },
+    {
+      "path": "12-relogin-pagination.png",
+      "observed": "After relogin and load-more, IDs 21-22 and the loaded-all message are again visible."
+    }
+  ],
+  "boundaries": [
+    "The rating picker was driven by the supported automator change event; a native system picker overlay is not claimed.",
+    "The first native modal attempt did not deliver a page callback. The successful run used an automator showModal method mock for one cancel choice and one confirm choice; it still clicked the real page button and sent the real API request, but native modal visual acceptance is not claimed.",
+    "All visible content is synthetic; no real resident information is included.",
+    "Development/Fake analysis is not real Qwen or Production V1 AI acceptance."
+  ]
+}

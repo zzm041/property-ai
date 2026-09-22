@@ -1,0 +1,232 @@
+{
+  "task_id": "RESIDENT-WO-PAGING-ACTIONS-012",
+  "captured_at": "2026-09-22T05:23:45.417Z",
+  "code_sha": "76cb7f36e99a57ffa31e70b935e2cb4aea105634",
+  "run_id": "wo012-5d14bd08ca71",
+  "environment": {
+    "interaction": "WeChat DevTools miniprogram-automator through actual page controls",
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "rabbit_vhost": "property_ai_auth001",
+    "rabbit_queue": "property_ai.auth001",
+    "worker_during_actions": "intentionally paused after verified zero ready/unacked",
+    "provider": "DEVELOPMENT_SMS_AND_FAKE_AI",
+    "automator_endpoint": "ws://127.0.0.1:9440",
+    "api_log": "tmp/auth001-runtime/api-76cb7f3-wo012.stdout.log"
+  },
+  "objects": {
+    "append_id": 11,
+    "cancel_id": 12,
+    "rating_id": 9,
+    "append_marker_hash": "3d2f0b21ebd48676",
+    "cancel_reason_hash": "d149ad62302734ab",
+    "rating_comment_hash": "1bfda601300ff493"
+  },
+  "checks": {
+    "resident_identity": 3,
+    "first_page_count": 20,
+    "first_page_cursor": 20,
+    "loaded_total_count": 22,
+    "second_page_count": 2,
+    "cursor_request_observed": true,
+    "append_page_single_request": true,
+    "append_recovered_from_interrupted_page_run": true,
+    "append_refresh_persisted": true,
+    "cancel_modal_cancel_sent_no_request": true,
+    "cancel_modal_confirm_single_request": true,
+    "cancel_reason_rendered_in_history": true,
+    "rating_selected": 3,
+    "rating_page_single_request": true,
+    "rating_refresh_persisted": true,
+    "relogin_append_persisted": true,
+    "relogin_cancel_and_history_persisted": true,
+    "relogin_rating_persisted_and_action_hidden": true,
+    "relogin_cursor": 20,
+    "relogin_final_count": 22
+  },
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:23:47.728Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders?limit=20",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:23:49.134Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders?limit=20&after_id=20",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:23:50.776Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/11",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:23:53.309Z"
+    },
+    {
+      "method": "POST",
+      "path": "/work-orders/11/append",
+      "status": 200,
+      "request_id_hash": "b2b0d3fa362e7718",
+      "source": "redacted API log from interrupted page run"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/11",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:23:54.358Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders?limit=20",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:23:55.131Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/12",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:23:58.848Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/12",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:23:59.890Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/12",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:24:00.952Z"
+    },
+    {
+      "method": "POST",
+      "path": "/work-orders/12/cancel",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:24:01.019Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/12",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:24:01.064Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders?limit=20",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:24:02.823Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/9",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:24:06.554Z"
+    },
+    {
+      "method": "POST",
+      "path": "/work-orders/9/rate",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:24:08.404Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/9",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:24:08.435Z"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:24:12.448Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders?limit=20",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:24:14.036Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/11",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:24:14.816Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/11",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:24:15.914Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders?limit=20",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:24:16.600Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/12",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:24:20.334Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders?limit=20",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:24:21.976Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/9",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:24:25.691Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders?limit=20",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:24:27.298Z"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders?limit=20&after_id=20",
+      "status": 200,
+      "received_at_local": "2026-09-22T05:24:30.360Z"
+    }
+  ],
+  "screenshots": [
+    "01-list-first-page.png",
+    "02-list-loaded-all.png",
+    "03-append-form.png",
+    "04-append-saved.png",
+    "05-cancel-form.png",
+    "06-cancelled-history.png",
+    "07-rating-form.png",
+    "08-rating-saved.png",
+    "09-relogin-append.png",
+    "10-relogin-cancelled.png",
+    "11-relogin-rating.png",
+    "12-relogin-pagination.png"
+  ],
+  "boundaries": {
+    "normal_sms_page_login": true,
+    "development_sms_test_inbox_used": true,
+    "seed_or_dev_token_login": false,
+    "page_state_faked": false,
+    "direct_database_business_write": false,
+    "modal_driver": "automator showModal method mock returned one cancel then one confirm; native modal visual not claimed",
+    "rating_picker_driver": "supported automator change event; native picker overlay not claimed",
+    "real_model_claimed": false,
+    "production_claimed": false
+  }
+}

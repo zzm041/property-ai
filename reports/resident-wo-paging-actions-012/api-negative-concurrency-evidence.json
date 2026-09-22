@@ -1,0 +1,410 @@
+{
+  "task_id": "RESIDENT-WO-PAGING-ACTIONS-012",
+  "captured_at": "2026-09-22T05:27:35.228148+00:00",
+  "code_sha": "76cb7f36e99a57ffa31e70b935e2cb4aea105634",
+  "run_id": "wo012-5d14bd08ca71",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "rabbit_vhost": "property_ai_auth001",
+    "rabbit_queue": "property_ai.auth001",
+    "worker_during_negative_checks": "paused; pending state stable"
+  },
+  "identities": {
+    "primary": 3,
+    "secondary": 4
+  },
+  "objects": {
+    "append_id": 11,
+    "cancel_id": 12,
+    "append_race_id": 13,
+    "filler_boundary_id": 14,
+    "assigned_boundary_id": 1,
+    "rating_page_id": 9,
+    "rating_race_id": 10,
+    "append_race_marker_hash": "946bf445c012e6e5",
+    "rating_race_comment_hash": "14500f389962b38b"
+  },
+  "pagination": {
+    "first_count": 20,
+    "first_cursor": 20,
+    "second_count": 2,
+    "second_cursor": null,
+    "after_final_count": 0,
+    "after_final_cursor": null,
+    "unique_across_pages": true,
+    "limit_zero": {
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR"
+    },
+    "limit_101": {
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR"
+    }
+  },
+  "append": {
+    "empty": {
+      "status": 422,
+      "error_code": "WO.CONTENT_REQUIRED"
+    },
+    "invalid_phase": {
+      "status": 422,
+      "error_code": "WO.INVALID_INPUT"
+    },
+    "foreign_resident": {
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN"
+    },
+    "terminal": {
+      "status": 409,
+      "error_code": "WO.ALREADY_PROCESSED"
+    },
+    "concurrent_same_version": [
+      {
+        "attempt": 2,
+        "status": 200,
+        "error_code": null,
+        "request_id_hash": "87284e5c6353b853"
+      },
+      {
+        "attempt": 1,
+        "status": 409,
+        "error_code": "WO.CONFLICT",
+        "request_id_hash": "da6b06f7a58945a3"
+      }
+    ],
+    "concurrent_marker_occurrences": 1
+  },
+  "cancel": {
+    "stale_version": {
+      "status": 409,
+      "error_code": "WO.CONFLICT"
+    },
+    "foreign_resident": {
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN"
+    },
+    "repeat": {
+      "status": 409,
+      "error_code": "WO.INVALID_TRANSITION"
+    },
+    "assigned_illegal_state": {
+      "status": 409,
+      "error_code": "WO.INVALID_TRANSITION"
+    }
+  },
+  "rating": {
+    "before_terminal": {
+      "status": 409,
+      "error_code": "WO.INVALID_TRANSITION"
+    },
+    "foreign_resident": {
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN"
+    },
+    "rating_zero": {
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR"
+    },
+    "rating_six": {
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR"
+    },
+    "concurrent_first_rating": [
+      {
+        "attempt": 2,
+        "status": 200,
+        "error_code": null,
+        "request_id_hash": "5538cfea41d2d91a"
+      },
+      {
+        "attempt": 1,
+        "status": 409,
+        "error_code": "WO.ALREADY_PROCESSED",
+        "request_id_hash": "cfb9c387d5ee3eb9"
+      }
+    ],
+    "repeat_page_rating": {
+      "status": 409,
+      "error_code": "WO.ALREADY_PROCESSED"
+    }
+  },
+  "detail_foreign_resident": {
+    "status": 403,
+    "error_code": "IAM.FORBIDDEN"
+  },
+  "requests": [
+    {
+      "label": "primary-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6a97edd1f8c92669"
+    },
+    {
+      "label": "primary-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "7691959b41ade246"
+    },
+    {
+      "label": "primary-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "45e871a1a1347775"
+    },
+    {
+      "label": "primary-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "fefd5ccf6328036b"
+    },
+    {
+      "label": "secondary-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "8f8e80ba97af30c3"
+    },
+    {
+      "label": "secondary-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c1ded1561eec90e8"
+    },
+    {
+      "label": "secondary-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "fbbfc2a2e4794b08"
+    },
+    {
+      "label": "secondary-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "78eac6a20d55e636"
+    },
+    {
+      "label": "page-first",
+      "method": "GET",
+      "path": "/work-orders",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "edb26b3dc15f462d"
+    },
+    {
+      "label": "page-second",
+      "method": "GET",
+      "path": "/work-orders",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "0c6ad03abd393f8d"
+    },
+    {
+      "label": "page-after-final",
+      "method": "GET",
+      "path": "/work-orders",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "4a377414e6c7c871"
+    },
+    {
+      "label": "page-limit-zero",
+      "method": "GET",
+      "path": "/work-orders",
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR",
+      "request_id_hash": "75ba378657092a8c"
+    },
+    {
+      "label": "page-limit-high",
+      "method": "GET",
+      "path": "/work-orders",
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR",
+      "request_id_hash": "111b4e34222d7e7a"
+    },
+    {
+      "label": "append-detail",
+      "method": "GET",
+      "path": "/work-orders/11",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "27cfad9e15823bef"
+    },
+    {
+      "label": "append-empty",
+      "method": "POST",
+      "path": "/work-orders/11/append",
+      "status": 422,
+      "error_code": "WO.CONTENT_REQUIRED",
+      "request_id_hash": "88a37e038c061455"
+    },
+    {
+      "label": "append-invalid-phase",
+      "method": "POST",
+      "path": "/work-orders/11/append",
+      "status": 422,
+      "error_code": "WO.INVALID_INPUT",
+      "request_id_hash": "3a885a1784fd3619"
+    },
+    {
+      "label": "append-foreign-resident",
+      "method": "POST",
+      "path": "/work-orders/11/append",
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "0228ae001dcc77f2"
+    },
+    {
+      "label": "detail-foreign-resident",
+      "method": "GET",
+      "path": "/work-orders/11",
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "66c61e6652762115"
+    },
+    {
+      "label": "cancelled-detail",
+      "method": "GET",
+      "path": "/work-orders/12",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "7c65c1721c7411bb"
+    },
+    {
+      "label": "append-terminal",
+      "method": "POST",
+      "path": "/work-orders/12/append",
+      "status": 409,
+      "error_code": "WO.ALREADY_PROCESSED",
+      "request_id_hash": "f53b98e00a4dc7b3"
+    },
+    {
+      "label": "append-race-detail-before",
+      "method": "GET",
+      "path": "/work-orders/13",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6eb3907de263638f"
+    },
+    {
+      "label": "append-race-detail-after",
+      "method": "GET",
+      "path": "/work-orders/13",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "862938098c36ba92"
+    },
+    {
+      "label": "filler-detail",
+      "method": "GET",
+      "path": "/work-orders/14",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "cb2a4379247fdef2"
+    },
+    {
+      "label": "cancel-stale",
+      "method": "POST",
+      "path": "/work-orders/14/cancel",
+      "status": 409,
+      "error_code": "WO.CONFLICT",
+      "request_id_hash": "b997f91bde82cb19"
+    },
+    {
+      "label": "cancel-foreign-resident",
+      "method": "POST",
+      "path": "/work-orders/14/cancel",
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "2a02866d6cd9c169"
+    },
+    {
+      "label": "cancel-repeat",
+      "method": "POST",
+      "path": "/work-orders/12/cancel",
+      "status": 409,
+      "error_code": "WO.INVALID_TRANSITION",
+      "request_id_hash": "e24a3ef83fa26f4a"
+    },
+    {
+      "label": "assigned-detail",
+      "method": "GET",
+      "path": "/work-orders/1",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d7cf19e55da077f4"
+    },
+    {
+      "label": "cancel-assigned",
+      "method": "POST",
+      "path": "/work-orders/1/cancel",
+      "status": 409,
+      "error_code": "WO.INVALID_TRANSITION",
+      "request_id_hash": "744d23d27df2a8b6"
+    },
+    {
+      "label": "rate-early",
+      "method": "POST",
+      "path": "/work-orders/14/rate",
+      "status": 409,
+      "error_code": "WO.INVALID_TRANSITION",
+      "request_id_hash": "7ae5c917ae3b98cb"
+    },
+    {
+      "label": "rate-foreign-resident",
+      "method": "POST",
+      "path": "/work-orders/9/rate",
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "1f08b204d29dca32"
+    },
+    {
+      "label": "rate-zero",
+      "method": "POST",
+      "path": "/work-orders/10/rate",
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR",
+      "request_id_hash": "833b355073ed42ed"
+    },
+    {
+      "label": "rate-six",
+      "method": "POST",
+      "path": "/work-orders/10/rate",
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR",
+      "request_id_hash": "d2a5d3128e2b70ce"
+    },
+    {
+      "label": "rate-repeat",
+      "method": "POST",
+      "path": "/work-orders/9/rate",
+      "status": 409,
+      "error_code": "WO.ALREADY_PROCESSED",
+      "request_id_hash": "922c0c496a3696a9"
+    }
+  ],
+  "boundaries": {
+    "normal_sms_login": true,
+    "seed_or_dev_token_login": false,
+    "direct_database_business_write": false,
+    "real_model_claimed": false,
+    "production_claimed": false
+  }
+}

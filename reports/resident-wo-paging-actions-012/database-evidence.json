@@ -1,0 +1,660 @@
+{
+  "task_id": "RESIDENT-WO-PAGING-ACTIONS-012",
+  "captured_at": "2026-09-22T05:29:00.199455+00:00",
+  "code_sha": "76cb7f36e99a57ffa31e70b935e2cb4aea105634",
+  "run_id": "wo012-5d14bd08ca71",
+  "environment": {
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "read_only_transaction": true,
+    "rabbit_vhost": "property_ai_auth001",
+    "rabbit_queue": "property_ai.auth001"
+  },
+  "objects": {
+    "rating_page_id": 9,
+    "rating_race_id": 10,
+    "append_page_id": 11,
+    "cancel_page_id": 12,
+    "append_race_id": 13
+  },
+  "work_orders": [
+    {
+      "id": 9,
+      "reporter_user_id": 3,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "status": "CLOSED",
+      "version": 8,
+      "current_assignment_id": null,
+      "closed_at": "2026-09-22 05:17:24.498740"
+    },
+    {
+      "id": 10,
+      "reporter_user_id": 3,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "status": "CLOSED",
+      "version": 8,
+      "current_assignment_id": null,
+      "closed_at": "2026-09-22 05:17:25.314630"
+    },
+    {
+      "id": 11,
+      "reporter_user_id": 3,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "status": "ASSIGNED",
+      "version": 4,
+      "current_assignment_id": 9,
+      "closed_at": null
+    },
+    {
+      "id": 12,
+      "reporter_user_id": 3,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "status": "CANCELLED",
+      "version": 2,
+      "current_assignment_id": null,
+      "closed_at": null
+    },
+    {
+      "id": 13,
+      "reporter_user_id": 3,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "status": "ASSIGNED",
+      "version": 4,
+      "current_assignment_id": 10,
+      "closed_at": null
+    }
+  ],
+  "contents": [
+    {
+      "work_order_id": 9,
+      "notes_length": 0,
+      "notes_hash": "e3b0c44298fc1c14",
+      "page_marker_occurrences": 0,
+      "race_marker_occurrences": 0
+    },
+    {
+      "work_order_id": 10,
+      "notes_length": 0,
+      "notes_hash": "e3b0c44298fc1c14",
+      "page_marker_occurrences": 0,
+      "race_marker_occurrences": 0
+    },
+    {
+      "work_order_id": 11,
+      "notes_length": 30,
+      "notes_hash": "3d2f0b21ebd48676",
+      "page_marker_occurrences": 1,
+      "race_marker_occurrences": 0
+    },
+    {
+      "work_order_id": 12,
+      "notes_length": 0,
+      "notes_hash": "e3b0c44298fc1c14",
+      "page_marker_occurrences": 0,
+      "race_marker_occurrences": 0
+    },
+    {
+      "work_order_id": 13,
+      "notes_length": 34,
+      "notes_hash": "946bf445c012e6e5",
+      "page_marker_occurrences": 0,
+      "race_marker_occurrences": 1
+    }
+  ],
+  "logs": [
+    {
+      "work_order_id": 9,
+      "actor_user_id": 3,
+      "actor_type": "RESIDENT",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "event_code": "CREATE",
+      "created_at": "2026-09-22 05:17:23.748262",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 9,
+      "actor_user_id": null,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "event_code": "ANALYZE",
+      "created_at": "2026-09-22 05:17:23.837947",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 9,
+      "actor_user_id": null,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "event_code": "ASSIGN",
+      "created_at": "2026-09-22 05:17:24.028752",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 9,
+      "actor_user_id": 6,
+      "actor_type": "STAFF",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "event_code": "ACCEPT",
+      "created_at": "2026-09-22 05:17:24.368288",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 9,
+      "actor_user_id": 6,
+      "actor_type": "STAFF",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "event_code": "START",
+      "created_at": "2026-09-22 05:17:24.408876",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 9,
+      "actor_user_id": 6,
+      "actor_type": "STAFF",
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "event_code": "RECEIPT_RESOLVED",
+      "created_at": "2026-09-22 05:17:24.444578",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 9,
+      "actor_user_id": 3,
+      "actor_type": "RESIDENT",
+      "from_status": "WAIT_CONFIRM",
+      "to_status": "COMPLETED",
+      "event_code": "CONFIRM",
+      "created_at": "2026-09-22 05:17:24.484104",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 9,
+      "actor_user_id": 3,
+      "actor_type": "SYSTEM",
+      "from_status": "COMPLETED",
+      "to_status": "CLOSED",
+      "event_code": "ARCHIVE",
+      "created_at": "2026-09-22 05:17:24.497695",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 10,
+      "actor_user_id": 3,
+      "actor_type": "RESIDENT",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "event_code": "CREATE",
+      "created_at": "2026-09-22 05:17:24.536847",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 10,
+      "actor_user_id": null,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "event_code": "ANALYZE",
+      "created_at": "2026-09-22 05:17:24.662862",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 10,
+      "actor_user_id": null,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "event_code": "ASSIGN",
+      "created_at": "2026-09-22 05:17:24.846966",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 10,
+      "actor_user_id": 6,
+      "actor_type": "STAFF",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "event_code": "ACCEPT",
+      "created_at": "2026-09-22 05:17:25.176430",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 10,
+      "actor_user_id": 6,
+      "actor_type": "STAFF",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "event_code": "START",
+      "created_at": "2026-09-22 05:17:25.218422",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 10,
+      "actor_user_id": 6,
+      "actor_type": "STAFF",
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "event_code": "RECEIPT_RESOLVED",
+      "created_at": "2026-09-22 05:17:25.256305",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 10,
+      "actor_user_id": 3,
+      "actor_type": "RESIDENT",
+      "from_status": "WAIT_CONFIRM",
+      "to_status": "COMPLETED",
+      "event_code": "CONFIRM",
+      "created_at": "2026-09-22 05:17:25.298743",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 10,
+      "actor_user_id": 3,
+      "actor_type": "SYSTEM",
+      "from_status": "COMPLETED",
+      "to_status": "CLOSED",
+      "event_code": "ARCHIVE",
+      "created_at": "2026-09-22 05:17:25.312756",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 11,
+      "actor_user_id": 3,
+      "actor_type": "RESIDENT",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "event_code": "CREATE",
+      "created_at": "2026-09-22 05:18:15.390983",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 12,
+      "actor_user_id": 3,
+      "actor_type": "RESIDENT",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "event_code": "CREATE",
+      "created_at": "2026-09-22 05:18:15.440364",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 13,
+      "actor_user_id": 3,
+      "actor_type": "RESIDENT",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "event_code": "CREATE",
+      "created_at": "2026-09-22 05:18:15.484805",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 11,
+      "actor_user_id": 3,
+      "actor_type": "RESIDENT",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ANALYSIS",
+      "event_code": "APPEND",
+      "created_at": "2026-09-22 05:21:54.937380",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 12,
+      "actor_user_id": 3,
+      "actor_type": "RESIDENT",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "CANCELLED",
+      "event_code": "CANCEL",
+      "created_at": "2026-09-22 05:24:01.007088",
+      "reason_hash": "d149ad62302734ab"
+    },
+    {
+      "work_order_id": 9,
+      "actor_user_id": 3,
+      "actor_type": "RESIDENT",
+      "from_status": "CLOSED",
+      "to_status": "CLOSED",
+      "event_code": "RATE",
+      "created_at": "2026-09-22 05:24:08.396460",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 13,
+      "actor_user_id": 3,
+      "actor_type": "RESIDENT",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ANALYSIS",
+      "event_code": "APPEND",
+      "created_at": "2026-09-22 05:27:34.429961",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 10,
+      "actor_user_id": 3,
+      "actor_type": "RESIDENT",
+      "from_status": "CLOSED",
+      "to_status": "CLOSED",
+      "event_code": "RATE",
+      "created_at": "2026-09-22 05:27:35.188505",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 11,
+      "actor_user_id": null,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "event_code": "ANALYZE",
+      "created_at": "2026-09-22 05:27:59.426773",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 11,
+      "actor_user_id": null,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "event_code": "ASSIGN",
+      "created_at": "2026-09-22 05:27:59.643318",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 13,
+      "actor_user_id": null,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "event_code": "ANALYZE",
+      "created_at": "2026-09-22 05:27:59.999210",
+      "reason_hash": null
+    },
+    {
+      "work_order_id": 13,
+      "actor_user_id": null,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "event_code": "ASSIGN",
+      "created_at": "2026-09-22 05:28:00.196150",
+      "reason_hash": null
+    }
+  ],
+  "feedbacks": [
+    {
+      "work_order_id": 9,
+      "actor_user_id": 3,
+      "confirmed": 1,
+      "rating": null,
+      "unresolved_flag": 0,
+      "created_at": "2026-09-22 05:17:24.481101",
+      "comment_hash": null
+    },
+    {
+      "work_order_id": 10,
+      "actor_user_id": 3,
+      "confirmed": 1,
+      "rating": null,
+      "unresolved_flag": 0,
+      "created_at": "2026-09-22 05:17:25.296093",
+      "comment_hash": null
+    },
+    {
+      "work_order_id": 9,
+      "actor_user_id": 3,
+      "confirmed": null,
+      "rating": 3,
+      "unresolved_flag": 0,
+      "created_at": "2026-09-22 05:24:08.394864",
+      "comment_hash": "1bfda601300ff493"
+    },
+    {
+      "work_order_id": 10,
+      "actor_user_id": 3,
+      "confirmed": null,
+      "rating": 4,
+      "unresolved_flag": 0,
+      "created_at": "2026-09-22 05:27:35.186925",
+      "comment_hash": "14500f389962b38b"
+    }
+  ],
+  "assignments": [
+    {
+      "work_order_id": 9,
+      "employee_id": 1,
+      "assigned_by_user_id": null,
+      "status": "ENDED",
+      "reason": "AUTO_DISPATCH",
+      "ended_at": "2026-09-22 05:17:24.485768"
+    },
+    {
+      "work_order_id": 10,
+      "employee_id": 1,
+      "assigned_by_user_id": null,
+      "status": "ENDED",
+      "reason": "AUTO_DISPATCH",
+      "ended_at": "2026-09-22 05:17:25.299803"
+    },
+    {
+      "work_order_id": 11,
+      "employee_id": 1,
+      "assigned_by_user_id": null,
+      "status": "ACTIVE",
+      "reason": "AUTO_DISPATCH",
+      "ended_at": null
+    },
+    {
+      "work_order_id": 13,
+      "employee_id": 1,
+      "assigned_by_user_id": null,
+      "status": "ACTIVE",
+      "reason": "AUTO_DISPATCH",
+      "ended_at": null
+    }
+  ],
+  "processes": [
+    {
+      "work_order_id": 9,
+      "cycle_no": 1,
+      "assignee_id": 1,
+      "started_at": "2026-09-22 05:17:24.407227",
+      "ended_at": "2026-09-22 05:17:24.441804"
+    },
+    {
+      "work_order_id": 10,
+      "cycle_no": 1,
+      "assignee_id": 1,
+      "started_at": "2026-09-22 05:17:25.216280",
+      "ended_at": "2026-09-22 05:17:25.252537"
+    }
+  ],
+  "receipts": [
+    {
+      "work_order_id": 9,
+      "problem_type": "ELECTRICAL",
+      "method": "Synthetic scoped verification wo012-5d14bd08ca71",
+      "fee_flag": "NONE",
+      "resolved": 1,
+      "finished_at": "2026-09-22 05:17:24.441804"
+    },
+    {
+      "work_order_id": 10,
+      "problem_type": "ELECTRICAL",
+      "method": "Synthetic scoped verification wo012-5d14bd08ca71",
+      "fee_flag": "NONE",
+      "resolved": 1,
+      "finished_at": "2026-09-22 05:17:25.252537"
+    }
+  ],
+  "audits": [
+    {
+      "actor_user_id": 3,
+      "action": "WORK_ORDER_CREATED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 9,
+      "tenant_id": 1,
+      "property_id": 1,
+      "created_at": "2026-09-22 05:17:23.750364"
+    },
+    {
+      "actor_user_id": 6,
+      "action": "WORK_ORDER_ACCEPTED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 9,
+      "tenant_id": 1,
+      "property_id": 1,
+      "created_at": "2026-09-22 05:17:24.372911"
+    },
+    {
+      "actor_user_id": 6,
+      "action": "WORK_ORDER_PROCESS_STARTED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 9,
+      "tenant_id": 1,
+      "property_id": 1,
+      "created_at": "2026-09-22 05:17:24.415717"
+    },
+    {
+      "actor_user_id": 6,
+      "action": "WORK_ORDER_RESOLVED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 9,
+      "tenant_id": 1,
+      "property_id": 1,
+      "created_at": "2026-09-22 05:17:24.447265"
+    },
+    {
+      "actor_user_id": 3,
+      "action": "WORK_ORDER_CLOSED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 9,
+      "tenant_id": 1,
+      "property_id": 1,
+      "created_at": "2026-09-22 05:17:24.500503"
+    },
+    {
+      "actor_user_id": 3,
+      "action": "WORK_ORDER_CREATED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 10,
+      "tenant_id": 1,
+      "property_id": 1,
+      "created_at": "2026-09-22 05:17:24.539813"
+    },
+    {
+      "actor_user_id": 6,
+      "action": "WORK_ORDER_ACCEPTED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 10,
+      "tenant_id": 1,
+      "property_id": 1,
+      "created_at": "2026-09-22 05:17:25.180937"
+    },
+    {
+      "actor_user_id": 6,
+      "action": "WORK_ORDER_PROCESS_STARTED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 10,
+      "tenant_id": 1,
+      "property_id": 1,
+      "created_at": "2026-09-22 05:17:25.224250"
+    },
+    {
+      "actor_user_id": 6,
+      "action": "WORK_ORDER_RESOLVED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 10,
+      "tenant_id": 1,
+      "property_id": 1,
+      "created_at": "2026-09-22 05:17:25.260018"
+    },
+    {
+      "actor_user_id": 3,
+      "action": "WORK_ORDER_CLOSED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 10,
+      "tenant_id": 1,
+      "property_id": 1,
+      "created_at": "2026-09-22 05:17:25.316161"
+    },
+    {
+      "actor_user_id": 3,
+      "action": "WORK_ORDER_CREATED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 11,
+      "tenant_id": 1,
+      "property_id": 1,
+      "created_at": "2026-09-22 05:18:15.393763"
+    },
+    {
+      "actor_user_id": 3,
+      "action": "WORK_ORDER_CREATED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 12,
+      "tenant_id": 1,
+      "property_id": 1,
+      "created_at": "2026-09-22 05:18:15.443816"
+    },
+    {
+      "actor_user_id": 3,
+      "action": "WORK_ORDER_CREATED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 13,
+      "tenant_id": 1,
+      "property_id": 1,
+      "created_at": "2026-09-22 05:18:15.488813"
+    },
+    {
+      "actor_user_id": 3,
+      "action": "WORK_ORDER_CANCELLED",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 12,
+      "tenant_id": 1,
+      "property_id": 1,
+      "created_at": "2026-09-22 05:24:01.011322"
+    }
+  ],
+  "assertions": {
+    "revision_is_0009": true,
+    "all_objects_present": true,
+    "page_append_marker_once": true,
+    "concurrent_append_marker_once": true,
+    "cancelled_state_persisted": true,
+    "cancel_reason_hash_matches": true,
+    "one_page_rating": true,
+    "page_rating_matches": true,
+    "one_concurrent_rating": true,
+    "concurrent_rating_matches": true,
+    "rating_objects_remain_closed": true,
+    "rating_objects_have_auto_assignments": true,
+    "rating_objects_have_process_and_receipt": true,
+    "cancel_audit_present": true
+  },
+  "hashes": {
+    "page_append_marker": "3d2f0b21ebd48676",
+    "concurrent_append_marker": "946bf445c012e6e5",
+    "cancel_reason": "d149ad62302734ab",
+    "page_rating_comment": "1bfda601300ff493",
+    "concurrent_rating_comment": "14500f389962b38b"
+  },
+  "boundaries": {
+    "direct_database_business_write": false,
+    "database_evidence_only": true,
+    "phone_token_otp_or_resident_text_included": false,
+    "real_model_claimed": false,
+    "production_claimed": false
+  }
+}

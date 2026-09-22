@@ -1,0 +1,80 @@
+{
+  "task_id": "RESIDENT-WO-PAGING-ACTIONS-012",
+  "captured_at": "2026-09-22T05:29:25.0503203Z",
+  "code_sha": "76cb7f36e99a57ffa31e70b935e2cb4aea105634",
+  "api": {
+    "url": "http://127.0.0.1:8083/api/v1",
+    "pid": 44104,
+    "interpreter": "D:/property-ai/tmp/uv-python/cpython-3.12.10-windows-x86_64-none/python.exe",
+    "stdout": "tmp/auth001-runtime/api-76cb7f3-wo012.stdout.log",
+    "stderr": "tmp/auth001-runtime/api-76cb7f3-wo012.stderr.log",
+    "stderr_bytes": 0,
+    "health": "ok",
+    "ready": "ready"
+  },
+  "worker": {
+    "wrapper_pid": 40644,
+    "child_pid": 39556,
+    "interpreter": "D:/property-ai/tmp/uv-python/cpython-3.12.10-windows-x86_64-none/python.exe",
+    "stdout": "tmp/auth001-runtime/worker-76cb7f3-wo012.stdout.log",
+    "stderr": "tmp/auth001-runtime/worker-76cb7f3-wo012.stderr.log",
+    "stderr_bytes": 0,
+    "node_name": "auth001@DESKTOP-8NHSE12",
+    "pool": "solo",
+    "queue": "property_ai.auth001",
+    "vhost": "property_ai_auth001"
+  },
+  "database": {
+    "host": "127.0.0.1",
+    "port": 3307,
+    "name": "property_ai_auth001_test",
+    "revision": "20260919_0009"
+  },
+  "isolated_dependencies": {
+    "redis_db": 12,
+    "milvus_collection": "knowledge_chunks_auth001",
+    "rabbit_vhost": "property_ai_auth001",
+    "rabbit_queue": "property_ai.auth001",
+    "queue_after_run": {
+      "messages_ready": 0,
+      "messages_unacknowledged": 0,
+      "consumers": 1
+    },
+    "dlq_preserved": {
+      "name": "property_ai.auth001.dlq",
+      "messages_ready": 2,
+      "messages_unacknowledged": 0,
+      "consumers": 0,
+      "read_consumed_replayed_or_cleared": false
+    }
+  },
+  "readiness_dependencies": {
+    "mysql": "up",
+    "redis": "up",
+    "rabbitmq": "up",
+    "milvus": "up",
+    "llm": "not_checked",
+    "vlm": "not_checked",
+    "asr": "not_checked",
+    "embedding": "not_checked",
+    "reranker": "not_checked",
+    "storage": "not_checked"
+  },
+  "miniprogram": {
+    "devtools_automator": "ws://127.0.0.1:9440",
+    "project_config_sha256_before_and_after": "342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F",
+    "project_config_preserved_unstaged": true
+  },
+  "provider_boundary": {
+    "sms": "Development test inbox",
+    "work_order_analysis": "Development/Fake",
+    "real_qwen_bge_m3_or_production_provider_claimed": false
+  },
+  "forbidden_targets_untouched": [
+    "8082",
+    "RabbitMQ shared vhost property_ai",
+    "Migration 0010",
+    "other databases",
+    "shared Redis/Milvus/MinIO data"
+  ]
+}

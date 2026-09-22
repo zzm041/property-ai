@@ -1,0 +1,249 @@
+{
+  "task_id": "RESIDENT-WO-PAGING-ACTIONS-012",
+  "captured_at": "2026-09-22T05:18:15.961501+00:00",
+  "code_sha": "76cb7f36e99a57ffa31e70b935e2cb4aea105634",
+  "run_id": "wo012-5d14bd08ca71",
+  "environment": {
+    "api": "http://127.0.0.1:8083/api/v1",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "rabbit_vhost": "property_ai_auth001",
+    "rabbit_queue": "property_ai.auth001",
+    "providers": "DEVELOPMENT_SMS_AND_FAKE_AI"
+  },
+  "identities": {
+    "primary": 3,
+    "secondary": 4,
+    "staff": 6,
+    "manager": 5
+  },
+  "objects": {
+    "interrupted_pending_ids": [
+      7,
+      8
+    ],
+    "interrupted_pending_marker_hashes": [
+      "1b55b7ca6d921285",
+      "aa354ec63fa4b705"
+    ],
+    "capacity_release_id": 6,
+    "rating_race_id": 10,
+    "rating_race_marker_hash": "301da7c2dc75f964",
+    "rating_page_id": 9,
+    "rating_page_marker_hash": "69b58b2c035ae864",
+    "append_page_id": 11,
+    "append_page_marker_hash": "f70d1012de0c5ca1",
+    "cancel_page_id": 12,
+    "cancel_page_marker_hash": "25e28c2292fb44f8",
+    "append_race_id": 13,
+    "append_race_marker_hash": "0e32a4e0eeeecaf8",
+    "filler_01_id": 14,
+    "filler_01_marker_hash": "9073ec6c344b61c0",
+    "filler_02_id": 15,
+    "filler_02_marker_hash": "ffb2d8c7046c00c4",
+    "filler_03_id": 16,
+    "filler_03_marker_hash": "6d3f523a7b38bb0d",
+    "filler_04_id": 17,
+    "filler_04_marker_hash": "01e93b629e7c90c8",
+    "filler_05_id": 18,
+    "filler_05_marker_hash": "0d61d7b5da2a9d1e",
+    "filler_06_id": 19,
+    "filler_06_marker_hash": "91355c3dc66bf1c7",
+    "filler_07_id": 20,
+    "filler_07_marker_hash": "9a727ac8c01a826c",
+    "filler_08_id": 21,
+    "filler_08_marker_hash": "95e244dd9ed5cb37",
+    "filler_09_id": 22,
+    "filler_09_marker_hash": "77e99d9c96cc2642"
+  },
+  "phases": {
+    "rating": {
+      "completed": true,
+      "created_count": 2,
+      "final_status": "CLOSED",
+      "normal_business_api": true,
+      "staff_checkin_performed": false,
+      "staff_status_update_performed": false,
+      "interrupted_first_attempt_recovered": true,
+      "capacity_release_id": 6
+    },
+    "pending": {
+      "completed": true,
+      "worker_expected_paused": true,
+      "before_count": 10,
+      "created_count": 12,
+      "after_count": 22,
+      "created_ids": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "all_initial_statuses": "PENDING_ANALYSIS"
+    }
+  },
+  "requests": [
+    {
+      "label": "pending-primary-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "335360dc33204fbf"
+    },
+    {
+      "label": "pending-primary-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "92fd378dddfa2dfd"
+    },
+    {
+      "label": "pending-primary-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6d6b9859a7312d13"
+    },
+    {
+      "label": "pending-primary-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "8ab6f80ffc6d8bb8"
+    },
+    {
+      "label": "list-before-pending",
+      "method": "GET",
+      "path": "/work-orders",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6ee5e6345bc09380"
+    },
+    {
+      "label": "create-append_page",
+      "method": "POST",
+      "path": "/work-orders",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "b7ff9adaf0fe516d"
+    },
+    {
+      "label": "create-cancel_page",
+      "method": "POST",
+      "path": "/work-orders",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "f67f461a9e1bff4c"
+    },
+    {
+      "label": "create-append_race",
+      "method": "POST",
+      "path": "/work-orders",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d2c4051e8273c279"
+    },
+    {
+      "label": "create-filler_01",
+      "method": "POST",
+      "path": "/work-orders",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "5d544554115995df"
+    },
+    {
+      "label": "create-filler_02",
+      "method": "POST",
+      "path": "/work-orders",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "0dd8362b175bd96d"
+    },
+    {
+      "label": "create-filler_03",
+      "method": "POST",
+      "path": "/work-orders",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "04fd07426d1e102b"
+    },
+    {
+      "label": "create-filler_04",
+      "method": "POST",
+      "path": "/work-orders",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "24ecec8082d9f0bf"
+    },
+    {
+      "label": "create-filler_05",
+      "method": "POST",
+      "path": "/work-orders",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "13c93937782f7b4d"
+    },
+    {
+      "label": "create-filler_06",
+      "method": "POST",
+      "path": "/work-orders",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "481d05cbfc849547"
+    },
+    {
+      "label": "create-filler_07",
+      "method": "POST",
+      "path": "/work-orders",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "59ebe49393294c7b"
+    },
+    {
+      "label": "create-filler_08",
+      "method": "POST",
+      "path": "/work-orders",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2f1f30dc18446d37"
+    },
+    {
+      "label": "create-filler_09",
+      "method": "POST",
+      "path": "/work-orders",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "97537cae8982e692"
+    },
+    {
+      "label": "list-after-pending",
+      "method": "GET",
+      "path": "/work-orders",
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "269073f721bec725"
+    }
+  ],
+  "boundaries": {
+    "normal_sms_login": true,
+    "seed_or_dev_token_login": false,
+    "direct_database_business_write": false,
+    "migration_run": false,
+    "shared_vhost_touched": false,
+    "real_model_claimed": false,
+    "production_claimed": false,
+    "phones_tokens_and_otp_persisted_publicly": false
+  }
+}
