@@ -2,6 +2,7 @@ const PAGE_SIZE = 20;
 const api = require("../../services/api");
 const { withLoading, workOrderOf } = require("../../utils/ui");
 const notificationRoute = require("../../utils/notification-route");
+const { presentNotification } = require("../../utils/notification-display");
 
 function mergeById(existing, incoming) {
   const seen = {};
@@ -45,7 +46,7 @@ Page({
         });
     return Promise.all([api.notifications(afterId, PAGE_SIZE), mePromise]).then(
       ([data]) => {
-        const incoming = (data && data.items) || [];
+        const incoming = ((data && data.items) || []).map(presentNotification);
         const nextCursor = data && data.next_cursor;
         if (
           append &&
@@ -97,7 +98,7 @@ Page({
         const read = await api.readNotification(id);
         this.setData({
           items: this.data.items.map((item) =>
-            Number(item.id) === id ? Object.assign({}, item, read) : item
+            Number(item.id) === id ? presentNotification(Object.assign({}, item, read)) : item
           ),
           unread: Math.max(0, Number(this.data.unread || 0) - 1),
         });
