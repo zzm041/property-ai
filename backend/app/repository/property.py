@@ -338,18 +338,17 @@ class PropertyRepository:
         unit_id: int,
         after_id: int = 0,
         limit: int = 100,
+        active_only: bool = False,
     ) -> Sequence[House]:
-        return self._session.scalars(
-            select(House)
-            .where(
-                House.tenant_id == tenant_id,
-                House.property_id == property_id,
-                House.unit_id == unit_id,
-                House.id > after_id,
-            )
-            .order_by(House.id)
-            .limit(limit)
-        ).all()
+        statement = select(House).where(
+            House.tenant_id == tenant_id,
+            House.property_id == property_id,
+            House.unit_id == unit_id,
+            House.id > after_id,
+        )
+        if active_only:
+            statement = statement.where(House.status == "ACTIVE")
+        return self._session.scalars(statement.order_by(House.id).limit(limit)).all()
 
     def list_all_houses(
         self,

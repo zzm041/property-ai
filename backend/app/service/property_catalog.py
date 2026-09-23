@@ -50,14 +50,14 @@ class PropertyCatalogService:
         if unit is None:
             raise AppError(code=ErrorCode.NOT_FOUND, message="Unit was not found", status_code=404)
         self._require_active_property(unit.property_id)
-        houses = self._repository.list_houses(
+        return self._repository.list_houses(
             tenant_id=unit.tenant_id,
             property_id=unit.property_id,
             unit_id=unit.id,
             after_id=max(after_id, 0),
             limit=min(max(limit, 1), 100),
+            active_only=True,
         )
-        return tuple(item for item in houses if item.status == "ACTIVE")
 
     def _require_active_property(self, property_id: int) -> Property:
         record = self._session.get(Property, property_id)
