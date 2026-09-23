@@ -1,0 +1,87 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "model": "qwen3.5:4b",
+  "source": "official registry.ollama.ai/library/qwen3.5/4b",
+  "ollama_version": "0.34.2",
+  "models_directory": "D:\\property-ai\\tmp\\selfhost-ai-local\\models",
+  "manifest_sha256": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "artifacts": [
+    {
+      "media_type": "application/vnd.docker.container.image.v1+json",
+      "size": 475,
+      "sha256": "de9fed2251b37295b763727a59ca35cf5cfe5c7379bc3e2104b2ce3c145aa887"
+    },
+    {
+      "media_type": "application/vnd.ollama.image.model",
+      "size": 3389971840,
+      "sha256": "81fb60c7daa80fc1123380b98970b320ae233409f0f71a72ed7b9b0d62f40490"
+    },
+    {
+      "media_type": "application/vnd.ollama.image.license",
+      "size": 11355,
+      "sha256": "7339fa418c9ad3e8e12e74ad0fd26a9cc4be8703f9c110728a992b193be85cb2"
+    },
+    {
+      "media_type": "application/vnd.ollama.image.params",
+      "size": 65,
+      "sha256": "9371364b27a52acac9d87f88bd93c9db1174d8d6ec57f6888925cdc1788871ff"
+    }
+  ],
+  "total_blob_bytes": 3389983735,
+  "elapsed_seconds": 627.89,
+  "hashes_verified": true,
+  "inference_performed": false,
+  "paid_calls": false,
+  "tags": [
+    {
+      "name": "qwen3.5:4b",
+      "model": "qwen3.5:4b",
+      "modified_at": "2026-09-23T16:52:52.016125+08:00",
+      "size": 3389983735,
+      "digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "4.7B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 262144,
+        "embedding_length": 2560
+      },
+      "capabilities": [
+        "completion",
+        "vision",
+        "tools",
+        "thinking"
+      ]
+    },
+    {
+      "name": "qwen3.5:2b",
+      "model": "qwen3.5:2b",
+      "modified_at": "2026-09-23T16:12:58.2580439+08:00",
+      "size": 2741192820,
+      "digest": "324d162be6ca5629ae4517c8710434d0bd2d665bc94dbad46e9af8fbf8a2f0df",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "2.3B",
+        "quantization_level": "Q8_0",
+        "context_length": 262144,
+        "embedding_length": 2048
+      },
+      "capabilities": [
+        "completion",
+        "vision",
+        "tools",
+        "thinking"
+      ]
+    }
+  ]
+}

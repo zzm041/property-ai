@@ -1,0 +1,257 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "model": "qwen3.5:4b",
+  "source_sha": "e65b4d7fb0e9541695fdcb9a1f1b216d97dbf6c2",
+  "manifest_sha256": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "model_details": {
+    "parent_model": "",
+    "format": "gguf",
+    "family": "qwen35",
+    "families": [
+      "qwen35"
+    ],
+    "parameter_size": "4.7B",
+    "quantization_level": "Q4_K_M"
+  },
+  "capabilities": [
+    "completion",
+    "vision",
+    "tools",
+    "thinking"
+  ],
+  "mode": "Same committed-v3 prompt/input; SELECT existing synthetic order; direct real local inference",
+  "baseline": {
+    "utc": "2026-09-23T08:53:02Z",
+    "ram_free_mib": 14816,
+    "gpu_used_mib": 1568,
+    "gpu_free_mib": 14428,
+    "gpu_utilization_percent": 5
+  },
+  "business_requests": false,
+  "business_state_changed": false,
+  "queue_operations": false,
+  "runtime_config_changed": false,
+  "acceptance_boundary": "Diagnostic only; schema/labels do not establish factual grounding, AUTO dispatch, UI or production acceptance.",
+  "resource_scope": "Whole-workstation measurements with other applications retained; not exclusive model attribution.",
+  "comparison_limit": "Two actual deployment candidates: 2B Q8_0 versus 4B Q4_K_M; not an isolated parameter-count experiment.",
+  "request_controls": {
+    "temperature": 0,
+    "reasoning_effort": "none",
+    "max_tokens": 512,
+    "timeout_seconds": 60,
+    "context_length": 4096
+  },
+  "source_sha256": {
+    "backend/app/service/analysis.py": "9093ca1ba0fc2e38de581fa04741a8c1a33b33b31c081426595570301f79e5c1",
+    "backend/app/domain/ai.py": "90ddc15a7dcc48270991a8d640da4766733215724a30c3d03b729d5c5e92a7c7",
+    "backend/app/provider/llm/__init__.py": "4901bc99b45c73d99a57da1406b93bcf08df32741c1bd74b9a3bfbdff023380e"
+  },
+  "work_order_id": 12,
+  "prompt_version": "wo-analysis-v3",
+  "prior_input_hash_verified": "c6c2528a040d78cf695f0a326017f1ebce26febc67df79309af545a7d00dffdd",
+  "current_report": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+  "context": {
+    "house": {
+      "property_name": "014合成小区-wo014-745f67277104",
+      "building_code": "WO014",
+      "building_name": "014合成楼栋",
+      "unit_code": "U014",
+      "unit_name": "014合成单元",
+      "room_no": "014-01"
+    },
+    "reporter_relationships": [
+      "OWNER"
+    ],
+    "recent_house_orders": [
+      {
+        "category": "OTHER",
+        "status": "PENDING_ANALYSIS",
+        "summary": null
+      },
+      {
+        "category": "ELECTRICAL",
+        "status": "ASSIGNED",
+        "summary": "Kitchen electrical outlet sparking"
+      },
+      {
+        "category": "ELECTRICAL",
+        "status": "ASSIGNED",
+        "summary": "Kitchen electrical outlet sparking"
+      },
+      {
+        "category": "ELECTRICAL",
+        "status": "CLOSED",
+        "summary": "Kitchen electrical outlet sparking"
+      },
+      {
+        "category": "ELECTRICAL",
+        "status": "CLOSED",
+        "summary": "Kitchen electrical outlet sparking"
+      }
+    ]
+  },
+  "persisted_status_before": "PENDING_ANALYSIS",
+  "transport": "Real httpx client, trust_env=False; no inherited proxy, mock transport or answer substitution",
+  "full_prompt_sha256": "943dfc2c7d3659ef95351bfbcd3a718029d4364e8bd597f4a3a2fbb01bb948a4",
+  "full_prompt_characters": 3242,
+  "raw_payload": {
+    "category": "electrical",
+    "subcategory": "outlet_failure",
+    "severity": "low",
+    "priority": "p4",
+    "summary": "Kitchen electrical outlet has no power, other rooms normal, no smoke.",
+    "risk": "electric",
+    "required_role": "STAFF",
+    "required_skill": "electrician",
+    "confidence": 0.8
+  },
+  "error": null,
+  "call_status": "SUCCESS",
+  "measured_call": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-23 08:53:03.733998+00:00",
+      "latency_ms": 12697,
+      "request_id": "localqwen-b1090f3deaa3-4b-readonly",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1013
+    }
+  ],
+  "mapped": {
+    "category": "ELECTRICAL",
+    "subcategory": "outlet_failure",
+    "severity": "LOW",
+    "priority": "LOW",
+    "summary": "Kitchen electrical outlet has no power, other rooms normal, no smoke.",
+    "risk": "electric",
+    "required_role": "STAFF",
+    "required_skill": "ELECTRICAL",
+    "required_duty": "MAINTENANCE",
+    "confidence": 0.8,
+    "low_confidence": false
+  },
+  "schema_and_dispatch_labels_match": true,
+  "result": "DIAGNOSTIC_REQUIRES_SEMANTIC_REVIEW",
+  "loaded_models": [
+    {
+      "name": "qwen3.5:4b",
+      "model": "qwen3.5:4b",
+      "size": 3128038521,
+      "digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "4.7B",
+        "quantization_level": "Q4_K_M"
+      },
+      "expires_at": "2026-09-23T16:53:46.430458+08:00",
+      "size_vram": 3128038521,
+      "context_length": 4096
+    }
+  ],
+  "elapsed_seconds": 12.718,
+  "resource_samples": [
+    {
+      "utc": "2026-09-23T08:53:02Z",
+      "ram_free_mib": 14816,
+      "gpu_used_mib": 1568,
+      "gpu_free_mib": 14428,
+      "gpu_utilization_percent": 5
+    },
+    {
+      "utc": "2026-09-23T08:53:04Z",
+      "ram_free_mib": 14458,
+      "gpu_used_mib": 1761,
+      "gpu_free_mib": 14235,
+      "gpu_utilization_percent": 6
+    },
+    {
+      "utc": "2026-09-23T08:53:05Z",
+      "ram_free_mib": 13843,
+      "gpu_used_mib": 4526,
+      "gpu_free_mib": 11470,
+      "gpu_utilization_percent": 20
+    },
+    {
+      "utc": "2026-09-23T08:53:06Z",
+      "ram_free_mib": 13638,
+      "gpu_used_mib": 5521,
+      "gpu_free_mib": 10475,
+      "gpu_utilization_percent": 4
+    },
+    {
+      "utc": "2026-09-23T08:53:07Z",
+      "ram_free_mib": 13631,
+      "gpu_used_mib": 5521,
+      "gpu_free_mib": 10475,
+      "gpu_utilization_percent": 3
+    },
+    {
+      "utc": "2026-09-23T08:53:09Z",
+      "ram_free_mib": 13570,
+      "gpu_used_mib": 5521,
+      "gpu_free_mib": 10475,
+      "gpu_utilization_percent": 3
+    },
+    {
+      "utc": "2026-09-23T08:53:10Z",
+      "ram_free_mib": 13573,
+      "gpu_used_mib": 5521,
+      "gpu_free_mib": 10475,
+      "gpu_utilization_percent": 3
+    },
+    {
+      "utc": "2026-09-23T08:53:11Z",
+      "ram_free_mib": 13628,
+      "gpu_used_mib": 5525,
+      "gpu_free_mib": 10471,
+      "gpu_utilization_percent": 6
+    },
+    {
+      "utc": "2026-09-23T08:53:12Z",
+      "ram_free_mib": 13543,
+      "gpu_used_mib": 5525,
+      "gpu_free_mib": 10471,
+      "gpu_utilization_percent": 6
+    },
+    {
+      "utc": "2026-09-23T08:53:13Z",
+      "ram_free_mib": 13604,
+      "gpu_used_mib": 5525,
+      "gpu_free_mib": 10471,
+      "gpu_utilization_percent": 5
+    },
+    {
+      "utc": "2026-09-23T08:53:14Z",
+      "ram_free_mib": 13599,
+      "gpu_used_mib": 5525,
+      "gpu_free_mib": 10471,
+      "gpu_utilization_percent": 4
+    },
+    {
+      "utc": "2026-09-23T08:53:15Z",
+      "ram_free_mib": 13607,
+      "gpu_used_mib": 5525,
+      "gpu_free_mib": 10471,
+      "gpu_utilization_percent": 4
+    },
+    {
+      "utc": "2026-09-23T08:53:16Z",
+      "ram_free_mib": 13622,
+      "gpu_used_mib": 5531,
+      "gpu_free_mib": 10465,
+      "gpu_utilization_percent": 82
+    }
+  ],
+  "min_ram_free_mib": 13543,
+  "min_gpu_free_mib": 10465,
+  "max_gpu_used_mib": 5531,
+  "headroom_stop_further_tests": false
+}

@@ -1,0 +1,90 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "mode": "SELECT exact existing input + direct real model, no business/queue replay",
+  "work_order_id": 12,
+  "prompt_version": "wo-analysis-v4",
+  "prior_input_hash_verified": "c6c2528a040d78cf695f0a326017f1ebce26febc67df79309af545a7d00dffdd",
+  "current_report": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+  "context": {
+    "house": {
+      "property_name": "014合成小区-wo014-745f67277104",
+      "building_code": "WO014",
+      "building_name": "014合成楼栋",
+      "unit_code": "U014",
+      "unit_name": "014合成单元",
+      "room_no": "014-01"
+    },
+    "reporter_relationships": [
+      "OWNER"
+    ],
+    "recent_house_orders": [
+      {
+        "category": "OTHER",
+        "status": "PENDING_ANALYSIS",
+        "summary": null
+      },
+      {
+        "category": "ELECTRICAL",
+        "status": "ASSIGNED",
+        "summary": "Kitchen electrical outlet sparking"
+      },
+      {
+        "category": "ELECTRICAL",
+        "status": "ASSIGNED",
+        "summary": "Kitchen electrical outlet sparking"
+      },
+      {
+        "category": "ELECTRICAL",
+        "status": "CLOSED",
+        "summary": "Kitchen electrical outlet sparking"
+      },
+      {
+        "category": "ELECTRICAL",
+        "status": "CLOSED",
+        "summary": "Kitchen electrical outlet sparking"
+      }
+    ]
+  },
+  "raw_payload": {
+    "category": "electrical",
+    "subcategory": "outlet",
+    "severity": "low",
+    "priority": "p3",
+    "summary": "Kitchen electrical outlet sparking",
+    "risk": "electric",
+    "required_role": "STAFF",
+    "required_skill": "electrician",
+    "confidence": 0.8
+  },
+  "mapped": {
+    "category": "ELECTRICAL",
+    "subcategory": "outlet",
+    "severity": "LOW",
+    "priority": "MEDIUM",
+    "summary": "Kitchen electrical outlet sparking",
+    "risk": "electric",
+    "required_role": "STAFF",
+    "required_skill": "ELECTRICAL",
+    "required_duty": "MAINTENANCE",
+    "confidence": 0.8,
+    "low_confidence": false
+  },
+  "error": null,
+  "call_status": "SUCCESS",
+  "measured_call": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-23 08:37:11.138905+00:00",
+      "latency_ms": 3671,
+      "request_id": "localqwen-b1090f3deaa3-context-probe",
+      "attempt": 1,
+      "model_version": "qwen3.5:2b",
+      "token_usage": 1108
+    }
+  ],
+  "business_state_changed": false,
+  "collector_limit": "First SELECT used the wrong column name and failed before inference; corrected to existing text/extra_notes/asr_text, no data mutation.",
+  "result": "QUALIFIED_DIRECT_PROBE"
+}

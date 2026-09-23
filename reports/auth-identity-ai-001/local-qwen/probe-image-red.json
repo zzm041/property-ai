@@ -1,0 +1,106 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "case": "image-red",
+  "model": "qwen3.5:2b",
+  "manifest_sha256": "324d162be6ca5629ae4517c8710434d0bd2d665bc94dbad46e9af8fbf8a2f0df",
+  "endpoint": "http://127.0.0.1:11435",
+  "business_requests": false,
+  "synthetic_only": true,
+  "resource_scope": "Whole workstation samples; other applications remain running, not exclusive attribution.",
+  "baseline": {
+    "utc": "2026-09-23T08:14:58Z",
+    "ram_free_mib": 5760,
+    "gpu_used_mib": 6516,
+    "gpu_free_mib": 9480,
+    "gpu_utilization_percent": 1
+  },
+  "image_sha256": "ba0298a7ba2b1aed42bd52025b04d46e7c09b8162359f717f27113cfc7bb8987",
+  "image_boundary": "Solid-color calibration only, not a repair-photo quality benchmark.",
+  "request_controls": {
+    "model": "qwen3.5:2b",
+    "response_format": {
+      "type": "json_object"
+    },
+    "temperature": 0,
+    "reasoning_effort": "none",
+    "max_tokens": 256,
+    "stream": false
+  },
+  "response": {
+    "id": "chatcmpl-878",
+    "object": "chat.completion",
+    "created": 1790151301,
+    "model": "qwen3.5:2b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"dominant_color\": \"red\",\n  \"description\": \"Solid red color\"\n}"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 114,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "completion_tokens": 24,
+      "total_tokens": 138
+    }
+  },
+  "status": "PASS_BOUNDED_REAL_MODEL_PROBE",
+  "parsed_answer": {
+    "dominant_color": "red",
+    "description": "Solid red color"
+  },
+  "loaded_models": [
+    {
+      "name": "qwen3.5:2b",
+      "model": "qwen3.5:2b",
+      "size": 2356234156,
+      "digest": "324d162be6ca5629ae4517c8710434d0bd2d665bc94dbad46e9af8fbf8a2f0df",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "2.3B",
+        "quantization_level": "Q8_0"
+      },
+      "expires_at": "2026-09-23T16:15:31.2021351+08:00",
+      "size_vram": 2356234156,
+      "context_length": 4096
+    }
+  ],
+  "elapsed_seconds": 2.921,
+  "resource_samples": [
+    {
+      "utc": "2026-09-23T08:14:58Z",
+      "ram_free_mib": 5760,
+      "gpu_used_mib": 6516,
+      "gpu_free_mib": 9480,
+      "gpu_utilization_percent": 1
+    },
+    {
+      "utc": "2026-09-23T08:14:59Z",
+      "ram_free_mib": 5488,
+      "gpu_used_mib": 6709,
+      "gpu_free_mib": 9287,
+      "gpu_utilization_percent": 5
+    },
+    {
+      "utc": "2026-09-23T08:15:00Z",
+      "ram_free_mib": 4863,
+      "gpu_used_mib": 8741,
+      "gpu_free_mib": 7255,
+      "gpu_utilization_percent": 16
+    }
+  ],
+  "min_ram_free_mib": 4863,
+  "max_gpu_used_mib": 8741
+}

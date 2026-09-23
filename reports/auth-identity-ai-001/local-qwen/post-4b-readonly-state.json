@@ -1,0 +1,136 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "observed_at_utc": "2026-09-23T08:56:16.171262+00:00",
+  "database": "127.0.0.1:3307/property_ai_auth001_test",
+  "mode": "SELECT only; no queue connection or model generation",
+  "revision": "20260919_0009",
+  "work_order": {
+    "id": 12,
+    "tenant_id": 1,
+    "property_id": 1,
+    "house_id": 1,
+    "reporter_user_id": 3,
+    "status": "PENDING_ANALYSIS",
+    "version": 1,
+    "current_assignment_id": null
+  },
+  "same_business_row_ids": {
+    "analyses": [
+      12
+    ],
+    "ai_calls": [
+      16
+    ],
+    "assignments": [],
+    "recommendations": [
+      21,
+      22
+    ],
+    "history": [
+      77
+    ]
+  },
+  "persisted_analysis": {
+    "id": 12,
+    "status": "LOW_CONFIDENCE",
+    "summary": "Kitchen electrical outlet sparking",
+    "input_hash": "c6c2528a040d78cf695f0a326017f1ebce26febc67df79309af545a7d00dffdd"
+  },
+  "prior_orders": [
+    {
+      "id": 1,
+      "status": "CLOSED",
+      "version": 10
+    },
+    {
+      "id": 2,
+      "status": "CLOSED",
+      "version": 13
+    },
+    {
+      "id": 3,
+      "status": "CLOSED",
+      "version": 10
+    },
+    {
+      "id": 4,
+      "status": "CLOSED",
+      "version": 10
+    },
+    {
+      "id": 5,
+      "status": "CANCELLED",
+      "version": 4
+    },
+    {
+      "id": 6,
+      "status": "CANCELLED",
+      "version": 5
+    },
+    {
+      "id": 7,
+      "status": "CLOSED",
+      "version": 8
+    },
+    {
+      "id": 8,
+      "status": "CLOSED",
+      "version": 8
+    },
+    {
+      "id": 9,
+      "status": "ASSIGNED",
+      "version": 3
+    },
+    {
+      "id": 10,
+      "status": "ASSIGNED",
+      "version": 3
+    },
+    {
+      "id": 11,
+      "status": "PENDING_ANALYSIS",
+      "version": 1
+    }
+  ],
+  "loaded_local_models_after_keepalive": [],
+  "runtime_startup_headers": {
+    "api": {
+      "task_id": "SELFHOST-AI-LOCAL-001",
+      "component": "api",
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "module_root": "D:\\property-ai\\backend\\app",
+      "code_sha": "e65b4d7fb0e9541695fdcb9a1f1b216d97dbf6c2",
+      "target": "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True",
+      "prompt_version": "wo-analysis-v3",
+      "llm_vlm": "real qwen3.5:2b @ loopback11435; not paid/cloud",
+      "thinking": false,
+      "max_tokens": {
+        "llm": 512,
+        "vlm": 256
+      },
+      "timeout_seconds": 60,
+      "other_providers": "Development unchanged",
+      "check_only": false
+    },
+    "worker": {
+      "task_id": "SELFHOST-AI-LOCAL-001",
+      "component": "worker",
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "module_root": "D:\\property-ai\\backend\\app",
+      "code_sha": "e65b4d7fb0e9541695fdcb9a1f1b216d97dbf6c2",
+      "target": "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True",
+      "prompt_version": "wo-analysis-v3",
+      "llm_vlm": "real qwen3.5:2b @ loopback11435; not paid/cloud",
+      "thinking": false,
+      "max_tokens": {
+        "llm": 512,
+        "vlm": 256
+      },
+      "timeout_seconds": 60,
+      "other_providers": "Development unchanged",
+      "check_only": false
+    }
+  },
+  "result": "UNCHANGED_PERSISTED_ORDER_AND_HISTORY_NO_4B_BUSINESS_RESULT_WRITTEN"
+}

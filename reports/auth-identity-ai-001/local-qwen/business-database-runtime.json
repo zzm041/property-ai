@@ -1,0 +1,260 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "run_id": "localqwen-b1090f3deaa3",
+  "code_sha": "e65b4d7fb0e9541695fdcb9a1f1b216d97dbf6c2",
+  "database": "127.0.0.1:3307/property_ai_auth001_test",
+  "request_id": "1af64d3b07114c9ba6abdaaa202918c7",
+  "observed_at_utc": "2026-09-23T08:34:05.809126+00:00",
+  "read_only": true,
+  "page_file_sha256": "2612071e3cb5bd72d84361869c2f71812b7d01a2130baeb41f0be69936556731",
+  "revision": "20260919_0009",
+  "work_order": {
+    "id": 12,
+    "tenant_id": 1,
+    "property_id": 1,
+    "house_id": 1,
+    "reporter_user_id": 3,
+    "status": "PENDING_ANALYSIS",
+    "version": 1,
+    "current_assignment_id": null,
+    "created_at": "2026-09-23 08:31:38.172425"
+  },
+  "analyses": [
+    {
+      "id": 12,
+      "work_order_id": 12,
+      "analysis_version": 1,
+      "status": "LOW_CONFIDENCE",
+      "category": "ELECTRICAL",
+      "subcategory": "outlet",
+      "severity": "LOW",
+      "priority": "HIGH",
+      "summary": "Kitchen electrical outlet sparking",
+      "risk": "electric",
+      "required_role": "STAFF",
+      "required_skill": "ELECTRICAL",
+      "confidence": "0.500",
+      "error_code": "AI.LOW_CONFIDENCE",
+      "input_hash": "c6c2528a040d78cf695f0a326017f1ebce26febc67df79309af545a7d00dffdd",
+      "prompt_version": "wo-analysis-v3"
+    }
+  ],
+  "ai_calls": [
+    {
+      "id": 16,
+      "work_order_id": 12,
+      "request_id": "1af64d3b07114c9ba6abdaaa202918c7",
+      "provider_type": "LLM",
+      "provider_mode": "PRODUCTION",
+      "model_version": "qwen3.5:2b",
+      "status": "SUCCESS",
+      "attempt": 1,
+      "error_code": null,
+      "latency_ms": 3591,
+      "token_usage": 986,
+      "input_hash": "c6c2528a040d78cf695f0a326017f1ebce26febc67df79309af545a7d00dffdd",
+      "prompt_version": "wo-analysis-v3",
+      "started_at": "2026-09-23 08:31:38.482675",
+      "finished_at": "2026-09-23 08:31:42.073675"
+    }
+  ],
+  "assignments": [],
+  "recommendations": [
+    {
+      "id": 21,
+      "analysis_id": 12,
+      "employee_id": 1,
+      "eligible": 1,
+      "selected": 0,
+      "filter_reason": null,
+      "reason_codes": "[\"DUTY_MATCH\", \"SKILL_MATCH\", \"LOAD_REMAINING\", \"SAME_BUILDING_HISTORY\", \"RESPONSE_HISTORY\", \"COMPLETION_HISTORY\"]",
+      "score": "0.9400",
+      "rank_no": 1
+    },
+    {
+      "id": 22,
+      "analysis_id": 12,
+      "employee_id": 2,
+      "eligible": 1,
+      "selected": 0,
+      "filter_reason": null,
+      "reason_codes": "[\"DUTY_MATCH\", \"SKILL_MATCH\", \"LOAD_REMAINING\", \"SAME_BUILDING_HISTORY\", \"RESPONSE_HISTORY\", \"COMPLETION_HISTORY\"]",
+      "score": "0.9390",
+      "rank_no": 2
+    }
+  ],
+  "history": [
+    {
+      "id": 77,
+      "actor_user_id": 3,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "payload_json": "{\"event_code\": \"CREATE\"}",
+      "created_at": "2026-09-23 08:31:38.185626"
+    }
+  ],
+  "audit": [
+    {
+      "id": 370,
+      "actor_user_id": null,
+      "action": "WORK_ORDER_AI_ANALYSIS_COMPLETED",
+      "resource_type": "WORK_ORDER_ANALYSIS",
+      "resource_id": 12,
+      "request_id": "1af64d3b07114c9ba6abdaaa202918c7",
+      "details_json": "{\"status\": \"LOW_CONFIDENCE\", \"confidence\": 0.5, \"analysis_id\": 12, \"work_order_id\": 12}",
+      "created_at": "2026-09-23 08:31:42.202172"
+    }
+  ],
+  "staff_daily": [
+    {
+      "employee_id": 1,
+      "property_id": 1,
+      "business_date": "2026-09-23",
+      "on_duty": "ON_DUTY",
+      "current_load": 1
+    },
+    {
+      "employee_id": 2,
+      "property_id": 1,
+      "business_date": "2026-09-23",
+      "on_duty": "ON_DUTY",
+      "current_load": 1
+    }
+  ],
+  "prior_orders": [
+    {
+      "id": 1,
+      "status": "CLOSED",
+      "version": 10
+    },
+    {
+      "id": 2,
+      "status": "CLOSED",
+      "version": 13
+    },
+    {
+      "id": 3,
+      "status": "CLOSED",
+      "version": 10
+    },
+    {
+      "id": 4,
+      "status": "CLOSED",
+      "version": 10
+    },
+    {
+      "id": 5,
+      "status": "CANCELLED",
+      "version": 4
+    },
+    {
+      "id": 6,
+      "status": "CANCELLED",
+      "version": 5
+    },
+    {
+      "id": 7,
+      "status": "CLOSED",
+      "version": 8
+    },
+    {
+      "id": 8,
+      "status": "CLOSED",
+      "version": 8
+    },
+    {
+      "id": 9,
+      "status": "ASSIGNED",
+      "version": 3
+    },
+    {
+      "id": 10,
+      "status": "ASSIGNED",
+      "version": 3
+    },
+    {
+      "id": 11,
+      "status": "PENDING_ANALYSIS",
+      "version": 1
+    }
+  ],
+  "worker_events": [
+    {
+      "timestamp": "2026-09-23T08:31:42.072882Z",
+      "event": "provider_succeeded",
+      "task_id": "ce4284d8-05ac-404f-b9f0-58b1335a8c4c",
+      "request_id": "1af64d3b07114c9ba6abdaaa202918c7",
+      "work_order_id": 12,
+      "provider": "llm",
+      "latency_ms": 3304.0
+    },
+    {
+      "timestamp": "2026-09-23T08:31:42.229809Z",
+      "event": "Task app.worker.tasks.analyze_work_order_task[ce4284d8-05ac-404f-b9f0-58b1335a8c4c] succeeded in 3.812000000005355s: None",
+      "task_id": "ce4284d8-05ac-404f-b9f0-58b1335a8c4c",
+      "request_id": "1af64d3b07114c9ba6abdaaa202918c7",
+      "work_order_id": 12
+    }
+  ],
+  "idle": {
+    "active": 0,
+    "reserved": 0,
+    "scheduled": 0
+  },
+  "queue": {
+    "vhost": "property_ai_auth001",
+    "output": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nceleryev.f8b5338c-3ef8-4b6b-802b-0ad0e1c36e3e\t0\t0\t1\nproperty_ai.auth001.dlq\t3\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1\n",
+    "shared_access": false,
+    "message_contents_read": false
+  },
+  "runtime": {
+    "api": {
+      "task_id": "SELFHOST-AI-LOCAL-001",
+      "component": "api",
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "module_root": "D:\\property-ai\\backend\\app",
+      "code_sha": "e65b4d7fb0e9541695fdcb9a1f1b216d97dbf6c2",
+      "target": "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True",
+      "prompt_version": "wo-analysis-v3",
+      "llm_vlm": "real qwen3.5:2b @ loopback11435; not paid/cloud",
+      "thinking": false,
+      "max_tokens": {
+        "llm": 512,
+        "vlm": 256
+      },
+      "timeout_seconds": 60,
+      "other_providers": "Development unchanged",
+      "check_only": false
+    },
+    "worker": {
+      "task_id": "SELFHOST-AI-LOCAL-001",
+      "component": "worker",
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "module_root": "D:\\property-ai\\backend\\app",
+      "code_sha": "e65b4d7fb0e9541695fdcb9a1f1b216d97dbf6c2",
+      "target": "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True",
+      "prompt_version": "wo-analysis-v3",
+      "llm_vlm": "real qwen3.5:2b @ loopback11435; not paid/cloud",
+      "thinking": false,
+      "max_tokens": {
+        "llm": 512,
+        "vlm": 256
+      },
+      "timeout_seconds": 60,
+      "other_providers": "Development unchanged",
+      "check_only": false
+    }
+  },
+  "api_health": {
+    "status": 200,
+    "body": {
+      "request_id": "369234903452473eb38ef3533a3e2de1",
+      "data": {
+        "status": "ok"
+      }
+    }
+  },
+  "replacement_helper_limit": "Initial helper used wrong /healthz path; correct prefixed path independently confirms same already-started API; no second replacement.",
+  "status": "REAL_QWEN_CALLED_BUT_AUTO_NOT_ACHIEVED"
+}

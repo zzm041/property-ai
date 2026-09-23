@@ -1,0 +1,131 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "related_slice": "RESIDENT-HOUSE-SELECT-023",
+  "run_id": "localqwen-b1090f3deaa3",
+  "code_sha": "e65b4d7fb0e9541695fdcb9a1f1b216d97dbf6c2",
+  "model": "real local qwen3.5:2b",
+  "steps": {
+    "01-authorized-address-choice": {
+      "path": "pages/work-orders/create",
+      "houses": [
+        {
+          "relation_id": 1,
+          "house_id": 1,
+          "tenant_id": 1,
+          "property_id": 1,
+          "room_no": "014-01",
+          "property_name": "014合成小区-wo014-745f67277104",
+          "property_address": "仅用于隔离测试",
+          "building_name": "014合成楼栋",
+          "unit_name": "014合成单元",
+          "relation_type": "OWNER",
+          "status": "ACTIVE",
+          "valid_from": "2026-09-23T02:12:43.953827Z",
+          "valid_to": null,
+          "addressLabel": "014合成小区-wo014-745f67277104 · 014合成楼栋 · 014合成单元 · 014-01"
+        }
+      ],
+      "houseId": "",
+      "selectedHouseLabel": "",
+      "error": "",
+      "buttons": [
+        "\n    014合成小区-wo014-745f67277104 · 014合成楼栋 · 014合成单元 · 014-01\n    仅用于隔离测试",
+        "刷新房屋",
+        "我的房屋 / 申请绑定",
+        "选择图片（可选）",
+        "选择音频（可选）",
+        "提交报修"
+      ]
+    },
+    "02-selected-report-address": {
+      "path": "pages/work-orders/create",
+      "houses": [
+        {
+          "relation_id": 1,
+          "house_id": 1,
+          "tenant_id": 1,
+          "property_id": 1,
+          "room_no": "014-01",
+          "property_name": "014合成小区-wo014-745f67277104",
+          "property_address": "仅用于隔离测试",
+          "building_name": "014合成楼栋",
+          "unit_name": "014合成单元",
+          "relation_type": "OWNER",
+          "status": "ACTIVE",
+          "valid_from": "2026-09-23T02:12:43.953827Z",
+          "valid_to": null,
+          "addressLabel": "014合成小区-wo014-745f67277104 · 014合成楼栋 · 014合成单元 · 014-01"
+        }
+      ],
+      "houseId": "1",
+      "selectedHouseLabel": "014合成小区-wo014-745f67277104 · 014合成楼栋 · 014合成单元 · 014-01",
+      "error": "",
+      "buttons": [
+        "\n    ✓ 已选：014合成小区-wo014-745f67277104 · 014合成楼栋 · 014合成单元 · 014-01\n    仅用于隔离测试",
+        "刷新房屋",
+        "我的房屋 / 申请绑定",
+        "选择图片（可选）",
+        "选择音频（可选）",
+        "提交报修"
+      ]
+    }
+  },
+  "requests": [
+    {
+      "path": "/me/houses?after_id=0&limit=20",
+      "method": "GET",
+      "status": 200,
+      "request_id": "e8714a74494b4484917cb978932a9b69",
+      "result": {
+        "items": [
+          {
+            "relation_id": 1,
+            "house_id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "room_no": "014-01",
+            "property_name": "014合成小区-wo014-745f67277104",
+            "property_address": "仅用于隔离测试",
+            "building_name": "014合成楼栋",
+            "unit_name": "014合成单元",
+            "relation_type": "OWNER",
+            "status": "ACTIVE",
+            "valid_from": "2026-09-23T02:12:43.953827Z",
+            "valid_to": null
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T08:30:02.803Z",
+      "source": "real origin-forwarded wx.request"
+    }
+  ],
+  "screenshots": [
+    "01-authorized-address-choice.png"
+  ],
+  "principal": {
+    "user_id": 3,
+    "roles": [
+      "RESIDENT"
+    ],
+    "scopes": [
+      {
+        "role_code": "RESIDENT",
+        "scope_type": "PROPERTY",
+        "tenant_id": 1,
+        "property_id": 1,
+        "permissions": [
+          "announcement:read",
+          "knowledge:read",
+          "resident_binding:create",
+          "resident_binding:read",
+          "resident_relation:read",
+          "work_order:cancel",
+          "work_order:create",
+          "work_order:read"
+        ]
+      }
+    ]
+  },
+  "last_error": "Error: timeout waiting for automator response\n    at Connection.onMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\miniprogram-automator\\out\\Connection.js:1:985)\n    at Transport.emit (node:events:509:28)\n    at WebSocket.<anonymous> (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\miniprogram-automator\\out\\Transport.js:1:220)\n    at WebSocket.onMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\event-target.js:120:16)\n    at WebSocket.emit (node:events:509:28)\n    at Receiver.receiverOnMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\websocket.js:807:20)\n    at Receiver.emit (node:events:509:28)\n    at Receiver.dataMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\receiver.js:448:14)\n    at Receiver.getData (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\receiver.js:377:17)\n    at Receiver.startLoop (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\receiver.js:158:22)"
+}

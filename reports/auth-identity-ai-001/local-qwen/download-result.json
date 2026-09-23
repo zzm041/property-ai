@@ -1,0 +1,62 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "model": "qwen3.5:2b",
+  "source": "official registry.ollama.ai/library/qwen3.5/2b",
+  "ollama_version": "0.34.2",
+  "models_directory": "D:\\property-ai\\tmp\\selfhost-ai-local\\models",
+  "manifest_sha256": "324d162be6ca5629ae4517c8710434d0bd2d665bc94dbad46e9af8fbf8a2f0df",
+  "artifacts": [
+    {
+      "media_type": "application/vnd.docker.container.image.v1+json",
+      "size": 473,
+      "sha256": "ee043a99abe5e8317272712ed08ee2993af1f7930d69aefa3eba562cdc2822bd"
+    },
+    {
+      "media_type": "application/vnd.ollama.image.model",
+      "size": 2741180928,
+      "sha256": "b709d81508a078a686961de6ca07a953b895d9b286c46e17f00fb267f4f2d297"
+    },
+    {
+      "media_type": "application/vnd.ollama.image.license",
+      "size": 11354,
+      "sha256": "9be69ef463066202c1b1bd299aaf42bad370a01ba4b40d293617859720776c17"
+    },
+    {
+      "media_type": "application/vnd.ollama.image.params",
+      "size": 65,
+      "sha256": "9371364b27a52acac9d87f88bd93c9db1174d8d6ec57f6888925cdc1788871ff"
+    }
+  ],
+  "total_blob_bytes": 2741192820,
+  "elapsed_seconds": 511.22,
+  "hashes_verified": true,
+  "inference_performed": false,
+  "paid_calls": false,
+  "tags": [
+    {
+      "name": "qwen3.5:2b",
+      "model": "qwen3.5:2b",
+      "modified_at": "2026-09-23T16:12:58.2580439+08:00",
+      "size": 2741192820,
+      "digest": "324d162be6ca5629ae4517c8710434d0bd2d665bc94dbad46e9af8fbf8a2f0df",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "2.3B",
+        "quantization_level": "Q8_0",
+        "context_length": 262144,
+        "embedding_length": 2048
+      },
+      "capabilities": [
+        "completion",
+        "vision",
+        "tools",
+        "thinking"
+      ]
+    }
+  ]
+}

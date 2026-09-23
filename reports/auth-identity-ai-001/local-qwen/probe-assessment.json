@@ -1,0 +1,56 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "model": "qwen3.5:2b",
+  "assessment": "LOCAL_RUNTIME_AND_MULTIMODAL_PROBES_CONFIRMED_BUT_BUSINESS_QUALITY_NOT_ACCEPTED",
+  "findings": [
+    {
+      "id": "LOCALAI-B1",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "status": "PARTIALLY_MITIGATED_NOT_FULL_MODEL_PASS",
+      "location": "probe-analysis.json; backend/app/service/analysis.py:_run_llm",
+      "trigger": "Original v2 prompt with real 2B model",
+      "impact": "Combined skill, unsupported electric risk for plumbing and extra schema metadata; category-only helper booleans were insufficient quality checks.",
+      "evidence": "Retain original output. v3 clarification plus stricter skill/risk checks passed six bounded cases in probe-analysis-round2.json; this does not establish full-context reliability."
+    },
+    {
+      "id": "LOCALAI-B2",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "status": "OPEN",
+      "location": "business-database-runtime.json; probe-current-context-v4.json",
+      "trigger": "Actual page order12 includes same-house historical summaries; current report says outlet has no power and no smoke.",
+      "impact": "2B copies a historical sparking summary into the current report. Actual v3 result has confidence0.5, LOW_CONFIDENCE and no Assignment. Safety fallback operated; automatic dispatch did not pass.",
+      "evidence": "Direct v4 experiment reproduced the exact original v3 input hash but still said Kitchen electrical outlet sparking, now confidence0.8. Its QUALIFIED_DIRECT_PROBE flag tested category/skill/confidence only, NOT factual grounding; it is NOT acceptance. No v4 runtime deployment or business replay occurred."
+    }
+  ],
+  "failed_v4_experiment": {
+    "retention": "Exact three source/test files preserved under ignored tmp/selfhost-ai-local/failed-v4-experiment; main removed only its own uncommitted v4 delta with apply_patch. Committed e65b4d7 v3 source and live runtime remain aligned; no git reset/restore/checkpoint rollback.",
+    "added_prompt_text": "Analyze the CURRENT report_text and its current ASR/images. context.recent_house_orders contains separate PAST reports, not current symptoms. Never copy a past report's summary, risk, severity or fault into this report. A difference between past reports and the current report is not a contradiction within the current report. Use history only as background, never to override current evidence or invent current sparking, smoke, flooding or gas.",
+    "tests": "33 pure prompt/input tests passed; not proof of model factual correctness."
+  },
+  "four_b_diagnostic": {
+    "approval": "Owner approved free 4B controlled validation on 2026-09-23; no paid resource/model and no business replay.",
+    "manifest_sha256": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+    "artifact": "3,389,983,735 bytes across four hash-verified artifacts; Q4_K_M; isolated project directory and existing Ollama0.34.2.",
+    "comparison": "Same original order12 input hash and committed v3 source, 4096 context, temperature0, thinking disabled, max512. Compared with 2B Q8_0; quantization and background workstation load differ, not a model-size-only benchmark.",
+    "factual_result": "In this one case 4B correctly says the outlet has no power, other rooms are normal and there is no smoke. It does not invent historical sparking. ELECTRICAL/electrician, confidence0.8, schema valid. This mitigates the observed symptom for this candidate/sample only; LOCALAI-B2 remains open for business/model acceptance.",
+    "remaining_output_issue": "Summary is English despite Chinese input and the existing prompt's report-language instruction. No automatic translation, fabricated corrected output or changed threshold was substituted.",
+    "measurement": "One cold direct call12.718s; total1013tokens. Whole-workstation minimum freeRAM13543MiB/freeGPU10465MiB, peak GPUused5531MiB. Baseline freeRAM14816MiB/freeGPU14428MiB was substantially more generous than earlier2B; not pressure/stress/p95 or frozen8s production-latency acceptance.",
+    "image_calibration": "Two real4B calls correctly distinguish the existing blue/red256px PNGs,3.375s/0.472s. FullGPU model size_vram3128038521 bytes, context4096, one resident model. Color calibration only, not real repair-photo understanding.",
+    "business_preservation": "Post-diagnostic SELECT verifies same order12/version1/PENDING_ANALYSIS, analysis12LOW_CONFIDENCE, call16, zeroAssignments, unchanged row IDs/history/prior orders. API/Worker remain2B; no4B business result was persisted. Local model automatically unloaded after short keepalive; original service/models remain.",
+    "transport_boundary": "4B diagnostic HTTP explicitly bypasses inherited proxies. That guarantee does not apply automatically to existing API/Worker providers, whose normal httpx path uses environment defaults; verify/close this before a business model switch.",
+    "evidence": ["download-4b-result.json", "probe-current-context-4b-v3.json", "probe-4b-image-blue.json", "probe-4b-image-red.json", "post-4b-readonly-state.json"]
+  },
+  "next_gate": "Retain4B as the next free local validation candidate, not a business/production PASS. Complete bounded factual/language/image holdouts and production-provider direct-local transport verification before any business configuration switch. Do not replay order12 or silently enlarge model/context. Continue separate023 software work; no additional fee or download approval is requested at this checkpoint.",
+  "independent_review": {
+    "path": "reports/codex/SELFHOST-AI-LOCAL-001-4B-diagnostic-review.json",
+    "context": "/root/wo014_independent_review",
+    "decision": "READY",
+    "scope": "4B approved download and bounded read-only diagnostics only; not SELFHOST/AUTO/023 or Production PASS. Reviewer inspected saved source/evidence/images, did not run tests/inference/business operations."
+  },
+  "preserved_boundaries": [
+    "No confidence threshold or validation weakening; no handcrafted replacement answer.",
+    "No new order to replace failed order12, no manual analyze/assign, no SQL state changes, no task replay.",
+    "No paid model/GPU, no dependency upgrade/Migration/0010/shared queue access.",
+    "No independent review PASS has yet been obtained for this model task or023."
+  ]
+}

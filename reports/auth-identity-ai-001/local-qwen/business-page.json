@@ -1,0 +1,2502 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "related_slice": "RESIDENT-HOUSE-SELECT-023",
+  "run_id": "localqwen-b1090f3deaa3",
+  "code_sha": "e65b4d7fb0e9541695fdcb9a1f1b216d97dbf6c2",
+  "model": "real local qwen3.5:2b",
+  "steps": {
+    "01-authorized-address-choice": {
+      "path": "pages/work-orders/create",
+      "houses": [
+        {
+          "relation_id": 1,
+          "house_id": 1,
+          "tenant_id": 1,
+          "property_id": 1,
+          "room_no": "014-01",
+          "property_name": "014合成小区-wo014-745f67277104",
+          "property_address": "仅用于隔离测试",
+          "building_name": "014合成楼栋",
+          "unit_name": "014合成单元",
+          "relation_type": "OWNER",
+          "status": "ACTIVE",
+          "valid_from": "2026-09-23T02:12:43.953827Z",
+          "valid_to": null,
+          "addressLabel": "014合成小区-wo014-745f67277104 · 014合成楼栋 · 014合成单元 · 014-01"
+        }
+      ],
+      "houseId": "",
+      "selectedHouseLabel": "",
+      "error": "",
+      "buttons": [
+        "\n    014合成小区-wo014-745f67277104 · 014合成楼栋 · 014合成单元 · 014-01\n    仅用于隔离测试",
+        "刷新房屋",
+        "我的房屋 / 申请绑定",
+        "选择图片（可选）",
+        "选择音频（可选）",
+        "提交报修"
+      ]
+    },
+    "02-selected-report-address": {
+      "path": "pages/work-orders/create",
+      "houses": [
+        {
+          "relation_id": 1,
+          "house_id": 1,
+          "tenant_id": 1,
+          "property_id": 1,
+          "room_no": "014-01",
+          "property_name": "014合成小区-wo014-745f67277104",
+          "property_address": "仅用于隔离测试",
+          "building_name": "014合成楼栋",
+          "unit_name": "014合成单元",
+          "relation_type": "OWNER",
+          "status": "ACTIVE",
+          "valid_from": "2026-09-23T02:12:43.953827Z",
+          "valid_to": null,
+          "addressLabel": "014合成小区-wo014-745f67277104 · 014合成楼栋 · 014合成单元 · 014-01"
+        }
+      ],
+      "houseId": "1",
+      "selectedHouseLabel": "014合成小区-wo014-745f67277104 · 014合成楼栋 · 014合成单元 · 014-01",
+      "error": "",
+      "buttons": [
+        "\n    ✓ 已选：014合成小区-wo014-745f67277104 · 014合成楼栋 · 014合成单元 · 014-01\n    仅用于隔离测试",
+        "刷新房屋",
+        "我的房屋 / 申请绑定",
+        "选择图片（可选）",
+        "选择音频（可选）",
+        "提交报修"
+      ]
+    },
+    "02-selected-report-address-resume": {
+      "path": "pages/work-orders/create",
+      "houses": [
+        {
+          "relation_id": 1,
+          "house_id": 1,
+          "tenant_id": 1,
+          "property_id": 1,
+          "room_no": "014-01",
+          "property_name": "014合成小区-wo014-745f67277104",
+          "property_address": "仅用于隔离测试",
+          "building_name": "014合成楼栋",
+          "unit_name": "014合成单元",
+          "relation_type": "OWNER",
+          "status": "ACTIVE",
+          "valid_from": "2026-09-23T02:12:43.953827Z",
+          "valid_to": null,
+          "addressLabel": "014合成小区-wo014-745f67277104 · 014合成楼栋 · 014合成单元 · 014-01"
+        }
+      ],
+      "houseId": "1",
+      "selectedHouseLabel": "014合成小区-wo014-745f67277104 · 014合成楼栋 · 014合成单元 · 014-01",
+      "error": "",
+      "buttons": [
+        "\n    ✓ 已选：014合成小区-wo014-745f67277104 · 014合成楼栋 · 014合成单元 · 014-01\n    仅用于隔离测试",
+        "刷新房屋",
+        "我的房屋 / 申请绑定",
+        "选择图片（可选）",
+        "选择音频（可选）",
+        "提交报修"
+      ]
+    }
+  },
+  "requests": [
+    {
+      "path": "/me/houses?after_id=0&limit=20",
+      "method": "GET",
+      "status": 200,
+      "request_id": "e8714a74494b4484917cb978932a9b69",
+      "result": {
+        "items": [
+          {
+            "relation_id": 1,
+            "house_id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "room_no": "014-01",
+            "property_name": "014合成小区-wo014-745f67277104",
+            "property_address": "仅用于隔离测试",
+            "building_name": "014合成楼栋",
+            "unit_name": "014合成单元",
+            "relation_type": "OWNER",
+            "status": "ACTIVE",
+            "valid_from": "2026-09-23T02:12:43.953827Z",
+            "valid_to": null
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T08:30:02.803Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders",
+      "method": "POST",
+      "status": 200,
+      "request_id": "1af64d3b07114c9ba6abdaaa202918c7",
+      "result": {
+        "id": 12,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 1,
+        "reporter_user_id": 3,
+        "status": "PENDING_ANALYSIS",
+        "process_reason": "NONE",
+        "category": "OTHER",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "version": 1,
+        "current_assignment_id": null,
+        "incident_id": null,
+        "sla_due_at": "2026-09-24T08:31:38.164767Z",
+        "assigned_at": null,
+        "accepted_at": null,
+        "started_at": null,
+        "resolved_at": null,
+        "closed_at": null,
+        "created_at": "2026-09-23T08:31:38.172425Z",
+        "updated_at": "2026-09-23T08:31:38.172425Z",
+        "sla_overdue": false
+      },
+      "received_at_utc": "2026-09-23T08:31:38.258Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "60e917bcea2d43c58bd1ce1b34208b4f",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:39.106Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "8905b689e83743f98db7abea2f6f5b2b",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:40.168Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "3978fb0c2d944284b1ecd7f32540baf9",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:41.218Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "fbec18db5896482e84860ee18a7dd45a",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:41.257Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "776aca12d4e04e4289ad97c6b01b8a47",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:42.314Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "0159c76c962342dc831afae4d0aa206f",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:43.364Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "6e879bbf35a948d8b84a476a9a9176b1",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:43.520Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "b036b19a06d24c828b0959589b78bfa9",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:44.560Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "b3ae52a292b9473091f11655e52342ef",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:45.567Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "62514e5c363a4fb18f0b6a80746984ac",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:46.621Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "9c3ed4f610e54ce9b8b816591b5c6998",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:47.606Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "311563a4ab244a9981fe0299cb80c8b0",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:48.659Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "b98e0a5c4a43420c9ea4089f9b352713",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:49.640Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "e8cd67cdd8054abbb70999eb02d076ad",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:50.697Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "bec5e170bb674b7b8e7b981b95cf8228",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:51.684Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "b9fd04a27dcd49b5a80bd5b0a8209027",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:52.739Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "c7b01f53484649dfadd704e63bd72e2a",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:53.725Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "7267bae8e2b949e3acefa45a2eed0689",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:54.784Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "3de0343ca5a04d69b9dadd5a0955e48c",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:55.766Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "4431be102610463fae29d8b8d844fe74",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:56.823Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "04fbf8d4ad624464a5ab3444dc73ce65",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:57.800Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "9b2bba3b5c0a4ef09bc2c1f4cb020102",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:31:59.848Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "b297c47f6eb64393ac5c524d9e553c0e",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:32:01.894Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "12b7cc1c03b44391b6704cfdd4504f13",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:32:03.935Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "17c460fdc95d4bfcb546388f54cd8a53",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:32:05.976Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "aa300d97153a4652956e4ee022dd05d5",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:32:08.026Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "efe2ff42ac334a59babfe57f90818d3a",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:32:10.078Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "893a4bd227a04a2b811b656c4f52c988",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:32:12.127Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "ea74bcee6ed44d1cab2cff96dc322fba",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:32:14.162Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "9f09342fe35c43628aa12c2d6c52f09f",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:32:16.199Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "69d3f81569f8450bb0bc8c31da78d424",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:32:18.240Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "fe40c9b00b404980b15642a8ea31e3a2",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:32:20.289Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "9cb8b770fe7a43b0b96b055e5e0cb0ae",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:32:22.332Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "30bf63a2b8a34056bea41e269586509a",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:32:24.379Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "5975c9301f9245788f76b763a753263d",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:32:26.423Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id": "2792e0b5017343bcae1c3a03a93c235c",
+      "result": {
+        "work_order": {
+          "id": 12,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T08:31:38.164767Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T08:31:38.172425Z",
+          "updated_at": "2026-09-23T08:31:38.172425Z",
+          "sla_overdue": false
+        },
+        "text": "localqwen-b1090f3deaa3 合成资料：厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 77,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T08:31:38.185626Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T08:31:38.164767Z": "2026-09-24 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.172425Z": "2026-09-23 16:31:38 UTC+08:00",
+            "2026-09-23T08:31:38.185626Z": "2026-09-23 16:31:38 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T08:32:28.470Z",
+      "source": "real origin-forwarded wx.request"
+    }
+  ],
+  "screenshots": [
+    "01-authorized-address-choice.png",
+    "02-selected-report-address-resume.png"
+  ],
+  "principal": {
+    "user_id": 3,
+    "roles": [
+      "RESIDENT"
+    ],
+    "scopes": [
+      {
+        "role_code": "RESIDENT",
+        "scope_type": "PROPERTY",
+        "tenant_id": 1,
+        "property_id": 1,
+        "permissions": [
+          "announcement:read",
+          "knowledge:read",
+          "resident_binding:create",
+          "resident_binding:read",
+          "resident_relation:read",
+          "work_order:cancel",
+          "work_order:create",
+          "work_order:read"
+        ]
+      }
+    ]
+  },
+  "last_error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'PENDING_ANALYSIS'\n- 'ASSIGNED'\n\n    at main (D:\\property-ai\\reports\\auth-identity-ai-001\\local-qwen\\run-business-page.js:43:9)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)",
+  "initial_capture_error": "Error: timeout waiting for automator response\n    at Connection.onMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\miniprogram-automator\\out\\Connection.js:1:985)\n    at Transport.emit (node:events:509:28)\n    at WebSocket.<anonymous> (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\miniprogram-automator\\out\\Transport.js:1:220)\n    at WebSocket.onMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\event-target.js:120:16)\n    at WebSocket.emit (node:events:509:28)\n    at Receiver.receiverOnMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\websocket.js:807:20)\n    at Receiver.emit (node:events:509:28)\n    at Receiver.dataMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\receiver.js:448:14)\n    at Receiver.getData (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\receiver.js:377:17)\n    at Receiver.startLoop (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\receiver.js:158:22)",
+  "resume_note": "Resumed existing selected-address page after screenshot acknowledgement timeout; no prior create request, no repeated login or house selection."
+}

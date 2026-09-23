@@ -1,0 +1,33 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "started_at_utc": "2026-09-23T08:26:15.5052288Z",
+  "old_processes": [
+    {
+      "ProcessId": 26332,
+      "ParentProcessId": 35524,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "\"D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\" -I D:\\property-ai\\reports\\ai-fallback-runtime-022\\launch-runtime.py api success"
+    },
+    {
+      "ProcessId": 47436,
+      "ParentProcessId": 35524,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "\"D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\" -I D:\\property-ai\\reports\\ai-fallback-runtime-022\\launch-runtime.py worker success"
+    },
+    {
+      "ProcessId": 47800,
+      "ParentProcessId": 47436,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -m celery -A app.worker.celery_app:celery_app worker -Q property_ai.auth001 --pool=solo --loglevel=info --hostname=auth001@%h"
+    }
+  ],
+  "steps": [
+    "exact-idle-worker-warm-shutdown-requested",
+    "old-worker-exited",
+    "verified-old-api-stopped",
+    "new-api-and-worker-started-same-launcher"
+  ],
+  "source_sha": "e65b4d7fb0e9541695fdcb9a1f1b216d97dbf6c2",
+  "api_pid": 33592,
+  "worker_pid": 42984
+}

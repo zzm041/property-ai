@@ -1,0 +1,166 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "mode": "real Qwen via existing factory/Providers/AnalysisService prompt; no DB/queue/Worker/UI",
+  "model": "qwen3.5:2b",
+  "manifest_sha256": "324d162be6ca5629ae4517c8710434d0bd2d665bc94dbad46e9af8fbf8a2f0df",
+  "settings_boundary": "production selects real HTTP adapter, not production environment; APP_ENV=test; API/Worker settings unchanged",
+  "started_at_utc": "2026-09-23T08:18:20.407841+00:00",
+  "results": [
+    {
+      "case": "electrical",
+      "report": "厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+      "elapsed_seconds": 0.689,
+      "error_code": null,
+      "call_status": "SUCCESS",
+      "raw_payload": {
+        "category": "electrical",
+        "subcategory": "outlet",
+        "severity": "low",
+        "priority": "p3",
+        "summary": "Kitchen outlet not powered; other rooms lighting normal; no smoke detected.",
+        "risk": "electric",
+        "required_role": "STAFF",
+        "required_skill": "plumber/electrician",
+        "confidence": 0.9
+      },
+      "token_usage": 585,
+      "mapped": {
+        "category": "ELECTRICAL",
+        "subcategory": "outlet",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "summary": "Kitchen outlet not powered; other rooms lighting normal; no smoke detected.",
+        "risk": "electric",
+        "required_role": "STAFF",
+        "required_skill": "PLUMBER/ELECTRICIAN",
+        "required_duty": "MAINTENANCE",
+        "confidence": 0.9,
+        "low_confidence": false
+      },
+      "schema_valid": true,
+      "expectation_met": true
+    },
+    {
+      "case": "plumbing",
+      "report": "卫生间水龙头一直滴水，关紧后仍漏水，请维修。",
+      "elapsed_seconds": 0.666,
+      "error_code": null,
+      "call_status": "SUCCESS",
+      "raw_payload": {
+        "category": "water_supply",
+        "subcategory": "plumbing",
+        "severity": "low",
+        "priority": "p3",
+        "summary": "Toilet sink dripping despite closure requires repair.",
+        "risk": "electric",
+        "required_role": "STAFF",
+        "required_skill": "plumber",
+        "confidence": 0.8
+      },
+      "token_usage": 574,
+      "mapped": {
+        "category": "PLUMBING",
+        "subcategory": "plumbing",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "summary": "Toilet sink dripping despite closure requires repair.",
+        "risk": "electric",
+        "required_role": "STAFF",
+        "required_skill": "PLUMBING",
+        "required_duty": "MAINTENANCE",
+        "confidence": 0.8,
+        "low_confidence": false
+      },
+      "schema_valid": true,
+      "expectation_met": true
+    },
+    {
+      "case": "insufficient",
+      "report": "帮忙看看，有点问题，具体在哪里我也不清楚。",
+      "elapsed_seconds": 0.707,
+      "error_code": null,
+      "call_status": "SUCCESS",
+      "raw_payload": {
+        "additionalProperties": false,
+        "category": "other",
+        "subcategory": "unknown",
+        "severity": "low",
+        "priority": "p3",
+        "summary": "User reports unclear issue location without specific details.",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "other",
+        "confidence": 0.1
+      },
+      "token_usage": 591,
+      "schema_valid": false,
+      "validation_error_type": "ValidationError"
+    }
+  ],
+  "baseline": {
+    "utc": "2026-09-23T08:18:20Z",
+    "ram_free_mib": 5676,
+    "gpu_used_mib": 6518,
+    "gpu_free_mib": 9478,
+    "gpu_utilization_percent": 1
+  },
+  "vision_adapter": {
+    "insight": {
+      "description": "A solid, uniform blue color filling the entire frame.",
+      "labels": [
+        "solid color",
+        "blue",
+        "uniform"
+      ],
+      "confidence": 0.98,
+      "model_version": "qwen3.5:2b",
+      "token_usage": 154
+    },
+    "elapsed_seconds": 3.421,
+    "input_sha256": "e06236b5f31a36145d0b4fcf18a568afd4e10d11ac2f07801965a2ba7aa17ed8",
+    "boundary": "same calibration image through actual storage/VLM adapter; no repair photo or business upload claim"
+  },
+  "status": "NOT_ALL_PROBES_PASSED",
+  "call_log_capture": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-23 08:18:23.877079+00:00",
+      "latency_ms": 688,
+      "request_id": "local-qwen-probe-electrical",
+      "attempt": 1,
+      "model_version": "qwen3.5:2b",
+      "token_usage": 585
+    },
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-23 08:18:24.567293+00:00",
+      "latency_ms": 665,
+      "request_id": "local-qwen-probe-plumbing",
+      "attempt": 1,
+      "model_version": "qwen3.5:2b",
+      "token_usage": 574
+    },
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-23 08:18:25.234050+00:00",
+      "latency_ms": 706,
+      "request_id": "local-qwen-probe-insufficient",
+      "attempt": 1,
+      "model_version": "qwen3.5:2b",
+      "token_usage": 591
+    }
+  ],
+  "final_resource_sample": {
+    "utc": "2026-09-23T08:18:25Z",
+    "ram_free_mib": 4487,
+    "gpu_used_mib": 9783,
+    "gpu_free_mib": 6213,
+    "gpu_utilization_percent": 2
+  }
+}

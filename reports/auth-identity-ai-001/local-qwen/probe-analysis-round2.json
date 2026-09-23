@@ -1,0 +1,345 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "mode": "real Qwen via existing factory/Providers/AnalysisService prompt; no DB/queue/Worker/UI",
+  "model": "qwen3.5:2b",
+  "manifest_sha256": "324d162be6ca5629ae4517c8710434d0bd2d665bc94dbad46e9af8fbf8a2f0df",
+  "settings_boundary": "production selects real HTTP adapter, not production environment; APP_ENV=test; API/Worker settings unchanged",
+  "started_at_utc": "2026-09-23T08:20:50.857547+00:00",
+  "round": 2,
+  "results": [
+    {
+      "case": "electrical",
+      "report": "厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+      "elapsed_seconds": 3.294,
+      "error_code": null,
+      "call_status": "SUCCESS",
+      "raw_payload": {
+        "category": "electrical",
+        "subcategory": "outlet",
+        "severity": "low",
+        "priority": "p3",
+        "summary": "Kitchen outlet not receiving power; other rooms lighting normal, no smoke detected.",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "electrician",
+        "confidence": 0.8
+      },
+      "token_usage": 766,
+      "mapped": {
+        "category": "ELECTRICAL",
+        "subcategory": "outlet",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "summary": "Kitchen outlet not receiving power; other rooms lighting normal, no smoke detected.",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "ELECTRICAL",
+        "required_duty": "MAINTENANCE",
+        "confidence": 0.8,
+        "low_confidence": false
+      },
+      "schema_valid": true,
+      "expected": {
+        "category": "ELECTRICAL",
+        "skill": "ELECTRICAL",
+        "allowed_risks": [
+          "electric",
+          "none"
+        ]
+      },
+      "expectation_met": true
+    },
+    {
+      "case": "plumbing",
+      "report": "卫生间水龙头一直滴水，关紧后仍漏水，请维修。",
+      "elapsed_seconds": 0.63,
+      "error_code": null,
+      "call_status": "SUCCESS",
+      "raw_payload": {
+        "category": "water_supply",
+        "subcategory": "plumbing",
+        "severity": "low",
+        "priority": "p3",
+        "summary": "Water supply leak in bathroom,",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "plumber",
+        "confidence": 0.8
+      },
+      "token_usage": 755,
+      "mapped": {
+        "category": "PLUMBING",
+        "subcategory": "plumbing",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "summary": "Water supply leak in bathroom,",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "PLUMBING",
+        "required_duty": "MAINTENANCE",
+        "confidence": 0.8,
+        "low_confidence": false
+      },
+      "schema_valid": true,
+      "expected": {
+        "category": "PLUMBING",
+        "skill": "PLUMBING",
+        "allowed_risks": [
+          "flooding",
+          "none"
+        ]
+      },
+      "expectation_met": true
+    },
+    {
+      "case": "insufficient",
+      "report": "帮忙看看，有点问题，具体在哪里我也不清楚。",
+      "elapsed_seconds": 0.786,
+      "error_code": null,
+      "call_status": "SUCCESS",
+      "raw_payload": {
+        "category": "other",
+        "subcategory": "unknown_location",
+        "severity": "low",
+        "priority": "p3",
+        "summary": "User reports a problem but cannot identify the specific location.",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "other",
+        "confidence": 0.5
+      },
+      "token_usage": 791,
+      "mapped": {
+        "category": "OTHER",
+        "subcategory": "unknown_location",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "summary": "User reports a problem but cannot identify the specific location.",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "OTHER",
+        "required_duty": "MAINTENANCE",
+        "confidence": 0.5,
+        "low_confidence": true
+      },
+      "schema_valid": true,
+      "expected": {
+        "category": "OTHER",
+        "skill": "OTHER",
+        "allowed_risks": [
+          "none",
+          "other"
+        ]
+      },
+      "expectation_met": true
+    },
+    {
+      "case": "holdout-cleaning",
+      "report": "楼道里有散落的纸箱和垃圾，需要清扫，没有其他异常。",
+      "elapsed_seconds": 0.806,
+      "error_code": null,
+      "call_status": "SUCCESS",
+      "raw_payload": {
+        "category": "cleaning",
+        "subcategory": "general_cleanup",
+        "severity": "low",
+        "priority": "p3",
+        "summary": "Scattered cardboard boxes and trash in the hallway require cleaning.",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "cleaning",
+        "confidence": 0.8
+      },
+      "token_usage": 797,
+      "mapped": {
+        "category": "CLEANING",
+        "subcategory": "general_cleanup",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "summary": "Scattered cardboard boxes and trash in the hallway require cleaning.",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "CLEANING",
+        "required_duty": "CLEANING",
+        "confidence": 0.8,
+        "low_confidence": false
+      },
+      "schema_valid": true,
+      "expected": {
+        "category": "CLEANING",
+        "skill": "CLEANING",
+        "allowed_risks": [
+          "none"
+        ]
+      },
+      "expectation_met": true
+    },
+    {
+      "case": "holdout-hvac",
+      "report": "空调能开机，吹出来的风不凉，没有漏水或异味，请检修。",
+      "elapsed_seconds": 0.796,
+      "error_code": null,
+      "call_status": "SUCCESS",
+      "raw_payload": {
+        "category": "hvac",
+        "subcategory": "cooling_system",
+        "severity": "low",
+        "priority": "p3",
+        "summary": "AC unit runs but produces warm air without leaks or odors.",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "hvac",
+        "confidence": 0.8
+      },
+      "token_usage": 803,
+      "mapped": {
+        "category": "HVAC",
+        "subcategory": "cooling_system",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "summary": "AC unit runs but produces warm air without leaks or odors.",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "HVAC",
+        "required_duty": "MAINTENANCE",
+        "confidence": 0.8,
+        "low_confidence": false
+      },
+      "schema_valid": true,
+      "expected": {
+        "category": "HVAC",
+        "skill": "HVAC",
+        "allowed_risks": [
+          "none"
+        ]
+      },
+      "expectation_met": true
+    },
+    {
+      "case": "holdout-plumbing",
+      "report": "洗手盆下方的排水接头缓慢渗水，地面有少量水滴，旁边没有电器。",
+      "elapsed_seconds": 0.837,
+      "error_code": null,
+      "call_status": "SUCCESS",
+      "raw_payload": {
+        "category": "water_supply",
+        "subcategory": "plumbing_leak",
+        "severity": "low",
+        "priority": "p3",
+        "summary": "Slow leak detected under sink drain fitting with minimal water on floor.",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "plumber",
+        "confidence": 0.8
+      },
+      "token_usage": 804,
+      "mapped": {
+        "category": "PLUMBING",
+        "subcategory": "plumbing_leak",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "summary": "Slow leak detected under sink drain fitting with minimal water on floor.",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "PLUMBING",
+        "required_duty": "MAINTENANCE",
+        "confidence": 0.8,
+        "low_confidence": false
+      },
+      "schema_valid": true,
+      "expected": {
+        "category": "PLUMBING",
+        "skill": "PLUMBING",
+        "allowed_risks": [
+          "flooding",
+          "none"
+        ]
+      },
+      "expectation_met": true
+    }
+  ],
+  "baseline": {
+    "utc": "2026-09-23T08:20:50Z",
+    "ram_free_mib": 5596,
+    "gpu_used_mib": 6519,
+    "gpu_free_mib": 9477,
+    "gpu_utilization_percent": 2
+  },
+  "vision_adapter_reused_from": "probe-analysis.json; unchanged VLM path, not rerun",
+  "status": "PASS_BOUNDED_PROVIDER_PROMPT_PROBE",
+  "call_log_capture": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-23 08:20:50.912712+00:00",
+      "latency_ms": 3293,
+      "request_id": "local-qwen-probe-electrical",
+      "attempt": 1,
+      "model_version": "qwen3.5:2b",
+      "token_usage": 766
+    },
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-23 08:20:54.207063+00:00",
+      "latency_ms": 629,
+      "request_id": "local-qwen-probe-plumbing",
+      "attempt": 1,
+      "model_version": "qwen3.5:2b",
+      "token_usage": 755
+    },
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-23 08:20:54.837525+00:00",
+      "latency_ms": 785,
+      "request_id": "local-qwen-probe-insufficient",
+      "attempt": 1,
+      "model_version": "qwen3.5:2b",
+      "token_usage": 791
+    },
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-23 08:20:55.624492+00:00",
+      "latency_ms": 805,
+      "request_id": "local-qwen-probe-holdout-cleaning",
+      "attempt": 1,
+      "model_version": "qwen3.5:2b",
+      "token_usage": 797
+    },
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-23 08:20:56.432777+00:00",
+      "latency_ms": 794,
+      "request_id": "local-qwen-probe-holdout-hvac",
+      "attempt": 1,
+      "model_version": "qwen3.5:2b",
+      "token_usage": 803
+    },
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-23 08:20:57.228010+00:00",
+      "latency_ms": 836,
+      "request_id": "local-qwen-probe-holdout-plumbing",
+      "attempt": 1,
+      "model_version": "qwen3.5:2b",
+      "token_usage": 804
+    }
+  ],
+  "final_resource_sample": {
+    "utc": "2026-09-23T08:20:58Z",
+    "ram_free_mib": 4536,
+    "gpu_used_mib": 9740,
+    "gpu_free_mib": 6256,
+    "gpu_utilization_percent": 73
+  }
+}

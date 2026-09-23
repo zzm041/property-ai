@@ -1,0 +1,99 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "phase": "review",
+  "reviewed_head": "e65b4d7fb0e9541695fdcb9a1f1b216d97dbf6c2; product diff 87792ee..e65b4d7; scope limited to approved 4B download and read-only local diagnostics",
+  "decision": "READY",
+  "actions_or_findings": [
+    {
+      "title": "NON_BLOCKING LOCALAI4B-N1 — one grounded summary is useful evidence, not general model-quality acceptance",
+      "path": "reports/auth-identity-ai-001/local-qwen/probe-current-context-4b-v3.json:93-137",
+      "trigger": "Interpreting schema_and_dispatch_labels_match or confidence 0.8 as complete semantic acceptance.",
+      "rationale": "The independently inspected output correctly preserves the current report's no-power, other-rooms-normal and no-smoke facts instead of copying historical sparking. However, its summary remains English despite the committed prompt requesting the report's language. Only one full-context text sample was tested; risk, severity and priority calibration and broader factual reliability remain unverified. This does not prevent further bounded read-only diagnostics."
+    },
+    {
+      "title": "CURRENT_TASK_BLOCKER LOCALAI-B2 — retained for full business acceptance, not this diagnostic stage",
+      "path": "reports/auth-identity-ai-001/local-qwen/business-database-runtime.json; reports/auth-identity-ai-001/local-qwen/probe-current-context-v4.json; reports/auth-identity-ai-001/local-qwen/post-4b-readonly-state.json",
+      "trigger": "Claiming SELFHOST-AI-LOCAL-001, actual automatic dispatch, or slice 023 has passed.",
+      "rationale": "The actual 2B business run remains unsuccessful: WorkOrder 12 is PENDING_ANALYSIS/version 1, analysis 12 is LOW_CONFIDENCE with the incorrect historical sparking summary, and Assignment is empty. The later 2B v4 diagnostic still returned that false fact at confidence 0.8; its QUALIFIED_DIRECT_PROBE field was not a semantic check. Post-4B SELECT evidence preserves those same rows and old-order states. The 4B diagnostic did not repair or replay that business result, so the original finding stays open."
+    },
+    {
+      "title": "NON_BLOCKING LOCALAI4B-N2 — resource evidence compares deployment candidates, not parameter count alone",
+      "path": "reports/auth-identity-ai-001/local-qwen/download-4b-result.json; reports/auth-identity-ai-001/local-qwen/probe-current-context-4b-v3.json; reports/auth-identity-ai-001/local-qwen/probe-4b-image-red.json",
+      "trigger": "Making model-size, memory, latency or production-capacity conclusions.",
+      "rationale": "The actual candidates differ in both size and quantization: 2B tag reports 2.3B/Q8_0 and 2,741,192,820 bytes; 4B reports 4.7B/Q4_K_M and 3,389,983,735 bytes. The 4B text run took 12.718 seconds with sampled minimum free RAM 13,543 MiB and GPU free 10,465 MiB. These are whole-workstation samples under a different baseline, not model-exclusive allocation or a controlled 2B-versus-4B benchmark. The 0.472-second red-image run has only its baseline sample, so it does not establish an in-flight memory peak."
+    },
+    {
+      "title": "RELEASE_BLOCKER LOCALAI-R-PROXY — diagnostic proxy isolation does not establish API/Worker proxy isolation",
+      "path": "reports/auth-identity-ai-001/local-qwen/probe-4b-context.py:89; reports/auth-identity-ai-001/local-qwen/probe-model.py; backend/app/provider/http.py:39; reports/auth-identity-ai-001/local-qwen/launch-auth001.py",
+      "trigger": "Extending the diagnostic's no-inherited-proxy guarantee to business runtime or real resident data.",
+      "rationale": "The reviewed 4B text client explicitly uses trust_env=False; image/metadata/download-loopback helpers use ProxyHandler({}). Thus this diagnostic avoids inherited environment proxies. The shared production-provider HTTP helper still constructs a default httpx.Client, and the reviewed launcher does not establish equivalent isolation. No actual proxy leakage was observed or inferred. Verify or explicitly constrain that runtime boundary before broader business/real-data acceptance; it does not block the already-isolated read-only probes."
+    },
+    {
+      "title": "RELEASE_BLOCKER LOCALAI-R-QUALITY — image calibration, real inference and production acceptance remain distinct",
+      "path": "reports/auth-identity-ai-001/local-qwen/probe-4b-image-blue.json; reports/auth-identity-ai-001/local-qwen/probe-4b-image-red.json; docs/05-AI-DISPATCH-SPEC.md",
+      "trigger": "Claiming repair-photo understanding, real multimodal automatic dispatch, real RAG or production readiness.",
+      "rationale": "I opened both PNGs and verified their recorded hashes. They are plain blue/red calibration images, correctly distinguished by the real 4B responses in 3.375 and 0.472 seconds. This establishes a bounded image-input/output path, not appliance/fault recognition, image-versus-text contradiction handling or the application's full VLM/Worker business path. Real bge-m3/RAG, speech, production throughput, security, providers and release remain unaccepted."
+    }
+  ],
+  "evidence_paths": [
+    "AGENTS.md",
+    "docs/05-AI-DISPATCH-SPEC.md",
+    "backend/app/core/config.py",
+    "backend/app/domain/ai.py",
+    "backend/app/provider/factory.py",
+    "backend/app/provider/http.py",
+    "backend/app/provider/llm/__init__.py",
+    "backend/app/provider/vision/__init__.py",
+    "backend/app/service/analysis.py",
+    "backend/tests/unit/test_ai_analysis_input.py",
+    "backend/tests/unit/test_qwen_local_controls.py",
+    "reports/auth-identity-ai-001/local-qwen/pull-model.py",
+    "reports/auth-identity-ai-001/local-qwen/download-4b-result.json",
+    "reports/auth-identity-ai-001/local-qwen/download-4b-events.jsonl",
+    "reports/auth-identity-ai-001/local-qwen/probe-4b-context.py",
+    "reports/auth-identity-ai-001/local-qwen/probe-current-context-4b-v3.json",
+    "reports/auth-identity-ai-001/local-qwen/probe-model.py",
+    "reports/auth-identity-ai-001/local-qwen/probe-4b-image-blue.json",
+    "reports/auth-identity-ai-001/local-qwen/probe-4b-image-red.json",
+    "reports/auth-identity-ai-001/local-qwen/calibration-blue.png",
+    "reports/auth-identity-ai-001/local-qwen/calibration-red.png",
+    "reports/auth-identity-ai-001/local-qwen/probe-assessment.json",
+    "reports/auth-identity-ai-001/local-qwen/business-database-runtime.json",
+    "reports/auth-identity-ai-001/local-qwen/probe-current-context-v4.json",
+    "reports/auth-identity-ai-001/local-qwen/probe-analysis-round2.json",
+    "reports/auth-identity-ai-001/local-qwen/verify-4b-readonly-state.py",
+    "reports/auth-identity-ai-001/local-qwen/post-4b-readonly-state.json",
+    "reports/auth-identity-ai-001/local-qwen/launch-local.ps1",
+    "reports/auth-identity-ai-001/local-qwen/launch-auth001.py",
+    "reports/auth-identity-ai-001/local-qwen/focused.txt",
+    "reports/auth-identity-ai-001/local-qwen/focused-storage-resume.txt",
+    "reports/auth-identity-ai-001/local-qwen/focused-prompt-v3.txt",
+    "reports/auth-identity-ai-001/local-qwen/focused-prompt-v4.txt",
+    "reports/project-handoff.md",
+    "reports/auth-identity-ai-001/self-host-recommendation.md",
+    "tmp/selfhost-ai-local/models/manifests/registry.ollama.ai/library/qwen3.5/4b"
+  ],
+  "unverified": [
+    "I did not run tests, inference, HTTP requests, pages, database/queue operations or background processes; this independent session inspected source and saved evidence only.",
+    "I independently hashed the local manifest and checked the model blob's file size, but did not rehash the entire multi-gigabyte model. Full blob verification is supported by the retained download script and result.",
+    "The 4B text result is one sample; repeatability, held-out full-context cases, Chinese-summary compliance, risk/priority calibration and adversarial historical context remain unverified.",
+    "The 4B image checks cover two plain-color images only. No real repair-photo or 4B business VLM acceptance is established.",
+    "No 4B business configuration switch, Worker replay, persisted 4B analysis or AUTO Assignment occurred.",
+    "Post-diagnostic evidence compares specified business fields and row IDs, not a complete database checksum. Runtime headers describe startup settings, not live debugger introspection.",
+    "Runtime proxy routing, complete network-egress isolation, warm/cold latency distributions, concurrency, sustained memory peaks and production capacity were not independently exercised.",
+    "The focused test records were inspected, not rerun: initial 58 passes plus one fixture setup error; the isolated failed fixture subsequently passed. The 33-case prompt runs overlap and must not be added as unique coverage. The v4 test pass does not establish model factual correctness.",
+    "Real bge-m3/reranker/RAG, speech, physical-device, production-provider, production security/performance and formal release remain outside this diagnostic acceptance."
+  ],
+  "session_note": "This is a separate read-only review of the approved diagnostic stage. Actual repository HEAD is e65b4d7fb0e9541695fdcb9a1f1b216d97dbf6c2. The three recorded source hashes match the current analysis/domain/LLM files. Download events end in digest verification, manifest writing and success; the independently hashed local manifest matches 2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd, and the model blob size is 3,389,971,840 bytes. The probe uses the committed v3 AnalysisService prompt and the exact original input hash c6c2528a040d78cf695f0a326017f1ebce26febc67df79309af545a7d00dffdd for synthetic WorkOrder 12, including the conflicting historical summaries. It calls the real loopback provider and captures call logging in memory rather than writing AiCallLog. The output correctly describes no power/normal other rooms/no smoke, with actual reported token total 1013; token count is not used as proof of semantic quality. Both calibration image files were actually viewed and their hashes matched the saved 4B requests. Post-probe SELECT evidence retains the original WorkOrder, analysis, AiCallLog, recommendations and history IDs, zero assignments and all eleven older-order states. Model listing is empty after keepalive, while retained runtime startup headers still specify 2B, not 4B. No source, evidence or configuration was modified by this reviewer. Relevant memory guidance was used only for evidence/acceptance separation; current repository instructions supersede its outdated implementation-role note.",
+  "task_result": "READY_SCOPED_LOCAL_READ_ONLY_DIAGNOSTICS. The approved 4B download and bounded real text/two-color diagnostic evidence are credible and support continuing controlled local read-only validation. This is explicitly NOT a PASS for the whole SELFHOST-AI-LOCAL-001 task, actual automatic dispatch, slice 023, model-quality acceptance or Production V1.",
+  "product_gap_changes": [
+    "Real local 4B inference is now evidenced; it is no longer accurate to say no real model has run locally.",
+    "For one exact full-context input, the 4B candidate avoids the 2B historical-sparking contamination, while Chinese-summary compliance remains open.",
+    "A real 4B image calibration path is evidenced for two solid colors only; repair-photo understanding remains open.",
+    "Preserve LOCALAI-B1 historical failures and LOCALAI-B2's unresolved business acceptance status. Do not replace the failed 2B evidence with the successful diagnostic.",
+    "No AUTO, 023, real RAG or production coverage row should be upgraded to PASS on this result."
+  ],
+  "schedule_risk": "Visible sampled headroom supports another bounded sequential diagnostic, but it does not guarantee future headroom or production capacity. The 12.718-second full-context text call used a 60-second diagnostic timeout and is not evidence that the default eight-second LLM budget or a production latency target is met. Quality and integration gates remain ahead of any business switch.",
+  "next_action": "Save this stage-specific review and update the existing handoff/recommendation with the actual 4B hashes, quantization, three probe boundaries and unchanged WorkOrder 12 state. Within the already approved controlled-local scope, continue a small, explicitly bounded read-only validation set covering held-out full-context faults, misleading past summaries, insufficient evidence and Chinese-summary compliance; retain every result and do not substitute handcrafted answers. Keep one resident model, loopback-only/no-cloud operation, explicit no-proxy clients, resource prechecks, finite call limits and no business/queue writes. Do not repeat the completed download or use new business orders to hide the failed order. Before any business-runtime switch or replay, separately resolve the proxy/configuration and semantic acceptance gates and confirm the applicable authorization. Do not infer business-switch authority from this READY result.",
+  "approval_requests": []
+}

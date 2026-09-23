@@ -1,0 +1,155 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "case": "image-blue",
+  "model": "qwen3.5:2b",
+  "manifest_sha256": "324d162be6ca5629ae4517c8710434d0bd2d665bc94dbad46e9af8fbf8a2f0df",
+  "endpoint": "http://127.0.0.1:11435",
+  "business_requests": false,
+  "synthetic_only": true,
+  "resource_scope": "Whole workstation samples; other applications remain running, not exclusive attribution.",
+  "baseline": {
+    "utc": "2026-09-23T08:14:14Z",
+    "ram_free_mib": 4774,
+    "gpu_used_mib": 9728,
+    "gpu_free_mib": 6268,
+    "gpu_utilization_percent": 8
+  },
+  "image_sha256": "e06236b5f31a36145d0b4fcf18a568afd4e10d11ac2f07801965a2ba7aa17ed8",
+  "image_boundary": "Solid-color calibration only, not a repair-photo quality benchmark.",
+  "request_controls": {
+    "model": "qwen3.5:2b",
+    "response_format": {
+      "type": "json_object"
+    },
+    "temperature": 0,
+    "reasoning_effort": "none",
+    "max_tokens": 256,
+    "stream": false
+  },
+  "response": {
+    "id": "chatcmpl-802",
+    "object": "chat.completion",
+    "created": 1790151263,
+    "model": "qwen3.5:2b",
+    "system_fingerprint": "fp_ollama",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"dominant_color\": \"blue\",\n  \"description\": \"A solid, uniform blue surface with no discernible patterns, textures, or objects.\"\n}"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 114,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "completion_tokens": 37,
+      "total_tokens": 151
+    }
+  },
+  "status": "PASS_BOUNDED_REAL_MODEL_PROBE",
+  "parsed_answer": {
+    "dominant_color": "blue",
+    "description": "A solid, uniform blue surface with no discernible patterns, textures, or objects."
+  },
+  "loaded_models": [
+    {
+      "name": "qwen3.5:2b",
+      "model": "qwen3.5:2b",
+      "size": 2356234156,
+      "digest": "324d162be6ca5629ae4517c8710434d0bd2d665bc94dbad46e9af8fbf8a2f0df",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "2.3B",
+        "quantization_level": "Q8_0"
+      },
+      "expires_at": "2026-09-23T16:14:53.9732506+08:00",
+      "size_vram": 2356234156,
+      "context_length": 4096
+    }
+  ],
+  "elapsed_seconds": 9.741,
+  "resource_samples": [
+    {
+      "utc": "2026-09-23T08:14:14Z",
+      "ram_free_mib": 4774,
+      "gpu_used_mib": 9728,
+      "gpu_free_mib": 6268,
+      "gpu_utilization_percent": 8
+    },
+    {
+      "utc": "2026-09-23T08:14:15Z",
+      "ram_free_mib": 4591,
+      "gpu_used_mib": 9777,
+      "gpu_free_mib": 6219,
+      "gpu_utilization_percent": 2
+    },
+    {
+      "utc": "2026-09-23T08:14:16Z",
+      "ram_free_mib": 4538,
+      "gpu_used_mib": 9772,
+      "gpu_free_mib": 6224,
+      "gpu_utilization_percent": 2
+    },
+    {
+      "utc": "2026-09-23T08:14:17Z",
+      "ram_free_mib": 4495,
+      "gpu_used_mib": 9772,
+      "gpu_free_mib": 6224,
+      "gpu_utilization_percent": 2
+    },
+    {
+      "utc": "2026-09-23T08:14:18Z",
+      "ram_free_mib": 4487,
+      "gpu_used_mib": 9772,
+      "gpu_free_mib": 6224,
+      "gpu_utilization_percent": 1
+    },
+    {
+      "utc": "2026-09-23T08:14:19Z",
+      "ram_free_mib": 4523,
+      "gpu_used_mib": 9772,
+      "gpu_free_mib": 6224,
+      "gpu_utilization_percent": 1
+    },
+    {
+      "utc": "2026-09-23T08:14:20Z",
+      "ram_free_mib": 4457,
+      "gpu_used_mib": 9776,
+      "gpu_free_mib": 6220,
+      "gpu_utilization_percent": 2
+    },
+    {
+      "utc": "2026-09-23T08:14:21Z",
+      "ram_free_mib": 4475,
+      "gpu_used_mib": 9776,
+      "gpu_free_mib": 6220,
+      "gpu_utilization_percent": 2
+    },
+    {
+      "utc": "2026-09-23T08:14:22Z",
+      "ram_free_mib": 4515,
+      "gpu_used_mib": 9776,
+      "gpu_free_mib": 6220,
+      "gpu_utilization_percent": 1
+    },
+    {
+      "utc": "2026-09-23T08:14:23Z",
+      "ram_free_mib": 4577,
+      "gpu_used_mib": 9776,
+      "gpu_free_mib": 6220,
+      "gpu_utilization_percent": 1
+    }
+  ],
+  "min_ram_free_mib": 4457,
+  "max_gpu_used_mib": 9777
+}
