@@ -1,0 +1,48 @@
+{
+  "task_id": "HOUSE-CSV-ROUNDTRIP-018",
+  "run_id": "csv018-ed7da6f01249",
+  "database": "127.0.0.1:3307/property_ai_auth001_test",
+  "frontend_sha": "ece4855f00d2ac69c63e0c2a092c337739cb279a",
+  "backend_sha": "4a8ae835388c6ee1da4d9bd088f7fc73356644e4",
+  "mode": "Backend unchanged; retained API/Worker, no restart, identity/house/business writes or fixture recreation.",
+  "revision": "20260919_0009",
+  "property": {
+    "id": 1,
+    "tenant_id": 1,
+    "name": "014合成小区-wo014-745f67277104"
+  },
+  "house_count_before": 53,
+  "health": {
+    "request_id": "fb52be9083804055a19fdd2420ffff90",
+    "data": {
+      "status": "ok"
+    }
+  },
+  "queue": {
+    "vhost": "property_ai_auth001",
+    "actual_output": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nproperty_ai.auth001.dlq\t2\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1\nceleryev.45d87d1d-72c8-4c3c-b771-98867858b00e\t0\t0\t1\n",
+    "message_content_read": false,
+    "shared_vhost_accessed": false
+  },
+  "processes": [
+    {
+      "ProcessId": 46236,
+      "ParentProcessId": 3420,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "\"D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\" -I D:\\property-ai\\tmp\\run_auth001_recovered.py api"
+    },
+    {
+      "ProcessId": 41920,
+      "ParentProcessId": 3420,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "\"D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\" -I D:\\property-ai\\tmp\\run_auth001_recovered.py worker"
+    },
+    {
+      "ProcessId": 46688,
+      "ParentProcessId": 41920,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -m celery -A app.worker.celery_app:celery_app worker -Q property_ai.auth001 --pool=solo --loglevel=info --hostname=auth001@%h"
+    }
+  ],
+  "observed_at_utc": "2026-09-23T04:37:49.880617+00:00"
+}

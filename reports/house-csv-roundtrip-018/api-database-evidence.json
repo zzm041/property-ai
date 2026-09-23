@@ -1,0 +1,749 @@
+{
+  "task_id": "HOUSE-CSV-ROUNDTRIP-018",
+  "run_id": "csv018-ed7da6f01249",
+  "frontend_sha": "ece4855f00d2ac69c63e0c2a092c337739cb279a",
+  "backend_sha": "4a8ae835388c6ee1da4d9bd088f7fc73356644e4",
+  "results": {
+    "current-export": {
+      "columns": [
+        "building_code",
+        "building_name",
+        "unit_code",
+        "unit_name",
+        "room_no",
+        "floor",
+        "status"
+      ],
+      "rows": [
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "014-01",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "015-5f73ff",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-00",
+          "floor": 1,
+          "status": "INACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-01",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-02",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-03",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-04",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-05",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-06",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-07",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-08",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-09",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-10",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-11",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-12",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-13",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-14",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-15",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-16",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-17",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-18",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-19",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-20",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-21",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-22",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-23",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-24",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-25",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-26",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-27",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-28",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-29",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-30",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-31",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-32",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-33",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-34",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-35",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-36",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-37",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-38",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-39",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-40",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-41",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-42",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-43",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-44",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-45",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-46",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-47",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-48",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-49",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "WO014",
+          "building_name": "014合成楼栋",
+          "unit_code": "U014",
+          "unit_name": "014合成单元",
+          "room_no": "016-5e420c-50",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "018-a6f01249",
+          "building_name": "csv018-ed7da6f01249 北区,\"一\"\n二栋",
+          "unit_code": "A",
+          "unit_name": "东\n\n单元 \"甲\"",
+          "room_no": "101",
+          "floor": 1,
+          "status": "ACTIVE"
+        },
+        {
+          "building_code": "018-a6f01249",
+          "building_name": "csv018-ed7da6f01249 北区,\"一\"\n二栋",
+          "unit_code": "A",
+          "unit_name": "东\n\n单元 \"甲\"",
+          "room_no": "102",
+          "floor": 2,
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    "resident-import-denied": [
+      403,
+      {
+        "request_id": "csv018-ed7da6f01249-resident-import-denied",
+        "error": {
+          "code": "IAM.FORBIDDEN",
+          "message": "Permission denied",
+          "details": {}
+        }
+      }
+    ],
+    "resident-export-denied": [
+      403,
+      {
+        "request_id": "csv018-ed7da6f01249-resident-export-denied",
+        "error": {
+          "code": "IAM.FORBIDDEN",
+          "message": "Permission denied",
+          "details": {}
+        }
+      }
+    ],
+    "over500-rejected": [
+      422,
+      {
+        "request_id": "csv018-ed7da6f01249-over500-rejected",
+        "error": {
+          "code": "SYS.VALIDATION_ERROR",
+          "message": "Request validation failed",
+          "details": {
+            "errors": [
+              {
+                "type": "too_long",
+                "location": [
+                  "body",
+                  "rows"
+                ],
+                "message": "List should have at most 500 items after validation, not 501"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "existing-conflict": [
+      409,
+      {
+        "request_id": "csv018-ed7da6f01249-existing-conflict",
+        "error": {
+          "code": "RES.HIERARCHY_CONFLICT",
+          "message": "The import conflicts with an existing archive record",
+          "details": {
+            "row": 1,
+            "field": "building_name"
+          }
+        }
+      }
+    ]
+  },
+  "requests": [
+    {
+      "label": "manager-current",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d0d2aec016569ecd"
+    },
+    {
+      "label": "other-auth-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "fd39092e585b49d4"
+    },
+    {
+      "label": "other-auth-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "0a8bebfa138f7c0d"
+    },
+    {
+      "label": "other-auth-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c6f991baf5bc4068"
+    },
+    {
+      "label": "other-auth-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d33b8480f496fc52"
+    },
+    {
+      "label": "current-export",
+      "method": "GET",
+      "path": "/admin/houses/export",
+      "params": [
+        "property_id",
+        "tenant_id"
+      ],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "71bb017750385f79"
+    },
+    {
+      "label": "resident-import-denied",
+      "method": "POST",
+      "path": "/admin/houses/import",
+      "params": [],
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "775176c62c451d95"
+    },
+    {
+      "label": "resident-export-denied",
+      "method": "GET",
+      "path": "/admin/houses/export",
+      "params": [
+        "property_id",
+        "tenant_id"
+      ],
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "d9f45c7381ec348f"
+    },
+    {
+      "label": "over500-rejected",
+      "method": "POST",
+      "path": "/admin/houses/import",
+      "params": [],
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR",
+      "request_id_hash": "dc6cfcfa398e3012"
+    },
+    {
+      "label": "existing-conflict",
+      "method": "POST",
+      "path": "/admin/houses/import",
+      "params": [],
+      "status": 409,
+      "error_code": "RES.HIERARCHY_CONFLICT",
+      "request_id_hash": "19b18cdb55b74562"
+    }
+  ],
+  "mode": "Normal existing manager page session and fresh other-resident SMS session. No Seed login; API negatives are not UI. SQL SELECT-only.",
+  "database": {
+    "target": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "records": [
+      {
+        "building_id": 2,
+        "building_code": "018-a6f01249",
+        "building_name": "csv018-ed7da6f01249 北区,\"一\"\n二栋",
+        "unit_id": 2,
+        "unit_name": "东\n\n单元 \"甲\"",
+        "house_id": 54,
+        "room_no": "101",
+        "floor": 1,
+        "status": "ACTIVE",
+        "tenant_id": 1,
+        "property_id": 1
+      },
+      {
+        "building_id": 2,
+        "building_code": "018-a6f01249",
+        "building_name": "csv018-ed7da6f01249 北区,\"一\"\n二栋",
+        "unit_id": 2,
+        "unit_name": "东\n\n单元 \"甲\"",
+        "house_id": 55,
+        "room_no": "102",
+        "floor": 2,
+        "status": "ACTIVE",
+        "tenant_id": 1,
+        "property_id": 1
+      }
+    ],
+    "first_import_audits": [
+      {
+        "id": 342,
+        "actor_user_id": 5,
+        "action": "PROPERTY_BUILDING_CREATED",
+        "resource_type": "BUILDING",
+        "resource_id": 2,
+        "request_id": "d472c3287f464246a3e7e345bf259e36"
+      },
+      {
+        "id": 343,
+        "actor_user_id": 5,
+        "action": "PROPERTY_UNIT_CREATED",
+        "resource_type": "UNIT",
+        "resource_id": 2,
+        "request_id": "d472c3287f464246a3e7e345bf259e36"
+      },
+      {
+        "id": 344,
+        "actor_user_id": 5,
+        "action": "PROPERTY_HOUSE_CREATED",
+        "resource_type": "HOUSE",
+        "resource_id": 54,
+        "request_id": "d472c3287f464246a3e7e345bf259e36"
+      },
+      {
+        "id": 345,
+        "actor_user_id": 5,
+        "action": "PROPERTY_HOUSE_CREATED",
+        "resource_type": "HOUSE",
+        "resource_id": 55,
+        "request_id": "d472c3287f464246a3e7e345bf259e36"
+      }
+    ],
+    "total_houses": 55,
+    "old_count_before": 53
+  },
+  "queue": {
+    "vhost": "property_ai_auth001",
+    "actual_output": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nproperty_ai.auth001.dlq\t2\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1\nceleryev.45d87d1d-72c8-4c3c-b771-98867858b00e\t0\t0\t1\n",
+    "message_content_read": false,
+    "shared_vhost_accessed": false
+  },
+  "observed_at_utc": "2026-09-23T04:43:30.863259+00:00",
+  "status": "API_DB_PASS_PENDING_INDEPENDENT_REVIEW"
+}

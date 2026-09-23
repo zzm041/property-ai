@@ -1,0 +1,2935 @@
+{
+  "task_id": "HOUSE-CSV-ROUNDTRIP-018",
+  "run_id": "csv018-ed7da6f01249",
+  "code_sha": "ece4855f00d2ac69c63e0c2a092c337739cb279a",
+  "steps": {
+    "01-malformed-rejected": {
+      "path": "pages/supervisor/properties",
+      "property_id": "1",
+      "canEdit": true,
+      "notice": "",
+      "error": "CSV 引号没有闭合",
+      "buildings": [],
+      "units": [],
+      "houses": []
+    },
+    "02-import-success": {
+      "path": "pages/supervisor/properties",
+      "property_id": "1",
+      "canEdit": true,
+      "notice": "导入完成：楼栋 1，单元 1，房屋 2，未变化 0",
+      "error": "",
+      "buildings": [
+        {
+          "id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "code": "018-a6f01249",
+          "name": "csv018-ed7da6f01249 北区,\"一\"\n二栋"
+        }
+      ],
+      "units": [
+        {
+          "id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "building_id": 2,
+          "code": "A",
+          "name": "东\n\n单元 \"甲\"",
+          "label": "018-a6f01249 / A 东\n\n单元 \"甲\""
+        }
+      ],
+      "houses": [
+        {
+          "id": 54,
+          "tenant_id": 1,
+          "property_id": 1,
+          "unit_id": 2,
+          "room_no": "101",
+          "floor": 1,
+          "status": "ACTIVE",
+          "buildingCode": "018-a6f01249",
+          "unitCode": "A",
+          "label": "018-a6f01249 / A / 101"
+        },
+        {
+          "id": 55,
+          "tenant_id": 1,
+          "property_id": 1,
+          "unit_id": 2,
+          "room_no": "102",
+          "floor": 2,
+          "status": "ACTIVE",
+          "buildingCode": "018-a6f01249",
+          "unitCode": "A",
+          "label": "018-a6f01249 / A / 102"
+        }
+      ]
+    },
+    "03-export-clipboard": {
+      "path": "pages/supervisor/properties",
+      "property_id": "1",
+      "canEdit": true,
+      "notice": "已导出并复制 55 行 CSV",
+      "error": "",
+      "buildings": [
+        {
+          "id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "code": "018-a6f01249",
+          "name": "csv018-ed7da6f01249 北区,\"一\"\n二栋"
+        }
+      ],
+      "units": [
+        {
+          "id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "building_id": 2,
+          "code": "A",
+          "name": "东\n\n单元 \"甲\"",
+          "label": "018-a6f01249 / A 东\n\n单元 \"甲\""
+        }
+      ],
+      "houses": [
+        {
+          "id": 54,
+          "tenant_id": 1,
+          "property_id": 1,
+          "unit_id": 2,
+          "room_no": "101",
+          "floor": 1,
+          "status": "ACTIVE",
+          "buildingCode": "018-a6f01249",
+          "unitCode": "A",
+          "label": "018-a6f01249 / A / 101"
+        },
+        {
+          "id": 55,
+          "tenant_id": 1,
+          "property_id": 1,
+          "unit_id": 2,
+          "room_no": "102",
+          "floor": 2,
+          "status": "ACTIVE",
+          "buildingCode": "018-a6f01249",
+          "unitCode": "A",
+          "label": "018-a6f01249 / A / 102"
+        }
+      ]
+    },
+    "04-reimport-unchanged": {
+      "path": "pages/supervisor/properties",
+      "property_id": "1",
+      "canEdit": true,
+      "notice": "导入完成：楼栋 0，单元 0，房屋 0，未变化 55",
+      "error": "",
+      "buildings": [
+        {
+          "id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "code": "018-a6f01249",
+          "name": "csv018-ed7da6f01249 北区,\"一\"\n二栋"
+        }
+      ],
+      "units": [
+        {
+          "id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "building_id": 2,
+          "code": "A",
+          "name": "东\n\n单元 \"甲\"",
+          "label": "018-a6f01249 / A 东\n\n单元 \"甲\""
+        }
+      ],
+      "houses": [
+        {
+          "id": 54,
+          "tenant_id": 1,
+          "property_id": 1,
+          "unit_id": 2,
+          "room_no": "101",
+          "floor": 1,
+          "status": "ACTIVE",
+          "buildingCode": "018-a6f01249",
+          "unitCode": "A",
+          "label": "018-a6f01249 / A / 101"
+        },
+        {
+          "id": 55,
+          "tenant_id": 1,
+          "property_id": 1,
+          "unit_id": 2,
+          "room_no": "102",
+          "floor": 2,
+          "status": "ACTIVE",
+          "buildingCode": "018-a6f01249",
+          "unitCode": "A",
+          "label": "018-a6f01249 / A / 102"
+        }
+      ]
+    },
+    "05-refresh-relogin": {
+      "path": "pages/supervisor/properties",
+      "property_id": "1",
+      "canEdit": true,
+      "notice": "",
+      "error": "",
+      "buildings": [
+        {
+          "id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "code": "018-a6f01249",
+          "name": "csv018-ed7da6f01249 北区,\"一\"\n二栋"
+        }
+      ],
+      "units": [
+        {
+          "id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "building_id": 2,
+          "code": "A",
+          "name": "东\n\n单元 \"甲\"",
+          "label": "018-a6f01249 / A 东\n\n单元 \"甲\""
+        }
+      ],
+      "houses": [
+        {
+          "id": 54,
+          "tenant_id": 1,
+          "property_id": 1,
+          "unit_id": 2,
+          "room_no": "101",
+          "floor": 1,
+          "status": "ACTIVE",
+          "buildingCode": "018-a6f01249",
+          "unitCode": "A",
+          "label": "018-a6f01249 / A / 101"
+        },
+        {
+          "id": 55,
+          "tenant_id": 1,
+          "property_id": 1,
+          "unit_id": 2,
+          "room_no": "102",
+          "floor": 2,
+          "status": "ACTIVE",
+          "buildingCode": "018-a6f01249",
+          "unitCode": "A",
+          "label": "018-a6f01249 / A / 102"
+        }
+      ]
+    }
+  },
+  "requests": [
+    {
+      "path": "/admin/property-archive?property_id=1&tenant_id=1",
+      "method": "GET",
+      "status": 200,
+      "request_id": "a7e860dc189044138c4277a5074cd91d",
+      "result": {
+        "buildings": [
+          {
+            "id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "code": "WO014",
+            "name": "014合成楼栋"
+          }
+        ],
+        "units": [
+          {
+            "id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "building_id": 1,
+            "code": "U014",
+            "name": "014合成单元"
+          }
+        ],
+        "houses": [
+          {
+            "id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "014-01",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 2,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "015-5f73ff",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 3,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-00",
+            "floor": 1,
+            "status": "INACTIVE"
+          },
+          {
+            "id": 4,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-01",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 5,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-02",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 6,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-03",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 7,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-04",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 8,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-05",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 9,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-06",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 10,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-07",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 11,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-08",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 12,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-09",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 13,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-10",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 14,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-11",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 15,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-12",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 16,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-13",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 17,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-14",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 18,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-15",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 19,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-16",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 20,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-17",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 21,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-18",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 22,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-19",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 23,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-20",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 24,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-21",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 25,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-22",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 26,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-23",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 27,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-24",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 28,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-25",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 29,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-26",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 30,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-27",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 31,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-28",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 32,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-29",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 33,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-30",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 34,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-31",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 35,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-32",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 36,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-33",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 37,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-34",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 38,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-35",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 39,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-36",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 40,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-37",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 41,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-38",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 42,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-39",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 43,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-40",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 44,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-41",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 45,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-42",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 46,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-43",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 47,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-44",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 48,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-45",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 49,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-46",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 50,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-47",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 51,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-48",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 52,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-49",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 53,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-50",
+            "floor": 1,
+            "status": "ACTIVE"
+          }
+        ]
+      },
+      "received_at_utc": "2026-09-23T04:39:49.425Z",
+      "source": "real origin-forwarded wx.request; no fake result"
+    },
+    {
+      "path": "/admin/houses/import",
+      "method": "POST",
+      "status": 200,
+      "request_id": "d472c3287f464246a3e7e345bf259e36",
+      "result": {
+        "created_buildings": 1,
+        "created_units": 1,
+        "created_houses": 2,
+        "unchanged_houses": 0
+      },
+      "received_at_utc": "2026-09-23T04:42:10.288Z",
+      "source": "real origin-forwarded wx.request; no fake result"
+    },
+    {
+      "path": "/admin/property-archive?property_id=1&tenant_id=1",
+      "method": "GET",
+      "status": 200,
+      "request_id": "4756915ed23f45e29bb9b21a426091d8",
+      "result": {
+        "buildings": [
+          {
+            "id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "code": "WO014",
+            "name": "014合成楼栋"
+          },
+          {
+            "id": 2,
+            "tenant_id": 1,
+            "property_id": 1,
+            "code": "018-a6f01249",
+            "name": "csv018-ed7da6f01249 北区,\"一\"\n二栋"
+          }
+        ],
+        "units": [
+          {
+            "id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "building_id": 1,
+            "code": "U014",
+            "name": "014合成单元"
+          },
+          {
+            "id": 2,
+            "tenant_id": 1,
+            "property_id": 1,
+            "building_id": 2,
+            "code": "A",
+            "name": "东\n\n单元 \"甲\""
+          }
+        ],
+        "houses": [
+          {
+            "id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "014-01",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 2,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "015-5f73ff",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 3,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-00",
+            "floor": 1,
+            "status": "INACTIVE"
+          },
+          {
+            "id": 4,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-01",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 5,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-02",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 6,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-03",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 7,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-04",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 8,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-05",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 9,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-06",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 10,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-07",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 11,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-08",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 12,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-09",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 13,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-10",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 14,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-11",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 15,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-12",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 16,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-13",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 17,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-14",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 18,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-15",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 19,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-16",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 20,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-17",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 21,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-18",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 22,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-19",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 23,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-20",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 24,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-21",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 25,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-22",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 26,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-23",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 27,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-24",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 28,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-25",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 29,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-26",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 30,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-27",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 31,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-28",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 32,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-29",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 33,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-30",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 34,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-31",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 35,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-32",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 36,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-33",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 37,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-34",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 38,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-35",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 39,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-36",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 40,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-37",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 41,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-38",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 42,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-39",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 43,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-40",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 44,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-41",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 45,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-42",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 46,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-43",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 47,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-44",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 48,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-45",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 49,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-46",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 50,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-47",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 51,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-48",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 52,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-49",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 53,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-50",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 54,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 2,
+            "room_no": "101",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 55,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 2,
+            "room_no": "102",
+            "floor": 2,
+            "status": "ACTIVE"
+          }
+        ]
+      },
+      "received_at_utc": "2026-09-23T04:42:10.329Z",
+      "source": "real origin-forwarded wx.request; no fake result"
+    },
+    {
+      "path": "/admin/houses/export?property_id=1&tenant_id=1",
+      "method": "GET",
+      "status": 200,
+      "request_id": "f00dd1864dd14c09bd84b2b0e710473d",
+      "result": {
+        "columns": [
+          "building_code",
+          "building_name",
+          "unit_code",
+          "unit_name",
+          "room_no",
+          "floor",
+          "status"
+        ],
+        "rows": [
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "014-01",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "015-5f73ff",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-00",
+            "floor": 1,
+            "status": "INACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-01",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-02",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-03",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-04",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-05",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-06",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-07",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-08",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-09",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-10",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-11",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-12",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-13",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-14",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-15",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-16",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-17",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-18",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-19",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-20",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-21",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-22",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-23",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-24",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-25",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-26",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-27",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-28",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-29",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-30",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-31",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-32",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-33",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-34",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-35",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-36",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-37",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-38",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-39",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-40",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-41",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-42",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-43",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-44",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-45",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-46",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-47",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-48",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-49",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "016-5e420c-50",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "018-a6f01249",
+            "building_name": "csv018-ed7da6f01249 北区,\"一\"\n二栋",
+            "unit_code": "A",
+            "unit_name": "东\n\n单元 \"甲\"",
+            "room_no": "101",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "building_code": "018-a6f01249",
+            "building_name": "csv018-ed7da6f01249 北区,\"一\"\n二栋",
+            "unit_code": "A",
+            "unit_name": "东\n\n单元 \"甲\"",
+            "room_no": "102",
+            "floor": 2,
+            "status": "ACTIVE"
+          }
+        ]
+      },
+      "received_at_utc": "2026-09-23T04:42:19.824Z",
+      "source": "real origin-forwarded wx.request; no fake result"
+    },
+    {
+      "path": "/admin/houses/import",
+      "method": "POST",
+      "status": 200,
+      "request_id": "5a8bb9b6f60f44f889ec29b0977d6ad4",
+      "result": {
+        "created_buildings": 0,
+        "created_units": 0,
+        "created_houses": 0,
+        "unchanged_houses": 55
+      },
+      "received_at_utc": "2026-09-23T04:42:31.336Z",
+      "source": "real origin-forwarded wx.request; no fake result"
+    },
+    {
+      "path": "/admin/property-archive?property_id=1&tenant_id=1",
+      "method": "GET",
+      "status": 200,
+      "request_id": "7971ff61bbcc473dbf14498025a2b617",
+      "result": {
+        "buildings": [
+          {
+            "id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "code": "WO014",
+            "name": "014合成楼栋"
+          },
+          {
+            "id": 2,
+            "tenant_id": 1,
+            "property_id": 1,
+            "code": "018-a6f01249",
+            "name": "csv018-ed7da6f01249 北区,\"一\"\n二栋"
+          }
+        ],
+        "units": [
+          {
+            "id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "building_id": 1,
+            "code": "U014",
+            "name": "014合成单元"
+          },
+          {
+            "id": 2,
+            "tenant_id": 1,
+            "property_id": 1,
+            "building_id": 2,
+            "code": "A",
+            "name": "东\n\n单元 \"甲\""
+          }
+        ],
+        "houses": [
+          {
+            "id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "014-01",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 2,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "015-5f73ff",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 3,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-00",
+            "floor": 1,
+            "status": "INACTIVE"
+          },
+          {
+            "id": 4,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-01",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 5,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-02",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 6,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-03",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 7,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-04",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 8,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-05",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 9,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-06",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 10,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-07",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 11,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-08",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 12,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-09",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 13,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-10",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 14,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-11",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 15,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-12",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 16,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-13",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 17,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-14",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 18,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-15",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 19,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-16",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 20,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-17",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 21,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-18",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 22,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-19",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 23,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-20",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 24,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-21",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 25,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-22",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 26,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-23",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 27,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-24",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 28,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-25",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 29,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-26",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 30,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-27",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 31,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-28",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 32,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-29",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 33,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-30",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 34,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-31",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 35,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-32",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 36,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-33",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 37,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-34",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 38,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-35",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 39,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-36",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 40,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-37",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 41,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-38",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 42,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-39",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 43,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-40",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 44,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-41",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 45,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-42",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 46,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-43",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 47,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-44",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 48,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-45",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 49,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-46",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 50,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-47",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 51,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-48",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 52,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-49",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 53,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-50",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 54,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 2,
+            "room_no": "101",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 55,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 2,
+            "room_no": "102",
+            "floor": 2,
+            "status": "ACTIVE"
+          }
+        ]
+      },
+      "received_at_utc": "2026-09-23T04:42:31.385Z",
+      "source": "real origin-forwarded wx.request; no fake result"
+    },
+    {
+      "path": "/admin/property-archive?property_id=1&tenant_id=1",
+      "method": "GET",
+      "status": 200,
+      "request_id": "d96e7f714a1c4d3eaa46a59e0bb7bebe",
+      "result": {
+        "buildings": [
+          {
+            "id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "code": "WO014",
+            "name": "014合成楼栋"
+          },
+          {
+            "id": 2,
+            "tenant_id": 1,
+            "property_id": 1,
+            "code": "018-a6f01249",
+            "name": "csv018-ed7da6f01249 北区,\"一\"\n二栋"
+          }
+        ],
+        "units": [
+          {
+            "id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "building_id": 1,
+            "code": "U014",
+            "name": "014合成单元"
+          },
+          {
+            "id": 2,
+            "tenant_id": 1,
+            "property_id": 1,
+            "building_id": 2,
+            "code": "A",
+            "name": "东\n\n单元 \"甲\""
+          }
+        ],
+        "houses": [
+          {
+            "id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "014-01",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 2,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "015-5f73ff",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 3,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-00",
+            "floor": 1,
+            "status": "INACTIVE"
+          },
+          {
+            "id": 4,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-01",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 5,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-02",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 6,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-03",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 7,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-04",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 8,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-05",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 9,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-06",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 10,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-07",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 11,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-08",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 12,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-09",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 13,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-10",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 14,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-11",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 15,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-12",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 16,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-13",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 17,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-14",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 18,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-15",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 19,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-16",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 20,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-17",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 21,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-18",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 22,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-19",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 23,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-20",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 24,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-21",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 25,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-22",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 26,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-23",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 27,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-24",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 28,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-25",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 29,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-26",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 30,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-27",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 31,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-28",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 32,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-29",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 33,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-30",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 34,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-31",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 35,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-32",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 36,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-33",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 37,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-34",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 38,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-35",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 39,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-36",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 40,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-37",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 41,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-38",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 42,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-39",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 43,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-40",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 44,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-41",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 45,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-42",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 46,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-43",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 47,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-44",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 48,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-45",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 49,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-46",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 50,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-47",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 51,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-48",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 52,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-49",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 53,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 1,
+            "room_no": "016-5e420c-50",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 54,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 2,
+            "room_no": "101",
+            "floor": 1,
+            "status": "ACTIVE"
+          },
+          {
+            "id": 55,
+            "tenant_id": 1,
+            "property_id": 1,
+            "unit_id": 2,
+            "room_no": "102",
+            "floor": 2,
+            "status": "ACTIVE"
+          }
+        ]
+      },
+      "received_at_utc": "2026-09-23T04:42:45.271Z",
+      "source": "real origin-forwarded wx.request; no fake result"
+    }
+  ],
+  "screenshots": [
+    "01-malformed-rejected.png",
+    "02-import-success.png",
+    "03-export-clipboard.png",
+    "04-reimport-unchanged.png",
+    "05-refresh-relogin.png"
+  ],
+  "authentication": {
+    "user_id": 5,
+    "roles": [
+      "TENANT_ADMIN"
+    ],
+    "mode": "normal challenge/SMS/login controls, Development inbox only, no Seed"
+  },
+  "last_error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'building_code,building_name,unit_code,unit_name,room_no,floor,status\\n' +\n+   'B,\"unfinished\\n' +\n+   'name'\n- 'building_code,building_name,unit_code,unit_name,room_no,floor,status\\r\\n' +\n-   '018-a6f01249,\"csv018-ed7da6f01249 北区,\"\"一\"\"\\n' +\n-   '二栋\",A,\"东\\n' +\n-   '\\n' +\n-   '单元 \"\"甲\"\"\",101,1,ACTIVE\\r\\n' +\n-   '018-a6f01249,\"csv018-ed7da6f01249 北区,\"\"一\"\"\\n' +\n-   '二栋\",A,\"东\\n' +\n-   '\\n' +\n-   '单元 \"\"甲\"\"\",102,2,ACTIVE'\n\n    at main (D:\\property-ai\\reports\\house-csv-roundtrip-018\\run-page-evidence.js:60:62)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)",
+  "clipboard": {
+    "source": "actual wx.setClipboardData then getClipboardData; not mocked",
+    "length": 2917,
+    "sha256": "207c0c38fbbebe09489e9dd4cc7d0ba221895fa3d4d01bb2f9e730dac0ab6183",
+    "has_quoted_multiline_names": true
+  },
+  "helper_interruption": "Initial immediate textarea assertion ran before the asynchronous input event applied. Read-only inspection confirmed correct222-character input and no new marker building; resumed existing page with state polling. No duplicate login/import or product-code change for this interruption.",
+  "status": "PAGE_PASS_PENDING_INDEPENDENT_REVIEW",
+  "house_ids": [
+    54,
+    55
+  ],
+  "building_code": "018-a6f01249",
+  "project_config_sha256": "342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F"
+}

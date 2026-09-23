@@ -1999,6 +1999,34 @@
     ],
     "next_slice": {"task_id": "HOUSE-CSV-ROUNDTRIP-018", "scope": "Existing PHR006-N1 quoted-newline CSV export/reimport; existing import API/service only, no schema/dependency changes."}
   },
+  "house_csv_roundtrip_018": {
+    "task_id": "HOUSE-CSV-ROUNDTRIP-018",
+    "base_sha": "13ad49f31d8584d05e6731c0fd87b46ee9386ebe",
+    "implementation_head": "ece4855f00d2ac69c63e0c2a092c337739cb279a",
+    "backend_runtime_head": "4a8ae835388c6ee1da4d9bd088f7fc73356644e4 (unchanged backend; no restart)",
+    "runtime_run_id": "csv018-ed7da6f01249",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
+    "independent_review": {
+      "round": 1,
+      "product_repair_rounds": 0,
+      "result": "PASS",
+      "session_id": "01a0cc95-276d-7ec3-883f-67129d49c7e3",
+      "path": "reports/codex/HOUSE-CSV-ROUNDTRIP-018-review.json",
+      "boundary": "Separate read-only CLI; actual source/evidence/fivePNG inspection, no reviewer runtime/test/UI/API/DB/queue operations. PHR006-N1 closed;006B1-B4 remain closed; CSV018-N1/R1 retained."
+    },
+    "evidence": "reports/house-csv-roundtrip-018/:34focused1warning,fivePNG,normalTENANT_ADMIN5 createsbuilding2/unit2/houses54/55,realclipboard55rowexport/exactreimport0created55unchanged,refresh/relogin,403/422/409API,readonlyDBexactnames/audits342-345,AUTH0010009uniquevhost/queue0/0/1DLQ2untouched",
+    "current_status_overlays": [
+      {
+        "id": "HOUSE-IMPORT-EXPORT",
+        "implementation_status": "Existing scoped atomic import/export now preserves quoted embedded newlines, commas and escaped quotes through whole-text parsing; full CSV textarea and busy/scope guards reuse existing server rules.",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
+        "evidence_version": "006e2bb791 historical service evidence retained;018ece4855f00d2ac69c63e0c2a092c337739cb279a / csv018-ed7da6f01249",
+        "remaining_gap": "PHR006-N1 closed. Native file/device, Excel encoding, formula hardening, production capacity/security and formal release remain; other newline/500 variants are unit/API rather than physical-device evidence.",
+        "next_action": "Preserve018/006 results and closed findings; next019 AI input/provenance wiring, no migration/dependency/resource spend."
+      }
+    ],
+    "next_slice": {"task_id": "AI-ANALYSIS-INPUT-019", "scope": "Existing docs05 input/context/provider usage wiring; no real-model/paid-resource acceptance inferred."}
+  },
   "auth_failure_policy_20260923": {
     "task_id": "AUTH-FAILURE-POLICY-20260923",
     "owner_decision": "不锁定",
@@ -2019,7 +2047,7 @@
     "generated_at": "2026-09-23",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
     "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs), then notification_events_inbox_013.current_status_overlays (2 IDs)",
-    "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs), then manager_wo_cancel_017 (1 composite ID, remains PARTIAL)",
+    "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs), then manager_wo_cancel_017 (1 composite ID, remains PARTIAL), then house_csv_roundtrip_018 (1 existing ID)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced. Old AUTH001 objects were lost on the 2026-09-23 tmpfs stop; historical evidence remains version-bound, not current-object proof.",
     "row_count": 83,
     "rows": [
@@ -2377,11 +2405,11 @@
       },
       {
         "requirement_id": "HOUSE-IMPORT-EXPORT",
-        "current_implementation": "scoped_atomic_csv_import_export_and_building_unit_house_maintenance_wired",
-        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_SMS",
-        "evidence_version": "e19f01bac095f95afbd30dc3eb4d79f272dd8e2c / 05219fa8ee5255bc4e1302c3cddbeaaee4a33150 / e2bb791791f139918c83cf609a31724c49722289",
-        "remaining_gap": "quoted embedded-newline CSV parsing edge and production acceptance",
-        "next_action": "preserve scoped evidence; fix the quoted-newline edge during later import UX hardening"
+        "current_implementation": "Existing scoped atomic import/export now preserves quoted embedded newlines, commas and escaped quotes through whole-text parsing; full CSV textarea and busy/scope guards reuse existing server rules.",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
+        "evidence_version": "006e2bb791 historical service evidence retained;018ece4855f00d2ac69c63e0c2a092c337739cb279a / csv018-ed7da6f01249",
+        "remaining_gap": "PHR006-N1 closed. Native file/device, Excel encoding, formula hardening, production capacity/security and formal release remain; other newline/500 variants are unit/API rather than physical-device evidence.",
+        "next_action": "Preserve018/006 results and closed findings; next019 AI input/provenance wiring, no migration/dependency/resource spend."
       },
       {
         "requirement_id": "STATS-CONFIG",

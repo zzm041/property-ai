@@ -1,0 +1,17 @@
+{
+  "task_id": "HOUSE-CSV-ROUNDTRIP-018",
+  "base_sha": "13ad49f31d8584d05e6731c0fd87b46ee9386ebe",
+  "head_sha": "ece4855f00d2ac69c63e0c2a092c337739cb279a",
+  "review_round": 1,
+  "product_repair_rounds": 0,
+  "status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
+  "session_id": "01a0cc95-276d-7ec3-883f-67129d49c7e3",
+  "model": "gpt-5.6-sol (existing default; no override)",
+  "sandbox": "read-only",
+  "exit_code": 0,
+  "schema_validated": true,
+  "timeout_seconds": 900,
+  "result_path": "reports/codex/HOUSE-CSV-ROUNDTRIP-018-review.json",
+  "private_invocation_log": "tmp/house-csv-roundtrip-018/review.call.json",
+  "mechanism": "Existing wrapper/schema/default model/ChatGPT subscription/read-only; built-in agent thread limit known, no repeated spawning. Actual valid result closes PHR006-N1; reviewer opened all fivePNG and code/evidence, didnot run tests/pages/business/DB/queue."
+}
