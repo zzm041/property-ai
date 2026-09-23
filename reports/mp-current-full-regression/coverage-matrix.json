@@ -1908,6 +1908,70 @@
       "scope": "Complete first-page-only existing authenticated address catalog, active-house and pending-review list retrieval using existing cursors; no new business rule/schema."
     }
   },
+  "house_catalog_paging_016": {
+    "task_id": "HOUSE-CATALOG-PAGING-016",
+    "base_sha": "efade8cfcc266a85b8932e4e23520036d0602ece",
+    "initial_product": "b54442e219e9d8e9e8e569f2afaec8d682169a8f",
+    "implementation_head": "0690b34064c5a7e4b54add6fac3b87367f25dade",
+    "runtime_run_id": "paging016-683a935e420c",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+    "independent_review": {
+      "round": 2,
+      "product_repair_rounds": 1,
+      "result": "PASS",
+      "session_id": "01a0cc5e-d0c2-7192-aa22-6dfbd7f5863e",
+      "path": "reports/codex/HOUSE-CATALOG-PAGING-016-FIX-1-review.json",
+      "round1_history": "reports/codex/HOUSE-CATALOG-PAGING-016-review.json;NEEDS_CHANGES HOUSE016-B1 closed at0690b34",
+      "boundary": "Separate read-only CLI context; actually inspected new PNGs and code/saved evidence, no reviewer test/UI/API/DB/queue execution."
+    },
+    "evidence": "reports/house-catalog-paging-016/:55focused, original5PNG catalog53/active51/pending51; repair1 twoPNG mixed-state52ACTIVE/53physical, real page50+2/selecthouse53, databaseorder and archive retention, API/Worker0690b34 uniquevhost/queue0/0/1 DLQ2 untouched",
+    "current_status_overlays": [
+      {
+        "id": "RES-HOUSE-CASCADE",
+        "implementation_status": "Existing four-level address catalogs now page with safe cursors and stale-parent guards; ACTIVE house eligibility is filtered before SQL LIMIT.",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "015 d8993fa / bind015-919b885f73ff;016 b54442e ->0690b34064c5a7e4b54add6fac3b87367f25dade / paging016-683a935e420c",
+        "remaining_gap": "Native picker/device, full-size parent catalogs, production UX/scale, raw UTC/internal IDs, application-history eager-load cap and real providers/release. Original015 single missing client completion remains corroborated by server/DB/audit; no passed flows replayed.",
+        "next_action": "Preserve015/016 evidence; next017 current-schema manager cancellation before field work; production/device/real-provider gaps remain."
+      },
+      {
+        "id": "RES-BIND-APPLY",
+        "implementation_status": "Retained015 four relationship choices and actual TENANT application;016 can select beyond-first-page eligible houses without changing binding business rules.",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "015 d8993fa / bind015-919b885f73ff;016 b54442e ->0690b34064c5a7e4b54add6fac3b87367f25dade / paging016-683a935e420c",
+        "remaining_gap": "Native picker/device, full-size parent catalogs, production UX/scale, raw UTC/internal IDs, application-history eager-load cap and real providers/release. Original015 single missing client completion remains corroborated by server/DB/audit; no passed flows replayed.",
+        "next_action": "Preserve015/016 evidence; next017 current-schema manager cancellation before field work; production/device/real-provider gaps remain."
+      },
+      {
+        "id": "MGR-BIND-APPROVE",
+        "implementation_status": "Retained normal015 TENANT_ADMIN approval;016 pending approval queue pages50+1 with same request/object identities and no duplicates.",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "015 d8993fa / bind015-919b885f73ff;016 b54442e ->0690b34064c5a7e4b54add6fac3b87367f25dade / paging016-683a935e420c",
+        "remaining_gap": "Native picker/device, full-size parent catalogs, production UX/scale, raw UTC/internal IDs, application-history eager-load cap and real providers/release. Original015 single missing client completion remains corroborated by server/DB/audit; no passed flows replayed.",
+        "next_action": "Preserve015/016 evidence; next017 current-schema manager cancellation before field work; production/device/real-provider gaps remain."
+      },
+      {
+        "id": "MGR-BIND-REJECT",
+        "implementation_status": "Retained015 actual rejection reason/history/reapplication;016 pending-review pagination no longer stops at first50.",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "015 d8993fa / bind015-919b885f73ff;016 b54442e ->0690b34064c5a7e4b54add6fac3b87367f25dade / paging016-683a935e420c",
+        "remaining_gap": "Native picker/device, full-size parent catalogs, production UX/scale, raw UTC/internal IDs, application-history eager-load cap and real providers/release. Original015 single missing client completion remains corroborated by server/DB/audit; no passed flows replayed.",
+        "next_action": "Preserve015/016 evidence; next017 current-schema manager cancellation before field work; production/device/real-provider gaps remain."
+      },
+      {
+        "id": "RES-AFTER-APPROVE",
+        "implementation_status": "Retained015 refresh/relogin ACTIVE TENANT relationship;016 active-house list pages50+1 and preserves current house selection.",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "015 d8993fa / bind015-919b885f73ff;016 b54442e ->0690b34064c5a7e4b54add6fac3b87367f25dade / paging016-683a935e420c",
+        "remaining_gap": "Native picker/device, full-size parent catalogs, production UX/scale, raw UTC/internal IDs, application-history eager-load cap and real providers/release. Original015 single missing client completion remains corroborated by server/DB/audit; no passed flows replayed.",
+        "next_action": "Preserve015/016 evidence; next017 current-schema manager cancellation before field work; production/device/real-provider gaps remain."
+      }
+    ],
+    "next_slice": {
+      "task_id": "MANAGER-WO-CANCEL-017",
+      "scope": "Existing pre-field-work FSM cancellation, manager controls, incident-aware assignment/load release; no PROCESSING/WAIT_CONFIRM extension, no schema/newpolicy."
+    }
+  },
   "auth_failure_policy_20260923": {
     "task_id": "AUTH-FAILURE-POLICY-20260923",
     "owner_decision": "不锁定",
@@ -1928,7 +1992,7 @@
     "generated_at": "2026-09-23",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
     "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs), then notification_events_inbox_013.current_status_overlays (2 IDs)",
-    "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS)",
+    "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced. Old AUTH001 objects were lost on the 2026-09-23 tmpfs stop; historical evidence remains version-bound, not current-object proof.",
     "row_count": 83,
     "rows": [
@@ -2030,19 +2094,19 @@
       },
       {
         "requirement_id": "RES-HOUSE-CASCADE",
-        "current_implementation": "Address selection clears descendants and ignores stale replies; existing catalog API reused",
+        "current_implementation": "Existing four-level address catalogs now page with safe cursors and stale-parent guards; ACTIVE house eligibility is filtered before SQL LIMIT.",
         "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
-        "evidence_version": "d8993fa557ee7683ec7946509b7d7d6ae58b0b22 / bind015-919b885f73ff",
-        "remaining_gap": "Native picker/device, production UX/scale, raw UTC/internal IDs, existing catalog/active-house/admin-queue pagination, real providers/release. One client rejection completion absent; corroborated by exact existing server log/DB/audit.",
-        "next_action": "Preserve 015 evidence; finish existing catalog paging independently. No passed business replay."
+        "evidence_version": "015 d8993fa / bind015-919b885f73ff;016 b54442e ->0690b34064c5a7e4b54add6fac3b87367f25dade / paging016-683a935e420c",
+        "remaining_gap": "Native picker/device, full-size parent catalogs, production UX/scale, raw UTC/internal IDs, application-history eager-load cap and real providers/release. Original015 single missing client completion remains corroborated by server/DB/audit; no passed flows replayed.",
+        "next_action": "Preserve015/016 evidence; next017 current-schema manager cancellation before field work; production/device/real-provider gaps remain."
       },
       {
         "requirement_id": "RES-BIND-APPLY",
-        "current_implementation": "Four explicit relationship choices; normal TENANT page application",
+        "current_implementation": "Retained015 four relationship choices and actual TENANT application;016 can select beyond-first-page eligible houses without changing binding business rules.",
         "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
-        "evidence_version": "d8993fa557ee7683ec7946509b7d7d6ae58b0b22 / bind015-919b885f73ff",
-        "remaining_gap": "Native picker/device, production UX/scale, raw UTC/internal IDs, existing catalog/active-house/admin-queue pagination, real providers/release. One client rejection completion absent; corroborated by exact existing server log/DB/audit.",
-        "next_action": "Preserve 015 evidence; finish existing catalog paging independently. No passed business replay."
+        "evidence_version": "015 d8993fa / bind015-919b885f73ff;016 b54442e ->0690b34064c5a7e4b54add6fac3b87367f25dade / paging016-683a935e420c",
+        "remaining_gap": "Native picker/device, full-size parent catalogs, production UX/scale, raw UTC/internal IDs, application-history eager-load cap and real providers/release. Original015 single missing client completion remains corroborated by server/DB/audit; no passed flows replayed.",
+        "next_action": "Preserve015/016 evidence; next017 current-schema manager cancellation before field work; production/device/real-provider gaps remain."
       },
       {
         "requirement_id": "MGR-TENANT-HOME",
@@ -2062,27 +2126,27 @@
       },
       {
         "requirement_id": "MGR-BIND-APPROVE",
-        "current_implementation": "已实现可测试",
-        "verification_mode_status": "UI:PASS",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
-        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+        "current_implementation": "Retained normal015 TENANT_ADMIN approval;016 pending approval queue pages50+1 with same request/object identities and no duplicates.",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "015 d8993fa / bind015-919b885f73ff;016 b54442e ->0690b34064c5a7e4b54add6fac3b87367f25dade / paging016-683a935e420c",
+        "remaining_gap": "Native picker/device, full-size parent catalogs, production UX/scale, raw UTC/internal IDs, application-history eager-load cap and real providers/release. Original015 single missing client completion remains corroborated by server/DB/audit; no passed flows replayed.",
+        "next_action": "Preserve015/016 evidence; next017 current-schema manager cancellation before field work; production/device/real-provider gaps remain."
       },
       {
         "requirement_id": "MGR-BIND-REJECT",
-        "current_implementation": "Manager enters real rejection reason; resident sees reason and may reapply",
+        "current_implementation": "Retained015 actual rejection reason/history/reapplication;016 pending-review pagination no longer stops at first50.",
         "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
-        "evidence_version": "d8993fa557ee7683ec7946509b7d7d6ae58b0b22 / bind015-919b885f73ff",
-        "remaining_gap": "Native picker/device, production UX/scale, raw UTC/internal IDs, existing catalog/active-house/admin-queue pagination, real providers/release. One client rejection completion absent; corroborated by exact existing server log/DB/audit.",
-        "next_action": "Preserve 015 evidence; finish existing catalog paging independently. No passed business replay."
+        "evidence_version": "015 d8993fa / bind015-919b885f73ff;016 b54442e ->0690b34064c5a7e4b54add6fac3b87367f25dade / paging016-683a935e420c",
+        "remaining_gap": "Native picker/device, full-size parent catalogs, production UX/scale, raw UTC/internal IDs, application-history eager-load cap and real providers/release. Original015 single missing client completion remains corroborated by server/DB/audit; no passed flows replayed.",
+        "next_action": "Preserve015/016 evidence; next017 current-schema manager cancellation before field work; production/device/real-provider gaps remain."
       },
       {
         "requirement_id": "RES-AFTER-APPROVE",
-        "current_implementation": "TENANT relation persists through refresh/relogin; old rejected request retained",
+        "current_implementation": "Retained015 refresh/relogin ACTIVE TENANT relationship;016 active-house list pages50+1 and preserves current house selection.",
         "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
-        "evidence_version": "d8993fa557ee7683ec7946509b7d7d6ae58b0b22 / bind015-919b885f73ff",
-        "remaining_gap": "Native picker/device, production UX/scale, raw UTC/internal IDs, existing catalog/active-house/admin-queue pagination, real providers/release. One client rejection completion absent; corroborated by exact existing server log/DB/audit.",
-        "next_action": "Preserve 015 evidence; finish existing catalog paging independently. No passed business replay."
+        "evidence_version": "015 d8993fa / bind015-919b885f73ff;016 b54442e ->0690b34064c5a7e4b54add6fac3b87367f25dade / paging016-683a935e420c",
+        "remaining_gap": "Native picker/device, full-size parent catalogs, production UX/scale, raw UTC/internal IDs, application-history eager-load cap and real providers/release. Original015 single missing client completion remains corroborated by server/DB/audit; no passed flows replayed.",
+        "next_action": "Preserve015/016 evidence; next017 current-schema manager cancellation before field work; production/device/real-provider gaps remain."
       },
       {
         "requirement_id": "STAFF-CLAIM",

@@ -1,0 +1,24 @@
+{
+  "task_id":"HOUSE-CATALOG-PAGING-016",
+  "base_sha":"efade8cfcc266a85b8932e4e23520036d0602ece",
+  "head_sha":"b54442e219e9d8e9e8e569f2afaec8d682169a8f",
+  "review_round":1,
+  "product_repair_rounds":1,
+  "status":"ROUND2_REPAIR1_INDEPENDENT_PASS",
+  "round2_session_id":"01a0cc5e-d0c2-7192-aa22-6dfbd7f5863e",
+  "round2_result":"PASS;exit0;schema valid;actual modelgpt-5.6-sol;read-only;HOUSE016-B1 closed;no current blocker;both fix1PNG actually seen",
+  "round2_result_path":"reports/codex/HOUSE-CATALOG-PAGING-016-FIX-1-review.json",
+  "round2_private_log":"tmp/house-catalog-paging-016/review-fix1.call.json",
+  "round2_evidence":"55focused; actual mixed-state catalog50+2; two new screenshots actually inspected by main; runtime0690b34 API/Worker; originalround1 preserved",
+  "session_id":"01a0cc45-4e4f-75d3-a3a6-c1a917a01955",
+  "actual_model":"gpt-5.6-sol (existing default; not overridden)",
+  "fix1_product_sha":"0690b34064c5a7e4b54add6fac3b87367f25dade",
+  "attempts":[
+    {"mode":"built-in independent context","result":"agent thread limit reached; no context started"},
+    {"mode":"existing codex_exec_readonly.py wrapper; explicit read-only sandbox and unchanged default model/subscription authentication","timeout_seconds":900,"result":"exit0; valid structured NEEDS_CHANGES for HOUSE016-B1; five attached PNGs actually inspected; process exited"}
+  ],
+  "owned_processes":{"wrapper_pid":19732,"cmd_pid":43772,"node_pid":39780,"codex_pid":39168,"creation_local":"2026-09-23T11:18:03+08:00","source":"actual Win32_Process metadata; not a review session ID or acceptance evidence"},
+  "result_path":"reports/codex/HOUSE-CATALOG-PAGING-016-review.json",
+  "private_invocation_log":"tmp/house-catalog-paging-016/review.call.json",
+  "passed_evidence":"52 focused; page/API/readonly DB 53 catalog/51 active/51 pending; five PNGs. Do not rerun them without relevant source change."
+}

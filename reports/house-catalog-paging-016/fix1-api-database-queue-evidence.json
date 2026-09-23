@@ -1,0 +1,810 @@
+{
+  "task_id": "HOUSE-CATALOG-PAGING-016",
+  "finding": "HOUSE016-B1",
+  "repair_round": 1,
+  "run_id": "paging016-683a935e420c",
+  "code_sha": "0690b34064c5a7e4b54add6fac3b87367f25dade",
+  "mode": "Normal manager API sets one existing016 synthetic house INACTIVE; catalog GETs and read-only SQL only. No replay of015 or initial016 flows.",
+  "revision": "20260919_0009",
+  "precondition": {
+    "house": {
+      "id": 3,
+      "tenant_id": 1,
+      "property_id": 1,
+      "unit_id": 1,
+      "room_no": "016-5e420c-00",
+      "status": "ACTIVE"
+    },
+    "work_order_count": 0
+  },
+  "api": {
+    "first": [
+      {
+        "id": 1,
+        "unit_id": 1,
+        "room_no": "014-01",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 2,
+        "unit_id": 1,
+        "room_no": "015-5f73ff",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 4,
+        "unit_id": 1,
+        "room_no": "016-5e420c-01",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 5,
+        "unit_id": 1,
+        "room_no": "016-5e420c-02",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 6,
+        "unit_id": 1,
+        "room_no": "016-5e420c-03",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 7,
+        "unit_id": 1,
+        "room_no": "016-5e420c-04",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 8,
+        "unit_id": 1,
+        "room_no": "016-5e420c-05",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 9,
+        "unit_id": 1,
+        "room_no": "016-5e420c-06",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 10,
+        "unit_id": 1,
+        "room_no": "016-5e420c-07",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 11,
+        "unit_id": 1,
+        "room_no": "016-5e420c-08",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 12,
+        "unit_id": 1,
+        "room_no": "016-5e420c-09",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 13,
+        "unit_id": 1,
+        "room_no": "016-5e420c-10",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 14,
+        "unit_id": 1,
+        "room_no": "016-5e420c-11",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 15,
+        "unit_id": 1,
+        "room_no": "016-5e420c-12",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 16,
+        "unit_id": 1,
+        "room_no": "016-5e420c-13",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 17,
+        "unit_id": 1,
+        "room_no": "016-5e420c-14",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 18,
+        "unit_id": 1,
+        "room_no": "016-5e420c-15",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 19,
+        "unit_id": 1,
+        "room_no": "016-5e420c-16",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 20,
+        "unit_id": 1,
+        "room_no": "016-5e420c-17",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 21,
+        "unit_id": 1,
+        "room_no": "016-5e420c-18",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 22,
+        "unit_id": 1,
+        "room_no": "016-5e420c-19",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 23,
+        "unit_id": 1,
+        "room_no": "016-5e420c-20",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 24,
+        "unit_id": 1,
+        "room_no": "016-5e420c-21",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 25,
+        "unit_id": 1,
+        "room_no": "016-5e420c-22",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 26,
+        "unit_id": 1,
+        "room_no": "016-5e420c-23",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 27,
+        "unit_id": 1,
+        "room_no": "016-5e420c-24",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 28,
+        "unit_id": 1,
+        "room_no": "016-5e420c-25",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 29,
+        "unit_id": 1,
+        "room_no": "016-5e420c-26",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 30,
+        "unit_id": 1,
+        "room_no": "016-5e420c-27",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 31,
+        "unit_id": 1,
+        "room_no": "016-5e420c-28",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 32,
+        "unit_id": 1,
+        "room_no": "016-5e420c-29",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 33,
+        "unit_id": 1,
+        "room_no": "016-5e420c-30",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 34,
+        "unit_id": 1,
+        "room_no": "016-5e420c-31",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 35,
+        "unit_id": 1,
+        "room_no": "016-5e420c-32",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 36,
+        "unit_id": 1,
+        "room_no": "016-5e420c-33",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 37,
+        "unit_id": 1,
+        "room_no": "016-5e420c-34",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 38,
+        "unit_id": 1,
+        "room_no": "016-5e420c-35",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 39,
+        "unit_id": 1,
+        "room_no": "016-5e420c-36",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 40,
+        "unit_id": 1,
+        "room_no": "016-5e420c-37",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 41,
+        "unit_id": 1,
+        "room_no": "016-5e420c-38",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 42,
+        "unit_id": 1,
+        "room_no": "016-5e420c-39",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 43,
+        "unit_id": 1,
+        "room_no": "016-5e420c-40",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 44,
+        "unit_id": 1,
+        "room_no": "016-5e420c-41",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 45,
+        "unit_id": 1,
+        "room_no": "016-5e420c-42",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 46,
+        "unit_id": 1,
+        "room_no": "016-5e420c-43",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 47,
+        "unit_id": 1,
+        "room_no": "016-5e420c-44",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 48,
+        "unit_id": 1,
+        "room_no": "016-5e420c-45",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 49,
+        "unit_id": 1,
+        "room_no": "016-5e420c-46",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 50,
+        "unit_id": 1,
+        "room_no": "016-5e420c-47",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 51,
+        "unit_id": 1,
+        "room_no": "016-5e420c-48",
+        "floor": 1,
+        "status": "ACTIVE"
+      }
+    ],
+    "second": [
+      {
+        "id": 52,
+        "unit_id": 1,
+        "room_no": "016-5e420c-49",
+        "floor": 1,
+        "status": "ACTIVE"
+      },
+      {
+        "id": 53,
+        "unit_id": 1,
+        "room_no": "016-5e420c-50",
+        "floor": 1,
+        "status": "ACTIVE"
+      }
+    ],
+    "empty_terminal_page": true,
+    "archive_retains_inactive_house": 3
+  },
+  "database": {
+    "target": "127.0.0.1:3307/property_ai_auth001_test",
+    "houses_in_physical_id_order": [
+      {
+        "id": 1,
+        "room_no": "014-01",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 2,
+        "room_no": "015-5f73ff",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 3,
+        "room_no": "016-5e420c-00",
+        "status": "INACTIVE"
+      },
+      {
+        "id": 4,
+        "room_no": "016-5e420c-01",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 5,
+        "room_no": "016-5e420c-02",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 6,
+        "room_no": "016-5e420c-03",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 7,
+        "room_no": "016-5e420c-04",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 8,
+        "room_no": "016-5e420c-05",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 9,
+        "room_no": "016-5e420c-06",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 10,
+        "room_no": "016-5e420c-07",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 11,
+        "room_no": "016-5e420c-08",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 12,
+        "room_no": "016-5e420c-09",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 13,
+        "room_no": "016-5e420c-10",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 14,
+        "room_no": "016-5e420c-11",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 15,
+        "room_no": "016-5e420c-12",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 16,
+        "room_no": "016-5e420c-13",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 17,
+        "room_no": "016-5e420c-14",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 18,
+        "room_no": "016-5e420c-15",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 19,
+        "room_no": "016-5e420c-16",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 20,
+        "room_no": "016-5e420c-17",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 21,
+        "room_no": "016-5e420c-18",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 22,
+        "room_no": "016-5e420c-19",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 23,
+        "room_no": "016-5e420c-20",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 24,
+        "room_no": "016-5e420c-21",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 25,
+        "room_no": "016-5e420c-22",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 26,
+        "room_no": "016-5e420c-23",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 27,
+        "room_no": "016-5e420c-24",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 28,
+        "room_no": "016-5e420c-25",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 29,
+        "room_no": "016-5e420c-26",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 30,
+        "room_no": "016-5e420c-27",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 31,
+        "room_no": "016-5e420c-28",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 32,
+        "room_no": "016-5e420c-29",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 33,
+        "room_no": "016-5e420c-30",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 34,
+        "room_no": "016-5e420c-31",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 35,
+        "room_no": "016-5e420c-32",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 36,
+        "room_no": "016-5e420c-33",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 37,
+        "room_no": "016-5e420c-34",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 38,
+        "room_no": "016-5e420c-35",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 39,
+        "room_no": "016-5e420c-36",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 40,
+        "room_no": "016-5e420c-37",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 41,
+        "room_no": "016-5e420c-38",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 42,
+        "room_no": "016-5e420c-39",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 43,
+        "room_no": "016-5e420c-40",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 44,
+        "room_no": "016-5e420c-41",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 45,
+        "room_no": "016-5e420c-42",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 46,
+        "room_no": "016-5e420c-43",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 47,
+        "room_no": "016-5e420c-44",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 48,
+        "room_no": "016-5e420c-45",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 49,
+        "room_no": "016-5e420c-46",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 50,
+        "room_no": "016-5e420c-47",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 51,
+        "room_no": "016-5e420c-48",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 52,
+        "room_no": "016-5e420c-49",
+        "status": "ACTIVE"
+      },
+      {
+        "id": 53,
+        "room_no": "016-5e420c-50",
+        "status": "ACTIVE"
+      }
+    ],
+    "first_physical_page_contains_inactive": true,
+    "active_after_physical_page": true,
+    "active_api_order_matches_database": true
+  },
+  "queue": {
+    "vhost": "property_ai_auth001",
+    "actual_output": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nceleryev.e74868e3-9cc1-4b8e-a33a-fde80a5830d2\t0\t0\t1\nproperty_ai.auth001.dlq\t2\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1\n",
+    "message_content_read": false,
+    "shared_vhost_accessed": false
+  },
+  "requests": [
+    {
+      "label": "login-manager-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "39d6b581c73d2f09"
+    },
+    {
+      "label": "login-manager-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "798c142e42a1b126"
+    },
+    {
+      "label": "login-manager-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "eca05525a66191e5"
+    },
+    {
+      "label": "login-manager-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "668baa651ce96621"
+    },
+    {
+      "label": "verify-manager",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "b5c81a5ae7bd5786"
+    },
+    {
+      "label": "login-resident-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "fa502a40fa9c4113"
+    },
+    {
+      "label": "login-resident-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "f7a21306936a9d10"
+    },
+    {
+      "label": "login-resident-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "63dc48b81823990a"
+    },
+    {
+      "label": "login-resident-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "3bc8c6be066e3f0a"
+    },
+    {
+      "label": "verify-resident",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "f674d2503e9d6200"
+    },
+    {
+      "label": "set-tagged-house-inactive",
+      "method": "PATCH",
+      "path": "/admin/houses/3",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "0956b347ecb3bfe2"
+    },
+    {
+      "label": "active-first",
+      "method": "GET",
+      "path": "/units/1/houses?limit=50",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "ba6612f4fe6497f5"
+    },
+    {
+      "label": "active-second",
+      "method": "GET",
+      "path": "/units/1/houses?limit=50&after_id=51",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "83bfc195615c9ebf"
+    },
+    {
+      "label": "active-final",
+      "method": "GET",
+      "path": "/units/1/houses?limit=50&after_id=53",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "342a3307ca30e823"
+    },
+    {
+      "label": "archive-retains-inactive",
+      "method": "GET",
+      "path": "/admin/property-archive?tenant_id=1&property_id=1",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "95ebe654b7ecb467"
+    }
+  ],
+  "collected_at_utc": "2026-09-23T03:42:57.784153+00:00",
+  "status": "FIX1_API_DB_PASS_PENDING_REVIEW"
+}
