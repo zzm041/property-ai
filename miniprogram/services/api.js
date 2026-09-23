@@ -317,12 +317,12 @@ module.exports = {
     }),
   createBindRequest: (body) =>
     request({ path: "/resident-bind-requests", method: "POST", data: body }),
-  createWorkOrder: (body) =>
+  createWorkOrder: (body, idempotencyKey) =>
     request({
       path: "/work-orders",
       method: "POST",
       data: body,
-      headers: { "Idempotency-Key": `mp-${Date.now()}-${Math.random().toString(16).slice(2)}` },
+      headers: { "Idempotency-Key": idempotencyKey || `mp-${Date.now()}-${Math.random().toString(16).slice(2)}` },
     }),
   listWorkOrders: (afterId, limit = 20) =>
     request({

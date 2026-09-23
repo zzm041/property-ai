@@ -22,27 +22,78 @@ function imageUploadType(type) {
 Page({
   data: {
     houseId: "",
+    houses: [],
+    houseCursor: 0,
+    houseLoading: false,
+    houseError: "",
+    selectedHouseLabel: "",
     text: "",
     fileIds: [],
     mediaHint: "",
     loading: false,
     error: "",
   },
-  onLoad(query) {
+  onLoad(query = {}) {
     const auth = require("../../services/auth");
-    const houseId = query.houseId || auth.getSelectedHouseId() || "";
-    this.setData({ houseId });
+    this.preferredHouseId = Number(query.houseId || auth.getSelectedHouseId() || 0);
+    this.unloaded = false;
   },
-  onHouse(e) {
-    this.setData({ houseId: e.detail.value });
+  onShow() {
+    return this.loadHouses(false);
+  },
+  onUnload() {
+    this.unloaded = true;
+    this.houseRequest = (this.houseRequest || 0) + 1;
+  },
+  reloadHouses() {
+    return this.loadHouses(false);
+  },
+  loadMoreHouses() {
+    if (!this.data.houseCursor) return Promise.resolve();
+    return this.loadHouses(true);
+  },
+  loadHouses(more) {
+    if (this.unloaded || this.data.loading || this.data.houseLoading) return Promise.resolve();
+    const api = require("../../services/api");
+    const { appendPage } = require("../../utils/paging");
+    const { houseLabel } = require("../../utils/house-display");
+    const after = more ? this.data.houseCursor : 0;
+    const version = this.houseRequest = (this.houseRequest || 0) + 1;
+    this.preferredHouseId = Number(this.data.houseId || this.preferredHouseId || 0);
+    this.setData({ houseLoading: true, houseError: "", ...(more ? {} : { houses: [], houseCursor: 0, houseId: "", selectedHouseLabel: "" }) });
+    return Promise.resolve().then(() => api.houses(after, 20)).then((payload) => {
+      if (this.unloaded || version !== this.houseRequest) return;
+      const result = appendPage(more ? this.data.houses : [], payload, after, 20, "relation_id");
+      const houses = result.items.map(item => ({ ...item, addressLabel: houseLabel(item) }));
+      const selected = houses.find(item => Number(item.house_id) === this.preferredHouseId);
+      this.setData({ houses, houseCursor: result.nextCursor, houseId: selected ? String(selected.house_id) : "", selectedHouseLabel: selected ? selected.addressLabel : "" });
+    }).catch((error) => {
+      if (!this.unloaded && version === this.houseRequest) this.setData({ houseError: error.message || "房屋加载失败，请重试" });
+    }).finally(() => {
+      if (!this.unloaded && version === this.houseRequest) this.setData({ houseLoading: false });
+    });
+  },
+  selectHouse(e) {
+    if (this.data.loading || this.data.houseLoading) return;
+    const id = Number(e.currentTarget.dataset.id);
+    const item = this.data.houses.find(house => Number(house.house_id) === id);
+    if (!Number.isSafeInteger(id) || id <= 0 || !item) return;
+    this.preferredHouseId = id;
+    this.setData({ houseId: String(id), selectedHouseLabel: item.addressLabel, error: "" });
+  },
+  manageHouses() {
+    if (this.data.loading || this.data.houseLoading) return;
+    wx.navigateTo({ url: "/pages/houses/houses" });
   },
   onText(e) {
     this.setData({ text: e.detail.value });
   },
   chooseImage() {
+    if (this.data.loading || this.data.houseLoading) return;
     this._pick("image");
   },
   chooseAudio() {
+    if (this.data.loading || this.data.houseLoading) return;
     wx.chooseMessageFile({
       count: 1,
       type: "file",
@@ -107,19 +158,26 @@ Page({
     ).catch(() => {});
   },
   async submit() {
+    if (this.data.loading || this.data.houseLoading || this.unloaded) return;
     const { withLoading } = require("../../utils/ui");
-    withLoading(this, async () => {
+    return withLoading(this, async () => {
       const api = require("../../services/api");
       const auth = require("../../services/auth");
       const houseId = Number(this.data.houseId);
-      if (!houseId || !this.data.text) {
-        throw new Error("请填写房屋和报修说明");
+      if (!Number.isSafeInteger(houseId) || houseId <= 0 || !this.data.houses.some(item => Number(item.house_id) === houseId)) {
+        throw new Error("请选择本人已绑定的房屋；没有房屋时请先申请绑定");
       }
-      const item = await api.createWorkOrder({
+      if (!this.data.text.trim()) throw new Error("请填写报修说明");
+      const body = {
         house_id: houseId,
         text: this.data.text,
-        file_ids: this.data.fileIds,
-      });
+        file_ids: this.data.fileIds.slice(),
+      };
+      const signature = JSON.stringify(body);
+      if (!this.pendingSubmission || this.pendingSubmission.signature !== signature) {
+        this.pendingSubmission = { signature, key: `mp-${Date.now()}-${Math.random().toString(16).slice(2)}` };
+      }
+      const item = await api.createWorkOrder(body, this.pendingSubmission.key);
       const id = item.id || (item.work_order && item.work_order.id);
       auth.setSelectedHouseId(houseId);
       auth.setLastWorkOrderId(id);

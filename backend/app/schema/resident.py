@@ -42,6 +42,10 @@ class ResidentHouseData(BaseModel):
     tenant_id: int
     property_id: int
     room_no: str
+    property_name: str = ""
+    property_address: str = ""
+    building_name: str = ""
+    unit_name: str = ""
     relation_type: str
     status: str
     valid_from: datetime

@@ -1,7 +1,8 @@
 <view class="loading" wx:if="{{loading}}">加载中...</view>
 <view class="empty" wx:if="{{!loading && !items.length}}">暂无绑定房屋。请按小区 / 楼栋 / 单元 / 房号申请，等待物业审核。</view>
 <view class="card" wx:for="{{items}}" wx:key="relation_id" data-id="{{item.house_id}}" bindtap="selectHouse">
-  {{item.room_no}} {{item.status}} · {{item.relationLabel}}
+  {{item.addressLabel}} · {{item.relationLabel}}
+  <view class="empty">{{item.property_address}}</view>
   <view class="empty">点此用该房屋报修</view>
 </view>
 <button class="btn" wx:if="{{activeCursor}}" bindtap="loadMoreActive" disabled="{{loading || catalogLoading || moreLoading}}">加载更多已绑定房屋</button>

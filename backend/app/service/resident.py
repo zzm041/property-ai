@@ -198,6 +198,18 @@ class ResidentBindingService:
             limit=self._page_limit(limit),
         )
 
+    def list_my_house_views(
+        self,
+        *,
+        actor: Principal,
+        after_id: int = 0,
+        limit: int = 50,
+    ) -> tuple[tuple[ResidentHouseRelation, House, dict[str, str]], ...]:
+        """Enrich only the existing authorized page, without changing its cursor."""
+        pairs = self.list_my_houses(actor=actor, after_id=after_id, limit=limit)
+        labels = self._property_repository.house_address_labels(tuple(house for _, house in pairs))
+        return tuple((relation, house, labels.get(house.id, {})) for relation, house in pairs)
+
     def get_my_house(
         self,
         *,

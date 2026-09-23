@@ -2,7 +2,7 @@
 
 from collections.abc import Sequence
 
-from sqlalchemy import select
+from sqlalchemy import and_, select, tuple_
 from sqlalchemy.orm import Session
 
 from app.model.property import Building, House, Property, Tenant, Unit
@@ -43,6 +43,28 @@ class PropertyRepository:
         return self._session.scalar(
             select(Tenant).where(Tenant.id == tenant_id)
         )
+
+    def house_address_labels(self, houses: Sequence[House]) -> dict[int, dict[str, str]]:
+        """Batch presentation for already-authorized houses; no catalog expansion."""
+        if not houses:
+            return {}
+        rows = self._session.execute(
+            select(
+                House.id.label("house_id"),
+                Property.name.label("property_name"),
+                Property.address.label("property_address"),
+                Building.name.label("building_name"),
+                Unit.name.label("unit_name"),
+            )
+            .select_from(House)
+            .join(Unit, and_(Unit.id == House.unit_id, Unit.tenant_id == House.tenant_id, Unit.property_id == House.property_id))
+            .join(Building, and_(Building.id == Unit.building_id, Building.tenant_id == House.tenant_id, Building.property_id == House.property_id))
+            .join(Property, and_(Property.id == House.property_id, Property.tenant_id == House.tenant_id))
+            .where(tuple_(House.id, House.tenant_id, House.property_id).in_(
+                [(house.id, house.tenant_id, house.property_id) for house in houses]
+            ))
+        ).mappings().all()
+        return {row["house_id"]: {key: row[key] for key in ("property_name", "property_address", "building_name", "unit_name")} for row in rows}
 
     def get_tenant_for_update(self, tenant_id: int) -> Tenant | None:
         return self._session.scalar(

@@ -6,9 +6,11 @@ const RELATIONS = [
 ];
 const STATUS_NAMES = { PENDING: "待审核", APPROVED: "已通过", REJECTED: "已驳回" };
 const { appendPage } = require("../../utils/paging");
+const { houseLabel } = require("../../utils/house-display");
 const PAGE_SIZE = 50;
 const withRelationLabel = (item) => ({
   ...item,
+  addressLabel: houseLabel(item),
   relationLabel: (RELATIONS.find((option) => option.value === item.relation_type) || {}).label || item.relation_type,
   statusLabel: STATUS_NAMES[item.status] || item.status,
 });

@@ -101,7 +101,7 @@ def list_my_houses(
     after_id: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
 ) -> dict[str, object]:
-    pairs = service.list_my_houses(actor=actor, after_id=after_id, limit=limit)
+    views = service.list_my_house_views(actor=actor, after_id=after_id, limit=limit)
     items = [
         ResidentHouseData(
             relation_id=relation.id,
@@ -113,8 +113,9 @@ def list_my_houses(
             status=relation.status,
             valid_from=relation.valid_from,
             valid_to=relation.valid_to,
+            **address,
         )
-        for relation, house in pairs
+        for relation, house, address in views
     ]
     next_cursor = items[-1].relation_id if len(items) == limit else None
     return success_envelope(

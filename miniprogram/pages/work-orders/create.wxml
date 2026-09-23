@@ -1,11 +1,22 @@
 <view class="card">
-  <view class="empty">房屋可从「我的房屋」点选。无绑定房屋时请先申请绑定并等待物业审核。</view>
-  <input placeholder="房屋 ID" value="{{houseId}}" bindinput="onHouse" />
-  <textarea placeholder="报修说明" bindinput="onText"></textarea>
-  <button class="btn" bindtap="chooseImage">选择图片（可选）</button>
-  <button class="btn" bindtap="chooseAudio">选择音频（可选）</button>
+  <view>选择报修房屋</view>
+  <view class="empty">仅显示本人当前有效绑定的房屋。请选择完整地址，无需填写房屋编号。</view>
+  <button class="house-choice" wx:for="{{houses}}" wx:key="relation_id" data-id="{{item.house_id}}" bindtap="selectHouse" disabled="{{loading || houseLoading}}">
+    {{houseId == item.house_id ? '✓ 已选：' : ''}}{{item.addressLabel}}
+    <view class="empty">{{item.property_address}}</view>
+  </button>
+  <view class="empty" wx:if="{{!houseLoading && !houseError && !houses.length}}">暂无有效绑定房屋，请先申请绑定并等待物业审核。</view>
+  <view class="error" wx:if="{{houseError}}">{{houseError}}</view>
+  <view class="loading" wx:if="{{houseLoading}}">正在加载本人房屋...</view>
+  <button wx:if="{{houseCursor}}" bindtap="loadMoreHouses" disabled="{{loading || houseLoading}}">加载更多房屋</button>
+  <button bindtap="reloadHouses" disabled="{{loading || houseLoading}}">刷新房屋</button>
+  <button bindtap="manageHouses" disabled="{{loading || houseLoading}}">我的房屋 / 申请绑定</button>
+  <view wx:if="{{selectedHouseLabel}}">报修地址：{{selectedHouseLabel}}</view>
+  <textarea placeholder="报修说明" value="{{text}}" bindinput="onText" disabled="{{loading}}"></textarea>
+  <button class="btn" bindtap="chooseImage" disabled="{{loading || houseLoading}}">选择图片（可选）</button>
+  <button class="btn" bindtap="chooseAudio" disabled="{{loading || houseLoading}}">选择音频（可选）</button>
   <view class="empty" wx:if="{{mediaHint}}">{{mediaHint}}</view>
-  <button class="btn" bindtap="submit" disabled="{{loading}}">提交报修</button>
+  <button class="btn" bindtap="submit" disabled="{{loading || houseLoading || !houseId}}">提交报修</button>
   <view class="loading" wx:if="{{loading}}">处理中...</view>
   <view class="error" wx:if="{{error}}">{{error}}</view>
 </view>
