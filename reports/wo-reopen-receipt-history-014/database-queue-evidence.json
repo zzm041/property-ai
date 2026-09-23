@@ -1,0 +1,1201 @@
+{
+  "task_id": "WO-REOPEN-RECEIPT-HISTORY-014",
+  "run_id": "wo014-745f67277104",
+  "code_sha": "65f20c5a288b2b8e027c8b80fefbe6cfed439d14",
+  "collected_at_utc": "2026-09-23T02:24:09.901582+00:00",
+  "mode": "read-only SQL, unique vhost queue metadata only",
+  "database": "127.0.0.1:3307/property_ai_auth001_test",
+  "objects": {
+    "1": {
+      "work_order": [
+        {
+          "id": 1,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "CLOSED",
+          "version": 10,
+          "current_assignment_id": null,
+          "resolved_at": "2026-09-23 02:17:51.226606",
+          "closed_at": "2026-09-23 02:18:17.128460"
+        }
+      ],
+      "processes": [
+        {
+          "id": 1,
+          "cycle_no": 1,
+          "assignee_id": 2,
+          "started_at": "2026-09-23 02:17:06.771680",
+          "ended_at": "2026-09-23 02:17:07.193994"
+        },
+        {
+          "id": 2,
+          "cycle_no": 2,
+          "assignee_id": 2,
+          "started_at": "2026-09-23 02:17:33.755950",
+          "ended_at": "2026-09-23 02:17:51.226606"
+        }
+      ],
+      "receipts": [
+        {
+          "id": 1,
+          "process_id": 1,
+          "problem_type": "电气维修",
+          "method": "wo014-745f67277104 第1轮：检查灯具接线并完成复测",
+          "materials": "第1轮绝缘接线材料",
+          "fee_flag": "NONE",
+          "fee_amount": null,
+          "resolved": 1,
+          "follow_up": "第1轮处理结果请住户复核",
+          "finished_at": "2026-09-23 02:17:07.193994"
+        },
+        {
+          "id": 2,
+          "process_id": 2,
+          "problem_type": "电气维修",
+          "method": "wo014-745f67277104 第2轮：检查灯具接线并完成复测",
+          "materials": "第2轮绝缘接线材料",
+          "fee_flag": "NONE",
+          "fee_amount": null,
+          "resolved": 1,
+          "follow_up": "第2轮处理结果请住户复核",
+          "finished_at": "2026-09-23 02:17:51.226606"
+        }
+      ],
+      "feedbacks": [
+        {
+          "id": 1,
+          "process_id": 1,
+          "actor_user_id": 3,
+          "confirmed": 0,
+          "unresolved_flag": 1,
+          "comment": "wo014-745f67277104 住户反馈：灯仍然闪烁，请继续检查。",
+          "created_at": "2026-09-23 02:17:33.752155"
+        },
+        {
+          "id": 2,
+          "process_id": 2,
+          "actor_user_id": 3,
+          "confirmed": 1,
+          "unresolved_flag": 0,
+          "comment": null,
+          "created_at": "2026-09-23 02:18:17.106933"
+        }
+      ],
+      "assignments": [
+        {
+          "id": 1,
+          "employee_id": 2,
+          "assigned_by_user_id": null,
+          "status": "ENDED",
+          "reason": "AUTO_DISPATCH",
+          "assigned_at": "2026-09-23 02:16:47.904858",
+          "accept_at": "2026-09-23 02:17:06.518223",
+          "ended_at": "2026-09-23 02:18:17.112082"
+        }
+      ],
+      "logs": [
+        {
+          "id": 1,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "event_code": "CREATE",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "payload_json": "{\"event_code\": \"CREATE\"}",
+          "created_at": "2026-09-23 02:16:47.539587"
+        },
+        {
+          "id": 2,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "event_code": "ANALYZE",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}",
+          "created_at": "2026-09-23 02:16:47.735769"
+        },
+        {
+          "id": 3,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "event_code": "ASSIGN",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 2, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}",
+          "created_at": "2026-09-23 02:16:47.983851"
+        },
+        {
+          "id": 4,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "event_code": "ACCEPT",
+          "from_status": "ASSIGNED",
+          "to_status": "ACCEPTED",
+          "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}",
+          "created_at": "2026-09-23 02:17:06.522064"
+        },
+        {
+          "id": 5,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "event_code": "START",
+          "from_status": "ACCEPTED",
+          "to_status": "PROCESSING",
+          "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}",
+          "created_at": "2026-09-23 02:17:06.773310"
+        },
+        {
+          "id": 6,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "event_code": "RECEIPT_RESOLVED",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}",
+          "created_at": "2026-09-23 02:17:07.198867"
+        },
+        {
+          "id": 7,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "event_code": "REOPEN",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "PROCESSING",
+          "payload_json": "{\"reason\": \"wo014-745f67277104 住户反馈：灯仍然闪烁，请继续检查。\", \"event_code\": \"REOPEN\", \"reason_code\": \"REOPEN\"}",
+          "created_at": "2026-09-23 02:17:33.754907"
+        },
+        {
+          "id": 8,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "event_code": "RECEIPT_RESOLVED",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}",
+          "created_at": "2026-09-23 02:17:51.229715"
+        },
+        {
+          "id": 9,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "event_code": "CONFIRM",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "COMPLETED",
+          "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}",
+          "created_at": "2026-09-23 02:18:17.111038"
+        },
+        {
+          "id": 10,
+          "actor_user_id": 3,
+          "actor_type": "SYSTEM",
+          "event_code": "ARCHIVE",
+          "from_status": "COMPLETED",
+          "to_status": "CLOSED",
+          "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}",
+          "created_at": "2026-09-23 02:18:17.127582"
+        }
+      ],
+      "media": [],
+      "sla": [
+        {
+          "state": "STOPPED",
+          "warning_at": "2026-09-23 20:16:47.523620",
+          "complete_due_at": "2026-09-24 02:16:47.523620"
+        }
+      ],
+      "audit": [
+        {
+          "id": 33,
+          "actor_user_id": 3,
+          "action": "WORK_ORDER_CREATED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 1,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:16:47.544640"
+        },
+        {
+          "id": 37,
+          "actor_user_id": 7,
+          "action": "WORK_ORDER_ACCEPTED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 1,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:17:06.528442"
+        },
+        {
+          "id": 38,
+          "actor_user_id": 7,
+          "action": "WORK_ORDER_PROCESS_STARTED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 1,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:17:06.781295"
+        },
+        {
+          "id": 39,
+          "actor_user_id": 7,
+          "action": "WORK_ORDER_RESOLVED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 1,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:17:07.202769"
+        },
+        {
+          "id": 41,
+          "actor_user_id": 3,
+          "action": "WORK_ORDER_REOPENED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 1,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:17:33.759590"
+        },
+        {
+          "id": 43,
+          "actor_user_id": 7,
+          "action": "WORK_ORDER_RESOLVED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 1,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:17:51.231271"
+        },
+        {
+          "id": 45,
+          "actor_user_id": 3,
+          "action": "WORK_ORDER_CLOSED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 1,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:18:17.130088"
+        }
+      ]
+    },
+    "2": {
+      "work_order": [
+        {
+          "id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "CLOSED",
+          "version": 13,
+          "current_assignment_id": null,
+          "resolved_at": "2026-09-23 02:22:42.524896",
+          "closed_at": "2026-09-23 02:22:42.567195"
+        }
+      ],
+      "processes": [
+        {
+          "id": 3,
+          "cycle_no": 1,
+          "assignee_id": 2,
+          "started_at": "2026-09-23 02:21:30.940225",
+          "ended_at": "2026-09-23 02:21:31.312052"
+        },
+        {
+          "id": 4,
+          "cycle_no": 2,
+          "assignee_id": 1,
+          "started_at": "2026-09-23 02:22:42.433727",
+          "ended_at": "2026-09-23 02:22:42.524896"
+        }
+      ],
+      "receipts": [
+        {
+          "id": 3,
+          "process_id": 3,
+          "problem_type": "ELECTRICAL",
+          "method": "wo014-745f67277104-redispatch-first-receipt",
+          "materials": "synthetic insulation",
+          "fee_flag": "NONE",
+          "fee_amount": null,
+          "resolved": 1,
+          "follow_up": "resident to verify",
+          "finished_at": "2026-09-23 02:21:31.312052"
+        },
+        {
+          "id": 4,
+          "process_id": 4,
+          "problem_type": "ELECTRICAL",
+          "method": "wo014-745f67277104-redispatch-final-receipt",
+          "materials": "synthetic insulation",
+          "fee_flag": "NONE",
+          "fee_amount": null,
+          "resolved": 1,
+          "follow_up": "resident to verify",
+          "finished_at": "2026-09-23 02:22:42.524896"
+        }
+      ],
+      "feedbacks": [
+        {
+          "id": 3,
+          "process_id": 3,
+          "actor_user_id": 3,
+          "confirmed": 0,
+          "unresolved_flag": 1,
+          "comment": "wo014-745f67277104 original employee off duty; issue persists",
+          "created_at": "2026-09-23 02:22:41.705254"
+        },
+        {
+          "id": 4,
+          "process_id": 4,
+          "actor_user_id": 3,
+          "confirmed": 1,
+          "unresolved_flag": 0,
+          "comment": null,
+          "created_at": "2026-09-23 02:22:42.555142"
+        }
+      ],
+      "assignments": [
+        {
+          "id": 2,
+          "employee_id": 2,
+          "assigned_by_user_id": null,
+          "status": "ENDED",
+          "reason": "AUTO_DISPATCH",
+          "assigned_at": "2026-09-23 02:21:30.634891",
+          "accept_at": "2026-09-23 02:21:30.895390",
+          "ended_at": "2026-09-23 02:22:41.706787"
+        },
+        {
+          "id": 3,
+          "employee_id": 1,
+          "assigned_by_user_id": null,
+          "status": "ENDED",
+          "reason": "AUTO_DISPATCH",
+          "assigned_at": "2026-09-23 02:22:41.948404",
+          "accept_at": "2026-09-23 02:22:42.399525",
+          "ended_at": "2026-09-23 02:22:42.558252"
+        }
+      ],
+      "logs": [
+        {
+          "id": 11,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "event_code": "CREATE",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "payload_json": "{\"event_code\": \"CREATE\"}",
+          "created_at": "2026-09-23 02:21:30.214279"
+        },
+        {
+          "id": 12,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "event_code": "ANALYZE",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}",
+          "created_at": "2026-09-23 02:21:30.498276"
+        },
+        {
+          "id": 13,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "event_code": "ASSIGN",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 2, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}",
+          "created_at": "2026-09-23 02:21:30.732430"
+        },
+        {
+          "id": 14,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "event_code": "ACCEPT",
+          "from_status": "ASSIGNED",
+          "to_status": "ACCEPTED",
+          "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}",
+          "created_at": "2026-09-23 02:21:30.900622"
+        },
+        {
+          "id": 15,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "event_code": "START",
+          "from_status": "ACCEPTED",
+          "to_status": "PROCESSING",
+          "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}",
+          "created_at": "2026-09-23 02:21:30.942314"
+        },
+        {
+          "id": 16,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "event_code": "SLA_WARNING",
+          "from_status": "PROCESSING",
+          "to_status": "PROCESSING",
+          "payload_json": "{\"sla_state\": \"WARNING\", \"complete_due_at\": \"2026-09-24T02:21:30.187153+00:00\"}",
+          "created_at": "2026-09-23 02:21:31.060972"
+        },
+        {
+          "id": 17,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "event_code": "RECEIPT_RESOLVED",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}",
+          "created_at": "2026-09-23 02:21:31.324615"
+        },
+        {
+          "id": 18,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "event_code": "REOPEN",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "PENDING_ASSIGNMENT",
+          "payload_json": "{\"reason\": \"wo014-745f67277104 original employee off duty; issue persists\", \"event_code\": \"REOPEN\", \"reason_code\": \"REOPEN\"}",
+          "created_at": "2026-09-23 02:22:41.715123"
+        },
+        {
+          "id": 19,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "event_code": "ASSIGN",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 1, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}",
+          "created_at": "2026-09-23 02:22:42.202408"
+        },
+        {
+          "id": 20,
+          "actor_user_id": 6,
+          "actor_type": "STAFF",
+          "event_code": "ACCEPT",
+          "from_status": "ASSIGNED",
+          "to_status": "ACCEPTED",
+          "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}",
+          "created_at": "2026-09-23 02:22:42.401682"
+        },
+        {
+          "id": 21,
+          "actor_user_id": 6,
+          "actor_type": "STAFF",
+          "event_code": "START",
+          "from_status": "ACCEPTED",
+          "to_status": "PROCESSING",
+          "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}",
+          "created_at": "2026-09-23 02:22:42.435373"
+        },
+        {
+          "id": 22,
+          "actor_user_id": 6,
+          "actor_type": "STAFF",
+          "event_code": "RECEIPT_RESOLVED",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}",
+          "created_at": "2026-09-23 02:22:42.527473"
+        },
+        {
+          "id": 23,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "event_code": "CONFIRM",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "COMPLETED",
+          "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}",
+          "created_at": "2026-09-23 02:22:42.557728"
+        },
+        {
+          "id": 24,
+          "actor_user_id": 3,
+          "actor_type": "SYSTEM",
+          "event_code": "ARCHIVE",
+          "from_status": "COMPLETED",
+          "to_status": "CLOSED",
+          "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}",
+          "created_at": "2026-09-23 02:22:42.566675"
+        }
+      ],
+      "media": [
+        {
+          "id": 1,
+          "file_id": 1,
+          "kind": "IMAGE",
+          "taken_phase": "AFTER",
+          "uploader_user_id": 7,
+          "created_at": "2026-09-23 02:21:31.316791"
+        }
+      ],
+      "sla": [
+        {
+          "state": "STOPPED",
+          "warning_at": "2026-09-23 20:21:30.187153",
+          "complete_due_at": "2026-09-24 02:21:30.187153"
+        }
+      ],
+      "audit": [
+        {
+          "id": 47,
+          "actor_user_id": 3,
+          "action": "WORK_ORDER_CREATED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:21:30.222158"
+        },
+        {
+          "id": 50,
+          "actor_user_id": 7,
+          "action": "WORK_ORDER_ACCEPTED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:21:30.907808"
+        },
+        {
+          "id": 51,
+          "actor_user_id": 7,
+          "action": "WORK_ORDER_PROCESS_STARTED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:21:30.951326"
+        },
+        {
+          "id": 52,
+          "actor_user_id": 7,
+          "action": "WORK_ORDER_RESOLVED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:21:31.327913"
+        },
+        {
+          "id": 54,
+          "actor_user_id": 3,
+          "action": "WORK_ORDER_REOPENED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:41.719238"
+        },
+        {
+          "id": 56,
+          "actor_user_id": 6,
+          "action": "WORK_ORDER_ACCEPTED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:42.407043"
+        },
+        {
+          "id": 57,
+          "actor_user_id": 6,
+          "action": "WORK_ORDER_PROCESS_STARTED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:42.440569"
+        },
+        {
+          "id": 58,
+          "actor_user_id": 6,
+          "action": "WORK_ORDER_RESOLVED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:42.529561"
+        },
+        {
+          "id": 59,
+          "actor_user_id": 3,
+          "action": "WORK_ORDER_CLOSED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:42.568737"
+        }
+      ]
+    },
+    "3": {
+      "work_order": [
+        {
+          "id": 3,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "CLOSED",
+          "version": 10,
+          "current_assignment_id": null,
+          "resolved_at": "2026-09-23 02:22:43.793721",
+          "closed_at": "2026-09-23 02:22:43.844468"
+        }
+      ],
+      "processes": [
+        {
+          "id": 5,
+          "cycle_no": 1,
+          "assignee_id": 1,
+          "started_at": "2026-09-23 02:22:43.112735",
+          "ended_at": "2026-09-23 02:22:43.174925"
+        },
+        {
+          "id": 6,
+          "cycle_no": 2,
+          "assignee_id": 1,
+          "started_at": "2026-09-23 02:22:43.674463",
+          "ended_at": "2026-09-23 02:22:43.793721"
+        }
+      ],
+      "receipts": [
+        {
+          "id": 5,
+          "process_id": 5,
+          "problem_type": "ELECTRICAL",
+          "method": "wo014-745f67277104-double-reopen-receipt",
+          "materials": "synthetic insulation",
+          "fee_flag": "NONE",
+          "fee_amount": null,
+          "resolved": 1,
+          "follow_up": "resident to verify",
+          "finished_at": "2026-09-23 02:22:43.174925"
+        },
+        {
+          "id": 6,
+          "process_id": 6,
+          "problem_type": "ELECTRICAL",
+          "method": "wo014-745f67277104-double-reopen-final-receipt",
+          "materials": "synthetic insulation",
+          "fee_flag": "NONE",
+          "fee_amount": null,
+          "resolved": 1,
+          "follow_up": "resident to verify",
+          "finished_at": "2026-09-23 02:22:43.793721"
+        }
+      ],
+      "feedbacks": [
+        {
+          "id": 6,
+          "process_id": 5,
+          "actor_user_id": 3,
+          "confirmed": 0,
+          "unresolved_flag": 1,
+          "comment": "wo014-745f67277104-race-0 still failing",
+          "created_at": "2026-09-23 02:22:43.670322"
+        },
+        {
+          "id": 7,
+          "process_id": 6,
+          "actor_user_id": 3,
+          "confirmed": 1,
+          "unresolved_flag": 0,
+          "comment": null,
+          "created_at": "2026-09-23 02:22:43.827872"
+        }
+      ],
+      "assignments": [
+        {
+          "id": 4,
+          "employee_id": 1,
+          "assigned_by_user_id": null,
+          "status": "ENDED",
+          "reason": "AUTO_DISPATCH",
+          "assigned_at": "2026-09-23 02:22:42.884959",
+          "accept_at": "2026-09-23 02:22:43.070253",
+          "ended_at": "2026-09-23 02:22:43.831040"
+        }
+      ],
+      "logs": [
+        {
+          "id": 25,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "event_code": "CREATE",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "payload_json": "{\"event_code\": \"CREATE\"}",
+          "created_at": "2026-09-23 02:22:42.701795"
+        },
+        {
+          "id": 26,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "event_code": "ANALYZE",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}",
+          "created_at": "2026-09-23 02:22:42.791117"
+        },
+        {
+          "id": 27,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "event_code": "ASSIGN",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 1, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}",
+          "created_at": "2026-09-23 02:22:42.943783"
+        },
+        {
+          "id": 28,
+          "actor_user_id": 6,
+          "actor_type": "STAFF",
+          "event_code": "ACCEPT",
+          "from_status": "ASSIGNED",
+          "to_status": "ACCEPTED",
+          "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}",
+          "created_at": "2026-09-23 02:22:43.074933"
+        },
+        {
+          "id": 29,
+          "actor_user_id": 6,
+          "actor_type": "STAFF",
+          "event_code": "START",
+          "from_status": "ACCEPTED",
+          "to_status": "PROCESSING",
+          "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}",
+          "created_at": "2026-09-23 02:22:43.114300"
+        },
+        {
+          "id": 30,
+          "actor_user_id": 6,
+          "actor_type": "STAFF",
+          "event_code": "RECEIPT_RESOLVED",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}",
+          "created_at": "2026-09-23 02:22:43.177496"
+        },
+        {
+          "id": 31,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "event_code": "REOPEN",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "PROCESSING",
+          "payload_json": "{\"reason\": \"wo014-745f67277104-race-0 still failing\", \"event_code\": \"REOPEN\", \"reason_code\": \"REOPEN\"}",
+          "created_at": "2026-09-23 02:22:43.672910"
+        },
+        {
+          "id": 32,
+          "actor_user_id": 6,
+          "actor_type": "STAFF",
+          "event_code": "RECEIPT_RESOLVED",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}",
+          "created_at": "2026-09-23 02:22:43.796305"
+        },
+        {
+          "id": 33,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "event_code": "CONFIRM",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "COMPLETED",
+          "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}",
+          "created_at": "2026-09-23 02:22:43.830005"
+        },
+        {
+          "id": 34,
+          "actor_user_id": 3,
+          "actor_type": "SYSTEM",
+          "event_code": "ARCHIVE",
+          "from_status": "COMPLETED",
+          "to_status": "CLOSED",
+          "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}",
+          "created_at": "2026-09-23 02:22:43.843430"
+        }
+      ],
+      "media": [],
+      "sla": [
+        {
+          "state": "STOPPED",
+          "warning_at": "2026-09-23 20:22:42.696085",
+          "complete_due_at": "2026-09-24 02:22:42.696085"
+        }
+      ],
+      "audit": [
+        {
+          "id": 61,
+          "actor_user_id": 3,
+          "action": "WORK_ORDER_CREATED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 3,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:42.702818"
+        },
+        {
+          "id": 64,
+          "actor_user_id": 6,
+          "action": "WORK_ORDER_ACCEPTED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 3,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:43.081247"
+        },
+        {
+          "id": 65,
+          "actor_user_id": 6,
+          "action": "WORK_ORDER_PROCESS_STARTED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 3,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:43.119975"
+        },
+        {
+          "id": 66,
+          "actor_user_id": 6,
+          "action": "WORK_ORDER_RESOLVED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 3,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:43.180100"
+        },
+        {
+          "id": 67,
+          "actor_user_id": 3,
+          "action": "WORK_ORDER_REOPENED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 3,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:43.678392"
+        },
+        {
+          "id": 68,
+          "actor_user_id": 6,
+          "action": "WORK_ORDER_RESOLVED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 3,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:43.798741"
+        },
+        {
+          "id": 69,
+          "actor_user_id": 3,
+          "action": "WORK_ORDER_CLOSED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 3,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:43.846092"
+        }
+      ]
+    },
+    "4": {
+      "work_order": [
+        {
+          "id": 4,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "CLOSED",
+          "version": 10,
+          "current_assignment_id": null,
+          "resolved_at": "2026-09-23 02:22:45.360692",
+          "closed_at": "2026-09-23 02:22:45.423393"
+        }
+      ],
+      "processes": [
+        {
+          "id": 7,
+          "cycle_no": 1,
+          "assignee_id": 1,
+          "started_at": "2026-09-23 02:22:44.631259",
+          "ended_at": "2026-09-23 02:22:44.708805"
+        },
+        {
+          "id": 8,
+          "cycle_no": 2,
+          "assignee_id": 1,
+          "started_at": "2026-09-23 02:22:45.220891",
+          "ended_at": "2026-09-23 02:22:45.360692"
+        }
+      ],
+      "receipts": [
+        {
+          "id": 7,
+          "process_id": 7,
+          "problem_type": "ELECTRICAL",
+          "method": "wo014-745f67277104-confirm-reopen-receipt",
+          "materials": "synthetic insulation",
+          "fee_flag": "NONE",
+          "fee_amount": null,
+          "resolved": 1,
+          "follow_up": "resident to verify",
+          "finished_at": "2026-09-23 02:22:44.708805"
+        },
+        {
+          "id": 8,
+          "process_id": 8,
+          "problem_type": "ELECTRICAL",
+          "method": "wo014-745f67277104-confirm-reopen-final-receipt",
+          "materials": "synthetic insulation",
+          "fee_flag": "NONE",
+          "fee_amount": null,
+          "resolved": 1,
+          "follow_up": "resident to verify",
+          "finished_at": "2026-09-23 02:22:45.360692"
+        }
+      ],
+      "feedbacks": [
+        {
+          "id": 8,
+          "process_id": 7,
+          "actor_user_id": 3,
+          "confirmed": 0,
+          "unresolved_flag": 1,
+          "comment": "wo014-745f67277104-race-1 still failing",
+          "created_at": "2026-09-23 02:22:45.216795"
+        },
+        {
+          "id": 9,
+          "process_id": 8,
+          "actor_user_id": 3,
+          "confirmed": 1,
+          "unresolved_flag": 0,
+          "comment": null,
+          "created_at": "2026-09-23 02:22:45.402322"
+        }
+      ],
+      "assignments": [
+        {
+          "id": 5,
+          "employee_id": 1,
+          "assigned_by_user_id": null,
+          "status": "ENDED",
+          "reason": "AUTO_DISPATCH",
+          "assigned_at": "2026-09-23 02:22:44.309701",
+          "accept_at": "2026-09-23 02:22:44.589209",
+          "ended_at": "2026-09-23 02:22:45.408309"
+        }
+      ],
+      "logs": [
+        {
+          "id": 35,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "event_code": "CREATE",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "payload_json": "{\"event_code\": \"CREATE\"}",
+          "created_at": "2026-09-23 02:22:43.922717"
+        },
+        {
+          "id": 36,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "event_code": "ANALYZE",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}",
+          "created_at": "2026-09-23 02:22:44.172117"
+        },
+        {
+          "id": 37,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "event_code": "ASSIGN",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 1, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}",
+          "created_at": "2026-09-23 02:22:44.377465"
+        },
+        {
+          "id": 38,
+          "actor_user_id": 6,
+          "actor_type": "STAFF",
+          "event_code": "ACCEPT",
+          "from_status": "ASSIGNED",
+          "to_status": "ACCEPTED",
+          "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}",
+          "created_at": "2026-09-23 02:22:44.592383"
+        },
+        {
+          "id": 39,
+          "actor_user_id": 6,
+          "actor_type": "STAFF",
+          "event_code": "START",
+          "from_status": "ACCEPTED",
+          "to_status": "PROCESSING",
+          "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}",
+          "created_at": "2026-09-23 02:22:44.632826"
+        },
+        {
+          "id": 40,
+          "actor_user_id": 6,
+          "actor_type": "STAFF",
+          "event_code": "RECEIPT_RESOLVED",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}",
+          "created_at": "2026-09-23 02:22:44.711913"
+        },
+        {
+          "id": 41,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "event_code": "REOPEN",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "PROCESSING",
+          "payload_json": "{\"reason\": \"wo014-745f67277104-race-1 still failing\", \"event_code\": \"REOPEN\", \"reason_code\": \"REOPEN\"}",
+          "created_at": "2026-09-23 02:22:45.219865"
+        },
+        {
+          "id": 42,
+          "actor_user_id": 6,
+          "actor_type": "STAFF",
+          "event_code": "RECEIPT_RESOLVED",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}",
+          "created_at": "2026-09-23 02:22:45.364309"
+        },
+        {
+          "id": 43,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "event_code": "CONFIRM",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "COMPLETED",
+          "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}",
+          "created_at": "2026-09-23 02:22:45.406759"
+        },
+        {
+          "id": 44,
+          "actor_user_id": 3,
+          "actor_type": "SYSTEM",
+          "event_code": "ARCHIVE",
+          "from_status": "COMPLETED",
+          "to_status": "CLOSED",
+          "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}",
+          "created_at": "2026-09-23 02:22:45.421348"
+        }
+      ],
+      "media": [],
+      "sla": [
+        {
+          "state": "STOPPED",
+          "warning_at": "2026-09-23 20:22:43.916431",
+          "complete_due_at": "2026-09-24 02:22:43.916431"
+        }
+      ],
+      "audit": [
+        {
+          "id": 70,
+          "actor_user_id": 3,
+          "action": "WORK_ORDER_CREATED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 4,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:43.924774"
+        },
+        {
+          "id": 73,
+          "actor_user_id": 6,
+          "action": "WORK_ORDER_ACCEPTED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 4,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:44.598707"
+        },
+        {
+          "id": 74,
+          "actor_user_id": 6,
+          "action": "WORK_ORDER_PROCESS_STARTED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 4,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:44.639577"
+        },
+        {
+          "id": 75,
+          "actor_user_id": 6,
+          "action": "WORK_ORDER_RESOLVED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 4,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:44.715013"
+        },
+        {
+          "id": 76,
+          "actor_user_id": 3,
+          "action": "WORK_ORDER_REOPENED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 4,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:45.225062"
+        },
+        {
+          "id": 77,
+          "actor_user_id": 6,
+          "action": "WORK_ORDER_RESOLVED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 4,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:45.367517"
+        },
+        {
+          "id": 78,
+          "actor_user_id": 3,
+          "action": "WORK_ORDER_CLOSED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 4,
+          "tenant_id": 1,
+          "property_id": 1,
+          "created_at": "2026-09-23 02:22:45.424936"
+        }
+      ]
+    }
+  },
+  "revision": "20260919_0009",
+  "new_scope_employee_daily_statuses": [
+    {
+      "employee_id": 1,
+      "property_id": 1,
+      "business_date": "2026-09-23",
+      "on_duty": "ON_DUTY",
+      "current_load": 0
+    },
+    {
+      "employee_id": 2,
+      "property_id": 1,
+      "business_date": "2026-09-23",
+      "on_duty": "ON_DUTY",
+      "current_load": 0
+    }
+  ],
+  "queue": {
+    "vhost": "property_ai_auth001",
+    "command": "rabbitmqctl list_queues -p property_ai_auth001 name messages_ready messages_unacknowledged consumers",
+    "actual_output": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nproperty_ai.auth001.dlq\t2\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1\nceleryev.a0f6731e-e837-40b3-8bf2-6a14c3f0bd01\t0\t0\t1\n",
+    "message_content_read": false,
+    "shared_vhost_accessed": false
+  }
+}

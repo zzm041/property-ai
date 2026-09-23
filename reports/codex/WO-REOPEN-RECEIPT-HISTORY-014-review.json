@@ -1,0 +1,113 @@
+{
+  "task_id": "WO-REOPEN-RECEIPT-HISTORY-014",
+  "phase": "review",
+  "reviewed_head": "65f20c5a288b2b8e027c8b80fefbe6cfed439d14; scoped product diff d449866..65f20c5; evidence run wo014-745f67277104",
+  "decision": "PASS",
+  "actions_or_findings": [
+    {
+      "title": "NON_BLOCKING WO014-N1 — living tracking requires the normal post-review update",
+      "path": "reports/project-handoff.md:5-7,31-38; reports/mp-current-full-regression/coverage-matrix.json:1786-1791,2336-2343",
+      "trigger": "Recording this independent result as the current project state.",
+      "rationale": "Impact: the handoff still describes 014 as unimplemented and retains older runtime information. Evidence: product 65f20c5, the 74-test output, and the new run support scoped local Development PASS. Update the existing handoff and relevant current overlays after saving this review; preserve the original 83 IDs, historical results, composite requirement gaps and release blockers. Record that the old AUTH001 objects were lost and the new database was restored under separate approval. This expected tracking work is not a product blocker."
+    },
+    {
+      "title": "NON_BLOCKING WO014-N2 — blank-reason validation has page-state evidence but its screenshot misses the error",
+      "path": "reports/wo-reopen-receipt-history-014/03-empty-reason-rejected.png; reports/wo-reopen-receipt-history-014/page-evidence.json",
+      "trigger": "Claiming that the blank-reason error text was visually inspected in screenshot 03.",
+      "rationale": "Impact: that particular visual claim would exceed the evidence. I opened the PNG: its viewport stops at the first receipt. The actual page state records the validation error, the interaction script taps the real control, and no reopen request is recorded until a non-empty reason is supplied. The limitation is accurately disclosed in visual_limits. Screenshots 09 and 10 independently establish the complete two-cycle receipt presentation; no successful business action needs repeating."
+    },
+    {
+      "title": "NON_BLOCKING WO014-N3 — production-facing history presentation remains rough",
+      "path": "miniprogram/pages/work-orders/detail.wxml:33-58; reports/wo-reopen-receipt-history-014/09-first-cycle-history.png; reports/wo-reopen-receipt-history-014/10-second-cycle-history.png",
+      "trigger": "Formal Production V1 UX/localization acceptance.",
+      "rationale": "Impact: residents currently see raw UTC timestamps, numeric employee identifiers and untranslated state/event codes. The inspected history is readable and correctly associates receipts and feedback with real process IDs, so this does not block the scoped current-schema capability. Keep production presentation work open."
+    },
+    {
+      "title": "RELEASE_BLOCKER WO014-R1 — Development mechanism evidence is not real-model or production acceptance",
+      "path": "reports/wo-reopen-receipt-history-014/runtime-environment.json; reports/wo-reopen-receipt-history-014/api-evidence.json; reports/project-handoff.md",
+      "trigger": "Any claim of real Qwen/bge-m3 effects, production RAG, production providers, production task supervision or formal release readiness.",
+      "rationale": "Impact: this result cannot authorize or establish Production V1 release. Evidence uses Development providers, isolated 8083/AUTH001 at 0009 and WeChat DevTools. Real self-hosted inference/RAG, production providers/storage, security/performance, physical-device validation and formal deployment remain open."
+    },
+    {
+      "title": "RELEASE_BLOCKER WO014-R2 — remaining frozen scope and approval gates are unchanged",
+      "path": "reports/project-handoff.md; reports/mp-current-full-regression/coverage-matrix.json",
+      "trigger": "Promoting the composite work-order requirements or the whole product to fully complete.",
+      "rationale": "Impact: this slice closes resident reopen/history software evidence, not every cancellation/exception path or all remaining V1 requirements. Account merge/recovery and unapproved 0010 remain outstanding. Media remain work-order-level attachments without an authoritative process/receipt relationship; this review does not claim otherwise or approve a schema change. Existing migration, dependency, shared-service, external-cost and release gates remain effective."
+    }
+  ],
+  "evidence_paths": [
+    "AGENTS.md",
+    ".cursor/rules/project.mdc",
+    "docs/01-PRD.md",
+    "docs/02-ROLES-PERMISSIONS.md",
+    "docs/04-WORKORDER-STATE-MACHINE.md",
+    "docs/06-API-CONTRACT.md",
+    "docs/10-ACCEPTANCE.md",
+    "backend/app/api/v1/work_orders.py",
+    "backend/app/schema/work_order.py",
+    "backend/app/service/work_order.py",
+    "backend/app/repository/work_order.py",
+    "backend/app/model/work_order.py",
+    "backend/app/domain/work_order.py",
+    "backend/app/core/database.py",
+    "backend/app/service/analysis.py",
+    "backend/app/service/auto_dispatch.py",
+    "backend/app/service/sla.py",
+    "backend/tests/unit/test_work_order_reopen_history.py",
+    "backend/tests/unit/test_work_order_reopen_page.py",
+    "backend/tests/unit/test_resident_work_order_actions.py",
+    "backend/tests/unit/test_miniprogram_work_order_lifecycle.py",
+    "miniprogram/pages/work-orders/detail.js",
+    "miniprogram/pages/work-orders/detail.wxml",
+    "miniprogram/utils/ui.js",
+    "reports/project-handoff.md",
+    "reports/mp-current-full-regression/coverage-matrix.json",
+    "reports/wo-reopen-receipt-history-014/focused-r2.txt",
+    "reports/wo-reopen-receipt-history-014/recovery-output.txt",
+    "reports/wo-reopen-receipt-history-014/environment-after-recovery.txt",
+    "reports/wo-reopen-receipt-history-014/runtime-environment.json",
+    "reports/wo-reopen-receipt-history-014/fixture-evidence.json",
+    "reports/wo-reopen-receipt-history-014/page-evidence.json",
+    "reports/wo-reopen-receipt-history-014/api-evidence.json",
+    "reports/wo-reopen-receipt-history-014/database-queue-evidence.json",
+    "reports/wo-reopen-receipt-history-014/prepare-fixture.py",
+    "reports/wo-reopen-receipt-history-014/run-page-evidence.js",
+    "reports/wo-reopen-receipt-history-014/capture-history.js",
+    "reports/wo-reopen-receipt-history-014/run-api-evidence.py",
+    "reports/wo-reopen-receipt-history-014/inspect-final-evidence.py",
+    "reports/wo-reopen-receipt-history-014/inspect-environment.py",
+    "reports/wo-reopen-receipt-history-014/01-auto-assigned.png",
+    "reports/wo-reopen-receipt-history-014/02-first-receipt.png",
+    "reports/wo-reopen-receipt-history-014/03-empty-reason-rejected.png",
+    "reports/wo-reopen-receipt-history-014/04-reopened-second-cycle.png",
+    "reports/wo-reopen-receipt-history-014/05-second-receipt.png",
+    "reports/wo-reopen-receipt-history-014/06-two-cycle-history.png",
+    "reports/wo-reopen-receipt-history-014/07-closed-refresh.png",
+    "reports/wo-reopen-receipt-history-014/08-closed-relogin.png",
+    "reports/wo-reopen-receipt-history-014/09-first-cycle-history.png",
+    "reports/wo-reopen-receipt-history-014/10-second-cycle-history.png"
+  ],
+  "unverified": [
+    "This independent review did not execute tests, page automation, HTTP/business requests, database queries or queue operations. It inspected saved evidence and opened all ten PNGs.",
+    "The 74 focused passes and six isolated recovery/authentication passes were inspected, not independently rerun. Historical 013 results were not rerun or promoted to this new runtime.",
+    "The off-duty redispatch branch, ownership/state/version negatives and concurrent races were exercised through authenticated APIs, not through a second page workflow.",
+    "The saved confirm-versus-reopen race demonstrates the reopen-winning interleaving. It does not separately exercise every possible interleaving.",
+    "SLA runtime evidence covers restoration of WARNING with the original deadline and a repeat sweep producing zero warnings and notifications. OVERDUE restoration is covered by unit evidence, not this runtime run. The scheduler invocation uses an explicit single-object virtual clock, not wall-clock or cross-process scheduler acceptance.",
+    "The preserved synthetic attachment was uploaded and downloaded through APIs with a hash assertion. Native image selection and attachment preview were not exercised in the 014 page run. No process-specific media association is claimed.",
+    "Runtime module paths in runtime-environment.json are explicitly collector imports, not debugger introspection into the running API and Worker.",
+    "Physical-device behavior, real Qwen/bge-m3, production RAG/providers/storage, production-scale security/performance and formal release remain unverified."
+  ],
+  "session_note": "Independent read-only round-1 review, with no CURRENT_TASK_BLOCKER found. I independently read the scoped product diff, necessary FSM/transaction/repository/analysis/dispatch/SLA context, tests, saved page/API/DB/queue/runtime artifacts and all ten screenshots. The service retains ownership and scope checks, a work-order row lock and version conflict handling inside its owned transaction. Reopen saves the resident reason in feedback and REOPEN history, preserves prior Process/Receipt rows, clears resolved_at, and either opens the next process for the existing eligible assignee or ends the assignment and enqueues the existing analysis/automatic-dispatch path after commit. SLA restoration retains original deadlines and previous alert progress. The page guards in-flight confirmation/reopen and renders history by actual process_id. Saved page evidence establishes WorkOrder 1 progressing through versions 3, 6, 7, 8 and 10, two receipts and CLOSED after refresh/relogin. API evidence establishes WorkOrder 2 returning to PENDING_ASSIGNMENT after employee 2 checks out, then Worker AUTO assignment 3 to employee 1 and cycle 2 completion, with earlier receipt/media retained. WorkOrders 3 and 4 use two submitted futures plus a barrier; each race produces one 200 and one WO.CONFLICT 409, one added feedback and one new process. Persisted evidence has all four orders CLOSED, one REOPEN per order, consistent audits and zero final employee loads. Queue metadata is explicitly property_ai_auth001/property_ai.auth001 at 0 ready, 0 unacked and 1 consumer; historical DLQ remains 2. Runtime evidence binds API PID 39184 and Worker wrapper/child 3364/29484 to the recovered CPython 3.12.10 AMD64 startup and the same unchanged product commit. I verified the preserved project.config.json hash remains 342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F. The scoped JSON/text evidence scan found no token, bearer credential, credential URL or unredacted phone match. No workspace files were written and no additional reviewers or background processes were started.",
+  "task_result": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA. Resident reasoned reopen, eligible-assignee continuation, ineligible-assignee automatic redispatch, immutable multi-cycle receipt/history presentation, ownership/state/version protections, duplicate/concurrent request handling and refresh/relogin persistence are accepted for product 65f20c5a288b2b8e027c8b80fefbe6cfed439d14 and new run wo014-745f67277104. This is not Production V1, real-model or formal-release acceptance.",
+  "product_gap_changes": [
+    "Close the 014 resident reopen/history slice at scoped local Development level.",
+    "Update V1-RECEIPT-HISTORY with version-bound actual page, concurrency and preserved-history evidence; retain production acceptance and the work-order-level media association boundary.",
+    "Update only the reopen portion of WO-CANCEL-REJECT-REASSIGN-REOPEN; preserve any remaining composite cancellation/exception requirements instead of marking the entire composite complete.",
+    "Retain all 83 historical requirement IDs and results. Do not count extra_v1 lists again or manufacture completion percentages.",
+    "Keep 013 and earlier evidence as historical version-bound results. Their old AUTH001 business objects are not current runtime objects after the approved tmpfs database restoration.",
+    "No migration, dependency, identity-merge policy, provider or release approval is supplied by this review."
+  ],
+  "schedule_risk": "The scoped slice is locally complete on 2026-09-23. Remaining full-V1 identity, real-model/RAG, provider/storage, security/performance, physical-device and release work still prevents a full Production V1 completion claim; preserve scope rather than shortening it to meet the elapsed original schedule.",
+  "next_action": "Main Codex: save this structured round-1 review, update the existing handoff and current matrix overlays with product SHA 65f20c5, run wo014-745f67277104, the exact evidence boundaries and the approved database restoration. Close WO014-N1 through that tracking update, retain N2/N3 and all release blockers, and commit only the intended 014 evidence/tracking paths while excluding project.config.json, private context, credentials, unrelated dirty files and interpreter/cache artifacts. Do not rerun passed 013 or 014 flows. Then select and record the next remaining frozen current-schema slice from the existing effective coverage view and proceed under the existing implementation/testing/independent-review rules; request approval only for a newly required migration, policy, cost, shared-service or high-risk action.",
+  "approval_requests": []
+}

@@ -1,0 +1,149 @@
+{
+  "task_id": "WO-REOPEN-RECEIPT-HISTORY-014",
+  "run_id": "wo014-745f67277104",
+  "collected_at_utc": "2026-09-23T02:25:37.494750+00:00",
+  "product_sha": "65f20c5a288b2b8e027c8b80fefbe6cfed439d14",
+  "interpreter": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+  "python_version": "3.12.10",
+  "architecture": "AMD64",
+  "dependency_reuse": "-I entry; explicit project .venv/Lib/site-packages only; Worker child PYTHONNOUSERSITE=1 and exact package/backend PYTHONPATH via existing recovered launcher",
+  "collector_module_sources": {
+    "api": "D:\\property-ai\\backend\\app\\api\\v1\\work_orders.py",
+    "service": "D:\\property-ai\\backend\\app\\service\\work_order.py"
+  },
+  "code_binding": "Main committed 65f20c5 before starting both listed processes. No product edits afterward; entrypoint paths/log headers bind launch. Module paths above are collector imports, not debugger introspection into running processes.",
+  "actual_processes": [
+    {
+      "ProcessId": 39184,
+      "ParentProcessId": 42548,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "\"D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\" -I D:\\property-ai\\tmp\\run_auth001_recovered.py api"
+    },
+    {
+      "ProcessId": 3364,
+      "ParentProcessId": 42548,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "\"D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\" -I D:\\property-ai\\tmp\\run_auth001_recovered.py worker"
+    },
+    {
+      "ProcessId": 29484,
+      "ParentProcessId": 3364,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -m celery -A app.worker.celery_app:celery_app worker -Q property_ai.auth001 --pool=solo --loglevel=info --hostname=auth001@%h"
+    }
+  ],
+  "actual_api_startup": "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True",
+  "actual_worker_startup": [
+    "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True",
+    "worker_queue=property_ai.auth001 pool=solo"
+  ],
+  "worker_auto_dispatch_events": [
+    {
+      "timestamp": "2026-09-23T02:16:48.000975Z",
+      "event": "auto_dispatch_assigned",
+      "service": "worker",
+      "operation": "app.worker.tasks.analyze_work_order_task",
+      "task_id": "cad61790-18e4-4599-a9ca-b35c6bbe94f8",
+      "work_order_id": 1,
+      "employee_id": 2,
+      "assignment_id": 1
+    },
+    {
+      "timestamp": "2026-09-23T02:16:48.003589Z",
+      "event": "auto_dispatch_outcome",
+      "service": "worker",
+      "operation": "app.worker.tasks.analyze_work_order_task",
+      "task_id": "cad61790-18e4-4599-a9ca-b35c6bbe94f8",
+      "work_order_id": 1,
+      "analysis_id": 1,
+      "outcome": "ASSIGNED"
+    },
+    {
+      "timestamp": "2026-09-23T02:21:30.748539Z",
+      "event": "auto_dispatch_assigned",
+      "service": "worker",
+      "operation": "app.worker.tasks.analyze_work_order_task",
+      "task_id": "045edc48-ad27-4cc6-9f04-6e69e9e44a72",
+      "work_order_id": 2,
+      "employee_id": 2,
+      "assignment_id": 2
+    },
+    {
+      "timestamp": "2026-09-23T02:21:30.751442Z",
+      "event": "auto_dispatch_outcome",
+      "service": "worker",
+      "operation": "app.worker.tasks.analyze_work_order_task",
+      "task_id": "045edc48-ad27-4cc6-9f04-6e69e9e44a72",
+      "work_order_id": 2,
+      "analysis_id": 2,
+      "outcome": "ASSIGNED"
+    },
+    {
+      "timestamp": "2026-09-23T02:22:42.217460Z",
+      "event": "auto_dispatch_assigned",
+      "service": "worker",
+      "operation": "app.worker.tasks.analyze_work_order_task",
+      "task_id": "e294609e-c9ce-40b0-a427-cf55149a9470",
+      "work_order_id": 2,
+      "employee_id": 1,
+      "assignment_id": 3
+    },
+    {
+      "timestamp": "2026-09-23T02:22:42.957880Z",
+      "event": "auto_dispatch_assigned",
+      "service": "worker",
+      "operation": "app.worker.tasks.analyze_work_order_task",
+      "task_id": "beac2202-1285-4154-84e2-e2d62291b50f",
+      "work_order_id": 3,
+      "employee_id": 1,
+      "assignment_id": 4
+    },
+    {
+      "timestamp": "2026-09-23T02:22:42.959942Z",
+      "event": "auto_dispatch_outcome",
+      "service": "worker",
+      "operation": "app.worker.tasks.analyze_work_order_task",
+      "task_id": "beac2202-1285-4154-84e2-e2d62291b50f",
+      "work_order_id": 3,
+      "analysis_id": 3,
+      "outcome": "ASSIGNED"
+    },
+    {
+      "timestamp": "2026-09-23T02:22:44.391517Z",
+      "event": "auto_dispatch_assigned",
+      "service": "worker",
+      "operation": "app.worker.tasks.analyze_work_order_task",
+      "task_id": "829200d4-3149-461d-87c2-88d5b12f4da5",
+      "work_order_id": 4,
+      "employee_id": 1,
+      "assignment_id": 5
+    },
+    {
+      "timestamp": "2026-09-23T02:22:44.392543Z",
+      "event": "auto_dispatch_outcome",
+      "service": "worker",
+      "operation": "app.worker.tasks.analyze_work_order_task",
+      "task_id": "829200d4-3149-461d-87c2-88d5b12f4da5",
+      "work_order_id": 4,
+      "analysis_id": 4,
+      "outcome": "ASSIGNED"
+    }
+  ],
+  "project_config_sha256": "342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F",
+  "recovery": {
+    "container_id": "fa78177adc270834bd1c25e63cb86b1d6a7fd3f7cfb2faa66c5ac4f67ab0d66f",
+    "image": "mysql:8.0.41",
+    "data_mount": "/var/lib/mysql tmpfs",
+    "host_port": 3307,
+    "prior_auth001_schema_count": 0,
+    "prior_auth001_objects": "lost; historical version-bound evidence retained, never current objects",
+    "authorizations": "User separately approved Desktop startup, existing mysql-test startup/read-only check, then AUTH001-only 0007->0009 restoration and fresh synthetic data on 2026-09-23.",
+    "desktop_side_effect": "Existing restart policies automatically started existing shared/Day4/prodlike containers. Main did not manually operate them or inspect/consume their messages.",
+    "provision": "Existing guarded scripts/ops/provision_auth001_isolated_db.py via retained recovered launcher; 6 isolated auth tests passed, no general destructive fixture activated; no 0010, other DB migration or container recreation."
+  },
+  "known_evidence_helper_interruptions": [
+    "Fixture manager grant committed before JSON serialization failed. Resumed by reading exact existing grant, not granting twice. Prior completed API steps reused from private checkpoint.",
+    "API evidence script initially imported unavailable Pillow and stopped before any business request. Replaced with standard-library synthetic PNG encoding, no dependency install.",
+    "Direct status OFF_DUTY request was correctly rejected 422; used normal checkout to make employee ineligible, then normal checkin after test. Prior successful steps not repeated."
+  ]
+}

@@ -1,0 +1,332 @@
+{
+  "task_id": "WO-REOPEN-RECEIPT-HISTORY-014",
+  "run_id": "wo014-745f67277104",
+  "database": "127.0.0.1:3307/property_ai_auth001_test",
+  "revision": "20260919_0009",
+  "tenant_id": 1,
+  "property_id": 1,
+  "house_id": 1,
+  "identities": {
+    "resident": {
+      "user_id": 3,
+      "roles": [
+        "RESIDENT"
+      ],
+      "scopes": [
+        {
+          "role_code": "RESIDENT",
+          "scope_type": "PROPERTY",
+          "tenant_id": 1,
+          "property_id": 1,
+          "permissions": [
+            "announcement:read",
+            "knowledge:read",
+            "resident_binding:create",
+            "resident_binding:read",
+            "resident_relation:read",
+            "work_order:cancel",
+            "work_order:create",
+            "work_order:read"
+          ]
+        }
+      ]
+    },
+    "other": {
+      "user_id": 4,
+      "roles": [
+        "RESIDENT"
+      ],
+      "scopes": [
+        {
+          "role_code": "RESIDENT",
+          "scope_type": "PROPERTY",
+          "tenant_id": 1,
+          "property_id": 1,
+          "permissions": [
+            "announcement:read",
+            "knowledge:read",
+            "resident_binding:create",
+            "resident_binding:read",
+            "resident_relation:read",
+            "work_order:cancel",
+            "work_order:create",
+            "work_order:read"
+          ]
+        }
+      ]
+    },
+    "manager": {
+      "user_id": 5,
+      "roles": [
+        "TENANT_ADMIN"
+      ],
+      "scopes": [
+        {
+          "role_code": "TENANT_ADMIN",
+          "scope_type": "TENANT",
+          "tenant_id": 1,
+          "property_id": null,
+          "permissions": [
+            "ai_analysis:read",
+            "ai_analysis:review",
+            "announcement:draft",
+            "announcement:publish",
+            "announcement:read",
+            "attendance:check_in",
+            "attendance:check_out",
+            "attendance:read",
+            "audit:read",
+            "dispatch_recommendation:read",
+            "employee:manage",
+            "employee:read",
+            "incident:manage",
+            "incident:read",
+            "knowledge:manage",
+            "knowledge:read",
+            "property:manage",
+            "property:read",
+            "resident_binding:read",
+            "resident_binding:review",
+            "resident_relation:read",
+            "role:manage",
+            "role:read",
+            "sla:manage",
+            "stats:read",
+            "work_order:cancel",
+            "work_order:decide",
+            "work_order:dispatch",
+            "work_order:process",
+            "work_order:read",
+            "work_order:resolve"
+          ]
+        }
+      ]
+    },
+    "staff": {
+      "user_id": 6,
+      "roles": [
+        "STAFF"
+      ],
+      "scopes": [
+        {
+          "role_code": "STAFF",
+          "scope_type": "PROPERTY",
+          "tenant_id": 1,
+          "property_id": 1,
+          "permissions": [
+            "announcement:read",
+            "attendance:check_in",
+            "attendance:check_out",
+            "incident:read",
+            "knowledge:read",
+            "work_order:process",
+            "work_order:read",
+            "work_order:resolve"
+          ]
+        }
+      ]
+    },
+    "backup": {
+      "user_id": 7,
+      "roles": [
+        "STAFF"
+      ],
+      "scopes": [
+        {
+          "role_code": "STAFF",
+          "scope_type": "PROPERTY",
+          "tenant_id": 1,
+          "property_id": 1,
+          "permissions": [
+            "announcement:read",
+            "attendance:check_in",
+            "attendance:check_out",
+            "incident:read",
+            "knowledge:read",
+            "work_order:process",
+            "work_order:read",
+            "work_order:resolve"
+          ]
+        }
+      ]
+    }
+  },
+  "employees": {
+    "staff": 1,
+    "backup": 2
+  },
+  "setup_mode": "Development organization and manager RBAC fixture; official SMS API authentication; normal binding/approval/invite/claim/checkin APIs. Not UI evidence.",
+  "requests": [
+    {
+      "label": "bind-resident",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "241d0bf47150d156"
+    },
+    {
+      "label": "approve-resident",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/1/approve",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "cc051f886aa39494"
+    },
+    {
+      "label": "bind-other",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a18acfcee829c7b9"
+    },
+    {
+      "label": "approve-other",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/2/approve",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c502751150d875d4"
+    },
+    {
+      "label": "duty",
+      "method": "POST",
+      "path": "/admin/duties",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "3ec60228916c8359"
+    },
+    {
+      "label": "skill",
+      "method": "POST",
+      "path": "/admin/skills",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "30ef71a969b0460e"
+    },
+    {
+      "label": "employee-staff",
+      "method": "POST",
+      "path": "/admin/employees",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "fc0d8f93059dad60"
+    },
+    {
+      "label": "invite-staff",
+      "method": "POST",
+      "path": "/admin/employees/1/invites",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2f647a95262564eb"
+    },
+    {
+      "label": "claim-staff",
+      "method": "POST",
+      "path": "/staff/employee-claim",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1ea5c6ee4dc6541d"
+    },
+    {
+      "label": "checkin-staff",
+      "method": "POST",
+      "path": "/staff/attendance/checkin",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "04e0edb1ecb49503"
+    },
+    {
+      "label": "employee-backup",
+      "method": "POST",
+      "path": "/admin/employees",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "4b5fad944a168cde"
+    },
+    {
+      "label": "invite-backup",
+      "method": "POST",
+      "path": "/admin/employees/2/invites",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "ede62b69800c3a47"
+    },
+    {
+      "label": "claim-backup",
+      "method": "POST",
+      "path": "/staff/employee-claim",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "006b84f88d9e03d1"
+    },
+    {
+      "label": "checkin-backup",
+      "method": "POST",
+      "path": "/staff/attendance/checkin",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c5e3817036ba64b7"
+    },
+    {
+      "label": "verify-resident",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9478e59cf13980f4"
+    },
+    {
+      "label": "verify-other",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "77d5c17bc0b40d56"
+    },
+    {
+      "label": "verify-manager",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "5155ac7c846c17cf"
+    },
+    {
+      "label": "verify-staff",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "858ee52d39eeb6fe"
+    },
+    {
+      "label": "verify-backup",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "7ba53e9c00b32318"
+    }
+  ]
+}

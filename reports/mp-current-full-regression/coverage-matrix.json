@@ -1814,11 +1814,52 @@
       }
     ]
   },
+  "wo_reopen_receipt_history_014": {
+    "task_id": "WO-REOPEN-RECEIPT-HISTORY-014",
+    "implementation_head": "65f20c5a288b2b8e027c8b80fefbe6cfed439d14",
+    "runtime_run_id": "wo014-745f67277104",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+    "independent_review": {
+      "round": 1,
+      "product_repair_rounds": 0,
+      "context": "/root/wo014_independent_review",
+      "result": "PASS",
+      "path": "reports/codex/WO-REOPEN-RECEIPT-HISTORY-014-review.json",
+      "boundary": "Separate read-only context inspected product diff, saved focused tests and page/API/DB/queue/runtime artifacts and opened all ten PNGs; no test/page/business/DB/queue execution by reviewer."
+    },
+    "evidence": "reports/wo-reopen-receipt-history-014/; 74 focused passes plus 6 isolated recovery/auth passes; new page order 1 and API orders 2-4, all CLOSED; ten screenshots; repeat/concurrent reopen protections; 0 ready/0 unacked/1 consumer, historical DLQ 2 untouched",
+    "environment_boundary": "On 2026-09-23 old tmpfs AUTH001 schema was confirmed absent, then restored only to 0009 under explicit fresh approval. New marker objects only; previous business objects remain historical evidence, not current runtime. No 0010, other DB migration or container rebuild.",
+    "next_slice": {
+      "task_id": "RESIDENT-BINDING-COMPLETE-015",
+      "base_product_sha": "65f20c5a288b2b8e027c8b80fefbe6cfed439d14",
+      "scope": "Frozen four relation-type choices, rejected application reason/history and legal reapplication, with directly related address-selector stale-response/submission guards using existing APIs and schema. Resolve execution HEAD after 014 evidence commit.",
+      "completion": "Non-OWNER page application, manager rejection, resident sees exact reason, normal reapplication and approval, refresh/relogin with matching relation and old rejection retained; focused tests, page/API/readonly DB evidence and separate read-only review."
+    },
+    "current_status_overlays": [
+      {
+        "id": "WO-CANCEL-REJECT-REASSIGN-REOPEN",
+        "implementation_status": "resident_reasoned_reopen_and_existing_assignee_or_worker_auto_redispatch_now_wired; existing_cancel_reject_supervisor_reassign_evidence_retained",
+        "verification_status": "PARTIAL_COMPOSITE_WITH_REOPEN_SCOPED_LOCAL_DEVELOPMENT_PASS",
+        "evidence_version": "65f20c5a288b2b8e027c8b80fefbe6cfed439d14 / wo014-745f67277104; earlier composite component versions retained",
+        "remaining_gap": "separate manager-cancellation policy/cleanup and broader production exception acceptance; do not upgrade the entire composite to PASS",
+        "next_action": "preserve reviewed reopen/history and previous component evidence; address only remaining approved component gaps"
+      },
+      {
+        "id": "V1-RECEIPT-HISTORY",
+        "implementation_status": "all_cycle_receipts_and_process_linked_resident_feedback_visible_after_reopen_refresh_relogin; old_receipts_and_whole_order_media_preserved",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "65f20c5a288b2b8e027c8b80fefbe6cfed439d14 / wo014-745f67277104",
+        "remaining_gap": "production/device UX, localized times/assignee names, heavier contention; media lack authoritative process association; no native media picker claim in 014",
+        "next_action": "retain actual page/API/DB/Worker and race evidence; complete production presentation and release acceptance separately"
+      }
+    ]
+  },
   "current_effective_view": {
-    "generated_at": "2026-09-22",
+    "generated_at": "2026-09-23",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
     "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs), then notification_events_inbox_013.current_status_overlays (2 IDs)",
-    "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced.",
+    "latest_overlay_source": "wo_reopen_receipt_history_014.current_status_overlays (2 existing IDs), applied after overlay_source",
+    "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced. Old AUTH001 objects were lost on the 2026-09-23 tmpfs stop; historical evidence remains version-bound, not current-object proof.",
     "row_count": 83,
     "rows": [
       {
@@ -2215,11 +2256,11 @@
       },
       {
         "requirement_id": "WO-CANCEL-REJECT-REASSIGN-REOPEN",
-        "current_implementation": "exception_paths_wired_with_live_supervisor_reassign",
-        "verification_mode_status": "PARTIAL",
-        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016 / 75caa5e13535f6d5ed90ad695c2ebec19e0d4373 / 406358da58f89741b973ca9ad299cf383d78e807",
-        "remaining_gap": "composite requirement still needs broader cancellation/reopen and production exception acceptance; live supervisor REASSIGN is now closed locally",
-        "next_action": "仅针对所列剩余缺口补实现或证据"
+        "current_implementation": "resident_reasoned_reopen_and_existing_assignee_or_worker_auto_redispatch_now_wired; existing_cancel_reject_supervisor_reassign_evidence_retained",
+        "verification_mode_status": "PARTIAL_COMPOSITE_WITH_REOPEN_SCOPED_LOCAL_DEVELOPMENT_PASS",
+        "evidence_version": "65f20c5a288b2b8e027c8b80fefbe6cfed439d14 / wo014-745f67277104; earlier composite component versions retained",
+        "remaining_gap": "separate manager-cancellation policy/cleanup and broader production exception acceptance; do not upgrade the entire composite to PASS",
+        "next_action": "preserve reviewed reopen/history and previous component evidence; address only remaining approved component gaps"
       },
       {
         "requirement_id": "AUTH-WECHAT",
@@ -2335,11 +2376,11 @@
       },
       {
         "requirement_id": "V1-RECEIPT-HISTORY",
-        "current_implementation": "multi_cycle_receipts_preserved",
-        "verification_mode_status": "PASS_SCOPED_LOCAL",
-        "evidence_version": "f1de143a546912b0cefaa3aa6b50582feb466016",
-        "remaining_gap": "broader concurrency and production acceptance",
-        "next_action": "仅针对所列剩余缺口补实现或证据"
+        "current_implementation": "all_cycle_receipts_and_process_linked_resident_feedback_visible_after_reopen_refresh_relogin; old_receipts_and_whole_order_media_preserved",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "65f20c5a288b2b8e027c8b80fefbe6cfed439d14 / wo014-745f67277104",
+        "remaining_gap": "production/device UX, localized times/assignee names, heavier contention; media lack authoritative process association; no native media picker claim in 014",
+        "next_action": "retain actual page/API/DB/Worker and race evidence; complete production presentation and release acceptance separately"
       },
       {
         "requirement_id": "V1-MGR-EXCEPTION",

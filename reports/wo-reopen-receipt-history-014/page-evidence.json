@@ -1,0 +1,1670 @@
+{
+  "task_id": "WO-REOPEN-RECEIPT-HISTORY-014",
+  "run_id": "wo014-745f67277104",
+  "code_sha": "65f20c5a288b2b8e027c8b80fefbe6cfed439d14",
+  "steps": {
+    "01-auto-assigned": {
+      "work_order": {
+        "id": 1,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 1,
+        "reporter_user_id": 3,
+        "status": "ASSIGNED",
+        "process_reason": "NONE",
+        "category": "ELECTRICAL",
+        "severity": "HIGH",
+        "priority": "HIGH",
+        "version": 3,
+        "current_assignment_id": 1,
+        "incident_id": null,
+        "sla_due_at": "2026-09-24T02:16:47.523620Z",
+        "assigned_at": "2026-09-23T02:16:47.904858Z",
+        "accepted_at": null,
+        "started_at": null,
+        "resolved_at": null,
+        "closed_at": null,
+        "created_at": "2026-09-23T02:16:47.529922Z",
+        "updated_at": "2026-09-23T02:16:47.982823Z",
+        "sla_overdue": false
+      },
+      "processes": [],
+      "receipts": [],
+      "logs": [
+        {
+          "id": 1,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.539587Z"
+        },
+        {
+          "id": 2,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "ANALYZE",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.735769Z"
+        },
+        {
+          "id": 3,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "process_reason": "NONE",
+          "event_code": "ASSIGN",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.983851Z"
+        }
+      ],
+      "error": "",
+      "can_reopen": false
+    },
+    "02-first-receipt": {
+      "work_order": {
+        "id": 1,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 1,
+        "reporter_user_id": 3,
+        "status": "WAIT_CONFIRM",
+        "process_reason": "NONE",
+        "category": "ELECTRICAL",
+        "severity": "HIGH",
+        "priority": "HIGH",
+        "version": 6,
+        "current_assignment_id": 1,
+        "incident_id": null,
+        "sla_due_at": "2026-09-24T02:16:47.523620Z",
+        "assigned_at": "2026-09-23T02:16:47.904858Z",
+        "accepted_at": "2026-09-23T02:17:06.518223Z",
+        "started_at": "2026-09-23T02:17:06.771680Z",
+        "resolved_at": "2026-09-23T02:17:07.193994Z",
+        "closed_at": null,
+        "created_at": "2026-09-23T02:16:47.529922Z",
+        "updated_at": "2026-09-23T02:17:07.196975Z",
+        "sla_overdue": false
+      },
+      "processes": [],
+      "receipts": [
+        {
+          "id": 1,
+          "process_id": 1,
+          "cycle_no": 1,
+          "assignee_id": 2,
+          "problem_type": "电气维修",
+          "method": "wo014-745f67277104 第1轮：检查灯具接线并完成复测",
+          "materials": "第1轮绝缘接线材料",
+          "fee_amount": null,
+          "fee_flag": "NONE",
+          "resolved": true,
+          "unresolved_reason": null,
+          "follow_up": "第1轮处理结果请住户复核",
+          "finished_at": "2026-09-23T02:17:07.193994Z"
+        }
+      ],
+      "logs": [
+        {
+          "id": 1,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.539587Z"
+        },
+        {
+          "id": 2,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "ANALYZE",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.735769Z"
+        },
+        {
+          "id": 3,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "process_reason": "NONE",
+          "event_code": "ASSIGN",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.983851Z"
+        },
+        {
+          "id": 4,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "ASSIGNED",
+          "to_status": "ACCEPTED",
+          "process_reason": "NONE",
+          "event_code": "ACCEPT",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:06.522064Z"
+        },
+        {
+          "id": 5,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "ACCEPTED",
+          "to_status": "PROCESSING",
+          "process_reason": "NONE",
+          "event_code": "START",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:06.773310Z"
+        },
+        {
+          "id": 6,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "process_reason": "NONE",
+          "event_code": "RECEIPT_RESOLVED",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:07.198867Z"
+        }
+      ],
+      "error": ""
+    },
+    "03-empty-reason-rejected": {
+      "work_order": {
+        "id": 1,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 1,
+        "reporter_user_id": 3,
+        "status": "WAIT_CONFIRM",
+        "process_reason": "NONE",
+        "category": "ELECTRICAL",
+        "severity": "HIGH",
+        "priority": "HIGH",
+        "version": 6,
+        "current_assignment_id": 1,
+        "incident_id": null,
+        "sla_due_at": "2026-09-24T02:16:47.523620Z",
+        "assigned_at": "2026-09-23T02:16:47.904858Z",
+        "accepted_at": "2026-09-23T02:17:06.518223Z",
+        "started_at": "2026-09-23T02:17:06.771680Z",
+        "resolved_at": "2026-09-23T02:17:07.193994Z",
+        "closed_at": null,
+        "created_at": "2026-09-23T02:16:47.529922Z",
+        "updated_at": "2026-09-23T02:17:07.196975Z",
+        "sla_overdue": false
+      },
+      "processes": [
+        {
+          "id": 1,
+          "cycle_no": 1,
+          "assignee_id": 2,
+          "started_at": "2026-09-23T02:17:06.771680Z",
+          "ended_at": "2026-09-23T02:17:07.193994Z",
+          "receipt": {
+            "id": 1,
+            "process_id": 1,
+            "cycle_no": 1,
+            "assignee_id": 2,
+            "problem_type": "电气维修",
+            "method": "wo014-745f67277104 第1轮：检查灯具接线并完成复测",
+            "materials": "第1轮绝缘接线材料",
+            "fee_amount": null,
+            "fee_flag": "NONE",
+            "resolved": true,
+            "unresolved_reason": null,
+            "follow_up": "第1轮处理结果请住户复核",
+            "finished_at": "2026-09-23T02:17:07.193994Z"
+          },
+          "feedbacks": []
+        }
+      ],
+      "receipts": [
+        {
+          "id": 1,
+          "process_id": 1,
+          "cycle_no": 1,
+          "assignee_id": 2,
+          "problem_type": "电气维修",
+          "method": "wo014-745f67277104 第1轮：检查灯具接线并完成复测",
+          "materials": "第1轮绝缘接线材料",
+          "fee_amount": null,
+          "fee_flag": "NONE",
+          "resolved": true,
+          "unresolved_reason": null,
+          "follow_up": "第1轮处理结果请住户复核",
+          "finished_at": "2026-09-23T02:17:07.193994Z"
+        }
+      ],
+      "logs": [
+        {
+          "id": 1,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.539587Z"
+        },
+        {
+          "id": 2,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "ANALYZE",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.735769Z"
+        },
+        {
+          "id": 3,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "process_reason": "NONE",
+          "event_code": "ASSIGN",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.983851Z"
+        },
+        {
+          "id": 4,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "ASSIGNED",
+          "to_status": "ACCEPTED",
+          "process_reason": "NONE",
+          "event_code": "ACCEPT",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:06.522064Z"
+        },
+        {
+          "id": 5,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "ACCEPTED",
+          "to_status": "PROCESSING",
+          "process_reason": "NONE",
+          "event_code": "START",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:06.773310Z"
+        },
+        {
+          "id": 6,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "process_reason": "NONE",
+          "event_code": "RECEIPT_RESOLVED",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:07.198867Z"
+        }
+      ],
+      "error": "请填写未解决的具体情况（1至255字）",
+      "can_reopen": true
+    },
+    "04-reopened-second-cycle": {
+      "work_order": {
+        "id": 1,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 1,
+        "reporter_user_id": 3,
+        "status": "PROCESSING",
+        "process_reason": "NONE",
+        "category": "ELECTRICAL",
+        "severity": "HIGH",
+        "priority": "HIGH",
+        "version": 7,
+        "current_assignment_id": 1,
+        "incident_id": null,
+        "sla_due_at": "2026-09-24T02:16:47.523620Z",
+        "assigned_at": "2026-09-23T02:16:47.904858Z",
+        "accepted_at": "2026-09-23T02:17:06.518223Z",
+        "started_at": "2026-09-23T02:17:06.771680Z",
+        "resolved_at": null,
+        "closed_at": null,
+        "created_at": "2026-09-23T02:16:47.529922Z",
+        "updated_at": "2026-09-23T02:17:33.762372Z",
+        "sla_overdue": false
+      },
+      "processes": [
+        {
+          "id": 1,
+          "cycle_no": 1,
+          "assignee_id": 2,
+          "started_at": "2026-09-23T02:17:06.771680Z",
+          "ended_at": "2026-09-23T02:17:07.193994Z",
+          "receipt": {
+            "id": 1,
+            "process_id": 1,
+            "cycle_no": 1,
+            "assignee_id": 2,
+            "problem_type": "电气维修",
+            "method": "wo014-745f67277104 第1轮：检查灯具接线并完成复测",
+            "materials": "第1轮绝缘接线材料",
+            "fee_amount": null,
+            "fee_flag": "NONE",
+            "resolved": true,
+            "unresolved_reason": null,
+            "follow_up": "第1轮处理结果请住户复核",
+            "finished_at": "2026-09-23T02:17:07.193994Z"
+          },
+          "feedbacks": [
+            {
+              "id": 1,
+              "process_id": 1,
+              "actor_user_id": 3,
+              "confirmed": false,
+              "rating": null,
+              "comment": "wo014-745f67277104 住户反馈：灯仍然闪烁，请继续检查。",
+              "unresolved_flag": true,
+              "created_at": "2026-09-23T02:17:33.752155Z"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "cycle_no": 2,
+          "assignee_id": 2,
+          "started_at": "2026-09-23T02:17:33.755950Z",
+          "ended_at": null,
+          "receipt": null,
+          "feedbacks": []
+        }
+      ],
+      "receipts": [
+        {
+          "id": 1,
+          "process_id": 1,
+          "cycle_no": 1,
+          "assignee_id": 2,
+          "problem_type": "电气维修",
+          "method": "wo014-745f67277104 第1轮：检查灯具接线并完成复测",
+          "materials": "第1轮绝缘接线材料",
+          "fee_amount": null,
+          "fee_flag": "NONE",
+          "resolved": true,
+          "unresolved_reason": null,
+          "follow_up": "第1轮处理结果请住户复核",
+          "finished_at": "2026-09-23T02:17:07.193994Z"
+        }
+      ],
+      "logs": [
+        {
+          "id": 1,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.539587Z"
+        },
+        {
+          "id": 2,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "ANALYZE",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.735769Z"
+        },
+        {
+          "id": 3,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "process_reason": "NONE",
+          "event_code": "ASSIGN",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.983851Z"
+        },
+        {
+          "id": 4,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "ASSIGNED",
+          "to_status": "ACCEPTED",
+          "process_reason": "NONE",
+          "event_code": "ACCEPT",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:06.522064Z"
+        },
+        {
+          "id": 5,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "ACCEPTED",
+          "to_status": "PROCESSING",
+          "process_reason": "NONE",
+          "event_code": "START",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:06.773310Z"
+        },
+        {
+          "id": 6,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "process_reason": "NONE",
+          "event_code": "RECEIPT_RESOLVED",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:07.198867Z"
+        },
+        {
+          "id": 7,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "PROCESSING",
+          "process_reason": "NONE",
+          "event_code": "REOPEN",
+          "reason": "wo014-745f67277104 住户反馈：灯仍然闪烁，请继续检查。",
+          "created_at": "2026-09-23T02:17:33.754907Z"
+        }
+      ],
+      "error": "",
+      "can_reopen": false
+    },
+    "05-second-receipt": {
+      "work_order": {
+        "id": 1,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 1,
+        "reporter_user_id": 3,
+        "status": "WAIT_CONFIRM",
+        "process_reason": "NONE",
+        "category": "ELECTRICAL",
+        "severity": "HIGH",
+        "priority": "HIGH",
+        "version": 8,
+        "current_assignment_id": 1,
+        "incident_id": null,
+        "sla_due_at": "2026-09-24T02:16:47.523620Z",
+        "assigned_at": "2026-09-23T02:16:47.904858Z",
+        "accepted_at": "2026-09-23T02:17:06.518223Z",
+        "started_at": "2026-09-23T02:17:06.771680Z",
+        "resolved_at": "2026-09-23T02:17:51.226606Z",
+        "closed_at": null,
+        "created_at": "2026-09-23T02:16:47.529922Z",
+        "updated_at": "2026-09-23T02:17:51.228148Z",
+        "sla_overdue": false
+      },
+      "processes": [],
+      "receipts": [
+        {
+          "id": 1,
+          "process_id": 1,
+          "cycle_no": 1,
+          "assignee_id": 2,
+          "problem_type": "电气维修",
+          "method": "wo014-745f67277104 第1轮：检查灯具接线并完成复测",
+          "materials": "第1轮绝缘接线材料",
+          "fee_amount": null,
+          "fee_flag": "NONE",
+          "resolved": true,
+          "unresolved_reason": null,
+          "follow_up": "第1轮处理结果请住户复核",
+          "finished_at": "2026-09-23T02:17:07.193994Z"
+        },
+        {
+          "id": 2,
+          "process_id": 2,
+          "cycle_no": 2,
+          "assignee_id": 2,
+          "problem_type": "电气维修",
+          "method": "wo014-745f67277104 第2轮：检查灯具接线并完成复测",
+          "materials": "第2轮绝缘接线材料",
+          "fee_amount": null,
+          "fee_flag": "NONE",
+          "resolved": true,
+          "unresolved_reason": null,
+          "follow_up": "第2轮处理结果请住户复核",
+          "finished_at": "2026-09-23T02:17:51.226606Z"
+        }
+      ],
+      "logs": [
+        {
+          "id": 1,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.539587Z"
+        },
+        {
+          "id": 2,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "ANALYZE",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.735769Z"
+        },
+        {
+          "id": 3,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "process_reason": "NONE",
+          "event_code": "ASSIGN",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.983851Z"
+        },
+        {
+          "id": 4,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "ASSIGNED",
+          "to_status": "ACCEPTED",
+          "process_reason": "NONE",
+          "event_code": "ACCEPT",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:06.522064Z"
+        },
+        {
+          "id": 5,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "ACCEPTED",
+          "to_status": "PROCESSING",
+          "process_reason": "NONE",
+          "event_code": "START",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:06.773310Z"
+        },
+        {
+          "id": 6,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "process_reason": "NONE",
+          "event_code": "RECEIPT_RESOLVED",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:07.198867Z"
+        },
+        {
+          "id": 7,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "PROCESSING",
+          "process_reason": "NONE",
+          "event_code": "REOPEN",
+          "reason": "wo014-745f67277104 住户反馈：灯仍然闪烁，请继续检查。",
+          "created_at": "2026-09-23T02:17:33.754907Z"
+        },
+        {
+          "id": 8,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "process_reason": "NONE",
+          "event_code": "RECEIPT_RESOLVED",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:51.229715Z"
+        }
+      ],
+      "error": ""
+    },
+    "06-two-cycle-history": {
+      "work_order": {
+        "id": 1,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 1,
+        "reporter_user_id": 3,
+        "status": "WAIT_CONFIRM",
+        "process_reason": "NONE",
+        "category": "ELECTRICAL",
+        "severity": "HIGH",
+        "priority": "HIGH",
+        "version": 8,
+        "current_assignment_id": 1,
+        "incident_id": null,
+        "sla_due_at": "2026-09-24T02:16:47.523620Z",
+        "assigned_at": "2026-09-23T02:16:47.904858Z",
+        "accepted_at": "2026-09-23T02:17:06.518223Z",
+        "started_at": "2026-09-23T02:17:06.771680Z",
+        "resolved_at": "2026-09-23T02:17:51.226606Z",
+        "closed_at": null,
+        "created_at": "2026-09-23T02:16:47.529922Z",
+        "updated_at": "2026-09-23T02:17:51.228148Z",
+        "sla_overdue": false
+      },
+      "processes": [
+        {
+          "id": 1,
+          "cycle_no": 1,
+          "assignee_id": 2,
+          "started_at": "2026-09-23T02:17:06.771680Z",
+          "ended_at": "2026-09-23T02:17:07.193994Z",
+          "receipt": {
+            "id": 1,
+            "process_id": 1,
+            "cycle_no": 1,
+            "assignee_id": 2,
+            "problem_type": "电气维修",
+            "method": "wo014-745f67277104 第1轮：检查灯具接线并完成复测",
+            "materials": "第1轮绝缘接线材料",
+            "fee_amount": null,
+            "fee_flag": "NONE",
+            "resolved": true,
+            "unresolved_reason": null,
+            "follow_up": "第1轮处理结果请住户复核",
+            "finished_at": "2026-09-23T02:17:07.193994Z"
+          },
+          "feedbacks": [
+            {
+              "id": 1,
+              "process_id": 1,
+              "actor_user_id": 3,
+              "confirmed": false,
+              "rating": null,
+              "comment": "wo014-745f67277104 住户反馈：灯仍然闪烁，请继续检查。",
+              "unresolved_flag": true,
+              "created_at": "2026-09-23T02:17:33.752155Z"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "cycle_no": 2,
+          "assignee_id": 2,
+          "started_at": "2026-09-23T02:17:33.755950Z",
+          "ended_at": "2026-09-23T02:17:51.226606Z",
+          "receipt": {
+            "id": 2,
+            "process_id": 2,
+            "cycle_no": 2,
+            "assignee_id": 2,
+            "problem_type": "电气维修",
+            "method": "wo014-745f67277104 第2轮：检查灯具接线并完成复测",
+            "materials": "第2轮绝缘接线材料",
+            "fee_amount": null,
+            "fee_flag": "NONE",
+            "resolved": true,
+            "unresolved_reason": null,
+            "follow_up": "第2轮处理结果请住户复核",
+            "finished_at": "2026-09-23T02:17:51.226606Z"
+          },
+          "feedbacks": []
+        }
+      ],
+      "receipts": [
+        {
+          "id": 1,
+          "process_id": 1,
+          "cycle_no": 1,
+          "assignee_id": 2,
+          "problem_type": "电气维修",
+          "method": "wo014-745f67277104 第1轮：检查灯具接线并完成复测",
+          "materials": "第1轮绝缘接线材料",
+          "fee_amount": null,
+          "fee_flag": "NONE",
+          "resolved": true,
+          "unresolved_reason": null,
+          "follow_up": "第1轮处理结果请住户复核",
+          "finished_at": "2026-09-23T02:17:07.193994Z"
+        },
+        {
+          "id": 2,
+          "process_id": 2,
+          "cycle_no": 2,
+          "assignee_id": 2,
+          "problem_type": "电气维修",
+          "method": "wo014-745f67277104 第2轮：检查灯具接线并完成复测",
+          "materials": "第2轮绝缘接线材料",
+          "fee_amount": null,
+          "fee_flag": "NONE",
+          "resolved": true,
+          "unresolved_reason": null,
+          "follow_up": "第2轮处理结果请住户复核",
+          "finished_at": "2026-09-23T02:17:51.226606Z"
+        }
+      ],
+      "logs": [
+        {
+          "id": 1,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.539587Z"
+        },
+        {
+          "id": 2,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "ANALYZE",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.735769Z"
+        },
+        {
+          "id": 3,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "process_reason": "NONE",
+          "event_code": "ASSIGN",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.983851Z"
+        },
+        {
+          "id": 4,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "ASSIGNED",
+          "to_status": "ACCEPTED",
+          "process_reason": "NONE",
+          "event_code": "ACCEPT",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:06.522064Z"
+        },
+        {
+          "id": 5,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "ACCEPTED",
+          "to_status": "PROCESSING",
+          "process_reason": "NONE",
+          "event_code": "START",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:06.773310Z"
+        },
+        {
+          "id": 6,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "process_reason": "NONE",
+          "event_code": "RECEIPT_RESOLVED",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:07.198867Z"
+        },
+        {
+          "id": 7,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "PROCESSING",
+          "process_reason": "NONE",
+          "event_code": "REOPEN",
+          "reason": "wo014-745f67277104 住户反馈：灯仍然闪烁，请继续检查。",
+          "created_at": "2026-09-23T02:17:33.754907Z"
+        },
+        {
+          "id": 8,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "process_reason": "NONE",
+          "event_code": "RECEIPT_RESOLVED",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:51.229715Z"
+        }
+      ],
+      "error": "",
+      "can_reopen": true
+    },
+    "07-closed-refresh": {
+      "work_order": {
+        "id": 1,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 1,
+        "reporter_user_id": 3,
+        "status": "CLOSED",
+        "process_reason": "NONE",
+        "category": "ELECTRICAL",
+        "severity": "HIGH",
+        "priority": "HIGH",
+        "version": 10,
+        "current_assignment_id": null,
+        "incident_id": null,
+        "sla_due_at": "2026-09-24T02:16:47.523620Z",
+        "assigned_at": "2026-09-23T02:16:47.904858Z",
+        "accepted_at": "2026-09-23T02:17:06.518223Z",
+        "started_at": "2026-09-23T02:17:06.771680Z",
+        "resolved_at": "2026-09-23T02:17:51.226606Z",
+        "closed_at": "2026-09-23T02:18:17.128460Z",
+        "created_at": "2026-09-23T02:16:47.529922Z",
+        "updated_at": "2026-09-23T02:18:17.131761Z",
+        "sla_overdue": false
+      },
+      "processes": [
+        {
+          "id": 1,
+          "cycle_no": 1,
+          "assignee_id": 2,
+          "started_at": "2026-09-23T02:17:06.771680Z",
+          "ended_at": "2026-09-23T02:17:07.193994Z",
+          "receipt": {
+            "id": 1,
+            "process_id": 1,
+            "cycle_no": 1,
+            "assignee_id": 2,
+            "problem_type": "电气维修",
+            "method": "wo014-745f67277104 第1轮：检查灯具接线并完成复测",
+            "materials": "第1轮绝缘接线材料",
+            "fee_amount": null,
+            "fee_flag": "NONE",
+            "resolved": true,
+            "unresolved_reason": null,
+            "follow_up": "第1轮处理结果请住户复核",
+            "finished_at": "2026-09-23T02:17:07.193994Z"
+          },
+          "feedbacks": [
+            {
+              "id": 1,
+              "process_id": 1,
+              "actor_user_id": 3,
+              "confirmed": false,
+              "rating": null,
+              "comment": "wo014-745f67277104 住户反馈：灯仍然闪烁，请继续检查。",
+              "unresolved_flag": true,
+              "created_at": "2026-09-23T02:17:33.752155Z"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "cycle_no": 2,
+          "assignee_id": 2,
+          "started_at": "2026-09-23T02:17:33.755950Z",
+          "ended_at": "2026-09-23T02:17:51.226606Z",
+          "receipt": {
+            "id": 2,
+            "process_id": 2,
+            "cycle_no": 2,
+            "assignee_id": 2,
+            "problem_type": "电气维修",
+            "method": "wo014-745f67277104 第2轮：检查灯具接线并完成复测",
+            "materials": "第2轮绝缘接线材料",
+            "fee_amount": null,
+            "fee_flag": "NONE",
+            "resolved": true,
+            "unresolved_reason": null,
+            "follow_up": "第2轮处理结果请住户复核",
+            "finished_at": "2026-09-23T02:17:51.226606Z"
+          },
+          "feedbacks": [
+            {
+              "id": 2,
+              "process_id": 2,
+              "actor_user_id": 3,
+              "confirmed": true,
+              "rating": null,
+              "comment": null,
+              "unresolved_flag": false,
+              "created_at": "2026-09-23T02:18:17.106933Z"
+            }
+          ]
+        }
+      ],
+      "receipts": [
+        {
+          "id": 1,
+          "process_id": 1,
+          "cycle_no": 1,
+          "assignee_id": 2,
+          "problem_type": "电气维修",
+          "method": "wo014-745f67277104 第1轮：检查灯具接线并完成复测",
+          "materials": "第1轮绝缘接线材料",
+          "fee_amount": null,
+          "fee_flag": "NONE",
+          "resolved": true,
+          "unresolved_reason": null,
+          "follow_up": "第1轮处理结果请住户复核",
+          "finished_at": "2026-09-23T02:17:07.193994Z"
+        },
+        {
+          "id": 2,
+          "process_id": 2,
+          "cycle_no": 2,
+          "assignee_id": 2,
+          "problem_type": "电气维修",
+          "method": "wo014-745f67277104 第2轮：检查灯具接线并完成复测",
+          "materials": "第2轮绝缘接线材料",
+          "fee_amount": null,
+          "fee_flag": "NONE",
+          "resolved": true,
+          "unresolved_reason": null,
+          "follow_up": "第2轮处理结果请住户复核",
+          "finished_at": "2026-09-23T02:17:51.226606Z"
+        }
+      ],
+      "logs": [
+        {
+          "id": 1,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.539587Z"
+        },
+        {
+          "id": 2,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "ANALYZE",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.735769Z"
+        },
+        {
+          "id": 3,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "process_reason": "NONE",
+          "event_code": "ASSIGN",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.983851Z"
+        },
+        {
+          "id": 4,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "ASSIGNED",
+          "to_status": "ACCEPTED",
+          "process_reason": "NONE",
+          "event_code": "ACCEPT",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:06.522064Z"
+        },
+        {
+          "id": 5,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "ACCEPTED",
+          "to_status": "PROCESSING",
+          "process_reason": "NONE",
+          "event_code": "START",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:06.773310Z"
+        },
+        {
+          "id": 6,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "process_reason": "NONE",
+          "event_code": "RECEIPT_RESOLVED",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:07.198867Z"
+        },
+        {
+          "id": 7,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "PROCESSING",
+          "process_reason": "NONE",
+          "event_code": "REOPEN",
+          "reason": "wo014-745f67277104 住户反馈：灯仍然闪烁，请继续检查。",
+          "created_at": "2026-09-23T02:17:33.754907Z"
+        },
+        {
+          "id": 8,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "process_reason": "NONE",
+          "event_code": "RECEIPT_RESOLVED",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:51.229715Z"
+        },
+        {
+          "id": 9,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "COMPLETED",
+          "process_reason": "NONE",
+          "event_code": "CONFIRM",
+          "reason": null,
+          "created_at": "2026-09-23T02:18:17.111038Z"
+        },
+        {
+          "id": 10,
+          "actor_user_id": 3,
+          "actor_type": "SYSTEM",
+          "from_status": "COMPLETED",
+          "to_status": "CLOSED",
+          "process_reason": "NONE",
+          "event_code": "ARCHIVE",
+          "reason": null,
+          "created_at": "2026-09-23T02:18:17.127582Z"
+        }
+      ],
+      "error": "",
+      "can_reopen": false
+    },
+    "08-closed-relogin": {
+      "work_order": {
+        "id": 1,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 1,
+        "reporter_user_id": 3,
+        "status": "CLOSED",
+        "process_reason": "NONE",
+        "category": "ELECTRICAL",
+        "severity": "HIGH",
+        "priority": "HIGH",
+        "version": 10,
+        "current_assignment_id": null,
+        "incident_id": null,
+        "sla_due_at": "2026-09-24T02:16:47.523620Z",
+        "assigned_at": "2026-09-23T02:16:47.904858Z",
+        "accepted_at": "2026-09-23T02:17:06.518223Z",
+        "started_at": "2026-09-23T02:17:06.771680Z",
+        "resolved_at": "2026-09-23T02:17:51.226606Z",
+        "closed_at": "2026-09-23T02:18:17.128460Z",
+        "created_at": "2026-09-23T02:16:47.529922Z",
+        "updated_at": "2026-09-23T02:18:17.131761Z",
+        "sla_overdue": false
+      },
+      "processes": [
+        {
+          "id": 1,
+          "cycle_no": 1,
+          "assignee_id": 2,
+          "started_at": "2026-09-23T02:17:06.771680Z",
+          "ended_at": "2026-09-23T02:17:07.193994Z",
+          "receipt": {
+            "id": 1,
+            "process_id": 1,
+            "cycle_no": 1,
+            "assignee_id": 2,
+            "problem_type": "电气维修",
+            "method": "wo014-745f67277104 第1轮：检查灯具接线并完成复测",
+            "materials": "第1轮绝缘接线材料",
+            "fee_amount": null,
+            "fee_flag": "NONE",
+            "resolved": true,
+            "unresolved_reason": null,
+            "follow_up": "第1轮处理结果请住户复核",
+            "finished_at": "2026-09-23T02:17:07.193994Z"
+          },
+          "feedbacks": [
+            {
+              "id": 1,
+              "process_id": 1,
+              "actor_user_id": 3,
+              "confirmed": false,
+              "rating": null,
+              "comment": "wo014-745f67277104 住户反馈：灯仍然闪烁，请继续检查。",
+              "unresolved_flag": true,
+              "created_at": "2026-09-23T02:17:33.752155Z"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "cycle_no": 2,
+          "assignee_id": 2,
+          "started_at": "2026-09-23T02:17:33.755950Z",
+          "ended_at": "2026-09-23T02:17:51.226606Z",
+          "receipt": {
+            "id": 2,
+            "process_id": 2,
+            "cycle_no": 2,
+            "assignee_id": 2,
+            "problem_type": "电气维修",
+            "method": "wo014-745f67277104 第2轮：检查灯具接线并完成复测",
+            "materials": "第2轮绝缘接线材料",
+            "fee_amount": null,
+            "fee_flag": "NONE",
+            "resolved": true,
+            "unresolved_reason": null,
+            "follow_up": "第2轮处理结果请住户复核",
+            "finished_at": "2026-09-23T02:17:51.226606Z"
+          },
+          "feedbacks": [
+            {
+              "id": 2,
+              "process_id": 2,
+              "actor_user_id": 3,
+              "confirmed": true,
+              "rating": null,
+              "comment": null,
+              "unresolved_flag": false,
+              "created_at": "2026-09-23T02:18:17.106933Z"
+            }
+          ]
+        }
+      ],
+      "receipts": [
+        {
+          "id": 1,
+          "process_id": 1,
+          "cycle_no": 1,
+          "assignee_id": 2,
+          "problem_type": "电气维修",
+          "method": "wo014-745f67277104 第1轮：检查灯具接线并完成复测",
+          "materials": "第1轮绝缘接线材料",
+          "fee_amount": null,
+          "fee_flag": "NONE",
+          "resolved": true,
+          "unresolved_reason": null,
+          "follow_up": "第1轮处理结果请住户复核",
+          "finished_at": "2026-09-23T02:17:07.193994Z"
+        },
+        {
+          "id": 2,
+          "process_id": 2,
+          "cycle_no": 2,
+          "assignee_id": 2,
+          "problem_type": "电气维修",
+          "method": "wo014-745f67277104 第2轮：检查灯具接线并完成复测",
+          "materials": "第2轮绝缘接线材料",
+          "fee_amount": null,
+          "fee_flag": "NONE",
+          "resolved": true,
+          "unresolved_reason": null,
+          "follow_up": "第2轮处理结果请住户复核",
+          "finished_at": "2026-09-23T02:17:51.226606Z"
+        }
+      ],
+      "logs": [
+        {
+          "id": 1,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.539587Z"
+        },
+        {
+          "id": 2,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "ANALYZE",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.735769Z"
+        },
+        {
+          "id": 3,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "process_reason": "NONE",
+          "event_code": "ASSIGN",
+          "reason": null,
+          "created_at": "2026-09-23T02:16:47.983851Z"
+        },
+        {
+          "id": 4,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "ASSIGNED",
+          "to_status": "ACCEPTED",
+          "process_reason": "NONE",
+          "event_code": "ACCEPT",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:06.522064Z"
+        },
+        {
+          "id": 5,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "ACCEPTED",
+          "to_status": "PROCESSING",
+          "process_reason": "NONE",
+          "event_code": "START",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:06.773310Z"
+        },
+        {
+          "id": 6,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "process_reason": "NONE",
+          "event_code": "RECEIPT_RESOLVED",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:07.198867Z"
+        },
+        {
+          "id": 7,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "PROCESSING",
+          "process_reason": "NONE",
+          "event_code": "REOPEN",
+          "reason": "wo014-745f67277104 住户反馈：灯仍然闪烁，请继续检查。",
+          "created_at": "2026-09-23T02:17:33.754907Z"
+        },
+        {
+          "id": 8,
+          "actor_user_id": 7,
+          "actor_type": "STAFF",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "process_reason": "NONE",
+          "event_code": "RECEIPT_RESOLVED",
+          "reason": null,
+          "created_at": "2026-09-23T02:17:51.229715Z"
+        },
+        {
+          "id": 9,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "COMPLETED",
+          "process_reason": "NONE",
+          "event_code": "CONFIRM",
+          "reason": null,
+          "created_at": "2026-09-23T02:18:17.111038Z"
+        },
+        {
+          "id": 10,
+          "actor_user_id": 3,
+          "actor_type": "SYSTEM",
+          "from_status": "COMPLETED",
+          "to_status": "CLOSED",
+          "process_reason": "NONE",
+          "event_code": "ARCHIVE",
+          "reason": null,
+          "created_at": "2026-09-23T02:18:17.127582Z"
+        }
+      ],
+      "error": "",
+      "can_reopen": false
+    }
+  },
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:16:45.537Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:16:45.563Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:16:46.371Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "POST",
+      "path": "/work-orders",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:16:47.569Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/1",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:16:50.219Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:01.675Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:01.700Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:02.481Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/staff/work-orders?limit=50",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:03.486Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/1",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:06.372Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "POST",
+      "path": "/staff/work-orders/1/accept",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:06.547Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/1",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:06.594Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "POST",
+      "path": "/staff/work-orders/1/start",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:06.799Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/1",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:06.848Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "POST",
+      "path": "/staff/work-orders/1/receipts",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:07.225Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/1",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:07.273Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:18.745Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:18.769Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:19.542Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders?limit=20",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:20.469Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/1",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:23.500Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "POST",
+      "path": "/work-orders/1/reopen",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:33.782Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/1",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:33.824Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:45.303Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:45.337Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:46.255Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/staff/work-orders?limit=50",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:47.336Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/1",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:50.791Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "POST",
+      "path": "/staff/work-orders/1/receipts",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:51.247Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/1",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:17:51.285Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:18:03.242Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:18:03.267Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:18:04.101Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders?limit=20",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:18:05.041Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/1",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:18:07.864Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "POST",
+      "path": "/work-orders/1/confirm",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:18:17.159Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/1",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:18:17.198Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/1",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:18:17.357Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:18:28.196Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:18:28.225Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/me",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:18:29.113Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders?limit=20",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:18:30.141Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    },
+    {
+      "method": "GET",
+      "path": "/work-orders/1",
+      "status": 200,
+      "received_at_utc": "2026-09-23T02:18:33.118Z",
+      "source": "real wx.request forwarded through supported automator logging proxy"
+    }
+  ],
+  "screenshots": [
+    "01-auto-assigned.png",
+    "02-first-receipt.png",
+    "03-empty-reason-rejected.png",
+    "04-reopened-second-cycle.png",
+    "05-second-receipt.png",
+    "06-two-cycle-history.png",
+    "07-closed-refresh.png",
+    "08-closed-relogin.png",
+    "09-first-cycle-history.png",
+    "10-second-cycle-history.png"
+  ],
+  "mode": "WeChat DevTools real controls, Development SMS/AI, real AUTH001 API/Worker/DB; not physical-device or Production acceptance",
+  "status": "PAGE_FLOW_PASS_PENDING_INDEPENDENT_REVIEW",
+  "project_config_sha256": "342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F",
+  "history_visual_captures": [
+    {
+      "cycle": 1,
+      "text": "第 1 轮处理 · 员工 2开始时间 2026-09-23T02:17:06.771680Z处理回执问题类型 电气维修处理方式与过程 wo014-745f67277104 第1轮：检查灯具接线并完成复测使用材料 第1轮绝缘接线材料未产生费用员工处理结果：已处理后续处理 第1轮处理结果请住户复核完成时间 2026-09-23T02:17:07.193994Z住户反馈未解决：wo014-745f67277104 住户反馈：灯仍然闪烁，请继续检查。反馈时间 2026-09-23T02:17:33.752155Z",
+      "scroll_top": 0,
+      "screenshot": "09-first-cycle-history.png"
+    },
+    {
+      "cycle": 2,
+      "text": "第 2 轮处理 · 员工 2开始时间 2026-09-23T02:17:33.755950Z处理回执问题类型 电气维修处理方式与过程 wo014-745f67277104 第2轮：检查灯具接线并完成复测使用材料 第2轮绝缘接线材料未产生费用员工处理结果：已处理后续处理 第2轮处理结果请住户复核完成时间 2026-09-23T02:17:51.226606Z住户已确认解决反馈时间 2026-09-23T02:18:17.106933Z",
+      "scroll_top": 0,
+      "screenshot": "10-second-cycle-history.png"
+    }
+  ],
+  "visual_limits": [
+    "03 records the empty-reason error in actual page state; its initial viewport does not show the error text. No fake overlay or repeated business request was used."
+  ]
+}

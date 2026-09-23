@@ -1,0 +1,14 @@
+{
+  "task_id": "WO-REOPEN-RECEIPT-HISTORY-014",
+  "round": 1,
+  "product_repair_rounds": 0,
+  "review_mechanism": "Separate built-in Codex collaboration context, not main implementation self-review",
+  "review_context": "/root/wo014_independent_review",
+  "cli_session_id": null,
+  "cli_session_id_note": "This review used a separate built-in context rather than a CLI wrapper; no CLI session identifier is claimed.",
+  "product_sha": "65f20c5a288b2b8e027c8b80fefbe6cfed439d14",
+  "run_id": "wo014-745f67277104",
+  "result": "PASS",
+  "structured_result": "reports/codex/WO-REOPEN-RECEIPT-HISTORY-014-review.json",
+  "boundaries": "Read-only; no file writes, test execution, page operation, business HTTP, DB/queue operations or recursive reviewers. All ten screenshot files actually opened."
+}

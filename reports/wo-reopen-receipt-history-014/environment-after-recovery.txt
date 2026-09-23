@@ -1,0 +1,9 @@
+{
+  "checked_at_utc": "2026-09-23T02:08:54.841733+00:00",
+  "target": "127.0.0.1:3307/property_ai_auth001_test",
+  "mode": "read-only; no initialization, migration, seed or business writes",
+  "revision": "20260919_0009",
+  "users_count": 2,
+  "work_orders_count": 0,
+  "status": "PRESENT"
+}
