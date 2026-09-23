@@ -41,7 +41,8 @@
   <view class="card">
     <view class="section-title">批量导入 / 导出</view>
     <view class="hint">CSV 列：building_code,building_name,unit_code,unit_name,room_no,floor,status。导入整批校验并提交；冲突时不会只写入一部分。</view>
-    <textarea class="csv-box" value="{{importText}}" data-field="importText" bindinput="onTextInput" auto-height />
+    <view class="hint">每批最多 500 条记录；名称中的逗号、双引号或换行按 CSV 引号格式填写，可原样导回本页导出的内容。</view>
+    <textarea class="csv-box" value="{{importText}}" data-field="importText" bindinput="onTextInput" maxlength="-1" auto-height />
     <button class="btn" bindtap="importHouses">导入 CSV 内容</button>
     <button class="btn secondary" bindtap="exportHouses">导出并复制 CSV</button>
   </view>

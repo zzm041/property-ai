@@ -54,22 +54,47 @@ function loadAllRelations(propertyId, tenantId, afterId, collected) {
     });
 }
 
-function parseCsvLine(line) {
-  const values = [];
+function parseCsvRecords(text) {
+  const records = [];
+  let values = [];
   let value = "";
   let quoted = false;
-  for (let index = 0; index < line.length; index += 1) {
-    const character = line[index];
-    if (character === '"') {
-      if (quoted && line[index + 1] === '"') {
+  let closedQuote = false;
+  function endField() {
+    values.push(value.trim());
+    value = "";
+    closedQuote = false;
+  }
+  function endRecord() {
+    endField();
+    if (values.length > 1 || values[0]) records.push(values);
+    values = [];
+  }
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index];
+    if (quoted) {
+      if (character === '"' && text[index + 1] === '"') {
         value += '"';
         index += 1;
+      } else if (character === '"') {
+        quoted = false;
+        closedQuote = true;
       } else {
-        quoted = !quoted;
+        value += character;
       }
-    } else if (character === "," && !quoted) {
-      values.push(value.trim());
+    } else if (character === ",") {
+      endField();
+    } else if (character === "\r" || character === "\n") {
+      endRecord();
+      if (character === "\r" && text[index + 1] === "\n") index += 1;
+    } else if (closedQuote) {
+      if (character !== " " && character !== "\t") {
+        throw new Error("CSV 闭合引号后只能是分隔符或换行");
+      }
+    } else if (character === '"') {
+      if (value.trim()) throw new Error("CSV 字段中的引号必须成对转义");
       value = "";
+      quoted = true;
     } else {
       value += character;
     }
@@ -77,24 +102,21 @@ function parseCsvLine(line) {
   if (quoted) {
     throw new Error("CSV 引号没有闭合");
   }
-  values.push(value.trim());
-  return values;
+  if (values.length || value || closedQuote) endRecord();
+  return records;
 }
 
 function parseImport(text) {
-  const lines = String(text || "")
-    .replace(/^\uFEFF/, "")
-    .split(/\r?\n/)
-    .filter((line) => line.trim());
-  if (lines.length < 2) {
+  const records = parseCsvRecords(String(text || "").replace(/^\uFEFF/, ""));
+  if (records.length < 2) {
     throw new Error("请粘贴表头和至少一行房屋数据");
   }
-  const header = parseCsvLine(lines[0]);
+  const header = records[0];
   if (header.join(",") !== IMPORT_COLUMNS.join(",")) {
     throw new Error(`CSV 表头必须为 ${IMPORT_COLUMNS.join(",")}`);
   }
-  return lines.slice(1).map((line, index) => {
-    const values = parseCsvLine(line);
+  if (records.length > 501) throw new Error("每批最多导入 500 条房屋记录");
+  return records.slice(1).map((values, index) => {
     if (values.length !== IMPORT_COLUMNS.length) {
       throw new Error(`第 ${index + 2} 行列数不正确`);
     }
@@ -212,6 +234,7 @@ Page({
   },
 
   onPropertyChange(event) {
+    if (this.data.loading) return;
     const propertyIndex = Number(event.detail.value);
     const current = this.data.properties[propertyIndex];
     if (!current) {
@@ -541,6 +564,7 @@ Page({
   },
 
   importHouses() {
+    if (this.data.loading || !this.data.canEdit) return;
     let rows;
     try {
       rows = parseImport(this.data.importText);
@@ -548,7 +572,7 @@ Page({
       this.setData({ error: error.message });
       return;
     }
-    withLoading(this, () =>
+    return withLoading(this, () =>
       api
         .importHouses({
           tenant_id: Number(this.data.tenantId),
@@ -565,7 +589,8 @@ Page({
   },
 
   exportHouses() {
-    withLoading(this, () =>
+    if (this.data.loading || !this.data.canEdit) return;
+    return withLoading(this, () =>
       api.exportHouses(this.data.propertyId, this.data.tenantId).then((result) => {
         const lines = [result.columns.map(csvValue).join(",")].concat(
           (result.rows || []).map((row) =>
