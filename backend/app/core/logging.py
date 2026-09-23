@@ -136,7 +136,6 @@ def configure_logging(*, debug: bool = False, service: str = "api") -> None:
         structlog.stdlib.add_logger_name,
         structlog.stdlib.add_log_level,
         structlog.processors.TimeStamper(fmt="iso", utc=True),
-        redact_log_event,
     ]
 
     structlog.configure(
@@ -145,6 +144,9 @@ def configure_logging(*, debug: bool = False, service: str = "api") -> None:
             structlog.stdlib.PositionalArgumentsFormatter(),
             structlog.processors.StackInfoRenderer(),
             structlog.processors.format_exc_info,
+            # Keep exception objects/tuples intact until traceback rendering.
+            # Redact the rendered chain and all other fields before emission.
+            redact_log_event,
             redact_exc_info,
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
         ],
@@ -162,6 +164,7 @@ def configure_logging(*, debug: bool = False, service: str = "api") -> None:
         processors=[
             structlog.stdlib.ProcessorFormatter.remove_processors_meta,
             structlog.processors.format_exc_info,
+            redact_log_event,
             redact_exc_info,
             structlog.processors.JSONRenderer(),
         ],
