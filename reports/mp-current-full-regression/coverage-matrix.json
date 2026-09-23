@@ -2074,6 +2074,36 @@
       "scope": "Chinese states/history, Property-timezone labels, current employee display names within authorized detail; preserve raw IDs/UTC/history, no business replay."
     }
   },
+  "resident_wo_presentation_020": {
+    "task_id": "RESIDENT-WO-PRESENTATION-020",
+    "base_sha": "386cf82f346ed66b43991ef44a1540989894927a",
+    "implementation_head": "b75fa97112b3144f9d4702e4782b231bb775c19c",
+    "runtime_run_id": "view020-1b7b00de4872",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
+    "independent_review": {
+      "round": 1,
+      "product_repair_rounds": 0,
+      "result": "PASS",
+      "session_id": "01a0cceb-5fb2-7463-8bcc-d263b1ab8393",
+      "path": "reports/codex/RESIDENT-WO-PRESENTATION-020-review.json",
+      "boundary": "Separate read-only reviewer inspected all14productfiles/directcontext,78focusedlog,page/API/SELECT-DB/queueevidence and all6PNG; no tests/pages/HTTP/DB/queue/process operations.014N3presentation closed locally;020NON_BLOCKING1transienttitle retained,2tracking closed here; all release blockers retained."
+    },
+    "evidence": "78focused/1warning; sixPNG actual normalresident list/detail/history/refresh/relogin on existing order1CLOSEDv10/twocycles and10ASSIGNEDv3/twoattachments. Scopedemployee2currentname/Propertytimezone/rawUTC/receiptprocessDBmatch; no lifecycle change. Immutable helper404expectationfailure + hashlinkedresume403/403/401.8083AUTH0010009,vhostproperty_ai_auth001/queueproperty_ai.auth0010/0/1,DLQ2untouched.",
+    "current_status_overlays": [
+      {
+        "id": "V1-RECEIPT-HISTORY",
+        "implementation_status": "Retained all-cycle receipts/process-linked feedback and rawUTC/IDs;020 adds authorized current employee names, Property-timezone/offset labels and readable Chinese states/reasons/events/media; no historical-name-snapshot claim.",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "014 65f20c5 / wo014-745f67277104;020 b75fa97112b3144f9d4702e4782b231bb775c19c / view020-1b7b00de4872",
+        "remaining_gap": "Production/device UX and performance/heavier contention, native picker/preview, real providers; media still lack authoritative process association; current display names are not historical snapshots.020 screenshot02 transient navigation title is nonblocking.",
+        "next_action": "Preserve014/020 evidence without replay. Next NOTIFICATION-PRESENTATION-021 closes retained013N3 inbox localization/explicit timestamp display only; unknown content/rawrecords/route/read-state semantics unchanged."
+      }
+    ],
+    "next_slice": {
+      "task_id": "NOTIFICATION-PRESENTATION-021",
+      "scope": "Existing013N3: presentation-only localization of exact known system templates and explicit UTC notification/read timestamps; preserve stored originals, resource identity, paging/read/navigation and all release gaps. No new events/lifecycle replay/schema/fees."
+    }
+  },
   "auth_failure_policy_20260923": {
     "task_id": "AUTH-FAILURE-POLICY-20260923",
     "owner_decision": "不锁定",
@@ -2094,7 +2124,7 @@
     "generated_at": "2026-09-23",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
     "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs), then notification_events_inbox_013.current_status_overlays (2 IDs)",
-    "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs), then manager_wo_cancel_017 (1 composite ID, remains PARTIAL), then house_csv_roundtrip_018 (1 existing ID), then ai_analysis_input_019 (3 existing IDs; real-model statuses remain BLOCKED)",
+    "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs), then manager_wo_cancel_017 (1 composite ID, remains PARTIAL), then house_csv_roundtrip_018 (1 existing ID), then ai_analysis_input_019 (3 existing IDs; real-model statuses remain BLOCKED), then resident_wo_presentation_020 (1 existing ID; release gaps retained)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced. Old AUTH001 objects were lost on the 2026-09-23 tmpfs stop; historical evidence remains version-bound, not current-object proof.",
     "row_count": 83,
     "rows": [
@@ -2612,11 +2642,11 @@
       },
       {
         "requirement_id": "V1-RECEIPT-HISTORY",
-        "current_implementation": "all_cycle_receipts_and_process_linked_resident_feedback_visible_after_reopen_refresh_relogin; old_receipts_and_whole_order_media_preserved",
+        "current_implementation": "Retained all-cycle receipts/process-linked feedback and rawUTC/IDs;020 adds authorized current employee names, Property-timezone/offset labels and readable Chinese states/reasons/events/media; no historical-name-snapshot claim.",
         "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
-        "evidence_version": "65f20c5a288b2b8e027c8b80fefbe6cfed439d14 / wo014-745f67277104",
-        "remaining_gap": "production/device UX, localized times/assignee names, heavier contention; media lack authoritative process association; no native media picker claim in 014",
-        "next_action": "retain actual page/API/DB/Worker and race evidence; complete production presentation and release acceptance separately"
+        "evidence_version": "014 65f20c5 / wo014-745f67277104;020 b75fa97112b3144f9d4702e4782b231bb775c19c / view020-1b7b00de4872",
+        "remaining_gap": "Production/device UX and performance/heavier contention, native picker/preview, real providers; media still lack authoritative process association; current display names are not historical snapshots.020 screenshot02 transient navigation title is nonblocking.",
+        "next_action": "Preserve014/020 evidence without replay. Next NOTIFICATION-PRESENTATION-021 closes retained013N3 inbox localization/explicit timestamp display only; unknown content/rawrecords/route/read-state semantics unchanged."
       },
       {
         "requirement_id": "V1-MGR-EXCEPTION",

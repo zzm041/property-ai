@@ -1,0 +1,103 @@
+{
+  "task_id": "RESIDENT-WO-PRESENTATION-020",
+  "run_id": "view020-1b7b00de4872",
+  "product_sha": "b75fa97112b3144f9d4702e4782b231bb775c19c",
+  "resumes": "api-database-evidence.json",
+  "prior_sha256": "c5479332b6f5b89f42eae9b1842d774602afd085aaf855f3adcbbf9d532b982b",
+  "interruption": "RuntimeError: cross-user-1 failed: HTTP 403 code=IAM.FORBIDDEN",
+  "negative": {
+    "1": {
+      "status": 403,
+      "response": {
+        "request_id": "view020-1b7b00de4872-resume-cross-user-1",
+        "error": {
+          "code": "IAM.FORBIDDEN",
+          "message": "Permission denied",
+          "details": {}
+        }
+      },
+      "business_metadata_leaked": false
+    },
+    "10": {
+      "status": 403,
+      "response": {
+        "request_id": "view020-1b7b00de4872-resume-cross-user-10",
+        "error": {
+          "code": "IAM.FORBIDDEN",
+          "message": "Permission denied",
+          "details": {}
+        }
+      },
+      "business_metadata_leaked": false
+    }
+  },
+  "basis": "docs/06-API-CONTRACT.md and WorkOrderService._authorize_read require 403 IAM.FORBIDDEN. First failed expectation retained; one read-only GET repeated to capture response body. No product change, positive DB/UI replay or new login.",
+  "principal": {
+    "user_id": 4,
+    "roles": [
+      "RESIDENT"
+    ]
+  },
+  "anonymous": {
+    "status": 401,
+    "response": {
+      "request_id": "view020-1b7b00de4872-resume-anonymous",
+      "error": {
+        "code": "AUTH.MISSING_TOKEN",
+        "message": "Bearer access token is required",
+        "details": {}
+      }
+    }
+  },
+  "queue": {
+    "vhost": "property_ai_auth001",
+    "actual_output": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nceleryev.2fa56e0f-87d3-4607-97c6-ee097502c16c\t0\t0\t1\nproperty_ai.auth001.dlq\t2\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1\n",
+    "shared_access": false,
+    "message_content_read": false
+  },
+  "status": "API_DB_READONLY_PASS_PENDING_INDEPENDENT_REVIEW",
+  "limits": [
+    "Own API and SELECT-only DB assertions are in immutable prior file; no successful operation replayed.",
+    "Runtime Asia/Shanghai, same-tenant nonowner 403, anonymous 401; DST and foreign-scope SQL are unit/source evidence.",
+    "Current names are not historical name snapshots. No new lifecycle records or fixture created."
+  ],
+  "requests": [
+    {
+      "label": "resume-other-principal",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "01784802d4f616c5"
+    },
+    {
+      "label": "resume-cross-user-1",
+      "method": "GET",
+      "path": "/work-orders/1",
+      "params": [],
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "66cbffdef9f42905"
+    },
+    {
+      "label": "resume-cross-user-10",
+      "method": "GET",
+      "path": "/work-orders/10",
+      "params": [],
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "dd29a18c4d13c4d0"
+    },
+    {
+      "label": "resume-anonymous",
+      "method": "GET",
+      "path": "/work-orders/1",
+      "params": [],
+      "status": 401,
+      "error_code": "AUTH.MISSING_TOKEN",
+      "request_id_hash": "5ac0727b90f55b99"
+    }
+  ],
+  "observed_at_utc": "2026-09-23T06:17:07.352464+00:00"
+}

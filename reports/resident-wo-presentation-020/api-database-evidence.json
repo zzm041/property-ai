@@ -1,0 +1,530 @@
+{
+  "task_id": "RESIDENT-WO-PRESENTATION-020",
+  "run_id": "view020-1b7b00de4872",
+  "product_sha": "b75fa97112b3144f9d4702e4782b231bb775c19c",
+  "mode": "Actual normal page-issued session, GET own objects; other normalSMS principal; SELECT-only DB; no lifecycle mutations",
+  "orders": [
+    {
+      "detail": {
+        "work_order": {
+          "id": 1,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "CLOSED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 10,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T02:16:47.523620Z",
+          "assigned_at": "2026-09-23T02:16:47.904858Z",
+          "accepted_at": "2026-09-23T02:17:06.518223Z",
+          "started_at": "2026-09-23T02:17:06.771680Z",
+          "resolved_at": "2026-09-23T02:17:51.226606Z",
+          "closed_at": "2026-09-23T02:18:17.128460Z",
+          "created_at": "2026-09-23T02:16:47.529922Z",
+          "updated_at": "2026-09-23T02:18:17.131761Z",
+          "sla_overdue": false
+        },
+        "text": "wo014-745f67277104 页面重开验证：客厅灯不亮，开关接触不良。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 1,
+            "employee_id": 2,
+            "assigned_by_user_id": null,
+            "status": "ENDED",
+            "assigned_at": "2026-09-23T02:16:47.904858Z",
+            "accept_at": "2026-09-23T02:17:06.518223Z",
+            "ended_at": "2026-09-23T02:18:17.112082Z",
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [
+          {
+            "id": 1,
+            "cycle_no": 1,
+            "assignee_id": 2,
+            "started_at": "2026-09-23T02:17:06.771680Z",
+            "ended_at": "2026-09-23T02:17:07.193994Z"
+          },
+          {
+            "id": 2,
+            "cycle_no": 2,
+            "assignee_id": 2,
+            "started_at": "2026-09-23T02:17:33.755950Z",
+            "ended_at": "2026-09-23T02:17:51.226606Z"
+          }
+        ],
+        "receipts": [
+          {
+            "id": 1,
+            "process_id": 1,
+            "cycle_no": 1,
+            "assignee_id": 2,
+            "problem_type": "电气维修",
+            "method": "wo014-745f67277104 第1轮：检查灯具接线并完成复测",
+            "materials": "第1轮绝缘接线材料",
+            "fee_amount": null,
+            "fee_flag": "NONE",
+            "resolved": true,
+            "unresolved_reason": null,
+            "follow_up": "第1轮处理结果请住户复核",
+            "finished_at": "2026-09-23T02:17:07.193994Z"
+          },
+          {
+            "id": 2,
+            "process_id": 2,
+            "cycle_no": 2,
+            "assignee_id": 2,
+            "problem_type": "电气维修",
+            "method": "wo014-745f67277104 第2轮：检查灯具接线并完成复测",
+            "materials": "第2轮绝缘接线材料",
+            "fee_amount": null,
+            "fee_flag": "NONE",
+            "resolved": true,
+            "unresolved_reason": null,
+            "follow_up": "第2轮处理结果请住户复核",
+            "finished_at": "2026-09-23T02:17:51.226606Z"
+          }
+        ],
+        "feedbacks": [
+          {
+            "id": 1,
+            "process_id": 1,
+            "actor_user_id": 3,
+            "confirmed": false,
+            "rating": null,
+            "comment": "wo014-745f67277104 住户反馈：灯仍然闪烁，请继续检查。",
+            "unresolved_flag": true,
+            "created_at": "2026-09-23T02:17:33.752155Z"
+          },
+          {
+            "id": 2,
+            "process_id": 2,
+            "actor_user_id": 3,
+            "confirmed": true,
+            "rating": null,
+            "comment": null,
+            "unresolved_flag": false,
+            "created_at": "2026-09-23T02:18:17.106933Z"
+          }
+        ],
+        "logs": [
+          {
+            "id": 1,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T02:16:47.539587Z"
+          },
+          {
+            "id": 2,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-23T02:16:47.735769Z"
+          },
+          {
+            "id": 3,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-23T02:16:47.983851Z"
+          },
+          {
+            "id": 4,
+            "actor_user_id": 7,
+            "actor_type": "STAFF",
+            "from_status": "ASSIGNED",
+            "to_status": "ACCEPTED",
+            "process_reason": "NONE",
+            "event_code": "ACCEPT",
+            "reason": null,
+            "created_at": "2026-09-23T02:17:06.522064Z"
+          },
+          {
+            "id": 5,
+            "actor_user_id": 7,
+            "actor_type": "STAFF",
+            "from_status": "ACCEPTED",
+            "to_status": "PROCESSING",
+            "process_reason": "NONE",
+            "event_code": "START",
+            "reason": null,
+            "created_at": "2026-09-23T02:17:06.773310Z"
+          },
+          {
+            "id": 6,
+            "actor_user_id": 7,
+            "actor_type": "STAFF",
+            "from_status": "PROCESSING",
+            "to_status": "WAIT_CONFIRM",
+            "process_reason": "NONE",
+            "event_code": "RECEIPT_RESOLVED",
+            "reason": null,
+            "created_at": "2026-09-23T02:17:07.198867Z"
+          },
+          {
+            "id": 7,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": "WAIT_CONFIRM",
+            "to_status": "PROCESSING",
+            "process_reason": "NONE",
+            "event_code": "REOPEN",
+            "reason": "wo014-745f67277104 住户反馈：灯仍然闪烁，请继续检查。",
+            "created_at": "2026-09-23T02:17:33.754907Z"
+          },
+          {
+            "id": 8,
+            "actor_user_id": 7,
+            "actor_type": "STAFF",
+            "from_status": "PROCESSING",
+            "to_status": "WAIT_CONFIRM",
+            "process_reason": "NONE",
+            "event_code": "RECEIPT_RESOLVED",
+            "reason": null,
+            "created_at": "2026-09-23T02:17:51.229715Z"
+          },
+          {
+            "id": 9,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": "WAIT_CONFIRM",
+            "to_status": "COMPLETED",
+            "process_reason": "NONE",
+            "event_code": "CONFIRM",
+            "reason": null,
+            "created_at": "2026-09-23T02:18:17.111038Z"
+          },
+          {
+            "id": 10,
+            "actor_user_id": 3,
+            "actor_type": "SYSTEM",
+            "from_status": "COMPLETED",
+            "to_status": "CLOSED",
+            "process_reason": "NONE",
+            "event_code": "ARCHIVE",
+            "reason": null,
+            "created_at": "2026-09-23T02:18:17.127582Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {
+            "2": "014-backup-277104"
+          },
+          "timestamp_labels": {
+            "2026-09-24T02:16:47.523620Z": "2026-09-24 10:16:47 UTC+08:00",
+            "2026-09-23T02:16:47.904858Z": "2026-09-23 10:16:47 UTC+08:00",
+            "2026-09-23T02:17:06.518223Z": "2026-09-23 10:17:06 UTC+08:00",
+            "2026-09-23T02:17:06.771680Z": "2026-09-23 10:17:06 UTC+08:00",
+            "2026-09-23T02:17:51.226606Z": "2026-09-23 10:17:51 UTC+08:00",
+            "2026-09-23T02:18:17.128460Z": "2026-09-23 10:18:17 UTC+08:00",
+            "2026-09-23T02:16:47.529922Z": "2026-09-23 10:16:47 UTC+08:00",
+            "2026-09-23T02:18:17.131761Z": "2026-09-23 10:18:17 UTC+08:00",
+            "2026-09-23T02:18:17.112082Z": "2026-09-23 10:18:17 UTC+08:00",
+            "2026-09-23T02:17:07.193994Z": "2026-09-23 10:17:07 UTC+08:00",
+            "2026-09-23T02:17:33.755950Z": "2026-09-23 10:17:33 UTC+08:00",
+            "2026-09-23T02:17:33.752155Z": "2026-09-23 10:17:33 UTC+08:00",
+            "2026-09-23T02:18:17.106933Z": "2026-09-23 10:18:17 UTC+08:00",
+            "2026-09-23T02:16:47.539587Z": "2026-09-23 10:16:47 UTC+08:00",
+            "2026-09-23T02:16:47.735769Z": "2026-09-23 10:16:47 UTC+08:00",
+            "2026-09-23T02:16:47.983851Z": "2026-09-23 10:16:47 UTC+08:00",
+            "2026-09-23T02:17:06.522064Z": "2026-09-23 10:17:06 UTC+08:00",
+            "2026-09-23T02:17:06.773310Z": "2026-09-23 10:17:06 UTC+08:00",
+            "2026-09-23T02:17:07.198867Z": "2026-09-23 10:17:07 UTC+08:00",
+            "2026-09-23T02:17:33.754907Z": "2026-09-23 10:17:33 UTC+08:00",
+            "2026-09-23T02:17:51.229715Z": "2026-09-23 10:17:51 UTC+08:00",
+            "2026-09-23T02:18:17.111038Z": "2026-09-23 10:18:17 UTC+08:00",
+            "2026-09-23T02:18:17.127582Z": "2026-09-23 10:18:17 UTC+08:00"
+          }
+        }
+      },
+      "database": {
+        "work_order": {
+          "id": 1,
+          "status": "CLOSED",
+          "version": 10,
+          "created_at": "2026-09-23 02:16:47.529922",
+          "updated_at": "2026-09-23 02:18:17.131761"
+        },
+        "processes": [
+          {
+            "id": 1,
+            "cycle_no": 1,
+            "assignee_id": 2,
+            "started_at": "2026-09-23 02:17:06.771680",
+            "ended_at": "2026-09-23 02:17:07.193994"
+          },
+          {
+            "id": 2,
+            "cycle_no": 2,
+            "assignee_id": 2,
+            "started_at": "2026-09-23 02:17:33.755950",
+            "ended_at": "2026-09-23 02:17:51.226606"
+          }
+        ],
+        "receipts": [
+          {
+            "id": 1,
+            "process_id": 1,
+            "finished_at": "2026-09-23 02:17:07.193994"
+          },
+          {
+            "id": 2,
+            "process_id": 2,
+            "finished_at": "2026-09-23 02:17:51.226606"
+          }
+        ],
+        "current_assignee_names": {
+          "2": "014-backup-277104"
+        },
+        "timezone": "Asia/Shanghai"
+      }
+    },
+    {
+      "detail": {
+        "work_order": {
+          "id": 10,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "ASSIGNED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 3,
+          "current_assignment_id": 11,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T05:16:49.491666Z",
+          "assigned_at": "2026-09-23T05:16:49.911616Z",
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T05:16:49.495269Z",
+          "updated_at": "2026-09-23T05:16:49.989499Z",
+          "sla_overdue": false
+        },
+        "text": "ai019-e4b477cee2ff 两张合成测试图片，用于验证逐图接线；客厅灯具线路故障。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [
+          {
+            "id": 2,
+            "file_id": 2,
+            "kind": "IMAGE",
+            "taken_phase": "REPORT",
+            "uploader_user_id": 3,
+            "created_at": "2026-09-23T05:16:49.502021Z"
+          },
+          {
+            "id": 3,
+            "file_id": 3,
+            "kind": "IMAGE",
+            "taken_phase": "REPORT",
+            "uploader_user_id": 3,
+            "created_at": "2026-09-23T05:16:49.507223Z"
+          }
+        ],
+        "assignments": [
+          {
+            "id": 11,
+            "employee_id": 2,
+            "assigned_by_user_id": null,
+            "status": "ACTIVE",
+            "assigned_at": "2026-09-23T05:16:49.911616Z",
+            "accept_at": null,
+            "ended_at": null,
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 73,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T05:16:49.510829Z"
+          },
+          {
+            "id": 74,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-23T05:16:49.743022Z"
+          },
+          {
+            "id": 75,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-23T05:16:49.991604Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {
+            "2": "014-backup-277104"
+          },
+          "timestamp_labels": {
+            "2026-09-24T05:16:49.491666Z": "2026-09-24 13:16:49 UTC+08:00",
+            "2026-09-23T05:16:49.911616Z": "2026-09-23 13:16:49 UTC+08:00",
+            "2026-09-23T05:16:49.495269Z": "2026-09-23 13:16:49 UTC+08:00",
+            "2026-09-23T05:16:49.989499Z": "2026-09-23 13:16:49 UTC+08:00",
+            "2026-09-23T05:16:49.502021Z": "2026-09-23 13:16:49 UTC+08:00",
+            "2026-09-23T05:16:49.507223Z": "2026-09-23 13:16:49 UTC+08:00",
+            "2026-09-23T05:16:49.510829Z": "2026-09-23 13:16:49 UTC+08:00",
+            "2026-09-23T05:16:49.743022Z": "2026-09-23 13:16:49 UTC+08:00",
+            "2026-09-23T05:16:49.991604Z": "2026-09-23 13:16:49 UTC+08:00"
+          }
+        }
+      },
+      "database": {
+        "work_order": {
+          "id": 10,
+          "status": "ASSIGNED",
+          "version": 3,
+          "created_at": "2026-09-23 05:16:49.495269",
+          "updated_at": "2026-09-23 05:16:49.989499"
+        },
+        "processes": [],
+        "receipts": [],
+        "current_assignee_names": {
+          "2": "014-backup-277104"
+        },
+        "timezone": "Asia/Shanghai"
+      }
+    }
+  ],
+  "revision": "20260919_0009",
+  "business_counts": {
+    "work_order_assignments": 2,
+    "work_order_processes": 2,
+    "work_order_receipts": 2,
+    "work_order_logs": 13,
+    "work_order_feedbacks": 2
+  },
+  "negative": {},
+  "error": "RuntimeError: cross-user-1 failed: HTTP 403 code=IAM.FORBIDDEN",
+  "requests": [
+    {
+      "label": "resident-principal",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "7e93268a32b586d0"
+    },
+    {
+      "label": "own-1",
+      "method": "GET",
+      "path": "/work-orders/1",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a5284193f7b38464"
+    },
+    {
+      "label": "own-10",
+      "method": "GET",
+      "path": "/work-orders/10",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "415d309623ef8af9"
+    },
+    {
+      "label": "other-normal-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "53f7d12806fb1ccd"
+    },
+    {
+      "label": "other-normal-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "377ec20e8886a0ee"
+    },
+    {
+      "label": "other-normal-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2721fbbefee60df1"
+    },
+    {
+      "label": "other-normal-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e0a7ee2cfc0b6940"
+    },
+    {
+      "label": "other-principal",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e9b5c7a047827cb9"
+    },
+    {
+      "label": "cross-user-1",
+      "method": "GET",
+      "path": "/work-orders/1",
+      "params": [],
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "3bca6110aa456a97"
+    }
+  ]
+}

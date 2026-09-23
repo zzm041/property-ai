@@ -1,0 +1,17 @@
+{
+  "task_id": "RESIDENT-WO-PRESENTATION-020",
+  "base_sha": "386cf82f346ed66b43991ef44a1540989894927a",
+  "head_sha": "b75fa97112b3144f9d4702e4782b231bb775c19c",
+  "review_round": 1,
+  "product_repair_rounds": 0,
+  "status": "PASS",
+  "session_id": "01a0cceb-5fb2-7463-8bcc-d263b1ab8393",
+  "model": "gpt-5.6-sol (existing default; no override)",
+  "exit_code": 0,
+  "schema_validated": true,
+  "sandbox": "read-only",
+  "timeout_seconds": 900,
+  "result_path": "reports/codex/RESIDENT-WO-PRESENTATION-020-review.json",
+  "private_invocation_log": "tmp/resident-wo-presentation-020/review.call.json",
+  "mechanism": "Existing wrapper/schema/ChatGPT subscription; built-in agent thread limit known, no repeated spawning. Wrapper buffers output; no invented live analysis."
+}

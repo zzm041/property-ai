@@ -1,0 +1,39 @@
+{
+  "scope": "Both started same committed020source after unit/idlecheck; recoveredCPython3.12.10AMD64 explicitprojectsitepackages. Process/startup/health provenance, not debugger introspection; no sharedservice/8082 change.",
+  "observed_at_utc": "2026-09-23T06:06:48.8093258Z",
+  "product_sha": "b75fa97112b3144f9d4702e4782b231bb775c19c",
+  "api_startup": [
+    "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True"
+  ],
+  "task_id": "RESIDENT-WO-PRESENTATION-020",
+  "processes": [
+    {
+      "ProcessId": 11020,
+      "ParentProcessId": 38688,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "\"D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\" -I D:\\property-ai\\tmp\\run_auth001_recovered.py api"
+    },
+    {
+      "ProcessId": 46400,
+      "ParentProcessId": 38688,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "\"D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\" -I D:\\property-ai\\tmp\\run_auth001_recovered.py worker"
+    },
+    {
+      "ProcessId": 16852,
+      "ParentProcessId": 46400,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -m celery -A app.worker.celery_app:celery_app worker -Q property_ai.auth001 --pool=solo --loglevel=info --hostname=auth001@%h"
+    }
+  ],
+  "worker_startup": [
+    "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True",
+    "worker_queue=property_ai.auth001 pool=solo"
+  ],
+  "health": {
+    "request_id": "3f5f55d4452a44e68f8774c783002659",
+    "data": {
+      "status": "ok"
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "task_id": "RESIDENT-WO-PRESENTATION-020",
+  "run_id": "view020-1b7b00de4872",
+  "product_sha": "b75fa97112b3144f9d4702e4782b231bb775c19c",
+  "source_runs": [
+    "wo014-745f67277104",
+    "ai019-e4b477cee2ff"
+  ],
+  "database": "127.0.0.1:3307/property_ai_auth001_test",
+  "mode": "SELECT-only current restored synthetic objects; no lifecycle replay",
+  "revision": "20260919_0009",
+  "orders": [
+    {
+      "id": 1,
+      "tenant_id": 1,
+      "property_id": 1,
+      "reporter_user_id": 3,
+      "status": "CLOSED",
+      "version": 10
+    },
+    {
+      "id": 10,
+      "tenant_id": 1,
+      "property_id": 1,
+      "reporter_user_id": 3,
+      "status": "ASSIGNED",
+      "version": 3
+    }
+  ],
+  "business_counts": {
+    "work_order_assignments": 2,
+    "work_order_processes": 2,
+    "work_order_receipts": 2,
+    "work_order_logs": 13,
+    "work_order_feedbacks": 2
+  },
+  "idle": {
+    "active": 0,
+    "reserved": 0,
+    "scheduled": 0
+  },
+  "queue": {
+    "vhost": "property_ai_auth001",
+    "actual_output": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nproperty_ai.auth001.dlq\t2\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1\nceleryev.bdd83664-e672-4487-ac96-f0120664efbc\t0\t0\t1\n",
+    "shared_access": false,
+    "message_content_read": false
+  },
+  "observed_at_utc": "2026-09-23T06:05:55.026049+00:00"
+}
