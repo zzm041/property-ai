@@ -1,0 +1,65 @@
+{
+  "task_id": "AI-FALLBACK-RUNTIME-022",
+  "code_sha": "08adb3dd4f25e41fc9f31b750994ac7a38e72bf8",
+  "observed_at_utc": "2026-09-23T07:26:06.6265683Z",
+  "replaced_fault_pids": [
+    41352,
+    46432,
+    47604
+  ],
+  "processes": [
+    {
+      "ProcessId": 26332,
+      "ParentProcessId": 35524,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "\"D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\" -I D:\\property-ai\\reports\\ai-fallback-runtime-022\\launch-runtime.py api success"
+    },
+    {
+      "ProcessId": 47436,
+      "ParentProcessId": 35524,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "\"D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\" -I D:\\property-ai\\reports\\ai-fallback-runtime-022\\launch-runtime.py worker success"
+    },
+    {
+      "ProcessId": 47800,
+      "ParentProcessId": 47436,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -m celery -A app.worker.celery_app:celery_app worker -Q property_ai.auth001 --pool=solo --loglevel=info --hostname=auth001@%h"
+    }
+  ],
+  "idle": {
+    "active": 0,
+    "reserved": 0,
+    "scheduled": 0
+  },
+  "health": {
+    "request_id": "da4e9e7269a2460d99568fcd30428e81",
+    "data": {
+      "status": "ok"
+    }
+  },
+  "queue": [
+    "Timeout: 60.0 seconds ...",
+    "Listing queues for vhost property_ai_auth001 ...",
+    "name\tmessages_ready\tmessages_unacknowledged\tconsumers",
+    "property_ai.auth001\t0\t0\t1",
+    "property_ai.auth001.dlq\t3\t0\t0",
+    "auth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1",
+    "celeryev.e1e6cd77-1f42-4974-8d90-796c7cde7987\t0\t0\t1"
+  ],
+  "api_startup": [
+    "{\"task_id\": \"AI-FALLBACK-RUNTIME-022\", \"component\": \"api\", \"target\": \"serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True\", \"llm_provider\": \"development\", \"llm_behavior\": \"success\", \"python\": \"D:\\\\property-ai\\\\tmp\\\\uv-python\\\\cpython-3.12.10-windows-x86_64-none\\\\python.exe\", \"project_modules\": \"D:\\\\property-ai\\\\backend\\\\app\", \"check_only\": false}",
+    "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True"
+  ],
+  "worker_startup": [
+    "{\"task_id\": \"AI-FALLBACK-RUNTIME-022\", \"component\": \"worker\", \"target\": \"serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True\", \"llm_provider\": \"development\", \"llm_behavior\": \"success\", \"python\": \"D:\\\\property-ai\\\\tmp\\\\uv-python\\\\cpython-3.12.10-windows-x86_64-none\\\\python.exe\", \"project_modules\": \"D:\\\\property-ai\\\\backend\\\\app\", \"check_only\": false}",
+    "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True",
+    "worker_queue=property_ai.auth001 pool=solo"
+  ],
+  "logging_source_sha256": "C5E6802AFF99AC6D664443D07999ABDCD653E6EAFFE7A569425D789B2648E3B7",
+  "project_config_sha256": "342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F",
+  "continuation_note": "First restore invocation stopped before any process mutation due to helper array matching; corrected second invocation replaced exact idle fault processes. Immediate worker inspect reply timed out after startup. This read-only continuation confirms those same live replacement processes; no duplicate start, business request or replay.",
+  "shared_services_changed": false,
+  "message_contents_read": false,
+  "business_replayed": false
+}

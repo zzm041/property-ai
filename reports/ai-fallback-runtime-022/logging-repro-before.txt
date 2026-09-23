@@ -1,0 +1,227 @@
+D:\property-ai\.venv\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+FFFFFFFFF                                                                [100%]
+================================== FAILURES ===================================
+_ test_delayed_exception_chain_keeps_json_and_redacts_secrets[tuple-structlog] _
+backend\tests\unit\test_logging_exception_pipeline.py:53: in test_delayed_exception_chain_keeps_json_and_redacts_secrets
+    logger.error('AI.UNAVAILABLE failure', **kwargs)
+.venv\Lib\site-packages\structlog\stdlib.py:212: in error
+    return self._proxy_to_logger("error", event, *args, **kw)
+.venv\Lib\site-packages\structlog\stdlib.py:258: in _proxy_to_logger
+    return super()._proxy_to_logger(method_name, event=event, **event_kw)
+.venv\Lib\site-packages\structlog\_base.py:214: in _proxy_to_logger
+    args, kw = self._process_event(method_name, event, event_kw)
+.venv\Lib\site-packages\structlog\_base.py:165: in _process_event
+    event_dict = proc(self._logger, method_name, event_dict)
+.venv\Lib\site-packages\structlog\processors.py:412: in __call__
+    event_dict["exception"] = self.format_exception(
+.venv\Lib\site-packages\structlog\_frames.py:30: in _format_exception
+    traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], None, sio)
+tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\traceback.py:124: in print_exception
+    te = TracebackException(type(value), value, tb, limit=limit, compact=True)
+tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\traceback.py:780: in __init__
+    exc_value.__suppress_context__ if exc_value is not None else False
+E   AttributeError: 'str' object has no attribute '__suppress_context__'
+__ test_delayed_exception_chain_keeps_json_and_redacts_secrets[tuple-stdlib] __
+backend\tests\unit\test_logging_exception_pipeline.py:55: in test_delayed_exception_chain_keeps_json_and_redacts_secrets
+    assert captured.err == '', 'No logging error or unredacted stderr fallback'
+E   AssertionError: No logging error or unredacted stderr fallback
+E   assert '--- Logging ...guments: ()\n' == ''
+E     
+E     + --- Logging error ---
+E     + Traceback (most recent call last):
+E     +   File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\logging\__init__.py", line 1160, in emit
+E     +     msg = self.format(record)
+E     +           ^^^^^^^^^^^^^^^^^^^
+E     +   File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\logging\__init__.py", line 999, in format...
+E     
+E     ...Full output truncated (82 lines hidden), use '-vv' to show
+------------------------------ Captured log call ------------------------------
+ERROR    test.foreign:test_logging_exception_pipeline.py:53 AI.UNAVAILABLE failure
+Traceback (most recent call last):
+  File "D:\property-ai\backend\tests\unit\test_logging_exception_pipeline.py", line 37, in exception_chain
+    raise RuntimeError('provider password=synthetic-inner')
+RuntimeError: provider password=synthetic-inner
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\property-ai\backend\tests\unit\test_logging_exception_pipeline.py", line 40, in exception_chain
+    raise ValueError('wrapper api_key=synthetic-outer') from inner
+ValueError: wrapper api_key=synthetic-outer
+__ test_delayed_exception_chain_keeps_json_and_redacts_secrets[tuple-celery] __
+backend\tests\unit\test_logging_exception_pipeline.py:55: in test_delayed_exception_chain_keeps_json_and_redacts_secrets
+    assert captured.err == '', 'No logging error or unredacted stderr fallback'
+E   AssertionError: No logging error or unredacted stderr fallback
+E   assert '--- Logging ...guments: ()\n' == ''
+E     
+E     + --- Logging error ---
+E     + Traceback (most recent call last):
+E     +   File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\logging\__init__.py", line 1160, in emit
+E     +     msg = self.format(record)
+E     +           ^^^^^^^^^^^^^^^^^^^
+E     +   File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\logging\__init__.py", line 999, in format...
+E     
+E     ...Full output truncated (82 lines hidden), use '-vv' to show
+------------------------------ Captured log call ------------------------------
+ERROR    celery.app.trace:test_logging_exception_pipeline.py:53 AI.UNAVAILABLE failure
+Traceback (most recent call last):
+  File "D:\property-ai\backend\tests\unit\test_logging_exception_pipeline.py", line 37, in exception_chain
+    raise RuntimeError('provider password=synthetic-inner')
+RuntimeError: provider password=synthetic-inner
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\property-ai\backend\tests\unit\test_logging_exception_pipeline.py", line 40, in exception_chain
+    raise ValueError('wrapper api_key=synthetic-outer') from inner
+ValueError: wrapper api_key=synthetic-outer
+_ test_delayed_exception_chain_keeps_json_and_redacts_secrets[exception-structlog] _
+backend\tests\unit\test_logging_exception_pipeline.py:57: in test_delayed_exception_chain_keeps_json_and_redacts_secrets
+    assert len(records) == 1
+E   assert 0 == 1
+E    +  where 0 = len([])
+---------------------------- Captured stdout call -----------------------------
+{"error_code": "AI.UNAVAILABLE", "nested": {"password": "[redacted]"}, "other": "ValueError: wrapper api_key=[redacted]", "event": "AI.UNAVAILABLE failure", "request_id": "fallback022-unit", "task_id": "synthetic-task", "service": "worker", "logger": "test", "level": "error", "timestamp": "2026-09-23T07:20:55.540907Z", "exception": "MISSING"}
+------------------------------ Captured log call ------------------------------
+ERROR    test:test_logging_exception_pipeline.py:53 {'error_code': 'AI.UNAVAILABLE', 'nested': {'password': '[redacted]'}, 'other': 'ValueError: wrapper api_key=[redacted]', 'event': 'AI.UNAVAILABLE failure', 'request_id': 'fallback022-unit', 'task_id': 'synthetic-task', 'service': 'worker', 'logger': 'test', 'level': 'error', 'timestamp': '2026-09-23T07:20:55.540907Z', 'exception': 'MISSING'}
+_ test_delayed_exception_chain_keeps_json_and_redacts_secrets[exception-stdlib] _
+backend\tests\unit\test_logging_exception_pipeline.py:55: in test_delayed_exception_chain_keeps_json_and_redacts_secrets
+    assert captured.err == '', 'No logging error or unredacted stderr fallback'
+E   AssertionError: No logging error or unredacted stderr fallback
+E   assert '--- Logging ...guments: ()\n' == ''
+E     
+E     + --- Logging error ---
+E     + Traceback (most recent call last):
+E     +   File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\logging\__init__.py", line 1160, in emit
+E     +     msg = self.format(record)
+E     +           ^^^^^^^^^^^^^^^^^^^
+E     +   File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\logging\__init__.py", line 999, in format...
+E     
+E     ...Full output truncated (82 lines hidden), use '-vv' to show
+------------------------------ Captured log call ------------------------------
+ERROR    test.foreign:test_logging_exception_pipeline.py:53 AI.UNAVAILABLE failure
+Traceback (most recent call last):
+  File "D:\property-ai\backend\tests\unit\test_logging_exception_pipeline.py", line 37, in exception_chain
+    raise RuntimeError('provider password=synthetic-inner')
+RuntimeError: provider password=synthetic-inner
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\property-ai\backend\tests\unit\test_logging_exception_pipeline.py", line 40, in exception_chain
+    raise ValueError('wrapper api_key=synthetic-outer') from inner
+ValueError: wrapper api_key=synthetic-outer
+_ test_delayed_exception_chain_keeps_json_and_redacts_secrets[exception-celery] _
+backend\tests\unit\test_logging_exception_pipeline.py:55: in test_delayed_exception_chain_keeps_json_and_redacts_secrets
+    assert captured.err == '', 'No logging error or unredacted stderr fallback'
+E   AssertionError: No logging error or unredacted stderr fallback
+E   assert '--- Logging ...guments: ()\n' == ''
+E     
+E     + --- Logging error ---
+E     + Traceback (most recent call last):
+E     +   File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\logging\__init__.py", line 1160, in emit
+E     +     msg = self.format(record)
+E     +           ^^^^^^^^^^^^^^^^^^^
+E     +   File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\logging\__init__.py", line 999, in format...
+E     
+E     ...Full output truncated (82 lines hidden), use '-vv' to show
+------------------------------ Captured log call ------------------------------
+ERROR    celery.app.trace:test_logging_exception_pipeline.py:53 AI.UNAVAILABLE failure
+Traceback (most recent call last):
+  File "D:\property-ai\backend\tests\unit\test_logging_exception_pipeline.py", line 37, in exception_chain
+    raise RuntimeError('provider password=synthetic-inner')
+RuntimeError: provider password=synthetic-inner
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\property-ai\backend\tests\unit\test_logging_exception_pipeline.py", line 40, in exception_chain
+    raise ValueError('wrapper api_key=synthetic-outer') from inner
+ValueError: wrapper api_key=synthetic-outer
+__________ test_active_exception_true_and_normal_messages[structlog] __________
+backend\tests\unit\test_logging_exception_pipeline.py:79: in test_active_exception_true_and_normal_messages
+    assert len(records) == 2 and 'RuntimeError:' in records[0]['exception']
+E   assert (0 == 2)
+E    +  where 0 = len([])
+---------------------------- Captured stdout call -----------------------------
+{"event": "failed", "request_id": "fallback022-unit", "task_id": "synthetic-task", "service": "worker", "logger": "test", "level": "error", "timestamp": "2026-09-23T07:20:55.548936Z", "exception": "Traceback (most recent call last):\n  File \"D:\\property-ai\\backend\\tests\\unit\\test_logging_exception_pipeline.py\", line 72, in test_active_exception_true_and_normal_messages\n    raise RuntimeError('password=[redacted]')\nRuntimeError: password=[redacted]"}
+{"event": "normal password=[redacted]", "request_id": "fallback022-unit", "task_id": "synthetic-task", "service": "worker", "logger": "test", "level": "info", "timestamp": "2026-09-23T07:20:55.549942Z"}
+------------------------------ Captured log call ------------------------------
+ERROR    test:test_logging_exception_pipeline.py:74 {'event': 'failed', 'request_id': 'fallback022-unit', 'task_id': 'synthetic-task', 'service': 'worker', 'logger': 'test', 'level': 'error', 'timestamp': '2026-09-23T07:20:55.548936Z', 'exception': 'Traceback (most recent call last):\n  File "D:\\property-ai\\backend\\tests\\unit\\test_logging_exception_pipeline.py", line 72, in test_active_exception_true_and_normal_messages\n    raise RuntimeError(\'password=[redacted]\')\nRuntimeError: password=[redacted]'}
+INFO     test:test_logging_exception_pipeline.py:75 {'event': 'normal password=[redacted]', 'request_id': 'fallback022-unit', 'task_id': 'synthetic-task', 'service': 'worker', 'logger': 'test', 'level': 'info', 'timestamp': '2026-09-23T07:20:55.549942Z'}
+___________ test_active_exception_true_and_normal_messages[stdlib] ____________
+backend\tests\unit\test_logging_exception_pipeline.py:77: in test_active_exception_true_and_normal_messages
+    assert captured.err == ''
+E   assert '--- Logging ...guments: ()\n' == ''
+E     
+E     + --- Logging error ---
+E     + Traceback (most recent call last):
+E     +   File "D:\property-ai\backend\tests\unit\test_logging_exception_pipeline.py", line 72, in test_active_exception_true_and_normal_messages
+E     +     raise RuntimeError('password=synthetic-active')
+E     + RuntimeError: password=synthetic-active
+E     + ...
+E     
+E     ...Full output truncated (89 lines hidden), use '-vv' to show
+---------------------------- Captured stdout call -----------------------------
+{"event": "normal password=[redacted]", "request_id": "fallback022-unit", "task_id": "synthetic-task", "service": "worker", "logger": "test.foreign", "level": "info", "timestamp": "2026-09-23T07:20:55.553449Z"}
+------------------------------ Captured log call ------------------------------
+ERROR    test.foreign:test_logging_exception_pipeline.py:74 failed
+Traceback (most recent call last):
+  File "D:\property-ai\backend\tests\unit\test_logging_exception_pipeline.py", line 72, in test_active_exception_true_and_normal_messages
+    raise RuntimeError('password=synthetic-active')
+RuntimeError: password=synthetic-active
+INFO     test.foreign:test_logging_exception_pipeline.py:75 normal password=synthetic-positional
+___________ test_active_exception_true_and_normal_messages[celery] ____________
+backend\tests\unit\test_logging_exception_pipeline.py:77: in test_active_exception_true_and_normal_messages
+    assert captured.err == ''
+E   assert '--- Logging ...guments: ()\n' == ''
+E     
+E     + --- Logging error ---
+E     + Traceback (most recent call last):
+E     +   File "D:\property-ai\backend\tests\unit\test_logging_exception_pipeline.py", line 72, in test_active_exception_true_and_normal_messages
+E     +     raise RuntimeError('password=synthetic-active')
+E     + RuntimeError: password=synthetic-active
+E     + ...
+E     
+E     ...Full output truncated (89 lines hidden), use '-vv' to show
+---------------------------- Captured stdout call -----------------------------
+{"event": "normal password=[redacted]", "request_id": "fallback022-unit", "task_id": "synthetic-task", "service": "worker", "logger": "celery.app.trace", "level": "info", "timestamp": "2026-09-23T07:20:55.557452Z"}
+------------------------------ Captured log call ------------------------------
+ERROR    celery.app.trace:test_logging_exception_pipeline.py:74 failed
+Traceback (most recent call last):
+  File "D:\property-ai\backend\tests\unit\test_logging_exception_pipeline.py", line 72, in test_active_exception_true_and_normal_messages
+    raise RuntimeError('password=synthetic-active')
+RuntimeError: password=synthetic-active
+INFO     celery.app.trace:test_logging_exception_pipeline.py:75 normal password=synthetic-positional
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:40
+  D:\property-ai\.venv\Lib\site-packages\starlette\testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+.venv\Lib\site-packages\_pytest\cacheprovider.py:475
+  D:\property-ai\.venv\Lib\site-packages\_pytest\cacheprovider.py:475: PytestCacheWarning: could not create cache path D:\property-ai\backend\.pytest_cache\v\cache\nodeids: [WinError 5] �ܾ����ʡ�: 'D:\\property-ai\\backend\\.pytest_cache\\v\\cache'
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+
+.venv\Lib\site-packages\_pytest\cacheprovider.py:429
+  D:\property-ai\.venv\Lib\site-packages\_pytest\cacheprovider.py:429: PytestCacheWarning: could not create cache path D:\property-ai\backend\.pytest_cache\v\cache\lastfailed: [WinError 5] �ܾ����ʡ�: 'D:\\property-ai\\backend\\.pytest_cache\\v\\cache'
+    config.cache.set("cache/lastfailed", self.lastfailed)
+
+.venv\Lib\site-packages\_pytest\stepwise.py:51
+  D:\property-ai\.venv\Lib\site-packages\_pytest\stepwise.py:51: PytestCacheWarning: could not create cache path D:\property-ai\backend\.pytest_cache\v\cache\stepwise: [WinError 5] �ܾ����ʡ�: 'D:\\property-ai\\backend\\.pytest_cache\\v\\cache'
+    session.config.cache.set(STEPWISE_CACHE_DIR, [])
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\unit\test_logging_exception_pipeline.py::test_delayed_exception_chain_keeps_json_and_redacts_secrets[tuple-structlog]
+FAILED backend\tests\unit\test_logging_exception_pipeline.py::test_delayed_exception_chain_keeps_json_and_redacts_secrets[tuple-stdlib]
+FAILED backend\tests\unit\test_logging_exception_pipeline.py::test_delayed_exception_chain_keeps_json_and_redacts_secrets[tuple-celery]
+FAILED backend\tests\unit\test_logging_exception_pipeline.py::test_delayed_exception_chain_keeps_json_and_redacts_secrets[exception-structlog]
+FAILED backend\tests\unit\test_logging_exception_pipeline.py::test_delayed_exception_chain_keeps_json_and_redacts_secrets[exception-stdlib]
+FAILED backend\tests\unit\test_logging_exception_pipeline.py::test_delayed_exception_chain_keeps_json_and_redacts_secrets[exception-celery]
+FAILED backend\tests\unit\test_logging_exception_pipeline.py::test_active_exception_true_and_normal_messages[structlog]
+FAILED backend\tests\unit\test_logging_exception_pipeline.py::test_active_exception_true_and_normal_messages[stdlib]
+FAILED backend\tests\unit\test_logging_exception_pipeline.py::test_active_exception_true_and_normal_messages[celery]
+9 failed, 4 warnings in 0.45s

@@ -1,0 +1,264 @@
+{
+  "task_id": "AI-FALLBACK-RUNTIME-022",
+  "run_id": "fallback022-de3bddec846a",
+  "business_code_sha": "d5c9098c59b1d67af34b59b859006bf1369eb0ed",
+  "page_source_sha256": "533066653341ad5f60f474081bf1ddf65128517ea4fc110959c1b57ea69eface",
+  "actual_create_status": 200,
+  "helper_correction": "Original helper incorrectly expected201. API router default and actual wx.request are200; all page steps completed. Original error preserved; no page replay.",
+  "worker_events": [
+    {
+      "timestamp": "2026-09-23T07:11:24.558134Z",
+      "event": "ai_analysis_retry",
+      "task_id": "1162e46d-03a3-46ee-9d7d-53559c995238",
+      "request_id": "843e55d4ef5b407ca89653934a6f210c",
+      "error_code": "AI.UNAVAILABLE"
+    },
+    {
+      "timestamp": "2026-09-23T07:11:25.705420Z",
+      "event": "ai_analysis_retry",
+      "task_id": "1162e46d-03a3-46ee-9d7d-53559c995238",
+      "request_id": "843e55d4ef5b407ca89653934a6f210c",
+      "error_code": "AI.UNAVAILABLE"
+    },
+    {
+      "timestamp": "2026-09-23T07:11:27.846541Z",
+      "event": "ai_analysis_retry",
+      "task_id": "1162e46d-03a3-46ee-9d7d-53559c995238",
+      "request_id": "843e55d4ef5b407ca89653934a6f210c",
+      "error_code": "AI.UNAVAILABLE"
+    },
+    {
+      "timestamp": "2026-09-23T07:11:27.892684Z",
+      "event": "failed_task_recorded",
+      "task_id": "1162e46d-03a3-46ee-9d7d-53559c995238",
+      "request_id": "843e55d4ef5b407ca89653934a6f210c",
+      "error_code": "AI.UNAVAILABLE",
+      "redis_ok": true,
+      "dlq_ok": true,
+      "dlq": "property_ai.auth001.dlq"
+    },
+    {
+      "timestamp": "2026-09-23T07:11:27.893725Z",
+      "event": "celery_task_dead_lettered",
+      "task_id": "1162e46d-03a3-46ee-9d7d-53559c995238",
+      "request_id": "843e55d4ef5b407ca89653934a6f210c",
+      "error_code": "AI.UNAVAILABLE"
+    }
+  ],
+  "celery_task_id": "1162e46d-03a3-46ee-9d7d-53559c995238",
+  "database": "127.0.0.1:3307/property_ai_auth001_test",
+  "redis_database": 12,
+  "revision": "20260919_0009",
+  "work_order": {
+    "id": 11,
+    "tenant_id": 1,
+    "property_id": 1,
+    "house_id": 1,
+    "reporter_user_id": 3,
+    "status": "PENDING_ANALYSIS",
+    "version": 1,
+    "current_assignment_id": null
+  },
+  "analyses": [
+    {
+      "id": 11,
+      "work_order_id": 11,
+      "analysis_version": 1,
+      "status": "FAILED",
+      "error_code": "AI.UNAVAILABLE",
+      "input_hash": "c500dc6ab8f5832276bcd0a1fce04478c20edf34db62ff4cbba9b4c321534135",
+      "prompt_version": "wo-analysis-v2"
+    }
+  ],
+  "ai_calls": [
+    {
+      "id": 13,
+      "work_order_id": 11,
+      "request_id": "843e55d4ef5b407ca89653934a6f210c",
+      "provider_type": "LLM",
+      "provider_mode": "DEVELOPMENT",
+      "status": "FAILED",
+      "attempt": 1,
+      "error_code": "AI.UNAVAILABLE",
+      "input_hash": "c500dc6ab8f5832276bcd0a1fce04478c20edf34db62ff4cbba9b4c321534135",
+      "prompt_version": "wo-analysis-v2",
+      "started_at": "2026-09-23 07:11:24.511785",
+      "finished_at": "2026-09-23 07:11:24.511785"
+    },
+    {
+      "id": 14,
+      "work_order_id": 11,
+      "request_id": "843e55d4ef5b407ca89653934a6f210c",
+      "provider_type": "LLM",
+      "provider_mode": "DEVELOPMENT",
+      "status": "FAILED",
+      "attempt": 2,
+      "error_code": "AI.UNAVAILABLE",
+      "input_hash": "c500dc6ab8f5832276bcd0a1fce04478c20edf34db62ff4cbba9b4c321534135",
+      "prompt_version": "wo-analysis-v2",
+      "started_at": "2026-09-23 07:11:25.647469",
+      "finished_at": "2026-09-23 07:11:25.647469"
+    },
+    {
+      "id": 15,
+      "work_order_id": 11,
+      "request_id": "843e55d4ef5b407ca89653934a6f210c",
+      "provider_type": "LLM",
+      "provider_mode": "DEVELOPMENT",
+      "status": "FAILED",
+      "attempt": 3,
+      "error_code": "AI.UNAVAILABLE",
+      "input_hash": "c500dc6ab8f5832276bcd0a1fce04478c20edf34db62ff4cbba9b4c321534135",
+      "prompt_version": "wo-analysis-v2",
+      "started_at": "2026-09-23 07:11:27.799433",
+      "finished_at": "2026-09-23 07:11:27.799433"
+    }
+  ],
+  "assignment_count": 0,
+  "history": [
+    {
+      "id": 76,
+      "actor_user_id": 3,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "created_at": "2026-09-23 07:11:24.150018"
+    }
+  ],
+  "audit": [
+    {
+      "id": 363,
+      "actor_user_id": null,
+      "action": "WORK_ORDER_AI_ANALYSIS_FAILED",
+      "resource_type": "WORK_ORDER_ANALYSIS",
+      "resource_id": 11,
+      "request_id": "843e55d4ef5b407ca89653934a6f210c",
+      "details_json": "{\"status\": \"FAILED\", \"error_code\": \"AI.UNAVAILABLE\", \"analysis_id\": 11, \"work_order_id\": 11}",
+      "created_at": "2026-09-23 07:11:24.553757"
+    },
+    {
+      "id": 364,
+      "actor_user_id": null,
+      "action": "WORK_ORDER_AI_ANALYSIS_FAILED",
+      "resource_type": "WORK_ORDER_ANALYSIS",
+      "resource_id": 11,
+      "request_id": "843e55d4ef5b407ca89653934a6f210c",
+      "details_json": "{\"status\": \"FAILED\", \"error_code\": \"AI.UNAVAILABLE\", \"analysis_id\": 11, \"work_order_id\": 11}",
+      "created_at": "2026-09-23 07:11:25.700133"
+    },
+    {
+      "id": 365,
+      "actor_user_id": null,
+      "action": "WORK_ORDER_AI_ANALYSIS_FAILED",
+      "resource_type": "WORK_ORDER_ANALYSIS",
+      "resource_id": 11,
+      "request_id": "843e55d4ef5b407ca89653934a6f210c",
+      "details_json": "{\"status\": \"FAILED\", \"error_code\": \"AI.UNAVAILABLE\", \"analysis_id\": 11, \"work_order_id\": 11}",
+      "created_at": "2026-09-23 07:11:27.841276"
+    }
+  ],
+  "loads": [
+    {
+      "employee_id": 1,
+      "property_id": 1,
+      "business_date": "2026-09-23",
+      "on_duty": "ON_DUTY",
+      "current_load": 1
+    },
+    {
+      "employee_id": 2,
+      "property_id": 1,
+      "business_date": "2026-09-23",
+      "on_duty": "ON_DUTY",
+      "current_load": 1
+    }
+  ],
+  "prior_orders_unchanged": [
+    {
+      "id": 1,
+      "status": "CLOSED",
+      "version": 10
+    },
+    {
+      "id": 2,
+      "status": "CLOSED",
+      "version": 13
+    },
+    {
+      "id": 3,
+      "status": "CLOSED",
+      "version": 10
+    },
+    {
+      "id": 4,
+      "status": "CLOSED",
+      "version": 10
+    },
+    {
+      "id": 5,
+      "status": "CANCELLED",
+      "version": 4
+    },
+    {
+      "id": 6,
+      "status": "CANCELLED",
+      "version": 5
+    },
+    {
+      "id": 7,
+      "status": "CLOSED",
+      "version": 8
+    },
+    {
+      "id": 8,
+      "status": "CLOSED",
+      "version": 8
+    },
+    {
+      "id": 9,
+      "status": "ASSIGNED",
+      "version": 3
+    },
+    {
+      "id": 10,
+      "status": "ASSIGNED",
+      "version": 3
+    }
+  ],
+  "failed_task": {
+    "record_id": "1162e46d-03a3-46ee-9d7d-53559c995238",
+    "task_id": "1162e46d-03a3-46ee-9d7d-53559c995238",
+    "operation": "app.worker.tasks.analyze_work_order_task",
+    "error_code": "AI.UNAVAILABLE",
+    "args": [
+      11,
+      "843e55d4ef5b407ca89653934a6f210c"
+    ],
+    "extra": {},
+    "recorded_at": "2026-09-23T07:11:27.854324Z",
+    "queue": "property_ai.auth001",
+    "dlq": "property_ai.auth001.dlq",
+    "status": "RECORDED",
+    "replay_task_id": null,
+    "replayed": false,
+    "current_attempt": 0,
+    "attempts": [],
+    "parent_record_id": "1162e46d-03a3-46ee-9d7d-53559c995238"
+  },
+  "idle": {
+    "active": 0,
+    "reserved": 0,
+    "scheduled": 0
+  },
+  "queue": {
+    "vhost": "property_ai_auth001",
+    "actual_output": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nproperty_ai.auth001.dlq\t3\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1\nceleryev.aa02c05f-d97f-41c6-9806-79a2ce133c22\t0\t0\t1\n",
+    "historical_dlq_before": 2,
+    "new_failed_task_delta": 1,
+    "shared_access": false,
+    "message_content_read": false,
+    "replay_or_purge": false
+  },
+  "status": "BUSINESS_FALLBACK_CONFIRMED_LOGGING_FIX_PENDING",
+  "observed_at_utc": "2026-09-23T07:19:38.504538+00:00"
+}

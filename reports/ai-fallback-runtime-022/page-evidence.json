@@ -1,0 +1,2612 @@
+{
+  "task_id": "AI-FALLBACK-RUNTIME-022",
+  "run_id": "fallback022-de3bddec846a",
+  "code_sha": "d5c9098c59b1d67af34b59b859006bf1369eb0ed",
+  "provider_mode": "DEVELOPMENT unavailable fault injection, not real Qwen outage",
+  "steps": {
+    "01-created-despite-provider-failure": {
+      "path": "pages/work-orders/detail",
+      "workOrder": {
+        "id": 11,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 1,
+        "reporter_user_id": 3,
+        "status": "PENDING_ANALYSIS",
+        "process_reason": "NONE",
+        "category": "OTHER",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "version": 1,
+        "current_assignment_id": null,
+        "incident_id": null,
+        "sla_due_at": "2026-09-24T07:11:24.051768Z",
+        "assigned_at": null,
+        "accepted_at": null,
+        "started_at": null,
+        "resolved_at": null,
+        "closed_at": null,
+        "created_at": "2026-09-23T07:11:24.060871Z",
+        "updated_at": "2026-09-23T07:11:24.060871Z",
+        "sla_overdue": false
+      },
+      "statusLabel": "待分析",
+      "logs": [
+        {
+          "id": 76,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-23T07:11:24.150018Z",
+          "fromStatusLabel": "未创建",
+          "toStatusLabel": "待分析",
+          "eventLabel": "提交报修",
+          "actorLabel": "住户",
+          "createdAtLabel": "2026-09-23 15:11:24 UTC+08:00"
+        }
+      ],
+      "error": "",
+      "buttons": [
+        "添加补充图片",
+        "提交补充",
+        "撤销工单",
+        "刷新"
+      ]
+    },
+    "02-resident-persisted-report": {
+      "path": "pages/work-orders/detail",
+      "workOrder": {
+        "id": 11,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 1,
+        "reporter_user_id": 3,
+        "status": "PENDING_ANALYSIS",
+        "process_reason": "NONE",
+        "category": "OTHER",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "version": 1,
+        "current_assignment_id": null,
+        "incident_id": null,
+        "sla_due_at": "2026-09-24T07:11:24.051768Z",
+        "assigned_at": null,
+        "accepted_at": null,
+        "started_at": null,
+        "resolved_at": null,
+        "closed_at": null,
+        "created_at": "2026-09-23T07:11:24.060871Z",
+        "updated_at": "2026-09-23T07:11:24.060871Z",
+        "sla_overdue": false
+      },
+      "statusLabel": "待分析",
+      "logs": [
+        {
+          "id": 76,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-23T07:11:24.150018Z",
+          "fromStatusLabel": "未创建",
+          "toStatusLabel": "待分析",
+          "eventLabel": "提交报修",
+          "actorLabel": "住户",
+          "createdAtLabel": "2026-09-23 15:11:24 UTC+08:00"
+        }
+      ],
+      "error": "",
+      "buttons": [
+        "添加补充图片",
+        "提交补充",
+        "撤销工单",
+        "刷新"
+      ]
+    },
+    "03-manager-fallback-queue": {
+      "path": "pages/supervisor/queue",
+      "items": [
+        {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        }
+      ],
+      "selectedId": 11,
+      "selectedStatus": "PENDING_ANALYSIS",
+      "staff": [
+        {
+          "id": 1,
+          "employee_id": 1,
+          "tenant_id": 1,
+          "property_id": 1,
+          "business_date": "2026-09-23",
+          "on_duty": "ON_DUTY",
+          "leave_type": null,
+          "current_load": 1
+        },
+        {
+          "id": 2,
+          "employee_id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "business_date": "2026-09-23",
+          "on_duty": "ON_DUTY",
+          "leave_type": null,
+          "current_load": 1
+        }
+      ],
+      "error": "",
+      "buttons": [
+        "待派 / 异常",
+        "未开工工单",
+        "刷新队列",
+        "撤销此工单",
+        "AI 建议（Fake Provider）",
+        "人工后备派单"
+      ]
+    },
+    "04-relogin-same-pending-report": {
+      "path": "pages/work-orders/detail",
+      "workOrder": {
+        "id": 11,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 1,
+        "reporter_user_id": 3,
+        "status": "PENDING_ANALYSIS",
+        "process_reason": "NONE",
+        "category": "OTHER",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "version": 1,
+        "current_assignment_id": null,
+        "incident_id": null,
+        "sla_due_at": "2026-09-24T07:11:24.051768Z",
+        "assigned_at": null,
+        "accepted_at": null,
+        "started_at": null,
+        "resolved_at": null,
+        "closed_at": null,
+        "created_at": "2026-09-23T07:11:24.060871Z",
+        "updated_at": "2026-09-23T07:11:24.060871Z",
+        "sla_overdue": false
+      },
+      "statusLabel": "待分析",
+      "logs": [
+        {
+          "id": 76,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-23T07:11:24.150018Z",
+          "fromStatusLabel": "未创建",
+          "toStatusLabel": "待分析",
+          "eventLabel": "提交报修",
+          "actorLabel": "住户",
+          "createdAtLabel": "2026-09-23 15:11:24 UTC+08:00"
+        }
+      ],
+      "error": "",
+      "buttons": [
+        "添加补充图片",
+        "提交补充",
+        "撤销工单",
+        "刷新"
+      ]
+    }
+  },
+  "requests": [
+    {
+      "path": "/work-orders",
+      "method": "POST",
+      "status": 200,
+      "request_id": "843e55d4ef5b407ca89653934a6f210c",
+      "result": {
+        "id": 11,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 1,
+        "reporter_user_id": 3,
+        "status": "PENDING_ANALYSIS",
+        "process_reason": "NONE",
+        "category": "OTHER",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "version": 1,
+        "current_assignment_id": null,
+        "incident_id": null,
+        "sla_due_at": "2026-09-24T07:11:24.051768Z",
+        "assigned_at": null,
+        "accepted_at": null,
+        "started_at": null,
+        "resolved_at": null,
+        "closed_at": null,
+        "created_at": "2026-09-23T07:11:24.060871Z",
+        "updated_at": "2026-09-23T07:11:24.060871Z",
+        "sla_overdue": false
+      },
+      "received_at_utc": "2026-09-23T07:11:24.235Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "024dd8f7d68a4bce967960757c3f61ff",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:26.819Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "13c79f7f50ca4d24870905b4dec6b5d7",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:27.866Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "bca2e2ddc1cc4129a98bafb97b4d267f",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:28.932Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "4823a97d1b334fb8998e355d49bfed97",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:29.993Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "6443b6e946b1496fbcc145a9a7034786",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:31.058Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "0f28042a995b4782b0c92e9d168cbe15",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:32.106Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "22548b74e5b5446c84176d96ac87ab23",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:33.169Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "21f75765d8ad4382ac421bccbe225ed4",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:34.232Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "26584e83744d43c9865ed8577d5f3a88",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:35.286Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "ebe0f5aaa5dc4b2091372e4aa7ed4664",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:36.355Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "4d4bcf2758344e10b6b17c9f373c6e37",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:37.420Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "152492e09c384b8b83d499619748579b",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:38.487Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "7200c589df84489493277c864a4f55e8",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:39.562Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "5580696e03f248d4b9ac2e7c5c10efcc",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:40.627Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "39579e1cfd044a50a41ea8fb7a2e7767",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:41.692Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "228ce5af68dc4af09b64c762fc735a79",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:42.743Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "1e79989c81dd43d2bf6b1e30870b8cf3",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:43.000Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "a9cb124521574336b64125bc95f0b5d9",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:44.050Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "49fac3f448924fa78736b515b0ca55ab",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:45.101Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "5f903cee02304a2f81c0d6099f547fcc",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:46.150Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "1e2e35dab6cf4da6b3afb50d42258c92",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:11:47.193Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/supervisor/work-orders?property_id=1",
+      "method": "GET",
+      "status": 200,
+      "request_id": "f1b9c32818c84caab6a706de029d3243",
+      "result": {
+        "items": [
+          {
+            "id": 11,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "category": "OTHER",
+            "severity": "LOW",
+            "priority": "MEDIUM",
+            "version": 1,
+            "current_assignment_id": null,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T07:11:24.051768Z",
+            "assigned_at": null,
+            "accepted_at": null,
+            "started_at": null,
+            "resolved_at": null,
+            "closed_at": null,
+            "created_at": "2026-09-23T07:11:24.060871Z",
+            "updated_at": "2026-09-23T07:11:24.060871Z",
+            "sla_overdue": false
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T07:11:56.545Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/supervisor/work-orders?property_id=1",
+      "method": "GET",
+      "status": 200,
+      "request_id": "f9ec936ad8b54d6d9eb34b1bed374d0a",
+      "result": {
+        "items": [
+          {
+            "id": 11,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "category": "OTHER",
+            "severity": "LOW",
+            "priority": "MEDIUM",
+            "version": 1,
+            "current_assignment_id": null,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T07:11:24.051768Z",
+            "assigned_at": null,
+            "accepted_at": null,
+            "started_at": null,
+            "resolved_at": null,
+            "closed_at": null,
+            "created_at": "2026-09-23T07:11:24.060871Z",
+            "updated_at": "2026-09-23T07:11:24.060871Z",
+            "sla_overdue": false
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T07:11:56.874Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders?limit=20",
+      "method": "GET",
+      "status": 200,
+      "request_id": "53e177fa63fa4560ba627e4b37fc0411",
+      "result": {
+        "items": [
+          {
+            "id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "CLOSED",
+            "process_reason": "NONE",
+            "category": "ELECTRICAL",
+            "severity": "HIGH",
+            "priority": "HIGH",
+            "version": 10,
+            "current_assignment_id": null,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T02:16:47.523620Z",
+            "assigned_at": "2026-09-23T02:16:47.904858Z",
+            "accepted_at": "2026-09-23T02:17:06.518223Z",
+            "started_at": "2026-09-23T02:17:06.771680Z",
+            "resolved_at": "2026-09-23T02:17:51.226606Z",
+            "closed_at": "2026-09-23T02:18:17.128460Z",
+            "created_at": "2026-09-23T02:16:47.529922Z",
+            "updated_at": "2026-09-23T02:18:17.131761Z",
+            "sla_overdue": false
+          },
+          {
+            "id": 2,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "CLOSED",
+            "process_reason": "NONE",
+            "category": "ELECTRICAL",
+            "severity": "HIGH",
+            "priority": "HIGH",
+            "version": 13,
+            "current_assignment_id": null,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T02:21:30.187153Z",
+            "assigned_at": "2026-09-23T02:22:41.948404Z",
+            "accepted_at": "2026-09-23T02:22:42.399525Z",
+            "started_at": "2026-09-23T02:22:42.433727Z",
+            "resolved_at": "2026-09-23T02:22:42.524896Z",
+            "closed_at": "2026-09-23T02:22:42.567195Z",
+            "created_at": "2026-09-23T02:21:30.194208Z",
+            "updated_at": "2026-09-23T02:22:42.569246Z",
+            "sla_overdue": false
+          },
+          {
+            "id": 3,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "CLOSED",
+            "process_reason": "NONE",
+            "category": "ELECTRICAL",
+            "severity": "HIGH",
+            "priority": "HIGH",
+            "version": 10,
+            "current_assignment_id": null,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T02:22:42.696085Z",
+            "assigned_at": "2026-09-23T02:22:42.884959Z",
+            "accepted_at": "2026-09-23T02:22:43.070253Z",
+            "started_at": "2026-09-23T02:22:43.112735Z",
+            "resolved_at": "2026-09-23T02:22:43.793721Z",
+            "closed_at": "2026-09-23T02:22:43.844468Z",
+            "created_at": "2026-09-23T02:22:42.698709Z",
+            "updated_at": "2026-09-23T02:22:43.847124Z",
+            "sla_overdue": false
+          },
+          {
+            "id": 4,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "CLOSED",
+            "process_reason": "NONE",
+            "category": "ELECTRICAL",
+            "severity": "HIGH",
+            "priority": "HIGH",
+            "version": 10,
+            "current_assignment_id": null,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T02:22:43.916431Z",
+            "assigned_at": "2026-09-23T02:22:44.309701Z",
+            "accepted_at": "2026-09-23T02:22:44.589209Z",
+            "started_at": "2026-09-23T02:22:44.631259Z",
+            "resolved_at": "2026-09-23T02:22:45.360692Z",
+            "closed_at": "2026-09-23T02:22:45.423393Z",
+            "created_at": "2026-09-23T02:22:43.919006Z",
+            "updated_at": "2026-09-23T02:22:45.426765Z",
+            "sla_overdue": false
+          },
+          {
+            "id": 5,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "CANCELLED",
+            "process_reason": "NONE",
+            "category": "ELECTRICAL",
+            "severity": "HIGH",
+            "priority": "HIGH",
+            "version": 4,
+            "current_assignment_id": null,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T04:09:39.379264Z",
+            "assigned_at": "2026-09-23T04:09:39.895801Z",
+            "accepted_at": null,
+            "started_at": null,
+            "resolved_at": null,
+            "closed_at": null,
+            "created_at": "2026-09-23T04:09:39.386488Z",
+            "updated_at": "2026-09-23T04:10:06.345984Z",
+            "sla_overdue": false
+          },
+          {
+            "id": 6,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "CANCELLED",
+            "process_reason": "NONE",
+            "category": "ELECTRICAL",
+            "severity": "HIGH",
+            "priority": "HIGH",
+            "version": 5,
+            "current_assignment_id": null,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T04:14:43.844752Z",
+            "assigned_at": "2026-09-23T04:14:44.186869Z",
+            "accepted_at": "2026-09-23T04:14:44.531966Z",
+            "started_at": null,
+            "resolved_at": null,
+            "closed_at": null,
+            "created_at": "2026-09-23T04:14:43.849998Z",
+            "updated_at": "2026-09-23T04:14:45.140244Z",
+            "sla_overdue": false
+          },
+          {
+            "id": 7,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "CLOSED",
+            "process_reason": "NONE",
+            "category": "ELECTRICAL",
+            "severity": "HIGH",
+            "priority": "HIGH",
+            "version": 8,
+            "current_assignment_id": null,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T04:14:45.257494Z",
+            "assigned_at": "2026-09-23T04:14:45.593703Z",
+            "accepted_at": "2026-09-23T04:14:45.933140Z",
+            "started_at": "2026-09-23T04:14:45.998757Z",
+            "resolved_at": "2026-09-23T04:14:46.091320Z",
+            "closed_at": "2026-09-23T04:14:46.195981Z",
+            "created_at": "2026-09-23T04:14:45.261100Z",
+            "updated_at": "2026-09-23T04:14:46.198042Z",
+            "sla_overdue": false
+          },
+          {
+            "id": 8,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "CLOSED",
+            "process_reason": "NONE",
+            "category": "ELECTRICAL",
+            "severity": "HIGH",
+            "priority": "HIGH",
+            "version": 8,
+            "current_assignment_id": null,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T04:14:46.266958Z",
+            "assigned_at": "2026-09-23T04:14:46.502029Z",
+            "accepted_at": "2026-09-23T04:14:46.936967Z",
+            "started_at": "2026-09-23T04:14:47.460837Z",
+            "resolved_at": "2026-09-23T04:14:47.557603Z",
+            "closed_at": "2026-09-23T04:14:47.607973Z",
+            "created_at": "2026-09-23T04:14:46.269025Z",
+            "updated_at": "2026-09-23T04:14:47.611090Z",
+            "sla_overdue": false
+          },
+          {
+            "id": 9,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "ASSIGNED",
+            "process_reason": "NONE",
+            "category": "ELECTRICAL",
+            "severity": "HIGH",
+            "priority": "HIGH",
+            "version": 3,
+            "current_assignment_id": 10,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T05:14:00.421888Z",
+            "assigned_at": "2026-09-23T05:14:01.157166Z",
+            "accepted_at": null,
+            "started_at": null,
+            "resolved_at": null,
+            "closed_at": null,
+            "created_at": "2026-09-23T05:14:00.483761Z",
+            "updated_at": "2026-09-23T05:14:01.265976Z",
+            "sla_overdue": false
+          },
+          {
+            "id": 10,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "ASSIGNED",
+            "process_reason": "NONE",
+            "category": "ELECTRICAL",
+            "severity": "HIGH",
+            "priority": "HIGH",
+            "version": 3,
+            "current_assignment_id": 11,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T05:16:49.491666Z",
+            "assigned_at": "2026-09-23T05:16:49.911616Z",
+            "accepted_at": null,
+            "started_at": null,
+            "resolved_at": null,
+            "closed_at": null,
+            "created_at": "2026-09-23T05:16:49.495269Z",
+            "updated_at": "2026-09-23T05:16:49.989499Z",
+            "sla_overdue": false
+          },
+          {
+            "id": 11,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "category": "OTHER",
+            "severity": "LOW",
+            "priority": "MEDIUM",
+            "version": 1,
+            "current_assignment_id": null,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T07:11:24.051768Z",
+            "assigned_at": null,
+            "accepted_at": null,
+            "started_at": null,
+            "resolved_at": null,
+            "closed_at": null,
+            "created_at": "2026-09-23T07:11:24.060871Z",
+            "updated_at": "2026-09-23T07:11:24.060871Z",
+            "sla_overdue": false
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T07:12:30.746Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "6259315990c44f84aad6b31710531337",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:12:34.190Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "38f6a478ead44ee197dcdd442ec28822",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:12:35.242Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "44db29001cbd4c5dae54b4bf7fdec81e",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:12:36.286Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "b44f24269e0f4dfa8290c43e11320bf8",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:12:37.345Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "4fe5fc8fb8204491be7b1f3c39d7c999",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:12:38.398Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "e10042de4157495683afc367d72f0432",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:12:39.453Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "c829ee9237724a43af6e7323b5935169",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:12:40.514Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "ee867f8d77dd4f14a940b885fc46568c",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:12:41.569Z",
+      "source": "real origin-forwarded wx.request"
+    },
+    {
+      "path": "/work-orders/11",
+      "method": "GET",
+      "status": 200,
+      "request_id": "ab81a7beeb4e45a99615788663534b1e",
+      "result": {
+        "work_order": {
+          "id": 11,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T07:11:24.051768Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T07:11:24.060871Z",
+          "updated_at": "2026-09-23T07:11:24.060871Z",
+          "sla_overdue": false
+        },
+        "text": "fallback022-de3bddec846a 软件故障后备验证：厨房插座断电。合成测试资料。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 76,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T07:11:24.150018Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-24T07:11:24.051768Z": "2026-09-24 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.060871Z": "2026-09-23 15:11:24 UTC+08:00",
+            "2026-09-23T07:11:24.150018Z": "2026-09-23 15:11:24 UTC+08:00"
+          }
+        }
+      },
+      "received_at_utc": "2026-09-23T07:12:42.617Z",
+      "source": "real origin-forwarded wx.request"
+    }
+  ],
+  "screenshots": [
+    "01-created-despite-provider-failure.png",
+    "02-resident-persisted-report.png",
+    "03-manager-fallback-queue.png",
+    "04-relogin-same-pending-report.png"
+  ],
+  "resident_principal": {
+    "user_id": 3,
+    "roles": [
+      "RESIDENT"
+    ],
+    "scopes": [
+      {
+        "role_code": "RESIDENT",
+        "scope_type": "PROPERTY",
+        "tenant_id": 1,
+        "property_id": 1,
+        "permissions": [
+          "announcement:read",
+          "knowledge:read",
+          "resident_binding:create",
+          "resident_binding:read",
+          "resident_relation:read",
+          "work_order:cancel",
+          "work_order:create",
+          "work_order:read"
+        ]
+      }
+    ]
+  },
+  "manager_principal": {
+    "user_id": 5,
+    "roles": [
+      "TENANT_ADMIN"
+    ],
+    "scopes": [
+      {
+        "role_code": "TENANT_ADMIN",
+        "scope_type": "TENANT",
+        "tenant_id": 1,
+        "property_id": null,
+        "permissions": [
+          "ai_analysis:read",
+          "ai_analysis:review",
+          "announcement:draft",
+          "announcement:publish",
+          "announcement:read",
+          "attendance:check_in",
+          "attendance:check_out",
+          "attendance:read",
+          "audit:read",
+          "dispatch_recommendation:read",
+          "employee:manage",
+          "employee:read",
+          "incident:manage",
+          "incident:read",
+          "knowledge:manage",
+          "knowledge:read",
+          "property:manage",
+          "property:read",
+          "resident_binding:read",
+          "resident_binding:review",
+          "resident_relation:read",
+          "role:manage",
+          "role:read",
+          "sla:manage",
+          "stats:read",
+          "work_order:cancel",
+          "work_order:decide",
+          "work_order:dispatch",
+          "work_order:process",
+          "work_order:read",
+          "work_order:resolve"
+        ]
+      }
+    ]
+  },
+  "last_error": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(e.requests.filter(x=>x.method==='POST').every(x=>x.status===201))\n\n    at main (D:\\property-ai\\reports\\ai-fallback-runtime-022\\run-page-evidence.js:40:65)"
+}

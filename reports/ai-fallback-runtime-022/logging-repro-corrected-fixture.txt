@@ -1,0 +1,128 @@
+D:\property-ai\.venv\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+FFFFFF.FF                                                                [100%]
+================================== FAILURES ===================================
+_ test_delayed_exception_chain_keeps_json_and_redacts_secrets[tuple-structlog] _
+backend\tests\unit\test_logging_exception_pipeline.py:53: in test_delayed_exception_chain_keeps_json_and_redacts_secrets
+    logger.error('AI.UNAVAILABLE failure', **kwargs)
+.venv\Lib\site-packages\structlog\stdlib.py:212: in error
+    return self._proxy_to_logger("error", event, *args, **kw)
+.venv\Lib\site-packages\structlog\stdlib.py:258: in _proxy_to_logger
+    return super()._proxy_to_logger(method_name, event=event, **event_kw)
+.venv\Lib\site-packages\structlog\_base.py:214: in _proxy_to_logger
+    args, kw = self._process_event(method_name, event, event_kw)
+.venv\Lib\site-packages\structlog\_base.py:165: in _process_event
+    event_dict = proc(self._logger, method_name, event_dict)
+.venv\Lib\site-packages\structlog\processors.py:412: in __call__
+    event_dict["exception"] = self.format_exception(
+.venv\Lib\site-packages\structlog\_frames.py:30: in _format_exception
+    traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], None, sio)
+tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\traceback.py:124: in print_exception
+    te = TracebackException(type(value), value, tb, limit=limit, compact=True)
+tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\traceback.py:780: in __init__
+    exc_value.__suppress_context__ if exc_value is not None else False
+E   AttributeError: 'str' object has no attribute '__suppress_context__'
+__ test_delayed_exception_chain_keeps_json_and_redacts_secrets[tuple-stdlib] __
+backend\tests\unit\test_logging_exception_pipeline.py:55: in test_delayed_exception_chain_keeps_json_and_redacts_secrets
+    assert captured.err == '', 'No logging error or unredacted stderr fallback'
+E   AssertionError: No logging error or unredacted stderr fallback
+E   assert '--- Logging ...guments: ()\n' == ''
+E     
+E     + --- Logging error ---
+E     + Traceback (most recent call last):
+E     +   File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\logging\__init__.py", line 1160, in emit
+E     +     msg = self.format(record)
+E     +           ^^^^^^^^^^^^^^^^^^^
+E     +   File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\logging\__init__.py", line 999, in format...
+E     
+E     ...Full output truncated (82 lines hidden), use '-vv' to show
+__ test_delayed_exception_chain_keeps_json_and_redacts_secrets[tuple-celery] __
+backend\tests\unit\test_logging_exception_pipeline.py:55: in test_delayed_exception_chain_keeps_json_and_redacts_secrets
+    assert captured.err == '', 'No logging error or unredacted stderr fallback'
+E   AssertionError: No logging error or unredacted stderr fallback
+E   assert '--- Logging ...guments: ()\n' == ''
+E     
+E     + --- Logging error ---
+E     + Traceback (most recent call last):
+E     +   File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\logging\__init__.py", line 1160, in emit
+E     +     msg = self.format(record)
+E     +           ^^^^^^^^^^^^^^^^^^^
+E     +   File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\logging\__init__.py", line 999, in format...
+E     
+E     ...Full output truncated (82 lines hidden), use '-vv' to show
+_ test_delayed_exception_chain_keeps_json_and_redacts_secrets[exception-structlog] _
+backend\tests\unit\test_logging_exception_pipeline.py:61: in test_delayed_exception_chain_keeps_json_and_redacts_secrets
+    assert 'RuntimeError:' in record['exception'] and 'ValueError:' in record['exception']
+E   AssertionError: assert ('RuntimeError:' in 'MISSING')
+_ test_delayed_exception_chain_keeps_json_and_redacts_secrets[exception-stdlib] _
+backend\tests\unit\test_logging_exception_pipeline.py:55: in test_delayed_exception_chain_keeps_json_and_redacts_secrets
+    assert captured.err == '', 'No logging error or unredacted stderr fallback'
+E   AssertionError: No logging error or unredacted stderr fallback
+E   assert '--- Logging ...guments: ()\n' == ''
+E     
+E     + --- Logging error ---
+E     + Traceback (most recent call last):
+E     +   File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\logging\__init__.py", line 1160, in emit
+E     +     msg = self.format(record)
+E     +           ^^^^^^^^^^^^^^^^^^^
+E     +   File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\logging\__init__.py", line 999, in format...
+E     
+E     ...Full output truncated (82 lines hidden), use '-vv' to show
+_ test_delayed_exception_chain_keeps_json_and_redacts_secrets[exception-celery] _
+backend\tests\unit\test_logging_exception_pipeline.py:55: in test_delayed_exception_chain_keeps_json_and_redacts_secrets
+    assert captured.err == '', 'No logging error or unredacted stderr fallback'
+E   AssertionError: No logging error or unredacted stderr fallback
+E   assert '--- Logging ...guments: ()\n' == ''
+E     
+E     + --- Logging error ---
+E     + Traceback (most recent call last):
+E     +   File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\logging\__init__.py", line 1160, in emit
+E     +     msg = self.format(record)
+E     +           ^^^^^^^^^^^^^^^^^^^
+E     +   File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\logging\__init__.py", line 999, in format...
+E     
+E     ...Full output truncated (82 lines hidden), use '-vv' to show
+___________ test_active_exception_true_and_normal_messages[stdlib] ____________
+backend\tests\unit\test_logging_exception_pipeline.py:79: in test_active_exception_true_and_normal_messages
+    assert captured.err == ''
+E   assert '--- Logging ...guments: ()\n' == ''
+E     
+E     + --- Logging error ---
+E     + Traceback (most recent call last):
+E     +   File "D:\property-ai\backend\tests\unit\test_logging_exception_pipeline.py", line 74, in test_active_exception_true_and_normal_messages
+E     +     raise RuntimeError('password=synthetic-active')
+E     + RuntimeError: password=synthetic-active
+E     + ...
+E     
+E     ...Full output truncated (89 lines hidden), use '-vv' to show
+___________ test_active_exception_true_and_normal_messages[celery] ____________
+backend\tests\unit\test_logging_exception_pipeline.py:79: in test_active_exception_true_and_normal_messages
+    assert captured.err == ''
+E   assert '--- Logging ...guments: ()\n' == ''
+E     
+E     + --- Logging error ---
+E     + Traceback (most recent call last):
+E     +   File "D:\property-ai\backend\tests\unit\test_logging_exception_pipeline.py", line 74, in test_active_exception_true_and_normal_messages
+E     +     raise RuntimeError('password=synthetic-active')
+E     + RuntimeError: password=synthetic-active
+E     + ...
+E     
+E     ...Full output truncated (89 lines hidden), use '-vv' to show
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:40
+  D:\property-ai\.venv\Lib\site-packages\starlette\testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\unit\test_logging_exception_pipeline.py::test_delayed_exception_chain_keeps_json_and_redacts_secrets[tuple-structlog]
+FAILED backend\tests\unit\test_logging_exception_pipeline.py::test_delayed_exception_chain_keeps_json_and_redacts_secrets[tuple-stdlib]
+FAILED backend\tests\unit\test_logging_exception_pipeline.py::test_delayed_exception_chain_keeps_json_and_redacts_secrets[tuple-celery]
+FAILED backend\tests\unit\test_logging_exception_pipeline.py::test_delayed_exception_chain_keeps_json_and_redacts_secrets[exception-structlog]
+FAILED backend\tests\unit\test_logging_exception_pipeline.py::test_delayed_exception_chain_keeps_json_and_redacts_secrets[exception-stdlib]
+FAILED backend\tests\unit\test_logging_exception_pipeline.py::test_delayed_exception_chain_keeps_json_and_redacts_secrets[exception-celery]
+FAILED backend\tests\unit\test_logging_exception_pipeline.py::test_active_exception_true_and_normal_messages[stdlib]
+FAILED backend\tests\unit\test_logging_exception_pipeline.py::test_active_exception_true_and_normal_messages[celery]
+8 failed, 1 passed, 1 warning in 0.49s

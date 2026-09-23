@@ -1,0 +1,38 @@
+{
+  "observed_at_utc": "2026-09-23T07:09:21.9889263Z",
+  "processes": [
+    {
+      "ProcessId": 41352,
+      "ParentProcessId": 41512,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "\"D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\" -I D:\\property-ai\\reports\\ai-fallback-runtime-022\\launch-runtime.py api unavailable"
+    },
+    {
+      "ProcessId": 46432,
+      "ParentProcessId": 41512,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "\"D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\" -I D:\\property-ai\\reports\\ai-fallback-runtime-022\\launch-runtime.py worker unavailable"
+    },
+    {
+      "ProcessId": 47604,
+      "ParentProcessId": 46432,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -m celery -A app.worker.celery_app:celery_app worker -Q property_ai.auth001 --pool=solo --loglevel=info --hostname=auth001@%h"
+    }
+  ],
+  "api_startup": [
+    "{\"task_id\": \"AI-FALLBACK-RUNTIME-022\", \"component\": \"api\", \"target\": \"serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True\", \"llm_provider\": \"development\", \"llm_behavior\": \"unavailable\", \"python\": \"D:\\\\property-ai\\\\tmp\\\\uv-python\\\\cpython-3.12.10-windows-x86_64-none\\\\python.exe\", \"project_modules\": \"D:\\\\property-ai\\\\backend\\\\app\", \"check_only\": false}",
+    "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True"
+  ],
+  "worker_startup": [
+    "{\"task_id\": \"AI-FALLBACK-RUNTIME-022\", \"component\": \"worker\", \"target\": \"serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True\", \"llm_provider\": \"development\", \"llm_behavior\": \"unavailable\", \"python\": \"D:\\\\property-ai\\\\tmp\\\\uv-python\\\\cpython-3.12.10-windows-x86_64-none\\\\python.exe\", \"project_modules\": \"D:\\\\property-ai\\\\backend\\\\app\", \"check_only\": false}",
+    "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True",
+    "worker_queue=property_ai.auth001 pool=solo"
+  ],
+  "health": {
+    "request_id": "2d6036e051084183ad6c242f7f7aa167",
+    "data": {
+      "status": "ok"
+    }
+  }
+}

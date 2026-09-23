@@ -2134,6 +2134,36 @@
       "scope": "Current V1-AI-FAIL-CREATE evidence gap: existing Development LLM unavailable mode, actual normalpage create persisted PENDING_ANALYSIS, independentWorker bounded failure/audit, no AUTOassignment, manager queue visibility, restore normal isolated runtime; no new rules or historical replay."
     }
   },
+  "ai_fallback_runtime_022": {
+    "task_id": "AI-FALLBACK-RUNTIME-022",
+    "base_sha": "d5c9098c59b1d67af34b59b859006bf1369eb0ed",
+    "implementation_head": "08adb3dd4f25e41fc9f31b750994ac7a38e72bf8",
+    "runtime_run_id": "fallback022-de3bddec846a",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT_INJECTED_FAILURE",
+    "independent_review": {
+      "round": 1,
+      "product_repair_rounds": 0,
+      "result": "PASS",
+      "session_id": "UNKNOWN",
+      "path": "reports/codex/AI-FALLBACK-RUNTIME-022-review.json",
+      "boundary": "Separate read-only reviewer checked actualtwofilediff/directcontext,51scopedtests,page/API/DB/audit/worker/queueevidence andall4PNG; no tests/pages/HTTP/DB/queueoperations. Wrapperexit1at900s butindependentCLI subsequentlywrotevalidschemaJSON; no repeatedreview. Model/sessionbannerlost, no exit0claim."
+    },
+    "evidence": "One normalpagePOST200 order11PENDING_ANALYSIS/v1 persistedrefresh/relogin;managerseessamefallback. ThreeAI.UNAVAILABLE attempts/calllogs13-15,oneFAILEDanalysis11,threeaudits,CREATElog76,zeroassignment/no staffload/priororderchange. Newfailedtask1162e46d-03a3-46ee-9d7d-53559c995238 unreplayed;uniquequeue0/0/1,DLQ2historical+1new=3 untouched.51scopedtests/1warning per run,4PNG. Restored API26332/Worker47436->47800success/Development08adb3d. Helper201/rowcount/capture/startuptimeoutlimitations retained.",
+    "current_status_overlays": [
+      {
+        "id": "V1-AI-FAIL-CREATE",
+        "implementation_status": "Existing page/API creation and isolated Worker failure fallback preserved;022 repairs exception-log ordering without changing dispatch/FSM.",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_INJECTED_FAILURE",
+        "evidence_version": "Business/page d5c9098c59b1d67af34b59b859006bf1369eb0ed runfallback022-de3bddec846a; loggingfix/tests/restoredruntime08adb3dd4f25e41fc9f31b750994ac7a38e72bf8",
+        "remaining_gap": "No live Worker failure re-exercised after logging-only fix. Real Qwen/provider/network outage, production reliability/DLQ replay/device/security/scale and formalrelease remain unverified.",
+        "next_action": "Preserve022 failureobject/record, no replay. Next RESIDENT-HOUSE-SELECT-023 closes existing normalreport house-selection/internalID UX using authorized current-schema data; real-model resources remain approval-gated."
+      }
+    ],
+    "next_slice": {
+      "task_id": "RESIDENT-HOUSE-SELECT-023",
+      "scope": "Replace rawinternalhouseID entry on normal residentreport with current authorized bound-house address selection and real paging; reuse existingService/auth/create rules; no schema/fee or acceptedflow replay."
+    }
+  },
   "auth_failure_policy_20260923": {
     "task_id": "AUTH-FAILURE-POLICY-20260923",
     "owner_decision": "不锁定",
@@ -2154,7 +2184,7 @@
     "generated_at": "2026-09-23",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
     "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs), then notification_events_inbox_013.current_status_overlays (2 IDs)",
-    "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs), then manager_wo_cancel_017 (1 composite ID, remains PARTIAL), then house_csv_roundtrip_018 (1 existing ID), then ai_analysis_input_019 (3 existing IDs; real-model statuses remain BLOCKED), then resident_wo_presentation_020 (1 existing ID; release gaps retained), then notification_presentation_021 (1 existing ID; explicitUTC not Property-local/outbound acceptance)",
+    "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs), then manager_wo_cancel_017 (1 composite ID, remains PARTIAL), then house_csv_roundtrip_018 (1 existing ID), then ai_analysis_input_019 (3 existing IDs; real-model statuses remain BLOCKED), then resident_wo_presentation_020 (1 existing ID; release gaps retained), then notification_presentation_021 (1 existing ID; explicitUTC not Property-local/outbound acceptance), then ai_fallback_runtime_022 (1 existing ID; Development injected failure only)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced. Old AUTH001 objects were lost on the 2026-09-23 tmpfs stop; historical evidence remains version-bound, not current-object proof.",
     "row_count": 83,
     "rows": [
@@ -2792,11 +2822,11 @@
       },
       {
         "requirement_id": "V1-AI-FAIL-CREATE",
-        "current_implementation": "fallback_code_and_unit_coverage_present",
-        "verification_mode_status": "PARTIAL",
-        "evidence_version": "d144bcddcfc24e6e9eaf60509acd124711bc0561",
-        "remaining_gap": "current live failure-path evidence with production-equivalent worker/provider",
-        "next_action": "仅针对所列剩余缺口补实现或证据"
+        "current_implementation": "Existing page/API creation and isolated Worker failure fallback preserved;022 repairs exception-log ordering without changing dispatch/FSM.",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_INJECTED_FAILURE",
+        "evidence_version": "Business/page d5c9098c59b1d67af34b59b859006bf1369eb0ed runfallback022-de3bddec846a; loggingfix/tests/restoredruntime08adb3dd4f25e41fc9f31b750994ac7a38e72bf8",
+        "remaining_gap": "No live Worker failure re-exercised after logging-only fix. Real Qwen/provider/network outage, production reliability/DLQ replay/device/security/scale and formalrelease remain unverified.",
+        "next_action": "Preserve022 failureobject/record, no replay. Next RESIDENT-HOUSE-SELECT-023 closes existing normalreport house-selection/internalID UX using authorized current-schema data; real-model resources remain approval-gated."
       },
       {
         "requirement_id": "V1-AUTO-DISPATCH-FILTER",

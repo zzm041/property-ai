@@ -1,0 +1,23 @@
+{
+  "task_id": "AI-FALLBACK-RUNTIME-022",
+  "source": "tmp/auth001-runtime/worker-d5c9098-fallback022-unavailable.stdout.log",
+  "selection": "Two exact original structured events; other raw log fields omitted; timestamps are original worker event times, not local reconstruction.",
+  "events": [
+    {
+      "timestamp": "2026-09-23T07:11:27.896242Z",
+      "event": "--- Logging error ---",
+      "level": "warning",
+      "logger": "celery.redirected",
+      "request_id": "843e55d4ef5b407ca89653934a6f210c",
+      "task_id": "1162e46d-03a3-46ee-9d7d-53559c995238"
+    },
+    {
+      "timestamp": "2026-09-23T07:11:27.952393Z",
+      "event": "AttributeError: 'str' object has no attribute '__suppress_context__'",
+      "level": "warning",
+      "logger": "celery.redirected",
+      "request_id": "843e55d4ef5b407ca89653934a6f210c",
+      "task_id": "1162e46d-03a3-46ee-9d7d-53559c995238"
+    }
+  ]
+}

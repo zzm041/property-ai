@@ -1,0 +1,23 @@
+{
+  "task_id": "AI-FALLBACK-RUNTIME-022",
+  "base_sha": "d5c9098c59b1d67af34b59b859006bf1369eb0ed",
+  "head_sha": "08adb3dd4f25e41fc9f31b750994ac7a38e72bf8",
+  "review_round": 1,
+  "product_repair_rounds": 0,
+  "pre_review_runtime_fixes": ["AIF022-B1 logging exception pipeline"],
+  "status": "PASS_VALID_STRUCTURED_RESULT_AFTER_WRAPPER_TIMEOUT",
+  "decision": "PASS",
+  "schema_validated": true,
+  "wrapper_exit_code": 1,
+  "wrapper_error": "subprocess.TimeoutExpired after900seconds; no raw invocation log was written",
+  "session_id": "UNKNOWN",
+  "session_id_limit": "Buffered stderr was lost when the wrapper timed out. No auth files or internal session database inspected to infer it.",
+  "model": "Existing default, no override; this call's model banner was not retained",
+  "result_written_local_time": "2026-09-23T15:44:01+08:00",
+  "subsequent_process_check": "2026-09-23T07:44:05Z: no matching python/codex/node/cmd review process remained; final structured result was present and schema-valid, so no retry launched",
+  "sandbox": "read-only",
+  "timeout_seconds": 900,
+  "result_path": "reports/codex/AI-FALLBACK-RUNTIME-022-review.json",
+  "private_invocation_log": "NOT_CREATED_DUE_TO_WRAPPER_TIMEOUT; intended tmp/ai-fallback-runtime-022/review.call.json",
+  "mechanism": "Existing wrapper/schema/subscription/defaultmodel; one independent call, buffered output; no available analysis summary invented. Known built-in agent thread limit not retried."
+}
