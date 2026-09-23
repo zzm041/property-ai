@@ -1,0 +1,43 @@
+{
+  "task_id": "AI-ANALYSIS-INPUT-019",
+  "product_sha": "d1c4e9f6891a47e052e4a00b111e44a335c4fa39",
+  "observed_at_utc": "2026-09-23T05:09:12.4503252Z",
+  "processes": [
+    {
+      "ProcessId": 47416,
+      "ParentProcessId": 4356,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "\"D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\" -I D:\\property-ai\\tmp\\run_auth001_recovered.py api"
+    },
+    {
+      "ProcessId": 24240,
+      "ParentProcessId": 4356,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "\"D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\" -I D:\\property-ai\\tmp\\run_auth001_recovered.py worker"
+    },
+    {
+      "ProcessId": 43020,
+      "ParentProcessId": 24240,
+      "ExecutablePath": "C:\\WINDOWS\\system32\\conhost.exe",
+      "CommandLine": "\\??\\C:\\WINDOWS\\system32\\conhost.exe 0x4"
+    },
+    {
+      "ProcessId": 38896,
+      "ParentProcessId": 24240,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -m celery -A app.worker.celery_app:celery_app worker -Q property_ai.auth001 --pool=solo --loglevel=info --hostname=auth001@%h"
+    }
+  ],
+  "health": {
+    "request_id": "ca7f556232fb4ad8a5a4a61797ec32ef",
+    "data": {
+      "status": "ok"
+    }
+  },
+  "api_startup": "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True",
+  "worker_startup": [
+    "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True",
+    "worker_queue=property_ai.auth001 pool=solo"
+  ],
+  "provenance": "Both started after product commit and idle check; bounded source/startup evidence, not debugger introspection. Retained recovered CPython3.12.10AMD64 + explicit projectsitepackages. Only exact idleAPI46236/Worker46688 stopped; sharedservices/8082 untouched."
+}

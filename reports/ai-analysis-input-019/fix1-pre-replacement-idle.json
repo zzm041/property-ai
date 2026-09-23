@@ -1,0 +1,15 @@
+{
+  "task_id": "AI-ANALYSIS-INPUT-019",
+  "observed_at_utc": "2026-09-23T05:37:49.447361+00:00",
+  "target_worker": "auth001@DESKTOP-8NHSE12",
+  "counts": {
+    "active": 0,
+    "reserved": 0,
+    "scheduled": 0
+  },
+  "vhost": "property_ai_auth001",
+  "queue": "property_ai.auth001",
+  "actual_queue_output": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nproperty_ai.auth001.dlq\t2\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1\nceleryev.0bad81a2-05ea-41a8-a013-3819daa986c1\t0\t0\t1\n",
+  "shared_vhost_accessed": false,
+  "message_content_read": false
+}

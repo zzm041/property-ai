@@ -1,0 +1,37 @@
+{
+  "task_id": "AI-ANALYSIS-INPUT-019",
+  "run_id": "ai019-e4b477cee2ff",
+  "product_sha": "d1c4e9f6891a47e052e4a00b111e44a335c4fa39",
+  "mode": "SELECT-only reuse of current synthetic identity/relation/staff data; no old flows replayed",
+  "revision": "20260919_0009",
+  "house": {
+    "id": 1,
+    "tenant_id": 1,
+    "property_id": 1,
+    "status": "ACTIVE"
+  },
+  "relation": [
+    {
+      "id": 1,
+      "user_id": 3,
+      "house_id": 1,
+      "relation_type": "OWNER",
+      "status": "ACTIVE"
+    }
+  ],
+  "staff": [
+    {
+      "employee_id": 1,
+      "on_duty": "ON_DUTY",
+      "current_load": 0,
+      "business_date": "2026-09-23"
+    },
+    {
+      "employee_id": 2,
+      "on_duty": "ON_DUTY",
+      "current_load": 0,
+      "business_date": "2026-09-23"
+    }
+  ],
+  "helper_note": "Initial SELECT referenced max_capacity on the daily-status table and failed before any business request. Removed that incorrect projection; no schema/data modification or business replay."
+}

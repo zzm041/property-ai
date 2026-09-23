@@ -1,0 +1,19 @@
+{
+  "task_id": "AI-ANALYSIS-INPUT-019",
+  "base_sha": "a38005dc5bc94721d7fe2b64d13cf80f2e9093e2",
+  "repair_base_sha": "d1c4e9f6891a47e052e4a00b111e44a335c4fa39",
+  "head_sha": "b52178c0cb5179eb60c394490f64b23b7125daad",
+  "review_round": 2,
+  "product_repair_rounds": 1,
+  "status": "PASS_SCOPED_LOCAL_DEVELOPMENT_FIX1",
+  "session_id": "01a0ccc8-55a8-7f50-a777-f7aa7dafd93d",
+  "model": "gpt-5.6-sol (existing default; no override)",
+  "exit_code": 0,
+  "schema_validated": true,
+  "finding_history": "AI019-B1 closed in FIX1; AI019-R1 retained; N1 tracking closed by this evidence update. Original round1 NEEDS_CHANGES preserved.",
+  "sandbox": "read-only",
+  "timeout_seconds": 900,
+  "result_path": "reports/codex/AI-ANALYSIS-INPUT-019-FIX-1-review.json",
+  "private_invocation_log": "tmp/ai-analysis-input-019/review-fix1.call.json",
+  "mechanism": "Existing wrapper/schema/default model/subscription; focus B1 and new regressions only, no recursive reviewers or business replay."
+}

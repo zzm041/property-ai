@@ -88,7 +88,7 @@ Only request the 24×7 node after Gate 2 meets the confirmed quality, latency, i
 
 - Existing Provider adapters already use OpenAI-compatible LLM/VLM endpoints, ASR HTTP, embeddings HTTP and reranker HTTP. Existing rule code—not the LLM—owns employee eligibility and scoring.
 - `8083`/AUTH001 has scoped Development/Fake auto-dispatch and DEVELOPMENT RAG wiring evidence. It is not a real-model result. The previous statement that the current mainline is only on 8082 or blocked by database 0007 is obsolete.
-- Before Gate 2 acceptance, the current analysis integration must be verified/fixed for all allowed images, approved house/resident/recent-order context, strict output schema and `AiCallLog` token usage. RAG needs the real 1024-dimensional collection, calibrated reranker thresholds and production provider readiness—not just `healthz`.
+- Gate2 software prerequisite now has scoped Development evidence: AI-ANALYSIS-INPUT-019/FIX1 at b52178c adds all-report-image calls, bounded scoped house/reporter/recent context, versioned strict output prompt and valid returned token usage; blank images record INVALID with fallback.106focused, initial d1c4e9f page/API/independentWorker run ai019-e4b477cee2ff, final independent review PASS. This does not validate Qwen quality or live usage: Gate2 must still exercise the exact real pinned providers and gold cases. RAG still needs the approved new1024-dimensional collection, calibrated reranker and production readiness—not just healthz.
 - Current Development/Fake evidence, provider `not_checked` readiness, and a model process starting successfully cannot be relabeled as Qwen/bge-m3/RAG PASS.
 
 ## Superseded 2026-09-19 planning notes (historical only)

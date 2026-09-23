@@ -1,0 +1,431 @@
+{
+  "task_id": "AI-ANALYSIS-INPUT-019",
+  "run_id": "ai019-e4b477cee2ff",
+  "product_sha": "d1c4e9f6891a47e052e4a00b111e44a335c4fa39",
+  "results": {
+    "file-1": {
+      "id": 2,
+      "tenant_id": 1,
+      "property_id": 1,
+      "uploader_user_id": 3,
+      "mime_type": "image/png",
+      "size_bytes": 74,
+      "storage_key": "dev-object:1:1:128ec563-682a-450c-8adc-7192719355a6",
+      "scanner_status": "skipped_dev",
+      "created_at": "2026-09-23T05:16:49.371035Z",
+      "upload_url": null,
+      "upload_expires_in": null
+    },
+    "upload-1": {
+      "status": 200,
+      "request_id": "ai019-e4b477cee2ff-upload-1",
+      "file_id": 2,
+      "bytes": 74,
+      "sha256": "85ed7594830299e8ff62dc0a7de1d4a1aa76d2b4f07ef1c24bf2098171c85133"
+    },
+    "file-2": {
+      "id": 3,
+      "tenant_id": 1,
+      "property_id": 1,
+      "uploader_user_id": 3,
+      "mime_type": "image/png",
+      "size_bytes": 74,
+      "storage_key": "dev-object:1:1:47361938-66f1-4fe1-8d70-32d5a9fc6852",
+      "scanner_status": "skipped_dev",
+      "created_at": "2026-09-23T05:16:49.431242Z",
+      "upload_url": null,
+      "upload_expires_in": null
+    },
+    "upload-2": {
+      "status": 200,
+      "request_id": "ai019-e4b477cee2ff-upload-2",
+      "file_id": 3,
+      "bytes": 74,
+      "sha256": "a6a1ff0cd931bef7a911f400fdb84d542e48a49745c57b0dcf7c6ddb778da41a"
+    },
+    "multi-image-created": {
+      "id": 10,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "category": "OTHER",
+      "severity": "LOW",
+      "priority": "MEDIUM",
+      "version": 1,
+      "current_assignment_id": null,
+      "incident_id": null,
+      "sla_due_at": "2026-09-24T05:16:49.491666Z",
+      "assigned_at": null,
+      "accepted_at": null,
+      "started_at": null,
+      "resolved_at": null,
+      "closed_at": null,
+      "created_at": "2026-09-23T05:16:49.495269Z",
+      "updated_at": "2026-09-23T05:16:49.495269Z",
+      "sla_overdue": false
+    },
+    "multi-image-auto-assigned": {
+      "work_order": {
+        "id": 10,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 1,
+        "reporter_user_id": 3,
+        "status": "ASSIGNED",
+        "process_reason": "NONE",
+        "category": "ELECTRICAL",
+        "severity": "HIGH",
+        "priority": "HIGH",
+        "version": 3,
+        "current_assignment_id": 11,
+        "incident_id": null,
+        "sla_due_at": "2026-09-24T05:16:49.491666Z",
+        "assigned_at": "2026-09-23T05:16:49.911616Z",
+        "accepted_at": null,
+        "started_at": null,
+        "resolved_at": null,
+        "closed_at": null,
+        "created_at": "2026-09-23T05:16:49.495269Z",
+        "updated_at": "2026-09-23T05:16:49.989499Z",
+        "sla_overdue": false
+      },
+      "text": "ai019-e4b477cee2ff 两张合成测试图片，用于验证逐图接线；客厅灯具线路故障。",
+      "asr_text": null,
+      "extra_notes": null,
+      "media": [
+        {
+          "id": 2,
+          "file_id": 2,
+          "kind": "IMAGE",
+          "taken_phase": "REPORT",
+          "uploader_user_id": 3,
+          "created_at": "2026-09-23T05:16:49.502021Z"
+        },
+        {
+          "id": 3,
+          "file_id": 3,
+          "kind": "IMAGE",
+          "taken_phase": "REPORT",
+          "uploader_user_id": 3,
+          "created_at": "2026-09-23T05:16:49.507223Z"
+        }
+      ],
+      "assignments": [
+        {
+          "id": 11,
+          "employee_id": 2,
+          "assigned_by_user_id": null,
+          "status": "ACTIVE",
+          "assigned_at": "2026-09-23T05:16:49.911616Z",
+          "accept_at": null,
+          "ended_at": null,
+          "reason": "AUTO_DISPATCH"
+        }
+      ],
+      "processes": [],
+      "receipts": [],
+      "feedbacks": [],
+      "logs": [
+        {
+          "id": 73,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-23T05:16:49.510829Z"
+        },
+        {
+          "id": 74,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "ANALYZE",
+          "reason": null,
+          "created_at": "2026-09-23T05:16:49.743022Z"
+        },
+        {
+          "id": 75,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "process_reason": "NONE",
+          "event_code": "ASSIGN",
+          "reason": null,
+          "created_at": "2026-09-23T05:16:49.991604Z"
+        }
+      ]
+    },
+    "download-1": {
+      "status": 200,
+      "file_id": 2,
+      "sha256": "85ed7594830299e8ff62dc0a7de1d4a1aa76d2b4f07ef1c24bf2098171c85133",
+      "bytes": 74,
+      "mode": "actual authorized content response, not metadata"
+    },
+    "download-2": {
+      "status": 200,
+      "file_id": 3,
+      "sha256": "a6a1ff0cd931bef7a911f400fdb84d542e48a49745c57b0dcf7c6ddb778da41a",
+      "bytes": 74,
+      "mode": "actual authorized content response, not metadata"
+    }
+  },
+  "requests": [
+    {
+      "label": "normal-page-principal",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d809973a192eff2f"
+    },
+    {
+      "label": "file-1",
+      "method": "POST",
+      "path": "/files",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "bcacdd36c16171e0"
+    },
+    {
+      "label": "file-2",
+      "method": "POST",
+      "path": "/files",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "b3fe1d462ea683bb"
+    },
+    {
+      "label": "multi-image-created",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "112abe4add2e3db6"
+    },
+    {
+      "label": "assigned-poll-0",
+      "method": "GET",
+      "path": "/work-orders/10",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6c6cf182eb548bc2"
+    },
+    {
+      "label": "assigned-poll-1",
+      "method": "GET",
+      "path": "/work-orders/10",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e5b6fc2a4a9d6217"
+    },
+    {
+      "label": "assigned-poll-2",
+      "method": "GET",
+      "path": "/work-orders/10",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e1a57a5bc670ec3c"
+    }
+  ],
+  "mode": "Real normal page credential reused, normal file/content/repair APIs, actual independentWorker; not UI creation of images and not real-model effects.",
+  "database": {
+    "target": "127.0.0.1:3307/property_ai_auth001_test",
+    "revision": "20260919_0009",
+    "orders": [
+      {
+        "order_id": 9,
+        "state": "ASSIGNED",
+        "analysis_id": 9,
+        "prompt_version": "wo-analysis-v2",
+        "input_hash": "940aa1b74ed2075d7c398d729ac25e6c56ec567c344ad91236ed3d98210f01b6",
+        "context_reconstruction": {
+          "house": {
+            "property_name": "014合成小区-wo014-745f67277104",
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "014-01"
+          },
+          "reporter_relationships": [
+            "OWNER"
+          ],
+          "recent_house_orders": [
+            {
+              "category": "ELECTRICAL",
+              "status": "CLOSED",
+              "summary": "Kitchen electrical outlet sparking"
+            },
+            {
+              "category": "ELECTRICAL",
+              "status": "CLOSED",
+              "summary": "Kitchen electrical outlet sparking"
+            },
+            {
+              "category": "ELECTRICAL",
+              "status": "CANCELLED",
+              "summary": "Kitchen electrical outlet sparking"
+            },
+            {
+              "category": "ELECTRICAL",
+              "status": "CANCELLED",
+              "summary": "Kitchen electrical outlet sparking"
+            },
+            {
+              "category": "ELECTRICAL",
+              "status": "CLOSED",
+              "summary": "Kitchen electrical outlet sparking"
+            }
+          ]
+        },
+        "context_boundary": "SELECT-only post-call reconstruction matching saved hash, not a real-model comprehension claim",
+        "media_calls": [],
+        "ai_call_logs": [
+          {
+            "id": 9,
+            "provider_type": "LLM",
+            "provider_mode": "DEVELOPMENT",
+            "operation": "structured_completion",
+            "status": "SUCCESS",
+            "prompt_version": "wo-analysis-v2",
+            "model_version": "dev-llm-v1",
+            "token_usage": null,
+            "input_hash": "940aa1b74ed2075d7c398d729ac25e6c56ec567c344ad91236ed3d98210f01b6",
+            "request_id": "9a812f70ca924ece8eae75afdc5d7afb"
+          }
+        ]
+      },
+      {
+        "order_id": 10,
+        "state": "ASSIGNED",
+        "analysis_id": 10,
+        "prompt_version": "wo-analysis-v2",
+        "input_hash": "f597ac57df1500f4a1c3c1b4f5a7d41166283306671f88e5f51514e1ec6d93f9",
+        "context_reconstruction": {
+          "house": {
+            "property_name": "014合成小区-wo014-745f67277104",
+            "building_code": "WO014",
+            "building_name": "014合成楼栋",
+            "unit_code": "U014",
+            "unit_name": "014合成单元",
+            "room_no": "014-01"
+          },
+          "reporter_relationships": [
+            "OWNER"
+          ],
+          "recent_house_orders": [
+            {
+              "category": "ELECTRICAL",
+              "status": "ASSIGNED",
+              "summary": "Kitchen electrical outlet sparking"
+            },
+            {
+              "category": "ELECTRICAL",
+              "status": "CLOSED",
+              "summary": "Kitchen electrical outlet sparking"
+            },
+            {
+              "category": "ELECTRICAL",
+              "status": "CLOSED",
+              "summary": "Kitchen electrical outlet sparking"
+            },
+            {
+              "category": "ELECTRICAL",
+              "status": "CANCELLED",
+              "summary": "Kitchen electrical outlet sparking"
+            },
+            {
+              "category": "ELECTRICAL",
+              "status": "CANCELLED",
+              "summary": "Kitchen electrical outlet sparking"
+            }
+          ]
+        },
+        "context_boundary": "SELECT-only post-call reconstruction matching saved hash, not a real-model comprehension claim",
+        "media_calls": [
+          {
+            "media_id": 2,
+            "file_id": 2,
+            "ai_call_id": 10,
+            "input_hash": "5d3c7d2247efc54c48b6bc450281a21b291f527abfc92dc94e4d8fe59de6d54c"
+          },
+          {
+            "media_id": 3,
+            "file_id": 3,
+            "ai_call_id": 11,
+            "input_hash": "173daf6f97aa4ac6b25417a4b9c5892fbfcc8dc73de03683ee3e5d663e85af0e"
+          }
+        ],
+        "ai_call_logs": [
+          {
+            "id": 10,
+            "provider_type": "VLM",
+            "provider_mode": "DEVELOPMENT",
+            "operation": "inspect_image",
+            "status": "SUCCESS",
+            "prompt_version": "wo-analysis-v2",
+            "model_version": "dev-vlm-v1",
+            "token_usage": null,
+            "input_hash": "5d3c7d2247efc54c48b6bc450281a21b291f527abfc92dc94e4d8fe59de6d54c",
+            "request_id": "ai019-e4b477cee2ff-multi-image-created"
+          },
+          {
+            "id": 11,
+            "provider_type": "VLM",
+            "provider_mode": "DEVELOPMENT",
+            "operation": "inspect_image",
+            "status": "SUCCESS",
+            "prompt_version": "wo-analysis-v2",
+            "model_version": "dev-vlm-v1",
+            "token_usage": null,
+            "input_hash": "173daf6f97aa4ac6b25417a4b9c5892fbfcc8dc73de03683ee3e5d663e85af0e",
+            "request_id": "ai019-e4b477cee2ff-multi-image-created"
+          },
+          {
+            "id": 12,
+            "provider_type": "LLM",
+            "provider_mode": "DEVELOPMENT",
+            "operation": "structured_completion",
+            "status": "SUCCESS",
+            "prompt_version": "wo-analysis-v2",
+            "model_version": "dev-llm-v1",
+            "token_usage": null,
+            "input_hash": "f597ac57df1500f4a1c3c1b4f5a7d41166283306671f88e5f51514e1ec6d93f9",
+            "request_id": "ai019-e4b477cee2ff-multi-image-created"
+          }
+        ]
+      }
+    ]
+  },
+  "queue": {
+    "vhost": "property_ai_auth001",
+    "actual_output": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nproperty_ai.auth001.dlq\t2\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1\nceleryev.0bad81a2-05ea-41a8-a013-3819daa986c1\t0\t0\t1\n",
+    "shared_vhost_accessed": false,
+    "message_content_read": false
+  },
+  "observed_at_utc": "2026-09-23T05:16:50.925026+00:00",
+  "status": "API_DB_WORKER_DEVELOPMENT_PASS_PENDING_INDEPENDENT_REVIEW",
+  "limits": [
+    "Two PNGs are actual synthetic stored bytes, not realistic visual quality tests. DevelopmentVLM is fixed; no Qwen invoked.",
+    "Provider-reported non-null token usage is verified by MockTransport unit tests only. LiveDevelopment usage staysNULL.",
+    "Current actualcontext is tenant1/property1/house1/OWNER with bounded older summaries; foreign-scope isolation is source/unit evidence, not a new cross-tenant runtime fixture.",
+    "New two orders remainASSIGNED for this evidence; no SQL status writes or lifecycle replay."
+  ]
+}
