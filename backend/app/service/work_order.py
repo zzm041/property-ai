@@ -592,6 +592,7 @@ class WorkOrderService:
         WorkOrderContent | None,
         tuple[WorkOrderMedia, ...],
         tuple[WorkOrderAssignment, ...],
+        tuple[WorkOrderProcess, ...],
         tuple[WorkOrderReceipt, ...],
         tuple[WorkOrderFeedback, ...],
         tuple[WorkOrderLog, ...],
@@ -602,6 +603,7 @@ class WorkOrderService:
             self._repository.get_content(record.id),
             self._repository.list_media(record.id),
             self._repository.list_assignments(record.id),
+            self._repository.list_processes(record.id),
             self._repository.list_receipts(record.id),
             self._repository.list_feedbacks(record.id),
             self._repository.list_logs(record.id),
@@ -744,13 +746,13 @@ class WorkOrderService:
         version: int | None = None,
     ) -> WorkOrder:
         self._validate_request_id(request_id)
-        if not isinstance(reason, str) or not reason.strip():
+        if not isinstance(reason, str) or not reason.strip() or len(reason) > 255:
             raise AppError(
                 code=WorkOrderErrorCode.INVALID_INPUT,
-                message="reason is required",
+                message="reason must contain 1 to 255 characters",
                 status_code=422,
             )
-        return self._execute(
+        record = self._execute(
             lambda: self._reopen(
                 actor=actor,
                 work_order_id=work_order_id,
@@ -759,6 +761,9 @@ class WorkOrderService:
                 version=version,
             )
         )
+        if record.status == WorkOrderStatus.PENDING_ASSIGNMENT.value:
+            self._enqueue_analysis(record.id, request_id)
+        return record
 
     def rate(
         self,
@@ -1473,6 +1478,7 @@ class WorkOrderService:
                 actor_type=WorkOrderActorType.RESIDENT,
                 request_id=request_id,
                 reason_code="REOPEN",
+                reason_detail=reason,
             )
             next_cycle = 1 if process is None else process.cycle_no + 1
             self._repository.add_process(
@@ -1499,7 +1505,10 @@ class WorkOrderService:
                 actor_type=WorkOrderActorType.RESIDENT,
                 request_id=request_id,
                 reason_code="REOPEN",
+                reason_detail=reason,
             )
+        record.resolved_at = None
+        self._resume_reopened_sla(record)
         self._append_audit(
             action=AuditAction.WORK_ORDER_REOPENED,
             resource_type=AuditResourceType.WORK_ORDER,
@@ -2774,6 +2783,19 @@ class WorkOrderService:
         clock = self._repository.get_sla_clock(record.id)
         if clock is not None:
             clock.state = SlaClockState.STOPPED.value
+
+    def _resume_reopened_sla(self, record: WorkOrder) -> None:
+        """Resume the original deadline without repeating prior SLA alerts."""
+        clock = self._repository.get_sla_clock_for_update(record.id)
+        if clock is None or clock.state != SlaClockState.STOPPED.value:
+            return
+        events = {item.event_code for item in self._repository.list_logs(record.id)}
+        if WorkOrderEvent.SLA_OVERDUE.value in events:
+            clock.state = SlaClockState.OVERDUE.value
+        elif WorkOrderEvent.SLA_WARNING.value in events:
+            clock.state = SlaClockState.WARNING.value
+        else:
+            clock.state = SlaClockState.OPEN.value
 
     def _property_scope(self, record: WorkOrder) -> OrganizationScope:
         return OrganizationScope(

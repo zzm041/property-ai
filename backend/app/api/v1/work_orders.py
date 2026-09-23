@@ -25,6 +25,7 @@ from app.schema.work_order import (
     WorkOrderListData,
     WorkOrderLogData,
     WorkOrderMediaData,
+    WorkOrderProcessData,
     WorkOrderReceiptData,
 )
 from app.service.work_order import WorkOrderService
@@ -142,10 +143,12 @@ def get_work_order(
         content,
         media,
         assignments,
+        processes,
         receipts,
         feedbacks,
         logs,
     ) = service.get_work_order_detail(actor=actor, work_order_id=work_order_id)
+    process_by_id = {item.id: item for item in processes}
     detail = WorkOrderDetailData(
         work_order=work_order_data(record, overdue=service.is_overdue(record)),
         text=None if content is None else content.text,
@@ -158,6 +161,7 @@ def get_work_order(
                 kind=item.kind,
                 taken_phase=item.taken_phase,
                 uploader_user_id=item.uploader_user_id,
+                created_at=item.created_at,
             )
             for item in media
         ],
@@ -174,10 +178,22 @@ def get_work_order(
             )
             for item in assignments
         ],
+        processes=[
+            WorkOrderProcessData(
+                id=item.id,
+                cycle_no=item.cycle_no,
+                assignee_id=item.assignee_id,
+                started_at=item.started_at,
+                ended_at=item.ended_at,
+            )
+            for item in processes
+        ],
         receipts=[
             WorkOrderReceiptData(
                 id=item.id,
                 process_id=item.process_id,
+                cycle_no=process_by_id[item.process_id].cycle_no,
+                assignee_id=process_by_id[item.process_id].assignee_id,
                 problem_type=item.problem_type,
                 method=item.method,
                 materials=item.materials,
@@ -193,6 +209,7 @@ def get_work_order(
         feedbacks=[
             WorkOrderFeedbackData(
                 id=item.id,
+                process_id=item.process_id,
                 actor_user_id=item.actor_user_id,
                 confirmed=None if item.confirmed is None else bool(item.confirmed),
                 rating=item.rating,

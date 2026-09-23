@@ -110,5 +110,6 @@ def test_resident_page_shows_receipt_and_versions_confirmation() -> None:
     assert "latestReceipt" in source
     assert "confirmWorkOrder(this.id, { version: this.data.workOrder.version })" in source
     assert "处理回执" in template
-    assert "latestReceipt.method" in template
-    assert "latestReceipt.fee_amount" in template
+    assert "cycle.receipt.method" in template
+    assert "cycle.receipt.fee_amount" in template
+    assert 'wx:for="{{processHistory}}"' in template

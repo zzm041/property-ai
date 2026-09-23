@@ -452,6 +452,7 @@ def test_detail_returns_saved_rating_and_cancel_reason() -> None:
     record = _record(61, "CLOSED")
     feedback = SimpleNamespace(
         id=4,
+        process_id=None,
         actor_user_id=7,
         confirmed=None,
         rating=5,
@@ -478,6 +479,7 @@ def test_detail_returns_saved_rating_and_cancel_reason() -> None:
         (),
         (),
         (),
+        (),
         (feedback,),
         (log,),
     )
@@ -487,6 +489,7 @@ def test_detail_returns_saved_rating_and_cancel_reason() -> None:
     assert detail["feedbacks"] == [
         {
             "id": 4,
+            "process_id": None,
             "actor_user_id": 7,
             "confirmed": None,
             "rating": 5,

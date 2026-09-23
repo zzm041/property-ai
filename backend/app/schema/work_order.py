@@ -168,6 +168,7 @@ class WorkOrderMediaData(BaseModel):
     kind: str
     taken_phase: str
     uploader_user_id: int
+    created_at: datetime
 
 
 class WorkOrderLogData(BaseModel):
@@ -195,9 +196,19 @@ class WorkOrderAssignmentData(BaseModel):
     reason: str | None
 
 
+class WorkOrderProcessData(BaseModel):
+    id: int
+    cycle_no: int
+    assignee_id: int
+    started_at: datetime
+    ended_at: datetime | None
+
+
 class WorkOrderReceiptData(BaseModel):
     id: int
     process_id: int
+    cycle_no: int
+    assignee_id: int
     problem_type: str
     method: str
     materials: str | None
@@ -211,6 +222,7 @@ class WorkOrderReceiptData(BaseModel):
 
 class WorkOrderFeedbackData(BaseModel):
     id: int
+    process_id: int | None
     actor_user_id: int
     confirmed: bool | None
     rating: int | None
@@ -251,6 +263,7 @@ class WorkOrderDetailData(BaseModel):
     extra_notes: str | None = None
     media: list[WorkOrderMediaData] = Field(default_factory=list)
     assignments: list[WorkOrderAssignmentData] = Field(default_factory=list)
+    processes: list[WorkOrderProcessData] = Field(default_factory=list)
     receipts: list[WorkOrderReceiptData] = Field(default_factory=list)
     feedbacks: list[WorkOrderFeedbackData] = Field(default_factory=list)
     logs: list[WorkOrderLogData] = Field(default_factory=list)

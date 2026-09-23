@@ -14,6 +14,8 @@ Page({
     workOrder: null,
     autoDispatched: false,
     latestReceipt: null,
+    processHistory: [],
+    reopenReason: "",
     media: [],
     logs: [],
     feedbacks: [],
@@ -50,7 +52,7 @@ Page({
   },
   reload() {
     const { withLoading, workOrderOf } = require("../../utils/ui");
-    withLoading(this, () =>
+    return withLoading(this, () =>
       require("../../services/api")
         .workOrder(this.id)
         .then((item) => {
@@ -59,6 +61,11 @@ Page({
           const assignments = (item && item.assignments) || [];
           const receipts = (item && item.receipts) || [];
           const feedbacks = (item && item.feedbacks) || [];
+          const processHistory = ((item && item.processes) || []).map((process) => ({
+            ...process,
+            receipt: receipts.find((receipt) => receipt.process_id === process.id) || null,
+            feedbacks: feedbacks.filter((feedback) => feedback.process_id === process.id),
+          }));
           const ratings = feedbacks.filter((feedback) => feedback.rating != null);
           const latestRating = ratings.length ? ratings[ratings.length - 1] : null;
           const currentAssignment = assignments.length
@@ -73,6 +80,7 @@ Page({
               currentAssignment.reason === "AUTO_DISPATCH" &&
               currentAssignment.assigned_by_user_id == null,
             latestReceipt: receipts.length ? receipts[receipts.length - 1] : null,
+            processHistory,
             media: (item && item.media) || [],
             logs: (item && item.logs) || [],
             feedbacks,
@@ -250,24 +258,41 @@ Page({
     ).catch(() => {});
   },
   confirm() {
+    if (this.data.loading) {
+      return;
+    }
     this._stopPendingRefresh();
     const { withLoading } = require("../../utils/ui");
-    withLoading(this, () =>
+    return withLoading(this, () =>
       require("../../services/api")
         .confirmWorkOrder(this.id, { version: this.data.workOrder.version })
         .then(() => this.reload())
     ).catch(() => {});
   },
+  onReopenReason(e) {
+    this.setData({ reopenReason: e.detail.value });
+  },
   reopen() {
+    if (this.data.loading) {
+      return;
+    }
+    const reason = this.data.reopenReason.trim();
+    if (!reason || reason.length > 255) {
+      this.setData({ error: "请填写未解决的具体情况（1至255字）" });
+      return;
+    }
     this._stopPendingRefresh();
     const { withLoading } = require("../../utils/ui");
-    withLoading(this, () =>
+    return withLoading(this, () =>
       require("../../services/api")
         .reopenWorkOrder(this.id, {
-          reason: "未解决",
+          reason,
           version: this.data.workOrder.version,
         })
-        .then(() => this.reload())
+        .then(() => {
+          this.setData({ reopenReason: "", actionNotice: "未解决反馈已保存，物业将继续处理" });
+          return this.reload();
+        })
     ).catch(() => {});
   },
   previewMedia(e) {

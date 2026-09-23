@@ -11,9 +11,10 @@
   </view>
 </view>
 <view class="card" wx:if="{{media.length}}">
-  <view>附件</view>
+  <view>工单附件（保留全部历史）</view>
   <view wx:for="{{media}}" wx:key="id">
     <view>{{item.taken_phase}} {{item.kind}}</view>
+    <view class="empty">上传时间 {{item.created_at}}</view>
     <button class="btn" wx:if="{{item.kind === 'IMAGE'}}" data-file-id="{{item.file_id}}" bindtap="previewMedia">查看图片</button>
     <button class="btn" wx:if="{{item.kind === 'AUDIO'}}" data-file-id="{{item.file_id}}" bindtap="playMedia">播放语音</button>
   </view>
@@ -30,18 +31,32 @@
   <textarea class="field" data-field="cancelReason" placeholder="撤销原因（可选）" value="{{cancelReason}}" bindinput="onCancelReason" maxlength="255"></textarea>
   <button class="btn btn-secondary" data-action="cancel" bindtap="cancel" disabled="{{loading}}">撤销工单</button>
 </view>
-<view class="card" wx:if="{{latestReceipt}}">
-  <view>处理回执</view>
-  <view>问题类型 {{latestReceipt.problem_type}}</view>
-  <view>处理方式与过程 {{latestReceipt.method}}</view>
-  <view wx:if="{{latestReceipt.materials}}">使用材料 {{latestReceipt.materials}}</view>
-  <view wx:if="{{latestReceipt.fee_flag === 'RECORDED'}}">费用记录 ¥{{latestReceipt.fee_amount}}</view>
-  <view wx:else>未产生费用</view>
-  <view wx:if="{{latestReceipt.follow_up}}">后续处理 {{latestReceipt.follow_up}}</view>
-  <view>完成时间 {{latestReceipt.finished_at}}</view>
+<view class="card" wx:for="{{processHistory}}" wx:for-item="cycle" wx:key="id">
+  <view>第 {{cycle.cycle_no}} 轮处理 · 员工 {{cycle.assignee_id}}</view>
+  <view class="empty">开始时间 {{cycle.started_at}}</view>
+  <view wx:if="{{cycle.receipt}}">
+    <view>处理回执</view>
+    <view>问题类型 {{cycle.receipt.problem_type}}</view>
+    <view>处理方式与过程 {{cycle.receipt.method}}</view>
+    <view wx:if="{{cycle.receipt.materials}}">使用材料 {{cycle.receipt.materials}}</view>
+    <view wx:if="{{cycle.receipt.fee_flag === 'RECORDED'}}">费用记录 ¥{{cycle.receipt.fee_amount}}</view>
+    <view wx:else>未产生费用</view>
+    <view>员工处理结果：{{cycle.receipt.resolved ? '已处理' : '未解决'}}</view>
+    <view wx:if="{{cycle.receipt.unresolved_reason}}">未解决原因 {{cycle.receipt.unresolved_reason}}</view>
+    <view wx:if="{{cycle.receipt.follow_up}}">后续处理 {{cycle.receipt.follow_up}}</view>
+    <view>完成时间 {{cycle.receipt.finished_at}}</view>
+  </view>
+  <view class="empty" wx:else>{{cycle.ended_at ? '本轮处理已结束，未提交回执' : '本轮处理中，尚未提交回执'}}</view>
+  <view wx:for="{{cycle.feedbacks}}" wx:for-item="feedback" wx:key="id">
+    <view wx:if="{{feedback.unresolved_flag}}">住户反馈未解决：{{feedback.comment}}</view>
+    <view wx:elif="{{feedback.confirmed}}">住户已确认解决</view>
+    <view wx:if="{{feedback.rating != null}}">住户评价 {{feedback.rating}} 分 {{feedback.comment}}</view>
+    <view class="empty">反馈时间 {{feedback.created_at}}</view>
+  </view>
 </view>
 <view class="card" wx:if="{{canConfirm || canReopen}}">
   <button class="btn" data-action="confirm" wx:if="{{canConfirm}}" bindtap="confirm" disabled="{{loading}}">确认解决</button>
+  <textarea class="field" wx:if="{{canReopen}}" data-field="reopenReason" placeholder="请说明仍未解决的问题（必填）" value="{{reopenReason}}" bindinput="onReopenReason" maxlength="255"></textarea>
   <button class="btn" data-action="reopen" wx:if="{{canReopen}}" bindtap="reopen" disabled="{{loading}}">未解决重开</button>
 </view>
 <view class="card" wx:if="{{canRate}}">
