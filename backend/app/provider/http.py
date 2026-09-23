@@ -1,10 +1,12 @@
 """Shared HTTP mapping for production providers. Never log secrets."""
 
 from collections.abc import Mapping
+from ipaddress import ip_address
 import json
 import logging
 import time
 from typing import Any
+from urllib.parse import urlsplit
 
 import httpx
 
@@ -19,6 +21,15 @@ from app.provider.errors import (
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
 logger = get_logger(__name__)
+
+
+def _loopback_target(url: str) -> bool:
+    """Classify literal loopback targets without DNS or substring matching."""
+    try:
+        host = urlsplit(url).hostname
+        return host is not None and ip_address(host).is_loopback
+    except ValueError:
+        return False
 
 
 def request_json(
@@ -36,7 +47,12 @@ def request_json(
     operation: str = "request",
 ) -> Any:
     own_client = client is None
-    http = client or httpx.Client(timeout=timeout_seconds)
+    # Local inference must never inherit a workstation's external proxy.
+    # Explicitly injected clients remain caller-owned (e.g. test transports).
+    # Non-loopback providers retain their existing environment/TLS behavior.
+    http = client or httpx.Client(
+        timeout=timeout_seconds, trust_env=not _loopback_target(url)
+    )
     started_at = time.perf_counter()
     try:
         response = http.request(

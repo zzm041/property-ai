@@ -1,0 +1,51 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001-PROXY",
+  "phase": "review",
+  "reviewed_head": "d97fcb48172abfab054c52a43042b5402dccf6a9",
+  "decision": "PASS",
+  "actions_or_findings": [
+    {
+      "title": "[NON_BLOCKING] PROXY-N1：显式注入客户端仍由调用者负责代理配置",
+      "path": "D:/property-ai/backend/app/provider/http.py:48",
+      "trigger": "调用 request_json 时显式传入 httpx.Client。",
+      "rationale": "本轮只对内部创建的客户端设置 trust_env=False，不替换或关闭调用者提供的客户端。已核对 LLM/VLM 正常工厂路径未注入客户端，因而受本次修复保护；不得将该保证推广到任意外部注入客户端。专项测试明确验证客户端保留及不被关闭。"
+    },
+    {
+      "title": "[NON_BLOCKING] PROXY-N2：保护范围为字面量回环地址",
+      "path": "D:/property-ai/backend/app/provider/http.py:26",
+      "trigger": "后续将本地模型地址改为 localhost、域名或其他非字面量回环地址。",
+      "rationale": "当前实现通过解析 hostname 和 ip_address.is_loopback 判断，不使用字符串包含或 DNS。127.0.0.1:11435、127/8 和 ::1 获得代理隔离；普通域名仍保留既有环境代理行为。当前批准地址满足保护条件，未来改变地址形式时应重新核对，不应笼统宣称所有本地名称均受保护。"
+    }
+  ],
+  "evidence_paths": [
+    "D:/property-ai/AGENTS.md",
+    "D:/property-ai/.cursor/rules/project.mdc",
+    "D:/property-ai/docs/05-AI-DISPATCH-SPEC.md",
+    "D:/property-ai/docs/07-SECURITY-PRIVACY.md",
+    "D:/property-ai/backend/app/provider/http.py",
+    "D:/property-ai/backend/tests/unit/test_provider_loopback_proxy.py",
+    "D:/property-ai/backend/app/provider/factory.py",
+    "D:/property-ai/backend/app/provider/llm/__init__.py",
+    "D:/property-ai/backend/app/provider/vision/__init__.py",
+    "D:/property-ai/backend/app/service/analysis.py",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/focused-loopback-proxy.txt",
+    "D:/property-ai/reports/codex/review-schema.json"
+  ],
+  "unverified": [
+    "审查者没有重新运行测试；45 passed、3 warnings、2.97 秒来自实际读取的专项输出。警告包括 Starlette 弃用及两项 pytest 缓存写入权限警告，输出前另有 pytest_asyncio 配置弃用提示。",
+    "未运行模型、页面、业务请求、数据库或队列操作；未核对运行中 API/Worker 是否已加载这份尚未提交的修复。",
+    "测试使用本机合成 HTTP 服务及合成图片字节验证传输，不构成真实 Qwen 文字、图片理解或工单自动派单效果验收。",
+    "外部 Provider 的 HTTP 环境代理行为有本地代理测试；真实外部 HTTPS、企业 CA 和生产网络没有运行验证。",
+    "4B 质量、实际 AUTO、023、真实 bge-m3/Qwen、生产 RAG 和 Production V1 均不在本轮通过范围。"
+  ],
+  "session_note": "本结论来自与主实施会话分离的独立只读子上下文 /root/wo014_independent_review，非主会话自评。实际读取规则、产品差异、完整新测试、工厂及 LLM/VLM 调用代码、AnalysisService 构造上下文和专项原始输出；没有写文件、运行测试或发出业务请求，没有递归创建审查者。审查对象为指定 HEAD 加本轮 WIP，而非声称修复已包含在 HEAD：http.py SHA-256=025A6F8CD20DDA35190A61CEECA970DC49BC8BE7573DDB5ACCFE4470CE00B574；test_provider_loopback_proxy.py SHA-256=4EBB3E63FD3C43964940E95E35EDC265AD4EC3BABE245820A3D9E4E527E4E155。",
+  "task_result": "PASS，仅限回环 Provider 环境代理隔离的软件修复。未发现 CURRENT_TASK_BLOCKER。内部客户端访问 127.0.0.1:11435 时禁用环境信任，因此不会继承 HTTP_PROXY、HTTPS_PROXY 或 ALL_PROXY；正常 LLM/VLM 工厂调用经过该路径。测试同时设置大小写代理变量、清空 NO_PROXY，验证文字和图片请求到达本地目标而代理收件为空；外部地址仍经过代理。主机名伪装、userinfo 和 query 不会误判为回环地址。既有超时、错误映射及客户端所有权逻辑保持。",
+  "product_gap_changes": [
+    "本地字面量回环模型端点继承环境代理的源码缺口，在本轮已审查 WIP 和专项测试范围内关闭。",
+    "运行态缺口须在 API/Worker 实际加载该修复后据实更新；本轮未证明这一点。",
+    "既有真实模型质量、业务 AUTO 与生产发布阻塞不变；本次 PASS 不提升任何其他任务状态。"
+  ],
+  "schedule_risk": "本轮未发现需要返修的范围内缺陷。主要后续风险是运行进程仍加载旧源码，或未来通过显式客户端、域名地址绕开当前保护范围。",
+  "next_action": "主会话保存本次独立审查结果，按准确路径提交本轮产品修复、测试和脱敏证据，排除用户预存 project.config.json 及其他任务修改；在既有授权边界内核对相关运行进程加载版本，再继续当前任务。无需为本次复审重跑已通过业务、页面或模型样本。",
+  "approval_requests": []
+}
