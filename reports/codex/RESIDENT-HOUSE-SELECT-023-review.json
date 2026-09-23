@@ -1,0 +1,130 @@
+{
+  "task_id": "RESIDENT-HOUSE-SELECT-023",
+  "phase": "review",
+  "reviewed_head": "87792ee7f8069bcdd9538402f98a090029d23d55",
+  "decision": "PASS",
+  "actions_or_findings": [
+    {
+      "title": "HSEL023-C1 VERIFIED：地址展示复用有效关系和原分页契约",
+      "path": "D:/property-ai/backend/app/repository/property.py:47",
+      "trigger": "登录住户读取 /me/houses，并加载后续有效房屋关系。",
+      "rationale": "地址投影仅接收现有授权分页中的 House，按 house_id、tenant_id、property_id 限定，并在 Property/Building/Unit 关联中保持复合组织条件。ResidentBindingService.list_my_house_views 复用 list_my_houses，不改变原 pair 返回契约；原查询继续限制当前用户、ACTIVE 及有效期。API 游标仍为 relation_id。实际 API 分页为 20+20+11，51 条关系与只读 SQL 对应，无重复；尾页后为空，limit 0/101 被拒绝。"
+    },
+    {
+      "title": "HSEL023-C2 VERIFIED：真实页面选择与唯一工单对应",
+      "path": "D:/property-ai/miniprogram/pages/work-orders/create.js:55",
+      "trigger": "住户从正常报修入口选择完整地址并提交。",
+      "rationale": "已移除可编辑内部房屋 ID；查询参数和缓存仅是 preference，必须匹配本次服务器授权列表才形成选择。实际打开了全部 9 张截图。原 localqwen-b1090f3deaa3 页面通过真实控件选择 house 1，唯一 POST /work-orders 返回工单 12，request_id 为 1af64d3b07114c9ba6abdaaa202918c7；数据库对应 reporter_user_id=3、house_id=1。后续刷新及正常退出重登仍展示同一工单 12、PENDING_ANALYSIS/version 1 与 CREATE 历史 77，没有重新创建工单。"
+    },
+    {
+      "title": "HSEL023-C3 VERIFIED：分页、空关系和失效 preference 安全收敛",
+      "path": "D:/property-ai/miniprogram/pages/work-orders/create.js:36",
+      "trigger": "多房屋分页、刷新、外来 houseId preference、无有效关系或加载失败。",
+      "rationale": "页面实测累计 20/40/51 条，末页选中 house 52；刷新至首 20 条时清空未重新取得授权的选择，加载至末页后才恢复。外来 preference 不产生选择；无有效关系时提交禁用且可导航至绑定入口。代码有加载/卸载守卫；失败、撤销关系、重复游标和迟到响应由保存的 handler 单元证据覆盖，未将这些模拟测试冒充真实页面负向操作。"
+    },
+    {
+      "title": "HSEL023-C4 VERIFIED：后端 Ownership 和组织边界未弱化",
+      "path": "D:/property-ai/backend/app/service/work_order.py:1040",
+      "trigger": "跨住户读取工单、使用他人房屋创建或伪造 property_id。",
+      "rationale": "读取仍经既有 _authorize_read，创建仍复核当前有效房屋关系、实际 House 组织与 RBAC。两次跨住户读取工单 12 返回 IAM.FORBIDDEN/403，符合本工单既有契约，不应套用通知的 404 契约。两次他人房屋创建返回 WO.HOUSE_NOT_OWNED/403；伪造组织返回 WO.SCOPE_MISMATCH/422。15 条独立 API 检查与正常认证记录分列；没有成功业务写入，全部工单快照及工单 12 的 analysis/call/log/Assignment ID 集合保持一致。"
+    },
+    {
+      "title": "HSEL023-C5 VERIFIED：提交守卫和已有幂等规则复用",
+      "path": "D:/property-ai/miniprogram/pages/work-orders/create.js:160",
+      "trigger": "重复点击提交、请求结果未知后重试或提交内容变化。",
+      "rationale": "withLoading 与同步 loading 守卫阻止并行重复提交；请求快照复制附件列表。相同内容重试复用同一 Idempotency-Key，内容变化才产生新 key，后端继续使用既有按用户隔离的幂等记录。本次保存输出为 46 passed 加 2 个新增 route cases passed，合计 48 个 distinct scoped cases；16 deselected 不计通过。独立审查未重跑测试。"
+    },
+    {
+      "title": "HSEL023-C6 VERIFIED：失败记录保留，恢复未重放成功业务",
+      "path": "D:/property-ai/reports/resident-house-select-023/continuation-page.json",
+      "trigger": "自动化导航超时、屏外控件点击未及时完成、API access token 过期及预期状态码写错。",
+      "rationale": "已检查初次/二次中断记录、分页恢复前记录、expired-session 和 denial-resume 记录及采集脚本。页面恢复继续原有状态，实际滚动点击后等待；API 恢复按已保存 label 跳过成功请求。最终续接页面记录只有 19 次 GET；三个创建探测均被拒绝。原工单创建仍仅一次。队列元数据明确为 property_ai_auth001 vhost、property_ai.auth001 queue，0 ready/0 unacked/1 consumer；历史 DLQ 为 3 条且未读消息内容。"
+    },
+    {
+      "title": "HSEL023-N1 NON_BLOCKING：长合成地址显示较窄",
+      "path": "D:/property-ai/miniprogram/pages/work-orders/create.wxml:4",
+      "trigger": "较窄 DevTools 视口显示较长的合成小区、楼栋和单元名称。",
+      "rationale": "截图可见地址多行换行、长列表需滚动，但完整地址、选中标记和实际选择结果均可核对，没有证据表明阻断本次选房流程。保留正式响应式布局、真机与大规模关系体验验收；不据此要求扩大本切片或重构。"
+    },
+    {
+      "title": "HSEL023-N2 NON_BLOCKING：跟踪文件等待本轮结论落盘",
+      "path": "D:/property-ai/reports/project-handoff.md:29",
+      "trigger": "本轮独立 review 尚未由主会话保存并更新现有 tracking。",
+      "rationale": "review.md、handoff 和 matrix 当前仍保留 023 WIP/待补证状态，这是结论落盘前的跟踪欠项，不是产品缺陷。主会话应保存本 JSON、更新 023 当前 overlay 和交接，不改原需求 ID、不覆盖历史证据、不重复计数，也不升级 SELFHOST/AUTO/production。"
+    },
+    {
+      "title": "HSEL023-R1 RELEASE_BLOCKER：真实模型业务质量和 Production 尚未通过",
+      "path": "D:/property-ai/reports/auth-identity-ai-001/local-qwen/business-database-runtime.json",
+      "trigger": "把地址选择成功、真实模型调用成功或只读 4B 诊断解释为自动派单或正式发布通过。",
+      "rationale": "真实 2B 调用已发生，但工单 12 仍为 LOW_CONFIDENCE/PENDING_ANALYSIS，零 Assignment；分析出现原报修未陈述的 sparking，不能判定 AUTO 业务成功。post-4b-readonly-state.json 确认没有 4B 业务结果写入。该失败不推翻已经成立的 023 地址选择证据；保留真实 Qwen 业务效果、bge-m3/reranker/生产 RAG、真机与正式发布缺口。用户暂不释放内存的 4B 诊断断点不是 023 阻塞。"
+    }
+  ],
+  "evidence_paths": [
+    "D:/property-ai/AGENTS.md",
+    "D:/property-ai/.cursor/rules/project.mdc",
+    "D:/property-ai/backend/app/api/v1/resident.py",
+    "D:/property-ai/backend/app/repository/property.py",
+    "D:/property-ai/backend/app/repository/resident.py",
+    "D:/property-ai/backend/app/schema/resident.py",
+    "D:/property-ai/backend/app/service/resident.py",
+    "D:/property-ai/backend/app/service/work_order.py",
+    "D:/property-ai/backend/tests/unit/test_resident_house_selection.py",
+    "D:/property-ai/miniprogram/pages/houses/houses.js",
+    "D:/property-ai/miniprogram/pages/houses/houses.wxml",
+    "D:/property-ai/miniprogram/pages/work-orders/create.js",
+    "D:/property-ai/miniprogram/pages/work-orders/create.wxml",
+    "D:/property-ai/miniprogram/services/api.js",
+    "D:/property-ai/miniprogram/utils/house-display.js",
+    "D:/property-ai/miniprogram/utils/paging.js",
+    "D:/property-ai/reports/resident-house-select-023/review.md",
+    "D:/property-ai/reports/resident-house-select-023/focused-initial.txt",
+    "D:/property-ai/reports/resident-house-select-023/focused-route.txt",
+    "D:/property-ai/reports/resident-house-select-023/continuation-preflight.json",
+    "D:/property-ai/reports/resident-house-select-023/continuation-page.json",
+    "D:/property-ai/reports/resident-house-select-023/continuation-api-db.json",
+    "D:/property-ai/reports/resident-house-select-023/continuation-page-first-attempt.json",
+    "D:/property-ai/reports/resident-house-select-023/continuation-page-second-attempt.json",
+    "D:/property-ai/reports/resident-house-select-023/continuation-page-before-paging-resume.json",
+    "D:/property-ai/reports/resident-house-select-023/continuation-api-expired-session.json",
+    "D:/property-ai/reports/resident-house-select-023/continuation-api-before-denial-resume.json",
+    "D:/property-ai/reports/resident-house-select-023/prepare-continuation.py",
+    "D:/property-ai/reports/resident-house-select-023/run-continuation-page.js",
+    "D:/property-ai/reports/resident-house-select-023/resume-paging-page.js",
+    "D:/property-ai/reports/resident-house-select-023/finish-empty-page.js",
+    "D:/property-ai/reports/resident-house-select-023/verify-continuation.py",
+    "D:/property-ai/reports/resident-house-select-023/01-existing-order-refresh.png",
+    "D:/property-ai/reports/resident-house-select-023/02-address-refresh.png",
+    "D:/property-ai/reports/resident-house-select-023/03-foreign-preference-not-selected.png",
+    "D:/property-ai/reports/resident-house-select-023/04-existing-order-relogin.png",
+    "D:/property-ai/reports/resident-house-select-023/05-multiple-houses-last-selection.png",
+    "D:/property-ai/reports/resident-house-select-023/06-last-page-preference-requires-reload.png",
+    "D:/property-ai/reports/resident-house-select-023/07-no-active-house.png",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/01-authorized-address-choice.png",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/02-selected-report-address-resume.png",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/run-business-page.js",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/business-page.json",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/business-database-runtime.json",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/post-4b-readonly-state.json",
+    "D:/property-ai/reports/project-handoff.md",
+    "D:/property-ai/reports/mp-current-full-regression/coverage-matrix.json"
+  ],
+  "unverified": [
+    "本独立上下文实际读取源码、保存的测试与运行证据并打开全部 9 张截图；没有自行运行测试、页面、HTTP、数据库或队列操作。",
+    "加载失败、撤销关系、迟到响应、重复点击和连接结果未知重试主要依据源码及 handler 单元测试，不宣称本轮全部经过真实页面故障注入。",
+    "本轮实际跨用户 API 证据主要为同小区不同住户；跨租户数据投影隔离另由复合 SQL 条件和专项测试支撑，不宣称重新完成全量跨租户运行矩阵。",
+    "实际多房屋规模为 51 条；生产规模、真机、正式微信认证、原生媒体选择及全面响应式体验未由本切片验收。",
+    "正常认证使用本地 Development 短信 inbox 取得验证码，不代表真实短信 Provider 通过。",
+    "真实 2B 自动派单失败仍保留；4B 只读诊断、真实 RAG、ASR、生产安全性能和发布验收不属于本次 PASS。"
+  ],
+  "session_note": "独立只读上下文 /root/bind015_independent_review，round 1，未递归创建审查者、未写文件、未执行测试或业务操作。检查 base ab1bc165ddfde5cac7fde7ff8d02c9f777e1533d 至产品 87792ee7f8069bcdd9538402f98a090029d23d55 的 11 文件修改及必要上下文。证据续接版本 d97fcb48172abfab054c52a43042b5402dccf6a9；审查期间实际 HEAD 已到独立 proxy 切片提交 0fdc65f0ced6e967c4168c9e54d0c7828676294e。已核对这 11 文件从产品版本到运行版本 e65b4d7fb0e9541695fdcb9a1f1b216d97dbf6c2 及当前 HEAD 均无差异。保存的 API/Worker 配置指向 8083、127.0.0.1:3307/property_ai_auth001_test@20260919_0009 和独占 vhost/queue。现场 project.config.json 哈希仍为 342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F，未触碰。",
+  "task_result": "RESIDENT-HOUSE-SELECT-023 round 1：PASS，范围为 scoped local Development 的授权完整地址选择、分页及报修关联软件闭环。未发现 CURRENT_TASK_BLOCKER；零轮返修。不代表 SELFHOST、AUTO 业务效果或 Production V1 通过。",
+  "product_gap_changes": [
+    "可关闭正常住户报修依赖手填内部房屋 ID 的当前软件缺口：现已使用服务器有效关系返回的完整地址选择。",
+    "可关闭本切片的真实 20+20+11 分页、空关系、外来 preference、刷新重登和原工单对应证据缺口。",
+    "保留正式公共地址选择全链体验、真机和规模边界；本次仅接受当前授权范围。",
+    "不改变任何真实模型自动派单、生产 RAG、ACCOUNT-MERGE/0010 或正式发布阻塞状态。"
+  ],
+  "schedule_risk": "023 无需返修或重跑已通过业务；只剩主会话保存审查结果、更新现有 tracking 并准确提交。整体 V1 风险仍集中在真实模型效果及既有生产验收缺口，不应转嫁为本选房切片阻塞。",
+  "next_action": "主会话保存本 review JSON，更新现有 review.md、coverage-matrix 当前 overlay 与 project-handoff，将 023 升级为 scoped local DEVELOPMENT PASS；仅按准确路径提交本任务证据与 tracking，排除受保护配置和其他 WIP。不得重新创建工单 12、重跑既有页面/48 个测试或升级 SELFHOST/AUTO/production。随后依据现有矩阵继续已批准、无需新 Migration/费用的下一软件缺口。",
+  "approval_requests": []
+}

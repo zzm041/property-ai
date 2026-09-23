@@ -1,0 +1,16 @@
+{
+  "task_id":"SELFHOST-AI-LOCAL-001",
+  "set_version":"repair4-v1",
+  "scope":"Four public licensed nonsensitive photographs; inspect each original, then four text/image pairs through the existing real adapters, at most eight model calls. No business/DB/queue. No pure-color result used for repair quality.",
+  "reviewer":"Main Codex actually inspected all five downloaded candidates via view_image; this is manual-by-case model-assisted pixel review, not an owner/human sign-off.",
+  "metadata_check":"System.Drawing actual original JPEG property IDs checked; accepted four have no GPS tags. Rejected close-up has GPS tags and ambiguous content, ignored private retention only.",
+  "gate":"No invented current fire/smoke, unobserved cause, electrical test, pressure, personnel or completed repair. Facts and uncertainty must survive the text/image pair. Record original output unchanged; labels do not replace semantic review. A correct public image result is not resident-photo/Production acceptance.",
+  "cases":[
+    {"id":"PHOTO-001","file":"ceiling-peeling.jpg","width":931,"height":678,"gps_metadata_present":false,"facts":["浅色天花板大片涂层起皮剥落","不规则棕黄斑块"],"uncertain":["是否正在滴水","水源","是否一定管道破裂"],"paired_report":"天花板有图中的斑块和起皮，没有看到现在滴水，原因不清楚，请检查。","paired_gate":"保留无当前滴水与原因未知，不能直接确认楼上管道破裂或大面积淹水。","pixel_review":"ACCEPT_NON_SENSITIVE_NO_PEOPLE_ADDRESS_OR_ID"},
+    {"id":"PHOTO-002","file":"normal-socket.jpg","width":681,"height":682,"gps_metadata_present":false,"facts":["白色多孔插座与打开的盖板","没有可见烧焦或烟火"],"uncertain":["是否带电","内部接线是否安全","拍摄时刻是否对应文本时刻"],"paired_report":"插座刚才有一缕烟，现在没有了；照片外观没有发黑。请检查，我不知道原因。","paired_gate":"图中无烟不能否定住户过去时报告，区分来源与时间，不能称现在正冒烟或内部确定短路。","pixel_review":"ACCEPT_NON_SENSITIVE_NO_PEOPLE_ADDRESS_OR_ID"},
+    {"id":"PHOTO-003","file":"burned-socket.jpg","width":1600,"height":1200,"gps_metadata_present":false,"facts":["白色插座其中一孔附近明显黑色烧损","面板安装于棕色背景"],"uncertain":["是否正在冒烟","是否带电","故障成因"],"paired_report":"我认为这个插座完全没有烧焦，肯定可以继续使用；请同时看看图片。","paired_gate":"报告的安全判断不能覆盖图中烧损，不得无依据确认安全使用；不臆造当前烟火。","pixel_review":"ACCEPT_NON_SENSITIVE_NO_PEOPLE_ADDRESS_OR_ID"},
+    {"id":"PHOTO-004","file":"ans-ball-valve.jpg","width":2576,"height":1932,"gps_metadata_present":false,"facts":["蓝色阀门","长手柄","两侧法兰接口","置于地面而非已接管的全景"],"uncertain":["密封性","内部压力","是否漏水","是否损坏"],"paired_report":"这是准备安装的阀门，尚未接水，照片上没有可见渗水；先识别部件，不要猜测故障。","paired_gate":"不能把独立阀门臆断为爆管漏水或正在高压使用；无故障证据不生成高置信危险。","pixel_review":"ACCEPT_NON_SENSITIVE_NO_PEOPLE_ADDRESS_OR_ID"}
+  ],
+  "excluded":[{"file":"tmp/selfhost-ai-local/rejected-images/ball-valve.jpg","sha256":"a6d8903a0f84257cbe8ca8e103c4f409136a77d545557ba4de4304f5abe7019c","reason":"GPS metadata present and close-up is not clear valve/handle scene; retained without editing, no inference or Git."}],
+  "unverified":["No positive currently-smoking photograph in this small set; visible-burn versus normal is the included contrast.","No model result yet. Individual semantic verdicts must follow actual outputs, not these expected facts."]
+}

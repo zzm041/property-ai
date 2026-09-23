@@ -1,0 +1,27 @@
+{
+  "task_id": "RESIDENT-HOUSE-SELECT-023",
+  "run_id": "house023-2b77fb2237aa",
+  "code_sha": "d97fcb48172abfab054c52a43042b5402dccf6a9",
+  "at_utc": "2026-09-23T18:12:11.417372+00:00",
+  "requests": [
+    {
+      "label": "multi-principal",
+      "method": "GET",
+      "path": "/me",
+      "params": null,
+      "body": null,
+      "status": 401,
+      "response": {
+        "request_id": "house023-2b77fb2237aa-multi-principal",
+        "error": {
+          "code": "AUTH.TOKEN_EXPIRED",
+          "message": "Access token has expired",
+          "details": {}
+        }
+      }
+    }
+  ],
+  "successful_business_writes": false,
+  "status": "INCOMPLETE",
+  "error_type": "AssertionError"
+}

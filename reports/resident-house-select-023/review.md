@@ -1,4 +1,20 @@
-# RESIDENT-HOUSE-SELECT-023 — active
+# RESIDENT-HOUSE-SELECT-023 — scoped local DEVELOPMENT PASS
+
+Independent round1 **PASS**, zero repairrounds, saved `reports/codex/RESIDENT-HOUSE-SELECT-023-review.json`, separate readonly context `/root/bind015_independent_review`. Reviewer actually read11-filediff/directcontexts,48scopedtestresults, savedpage/API/DB/queueevidence and all9PNG; no tests/inference/page/HTTP/DB/queueoperations by reviewer. HSEL023-C1–C6 verified; HSEL023-N1 long-address/formalUX retained; HSEL023-N2tracking is closed by this review/matrix/handoff save. HSEL023-R1 realmodel/Production release gaps unchanged. No current-taskblocker. Exactaddress-to-existingorder12 evidence accepted, not AUTO/SELFHOST PASS.
+
+## Continuation 2026-09-24
+
+Product remains `87792ee7f8069bcdd9538402f98a090029d23d55`, already loaded in API/Worker e65b4d7. Evidence base HEADd97fcb4; new unrelated-to023 proxy fix0fdc65f has separate45-test/readonlyPASS and is not loaded into liveAPI/Worker. No023 source changes or repeat48-test run were required this continuation.
+
+Run **house023-2b77fb2237aa**, normal syntheticRESIDENT identities3(single activehouse),8(51activehouses),9(noactivehouse), derived from actualprivatecontexts and SELECTs, not assumedIDs.7newPNG were actually opened by main;2earlier address/createPNG and originalsingleorder12POST remain version-bound. `continuation-page.json` proves actual normalSMS login, controls/navigation and origin-forwardedwx.request: order12refresh/relogin; full-addressselection; foreignqueryhouse52 ignored foruser3; actual20→40→51loaded/uniqueSQLmatchedrelations; last-house52selection; refreshclearsselectionuntilownedlastpageisloadedagain; emptyuser9disabledsubmit and actualbindingnavigation. No setData or fabricatedsuccess. Last identityswitch only cleared local sessionstorage (multi session retained privately); not misrepresented as serverlogout.
+
+`continuation-api-db.json`:15scopedAPIchecks, pagination20+20+11 and terminalempty, limit0/101→422, unauthenticated401, forgeduserquerydidnotbroadenemptyidentity, cross-userorderreads403/IAM.FORBIDDEN withoutbody, foreignhousecreates403/403 and forgedproperty422. ExistingWorkOrder policy `_authorize_read` returns403; collectorinitiallyassumed404, preserved the denial and resumed without replaying passedrequests. Separate expiredaccess401 preserved; normalSMS reauth used, noSeed/SQL permissiongrant. Read-onlySQL verifies all12ordersunchanged; order12PENDING_ANALYSIS/v1/house1/reporter3, analysis12/call16/log77/zeroAssignment unchanged. AUTH001@0009, uniquevhost/queue0ready/0unacked/1consumer,DLQ3retained/contentsunread; protectedproject.config SHA256342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F unchanged. Three negativecreate requests are APInegativeevidence, not UIcreates.
+
+Collector failures preserved: initialstaleautomator timeouts(no new businesswrite); existingCLI reopenedautomation9440 with supportedauto-port, no install/configchange. Expiredaccess refresh200 and/me200 were observed, but timeoutcausalreason isUNKNOWN, not proven solelycredentialexpiry. A later offscreenlastselection assertion readstate tooearly; samepage resumed with actualscroll/tap/wait, no resubmission. UTF-8collectorreaderror happened before auth/API; corrected. Original48distinctscopedpasses(46+2) retained, noallrepo/pureunit/businessreplay.
+
+023 scope is address selection, not SELFHOST/AUTO acceptance:2Brealorder12 failure stays failed,4BsinglecaseREADYstaysreadonlydiagnostic,24text/4repairphotoqualitytests havezero calls becauseRAMguard/ownerpause. No order12replay, newbusinessmodelconfiguration,0010 or8dcollectionchange. FormalresponsiveUX/nativepicker/realdevice/provider/production gaps remain.
+
+## Earlier checkpoints (historical, not current pending status)
 
 Base `ab1bc165ddfde5cac7fde7ff8d02c9f777e1533d`; derive producthead before independent review. Main sole sourcewriter, separate readonly review required, max3reviewrepair rounds; none yet. Current owner declines SELFHOST costs, software continues. No0010/newSchema/dependency/sharedservice/providerfee operations. Protected project.config and unrelatedWIP unchanged.
 

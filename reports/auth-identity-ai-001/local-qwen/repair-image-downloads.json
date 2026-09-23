@@ -1,0 +1,47 @@
+[
+  {
+    "id": "IMG-CEILING",
+    "file": "D:\\property-ai\\reports\\auth-identity-ai-001\\local-qwen\\repair-images\\ceiling-peeling.jpg",
+    "bytes": 89371,
+    "sha256": "dabfd2227a33efa7b085d6f8519bec47f43b1542c7eaafed81047abb3d52eb8d",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Ceiling_sheetrock_damaged_by_water_so_paint_was_peeling.jpg",
+    "downloaded_at_utc": "2026-09-23T18:05:34.771837+00:00",
+    "pixel_review": "ACTUALLY_INSPECTED_ACCEPTED; repair-image-gold.json PHOTO-001"
+  },
+  {
+    "id": "IMG-NORMAL-SOCKET",
+    "file": "D:\\property-ai\\reports\\auth-identity-ai-001\\local-qwen\\repair-images\\normal-socket.jpg",
+    "bytes": 71410,
+    "sha256": "d6d75928f4a23d4ddde0bed730ca6d71624b7a9032afd2ca2ab5b74c61b03b87",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/8/82/SEV_1011_Typ_25_Steckdose.jpg",
+    "downloaded_at_utc": "2026-09-23T18:05:35.408259+00:00",
+    "pixel_review": "ACTUALLY_INSPECTED_ACCEPTED; repair-image-gold.json PHOTO-002"
+  },
+  {
+    "id": "IMG-BURNED-SOCKET",
+    "file": "D:\\property-ai\\reports\\auth-identity-ai-001\\local-qwen\\repair-images\\burned-socket.jpg",
+    "bytes": 230309,
+    "sha256": "1e3d71c542f7c8f9bfe20fc4915da7c61cb2bac875e0e383470bd201b7dd454a",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/Burned_stove_socket.JPG",
+    "downloaded_at_utc": "2026-09-23T18:05:37.484269+00:00",
+    "pixel_review": "ACTUALLY_INSPECTED_ACCEPTED; repair-image-gold.json PHOTO-003"
+  },
+  {
+    "id": "IMG-VALVE",
+    "file": "D:\\property-ai\\tmp\\selfhost-ai-local\\rejected-images\\ball-valve.jpg",
+    "bytes": 765285,
+    "sha256": "a6d8903a0f84257cbe8ca8e103c4f409136a77d545557ba4de4304f5abe7019c",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Valve_%28ball%29.jpg",
+    "downloaded_at_utc": "2026-09-23T18:12:23.369966+00:00",
+    "pixel_review": "EXCLUDED_GPS_METADATA_AND_AMBIGUOUS_SCENE; retained unmodified ignored-only, no inference"
+  },
+  {
+    "id": "IMG-VALVE-REPLACEMENT",
+    "file": "D:\\property-ai\\reports\\auth-identity-ai-001\\local-qwen\\repair-images\\ans-ball-valve.jpg",
+    "bytes": 947681,
+    "sha256": "965dc412677a19d32b2ad7092e7c0203e0abbda75d6b230c7dd087300939f1cd",
+    "source_url": "https://upload.wikimedia.org/wikipedia/commons/5/55/ANS_Ball_Valve.jpg",
+    "downloaded_at_utc": "2026-09-23T18:16:56.454419+00:00",
+    "pixel_review": "ACTUALLY_INSPECTED_ACCEPTED; repair-image-gold.json PHOTO-004"
+  }
+]

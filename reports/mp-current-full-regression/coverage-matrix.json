@@ -2164,6 +2164,35 @@
       "scope": "Replace rawinternalhouseID entry on normal residentreport with current authorized bound-house address selection and real paging; reuse existingService/auth/create rules; no schema/fee or acceptedflow replay."
     }
   },
+  "resident_house_select_023": {
+    "task_id": "RESIDENT-HOUSE-SELECT-023",
+    "base_sha": "ab1bc165ddfde5cac7fde7ff8d02c9f777e1533d",
+    "implementation_head": "87792ee7f8069bcdd9538402f98a090029d23d55",
+    "runtime_code_sha": "e65b4d7fb0e9541695fdcb9a1f1b216d97dbf6c2",
+    "evidence_base_sha": "d97fcb48172abfab054c52a43042b5402dccf6a9",
+    "runtime_run_id": "house023-2b77fb2237aa",
+    "original_create_run_id": "localqwen-b1090f3deaa3",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT_ADDRESS_SELECTION",
+    "independent_review": {
+      "round": 1,
+      "product_repair_rounds": 0,
+      "result": "PASS",
+      "context": "/root/bind015_independent_review",
+      "path": "reports/codex/RESIDENT-HOUSE-SELECT-023-review.json",
+      "boundary": "Separate read-only reviewer checked actual11-filediff/directcontext,48scopedtestresults,page/API/DB/queueevidence and all9PNG; no tests/pages/HTTP/DB/queue/model operations. No CLI session ID fabricated."
+    },
+    "current_status_overlays": [
+      {
+        "id": "WO-CREATE",
+        "implementation_status": "Normal resident report selects full address from current server-authorized effective houses; real cursor pagination, validated preference, empty/stale/load guards and existing create/idempotency rules, no editable internal house ID.",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_ADDRESS_SELECTION",
+        "evidence_version": "Product87792ee/runtimee65b4d7; originalsinglecreate localqwen-b1090f3deaa3 order12; remaining runhouse023-2b77fb2237aa atd97fcb4; independentround1PASS/zero repairs;48retained scopedpasses,9inspectedPNG,15APIchecks,SELECTDB anduniquequeue0/0/1.",
+        "remaining_gap": "Formal responsive/physical-device/native-media/production scale remains. 2B order12 real analysis failed historical-fact quality, PENDING_ANALYSIS/v1/zeroAssignment; unchanged and unreplayed.4B remains READY_SCOPED_LOCAL_READ_ONLY_DIAGNOSTICS, notAUTO/SELFHOST/Production.24gold/4repairphoto inference paused before any call at lowRAM by owner; liveproxyload and later4B business switch remain gated.",
+        "next_action": "Preserve023 PASS without replay. Resume fixed4B readonly text/photo diagnostics only when owner releases memory; retain proxy softwarePASS0fdc65f but liveAPI/Worker e65b4d7 unchanged. Request a NEW synthetic4B business-run switch only after quality/proxy gates. No0010 or1024d collection without approval."
+      }
+    ],
+    "tracking": "HSEL023-N2 closed by this current-view/handoff update; N1 and R1 retained. No original IDs removed or new completion denominator."
+  },
   "auth_failure_policy_20260923": {
     "task_id": "AUTH-FAILURE-POLICY-20260923",
     "owner_decision": "不锁定",
@@ -2181,10 +2210,11 @@
     ]
   },
   "current_effective_view": {
-    "generated_at": "2026-09-23",
+    "generated_at": "2026-09-24",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
     "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs), then notification_events_inbox_013.current_status_overlays (2 IDs)",
     "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs), then manager_wo_cancel_017 (1 composite ID, remains PARTIAL), then house_csv_roundtrip_018 (1 existing ID), then ai_analysis_input_019 (3 existing IDs; real-model statuses remain BLOCKED), then resident_wo_presentation_020 (1 existing ID; release gaps retained), then notification_presentation_021 (1 existing ID; explicitUTC not Property-local/outbound acceptance), then ai_fallback_runtime_022 (1 existing ID; Development injected failure only)",
+    "latest_additional_overlay_source": "resident_house_select_023 (WO-CREATE only, scoped address-selection software; no SELFHOST/AUTO/Production upgrade)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced. Old AUTH001 objects were lost on the 2026-09-23 tmpfs stop; historical evidence remains version-bound, not current-object proof.",
     "row_count": 83,
     "rows": [
@@ -2366,11 +2396,11 @@
       },
       {
         "requirement_id": "WO-CREATE",
-        "current_implementation": "已实现可测试",
-        "verification_mode_status": "UI:PASS",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
-        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+        "current_implementation": "Normal resident report selects full address from current server-authorized effective houses; real cursor pagination, validated preference, empty/stale/load guards and existing create/idempotency rules, no editable internal house ID.",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_ADDRESS_SELECTION",
+        "evidence_version": "Product87792ee/runtimee65b4d7; originalsinglecreate localqwen-b1090f3deaa3 order12; remaining runhouse023-2b77fb2237aa atd97fcb4; independentround1PASS/zero repairs;48retained scopedpasses,9inspectedPNG,15APIchecks,SELECTDB anduniquequeue0/0/1.",
+        "remaining_gap": "Formal responsive/physical-device/native-media/production scale remains. 2B order12 real analysis failed historical-fact quality, PENDING_ANALYSIS/v1/zeroAssignment; unchanged and unreplayed.4B remains READY_SCOPED_LOCAL_READ_ONLY_DIAGNOSTICS, notAUTO/SELFHOST/Production.24gold/4repairphoto inference paused before any call at lowRAM by owner; liveproxyload and later4B business switch remain gated.",
+        "next_action": "Preserve023 PASS without replay. Resume fixed4B readonly text/photo diagnostics only when owner releases memory; retain proxy softwarePASS0fdc65f but liveAPI/Worker e65b4d7 unchanged. Request a NEW synthetic4B business-run switch only after quality/proxy gates. No0010 or1024d collection without approval."
       },
       {
         "requirement_id": "WO-MEDIA-NATIVE",

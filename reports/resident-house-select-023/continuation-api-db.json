@@ -1,0 +1,1323 @@
+{
+  "task_id": "RESIDENT-HOUSE-SELECT-023",
+  "run_id": "house023-2b77fb2237aa",
+  "code_sha": "d97fcb48172abfab054c52a43042b5402dccf6a9",
+  "at_utc": "2026-09-23T18:13:06.325797+00:00",
+  "requests": [
+    {
+      "label": "multi-principal",
+      "method": "GET",
+      "path": "/me",
+      "params": null,
+      "body": null,
+      "status": 200,
+      "response": {
+        "request_id": "house023-2b77fb2237aa-multi-principal",
+        "data": {
+          "user_id": 8,
+          "status": "ACTIVE",
+          "display_name": "015-resident-5f73ff",
+          "roles": [
+            "RESIDENT"
+          ],
+          "permissions": [
+            "announcement:read",
+            "knowledge:read",
+            "resident_binding:create",
+            "resident_binding:read",
+            "resident_relation:read",
+            "work_order:cancel",
+            "work_order:create",
+            "work_order:read"
+          ],
+          "scopes": [
+            {
+              "role_code": "RESIDENT",
+              "scope_type": "PROPERTY",
+              "tenant_id": 1,
+              "property_id": 1,
+              "permissions": [
+                "announcement:read",
+                "knowledge:read",
+                "resident_binding:create",
+                "resident_binding:read",
+                "resident_relation:read",
+                "work_order:cancel",
+                "work_order:create",
+                "work_order:read"
+              ]
+            }
+          ],
+          "profile_completed": true
+        }
+      }
+    },
+    {
+      "label": "empty-principal",
+      "method": "GET",
+      "path": "/me",
+      "params": null,
+      "body": null,
+      "status": 200,
+      "response": {
+        "request_id": "house023-2b77fb2237aa-empty-principal",
+        "data": {
+          "user_id": 9,
+          "status": "ACTIVE",
+          "display_name": "015-other-5f73ff",
+          "roles": [],
+          "permissions": [],
+          "scopes": [],
+          "profile_completed": true
+        }
+      }
+    },
+    {
+      "label": "page-0",
+      "method": "GET",
+      "path": "/me/houses",
+      "params": {
+        "limit": 20
+      },
+      "body": null,
+      "status": 200,
+      "response": {
+        "request_id": "house023-2b77fb2237aa-page-0",
+        "data": {
+          "items": [
+            {
+              "relation_id": 3,
+              "house_id": 2,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "015-5f73ff",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T02:51:57.856704Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 4,
+              "house_id": 3,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-00",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:42.694051Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 5,
+              "house_id": 4,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-01",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:42.841458Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 6,
+              "house_id": 5,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-02",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:42.979036Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 7,
+              "house_id": 6,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-03",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:43.120267Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 8,
+              "house_id": 7,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-04",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:43.235119Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 9,
+              "house_id": 8,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-05",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:43.362370Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 10,
+              "house_id": 9,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-06",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:43.492777Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 11,
+              "house_id": 10,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-07",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:43.624215Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 12,
+              "house_id": 11,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-08",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:43.749504Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 13,
+              "house_id": 12,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-09",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:43.877800Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 14,
+              "house_id": 13,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-10",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:44.012254Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 15,
+              "house_id": 14,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-11",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:44.145776Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 16,
+              "house_id": 15,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-12",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:44.277954Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 17,
+              "house_id": 16,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-13",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:44.412130Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 18,
+              "house_id": 17,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-14",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:44.548880Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 19,
+              "house_id": 18,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-15",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:44.696542Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 20,
+              "house_id": 19,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-16",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:44.835800Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 21,
+              "house_id": 20,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-17",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:44.970576Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 22,
+              "house_id": 21,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-18",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:45.105668Z",
+              "valid_to": null
+            }
+          ],
+          "next_cursor": 22
+        }
+      }
+    },
+    {
+      "label": "page-1",
+      "method": "GET",
+      "path": "/me/houses",
+      "params": {
+        "limit": 20,
+        "after_id": 22
+      },
+      "body": null,
+      "status": 200,
+      "response": {
+        "request_id": "house023-2b77fb2237aa-page-1",
+        "data": {
+          "items": [
+            {
+              "relation_id": 23,
+              "house_id": 22,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-19",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:45.231814Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 24,
+              "house_id": 23,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-20",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:45.360818Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 25,
+              "house_id": 24,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-21",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:45.494802Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 26,
+              "house_id": 25,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-22",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:45.627039Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 27,
+              "house_id": 26,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-23",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:45.758291Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 28,
+              "house_id": 27,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-24",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:45.871511Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 29,
+              "house_id": 28,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-25",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:45.984866Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 30,
+              "house_id": 29,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-26",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:46.081920Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 31,
+              "house_id": 30,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-27",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:46.173688Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 32,
+              "house_id": 31,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-28",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:46.260219Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 33,
+              "house_id": 32,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-29",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:46.384594Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 34,
+              "house_id": 33,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-30",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:46.518436Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 35,
+              "house_id": 34,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-31",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:46.656061Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 36,
+              "house_id": 35,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-32",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:46.788888Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 37,
+              "house_id": 36,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-33",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:46.921527Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 38,
+              "house_id": 37,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-34",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:47.059489Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 39,
+              "house_id": 38,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-35",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:47.196035Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 40,
+              "house_id": 39,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-36",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:47.332455Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 41,
+              "house_id": 40,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-37",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:47.462945Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 42,
+              "house_id": 41,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-38",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:47.596369Z",
+              "valid_to": null
+            }
+          ],
+          "next_cursor": 42
+        }
+      }
+    },
+    {
+      "label": "page-2",
+      "method": "GET",
+      "path": "/me/houses",
+      "params": {
+        "limit": 20,
+        "after_id": 42
+      },
+      "body": null,
+      "status": 200,
+      "response": {
+        "request_id": "house023-2b77fb2237aa-page-2",
+        "data": {
+          "items": [
+            {
+              "relation_id": 43,
+              "house_id": 42,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-39",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:47.721691Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 44,
+              "house_id": 43,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-40",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:47.857635Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 45,
+              "house_id": 44,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-41",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:47.986447Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 46,
+              "house_id": 45,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-42",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:48.135527Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 47,
+              "house_id": 46,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-43",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:48.267977Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 48,
+              "house_id": 47,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-44",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:48.398797Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 49,
+              "house_id": 48,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-45",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:48.539049Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 50,
+              "house_id": 49,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-46",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:48.679868Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 51,
+              "house_id": 50,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-47",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:48.809513Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 52,
+              "house_id": 51,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-48",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:48.934293Z",
+              "valid_to": null
+            },
+            {
+              "relation_id": 53,
+              "house_id": 52,
+              "tenant_id": 1,
+              "property_id": 1,
+              "room_no": "016-5e420c-49",
+              "property_name": "014合成小区-wo014-745f67277104",
+              "property_address": "仅用于隔离测试",
+              "building_name": "014合成楼栋",
+              "unit_name": "014合成单元",
+              "relation_type": "TENANT",
+              "status": "ACTIVE",
+              "valid_from": "2026-09-23T03:12:49.055953Z",
+              "valid_to": null
+            }
+          ],
+          "next_cursor": null
+        }
+      }
+    },
+    {
+      "label": "after-last",
+      "method": "GET",
+      "path": "/me/houses",
+      "params": {
+        "limit": 20,
+        "after_id": 53
+      },
+      "body": null,
+      "status": 200,
+      "response": {
+        "request_id": "house023-2b77fb2237aa-after-last",
+        "data": {
+          "items": [],
+          "next_cursor": null
+        }
+      }
+    },
+    {
+      "label": "invalid-limit-0",
+      "method": "GET",
+      "path": "/me/houses",
+      "params": {
+        "limit": 0
+      },
+      "body": null,
+      "status": 422,
+      "response": {
+        "request_id": "house023-2b77fb2237aa-invalid-limit-0",
+        "error": {
+          "code": "SYS.VALIDATION_ERROR",
+          "message": "Request validation failed",
+          "details": {
+            "errors": [
+              {
+                "type": "greater_than_equal",
+                "location": [
+                  "query",
+                  "limit"
+                ],
+                "message": "Input should be greater than or equal to 1"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "invalid-limit-101",
+      "method": "GET",
+      "path": "/me/houses",
+      "params": {
+        "limit": 101
+      },
+      "body": null,
+      "status": 422,
+      "response": {
+        "request_id": "house023-2b77fb2237aa-invalid-limit-101",
+        "error": {
+          "code": "SYS.VALIDATION_ERROR",
+          "message": "Request validation failed",
+          "details": {
+            "errors": [
+              {
+                "type": "less_than_equal",
+                "location": [
+                  "query",
+                  "limit"
+                ],
+                "message": "Input should be less than or equal to 100"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "label": "unauthenticated",
+      "method": "GET",
+      "path": "/me/houses",
+      "params": null,
+      "body": null,
+      "status": 401,
+      "response": {
+        "request_id": "house023-2b77fb2237aa-unauthenticated",
+        "error": {
+          "code": "AUTH.MISSING_TOKEN",
+          "message": "Bearer access token is required",
+          "details": {}
+        }
+      }
+    },
+    {
+      "label": "empty-cannot-impersonate",
+      "method": "GET",
+      "path": "/me/houses",
+      "params": {
+        "user_id": 8
+      },
+      "body": null,
+      "status": 200,
+      "response": {
+        "request_id": "house023-2b77fb2237aa-empty-cannot-impersonate",
+        "data": {
+          "items": [],
+          "next_cursor": null
+        }
+      }
+    },
+    {
+      "label": "multi-foreign-order",
+      "method": "GET",
+      "path": "/work-orders/12",
+      "params": null,
+      "body": null,
+      "status": 403,
+      "response": {
+        "request_id": "house023-2b77fb2237aa-multi-foreign-order",
+        "error": {
+          "code": "IAM.FORBIDDEN",
+          "message": "Permission denied",
+          "details": {}
+        }
+      }
+    },
+    {
+      "label": "empty-foreign-order",
+      "method": "GET",
+      "path": "/work-orders/12",
+      "params": null,
+      "body": null,
+      "status": 403,
+      "response": {
+        "request_id": "house023-2b77fb2237aa-empty-foreign-order",
+        "error": {
+          "code": "IAM.FORBIDDEN",
+          "message": "Permission denied",
+          "details": {}
+        }
+      }
+    },
+    {
+      "label": "multi-foreign-create",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": null,
+      "body": {
+        "house_id": 1,
+        "text": "house023-2b77fb2237aa denied foreign-house probe"
+      },
+      "status": 403,
+      "response": {
+        "request_id": "house023-2b77fb2237aa-multi-foreign-create",
+        "error": {
+          "code": "WO.HOUSE_NOT_OWNED",
+          "message": "Caller does not have an effective house relation",
+          "details": {}
+        }
+      }
+    },
+    {
+      "label": "empty-foreign-create",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": null,
+      "body": {
+        "house_id": 1,
+        "text": "house023-2b77fb2237aa denied foreign-house probe"
+      },
+      "status": 403,
+      "response": {
+        "request_id": "house023-2b77fb2237aa-empty-foreign-create",
+        "error": {
+          "code": "WO.HOUSE_NOT_OWNED",
+          "message": "Caller does not have an effective house relation",
+          "details": {}
+        }
+      }
+    },
+    {
+      "label": "forged-property",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": null,
+      "body": {
+        "house_id": 52,
+        "property_id": 2147483647,
+        "text": "house023-2b77fb2237aa denied scope probe"
+      },
+      "status": 422,
+      "response": {
+        "request_id": "house023-2b77fb2237aa-forged-property",
+        "error": {
+          "code": "WO.SCOPE_MISMATCH",
+          "message": "Declared scope does not match the target house",
+          "details": {}
+        }
+      }
+    }
+  ],
+  "successful_business_writes": false,
+  "normal_auth_requests": [
+    {
+      "label": "multi-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e5d93daacf98e5f0"
+    },
+    {
+      "label": "multi-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "10ca53193a5a7766"
+    },
+    {
+      "label": "multi-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e8eb22e5383303f6"
+    },
+    {
+      "label": "multi-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c538665c72944aa3"
+    },
+    {
+      "label": "empty-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "24534583e443f1e7"
+    },
+    {
+      "label": "empty-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "4ddf2ea9eb6fe154"
+    },
+    {
+      "label": "empty-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c663bc4a680f6b74"
+    },
+    {
+      "label": "empty-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a579c3c01155d8a9"
+    }
+  ],
+  "pagination": {
+    "counts": [
+      20,
+      20,
+      11
+    ],
+    "unique_relations": 51,
+    "sql_exact_match": true
+  },
+  "status": "SCOPED_API_DB_CHECKS_PASSED",
+  "collector_resume_note": "No passed request repeated. Existing WorkOrder read policy returns403 for unauthorized same-property resident, not assumed404; no data body disclosed. Continue from saved denial.",
+  "revision": "20260919_0009",
+  "orders": [
+    {
+      "id": 1,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "CLOSED",
+      "version": 10,
+      "current_assignment_id": null
+    },
+    {
+      "id": 2,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "CLOSED",
+      "version": 13,
+      "current_assignment_id": null
+    },
+    {
+      "id": 3,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "CLOSED",
+      "version": 10,
+      "current_assignment_id": null
+    },
+    {
+      "id": 4,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "CLOSED",
+      "version": 10,
+      "current_assignment_id": null
+    },
+    {
+      "id": 5,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "CANCELLED",
+      "version": 4,
+      "current_assignment_id": null
+    },
+    {
+      "id": 6,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "CANCELLED",
+      "version": 5,
+      "current_assignment_id": null
+    },
+    {
+      "id": 7,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "CLOSED",
+      "version": 8,
+      "current_assignment_id": null
+    },
+    {
+      "id": 8,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "CLOSED",
+      "version": 8,
+      "current_assignment_id": null
+    },
+    {
+      "id": 9,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "ASSIGNED",
+      "version": 3,
+      "current_assignment_id": 10
+    },
+    {
+      "id": 10,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "ASSIGNED",
+      "version": 3,
+      "current_assignment_id": 11
+    },
+    {
+      "id": 11,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "PENDING_ANALYSIS",
+      "version": 1,
+      "current_assignment_id": null
+    },
+    {
+      "id": 12,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "PENDING_ANALYSIS",
+      "version": 1,
+      "current_assignment_id": null
+    }
+  ],
+  "work_order_row_ids": {
+    "work_order_analyses": [
+      12
+    ],
+    "ai_call_logs": [
+      16
+    ],
+    "work_order_assignments": [],
+    "work_order_logs": [
+      77
+    ]
+  },
+  "queue": {
+    "vhost": "property_ai_auth001",
+    "metadata_only": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nceleryev.f8b5338c-3ef8-4b6b-802b-0ad0e1c36e3e\t0\t0\t1\nproperty_ai.auth001.dlq\t3\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1\n",
+    "message_contents_read": false
+  },
+  "project_config_sha256": "342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F"
+}

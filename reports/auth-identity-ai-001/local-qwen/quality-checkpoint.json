@@ -1,0 +1,23 @@
+{
+  "task_id":"SELFHOST-AI-LOCAL-001",
+  "checkpoint_date":"2026-09-24 Asia/Shanghai",
+  "status":"PAUSED_RESOURCE_HEADROOM_OWNER_ACKNOWLEDGED",
+  "owner_reply":"暂不释放，保留诊断断点",
+  "owner_reply_effect":"Do not retry model calls or lower guards. Keep text/photo diagnosis resumable; complete independent 023/proxy software work.",
+  "source_head_proxy":"0fdc65f0ced6e967c4168c9e54d0c7828676294e",
+  "model":"qwen3.5:4b",
+  "quantization":"Q4_K_M",
+  "digest":"2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "model_endpoint":"http://127.0.0.1:11435",
+  "controls":{"single_resident":true,"no_cloud":true,"context":4096,"text_max_tokens":512,"start_min_free_ram_mib":4500,"start_min_free_gpu_mib":6000},
+  "gold_set":{"path":"gold-set-24.json","version":"gold24-v1","sha256":"c3c93b419b7d5dea12b529152cde661c16826cc708b1d80d5b26d39d70ddfc1f","cases":24,"recorded_calls":0,"output":"gold24-v3-results.json","prompt_version":"wo-analysis-v3","individual_judgments":"NOT_AVAILABLE_NO_OUTPUT"},
+  "photos":{"source_manifest":"repair-image-sources.json","hashes":"repair-image-downloads.json","pixel_gold":"repair-image-gold.json","accepted":4,"excluded":1,"model_calls":0,"paired_diagnostic_calls_planned_max":8,"boundary":"Main actually inspected original pixels; no model quality verdict or human-owner acceptance. Public photos only; attribution/license retained, rejected original stays ignored and is not submitted to inference."},
+  "actual_resource_samples":[
+    {"utc":"2026-09-23T18:01:08Z","ram_free_mib":3381,"gpu_free_mib":9720,"action":"Start guard stopped before first model call"},
+    {"utc":"2026-09-23T18:12:16Z","ram_free_mib":3562,"gpu_free_mib":9536,"action":"Read-only recheck, still below unchanged RAM guard"}
+  ],
+  "proxy":{"product_commit":"0fdc65f0ced6e967c4168c9e54d0c7828676294e","tests":"focused-loopback-proxy.txt:45passed,3warnings","review":"../../codex/SELFHOST-AI-LOCAL-001-PROXY-review.json","status":"SCOPED_SOFTWARE_PASS_NOT_LIVE_RUNTIME_LOAD","limitations":"literal loopback/internal owned clients; explicit injected clients remain caller responsibility; external behavior preserved"},
+  "runtime":{"api_pid":33592,"worker_pid":42984,"startup_source":"e65b4d7fb0e9541695fdcb9a1f1b216d97dbf6c2","business_model":"qwen3.5:2b","changed_this_round":false,"new_successful_business_writes":false,"separate_023_requests":"Normal authentication, reads and three denied API creates; no new work order, inference, task replay or state change","last_order":"12/PENDING_ANALYSIS/v1/zeroAssignment retained, no replay","database":"127.0.0.1:3307/property_ai_auth001_test@20260919_0009","rabbit_vhost":"property_ai_auth001","rabbit_queue":"property_ai.auth001","queue":"0ready/0unacked/1consumer;DLQ3 untouched"},
+  "resume":"After owner releases memory, recheck live resources/loopback/single-model/source hashes. Use run-gold24.py --resume-zero-call-resource-block only for this zero-call checkpoint; immutable initial blocked artifact is preserved. Do not repeat saved calls, edit answers or alter fixed gold to fit outputs. Photo runner remains to be implemented/checked before bounded calls. Individual case review must be recorded as actual main/independent model-assisted review, not fictional human-owner sign-off.",
+  "approval_gates":["After sufficient gold/photo/Chinese/history/error/resource/proxy evidence, explicitly request 8083 plus AUTH001 Worker 4B switch and a NEW marked synthetic business run. No implicit READY authorization.","No replay or mutation of order12; retain2B failure and4B one-case correct evidence.","Real bge-m3/reranker/new1024d isolated collection require separate environment approval; existing8d collection untouched.","No0010, fees, additional models,8082/sharedvhost/DLQ message contents,protectedconfig,push/reset/restore."]
+}

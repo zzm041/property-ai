@@ -1,0 +1,44 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "set_version": "gold24-v1",
+  "set_sha256": "c3c93b419b7d5dea12b529152cde661c16826cc708b1d80d5b26d39d70ddfc1f",
+  "at_utc": "2026-09-23T18:01:08.205644+00:00",
+  "source_sha": "d97fcb48172abfab054c52a43042b5402dccf6a9",
+  "model": "qwen3.5:4b",
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "quantization": "Q4_K_M",
+  "prompt_version": "wo-analysis-v3",
+  "request_controls": {
+    "context": 4096,
+    "temperature": 0,
+    "thinking": false,
+    "max_tokens": 512,
+    "timeout_seconds": 60,
+    "parallel": 1,
+    "max_calls": 24
+  },
+  "model_switch": false,
+  "business_calls": false,
+  "database_access": false,
+  "source_scope": "Working prompt/domain/LLM hashes below; local HTTP proxy fix WIP present but explicitly direct client used.",
+  "source_hashes": {
+    "backend/app/service/analysis.py": "9093ca1ba0fc2e38de581fa04741a8c1a33b33b31c081426595570301f79e5c1",
+    "backend/app/domain/ai.py": "90ddc15a7dcc48270991a8d640da4766733215724a30c3d03b729d5c5e92a7c7",
+    "backend/app/provider/llm/__init__.py": "4901bc99b45c73d99a57da1406b93bcf08df32741c1bd74b9a3bfbdff023380e",
+    "backend/app/provider/http.py": "025a6f8cd20dda35190a61ceeca970dc49bc8be7573ddb5accfe4470ce00b574"
+  },
+  "results": [],
+  "stop_reason": "RESOURCE_HEADROOM",
+  "status": "BOUNDED_RUN_INCOMPLETE",
+  "resource_samples": [
+    {
+      "utc": "2026-09-23T18:01:08Z",
+      "ram_free_mib": 3381,
+      "gpu_used_mib": 6276,
+      "gpu_free_mib": 9720,
+      "gpu_utilization_percent": 1
+    }
+  ],
+  "min_ram_free_mib": 3381,
+  "min_gpu_free_mib": 9720
+}

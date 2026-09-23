@@ -1,0 +1,14 @@
+{
+  "task_id": "RESIDENT-HOUSE-SELECT-023",
+  "run_id": "house023-2b77fb2237aa",
+  "code_sha": "d97fcb48172abfab054c52a43042b5402dccf6a9",
+  "original_run_id": "localqwen-b1090f3deaa3",
+  "work_order_id": 12,
+  "steps": {},
+  "requests": [],
+  "screenshots": [],
+  "initial_error": "Error: timeout waiting for automator response\n    at Connection.onMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\miniprogram-automator\\out\\Connection.js:1:985)\n    at Transport.emit (node:events:509:28)\n    at WebSocket.<anonymous> (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\miniprogram-automator\\out\\Transport.js:1:220)\n    at WebSocket.onMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\event-target.js:120:16)\n    at WebSocket.emit (node:events:509:28)\n    at Receiver.receiverOnMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\websocket.js:807:20)\n    at Receiver.emit (node:events:509:28)\n    at Receiver.dataMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\receiver.js:448:14)\n    at Receiver.getData (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\receiver.js:377:17)\n    at Receiver.startLoop (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\receiver.js:158:22)",
+  "resume_note": "Initial navigation with existing expired access session timed out; server showed normal refresh200 and /me200, no SMS/business write. Existing home inspected before normal logout/relogin.",
+  "phase": "initial-normal-logout",
+  "last_error": "Error: timeout waiting for automator response\n    at Connection.onMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\miniprogram-automator\\out\\Connection.js:1:985)\n    at Transport.emit (node:events:509:28)\n    at WebSocket.<anonymous> (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\miniprogram-automator\\out\\Transport.js:1:220)\n    at WebSocket.onMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\event-target.js:120:16)\n    at WebSocket.emit (node:events:509:28)\n    at Receiver.receiverOnMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\websocket.js:807:20)\n    at Receiver.emit (node:events:509:28)\n    at Receiver.dataMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\receiver.js:448:14)\n    at Receiver.getData (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\receiver.js:377:17)\n    at Receiver.startLoop (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\receiver.js:158:22)"
+}
