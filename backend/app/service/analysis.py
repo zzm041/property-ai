@@ -575,6 +575,8 @@ class AnalysisService:
                 storage_key=media.storage_key,
                 mime_type=media.mime_type,
             )
+            if not isinstance(insight.description, str) or not insight.description.strip():
+                raise ProviderInvalidOutputError("VLM returned an empty description")
             self._write_call_log(
                 snapshot,
                 provider_type=ProviderType.VLM,

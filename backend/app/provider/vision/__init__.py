@@ -124,6 +124,9 @@ class QwenVLMProvider:
         except (KeyError, IndexError, TypeError) as exc:
             raise ProviderInvalidOutputError("VLM returned invalid JSON") from exc
         parsed = parse_json_object(str(raw))
+        description = parsed.get("description")
+        if not isinstance(description, str) or not description.strip():
+            raise ProviderInvalidOutputError("VLM returned an empty description")
         labels = parsed.get("labels") or ()
         if isinstance(labels, str):
             labels = (labels,)
@@ -133,7 +136,7 @@ class QwenVLMProvider:
         except (TypeError, ValueError) as exc:
             raise ProviderInvalidOutputError("VLM returned invalid JSON") from exc
         return VisionInsight(
-            description=str(parsed.get("description") or ""),
+            description=description,
             labels=tuple(str(item) for item in labels),
             confidence=confidence_value,
             model_version=self.model_version,

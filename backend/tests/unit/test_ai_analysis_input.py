@@ -12,7 +12,7 @@ from app.core.config import Settings
 from app.domain.ai import AiCallStatus, ProviderType, WORK_ORDER_ANALYSIS_PROMPT_VERSION
 from app.model.work_order import WorkOrder
 from app.provider.asr import HttpASRProvider
-from app.provider.errors import ProviderTimeoutError
+from app.provider.errors import ProviderInvalidOutputError, ProviderTimeoutError
 from app.provider.llm import DevelopmentLLMProvider, QwenLLMProvider, SUCCESS_ANALYSIS
 from app.provider.usage import StructuredCompletion, response_token_usage
 from app.provider.vision import VisionInsight, QwenVLMProvider
@@ -97,6 +97,56 @@ def test_all_images_fail_text_still_reaches_existing_llm_fallback():
     assert bundle.vision_text is None and bundle.error_code == 'AI.TIMEOUT'
     assert bundle.llm_payload['category'] == 'electrical'
     assert s._vlm.inspect_image.call_count == 3
+
+
+@pytest.mark.parametrize('body', [
+    {}, {'description': None}, {'description': ''}, {'description': ' \r\n\t'},
+    {'description': 42}, {'description': []}, {'description': {}},
+])
+def test_vlm_adapter_rejects_missing_blank_or_nontext_description(body):
+    def handler(request):
+        return httpx.Response(200, json={
+            'choices': [{'message': {'content': json.dumps(body)}}],
+        })
+    storage = MagicMock()
+    storage.get_object.return_value = b'synthetic bytes'
+    provider = QwenVLMProvider(
+        base_url='https://operator.invalid/v1', model='candidate',
+        api_key='synthetic-unit-key', timeout_seconds=1, storage=storage,
+        client=httpx.Client(transport=httpx.MockTransport(handler)),
+    )
+    with pytest.raises(ProviderInvalidOutputError):
+        provider.inspect_image(storage_key='authorized-key', mime_type='image/png')
+
+
+@pytest.mark.parametrize('all_blank', [False, True])
+def test_blank_custom_provider_images_are_invalid_and_text_fallback_continues(all_blank):
+    s = service()
+    s._vlm = MagicMock(model_version='custom-unit-vlm')
+    s._vlm.inspect_image.side_effect = [
+        VisionInsight('', (), .8, 'custom-unit-vlm'),
+        VisionInsight('  ' if all_blank else 'second image', (), .8, 'custom-unit-vlm'),
+        VisionInsight('\n\t', (), .8, 'custom-unit-vlm'),
+    ]
+    s._llm = DevelopmentLLMProvider()
+    bundle = s._call_providers(snapshot=snapshot(), request_id='blank-images', attempt=1)
+    assert s._vlm.inspect_image.call_count == 3
+    assert bundle.error_code == 'AI.INVALID_OUTPUT'
+    assert bundle.llm_payload['category'] == 'electrical'
+    logs = [c.kwargs for c in s._write_call_log.call_args_list
+            if c.kwargs['provider_type'] == ProviderType.VLM]
+    assert len(logs) == 3 and len({x['input_hash'] for x in logs}) == 3
+    assert [x['status'] for x in logs] == [
+        AiCallStatus.INVALID, AiCallStatus.INVALID if all_blank else AiCallStatus.SUCCESS,
+        AiCallStatus.INVALID,
+    ]
+    assert all(x['error_code'] == 'AI.INVALID_OUTPUT' for x in logs if x['status'] == AiCallStatus.INVALID)
+    if all_blank:
+        assert bundle.vision_text is None
+    else:
+        descriptions = json.loads(bundle.vision_text)
+        assert [x['description'] for x in descriptions] == [None, 'second image', None]
+        assert [x['error_code'] for x in descriptions] == ['AI.INVALID_OUTPUT', None, 'AI.INVALID_OUTPUT']
 
 
 def test_versioned_prompt_keeps_context_as_json_evidence_and_usage_separate():
