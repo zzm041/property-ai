@@ -1,7 +1,7 @@
 # Self-hosted inference recommendation (AUTH-IDENTITY-AI-001-C)
 
 Not an order. Not a running service. Not Production V1 / real-AI PASS.
-Current recommendation checked 2026-09-22. Do not treat this file as a billed instance.
+Current recommendation checked 2026-09-22; official model/release/pricing references rechecked 2026-09-23. Do not treat this file as a billed instance.
 
 ## Approval-ready recommendation (current)
 
@@ -17,6 +17,8 @@ This section supersedes the dated 2026-09-19 planning notes below. No model, ima
 | Reranking | [`BAAI/bge-reranker-v2-m3`](https://huggingface.co/BAAI/bge-reranker-v2-m3) | [`953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e`](https://huggingface.co/BAAI/bge-reranker-v2-m3/commit/953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e) | Apache-2.0 multilingual cross-encoder. Run separately from the business API and calibrate against the approved RAG gold set. |
 
 Inference-engine validation starts from the official stable [`vLLM v0.29.0`](https://github.com/vllm-project/vllm/releases/tag/v0.29.0) image tag `vllm/vllm-openai:v0.29.0`; the final OCI digest is `UNKNOWN` until an approved pull. Do not use `latest`, a nightly build or an unrecorded CPU-offload fallback. Keep BGE/reranker in a separate inference container, starting from `FlagEmbedding==1.4.2` with the exact wheel hash recorded; do not add model-serving packages to `backend/pyproject.toml`.
+
+2026-09-23 source recheck: the official v0.29.0 release documents CUDA 13.0 for the default image and a CUDA 12.9 alternative, `vllm/vllm-openai:v0.29.0-cu129`. Select and pin one only after checking the approved host's actual NVIDIA driver compatibility; neither image has been pulled or validated locally. This is an inference-host prerequisite, not permission to change the frozen business dependencies.
 
 ### Target validation and initial single-node BOM
 
@@ -55,6 +57,8 @@ Proposed approval package, not yet approved:
 - Synthetic or explicitly de-identified validation data only. Supplier/region, DPA, data residency and outbound rules must be approved before start.
 
 Cost anchor only: Runpod's [official cost guide](https://www.runpod.io/articles/guides/ai-server-cost) listed L40S at USD 1.09/GPU-hour and A100 80 GB at USD 1.59/GPU-hour, while its [pricing page](https://www.runpod.io/pricing) listed sub-1-TB network storage at USD 0.07/GB/month when checked on 2026-09-22. The bounded arithmetic floor is `48 × 1.09 + 200 × 0.07 = USD 66.32`; the USD 100 cap supplies tax/egress variance. A continuously running single L40S plus 200 GB storage is approximately `730 × 1.09 + 14 = USD 809.70/month` before tax, egress, operations and SLA; use **USD 1,000/month** only as a future approval cap after a supplier quote. A100 80 GB is a separate approval path (approximately USD 1,160.70/month GPU-only at that public anchor).
+
+2026-09-23 price clarification: that official guide explicitly dates its GPU rate table to **2026-08-10** and labels USD 1.09/hour as **Secure Cloud**, not a September checkout quote. The current pricing page separately lists the 48 GB L40/L40S/6000 Ada/MIG **Serverless** tier at USD 1.75/hour; do not substitute this managed tier for the operator-controlled GPU deployment or mix its rate into the above estimate. The USD 0.07/GB/month anchor is standard network storage below 1 TB; container/volume/high-performance storage have different rates. Supplier region, availability, eligible storage, tax/egress and a current bounded quote must be checked at approval. The proposed USD 100 validation ceiling remains unapproved and must not be exceeded or silently increased.
 
 ### Gate 2 — real business validation
 

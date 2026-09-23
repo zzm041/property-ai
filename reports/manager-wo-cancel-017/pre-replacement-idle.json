@@ -1,0 +1,15 @@
+{
+  "task_id": "MANAGER-WO-CANCEL-017",
+  "observed_at_utc": "2026-09-23T04:05:00.122960+00:00",
+  "target_worker": "auth001@DESKTOP-8NHSE12",
+  "counts": {
+    "active": 0,
+    "reserved": 0,
+    "scheduled": 0
+  },
+  "vhost": "property_ai_auth001",
+  "queue": "property_ai.auth001",
+  "actual_queue_output": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nceleryev.e74868e3-9cc1-4b8e-a33a-fde80a5830d2\t0\t0\t1\nproperty_ai.auth001.dlq\t2\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1\n",
+  "shared_vhost_accessed": false,
+  "message_content_read": false
+}

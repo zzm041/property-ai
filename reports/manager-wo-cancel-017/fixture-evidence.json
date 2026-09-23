@@ -1,0 +1,323 @@
+{
+  "task_id": "MANAGER-WO-CANCEL-017",
+  "run_id": "cancel017-51fb1ada56f2",
+  "code_sha": "4a8ae835388c6ee1da4d9bd088f7fc73356644e4",
+  "identities": {
+    "resident": 3,
+    "other": 4,
+    "manager": 5,
+    "staff": 6,
+    "backup": 7
+  },
+  "employees": {
+    "staff": 1,
+    "backup": 2
+  },
+  "tenant_id": 1,
+  "property_id": 1,
+  "house_id": 1,
+  "mode": "Retained current014 synthetic identities checked live; normal SMS authentication, GET qualification; no tenant/role/invite/binding recreation.",
+  "revision": "20260919_0009",
+  "house": {
+    "id": 1,
+    "tenant_id": 1,
+    "property_id": 1,
+    "status": "ACTIVE",
+    "room_no": "014-01"
+  },
+  "resident_active_relation_count": 1,
+  "staff_before": {
+    "staff": {
+      "business_date": "2026-09-23",
+      "attendance": {
+        "id": 1,
+        "employee_id": 1,
+        "tenant_id": 1,
+        "property_id": 1,
+        "business_date": "2026-09-23",
+        "check_in_at": "2026-09-23T02:12:44.316732Z",
+        "check_out_at": null,
+        "source": "STAFF_SELF"
+      },
+      "daily_status": {
+        "id": 1,
+        "employee_id": 1,
+        "tenant_id": 1,
+        "property_id": 1,
+        "business_date": "2026-09-23",
+        "on_duty": "ON_DUTY",
+        "leave_type": null,
+        "current_load": 0
+      }
+    },
+    "backup": {
+      "business_date": "2026-09-23",
+      "attendance": {
+        "id": 2,
+        "employee_id": 2,
+        "tenant_id": 1,
+        "property_id": 1,
+        "business_date": "2026-09-23",
+        "check_in_at": "2026-09-23T02:12:44.464450Z",
+        "check_out_at": null,
+        "source": "STAFF_SELF"
+      },
+      "daily_status": {
+        "id": 2,
+        "employee_id": 2,
+        "tenant_id": 1,
+        "property_id": 1,
+        "business_date": "2026-09-23",
+        "on_duty": "ON_DUTY",
+        "leave_type": null,
+        "current_load": 0
+      }
+    }
+  },
+  "requests": [
+    {
+      "label": "login-manager-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "b6f10d5b03b655e5"
+    },
+    {
+      "label": "login-manager-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "cdba646c675c2dc4"
+    },
+    {
+      "label": "login-manager-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "230a59b3238048dd"
+    },
+    {
+      "label": "login-manager-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "3e079b778a2792c9"
+    },
+    {
+      "label": "verify-manager",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "53db5a14e08768ec"
+    },
+    {
+      "label": "login-resident-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "017665ffd256bf52"
+    },
+    {
+      "label": "login-resident-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "4fab208b834245d4"
+    },
+    {
+      "label": "login-resident-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9127b1c63c88ec68"
+    },
+    {
+      "label": "login-resident-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "02be76d01443c101"
+    },
+    {
+      "label": "verify-resident",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1b7750ef5e76bb2f"
+    },
+    {
+      "label": "login-other-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "daad0029ce52bc5b"
+    },
+    {
+      "label": "login-other-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "241730002acca94b"
+    },
+    {
+      "label": "login-other-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "fcf5e334db8c9326"
+    },
+    {
+      "label": "login-other-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "40f8f0a8e81757fa"
+    },
+    {
+      "label": "verify-other",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "b4bc674f509f4fcc"
+    },
+    {
+      "label": "login-staff-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "457f59a5789c3bd1"
+    },
+    {
+      "label": "login-staff-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "f92e89d8cc2bd872"
+    },
+    {
+      "label": "login-staff-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "42dd9a3df4d2eb1d"
+    },
+    {
+      "label": "login-staff-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "f09fb267981d1b7d"
+    },
+    {
+      "label": "verify-staff",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "bd50e707739556bb"
+    },
+    {
+      "label": "login-backup-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a955f4f279facd41"
+    },
+    {
+      "label": "login-backup-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "4f06436925ba646e"
+    },
+    {
+      "label": "login-backup-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e57870a04ed41c0d"
+    },
+    {
+      "label": "login-backup-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "13547c426527602c"
+    },
+    {
+      "label": "verify-backup",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2c241bdd618d88dd"
+    },
+    {
+      "label": "today-staff",
+      "method": "GET",
+      "path": "/staff/attendance/today?property_id=1",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "17c5fc788e023646"
+    },
+    {
+      "label": "today-backup",
+      "method": "GET",
+      "path": "/staff/attendance/today?property_id=1",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "263eca19eb3389fc"
+    }
+  ],
+  "status": "CURRENT_FIXTURE_CHECKED_NO_BUSINESS_RECREATION"
+}

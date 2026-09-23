@@ -1,0 +1,1153 @@
+{
+  "task_id": "MANAGER-WO-CANCEL-017",
+  "run_id": "cancel017-51fb1ada56f2",
+  "code_sha": "4a8ae835388c6ee1da4d9bd088f7fc73356644e4",
+  "steps": {
+    "01-auto-assigned": {
+      "path": "pages/work-orders/detail",
+      "work_order": {
+        "id": 5,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 1,
+        "reporter_user_id": 3,
+        "status": "ASSIGNED",
+        "process_reason": "NONE",
+        "category": "ELECTRICAL",
+        "severity": "HIGH",
+        "priority": "HIGH",
+        "version": 3,
+        "current_assignment_id": 6,
+        "incident_id": null,
+        "sla_due_at": "2026-09-24T04:09:39.379264Z",
+        "assigned_at": "2026-09-23T04:09:39.895801Z",
+        "accepted_at": null,
+        "started_at": null,
+        "resolved_at": null,
+        "closed_at": null,
+        "created_at": "2026-09-23T04:09:39.386488Z",
+        "updated_at": "2026-09-23T04:09:39.989972Z",
+        "sla_overdue": false
+      },
+      "item": {
+        "work_order": {
+          "id": 5,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "ASSIGNED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 3,
+          "current_assignment_id": 6,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T04:09:39.379264Z",
+          "assigned_at": "2026-09-23T04:09:39.895801Z",
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T04:09:39.386488Z",
+          "updated_at": "2026-09-23T04:09:39.989972Z",
+          "sla_overdue": false
+        },
+        "text": "cancel017-51fb1ada56f2 页面撤销验证：客厅灯不亮，开关接触不良。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 6,
+            "employee_id": 1,
+            "assigned_by_user_id": null,
+            "status": "ACTIVE",
+            "assigned_at": "2026-09-23T04:09:39.895801Z",
+            "accept_at": null,
+            "ended_at": null,
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 45,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T04:09:39.401093Z"
+          },
+          {
+            "id": 46,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-23T04:09:39.740770Z"
+          },
+          {
+            "id": 47,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-23T04:09:39.991144Z"
+          }
+        ]
+      },
+      "logs": [
+        {
+          "id": 45,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-23T04:09:39.401093Z"
+        },
+        {
+          "id": 46,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "ANALYZE",
+          "reason": null,
+          "created_at": "2026-09-23T04:09:39.740770Z"
+        },
+        {
+          "id": 47,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "process_reason": "NONE",
+          "event_code": "ASSIGN",
+          "reason": null,
+          "created_at": "2026-09-23T04:09:39.991144Z"
+        }
+      ],
+      "canCancel": false,
+      "cancelReason": "",
+      "queue_items": null,
+      "error": ""
+    },
+    "02-manager-confirmation": {
+      "path": "pages/supervisor/queue",
+      "work_order": null,
+      "item": null,
+      "logs": null,
+      "selectedId": 5,
+      "selectedStatus": "ASSIGNED",
+      "selectedVersion": 3,
+      "queueView": "unstarted",
+      "canCancel": true,
+      "cancelConfirm": true,
+      "cancelReason": "cancel017-51fb1ada56f2 管理核实为重复报修，尚未开工。",
+      "success": "",
+      "queue_items": [
+        {
+          "id": 5,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "ASSIGNED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 3,
+          "current_assignment_id": 6,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T04:09:39.379264Z",
+          "assigned_at": "2026-09-23T04:09:39.895801Z",
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T04:09:39.386488Z",
+          "updated_at": "2026-09-23T04:09:39.989972Z",
+          "sla_overdue": false
+        }
+      ],
+      "error": ""
+    },
+    "03-manager-cancel-success": {
+      "path": "pages/supervisor/queue",
+      "work_order": null,
+      "item": null,
+      "logs": null,
+      "selectedId": "",
+      "selectedStatus": "",
+      "selectedVersion": "",
+      "queueView": "unstarted",
+      "canCancel": false,
+      "cancelConfirm": false,
+      "cancelReason": "",
+      "success": "工单 5 已撤销",
+      "queue_items": [],
+      "error": ""
+    },
+    "04-resident-cancel-history": {
+      "path": "pages/work-orders/detail",
+      "work_order": {
+        "id": 5,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 1,
+        "reporter_user_id": 3,
+        "status": "CANCELLED",
+        "process_reason": "NONE",
+        "category": "ELECTRICAL",
+        "severity": "HIGH",
+        "priority": "HIGH",
+        "version": 4,
+        "current_assignment_id": null,
+        "incident_id": null,
+        "sla_due_at": "2026-09-24T04:09:39.379264Z",
+        "assigned_at": "2026-09-23T04:09:39.895801Z",
+        "accepted_at": null,
+        "started_at": null,
+        "resolved_at": null,
+        "closed_at": null,
+        "created_at": "2026-09-23T04:09:39.386488Z",
+        "updated_at": "2026-09-23T04:10:06.345984Z",
+        "sla_overdue": false
+      },
+      "item": {
+        "work_order": {
+          "id": 5,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "CANCELLED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 4,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T04:09:39.379264Z",
+          "assigned_at": "2026-09-23T04:09:39.895801Z",
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T04:09:39.386488Z",
+          "updated_at": "2026-09-23T04:10:06.345984Z",
+          "sla_overdue": false
+        },
+        "text": "cancel017-51fb1ada56f2 页面撤销验证：客厅灯不亮，开关接触不良。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 6,
+            "employee_id": 1,
+            "assigned_by_user_id": null,
+            "status": "ENDED",
+            "assigned_at": "2026-09-23T04:09:39.895801Z",
+            "accept_at": null,
+            "ended_at": "2026-09-23T04:10:06.336827Z",
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 45,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T04:09:39.401093Z"
+          },
+          {
+            "id": 46,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-23T04:09:39.740770Z"
+          },
+          {
+            "id": 47,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-23T04:09:39.991144Z"
+          },
+          {
+            "id": 48,
+            "actor_user_id": 5,
+            "actor_type": "SUPERVISOR",
+            "from_status": "ASSIGNED",
+            "to_status": "CANCELLED",
+            "process_reason": "NONE",
+            "event_code": "CANCEL",
+            "reason": "cancel017-51fb1ada56f2 管理核实为重复报修，尚未开工。",
+            "created_at": "2026-09-23T04:10:06.335794Z"
+          }
+        ]
+      },
+      "logs": [
+        {
+          "id": 45,
+          "actor_user_id": 3,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-23T04:09:39.401093Z"
+        },
+        {
+          "id": 46,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "ANALYZE",
+          "reason": null,
+          "created_at": "2026-09-23T04:09:39.740770Z"
+        },
+        {
+          "id": 47,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "process_reason": "NONE",
+          "event_code": "ASSIGN",
+          "reason": null,
+          "created_at": "2026-09-23T04:09:39.991144Z"
+        },
+        {
+          "id": 48,
+          "actor_user_id": 5,
+          "actor_type": "SUPERVISOR",
+          "from_status": "ASSIGNED",
+          "to_status": "CANCELLED",
+          "process_reason": "NONE",
+          "event_code": "CANCEL",
+          "reason": "cancel017-51fb1ada56f2 管理核实为重复报修，尚未开工。",
+          "created_at": "2026-09-23T04:10:06.335794Z"
+        }
+      ],
+      "canCancel": false,
+      "cancelReason": "",
+      "queue_items": null,
+      "error": ""
+    },
+    "05-manager-relogin": {
+      "path": "pages/supervisor/queue",
+      "work_order": null,
+      "item": null,
+      "logs": null,
+      "selectedId": "",
+      "selectedStatus": "",
+      "selectedVersion": "",
+      "queueView": "unstarted",
+      "canCancel": false,
+      "cancelConfirm": false,
+      "cancelReason": "",
+      "success": "",
+      "queue_items": [],
+      "error": ""
+    }
+  },
+  "requests": [
+    {
+      "path": "/work-orders",
+      "method": "POST",
+      "status": 200,
+      "request_id": "a9847f3ce6e9458890948acd8a2fa50c",
+      "result": {
+        "id": 5,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 1,
+        "reporter_user_id": 3,
+        "status": "PENDING_ANALYSIS",
+        "process_reason": "NONE",
+        "category": "OTHER",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "version": 1,
+        "current_assignment_id": null,
+        "incident_id": null,
+        "sla_due_at": "2026-09-24T04:09:39.379264Z",
+        "assigned_at": null,
+        "accepted_at": null,
+        "started_at": null,
+        "resolved_at": null,
+        "closed_at": null,
+        "created_at": "2026-09-23T04:09:39.386488Z",
+        "updated_at": "2026-09-23T04:09:39.386488Z",
+        "sla_overdue": false
+      },
+      "received_at_utc": "2026-09-23T04:09:39.484Z",
+      "source": "real origin-forwarded wx.request; no fake response"
+    },
+    {
+      "path": "/work-orders/5",
+      "method": "GET",
+      "status": 200,
+      "request_id": "e62d5df4ac85417da97bc3fa783efb79",
+      "result": {
+        "work_order": {
+          "id": 5,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "ASSIGNED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 3,
+          "current_assignment_id": 6,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T04:09:39.379264Z",
+          "assigned_at": "2026-09-23T04:09:39.895801Z",
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T04:09:39.386488Z",
+          "updated_at": "2026-09-23T04:09:39.989972Z",
+          "sla_overdue": false
+        },
+        "text": "cancel017-51fb1ada56f2 页面撤销验证：客厅灯不亮，开关接触不良。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 6,
+            "employee_id": 1,
+            "assigned_by_user_id": null,
+            "status": "ACTIVE",
+            "assigned_at": "2026-09-23T04:09:39.895801Z",
+            "accept_at": null,
+            "ended_at": null,
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 45,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T04:09:39.401093Z"
+          },
+          {
+            "id": 46,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-23T04:09:39.740770Z"
+          },
+          {
+            "id": 47,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-23T04:09:39.991144Z"
+          }
+        ]
+      },
+      "received_at_utc": "2026-09-23T04:09:41.980Z",
+      "source": "real origin-forwarded wx.request; no fake response"
+    },
+    {
+      "path": "/supervisor/work-orders?property_id=1",
+      "method": "GET",
+      "status": 200,
+      "request_id": "3518dd8dcbac4429bff76e4c057c55ec",
+      "result": {
+        "items": [],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T04:09:55.009Z",
+      "source": "real origin-forwarded wx.request; no fake response"
+    },
+    {
+      "path": "/supervisor/staff/daily?property_id=1&tenant_id=1&limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "416872f7230e48e296b35ee729f64c5c",
+      "result": {
+        "business_date": "2026-09-23",
+        "items": [
+          {
+            "id": 1,
+            "employee_id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "business_date": "2026-09-23",
+            "on_duty": "ON_DUTY",
+            "leave_type": null,
+            "current_load": 1
+          },
+          {
+            "id": 2,
+            "employee_id": 2,
+            "tenant_id": 1,
+            "property_id": 1,
+            "business_date": "2026-09-23",
+            "on_duty": "ON_DUTY",
+            "leave_type": null,
+            "current_load": 0
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T04:09:55.019Z",
+      "source": "real origin-forwarded wx.request; no fake response"
+    },
+    {
+      "path": "/supervisor/staff/daily?property_id=1&tenant_id=1&limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "011d46e99be8418f8cde922cd69f28a7",
+      "result": {
+        "business_date": "2026-09-23",
+        "items": [
+          {
+            "id": 1,
+            "employee_id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "business_date": "2026-09-23",
+            "on_duty": "ON_DUTY",
+            "leave_type": null,
+            "current_load": 1
+          },
+          {
+            "id": 2,
+            "employee_id": 2,
+            "tenant_id": 1,
+            "property_id": 1,
+            "business_date": "2026-09-23",
+            "on_duty": "ON_DUTY",
+            "leave_type": null,
+            "current_load": 0
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T04:09:55.172Z",
+      "source": "real origin-forwarded wx.request; no fake response"
+    },
+    {
+      "path": "/supervisor/work-orders?property_id=1&view=unstarted",
+      "method": "GET",
+      "status": 200,
+      "request_id": "8a1e32f254fd42b4884d0a1c158342b2",
+      "result": {
+        "items": [
+          {
+            "id": 5,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "ASSIGNED",
+            "process_reason": "NONE",
+            "category": "ELECTRICAL",
+            "severity": "HIGH",
+            "priority": "HIGH",
+            "version": 3,
+            "current_assignment_id": 6,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T04:09:39.379264Z",
+            "assigned_at": "2026-09-23T04:09:39.895801Z",
+            "accepted_at": null,
+            "started_at": null,
+            "resolved_at": null,
+            "closed_at": null,
+            "created_at": "2026-09-23T04:09:39.386488Z",
+            "updated_at": "2026-09-23T04:09:39.989972Z",
+            "sla_overdue": false
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T04:09:55.173Z",
+      "source": "real origin-forwarded wx.request; no fake response"
+    },
+    {
+      "path": "/work-orders/5/cancel",
+      "method": "POST",
+      "status": 200,
+      "request_id": "2a7b5c55612645aaa0b848e560c6d6e8",
+      "result": {
+        "id": 5,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 1,
+        "reporter_user_id": 3,
+        "status": "CANCELLED",
+        "process_reason": "NONE",
+        "category": "ELECTRICAL",
+        "severity": "HIGH",
+        "priority": "HIGH",
+        "version": 4,
+        "current_assignment_id": null,
+        "incident_id": null,
+        "sla_due_at": "2026-09-24T04:09:39.379264Z",
+        "assigned_at": "2026-09-23T04:09:39.895801Z",
+        "accepted_at": null,
+        "started_at": null,
+        "resolved_at": null,
+        "closed_at": null,
+        "created_at": "2026-09-23T04:09:39.386488Z",
+        "updated_at": "2026-09-23T04:10:06.345984Z",
+        "sla_overdue": false
+      },
+      "received_at_utc": "2026-09-23T04:10:06.378Z",
+      "source": "real origin-forwarded wx.request; no fake response"
+    },
+    {
+      "path": "/supervisor/work-orders?property_id=1&view=unstarted",
+      "method": "GET",
+      "status": 200,
+      "request_id": "4f916e5ad843430e844dcb503dfa7a4c",
+      "result": {
+        "items": [],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T04:10:06.410Z",
+      "source": "real origin-forwarded wx.request; no fake response"
+    },
+    {
+      "path": "/supervisor/staff/daily?property_id=1&tenant_id=1&limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "ce0ac034708a40a682f9c1a3dbf60113",
+      "result": {
+        "business_date": "2026-09-23",
+        "items": [
+          {
+            "id": 1,
+            "employee_id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "business_date": "2026-09-23",
+            "on_duty": "ON_DUTY",
+            "leave_type": null,
+            "current_load": 0
+          },
+          {
+            "id": 2,
+            "employee_id": 2,
+            "tenant_id": 1,
+            "property_id": 1,
+            "business_date": "2026-09-23",
+            "on_duty": "ON_DUTY",
+            "leave_type": null,
+            "current_load": 0
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T04:10:06.411Z",
+      "source": "real origin-forwarded wx.request; no fake response"
+    },
+    {
+      "path": "/work-orders?limit=20",
+      "method": "GET",
+      "status": 200,
+      "request_id": "9bd0d3ee2dda40e49e6f0cf178c4a60b",
+      "result": {
+        "items": [
+          {
+            "id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "CLOSED",
+            "process_reason": "NONE",
+            "category": "ELECTRICAL",
+            "severity": "HIGH",
+            "priority": "HIGH",
+            "version": 10,
+            "current_assignment_id": null,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T02:16:47.523620Z",
+            "assigned_at": "2026-09-23T02:16:47.904858Z",
+            "accepted_at": "2026-09-23T02:17:06.518223Z",
+            "started_at": "2026-09-23T02:17:06.771680Z",
+            "resolved_at": "2026-09-23T02:17:51.226606Z",
+            "closed_at": "2026-09-23T02:18:17.128460Z",
+            "created_at": "2026-09-23T02:16:47.529922Z",
+            "updated_at": "2026-09-23T02:18:17.131761Z",
+            "sla_overdue": false
+          },
+          {
+            "id": 2,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "CLOSED",
+            "process_reason": "NONE",
+            "category": "ELECTRICAL",
+            "severity": "HIGH",
+            "priority": "HIGH",
+            "version": 13,
+            "current_assignment_id": null,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T02:21:30.187153Z",
+            "assigned_at": "2026-09-23T02:22:41.948404Z",
+            "accepted_at": "2026-09-23T02:22:42.399525Z",
+            "started_at": "2026-09-23T02:22:42.433727Z",
+            "resolved_at": "2026-09-23T02:22:42.524896Z",
+            "closed_at": "2026-09-23T02:22:42.567195Z",
+            "created_at": "2026-09-23T02:21:30.194208Z",
+            "updated_at": "2026-09-23T02:22:42.569246Z",
+            "sla_overdue": false
+          },
+          {
+            "id": 3,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "CLOSED",
+            "process_reason": "NONE",
+            "category": "ELECTRICAL",
+            "severity": "HIGH",
+            "priority": "HIGH",
+            "version": 10,
+            "current_assignment_id": null,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T02:22:42.696085Z",
+            "assigned_at": "2026-09-23T02:22:42.884959Z",
+            "accepted_at": "2026-09-23T02:22:43.070253Z",
+            "started_at": "2026-09-23T02:22:43.112735Z",
+            "resolved_at": "2026-09-23T02:22:43.793721Z",
+            "closed_at": "2026-09-23T02:22:43.844468Z",
+            "created_at": "2026-09-23T02:22:42.698709Z",
+            "updated_at": "2026-09-23T02:22:43.847124Z",
+            "sla_overdue": false
+          },
+          {
+            "id": 4,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "CLOSED",
+            "process_reason": "NONE",
+            "category": "ELECTRICAL",
+            "severity": "HIGH",
+            "priority": "HIGH",
+            "version": 10,
+            "current_assignment_id": null,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T02:22:43.916431Z",
+            "assigned_at": "2026-09-23T02:22:44.309701Z",
+            "accepted_at": "2026-09-23T02:22:44.589209Z",
+            "started_at": "2026-09-23T02:22:44.631259Z",
+            "resolved_at": "2026-09-23T02:22:45.360692Z",
+            "closed_at": "2026-09-23T02:22:45.423393Z",
+            "created_at": "2026-09-23T02:22:43.919006Z",
+            "updated_at": "2026-09-23T02:22:45.426765Z",
+            "sla_overdue": false
+          },
+          {
+            "id": 5,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 1,
+            "reporter_user_id": 3,
+            "status": "CANCELLED",
+            "process_reason": "NONE",
+            "category": "ELECTRICAL",
+            "severity": "HIGH",
+            "priority": "HIGH",
+            "version": 4,
+            "current_assignment_id": null,
+            "incident_id": null,
+            "sla_due_at": "2026-09-24T04:09:39.379264Z",
+            "assigned_at": "2026-09-23T04:09:39.895801Z",
+            "accepted_at": null,
+            "started_at": null,
+            "resolved_at": null,
+            "closed_at": null,
+            "created_at": "2026-09-23T04:09:39.386488Z",
+            "updated_at": "2026-09-23T04:10:06.345984Z",
+            "sla_overdue": false
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T04:10:46.532Z",
+      "source": "real origin-forwarded wx.request; no fake response"
+    },
+    {
+      "path": "/work-orders/5",
+      "method": "GET",
+      "status": 200,
+      "request_id": "b1f9b6c18e3b4c7d91ae4bc24838b7f1",
+      "result": {
+        "work_order": {
+          "id": 5,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "CANCELLED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 4,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T04:09:39.379264Z",
+          "assigned_at": "2026-09-23T04:09:39.895801Z",
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T04:09:39.386488Z",
+          "updated_at": "2026-09-23T04:10:06.345984Z",
+          "sla_overdue": false
+        },
+        "text": "cancel017-51fb1ada56f2 页面撤销验证：客厅灯不亮，开关接触不良。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 6,
+            "employee_id": 1,
+            "assigned_by_user_id": null,
+            "status": "ENDED",
+            "assigned_at": "2026-09-23T04:09:39.895801Z",
+            "accept_at": null,
+            "ended_at": "2026-09-23T04:10:06.336827Z",
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 45,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T04:09:39.401093Z"
+          },
+          {
+            "id": 46,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-23T04:09:39.740770Z"
+          },
+          {
+            "id": 47,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-23T04:09:39.991144Z"
+          },
+          {
+            "id": 48,
+            "actor_user_id": 5,
+            "actor_type": "SUPERVISOR",
+            "from_status": "ASSIGNED",
+            "to_status": "CANCELLED",
+            "process_reason": "NONE",
+            "event_code": "CANCEL",
+            "reason": "cancel017-51fb1ada56f2 管理核实为重复报修，尚未开工。",
+            "created_at": "2026-09-23T04:10:06.335794Z"
+          }
+        ]
+      },
+      "received_at_utc": "2026-09-23T04:10:49.403Z",
+      "source": "real origin-forwarded wx.request; no fake response"
+    },
+    {
+      "path": "/work-orders/5",
+      "method": "GET",
+      "status": 200,
+      "request_id": "70296f86774243bfade365d9a870be5c",
+      "result": {
+        "work_order": {
+          "id": 5,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "CANCELLED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 4,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T04:09:39.379264Z",
+          "assigned_at": "2026-09-23T04:09:39.895801Z",
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T04:09:39.386488Z",
+          "updated_at": "2026-09-23T04:10:06.345984Z",
+          "sla_overdue": false
+        },
+        "text": "cancel017-51fb1ada56f2 页面撤销验证：客厅灯不亮，开关接触不良。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 6,
+            "employee_id": 1,
+            "assigned_by_user_id": null,
+            "status": "ENDED",
+            "assigned_at": "2026-09-23T04:09:39.895801Z",
+            "accept_at": null,
+            "ended_at": "2026-09-23T04:10:06.336827Z",
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 45,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T04:09:39.401093Z"
+          },
+          {
+            "id": 46,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-23T04:09:39.740770Z"
+          },
+          {
+            "id": 47,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-23T04:09:39.991144Z"
+          },
+          {
+            "id": 48,
+            "actor_user_id": 5,
+            "actor_type": "SUPERVISOR",
+            "from_status": "ASSIGNED",
+            "to_status": "CANCELLED",
+            "process_reason": "NONE",
+            "event_code": "CANCEL",
+            "reason": "cancel017-51fb1ada56f2 管理核实为重复报修，尚未开工。",
+            "created_at": "2026-09-23T04:10:06.335794Z"
+          }
+        ]
+      },
+      "received_at_utc": "2026-09-23T04:10:49.615Z",
+      "source": "real origin-forwarded wx.request; no fake response"
+    },
+    {
+      "path": "/supervisor/work-orders?property_id=1",
+      "method": "GET",
+      "status": 200,
+      "request_id": "905d04d838124916af2cf2f29cef080c",
+      "result": {
+        "items": [],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T04:11:02.543Z",
+      "source": "real origin-forwarded wx.request; no fake response"
+    },
+    {
+      "path": "/supervisor/staff/daily?property_id=1&tenant_id=1&limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "9cefb8d781664c75afcd990b91a61a56",
+      "result": {
+        "business_date": "2026-09-23",
+        "items": [
+          {
+            "id": 1,
+            "employee_id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "business_date": "2026-09-23",
+            "on_duty": "ON_DUTY",
+            "leave_type": null,
+            "current_load": 0
+          },
+          {
+            "id": 2,
+            "employee_id": 2,
+            "tenant_id": 1,
+            "property_id": 1,
+            "business_date": "2026-09-23",
+            "on_duty": "ON_DUTY",
+            "leave_type": null,
+            "current_load": 0
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T04:11:02.545Z",
+      "source": "real origin-forwarded wx.request; no fake response"
+    },
+    {
+      "path": "/supervisor/work-orders?property_id=1&view=unstarted",
+      "method": "GET",
+      "status": 200,
+      "request_id": "65a8b86d981d45109d006e38d9c87b43",
+      "result": {
+        "items": [],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T04:11:02.700Z",
+      "source": "real origin-forwarded wx.request; no fake response"
+    },
+    {
+      "path": "/supervisor/staff/daily?property_id=1&tenant_id=1&limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "e1c8e93883334049be787443dd1cf798",
+      "result": {
+        "business_date": "2026-09-23",
+        "items": [
+          {
+            "id": 1,
+            "employee_id": 1,
+            "tenant_id": 1,
+            "property_id": 1,
+            "business_date": "2026-09-23",
+            "on_duty": "ON_DUTY",
+            "leave_type": null,
+            "current_load": 0
+          },
+          {
+            "id": 2,
+            "employee_id": 2,
+            "tenant_id": 1,
+            "property_id": 1,
+            "business_date": "2026-09-23",
+            "on_duty": "ON_DUTY",
+            "leave_type": null,
+            "current_load": 0
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T04:11:02.701Z",
+      "source": "real origin-forwarded wx.request; no fake response"
+    }
+  ],
+  "screenshots": [
+    "01-auto-assigned.png",
+    "02-manager-confirmation.png",
+    "03-manager-cancel-success.png",
+    "04-resident-cancel-history.png",
+    "05-manager-relogin.png"
+  ],
+  "mode": "Actual normal SMS page authentication, controls and real AUTH001 requests; no fake business state or manual dispatch.",
+  "last_error": "Error: timeout waiting for automator response\n    at Connection.onMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\miniprogram-automator\\out\\Connection.js:1:985)\n    at Transport.emit (node:events:509:28)\n    at WebSocket.<anonymous> (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\miniprogram-automator\\out\\Transport.js:1:220)\n    at WebSocket.onMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\event-target.js:120:16)\n    at WebSocket.emit (node:events:509:28)\n    at Receiver.receiverOnMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\websocket.js:807:20)\n    at Receiver.emit (node:events:509:28)\n    at Receiver.dataMessage (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\receiver.js:448:14)\n    at Receiver.getData (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\receiver.js:377:17)\n    at Receiver.startLoop (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\ws\\lib\\receiver.js:158:22)",
+  "helper_interruption": "Initial final screenshot timed out after manager relogin/state and single successful cancel were already saved. Read-only page inspection confirmed unstarted queue; resumed only current screenshot, no login or business mutation repeated.",
+  "status": "PAGE_PASS_PENDING_INDEPENDENT_REVIEW",
+  "order_id": 5,
+  "staff_identity": "staff",
+  "limits": [
+    "Actual UI create/AUTO/cancel/refresh/relogin; no manual analyze/assign, no fake business response.",
+    "Fixture credentials are normal Development SMS; no real SMS/WeChat/device/Production claim.",
+    "Unit simulations and API negatives remain separate from these actual controls."
+  ],
+  "project_config_sha256": "342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F"
+}

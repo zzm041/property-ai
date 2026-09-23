@@ -1,0 +1,18 @@
+{
+  "task_id":"MANAGER-WO-CANCEL-017",
+  "base_sha":"26f4a1692990fba012f4157efe10dc4bd19816fe",
+  "head_sha":"4a8ae835388c6ee1da4d9bd088f7fc73356644e4",
+  "review_round":1,
+  "product_repair_rounds":0,
+  "status":"PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+  "session_id":"01a0cc7b-4dbf-7a21-81d4-946abd2bcef6",
+  "model":"gpt-5.6-sol (existing default; no override)",
+  "sandbox":"read-only",
+  "exit_code":0,
+  "schema_validated":true,
+  "mechanism":"Existing codex_exec_readonly.py/schema/defaultmodel/ChatGPTsubscription; explicitread-only sandbox. Built-inagentthreadlimit alreadyknown from016, no repeatedcreation attempts.",
+  "timeout_seconds":900,
+  "result_path":"reports/codex/MANAGER-WO-CANCEL-017-review.json",
+  "private_invocation_log":"tmp/manager-wo-cancel-017/review.call.json",
+  "evidence":"104focused/fiveactualPNG/neworders5-8/API/readonlyDB/queue independently read; reviewer opened all fivePNG, didnot run tests/pages/API/DB/queue. No CURRENT_TASK_BLOCKER; N1/N2 and R1/R2 retained, N3 tracking closed. Do not replay without relevant sourcechanges."
+}

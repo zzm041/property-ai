@@ -1972,6 +1972,33 @@
       "scope": "Existing pre-field-work FSM cancellation, manager controls, incident-aware assignment/load release; no PROCESSING/WAIT_CONFIRM extension, no schema/newpolicy."
     }
   },
+  "manager_wo_cancel_017": {
+    "task_id": "MANAGER-WO-CANCEL-017",
+    "base_sha": "26f4a1692990fba012f4157efe10dc4bd19816fe",
+    "implementation_head": "4a8ae835388c6ee1da4d9bd088f7fc73356644e4",
+    "runtime_run_id": "cancel017-51fb1ada56f2",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+    "independent_review": {
+      "round": 1,
+      "product_repair_rounds": 0,
+      "result": "PASS",
+      "session_id": "01a0cc7b-4dbf-7a21-81d4-946abd2bcef6",
+      "path": "reports/codex/MANAGER-WO-CANCEL-017-review.json",
+      "boundary": "Separate read-only CLI reviewer read source and saved evidence and opened all fivePNG; didnot run tests/pages/API/DB/queue. N1/N2 and R1/R2 retained; N3 tracking closed."
+    },
+    "evidence": "reports/manager-wo-cancel-017/:104focused, fivePNG, normalmanagerpageorder5CANCELLED/load0, acceptedorder6cancelrace200/409, order7illegalstates409 andorder8cancel-vs-startrace409/200 thennormalCLOSED, readonlyDB/audit/notifications, AUTH0010009 uniquevhost/queue0/0/1 historicalDLQ2 untouched",
+    "current_status_overlays": [
+      {
+        "id": "WO-CANCEL-REJECT-REASSIGN-REOPEN",
+        "implementation_status": "Existing manager page supports frozen pre-field-work cancellation with scoped permissions, incident-aware assignment/load cleanup, SLA stop, audit/history and notifications; earlier reject/reassign/reopen and resident-only policy retained.",
+        "verification_status": "PARTIAL_COMPOSITE_WITH_REOPEN_AND_MANAGER_CANCEL_SCOPED_LOCAL_DEVELOPMENT_PASS",
+        "evidence_version": "014 65f20c5 / wo014-745f67277104;017 4a8ae835388c6ee1da4d9bd088f7fc73356644e4 / cancel017-51fb1ada56f2; earlier component versions retained",
+        "remaining_gap": "Broader production exceptions, real-provider/device/security/scale acceptance; live common-Incident cancellation and foreign-scope/mixed-role scenarios are not new017 runtime evidence. V1-RES-CANCEL remains distinct owner-only pre-assignment policy.",
+        "next_action": "Preserve017 accepted scope and earlier evidence; next018 closes existing PHR006-N1 CSV round trip without schema or policy changes."
+      }
+    ],
+    "next_slice": {"task_id": "HOUSE-CSV-ROUNDTRIP-018", "scope": "Existing PHR006-N1 quoted-newline CSV export/reimport; existing import API/service only, no schema/dependency changes."}
+  },
   "auth_failure_policy_20260923": {
     "task_id": "AUTH-FAILURE-POLICY-20260923",
     "owner_decision": "不锁定",
@@ -1992,7 +2019,7 @@
     "generated_at": "2026-09-23",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
     "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs), then notification_events_inbox_013.current_status_overlays (2 IDs)",
-    "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs)",
+    "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs), then manager_wo_cancel_017 (1 composite ID, remains PARTIAL)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced. Old AUTH001 objects were lost on the 2026-09-23 tmpfs stop; historical evidence remains version-bound, not current-object proof.",
     "row_count": 83,
     "rows": [
@@ -2390,11 +2417,11 @@
       },
       {
         "requirement_id": "WO-CANCEL-REJECT-REASSIGN-REOPEN",
-        "current_implementation": "resident_reasoned_reopen_and_existing_assignee_or_worker_auto_redispatch_now_wired; existing_cancel_reject_supervisor_reassign_evidence_retained",
-        "verification_mode_status": "PARTIAL_COMPOSITE_WITH_REOPEN_SCOPED_LOCAL_DEVELOPMENT_PASS",
-        "evidence_version": "65f20c5a288b2b8e027c8b80fefbe6cfed439d14 / wo014-745f67277104; earlier composite component versions retained",
-        "remaining_gap": "separate manager-cancellation policy/cleanup and broader production exception acceptance; do not upgrade the entire composite to PASS",
-        "next_action": "preserve reviewed reopen/history and previous component evidence; address only remaining approved component gaps"
+        "current_implementation": "Existing manager page supports frozen pre-field-work cancellation with scoped permissions, incident-aware assignment/load cleanup, SLA stop, audit/history and notifications; earlier reject/reassign/reopen and resident-only policy retained.",
+        "verification_mode_status": "PARTIAL_COMPOSITE_WITH_REOPEN_AND_MANAGER_CANCEL_SCOPED_LOCAL_DEVELOPMENT_PASS",
+        "evidence_version": "014 65f20c5 / wo014-745f67277104;017 4a8ae835388c6ee1da4d9bd088f7fc73356644e4 / cancel017-51fb1ada56f2; earlier component versions retained",
+        "remaining_gap": "Broader production exceptions, real-provider/device/security/scale acceptance; live common-Incident cancellation and foreign-scope/mixed-role scenarios are not new017 runtime evidence. V1-RES-CANCEL remains distinct owner-only pre-assignment policy.",
+        "next_action": "Preserve017 accepted scope and earlier evidence; next018 closes existing PHR006-N1 CSV round trip without schema or policy changes."
       },
       {
         "requirement_id": "AUTH-WECHAT",

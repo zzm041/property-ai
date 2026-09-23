@@ -1,0 +1,46 @@
+{
+  "task_id": "MANAGER-WO-CANCEL-017",
+  "product_sha": "4a8ae835388c6ee1da4d9bd088f7fc73356644e4",
+  "observed": {
+    "observed_utc": "2026-09-23T04:05:55.9969054Z",
+    "processes": [
+      {
+        "ProcessId": 46236,
+        "ParentProcessId": 3420,
+        "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+        "CommandLine": "\"D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\" -I D:\\property-ai\\tmp\\run_auth001_recovered.py api"
+      },
+      {
+        "ProcessId": 41920,
+        "ParentProcessId": 3420,
+        "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+        "CommandLine": "\"D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\" -I D:\\property-ai\\tmp\\run_auth001_recovered.py worker"
+      },
+      {
+        "ProcessId": 46688,
+        "ParentProcessId": 41920,
+        "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+        "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -m celery -A app.worker.celery_app:celery_app worker -Q property_ai.auth001 --pool=solo --loglevel=info --hostname=auth001@%h"
+      }
+    ],
+    "health": {
+      "request_id": "e1ec1ed764c44e6781c800246e9c0f4f",
+      "data": {
+        "status": "ok"
+      }
+    },
+    "api_startup": "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True",
+    "worker_startup": [
+      "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True",
+      "worker_queue=property_ai.auth001 pool=solo"
+    ]
+  },
+  "interpreter": "CPython3.12.10 AMD64 at D:/property-ai/tmp/uv-python/cpython-3.12.10-windows-x86_64-none/python.exe",
+  "dependencies": "Retained -I isolated launcher with explicit project .venv/Lib/site-packages; worker child has PYTHONNOUSERSITE=1 and exact project package/backend paths.",
+  "provenance": "Both launch after commit4a8ae83. Actual command/startup/health evidence, not debugger introspection. Old known API10164 and Worker38040 stopped after saved idle check and zero8083 connections; wrapper40136 exited. No other/shared/8082 operations.",
+  "preflight": "reports/manager-wo-cancel-017/pre-replacement-idle.json",
+  "logs": [
+    "tmp/auth001-runtime/api-4a8ae83-manager017.stdout.log",
+    "tmp/auth001-runtime/worker-4a8ae83-manager017.stdout.log"
+  ]
+}

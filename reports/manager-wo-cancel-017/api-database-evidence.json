@@ -1,0 +1,2209 @@
+{
+  "task_id": "MANAGER-WO-CANCEL-017",
+  "run_id": "cancel017-51fb1ada56f2",
+  "code_sha": "4a8ae835388c6ee1da4d9bd088f7fc73356644e4",
+  "mode": "Normal API tests, real MySQL two-request races, SELECT-only persistence; not UI claims.",
+  "results": {
+    "page-duplicate": 409,
+    "queue-denied-resident": 403,
+    "queue-denied-other": 403,
+    "queue-denied-staff": 403,
+    "queue-invalid-&limit=0": 422,
+    "queue-invalid-&limit=101": 422,
+    "queue-invalid-&after_id=-1": 422,
+    "accepted-race-create": {
+      "id": 6,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "category": "OTHER",
+      "severity": "LOW",
+      "priority": "MEDIUM",
+      "version": 1,
+      "current_assignment_id": null,
+      "incident_id": null,
+      "sla_due_at": "2026-09-24T04:14:43.844752Z",
+      "assigned_at": null,
+      "accepted_at": null,
+      "started_at": null,
+      "resolved_at": null,
+      "closed_at": null,
+      "created_at": "2026-09-23T04:14:43.849998Z",
+      "updated_at": "2026-09-23T04:14:43.849998Z",
+      "sla_overdue": false
+    },
+    "accepted-race-assigned": {
+      "detail": {
+        "work_order": {
+          "id": 6,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "ASSIGNED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 3,
+          "current_assignment_id": 7,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T04:14:43.844752Z",
+          "assigned_at": "2026-09-23T04:14:44.186869Z",
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T04:14:43.849998Z",
+          "updated_at": "2026-09-23T04:14:44.267800Z",
+          "sla_overdue": false
+        },
+        "text": "cancel017-51fb1ada56f2-accepted-race 电气灯具故障",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 7,
+            "employee_id": 1,
+            "assigned_by_user_id": null,
+            "status": "ACTIVE",
+            "assigned_at": "2026-09-23T04:14:44.186869Z",
+            "accept_at": null,
+            "ended_at": null,
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 49,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:43.857287Z"
+          },
+          {
+            "id": 50,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:44.030116Z"
+          },
+          {
+            "id": 51,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:44.269336Z"
+          }
+        ]
+      },
+      "staff": "staff"
+    },
+    "accepted-race-accept": {
+      "id": 6,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "ACCEPTED",
+      "process_reason": "NONE",
+      "category": "ELECTRICAL",
+      "severity": "HIGH",
+      "priority": "HIGH",
+      "version": 4,
+      "current_assignment_id": 7,
+      "incident_id": null,
+      "sla_due_at": "2026-09-24T04:14:43.844752Z",
+      "assigned_at": "2026-09-23T04:14:44.186869Z",
+      "accepted_at": "2026-09-23T04:14:44.531966Z",
+      "started_at": null,
+      "resolved_at": null,
+      "closed_at": null,
+      "created_at": "2026-09-23T04:14:43.849998Z",
+      "updated_at": "2026-09-23T04:14:44.542557Z",
+      "sla_overdue": false
+    },
+    "cancel-denied-other": 403,
+    "cancel-denied-staff": 403,
+    "accepted-race": {
+      "before": {
+        "work_order": {
+          "id": 6,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "ACCEPTED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 4,
+          "current_assignment_id": 7,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T04:14:43.844752Z",
+          "assigned_at": "2026-09-23T04:14:44.186869Z",
+          "accepted_at": "2026-09-23T04:14:44.531966Z",
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T04:14:43.849998Z",
+          "updated_at": "2026-09-23T04:14:44.542557Z",
+          "sla_overdue": false
+        },
+        "text": "cancel017-51fb1ada56f2-accepted-race 电气灯具故障",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 7,
+            "employee_id": 1,
+            "assigned_by_user_id": null,
+            "status": "ACTIVE",
+            "assigned_at": "2026-09-23T04:14:44.186869Z",
+            "accept_at": "2026-09-23T04:14:44.531966Z",
+            "ended_at": null,
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 49,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:43.857287Z"
+          },
+          {
+            "id": 50,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:44.030116Z"
+          },
+          {
+            "id": 51,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:44.269336Z"
+          },
+          {
+            "id": 52,
+            "actor_user_id": 6,
+            "actor_type": "STAFF",
+            "from_status": "ASSIGNED",
+            "to_status": "ACCEPTED",
+            "process_reason": "NONE",
+            "event_code": "ACCEPT",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:44.534557Z"
+          }
+        ]
+      },
+      "responses": [
+        {
+          "action": "cancel",
+          "status": 409,
+          "request_id": "cancel017-51fb1ada56f2-accepted-race-0",
+          "error_code": "WO.CONFLICT"
+        },
+        {
+          "action": "cancel",
+          "status": 200,
+          "request_id": "cancel017-51fb1ada56f2-accepted-race-1",
+          "error_code": null
+        }
+      ],
+      "after": {
+        "work_order": {
+          "id": 6,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "CANCELLED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 5,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T04:14:43.844752Z",
+          "assigned_at": "2026-09-23T04:14:44.186869Z",
+          "accepted_at": "2026-09-23T04:14:44.531966Z",
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T04:14:43.849998Z",
+          "updated_at": "2026-09-23T04:14:45.140244Z",
+          "sla_overdue": false
+        },
+        "text": "cancel017-51fb1ada56f2-accepted-race 电气灯具故障",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 7,
+            "employee_id": 1,
+            "assigned_by_user_id": null,
+            "status": "ENDED",
+            "assigned_at": "2026-09-23T04:14:44.186869Z",
+            "accept_at": "2026-09-23T04:14:44.531966Z",
+            "ended_at": "2026-09-23T04:14:45.132463Z",
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 49,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:43.857287Z"
+          },
+          {
+            "id": 50,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:44.030116Z"
+          },
+          {
+            "id": 51,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:44.269336Z"
+          },
+          {
+            "id": 52,
+            "actor_user_id": 6,
+            "actor_type": "STAFF",
+            "from_status": "ASSIGNED",
+            "to_status": "ACCEPTED",
+            "process_reason": "NONE",
+            "event_code": "ACCEPT",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:44.534557Z"
+          },
+          {
+            "id": 53,
+            "actor_user_id": 5,
+            "actor_type": "SUPERVISOR",
+            "from_status": "ACCEPTED",
+            "to_status": "CANCELLED",
+            "process_reason": "NONE",
+            "event_code": "CANCEL",
+            "reason": "cancel017-51fb1ada56f2-accepted-race",
+            "created_at": "2026-09-23T04:14:45.130903Z"
+          }
+        ]
+      },
+      "parallel_start": "two futures + barrier"
+    },
+    "illegal-processing-create": {
+      "id": 7,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "category": "OTHER",
+      "severity": "LOW",
+      "priority": "MEDIUM",
+      "version": 1,
+      "current_assignment_id": null,
+      "incident_id": null,
+      "sla_due_at": "2026-09-24T04:14:45.257494Z",
+      "assigned_at": null,
+      "accepted_at": null,
+      "started_at": null,
+      "resolved_at": null,
+      "closed_at": null,
+      "created_at": "2026-09-23T04:14:45.261100Z",
+      "updated_at": "2026-09-23T04:14:45.261100Z",
+      "sla_overdue": false
+    },
+    "illegal-processing-assigned": {
+      "detail": {
+        "work_order": {
+          "id": 7,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "ASSIGNED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 3,
+          "current_assignment_id": 8,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T04:14:45.257494Z",
+          "assigned_at": "2026-09-23T04:14:45.593703Z",
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T04:14:45.261100Z",
+          "updated_at": "2026-09-23T04:14:45.692363Z",
+          "sla_overdue": false
+        },
+        "text": "cancel017-51fb1ada56f2-illegal-processing 电气灯具故障",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 8,
+            "employee_id": 1,
+            "assigned_by_user_id": null,
+            "status": "ACTIVE",
+            "assigned_at": "2026-09-23T04:14:45.593703Z",
+            "accept_at": null,
+            "ended_at": null,
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 54,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:45.264183Z"
+          },
+          {
+            "id": 55,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:45.428427Z"
+          },
+          {
+            "id": 56,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:45.694425Z"
+          }
+        ]
+      },
+      "staff": "staff"
+    },
+    "illegal-accept": {
+      "id": 7,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "ACCEPTED",
+      "process_reason": "NONE",
+      "category": "ELECTRICAL",
+      "severity": "HIGH",
+      "priority": "HIGH",
+      "version": 4,
+      "current_assignment_id": 8,
+      "incident_id": null,
+      "sla_due_at": "2026-09-24T04:14:45.257494Z",
+      "assigned_at": "2026-09-23T04:14:45.593703Z",
+      "accepted_at": "2026-09-23T04:14:45.933140Z",
+      "started_at": null,
+      "resolved_at": null,
+      "closed_at": null,
+      "created_at": "2026-09-23T04:14:45.261100Z",
+      "updated_at": "2026-09-23T04:14:45.945195Z",
+      "sla_overdue": false
+    },
+    "illegal-start": {
+      "id": 7,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "PROCESSING",
+      "process_reason": "NONE",
+      "category": "ELECTRICAL",
+      "severity": "HIGH",
+      "priority": "HIGH",
+      "version": 5,
+      "current_assignment_id": 8,
+      "incident_id": null,
+      "sla_due_at": "2026-09-24T04:14:45.257494Z",
+      "assigned_at": "2026-09-23T04:14:45.593703Z",
+      "accepted_at": "2026-09-23T04:14:45.933140Z",
+      "started_at": "2026-09-23T04:14:45.998757Z",
+      "resolved_at": null,
+      "closed_at": null,
+      "created_at": "2026-09-23T04:14:45.261100Z",
+      "updated_at": "2026-09-23T04:14:46.002971Z",
+      "sla_overdue": false
+    },
+    "processing-cancel-denied": 409,
+    "waiting": {
+      "id": 7,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "WAIT_CONFIRM",
+      "process_reason": "NONE",
+      "category": "ELECTRICAL",
+      "severity": "HIGH",
+      "priority": "HIGH",
+      "version": 6,
+      "current_assignment_id": 8,
+      "incident_id": null,
+      "sla_due_at": "2026-09-24T04:14:45.257494Z",
+      "assigned_at": "2026-09-23T04:14:45.593703Z",
+      "accepted_at": "2026-09-23T04:14:45.933140Z",
+      "started_at": "2026-09-23T04:14:45.998757Z",
+      "resolved_at": "2026-09-23T04:14:46.091320Z",
+      "closed_at": null,
+      "created_at": "2026-09-23T04:14:45.261100Z",
+      "updated_at": "2026-09-23T04:14:46.094373Z",
+      "sla_overdue": false
+    },
+    "waiting-cancel-denied": 409,
+    "illegal-final": {
+      "id": 7,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "CLOSED",
+      "process_reason": "NONE",
+      "category": "ELECTRICAL",
+      "severity": "HIGH",
+      "priority": "HIGH",
+      "version": 8,
+      "current_assignment_id": null,
+      "incident_id": null,
+      "sla_due_at": "2026-09-24T04:14:45.257494Z",
+      "assigned_at": "2026-09-23T04:14:45.593703Z",
+      "accepted_at": "2026-09-23T04:14:45.933140Z",
+      "started_at": "2026-09-23T04:14:45.998757Z",
+      "resolved_at": "2026-09-23T04:14:46.091320Z",
+      "closed_at": "2026-09-23T04:14:46.195981Z",
+      "created_at": "2026-09-23T04:14:45.261100Z",
+      "updated_at": "2026-09-23T04:14:46.198042Z",
+      "sla_overdue": false
+    },
+    "closed-cancel-denied": 409,
+    "cancel-vs-start-create": {
+      "id": 8,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "category": "OTHER",
+      "severity": "LOW",
+      "priority": "MEDIUM",
+      "version": 1,
+      "current_assignment_id": null,
+      "incident_id": null,
+      "sla_due_at": "2026-09-24T04:14:46.266958Z",
+      "assigned_at": null,
+      "accepted_at": null,
+      "started_at": null,
+      "resolved_at": null,
+      "closed_at": null,
+      "created_at": "2026-09-23T04:14:46.269025Z",
+      "updated_at": "2026-09-23T04:14:46.269025Z",
+      "sla_overdue": false
+    },
+    "cancel-vs-start-assigned": {
+      "detail": {
+        "work_order": {
+          "id": 8,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "ASSIGNED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 3,
+          "current_assignment_id": 9,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T04:14:46.266958Z",
+          "assigned_at": "2026-09-23T04:14:46.502029Z",
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T04:14:46.269025Z",
+          "updated_at": "2026-09-23T04:14:46.557429Z",
+          "sla_overdue": false
+        },
+        "text": "cancel017-51fb1ada56f2-cancel-vs-start 电气灯具故障",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 9,
+            "employee_id": 1,
+            "assigned_by_user_id": null,
+            "status": "ACTIVE",
+            "assigned_at": "2026-09-23T04:14:46.502029Z",
+            "accept_at": null,
+            "ended_at": null,
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 62,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:46.271613Z"
+          },
+          {
+            "id": 63,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:46.411752Z"
+          },
+          {
+            "id": 64,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:46.558471Z"
+          }
+        ]
+      },
+      "staff": "staff"
+    },
+    "start-race-accept": {
+      "id": 8,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "ACCEPTED",
+      "process_reason": "NONE",
+      "category": "ELECTRICAL",
+      "severity": "HIGH",
+      "priority": "HIGH",
+      "version": 4,
+      "current_assignment_id": 9,
+      "incident_id": null,
+      "sla_due_at": "2026-09-24T04:14:46.266958Z",
+      "assigned_at": "2026-09-23T04:14:46.502029Z",
+      "accepted_at": "2026-09-23T04:14:46.936967Z",
+      "started_at": null,
+      "resolved_at": null,
+      "closed_at": null,
+      "created_at": "2026-09-23T04:14:46.269025Z",
+      "updated_at": "2026-09-23T04:14:46.949227Z",
+      "sla_overdue": false
+    },
+    "cancel-vs-start": {
+      "before": {
+        "work_order": {
+          "id": 8,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "ACCEPTED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 4,
+          "current_assignment_id": 9,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T04:14:46.266958Z",
+          "assigned_at": "2026-09-23T04:14:46.502029Z",
+          "accepted_at": "2026-09-23T04:14:46.936967Z",
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T04:14:46.269025Z",
+          "updated_at": "2026-09-23T04:14:46.949227Z",
+          "sla_overdue": false
+        },
+        "text": "cancel017-51fb1ada56f2-cancel-vs-start 电气灯具故障",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 9,
+            "employee_id": 1,
+            "assigned_by_user_id": null,
+            "status": "ACTIVE",
+            "assigned_at": "2026-09-23T04:14:46.502029Z",
+            "accept_at": "2026-09-23T04:14:46.936967Z",
+            "ended_at": null,
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 62,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:46.271613Z"
+          },
+          {
+            "id": 63,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:46.411752Z"
+          },
+          {
+            "id": 64,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:46.558471Z"
+          },
+          {
+            "id": 65,
+            "actor_user_id": 6,
+            "actor_type": "STAFF",
+            "from_status": "ASSIGNED",
+            "to_status": "ACCEPTED",
+            "process_reason": "NONE",
+            "event_code": "ACCEPT",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:46.939768Z"
+          }
+        ]
+      },
+      "responses": [
+        {
+          "action": "cancel",
+          "status": 409,
+          "request_id": "cancel017-51fb1ada56f2-cancel-vs-start-0",
+          "error_code": "WO.CONFLICT"
+        },
+        {
+          "action": "start",
+          "status": 200,
+          "request_id": "cancel017-51fb1ada56f2-cancel-vs-start-1",
+          "error_code": null
+        }
+      ],
+      "after": {
+        "work_order": {
+          "id": 8,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 1,
+          "reporter_user_id": 3,
+          "status": "PROCESSING",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 5,
+          "current_assignment_id": 9,
+          "incident_id": null,
+          "sla_due_at": "2026-09-24T04:14:46.266958Z",
+          "assigned_at": "2026-09-23T04:14:46.502029Z",
+          "accepted_at": "2026-09-23T04:14:46.936967Z",
+          "started_at": "2026-09-23T04:14:47.460837Z",
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-23T04:14:46.269025Z",
+          "updated_at": "2026-09-23T04:14:47.465536Z",
+          "sla_overdue": false
+        },
+        "text": "cancel017-51fb1ada56f2-cancel-vs-start 电气灯具故障",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 9,
+            "employee_id": 1,
+            "assigned_by_user_id": null,
+            "status": "ACTIVE",
+            "assigned_at": "2026-09-23T04:14:46.502029Z",
+            "accept_at": "2026-09-23T04:14:46.936967Z",
+            "ended_at": null,
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [
+          {
+            "id": 10,
+            "cycle_no": 1,
+            "assignee_id": 1,
+            "started_at": "2026-09-23T04:14:47.460837Z",
+            "ended_at": null
+          }
+        ],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 62,
+            "actor_user_id": 3,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:46.271613Z"
+          },
+          {
+            "id": 63,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:46.411752Z"
+          },
+          {
+            "id": 64,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:46.558471Z"
+          },
+          {
+            "id": 65,
+            "actor_user_id": 6,
+            "actor_type": "STAFF",
+            "from_status": "ASSIGNED",
+            "to_status": "ACCEPTED",
+            "process_reason": "NONE",
+            "event_code": "ACCEPT",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:46.939768Z"
+          },
+          {
+            "id": 66,
+            "actor_user_id": 6,
+            "actor_type": "STAFF",
+            "from_status": "ACCEPTED",
+            "to_status": "PROCESSING",
+            "process_reason": "NONE",
+            "event_code": "START",
+            "reason": null,
+            "created_at": "2026-09-23T04:14:47.462380Z"
+          }
+        ]
+      },
+      "parallel_start": "two futures + barrier"
+    },
+    "start-race-final": {
+      "id": 8,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "CLOSED",
+      "process_reason": "NONE",
+      "category": "ELECTRICAL",
+      "severity": "HIGH",
+      "priority": "HIGH",
+      "version": 8,
+      "current_assignment_id": null,
+      "incident_id": null,
+      "sla_due_at": "2026-09-24T04:14:46.266958Z",
+      "assigned_at": "2026-09-23T04:14:46.502029Z",
+      "accepted_at": "2026-09-23T04:14:46.936967Z",
+      "started_at": "2026-09-23T04:14:47.460837Z",
+      "resolved_at": "2026-09-23T04:14:47.557603Z",
+      "closed_at": "2026-09-23T04:14:47.607973Z",
+      "created_at": "2026-09-23T04:14:46.269025Z",
+      "updated_at": "2026-09-23T04:14:47.611090Z",
+      "sla_overdue": false
+    }
+  },
+  "requests": [
+    {
+      "label": "identity-resident",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "08802e5d82772326"
+    },
+    {
+      "label": "identity-other",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "896ff4a75847e28c"
+    },
+    {
+      "label": "identity-manager",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "314c163092a676bb"
+    },
+    {
+      "label": "identity-staff",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "89da13e543793604"
+    },
+    {
+      "label": "identity-backup",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "ed8a38d2e4da9bf7"
+    },
+    {
+      "label": "detail-5",
+      "method": "GET",
+      "path": "/work-orders/5",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "83c2470369067aad"
+    },
+    {
+      "label": "page-duplicate",
+      "method": "POST",
+      "path": "/work-orders/5/cancel",
+      "params": [],
+      "status": 409,
+      "error_code": "WO.CONFLICT",
+      "request_id_hash": "b1bb3c183a753f8d"
+    },
+    {
+      "label": "queue-denied-resident",
+      "method": "GET",
+      "path": "/supervisor/work-orders?property_id=1&view=unstarted",
+      "params": [],
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "0aabade64c45225a"
+    },
+    {
+      "label": "queue-denied-other",
+      "method": "GET",
+      "path": "/supervisor/work-orders?property_id=1&view=unstarted",
+      "params": [],
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "dfffe43d1ccc641b"
+    },
+    {
+      "label": "queue-denied-staff",
+      "method": "GET",
+      "path": "/supervisor/work-orders?property_id=1&view=unstarted",
+      "params": [],
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "a94c2fc047803d69"
+    },
+    {
+      "label": "queue-invalid-&limit=0",
+      "method": "GET",
+      "path": "/supervisor/work-orders?property_id=1&view=unstarted&limit=0",
+      "params": [],
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR",
+      "request_id_hash": "afa8d4a19345d603"
+    },
+    {
+      "label": "queue-invalid-&limit=101",
+      "method": "GET",
+      "path": "/supervisor/work-orders?property_id=1&view=unstarted&limit=101",
+      "params": [],
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR",
+      "request_id_hash": "3adb61fe65eebe92"
+    },
+    {
+      "label": "queue-invalid-&after_id=-1",
+      "method": "GET",
+      "path": "/supervisor/work-orders?property_id=1&view=unstarted&after_id=-1",
+      "params": [],
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR",
+      "request_id_hash": "bbcccaf4bb3b00cd"
+    },
+    {
+      "label": "accepted-race-create",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "fdfc16fa31eb0ec5"
+    },
+    {
+      "label": "assigned-poll-0",
+      "method": "GET",
+      "path": "/work-orders/6",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "40e05c67a59b151f"
+    },
+    {
+      "label": "assigned-poll-1",
+      "method": "GET",
+      "path": "/work-orders/6",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "037538348401d9db"
+    },
+    {
+      "label": "assigned-poll-2",
+      "method": "GET",
+      "path": "/work-orders/6",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1b04a0b368cede2b"
+    },
+    {
+      "label": "detail-6",
+      "method": "GET",
+      "path": "/work-orders/6",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "04401fd9a520f1e4"
+    },
+    {
+      "label": "accepted-race-accept",
+      "method": "POST",
+      "path": "/staff/work-orders/6/accept",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "917b8deddd3200ff"
+    },
+    {
+      "label": "detail-6",
+      "method": "GET",
+      "path": "/work-orders/6",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "04401fd9a520f1e4"
+    },
+    {
+      "label": "cancel-denied-other",
+      "method": "POST",
+      "path": "/work-orders/6/cancel",
+      "params": [],
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "363a8ce282d8b18c"
+    },
+    {
+      "label": "detail-6",
+      "method": "GET",
+      "path": "/work-orders/6",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "04401fd9a520f1e4"
+    },
+    {
+      "label": "cancel-denied-staff",
+      "method": "POST",
+      "path": "/work-orders/6/cancel",
+      "params": [],
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "2ca8ce5e8696d23c"
+    },
+    {
+      "label": "detail-6",
+      "method": "GET",
+      "path": "/work-orders/6",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "04401fd9a520f1e4"
+    },
+    {
+      "label": "detail-6",
+      "method": "GET",
+      "path": "/work-orders/6",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "04401fd9a520f1e4"
+    },
+    {
+      "label": "detail-6",
+      "method": "GET",
+      "path": "/work-orders/6",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "04401fd9a520f1e4"
+    },
+    {
+      "label": "illegal-processing-create",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9c2fd9670ae529d0"
+    },
+    {
+      "label": "assigned-poll-0",
+      "method": "GET",
+      "path": "/work-orders/7",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "40e05c67a59b151f"
+    },
+    {
+      "label": "assigned-poll-1",
+      "method": "GET",
+      "path": "/work-orders/7",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "037538348401d9db"
+    },
+    {
+      "label": "assigned-poll-2",
+      "method": "GET",
+      "path": "/work-orders/7",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1b04a0b368cede2b"
+    },
+    {
+      "label": "detail-7",
+      "method": "GET",
+      "path": "/work-orders/7",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "be3acf47c9654644"
+    },
+    {
+      "label": "illegal-accept",
+      "method": "POST",
+      "path": "/staff/work-orders/7/accept",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "b0b2cf4f31657450"
+    },
+    {
+      "label": "detail-7",
+      "method": "GET",
+      "path": "/work-orders/7",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "be3acf47c9654644"
+    },
+    {
+      "label": "illegal-start",
+      "method": "POST",
+      "path": "/staff/work-orders/7/start",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "80130e01bac300f3"
+    },
+    {
+      "label": "detail-7",
+      "method": "GET",
+      "path": "/work-orders/7",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "be3acf47c9654644"
+    },
+    {
+      "label": "processing-cancel-denied",
+      "method": "POST",
+      "path": "/work-orders/7/cancel",
+      "params": [],
+      "status": 409,
+      "error_code": "WO.INVALID_TRANSITION",
+      "request_id_hash": "5102e86974653742"
+    },
+    {
+      "label": "detail-7",
+      "method": "GET",
+      "path": "/work-orders/7",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "be3acf47c9654644"
+    },
+    {
+      "label": "waiting-receipt",
+      "method": "POST",
+      "path": "/staff/work-orders/7/receipts",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "f8982e9c18d8c8c4"
+    },
+    {
+      "label": "detail-7",
+      "method": "GET",
+      "path": "/work-orders/7",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "be3acf47c9654644"
+    },
+    {
+      "label": "waiting-cancel-denied",
+      "method": "POST",
+      "path": "/work-orders/7/cancel",
+      "params": [],
+      "status": 409,
+      "error_code": "WO.INVALID_TRANSITION",
+      "request_id_hash": "26979ebe8bf3caa3"
+    },
+    {
+      "label": "detail-7",
+      "method": "GET",
+      "path": "/work-orders/7",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "be3acf47c9654644"
+    },
+    {
+      "label": "illegal-final-confirm",
+      "method": "POST",
+      "path": "/work-orders/7/confirm",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "dd37fc6f3b7b0a3f"
+    },
+    {
+      "label": "detail-7",
+      "method": "GET",
+      "path": "/work-orders/7",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "be3acf47c9654644"
+    },
+    {
+      "label": "closed-cancel-denied",
+      "method": "POST",
+      "path": "/work-orders/7/cancel",
+      "params": [],
+      "status": 409,
+      "error_code": "WO.INVALID_TRANSITION",
+      "request_id_hash": "78edcc65084d99ca"
+    },
+    {
+      "label": "cancel-vs-start-create",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "23f81c104230342c"
+    },
+    {
+      "label": "assigned-poll-0",
+      "method": "GET",
+      "path": "/work-orders/8",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "40e05c67a59b151f"
+    },
+    {
+      "label": "assigned-poll-1",
+      "method": "GET",
+      "path": "/work-orders/8",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "037538348401d9db"
+    },
+    {
+      "label": "assigned-poll-2",
+      "method": "GET",
+      "path": "/work-orders/8",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1b04a0b368cede2b"
+    },
+    {
+      "label": "detail-8",
+      "method": "GET",
+      "path": "/work-orders/8",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c73ee2a3b7381b4b"
+    },
+    {
+      "label": "start-race-accept",
+      "method": "POST",
+      "path": "/staff/work-orders/8/accept",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "b4bf3a68dec06754"
+    },
+    {
+      "label": "detail-8",
+      "method": "GET",
+      "path": "/work-orders/8",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c73ee2a3b7381b4b"
+    },
+    {
+      "label": "detail-8",
+      "method": "GET",
+      "path": "/work-orders/8",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c73ee2a3b7381b4b"
+    },
+    {
+      "label": "detail-8",
+      "method": "GET",
+      "path": "/work-orders/8",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c73ee2a3b7381b4b"
+    },
+    {
+      "label": "start-race-final-receipt",
+      "method": "POST",
+      "path": "/staff/work-orders/8/receipts",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d6440a8dff82a0a9"
+    },
+    {
+      "label": "start-race-final-confirm",
+      "method": "POST",
+      "path": "/work-orders/8/confirm",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1af55cd44e535e7e"
+    }
+  ],
+  "objects": {
+    "page": 5,
+    "accepted-race": 6,
+    "illegal-processing": 7,
+    "cancel-vs-start": 8
+  },
+  "revision": "20260919_0009",
+  "page_final_detail": {
+    "work_order": {
+      "id": 5,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 1,
+      "reporter_user_id": 3,
+      "status": "CANCELLED",
+      "process_reason": "NONE",
+      "category": "ELECTRICAL",
+      "severity": "HIGH",
+      "priority": "HIGH",
+      "version": 4,
+      "current_assignment_id": null,
+      "incident_id": null,
+      "sla_due_at": "2026-09-24T04:09:39.379264Z",
+      "assigned_at": "2026-09-23T04:09:39.895801Z",
+      "accepted_at": null,
+      "started_at": null,
+      "resolved_at": null,
+      "closed_at": null,
+      "created_at": "2026-09-23T04:09:39.386488Z",
+      "updated_at": "2026-09-23T04:10:06.345984Z",
+      "sla_overdue": false
+    },
+    "text": "cancel017-51fb1ada56f2 页面撤销验证：客厅灯不亮，开关接触不良。",
+    "asr_text": null,
+    "extra_notes": null,
+    "media": [],
+    "assignments": [
+      {
+        "id": 6,
+        "employee_id": 1,
+        "assigned_by_user_id": null,
+        "status": "ENDED",
+        "assigned_at": "2026-09-23T04:09:39.895801Z",
+        "accept_at": null,
+        "ended_at": "2026-09-23T04:10:06.336827Z",
+        "reason": "AUTO_DISPATCH"
+      }
+    ],
+    "processes": [],
+    "receipts": [],
+    "feedbacks": [],
+    "logs": [
+      {
+        "id": 45,
+        "actor_user_id": 3,
+        "actor_type": "RESIDENT",
+        "from_status": null,
+        "to_status": "PENDING_ANALYSIS",
+        "process_reason": "NONE",
+        "event_code": "CREATE",
+        "reason": null,
+        "created_at": "2026-09-23T04:09:39.401093Z"
+      },
+      {
+        "id": 46,
+        "actor_user_id": null,
+        "actor_type": "SYSTEM",
+        "from_status": "PENDING_ANALYSIS",
+        "to_status": "PENDING_ASSIGNMENT",
+        "process_reason": "NONE",
+        "event_code": "ANALYZE",
+        "reason": null,
+        "created_at": "2026-09-23T04:09:39.740770Z"
+      },
+      {
+        "id": 47,
+        "actor_user_id": null,
+        "actor_type": "SYSTEM",
+        "from_status": "PENDING_ASSIGNMENT",
+        "to_status": "ASSIGNED",
+        "process_reason": "NONE",
+        "event_code": "ASSIGN",
+        "reason": null,
+        "created_at": "2026-09-23T04:09:39.991144Z"
+      },
+      {
+        "id": 48,
+        "actor_user_id": 5,
+        "actor_type": "SUPERVISOR",
+        "from_status": "ASSIGNED",
+        "to_status": "CANCELLED",
+        "process_reason": "NONE",
+        "event_code": "CANCEL",
+        "reason": "cancel017-51fb1ada56f2 管理核实为重复报修，尚未开工。",
+        "created_at": "2026-09-23T04:10:06.335794Z"
+      }
+    ]
+  },
+  "database": {
+    "target": "127.0.0.1:3307/property_ai_auth001_test",
+    "orders": [
+      {
+        "id": 5,
+        "tenant_id": 1,
+        "property_id": 1,
+        "reporter_user_id": 3,
+        "status": "CANCELLED",
+        "current_assignment_id": null,
+        "version": 4,
+        "incident_id": null
+      },
+      {
+        "id": 6,
+        "tenant_id": 1,
+        "property_id": 1,
+        "reporter_user_id": 3,
+        "status": "CANCELLED",
+        "current_assignment_id": null,
+        "version": 5,
+        "incident_id": null
+      },
+      {
+        "id": 7,
+        "tenant_id": 1,
+        "property_id": 1,
+        "reporter_user_id": 3,
+        "status": "CLOSED",
+        "current_assignment_id": null,
+        "version": 8,
+        "incident_id": null
+      },
+      {
+        "id": 8,
+        "tenant_id": 1,
+        "property_id": 1,
+        "reporter_user_id": 3,
+        "status": "CLOSED",
+        "current_assignment_id": null,
+        "version": 8,
+        "incident_id": null
+      }
+    ],
+    "assignments": [
+      {
+        "id": 6,
+        "work_order_id": 5,
+        "employee_id": 1,
+        "status": "ENDED",
+        "assigned_by_user_id": null,
+        "assigned_at": "2026-09-23 04:09:39.895801",
+        "ended_at": "2026-09-23 04:10:06.336827",
+        "reason": "AUTO_DISPATCH"
+      },
+      {
+        "id": 7,
+        "work_order_id": 6,
+        "employee_id": 1,
+        "status": "ENDED",
+        "assigned_by_user_id": null,
+        "assigned_at": "2026-09-23 04:14:44.186869",
+        "ended_at": "2026-09-23 04:14:45.132463",
+        "reason": "AUTO_DISPATCH"
+      },
+      {
+        "id": 8,
+        "work_order_id": 7,
+        "employee_id": 1,
+        "status": "ENDED",
+        "assigned_by_user_id": null,
+        "assigned_at": "2026-09-23 04:14:45.593703",
+        "ended_at": "2026-09-23 04:14:46.187423",
+        "reason": "AUTO_DISPATCH"
+      },
+      {
+        "id": 9,
+        "work_order_id": 8,
+        "employee_id": 1,
+        "status": "ENDED",
+        "assigned_by_user_id": null,
+        "assigned_at": "2026-09-23 04:14:46.502029",
+        "ended_at": "2026-09-23 04:14:47.595521",
+        "reason": "AUTO_DISPATCH"
+      }
+    ],
+    "logs": [
+      {
+        "id": 45,
+        "work_order_id": 5,
+        "actor_user_id": 3,
+        "actor_type": "RESIDENT",
+        "from_status": null,
+        "to_status": "PENDING_ANALYSIS",
+        "event_code": "CREATE",
+        "payload_json": "{\"event_code\": \"CREATE\"}"
+      },
+      {
+        "id": 46,
+        "work_order_id": 5,
+        "actor_user_id": null,
+        "actor_type": "SYSTEM",
+        "from_status": "PENDING_ANALYSIS",
+        "to_status": "PENDING_ASSIGNMENT",
+        "event_code": "ANALYZE",
+        "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+      },
+      {
+        "id": 47,
+        "work_order_id": 5,
+        "actor_user_id": null,
+        "actor_type": "SYSTEM",
+        "from_status": "PENDING_ASSIGNMENT",
+        "to_status": "ASSIGNED",
+        "event_code": "ASSIGN",
+        "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 1, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+      },
+      {
+        "id": 48,
+        "work_order_id": 5,
+        "actor_user_id": 5,
+        "actor_type": "SUPERVISOR",
+        "from_status": "ASSIGNED",
+        "to_status": "CANCELLED",
+        "event_code": "CANCEL",
+        "payload_json": "{\"reason\": \"cancel017-51fb1ada56f2 管理核实为重复报修，尚未开工。\", \"event_code\": \"CANCEL\", \"reason_code\": \"CANCELLED\"}"
+      },
+      {
+        "id": 49,
+        "work_order_id": 6,
+        "actor_user_id": 3,
+        "actor_type": "RESIDENT",
+        "from_status": null,
+        "to_status": "PENDING_ANALYSIS",
+        "event_code": "CREATE",
+        "payload_json": "{\"event_code\": \"CREATE\"}"
+      },
+      {
+        "id": 50,
+        "work_order_id": 6,
+        "actor_user_id": null,
+        "actor_type": "SYSTEM",
+        "from_status": "PENDING_ANALYSIS",
+        "to_status": "PENDING_ASSIGNMENT",
+        "event_code": "ANALYZE",
+        "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+      },
+      {
+        "id": 51,
+        "work_order_id": 6,
+        "actor_user_id": null,
+        "actor_type": "SYSTEM",
+        "from_status": "PENDING_ASSIGNMENT",
+        "to_status": "ASSIGNED",
+        "event_code": "ASSIGN",
+        "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 1, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+      },
+      {
+        "id": 52,
+        "work_order_id": 6,
+        "actor_user_id": 6,
+        "actor_type": "STAFF",
+        "from_status": "ASSIGNED",
+        "to_status": "ACCEPTED",
+        "event_code": "ACCEPT",
+        "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}"
+      },
+      {
+        "id": 53,
+        "work_order_id": 6,
+        "actor_user_id": 5,
+        "actor_type": "SUPERVISOR",
+        "from_status": "ACCEPTED",
+        "to_status": "CANCELLED",
+        "event_code": "CANCEL",
+        "payload_json": "{\"reason\": \"cancel017-51fb1ada56f2-accepted-race\", \"event_code\": \"CANCEL\", \"reason_code\": \"CANCELLED\"}"
+      },
+      {
+        "id": 54,
+        "work_order_id": 7,
+        "actor_user_id": 3,
+        "actor_type": "RESIDENT",
+        "from_status": null,
+        "to_status": "PENDING_ANALYSIS",
+        "event_code": "CREATE",
+        "payload_json": "{\"event_code\": \"CREATE\"}"
+      },
+      {
+        "id": 55,
+        "work_order_id": 7,
+        "actor_user_id": null,
+        "actor_type": "SYSTEM",
+        "from_status": "PENDING_ANALYSIS",
+        "to_status": "PENDING_ASSIGNMENT",
+        "event_code": "ANALYZE",
+        "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+      },
+      {
+        "id": 56,
+        "work_order_id": 7,
+        "actor_user_id": null,
+        "actor_type": "SYSTEM",
+        "from_status": "PENDING_ASSIGNMENT",
+        "to_status": "ASSIGNED",
+        "event_code": "ASSIGN",
+        "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 1, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+      },
+      {
+        "id": 57,
+        "work_order_id": 7,
+        "actor_user_id": 6,
+        "actor_type": "STAFF",
+        "from_status": "ASSIGNED",
+        "to_status": "ACCEPTED",
+        "event_code": "ACCEPT",
+        "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}"
+      },
+      {
+        "id": 58,
+        "work_order_id": 7,
+        "actor_user_id": 6,
+        "actor_type": "STAFF",
+        "from_status": "ACCEPTED",
+        "to_status": "PROCESSING",
+        "event_code": "START",
+        "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}"
+      },
+      {
+        "id": 59,
+        "work_order_id": 7,
+        "actor_user_id": 6,
+        "actor_type": "STAFF",
+        "from_status": "PROCESSING",
+        "to_status": "WAIT_CONFIRM",
+        "event_code": "RECEIPT_RESOLVED",
+        "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}"
+      },
+      {
+        "id": 60,
+        "work_order_id": 7,
+        "actor_user_id": 3,
+        "actor_type": "RESIDENT",
+        "from_status": "WAIT_CONFIRM",
+        "to_status": "COMPLETED",
+        "event_code": "CONFIRM",
+        "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}"
+      },
+      {
+        "id": 61,
+        "work_order_id": 7,
+        "actor_user_id": 3,
+        "actor_type": "SYSTEM",
+        "from_status": "COMPLETED",
+        "to_status": "CLOSED",
+        "event_code": "ARCHIVE",
+        "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}"
+      },
+      {
+        "id": 62,
+        "work_order_id": 8,
+        "actor_user_id": 3,
+        "actor_type": "RESIDENT",
+        "from_status": null,
+        "to_status": "PENDING_ANALYSIS",
+        "event_code": "CREATE",
+        "payload_json": "{\"event_code\": \"CREATE\"}"
+      },
+      {
+        "id": 63,
+        "work_order_id": 8,
+        "actor_user_id": null,
+        "actor_type": "SYSTEM",
+        "from_status": "PENDING_ANALYSIS",
+        "to_status": "PENDING_ASSIGNMENT",
+        "event_code": "ANALYZE",
+        "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+      },
+      {
+        "id": 64,
+        "work_order_id": 8,
+        "actor_user_id": null,
+        "actor_type": "SYSTEM",
+        "from_status": "PENDING_ASSIGNMENT",
+        "to_status": "ASSIGNED",
+        "event_code": "ASSIGN",
+        "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 1, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+      },
+      {
+        "id": 65,
+        "work_order_id": 8,
+        "actor_user_id": 6,
+        "actor_type": "STAFF",
+        "from_status": "ASSIGNED",
+        "to_status": "ACCEPTED",
+        "event_code": "ACCEPT",
+        "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}"
+      },
+      {
+        "id": 66,
+        "work_order_id": 8,
+        "actor_user_id": 6,
+        "actor_type": "STAFF",
+        "from_status": "ACCEPTED",
+        "to_status": "PROCESSING",
+        "event_code": "START",
+        "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}"
+      },
+      {
+        "id": 67,
+        "work_order_id": 8,
+        "actor_user_id": 6,
+        "actor_type": "STAFF",
+        "from_status": "PROCESSING",
+        "to_status": "WAIT_CONFIRM",
+        "event_code": "RECEIPT_RESOLVED",
+        "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}"
+      },
+      {
+        "id": 68,
+        "work_order_id": 8,
+        "actor_user_id": 3,
+        "actor_type": "RESIDENT",
+        "from_status": "WAIT_CONFIRM",
+        "to_status": "COMPLETED",
+        "event_code": "CONFIRM",
+        "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}"
+      },
+      {
+        "id": 69,
+        "work_order_id": 8,
+        "actor_user_id": 3,
+        "actor_type": "SYSTEM",
+        "from_status": "COMPLETED",
+        "to_status": "CLOSED",
+        "event_code": "ARCHIVE",
+        "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}"
+      }
+    ],
+    "audits": [
+      {
+        "id": 315,
+        "action": "WORK_ORDER_CREATED",
+        "actor_user_id": 3,
+        "resource_id": 5,
+        "request_id": "a9847f3ce6e9458890948acd8a2fa50c"
+      },
+      {
+        "id": 319,
+        "action": "WORK_ORDER_CANCELLED",
+        "actor_user_id": 5,
+        "resource_id": 5,
+        "request_id": "2a7b5c55612645aaa0b848e560c6d6e8"
+      },
+      {
+        "id": 322,
+        "action": "WORK_ORDER_CREATED",
+        "actor_user_id": 3,
+        "resource_id": 6,
+        "request_id": "cancel017-51fb1ada56f2-api-accepted-race-create"
+      },
+      {
+        "id": 325,
+        "action": "WORK_ORDER_ACCEPTED",
+        "actor_user_id": 6,
+        "resource_id": 6,
+        "request_id": "cancel017-51fb1ada56f2-api-accepted-race-accept"
+      },
+      {
+        "id": 326,
+        "action": "WORK_ORDER_CANCELLED",
+        "actor_user_id": 5,
+        "resource_id": 6,
+        "request_id": "cancel017-51fb1ada56f2-accepted-race-1"
+      },
+      {
+        "id": 327,
+        "action": "WORK_ORDER_CREATED",
+        "actor_user_id": 3,
+        "resource_id": 7,
+        "request_id": "cancel017-51fb1ada56f2-api-illegal-processing-create"
+      },
+      {
+        "id": 330,
+        "action": "WORK_ORDER_ACCEPTED",
+        "actor_user_id": 6,
+        "resource_id": 7,
+        "request_id": "cancel017-51fb1ada56f2-api-illegal-accept"
+      },
+      {
+        "id": 331,
+        "action": "WORK_ORDER_PROCESS_STARTED",
+        "actor_user_id": 6,
+        "resource_id": 7,
+        "request_id": "cancel017-51fb1ada56f2-api-illegal-start"
+      },
+      {
+        "id": 332,
+        "action": "WORK_ORDER_RESOLVED",
+        "actor_user_id": 6,
+        "resource_id": 7,
+        "request_id": "cancel017-51fb1ada56f2-api-waiting-receipt"
+      },
+      {
+        "id": 333,
+        "action": "WORK_ORDER_CLOSED",
+        "actor_user_id": 3,
+        "resource_id": 7,
+        "request_id": "cancel017-51fb1ada56f2-api-illegal-final-confirm"
+      },
+      {
+        "id": 334,
+        "action": "WORK_ORDER_CREATED",
+        "actor_user_id": 3,
+        "resource_id": 8,
+        "request_id": "cancel017-51fb1ada56f2-api-cancel-vs-start-create"
+      },
+      {
+        "id": 337,
+        "action": "WORK_ORDER_ACCEPTED",
+        "actor_user_id": 6,
+        "resource_id": 8,
+        "request_id": "cancel017-51fb1ada56f2-api-start-race-accept"
+      },
+      {
+        "id": 338,
+        "action": "WORK_ORDER_PROCESS_STARTED",
+        "actor_user_id": 6,
+        "resource_id": 8,
+        "request_id": "cancel017-51fb1ada56f2-cancel-vs-start-1"
+      },
+      {
+        "id": 339,
+        "action": "WORK_ORDER_RESOLVED",
+        "actor_user_id": 6,
+        "resource_id": 8,
+        "request_id": "cancel017-51fb1ada56f2-api-start-race-final-receipt"
+      },
+      {
+        "id": 340,
+        "action": "WORK_ORDER_CLOSED",
+        "actor_user_id": 3,
+        "resource_id": 8,
+        "request_id": "cancel017-51fb1ada56f2-api-start-race-final-confirm"
+      }
+    ],
+    "notifications": [
+      {
+        "id": 102,
+        "user_id": 3,
+        "resource_id": 5,
+        "title": "工单已创建",
+        "read_at": null
+      },
+      {
+        "id": 103,
+        "user_id": 3,
+        "resource_id": 5,
+        "title": "工单已派单",
+        "read_at": null
+      },
+      {
+        "id": 104,
+        "user_id": 6,
+        "resource_id": 5,
+        "title": "工单已派单",
+        "read_at": null
+      },
+      {
+        "id": 105,
+        "user_id": 3,
+        "resource_id": 5,
+        "title": "工单已撤销",
+        "read_at": null
+      },
+      {
+        "id": 106,
+        "user_id": 6,
+        "resource_id": 5,
+        "title": "工单已撤销",
+        "read_at": null
+      },
+      {
+        "id": 107,
+        "user_id": 3,
+        "resource_id": 6,
+        "title": "工单已创建",
+        "read_at": null
+      },
+      {
+        "id": 108,
+        "user_id": 3,
+        "resource_id": 6,
+        "title": "工单已派单",
+        "read_at": null
+      },
+      {
+        "id": 109,
+        "user_id": 6,
+        "resource_id": 6,
+        "title": "工单已派单",
+        "read_at": null
+      },
+      {
+        "id": 110,
+        "user_id": 3,
+        "resource_id": 6,
+        "title": "工单已接单",
+        "read_at": null
+      },
+      {
+        "id": 111,
+        "user_id": 3,
+        "resource_id": 6,
+        "title": "工单已撤销",
+        "read_at": null
+      },
+      {
+        "id": 112,
+        "user_id": 6,
+        "resource_id": 6,
+        "title": "工单已撤销",
+        "read_at": null
+      },
+      {
+        "id": 113,
+        "user_id": 3,
+        "resource_id": 7,
+        "title": "工单已创建",
+        "read_at": null
+      },
+      {
+        "id": 114,
+        "user_id": 3,
+        "resource_id": 7,
+        "title": "工单已派单",
+        "read_at": null
+      },
+      {
+        "id": 115,
+        "user_id": 6,
+        "resource_id": 7,
+        "title": "工单已派单",
+        "read_at": null
+      },
+      {
+        "id": 116,
+        "user_id": 3,
+        "resource_id": 7,
+        "title": "工单已接单",
+        "read_at": null
+      },
+      {
+        "id": 117,
+        "user_id": 3,
+        "resource_id": 7,
+        "title": "工单开始处理",
+        "read_at": null
+      },
+      {
+        "id": 118,
+        "user_id": 3,
+        "resource_id": 7,
+        "title": "工单待确认",
+        "read_at": null
+      },
+      {
+        "id": 119,
+        "user_id": 3,
+        "resource_id": 7,
+        "title": "工单已完成",
+        "read_at": null
+      },
+      {
+        "id": 120,
+        "user_id": 5,
+        "resource_id": 7,
+        "title": "工单已完成",
+        "read_at": null
+      },
+      {
+        "id": 121,
+        "user_id": 3,
+        "resource_id": 8,
+        "title": "工单已创建",
+        "read_at": null
+      },
+      {
+        "id": 122,
+        "user_id": 3,
+        "resource_id": 8,
+        "title": "工单已派单",
+        "read_at": null
+      },
+      {
+        "id": 123,
+        "user_id": 6,
+        "resource_id": 8,
+        "title": "工单已派单",
+        "read_at": null
+      },
+      {
+        "id": 124,
+        "user_id": 3,
+        "resource_id": 8,
+        "title": "工单已接单",
+        "read_at": null
+      },
+      {
+        "id": 125,
+        "user_id": 3,
+        "resource_id": 8,
+        "title": "工单开始处理",
+        "read_at": null
+      },
+      {
+        "id": 126,
+        "user_id": 3,
+        "resource_id": 8,
+        "title": "工单待确认",
+        "read_at": null
+      },
+      {
+        "id": 127,
+        "user_id": 3,
+        "resource_id": 8,
+        "title": "工单已完成",
+        "read_at": null
+      },
+      {
+        "id": 128,
+        "user_id": 5,
+        "resource_id": 8,
+        "title": "工单已完成",
+        "read_at": null
+      }
+    ],
+    "sla_clocks": [
+      {
+        "work_order_id": 5,
+        "state": "STOPPED"
+      },
+      {
+        "work_order_id": 6,
+        "state": "STOPPED"
+      },
+      {
+        "work_order_id": 7,
+        "state": "STOPPED"
+      },
+      {
+        "work_order_id": 8,
+        "state": "STOPPED"
+      }
+    ],
+    "daily_load": [
+      {
+        "employee_id": 1,
+        "on_duty": "ON_DUTY",
+        "current_load": 0,
+        "business_date": "2026-09-23"
+      },
+      {
+        "employee_id": 2,
+        "on_duty": "ON_DUTY",
+        "current_load": 0,
+        "business_date": "2026-09-23"
+      }
+    ]
+  },
+  "queue": {
+    "vhost": "property_ai_auth001",
+    "actual_output": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nproperty_ai.auth001.dlq\t2\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1\nceleryev.45d87d1d-72c8-4c3c-b771-98867858b00e\t0\t0\t1\n",
+    "message_content_read": false,
+    "shared_vhost_accessed": false
+  },
+  "collected_at_utc": "2026-09-23T04:14:48.237571+00:00",
+  "status": "API_DB_PASS_PENDING_REVIEW"
+}
