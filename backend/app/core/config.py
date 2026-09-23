@@ -112,11 +112,15 @@ class Settings(BaseSettings):
     llm_model: str = "qwen-plus"
     llm_api_key: SecretStr = SecretStr("")
     llm_timeout_seconds: float = Field(default=8.0, ge=0.1, le=60.0)
+    llm_disable_thinking: bool = False
+    llm_max_output_tokens: int | None = Field(default=None, ge=1, le=8192)
     vlm_provider: Literal["development", "production"] = "development"
     vlm_base_url: str = ""
     vlm_model: str = "qwen-vl-plus"
     vlm_api_key: SecretStr = SecretStr("")
     vlm_timeout_seconds: float = Field(default=12.0, ge=0.1, le=60.0)
+    vlm_disable_thinking: bool = False
+    vlm_max_output_tokens: int | None = Field(default=None, ge=1, le=8192)
     asr_provider: Literal["development", "production"] = "development"
     asr_base_url: str = ""
     asr_model: str = "paraformer-realtime-v2"

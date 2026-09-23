@@ -52,6 +52,8 @@ def build_llm_provider(settings: Settings) -> LLMProvider:
             model=settings.llm_model,
             api_key=settings.llm_api_key.get_secret_value(),
             timeout_seconds=settings.llm_timeout_seconds,
+            disable_thinking=settings.llm_disable_thinking,
+            max_output_tokens=settings.llm_max_output_tokens,
         )
     return DevelopmentLLMProvider(settings.llm_provider_behavior)
 
@@ -66,6 +68,8 @@ def build_vlm_provider(
             model=settings.vlm_model,
             api_key=settings.vlm_api_key.get_secret_value(),
             timeout_seconds=settings.vlm_timeout_seconds,
+            disable_thinking=settings.vlm_disable_thinking,
+            max_output_tokens=settings.vlm_max_output_tokens,
             storage=storage or build_storage_provider(settings),
         )
     return DevelopmentVLMProvider(settings.vlm_provider_behavior)

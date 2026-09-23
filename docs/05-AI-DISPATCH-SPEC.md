@@ -57,6 +57,8 @@ Gateway 只返回该对象或明确失败，不返回自由散文作为控制信
 
 当前软件接线（AI-ANALYSIS-INPUT-019，非真实模型效果验收）：`wo-analysis-v2` 将上述内容作为不可信 JSON 证据交给结构化输出提示词，不提供员工名单。房屋按 tenant/property/house 过滤；关系按报修人及报修时有效区间读取；近期摘要仅限同范围、同房、较早工单，默认最近30天最多5条（`AI_CONTEXT_RECENT_DAYS` / `AI_CONTEXT_RECENT_ORDERS_LIMIT`），不传其他住户凭证或原始历史全文。输入哈希包含提示词版本和上下文；原已完成结果不因本轮更新自动重跑。逐张处理已有 REPORT 图片，记录各图片输入哈希和失败，保留文字降级路径；不默默只取第一张。模型返回合法 token 总量时写现有 `AiCallLog.token_usage`，没有用量时保持空值，禁止用字符数、耗时或 Development 数据冒充真实用量。原生选图、真实Provider和生产容量仍需各自验收。
 
+2026-09-23 SELFHOST-AI-LOCAL-001：本机免费 Qwen3.5-2B 的实际输出暴露了技能值拼接、无依据风险和 schema 元数据混入问题。`wo-analysis-v3` 只澄清既有九字段/单值枚举/类别与技能对应及证据约束，不放宽 Structured Output 校验或改变规则派单。新增可选 `LLM_DISABLE_THINKING` / `VLM_DISABLE_THINKING`（默认 false，启用时发送兼容接口的 `reasoning_effort=none`）及 `LLM_MAX_OUTPUT_TOKENS` / `VLM_MAX_OUTPUT_TOKENS`（默认不指定，范围1–8192）；只对已验证支持这些字段的自托管端点显式启用。本地样例验证不是模型全面效果、生产并发、RAG或发布验收。
+
 ## 4. 派单流水线（强制顺序）
 
 ```text

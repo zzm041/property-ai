@@ -69,6 +69,8 @@ class QwenVLMProvider:
         timeout_seconds: float,
         storage: StorageProvider,
         client: httpx.Client | None = None,
+        disable_thinking: bool = False,
+        max_output_tokens: int | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.model = model
@@ -77,6 +79,8 @@ class QwenVLMProvider:
         self._storage = storage
         self._client = client
         self.model_version = model or self.model_version
+        self._disable_thinking = disable_thinking
+        self._max_output_tokens = max_output_tokens
 
     def inspect_image(self, *, storage_key: str, mime_type: str) -> VisionInsight:
         if not self.base_url or not self._api_key:
@@ -114,6 +118,8 @@ class QwenVLMProvider:
                 ],
                 "response_format": {"type": "json_object"},
                 "temperature": 0,
+                **({"reasoning_effort": "none"} if self._disable_thinking else {}),
+                **({"max_tokens": self._max_output_tokens} if self._max_output_tokens is not None else {}),
             },
             client=self._client,
             provider="vlm",
