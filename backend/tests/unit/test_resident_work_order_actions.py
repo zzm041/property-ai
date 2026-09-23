@@ -380,6 +380,8 @@ def test_resident_cancel_accepts_unassigned_states_and_preserves_reason(
         service._apply_transition = MagicMock()
         service._stop_sla = MagicMock()
         service._append_audit = MagicMock()
+        service._clock = MagicMock(return_value=NOW)
+        service._end_active_assignment = MagicMock()
 
         assert (
             service._cancel(

@@ -49,6 +49,7 @@ from app.domain.work_order import (
     WorkOrderStatus,
     compute_sla_due_at,
     employee_is_capacity_available,
+    is_legal_transition,
     require_legal_transition,
     sla_is_overdue,
     sla_warning_lead_minutes,
@@ -617,6 +618,7 @@ class WorkOrderService:
         after_id: int = 0,
         limit: int = 50,
         claimed_tenant_id: int | None = None,
+        view: str = "dispatch",
     ) -> tuple[WorkOrder, ...]:
         self._require_positive_id(property_id, "property_id")
         current = self._reload_actor(actor)
@@ -642,13 +644,30 @@ class WorkOrderService:
             property_id=property_record.id,
         )
         RbacService.require_permission(current, WORK_ORDER_DISPATCH, scope)
+        if view not in {"dispatch", "unstarted"}:
+            raise AppError(
+                code=WorkOrderErrorCode.INVALID_INPUT,
+                message="Unknown work-order queue view",
+                status_code=422,
+            )
+        # Derive the management list from the same frozen FSM used by cancel.
+        statuses = _QUEUE_STATUSES if view == "dispatch" else tuple(
+            status.value for status in WorkOrderStatus
+            if is_legal_transition(
+                from_status=status,
+                to_status=WorkOrderStatus.CANCELLED,
+                event=WorkOrderEvent.CANCEL,
+            )
+        )
         records = self._repository.list_queue_for_property(
             tenant_id=property_record.tenant_id,
             property_id=property_record.id,
-            statuses=_QUEUE_STATUSES,
+            statuses=statuses,
             after_id=after_id,
             limit=self._page_limit(limit),
         )
+        if view == "unstarted":
+            return records
         return tuple(
             item
             for item in records
@@ -1322,6 +1341,17 @@ class WorkOrderService:
             # ownership grant for another resident's work order.  Reuse the
             # existing read/assignment/management policy before allowing a
             # non-reporter cancellation.
+            # An assigned STAFF who also has RESIDENT cancellation permission
+            # must not combine those grants into manager powers over others.
+            if not (
+                current.has_permission(WORK_ORDER_DISPATCH, scope)
+                or current.has_permission(WORK_ORDER_DECIDE, scope)
+            ):
+                raise AppError(
+                    code=IamErrorCode.FORBIDDEN,
+                    message="Manager permission is required to cancel another report",
+                    status_code=403,
+                )
             self._authorize_read(current, record)
             RbacService.require_permission(current, WORK_ORDER_CANCEL, scope)
             active_assignee_user_id = self._repository.get_active_assignee_user_id(
@@ -1336,6 +1366,11 @@ class WorkOrderService:
             request_id=request_id,
             reason_code="CANCELLED",
             reason_detail=self._optional_text(reason),
+        )
+        self._end_active_assignment(
+            record,
+            now=self._clock(),
+            status=AssignmentStatus.ENDED,
         )
         self._stop_sla(record)
         self._append_audit(

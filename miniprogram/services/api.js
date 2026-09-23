@@ -418,11 +418,11 @@ module.exports = {
     request({ path: `/staff/work-orders/${id}/receipts`, method: "POST", data: body }),
   escalateWorkOrder: (id, body) =>
     request({ path: `/staff/work-orders/${id}/escalate`, method: "POST", data: body }),
-  supervisorQueue: (propertyId, afterId) =>
+  supervisorQueue: (propertyId, afterId, view = "dispatch") =>
     request({
       path: `/supervisor/work-orders?property_id=${propertyId}${
         afterId ? `&after_id=${afterId}` : ""
-      }`,
+      }${view === "unstarted" ? "&view=unstarted" : ""}`,
     }),
   assignWorkOrder: (id, body) =>
     request({ path: `/supervisor/work-orders/${id}/assign`, method: "POST", data: body }),

@@ -1,6 +1,6 @@
 """Supervisor WorkOrder queue, assign/reassign, and exception decisions."""
 
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Header, Query, Request
 from sqlalchemy.orm import Session
@@ -50,6 +50,7 @@ def list_supervisor_work_orders(
     after_id: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
     x_property_id: Annotated[str | None, Header(alias="X-Property-Id")] = None,
+    view: Literal["dispatch", "unstarted"] = "dispatch",
 ) -> dict[str, object]:
     _reject_header_mismatch(property_id=property_id, x_property_id=x_property_id)
     records = service.list_supervisor_queue(
@@ -58,6 +59,7 @@ def list_supervisor_work_orders(
         after_id=after_id,
         limit=limit,
         claimed_tenant_id=tenant_id,
+        view=view,
     )
     items = [work_order_data(item, overdue=service.is_overdue(item)) for item in records]
     next_cursor = items[-1].id if len(items) == limit else None

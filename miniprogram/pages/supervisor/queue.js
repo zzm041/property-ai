@@ -15,6 +15,11 @@ Page({
     recommendations: [],
     loading: false,
     nextCursor: "",
+    queueView: "dispatch",
+    canCancel: false,
+    cancelConfirm: false,
+    cancelReason: "",
+    success: "",
   },
   onLoad(query) {
     if (query.propertyId) {
@@ -34,32 +39,46 @@ Page({
     }
   },
   onProperty(e) {
-    this.setData({ propertyId: e.detail.value });
+    if (this._cancelBusy) return;
+    this._queueGeneration = (this._queueGeneration || 0) + 1;
+    this._clearSelection();
+    this.setData({ propertyId: e.detail.value, items: [], staff: [], nextCursor: "", targetWorkOrderId: 0, loading: false, success: "" });
+  },
+  changeView(e) {
+    if (this.data.loading || this._cancelBusy) return;
+    const view = e.currentTarget.dataset.view;
+    if (!["dispatch", "unstarted"].includes(view) || view === this.data.queueView) return;
+    this._clearSelection();
+    this.setData({ queueView: view, targetWorkOrderId: 0, items: [], nextCursor: "", success: "" });
+    return this.load();
   },
   load() {
-    this._loadQueue({ reset: true });
+    if (this.data.loading || this._cancelBusy) return Promise.resolve();
+    return this._loadQueue({ reset: true });
   },
   loadMore() {
-    if (!this.data.nextCursor) {
+    if (!this.data.nextCursor || this.data.loading || this._cancelBusy) {
       return;
     }
-    this._loadQueue({ reset: false });
+    return this._loadQueue({ reset: false });
   },
   _loadQueue({ reset }) {
-    const { withLoading } = require("../../utils/ui");
     const api = require("../../services/api");
     const propertyId = this.data.propertyId;
+    const generation = this._queueGeneration = (this._queueGeneration || 0) + 1;
     const afterId = reset ? 0 : this.data.nextCursor;
+    if (reset) this._clearSelection();
+    this.setData({ loading: true, error: "" });
     const targetPromise =
       reset && this.data.targetWorkOrderId
         ? api.workOrder(this.data.targetWorkOrderId)
         : Promise.resolve(null);
-    withLoading(this, () =>
-      Promise.all([
-        api.supervisorQueue(propertyId, afterId),
+    return Promise.all([
+        api.supervisorQueue(propertyId, afterId, this.data.queueView),
         api.staffDaily(propertyId, this.data.tenantId),
         targetPromise,
       ]).then(([queue, daily, targetDetail]) => {
+        if (generation !== this._queueGeneration) return;
         const incoming = (queue && queue.items) || [];
         let items = reset ? incoming : this.data.items.concat(incoming);
         const target = targetDetail
@@ -90,13 +109,18 @@ Page({
             selectedVersion: target.version,
             recommendations: [],
             decisionReason: "",
+            canCancel: this._cancellable(target.status),
           });
         }
         this.setData(updates);
-      })
-    ).catch(() => {});
+      }).catch((error) => {
+      if (generation === this._queueGeneration) this.setData({ error: error.message || "请求失败" });
+    }).finally(() => {
+      if (generation === this._queueGeneration) this.setData({ loading: false });
+    });
   },
   select(e) {
+    if (this.data.loading || this._cancelBusy) return;
     const selectedId = Number(e.currentTarget.dataset.id);
     const selected = this.data.items.find((item) => item.id === selectedId);
     this.setData({
@@ -106,12 +130,50 @@ Page({
       selectedVersion: selected ? selected.version : "",
       recommendations: [],
       decisionReason: "",
+      canCancel: Boolean(selected && this._cancellable(selected.status)),
+      cancelConfirm: false,
+      cancelReason: "",
+      success: "",
     });
+  },
+  _cancellable(status) {
+    // Display hint only. The existing service/FSM owns permission and state rules.
+    return ["PENDING_ANALYSIS", "PENDING_ASSIGNMENT", "ASSIGNED", "ACCEPTED"].includes(status);
+  },
+  onCancelReason(e) {
+    if (!this._cancelBusy) this.setData({ cancelReason: e.detail.value });
+  },
+  askCancel() {
+    if (this.data.loading || this._cancelBusy || !this.data.selectedId || !this.data.canCancel) return;
+    this.setData({ cancelConfirm: true, error: "", success: "" });
+  },
+  dismissCancel() {
+    if (!this._cancelBusy) this.setData({ cancelConfirm: false });
+  },
+  cancelSelected() {
+    if (this.data.loading || this._cancelBusy || !this.data.cancelConfirm || !this.data.canCancel) return;
+    const id = Number(this.data.selectedId), version = Number(this.data.selectedVersion);
+    if (!Number.isSafeInteger(id) || id < 1 || !Number.isSafeInteger(version) || version < 1) return;
+    const reason = this.data.cancelReason.trim();
+    this._cancelBusy = true;
+    this.setData({ loading: true, error: "", success: "" });
+    return require("../../services/api").cancelWorkOrder(id, { version, reason: reason || null })
+      .then(async () => {
+        // A completed mutation is never offered again if its following refresh fails.
+        this._clearSelection();
+        this.setData({ targetWorkOrderId: 0, success: `工单 ${id} 已撤销` });
+        await this._loadQueue({ reset: true });
+      })
+      .catch((error) => {
+        this.setData({ error: error.message || "撤销失败，请刷新核对工单状态", cancelConfirm: false });
+      })
+      .finally(() => { this._cancelBusy = false; this.setData({ loading: false }); });
   },
   selectEmployee(e) {
     this.setData({ employeeId: String(e.currentTarget.dataset.id) });
   },
   recommend() {
+    if (this.data.loading || this._cancelBusy) return;
     if (!this.data.selectedId) {
       this.setData({ error: "请先选择工单" });
       return;
@@ -136,6 +198,7 @@ Page({
     this.setData({ decisionReason: e.detail.value });
   },
   decide(e) {
+    if (this.data.loading || this._cancelBusy) return;
     const decision = e.currentTarget.dataset.decision;
     const reason = this.data.decisionReason.trim();
     if (!this.data.selectedId || this.data.selectedStatus !== "PROCESSING") {
@@ -156,11 +219,12 @@ Page({
         })
         .then(() => {
           this._clearSelection();
-          this.load();
+          return this._loadQueue({ reset: true });
         })
     ).catch(() => {});
   },
   _dispatch(name) {
+    if (this.data.loading || this._cancelBusy) return;
     if (!this.data.selectedId || !this.data.employeeId) {
       this.setData({ error: "请选择工单和在岗员工" });
       return;
@@ -178,7 +242,7 @@ Page({
         version: Number(this.data.selectedVersion),
       }).then(() => {
         this._clearSelection();
-        this.load();
+        return this._loadQueue({ reset: true });
       })
     ).catch(() => {});
   },
@@ -191,6 +255,9 @@ Page({
       employeeId: "",
       decisionReason: "",
       recommendations: [],
+      canCancel: false,
+      cancelConfirm: false,
+      cancelReason: "",
     });
   },
 });

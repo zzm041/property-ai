@@ -1,11 +1,25 @@
-<input placeholder="小区 ID" value="{{propertyId}}" bindinput="onProperty" />
+<input placeholder="小区 ID" value="{{propertyId}}" bindinput="onProperty" disabled="{{loading}}" />
+<button class="btn btn-secondary" data-view="dispatch" bindtap="changeView" disabled="{{loading}}">待派 / 异常</button>
+<button class="btn btn-secondary" data-view="unstarted" bindtap="changeView" disabled="{{loading}}">未开工工单</button>
+<view>{{queueView == 'unstarted' ? '未开工工单，可按权限撤销' : '待派与异常处理队列'}}</view>
 <button class="btn" bindtap="load">刷新队列</button>
 <button class="btn" wx:if="{{nextCursor}}" bindtap="loadMore">加载更多</button>
 <view class="loading" wx:if="{{loading}}">加载中...</view>
-<view class="empty" wx:if="{{!loading && !items.length}}">暂无待派工单</view>
+<view class="empty" wx:if="{{!loading && !items.length}}">当前队列暂无工单</view>
 <view class="card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="select">
   {{item.id}} {{item.status}} {{item.process_reason}} {{selectedId == item.id ? "已选" : ""}}
 </view>
+<view class="card" wx:if="{{selectedId && canCancel}}">
+  <view>撤销未开工工单 {{selectedId}}（{{selectedStatus}}）</view>
+  <textarea placeholder="撤销原因（可选，保留在工单历史）" value="{{cancelReason}}" bindinput="onCancelReason" maxlength="255" disabled="{{loading}}"></textarea>
+  <button class="btn btn-secondary" bindtap="askCancel" disabled="{{loading}}">撤销此工单</button>
+  <view wx:if="{{cancelConfirm}}">
+    <view>确认撤销？将停止本工单派单与 SLA；已开始处理的工单不能撤销。</view>
+    <button class="btn" bindtap="cancelSelected" disabled="{{loading}}">确认撤销未开工工单</button>
+    <button class="btn btn-secondary" bindtap="dismissCancel" disabled="{{loading}}">暂不撤销</button>
+  </view>
+</view>
+<view class="card" wx:if="{{success}}">{{success}}</view>
 <view class="card">
   <view>点选在岗员工（employee_id，不是 user_id）</view>
   <view class="empty" wx:if="{{!staff.length}}">今日暂无员工日报。请先让员工签到。</view>
