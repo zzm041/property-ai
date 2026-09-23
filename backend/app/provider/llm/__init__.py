@@ -15,6 +15,7 @@ from app.provider.errors import (
     ProviderUnavailableError,
 )
 from app.provider.http import parse_json_object, request_json
+from app.provider.usage import StructuredCompletion, response_token_usage
 
 SUCCESS_ANALYSIS = {
     "category": "electrical",
@@ -168,4 +169,6 @@ class QwenLLMProvider:
             raise ProviderInvalidOutputError("LLM returned invalid JSON") from exc
         if not isinstance(content, str) or not content.strip():
             raise ProviderInvalidOutputError("LLM returned an empty response")
-        return parse_json_object(content)
+        return StructuredCompletion(
+            parse_json_object(content), token_usage=response_token_usage(payload)
+        )

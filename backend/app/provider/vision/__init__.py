@@ -13,6 +13,7 @@ from app.provider.errors import (
 )
 from app.provider.http import parse_json_object, request_json
 from app.provider.storage import StorageProvider
+from app.provider.usage import response_token_usage
 
 
 @dataclass(frozen=True, slots=True)
@@ -21,6 +22,7 @@ class VisionInsight:
     labels: tuple[str, ...]
     confidence: float
     model_version: str
+    token_usage: int | None = None
 
 
 class VLMProvider(Protocol):
@@ -135,4 +137,5 @@ class QwenVLMProvider:
             labels=tuple(str(item) for item in labels),
             confidence=confidence_value,
             model_version=self.model_version,
+            token_usage=response_token_usage(payload),
         )

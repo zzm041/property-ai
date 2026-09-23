@@ -62,7 +62,7 @@ ANNOUNCEMENT_READ = "announcement:read"
 ANNOUNCEMENT_DRAFT = "announcement:draft"
 ANNOUNCEMENT_PUBLISH = "announcement:publish"
 
-WORK_ORDER_ANALYSIS_PROMPT_VERSION = "wo-analysis-v1"
+WORK_ORDER_ANALYSIS_PROMPT_VERSION = "wo-analysis-v2"
 INCIDENT_SUMMARY_PROMPT_VERSION = "incident-summary-v1"
 ANNOUNCEMENT_DRAFT_PROMPT_VERSION = "announcement-draft-v1"
 

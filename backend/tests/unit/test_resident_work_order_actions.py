@@ -10,6 +10,7 @@ import pytest
 from fastapi import Request
 
 from app.api.v1.work_orders import get_work_order, list_my_work_orders
+from app.core.config import Settings
 from app.core.errors import AppError, IamErrorCode, WorkOrderErrorCode
 from app.core.errors import AiErrorCode
 from app.domain.ai import AnalysisStatus
@@ -196,6 +197,7 @@ def test_resident_append_rejects_stale_version_before_mutation() -> None:
     service = WorkOrderService.__new__(WorkOrderService)
     current = SimpleNamespace(user_id=7)
     record = _record(44)
+    record.created_at = NOW
     service._reload_actor = MagicMock(return_value=current)
     service._lock_work_order = MagicMock(return_value=record)
     service._authorize_read = MagicMock()
@@ -258,6 +260,8 @@ def test_changed_pending_content_creates_new_analysis_version(
     )
     service = AnalysisService.__new__(AnalysisService)
     service._session = MagicMock()
+    service._settings = Settings(_env_file=None, app_env="test")
+    service._clock = lambda: datetime(2026, 9, 23, tzinfo=UTC)
     service._work_orders = MagicMock()
     service._ai = MagicMock()
     record = _record(44)
@@ -276,6 +280,7 @@ def test_changed_pending_content_creates_new_analysis_version(
     service._work_orders.get_work_order_for_update.return_value = record
     service._work_orders.get_content.return_value = content
     service._ai.list_media_with_files.return_value = ()
+    service._ai.get_analysis_context.return_value = {}
     service._ai.get_current_analysis_for_update.return_value = current
     service._ai.get_building_id.return_value = 9
 

@@ -27,7 +27,8 @@ from app.model.employee import (
     Skill,
 )
 from app.model.identity import Role, User, UserRole
-from app.model.property import House, Unit
+from app.model.property import Building, House, Property, Unit
+from app.model.resident import ResidentHouseRelation
 from app.model.work_order import (
     FileObject,
     WorkOrder,
@@ -119,6 +120,54 @@ class AiRepository:
             return None
         unit = self._session.get(Unit, house.unit_id)
         return None if unit is None else unit.building_id
+
+    def get_analysis_context(
+        self, record: WorkOrder, *, since: datetime, reference_at: datetime, limit: int
+    ) -> dict[str, object]:
+        """Minimal snapshot, never another house's text or resident credentials."""
+        house = self._session.execute(
+            select(
+                Property.name.label("property_name"), Building.code.label("building_code"),
+                Building.name.label("building_name"), Unit.code.label("unit_code"),
+                Unit.name.label("unit_name"), House.room_no,
+            )
+            .select_from(House)
+            .join(Unit, and_(Unit.id == House.unit_id, Unit.tenant_id == House.tenant_id, Unit.property_id == House.property_id))
+            .join(Building, and_(Building.id == Unit.building_id, Building.tenant_id == House.tenant_id, Building.property_id == House.property_id))
+            .join(Property, and_(Property.id == House.property_id, Property.tenant_id == House.tenant_id))
+            .where(House.id == record.house_id, House.tenant_id == record.tenant_id, House.property_id == record.property_id)
+        ).mappings().one_or_none()
+        if house is None:
+            return {"house": {}, "reporter_relationships": [], "recent_house_orders": []}
+        relationships = self._session.scalars(
+            select(ResidentHouseRelation.relation_type).where(
+                ResidentHouseRelation.house_id == record.house_id,
+                ResidentHouseRelation.user_id == record.reporter_user_id,
+                ResidentHouseRelation.tenant_id == record.tenant_id,
+                ResidentHouseRelation.property_id == record.property_id,
+                ResidentHouseRelation.valid_from <= reference_at,
+                or_(ResidentHouseRelation.valid_to.is_(None), ResidentHouseRelation.valid_to > reference_at),
+            ).order_by(ResidentHouseRelation.id)
+        ).all()
+        recent = self._session.scalars(
+            select(WorkOrder).where(
+                WorkOrder.house_id == record.house_id,
+                WorkOrder.tenant_id == record.tenant_id,
+                WorkOrder.property_id == record.property_id,
+                WorkOrder.id < record.id,
+                WorkOrder.created_at >= since,
+                WorkOrder.created_at <= reference_at,
+            ).order_by(WorkOrder.created_at.desc(), WorkOrder.id.desc()).limit(limit)
+        ).all() if limit else ()
+        summaries = []
+        for order in recent:
+            # A bounded <=20 lookups; omit raw reports/identity and failed old summaries.
+            analysis = self.get_current_analysis(order.id)
+            summaries.append({
+                "category": order.category, "status": order.status,
+                "summary": analysis.summary if analysis is not None and analysis.status == "COMPLETED" else None,
+            })
+        return {"house": dict(house), "reporter_relationships": sorted(set(relationships)), "recent_house_orders": summaries}
 
     def list_property_employees(self, *, tenant_id: int, property_id: int) -> tuple[Employee, ...]:
         return tuple(

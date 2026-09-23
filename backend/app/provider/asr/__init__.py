@@ -12,6 +12,7 @@ from app.provider.errors import (
 )
 from app.provider.http import request_json
 from app.provider.storage import StorageProvider
+from app.provider.usage import response_token_usage
 
 
 @dataclass(frozen=True, slots=True)
@@ -19,6 +20,7 @@ class Transcript:
     text: str
     confidence: float
     model_version: str
+    token_usage: int | None = None
 
 
 class ASRProvider(Protocol):
@@ -98,4 +100,5 @@ class HttpASRProvider:
             text=text.strip(),
             confidence=confidence_value,
             model_version=self.model_version,
+            token_usage=response_token_usage(payload),
         )

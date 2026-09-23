@@ -6,6 +6,7 @@ from pydantic import ValidationError
 import pytest
 
 from app.domain.ai import (
+    WORK_ORDER_ANALYSIS_PROMPT_VERSION,
     DispatchCandidate,
     DispatchWeights,
     FilterReason,
@@ -294,7 +295,7 @@ def test_announcement_cannot_publish_from_draft() -> None:
 def test_fake_providers_are_deterministic() -> None:
     assert DevelopmentLLMProvider("success").structured_completion(
         prompt="x",
-        prompt_version="wo-analysis-v1",
+        prompt_version=WORK_ORDER_ANALYSIS_PROMPT_VERSION,
     )["category"] == "electrical"
     with pytest.raises(ProviderTimeoutError):
         DevelopmentLLMProvider("timeout").structured_completion(
