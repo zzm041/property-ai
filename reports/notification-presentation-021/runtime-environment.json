@@ -1,0 +1,39 @@
+{
+  "observed_at_utc": "2026-09-23T06:44:47.4180468Z",
+  "processes": [
+    {
+      "ProcessId": 11020,
+      "ParentProcessId": 38688,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "\"D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\" -I D:\\property-ai\\tmp\\run_auth001_recovered.py api"
+    },
+    {
+      "ProcessId": 46400,
+      "ParentProcessId": 38688,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "\"D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\" -I D:\\property-ai\\tmp\\run_auth001_recovered.py worker"
+    },
+    {
+      "ProcessId": 16852,
+      "ParentProcessId": 46400,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -m celery -A app.worker.celery_app:celery_app worker -Q property_ai.auth001 --pool=solo --loglevel=info --hostname=auth001@%h"
+    }
+  ],
+  "listeners": [
+    {
+      "LocalAddress": "::",
+      "LocalPort": 9440,
+      "OwningProcess": 38020
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 8083,
+      "OwningProcess": 11020
+    }
+  ],
+  "task_id": "NOTIFICATION-PRESENTATION-021",
+  "product_sha": "3c85cd4b9e0d9045a0ffa25b8894f83a8ad5e929",
+  "backend_loaded_sha": "b75fa97112b3144f9d4702e4782b231bb775c19c",
+  "boundary": "Frontend-only product change. Backend/app, dependencies and migrations unchanged since b75fa97; no API/Worker replacement or debugger introspection. Startup config evidence remains reports/resident-wo-presentation-020/runtime-environment.json; new DB/health/queue checks are in this slice's preflight/api files."
+}

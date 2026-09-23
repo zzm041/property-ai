@@ -1,0 +1,17 @@
+{
+  "task_id": "NOTIFICATION-PRESENTATION-021",
+  "base_sha": "43b01798c763bdcafde5afe5ac83dd1076ed60e1",
+  "head_sha": "3c85cd4b9e0d9045a0ffa25b8894f83a8ad5e929",
+  "review_round": 1,
+  "product_repair_rounds": 0,
+  "status": "PASS",
+  "session_id": "01a0cd04-d2d0-7350-a9da-7242736b57ca",
+  "model": "gpt-5.6-sol (existing default; no override)",
+  "exit_code": 0,
+  "schema_validated": true,
+  "sandbox": "read-only",
+  "timeout_seconds": 900,
+  "result_path": "reports/codex/NOTIFICATION-PRESENTATION-021-review.json",
+  "private_invocation_log": "tmp/notification-presentation-021/review.call.json",
+  "mechanism": "Existing wrapper/schema/ChatGPT subscription; known built-in agent thread limit not retried. Wrapper buffers output; no invented summary."
+}

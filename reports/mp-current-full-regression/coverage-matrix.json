@@ -2104,6 +2104,36 @@
       "scope": "Existing013N3: presentation-only localization of exact known system templates and explicit UTC notification/read timestamps; preserve stored originals, resource identity, paging/read/navigation and all release gaps. No new events/lifecycle replay/schema/fees."
     }
   },
+  "notification_presentation_021": {
+    "task_id": "NOTIFICATION-PRESENTATION-021",
+    "base_sha": "43b01798c763bdcafde5afe5ac83dd1076ed60e1",
+    "implementation_head": "3c85cd4b9e0d9045a0ffa25b8894f83a8ad5e929",
+    "runtime_run_id": "ntfview021-5675062d1374",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
+    "independent_review": {
+      "round": 1,
+      "product_repair_rounds": 0,
+      "result": "PASS",
+      "session_id": "01a0cd04-d2d0-7350-a9da-7242736b57ca",
+      "path": "reports/codex/NOTIFICATION-PRESENTATION-021-review.json",
+      "boundary": "Separate reviewer read actual4filediff/directcontext,saved51focused,page/API/SELECTDB/queue evidence and visually inspectedall5PNG; no tests/pages/HTTP/DB/queue/process operations.TrackingN1closedhere; inheritedNTF013N2 retained; NTF013N3 closedonlyscopedinbox; Propertylocal/outboundlocalization and allreleaseblockersretained."
+    },
+    "evidence": "51focused/1warning; fivePNG;55currentrestorednotifications20+20+15,derivednotification10/order1CLOSEDv10,oneactualpagePOSTread/unread55->54,refresh/relogin identicalreadtimestamp2026-09-23T06:44:27Z,rawrecords/lifecycleunchanged. Initialscreenshottimeout/screenshot-onlyresume retained.8083AUTH0010009/uniquevhostqueue0/0/1,DLQ2untouched. Frontendonly/backendb75unchanged/no restart.",
+    "current_status_overlays": [
+      {
+        "id": "NTF-ROUND",
+        "implementation_status": "Retained owned descending inbox/read/navigation;021 adds exact-known system-template Chinese projection, explicit UTC notification/read-time labels, raw data and unknown text preserved.",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "01393838c1/ba510cb historicalobjects lost;0213c85cd4b9e0d9045a0ffa25b8894f83a8ad5e929/currentrunntfview021-5675062d1374",
+        "remaining_gap": "Property-local notification time and localized outbound delivery remain unimplemented release UX; branch-specific live events/targets, realproviders, physicaldevice, production scale/security and formalrelease remain unverified. No new event/delivery claim.",
+        "next_action": "Preserve013/021 scoped evidence; nextAI-FALLBACK-RUNTIME-022 covers existing local Worker/provider failure without new policy/schema/fees. Real-model and production gates retained."
+      }
+    ],
+    "next_slice": {
+      "task_id": "AI-FALLBACK-RUNTIME-022",
+      "scope": "Current V1-AI-FAIL-CREATE evidence gap: existing Development LLM unavailable mode, actual normalpage create persisted PENDING_ANALYSIS, independentWorker bounded failure/audit, no AUTOassignment, manager queue visibility, restore normal isolated runtime; no new rules or historical replay."
+    }
+  },
   "auth_failure_policy_20260923": {
     "task_id": "AUTH-FAILURE-POLICY-20260923",
     "owner_decision": "不锁定",
@@ -2124,7 +2154,7 @@
     "generated_at": "2026-09-23",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
     "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs), then notification_events_inbox_013.current_status_overlays (2 IDs)",
-    "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs), then manager_wo_cancel_017 (1 composite ID, remains PARTIAL), then house_csv_roundtrip_018 (1 existing ID), then ai_analysis_input_019 (3 existing IDs; real-model statuses remain BLOCKED), then resident_wo_presentation_020 (1 existing ID; release gaps retained)",
+    "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs), then manager_wo_cancel_017 (1 composite ID, remains PARTIAL), then house_csv_roundtrip_018 (1 existing ID), then ai_analysis_input_019 (3 existing IDs; real-model statuses remain BLOCKED), then resident_wo_presentation_020 (1 existing ID; release gaps retained), then notification_presentation_021 (1 existing ID; explicitUTC not Property-local/outbound acceptance)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced. Old AUTH001 objects were lost on the 2026-09-23 tmpfs stop; historical evidence remains version-bound, not current-object proof.",
     "row_count": 83,
     "rows": [
@@ -2394,11 +2424,11 @@
       },
       {
         "requirement_id": "NTF-ROUND",
-        "current_implementation": "descending_inbox_paging_load_more_serialized_read_state_and_grant_aware_resource_navigation_wired",
+        "current_implementation": "Retained owned descending inbox/read/navigation;021 adds exact-known system-template Chinese projection, explicit UTC notification/read-time labels, raw data and unknown text preserved.",
         "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
-        "evidence_version": "93838c1a624b6c03bf0f3982ebee09b48f727a60 / ba510cbc554ddb4f893c1a6e67ed9a00bc83ecec",
-        "remaining_gap": "branch-specific runtime/page evidence for every supported target, production provider, physical-device UX, production-scale operation and formal release acceptance",
-        "next_action": "preserve scoped inbox evidence; exercise additional branches when a dependent approved slice changes them and complete production/provider/device acceptance separately"
+        "evidence_version": "01393838c1/ba510cb historicalobjects lost;0213c85cd4b9e0d9045a0ffa25b8894f83a8ad5e929/currentrunntfview021-5675062d1374",
+        "remaining_gap": "Property-local notification time and localized outbound delivery remain unimplemented release UX; branch-specific live events/targets, realproviders, physicaldevice, production scale/security and formalrelease remain unverified. No new event/delivery claim.",
+        "next_action": "Preserve013/021 scoped evidence; nextAI-FALLBACK-RUNTIME-022 covers existing local Worker/provider failure without new policy/schema/fees. Real-model and production gates retained."
       },
       {
         "requirement_id": "UX-NO-DEV-LEAK",
