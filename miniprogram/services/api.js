@@ -296,19 +296,19 @@ module.exports = {
     request({ path: "/auth/logout", method: "POST", data: { refresh_token: refreshToken || undefined } }),
   updateProfile: (displayName) =>
     request({ path: "/me/profile", method: "PATCH", data: { display_name: displayName } }),
-  catalogProperties: (afterId) =>
+  catalogProperties: (afterId, limit = 100) =>
     request({
-      path: `/properties?limit=100${afterId ? `&after_id=${afterId}` : ""}`,
+      path: `/properties?limit=${limit}${afterId ? `&after_id=${afterId}` : ""}`,
     }),
-  catalogBuildings: (propertyId) => request({ path: `/properties/${propertyId}/buildings` }),
-  catalogUnits: (buildingId) => request({ path: `/buildings/${buildingId}/units` }),
-  catalogHouses: (unitId) => request({ path: `/units/${unitId}/houses` }),
+  catalogBuildings: (propertyId, afterId = 0, limit = 50) => request({ path: `/properties/${propertyId}/buildings?after_id=${afterId}&limit=${limit}` }),
+  catalogUnits: (buildingId, afterId = 0, limit = 50) => request({ path: `/buildings/${buildingId}/units?after_id=${afterId}&limit=${limit}` }),
+  catalogHouses: (unitId, afterId = 0, limit = 50) => request({ path: `/units/${unitId}/houses?after_id=${afterId}&limit=${limit}` }),
   claimEmployee: (token) =>
     request({ path: "/staff/employee-claim", method: "POST", data: { token } }),
   devToken: (seedKey) =>
     request({ path: "/auth/dev/token", method: "POST", data: { seed_key: seedKey } }),
   me: () => request({ path: "/me" }),
-  houses: () => request({ path: "/me/houses" }),
+  houses: (afterId = 0, limit = 50) => request({ path: `/me/houses?after_id=${afterId}&limit=${limit}` }),
   myBindRequests: (afterId, limit = 50) =>
     request({
       path: `/resident-bind-requests/mine?limit=${limit}${
@@ -474,9 +474,9 @@ module.exports = {
       method: "POST",
       data: body || { decision: "APPROVE" },
     }),
-  bindRequests: (propertyId, tenantId) =>
+  bindRequests: (propertyId, tenantId, afterId = 0, limit = 50) =>
     request({
-      path: `/admin/resident-bind-requests?property_id=${propertyId}&tenant_id=${tenantId}`,
+      path: `/admin/resident-bind-requests?property_id=${propertyId}&tenant_id=${tenantId}&after_id=${afterId}&limit=${limit}`,
     }),
   approveBindRequest: (id) =>
     request({

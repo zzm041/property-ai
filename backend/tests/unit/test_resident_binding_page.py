@@ -33,7 +33,7 @@ let page;
 const manager = scenario.startsWith('manager');
 vm.runInNewContext(fs.readFileSync(path.join(root, manager ? 'miniprogram/pages/supervisor/bindings.js' : 'miniprogram/pages/houses/houses.js'),'utf8'), {
   Page: value => {page=value;},
-  require: name => name === '../../services/api' ? api : require(path.join(root,'miniprogram/utils/ui.js')), wx:{},
+  require: name => name === '../../services/api' ? api : require(path.join(root,'miniprogram/pages/houses',name)), wx:{},
 });
 page.setData = value => Object.assign(page.data,value);
 async function main() {

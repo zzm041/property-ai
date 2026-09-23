@@ -5,6 +5,8 @@ const RELATIONS = [
   { value: "AUTHORIZED_OTHER", label: "其他授权住户" },
 ];
 const STATUS_NAMES = { PENDING: "待审核", APPROVED: "已通过", REJECTED: "已驳回" };
+const { appendPage } = require("../../utils/paging");
+const PAGE_SIZE = 50;
 const withRelationLabel = (item) => ({
   ...item,
   relationLabel: (RELATIONS.find((option) => option.value === item.relation_type) || {}).label || item.relation_type,
@@ -32,6 +34,12 @@ Page({
     relationNames: RELATIONS.map((item) => item.label),
     relationIndex: -1,
     catalogLoading: false,
+    moreLoading: false,
+    propertyCursor: 0,
+    buildingCursor: 0,
+    unitCursor: 0,
+    houseCursor: 0,
+    activeCursor: 0,
     loading: false,
     error: "",
   },
@@ -51,20 +59,24 @@ Page({
     return (rows || []).map((item) => item[key]);
   },
   reload() {
-    if (this.data.loading) return Promise.resolve();
+    if (this.data.loading || this.data.moreLoading) return Promise.resolve();
     const { withLoading } = require("../../utils/ui");
     return withLoading(this, () => this.loadPage()).catch(() => {});
   },
   loadPage() {
     const api = require("../../services/api");
     const version = this.clearSelection("property");
-    this.setData({ properties: [], propertyNames: [], propertyIndex: 0 });
-    return Promise.all([api.houses(), this.loadBindRequests(), api.catalogProperties()]).then(
+    this.setData({ properties: [], propertyNames: [], propertyIndex: 0, propertyCursor: 0, activeCursor: 0 });
+    return Promise.all([api.houses(0, PAGE_SIZE), this.loadBindRequests(), api.catalogProperties(0, PAGE_SIZE)]).then(
         ([houses, requests, catalog]) => {
           if (version !== this.catalogVersion) return;
-          const properties = (catalog && catalog.items) || [];
+          const catalogPage = appendPage([], catalog, 0, PAGE_SIZE);
+          const activePage = appendPage([], houses, 0, PAGE_SIZE, "relation_id");
+          const properties = catalogPage.items;
           this.setData({
-            items: ((houses && houses.items) || []).map(withRelationLabel),
+            items: activePage.items.map(withRelationLabel),
+            activeCursor: activePage.nextCursor,
+            propertyCursor: catalogPage.nextCursor,
             requests: requests.map(withRelationLabel),
             properties,
             propertyNames: this.names(properties, "name"),
@@ -107,9 +119,9 @@ Page({
   },
   clearSelection(level) {
     this.catalogVersion = (this.catalogVersion || 0) + 1;
-    const values = { houses: [], houseNames: [], houseIndex: 0, selectedHouseId: 0, catalogLoading: true, error: "" };
-    if (level !== "unit") Object.assign(values, { units: [], unitNames: [], unitIndex: 0 });
-    if (level === "property") Object.assign(values, { buildings: [], buildingNames: [], buildingIndex: 0 });
+    const values = { houses: [], houseNames: [], houseIndex: 0, houseCursor: 0, selectedHouseId: 0, catalogLoading: true, error: "" };
+    if (level !== "unit") Object.assign(values, { units: [], unitNames: [], unitIndex: 0, unitCursor: 0 });
+    if (level === "property") Object.assign(values, { buildings: [], buildingNames: [], buildingIndex: 0, buildingCursor: 0 });
     this.setData(values);
     return this.catalogVersion;
   },
@@ -127,11 +139,13 @@ Page({
       .catalogBuildings(propertyId)
       .then((payload) => {
         if (version !== this.catalogVersion) return;
-        const buildings = (payload && payload.items) || [];
+        const result = appendPage([], payload, 0, PAGE_SIZE);
+        const buildings = result.items;
         this.setData({
           buildings,
           buildingNames: this.names(buildings, "name"),
           buildingIndex: 0,
+          buildingCursor: result.nextCursor,
         });
         if (buildings.length) {
           return this.loadUnits(buildings[0].id, version);
@@ -145,8 +159,9 @@ Page({
       .catalogUnits(buildingId)
       .then((payload) => {
         if (version !== this.catalogVersion) return;
-        const units = (payload && payload.items) || [];
-        this.setData({ units, unitNames: this.names(units, "name"), unitIndex: 0 });
+        const result = appendPage([], payload, 0, PAGE_SIZE);
+        const units = result.items;
+        this.setData({ units, unitNames: this.names(units, "name"), unitIndex: 0, unitCursor: result.nextCursor });
         if (units.length) {
           return this.loadHouses(units[0].id, version);
         }
@@ -159,14 +174,52 @@ Page({
       .catalogHouses(unitId)
       .then((payload) => {
         if (version !== this.catalogVersion) return;
-        const houses = (payload && payload.items) || [];
+        const result = appendPage([], payload, 0, PAGE_SIZE);
+        const houses = result.items;
         this.setData({
           houses,
           houseNames: houses.map((item) => item.room_no),
           houseIndex: 0,
+          houseCursor: result.nextCursor,
           selectedHouseId: houses[0] ? houses[0].id : 0,
         });
       });
+  },
+  loadMoreCatalog(e) {
+    const level = e.currentTarget.dataset.level;
+    const config = {
+      property: ["properties", "propertyNames", "catalogProperties", null, "name"],
+      building: ["buildings", "buildingNames", "catalogBuildings", this.data.properties[this.data.propertyIndex], "name"],
+      unit: ["units", "unitNames", "catalogUnits", this.data.buildings[this.data.buildingIndex], "name"],
+      house: ["houses", "houseNames", "catalogHouses", this.data.units[this.data.unitIndex], "room_no"],
+    }[level];
+    if (!config || this.data.loading || this.data.catalogLoading || this.data.moreLoading) return;
+    const cursorKey = level + "Cursor";
+    const after = this.data[cursorKey];
+    if (!after || (level !== "property" && !config[3])) return;
+    const version = this.catalogVersion;
+    const api = require("../../services/api");
+    this.setData({ moreLoading: true, error: "" });
+    return Promise.resolve().then(() => level === "property"
+      ? api[config[2]](after, PAGE_SIZE)
+      : api[config[2]](config[3].id, after, PAGE_SIZE)
+    ).then((payload) => {
+      if (version !== this.catalogVersion) return;
+      const result = appendPage(this.data[config[0]], payload, after, PAGE_SIZE);
+      this.setData({ [config[0]]: result.items, [config[1]]: this.names(result.items, config[4]), [cursorKey]: result.nextCursor });
+    }).catch((error) => {
+      if (version === this.catalogVersion) this.setData({ error: error.message || "加载失败" });
+    }).finally(() => this.setData({ moreLoading: false }));
+  },
+  loadMoreActive() {
+    if (this.data.loading || this.data.catalogLoading || this.data.moreLoading || !this.data.activeCursor) return;
+    const after = this.data.activeCursor;
+    this.setData({ moreLoading: true, error: "" });
+    return require("../../services/api").houses(after, PAGE_SIZE).then((payload) => {
+      const result = appendPage(this.data.items, payload, after, PAGE_SIZE, "relation_id");
+      this.setData({ items: result.items.map(withRelationLabel), activeCursor: result.nextCursor });
+    }).catch((error) => this.setData({ error: error.message || "加载失败" }))
+      .finally(() => this.setData({ moreLoading: false }));
   },
   onProperty(e) {
     if (this.data.loading) return;
@@ -190,7 +243,7 @@ Page({
     return this.changeAddress("unit", (version) => item && this.loadHouses(item.id, version));
   },
   onHousePick(e) {
-    if (this.data.loading || this.data.catalogLoading) return;
+    if (this.data.loading || this.data.catalogLoading || this.data.moreLoading) return;
     const index = Number(e.detail.value);
     const item = this.data.houses[index];
     this.setData({ houseIndex: index, selectedHouseId: item ? item.id : 0 });
@@ -209,7 +262,7 @@ Page({
     wx.navigateTo({ url: `/pages/work-orders/create?houseId=${houseId}` });
   },
   applyBind() {
-    if (this.data.loading || this.data.catalogLoading) return;
+    if (this.data.loading || this.data.catalogLoading || this.data.moreLoading) return;
     const houseId = Number(this.data.selectedHouseId);
     if (!houseId) {
       this.setData({ error: "请选择房号" });

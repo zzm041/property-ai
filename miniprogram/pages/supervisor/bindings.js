@@ -1,5 +1,5 @@
 Page({
-  data: { items: [], error: "", propertyId: "", tenantId: "", loading: false, rejectReason: "" },
+  data: { items: [], error: "", propertyId: "", tenantId: "", loading: false, rejectReason: "", nextCursor: 0 },
   onLoad(query) {
     if (query.propertyId) {
       this.setData({ propertyId: query.propertyId });
@@ -15,15 +15,23 @@ Page({
   },
   onProperty(e) {
     if (this.data.loading) return;
-    this.setData({ propertyId: e.detail.value });
+    this.setData({ propertyId: e.detail.value, items: [], nextCursor: 0, rejectReason: "" });
   },
   onRejectReason(e) {
     if (!this.data.loading) this.setData({ rejectReason: e.detail.value });
   },
-  loadItems() {
+  loadItems(afterId = 0) {
     return require("../../services/api")
-      .bindRequests(this.data.propertyId, this.data.tenantId)
-      .then((data) => this.setData({ items: (data && data.items) || [] }));
+      .bindRequests(this.data.propertyId, this.data.tenantId, afterId, 50)
+      .then((data) => {
+        const result = require("../../utils/paging").appendPage(afterId ? this.data.items : [], data, afterId, 50);
+        this.setData({ items: result.items, nextCursor: result.nextCursor });
+      });
+  },
+  loadMore() {
+    if (this.data.loading || !this.data.nextCursor) return;
+    const after = this.data.nextCursor;
+    return require("../../utils/ui").withLoading(this, () => this.loadItems(after)).catch(() => {});
   },
   load() {
     if (this.data.loading) return Promise.resolve();
