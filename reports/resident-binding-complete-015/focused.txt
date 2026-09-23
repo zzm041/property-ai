@@ -1,0 +1,12 @@
+Actual shell output from the 2026-09-23 focused run (saved from tool output; not a rerun).
+Interpreter: D:/property-ai/tmp/uv-python/cpython-3.12.10-windows-x86_64-none/python.exe -I
+Dependencies: explicit D:/property-ai/.venv/Lib/site-packages; project D:/property-ai/backend.
+Command: pytest.main(['backend/tests/unit/test_resident_binding_page.py','backend/tests/unit/test_resident_authorization.py','backend/tests/unit/test_property_admin.py','backend/tests/unit/test_property_service.py','-q','-p','no:cacheprovider','--basetemp=D:/property-ai/tmp/pytest-bind015'])
+Top-level conftest inspected; no integration cleanup/migration/seed fixture executed.
+..........................................                               [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:40
+  DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+42 passed, 1 warning in 1.13s
+Startup also printed the existing pytest_asyncio asyncio_default_fixture_loop_scope unset deprecation warning.
+Page-handler cases are deterministic simulated APIs, not real UI acceptance.

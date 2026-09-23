@@ -1854,11 +1854,81 @@
       }
     ]
   },
+  "resident_binding_complete_015": {
+    "task_id": "RESIDENT-BINDING-COMPLETE-015",
+    "base_sha": "0726d89203343a318a41e5f88c42eec316161d37",
+    "implementation_head": "d8993fa557ee7683ec7946509b7d7d6ae58b0b22",
+    "runtime_run_id": "bind015-919b885f73ff",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+    "independent_review": {
+      "round": 1,
+      "product_repair_rounds": 0,
+      "context": "/root/bind015_independent_review",
+      "result": "PASS",
+      "path": "reports/codex/RESIDENT-BINDING-COMPLETE-015-review.json",
+      "boundary": "Read-only inspection including all nine PNGs; no reviewer test/page/DB/queue execution."
+    },
+    "evidence": "reports/resident-binding-complete-015/; 42 focused passed; normal TENANT rejection/reapplication/approval/refresh/relogin; API concurrency and authorization/state negatives; 3requests/1relation/6audits; unique queue0/0/1 DLQ2 untouched",
+    "current_status_overlays": [
+      {
+        "id": "RES-HOUSE-CASCADE",
+        "implementation_status": "Address selection clears descendants and ignores stale replies; existing catalog API reused",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "d8993fa557ee7683ec7946509b7d7d6ae58b0b22 / bind015-919b885f73ff",
+        "remaining_gap": "Native picker/device, production UX/scale, raw UTC/internal IDs, existing catalog/active-house/admin-queue pagination, real providers/release. One client rejection completion absent; corroborated by exact existing server log/DB/audit.",
+        "next_action": "Preserve 015 evidence; finish existing catalog paging independently. No passed business replay."
+      },
+      {
+        "id": "RES-BIND-APPLY",
+        "implementation_status": "Four explicit relationship choices; normal TENANT page application",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "d8993fa557ee7683ec7946509b7d7d6ae58b0b22 / bind015-919b885f73ff",
+        "remaining_gap": "Native picker/device, production UX/scale, raw UTC/internal IDs, existing catalog/active-house/admin-queue pagination, real providers/release. One client rejection completion absent; corroborated by exact existing server log/DB/audit.",
+        "next_action": "Preserve 015 evidence; finish existing catalog paging independently. No passed business replay."
+      },
+      {
+        "id": "MGR-BIND-REJECT",
+        "implementation_status": "Manager enters real rejection reason; resident sees reason and may reapply",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "d8993fa557ee7683ec7946509b7d7d6ae58b0b22 / bind015-919b885f73ff",
+        "remaining_gap": "Native picker/device, production UX/scale, raw UTC/internal IDs, existing catalog/active-house/admin-queue pagination, real providers/release. One client rejection completion absent; corroborated by exact existing server log/DB/audit.",
+        "next_action": "Preserve 015 evidence; finish existing catalog paging independently. No passed business replay."
+      },
+      {
+        "id": "RES-AFTER-APPROVE",
+        "implementation_status": "TENANT relation persists through refresh/relogin; old rejected request retained",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "d8993fa557ee7683ec7946509b7d7d6ae58b0b22 / bind015-919b885f73ff",
+        "remaining_gap": "Native picker/device, production UX/scale, raw UTC/internal IDs, existing catalog/active-house/admin-queue pagination, real providers/release. One client rejection completion absent; corroborated by exact existing server log/DB/audit.",
+        "next_action": "Preserve 015 evidence; finish existing catalog paging independently. No passed business replay."
+      }
+    ],
+    "next_slice": {
+      "task_id": "HOUSE-CATALOG-PAGING-016",
+      "scope": "Complete first-page-only existing authenticated address catalog, active-house and pending-review list retrieval using existing cursors; no new business rule/schema."
+    }
+  },
+  "auth_failure_policy_20260923": {
+    "task_id": "AUTH-FAILURE-POLICY-20260923",
+    "owner_decision": "不锁定",
+    "supersedes": "Original SMS/password failure-count phone/IP lockout. Proposed15-minute5/30-failure locks not approved.",
+    "retained": "OTP expiry/one-use/attempt ceiling, challenge, SMS frequency, existing total rate limits, sessions and audit; no release approval",
+    "current_status_overlays": [
+      {
+        "id": "V1-AUTH-LOCKOUT",
+        "implementation_status": "Owner on 2026-09-23 explicitly superseded failure-lockout requirement: no cumulative-failure phone/IP locking; existing challenge/OTP/send-frequency/total-rate protections retained",
+        "verification_status": "OWNER_APPROVED_REQUIREMENT_CHANGE_NOT_TEST_PASS",
+        "evidence_version": "2026-09-23 current conversation owner decision: 不锁定",
+        "remaining_gap": "Production security/abuse acceptance remains; do not weaken retained protections or change merge/recovery/session policy.",
+        "next_action": "Do not implement proposed failure locks. Preserve original ID/history and maintain remaining authentication protections."
+      }
+    ]
+  },
   "current_effective_view": {
     "generated_at": "2026-09-23",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
     "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs), then notification_events_inbox_013.current_status_overlays (2 IDs)",
-    "latest_overlay_source": "wo_reopen_receipt_history_014.current_status_overlays (2 existing IDs), applied after overlay_source",
+    "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced. Old AUTH001 objects were lost on the 2026-09-23 tmpfs stop; historical evidence remains version-bound, not current-object proof.",
     "row_count": 83,
     "rows": [
@@ -1960,19 +2030,19 @@
       },
       {
         "requirement_id": "RES-HOUSE-CASCADE",
-        "current_implementation": "已实现可测试",
-        "verification_mode_status": "UI:PASS",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
-        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+        "current_implementation": "Address selection clears descendants and ignores stale replies; existing catalog API reused",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "d8993fa557ee7683ec7946509b7d7d6ae58b0b22 / bind015-919b885f73ff",
+        "remaining_gap": "Native picker/device, production UX/scale, raw UTC/internal IDs, existing catalog/active-house/admin-queue pagination, real providers/release. One client rejection completion absent; corroborated by exact existing server log/DB/audit.",
+        "next_action": "Preserve 015 evidence; finish existing catalog paging independently. No passed business replay."
       },
       {
         "requirement_id": "RES-BIND-APPLY",
-        "current_implementation": "已实现可测试",
-        "verification_mode_status": "UI:PASS",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
-        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+        "current_implementation": "Four explicit relationship choices; normal TENANT page application",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "d8993fa557ee7683ec7946509b7d7d6ae58b0b22 / bind015-919b885f73ff",
+        "remaining_gap": "Native picker/device, production UX/scale, raw UTC/internal IDs, existing catalog/active-house/admin-queue pagination, real providers/release. One client rejection completion absent; corroborated by exact existing server log/DB/audit.",
+        "next_action": "Preserve 015 evidence; finish existing catalog paging independently. No passed business replay."
       },
       {
         "requirement_id": "MGR-TENANT-HOME",
@@ -2000,19 +2070,19 @@
       },
       {
         "requirement_id": "MGR-BIND-REJECT",
-        "current_implementation": "已实现可测试",
-        "verification_mode_status": "UI:PASS",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
-        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+        "current_implementation": "Manager enters real rejection reason; resident sees reason and may reapply",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "d8993fa557ee7683ec7946509b7d7d6ae58b0b22 / bind015-919b885f73ff",
+        "remaining_gap": "Native picker/device, production UX/scale, raw UTC/internal IDs, existing catalog/active-house/admin-queue pagination, real providers/release. One client rejection completion absent; corroborated by exact existing server log/DB/audit.",
+        "next_action": "Preserve 015 evidence; finish existing catalog paging independently. No passed business replay."
       },
       {
         "requirement_id": "RES-AFTER-APPROVE",
-        "current_implementation": "已实现可测试",
-        "verification_mode_status": "UI:PASS",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "已保存范围内无新增缺口；不等于Production V1通过",
-        "next_action": "无相关改动时保留证据；相关改动后专项回归"
+        "current_implementation": "TENANT relation persists through refresh/relogin; old rejected request retained",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
+        "evidence_version": "d8993fa557ee7683ec7946509b7d7d6ae58b0b22 / bind015-919b885f73ff",
+        "remaining_gap": "Native picker/device, production UX/scale, raw UTC/internal IDs, existing catalog/active-house/admin-queue pagination, real providers/release. One client rejection completion absent; corroborated by exact existing server log/DB/audit.",
+        "next_action": "Preserve 015 evidence; finish existing catalog paging independently. No passed business replay."
       },
       {
         "requirement_id": "STAFF-CLAIM",
@@ -2480,11 +2550,11 @@
       },
       {
         "requirement_id": "V1-AUTH-LOCKOUT",
-        "current_implementation": "不属于小程序页面、应单独后端验证",
-        "verification_mode_status": "API:NOT_IMPLEMENTED",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "密码/验证码失败计数与锁定窗口",
-        "next_action": "按依赖顺序实施，保留本ID在分母中"
+        "current_implementation": "Owner on 2026-09-23 explicitly superseded failure-lockout requirement: no cumulative-failure phone/IP locking; existing challenge/OTP/send-frequency/total-rate protections retained",
+        "verification_mode_status": "OWNER_APPROVED_REQUIREMENT_CHANGE_NOT_TEST_PASS",
+        "evidence_version": "2026-09-23 current conversation owner decision: 不锁定",
+        "remaining_gap": "Production security/abuse acceptance remains; do not weaken retained protections or change merge/recovery/session policy.",
+        "next_action": "Do not implement proposed failure locks. Preserve original ID/history and maintain remaining authentication protections."
       },
       {
         "requirement_id": "V1-EMBEDDING-RAG",

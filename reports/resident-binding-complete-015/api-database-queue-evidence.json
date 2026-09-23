@@ -1,0 +1,453 @@
+{
+  "task_id": "RESIDENT-BINDING-COMPLETE-015",
+  "run_id": "bind015-919b885f73ff",
+  "code_sha": "d8993fa557ee7683ec7946509b7d7d6ae58b0b22",
+  "steps": {
+    "invalid-relation": {
+      "status": 422,
+      "error": {
+        "code": "SYS.VALIDATION_ERROR",
+        "message": "Request validation failed",
+        "details": {
+          "errors": [
+            {
+              "type": "enum",
+              "location": [
+                "body",
+                "relation_type"
+              ],
+              "message": "Input should be 'OWNER', 'TENANT', 'FAMILY' or 'AUTHORIZED_OTHER'"
+            }
+          ]
+        }
+      },
+      "data": null
+    },
+    "forged-user": {
+      "status": 422,
+      "error": {
+        "code": "SYS.VALIDATION_ERROR",
+        "message": "Request validation failed",
+        "details": {
+          "errors": [
+            {
+              "type": "extra_forbidden",
+              "location": [
+                "body",
+                "user_id"
+              ],
+              "message": "Extra inputs are not permitted"
+            }
+          ]
+        }
+      },
+      "data": null
+    },
+    "false-scope": {
+      "status": 422,
+      "error": {
+        "code": "RES.INVALID_INPUT",
+        "message": "House does not match the claimed property scope",
+        "details": {}
+      },
+      "data": null
+    },
+    "duplicate-active": {
+      "status": 409,
+      "error": {
+        "code": "RES.DUPLICATE_ACTIVE_RELATION",
+        "message": "An active house relation already exists",
+        "details": {}
+      },
+      "data": null
+    },
+    "concurrent-apply": [
+      {
+        "status": 409,
+        "error": {
+          "code": "RES.DUPLICATE_PENDING",
+          "message": "A pending bind request already exists",
+          "details": {}
+        },
+        "data": null
+      },
+      {
+        "status": 200,
+        "error": null,
+        "data": {
+          "id": 5,
+          "user_id": 9,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 2,
+          "relation_type": "FAMILY",
+          "status": "PENDING",
+          "reviewer_id": null,
+          "review_reason": null,
+          "requested_at": "2026-09-23T02:54:08.350941Z",
+          "reviewed_at": null
+        }
+      }
+    ],
+    "duplicate-pending-other-type": {
+      "status": 409,
+      "error": {
+        "code": "RES.DUPLICATE_PENDING",
+        "message": "A pending bind request already exists",
+        "details": {}
+      },
+      "data": null
+    },
+    "resident-cannot-approve": {
+      "status": 403,
+      "error": {
+        "code": "IAM.FORBIDDEN",
+        "message": "Permission denied",
+        "details": {}
+      },
+      "data": null
+    },
+    "resident-cannot-reject": {
+      "status": 403,
+      "error": {
+        "code": "IAM.FORBIDDEN",
+        "message": "Permission denied",
+        "details": {}
+      },
+      "data": null
+    },
+    "empty-review-reason": {
+      "status": 422,
+      "error": {
+        "code": "RES.INVALID_INPUT",
+        "message": "reason is invalid",
+        "details": {
+          "field": "reason"
+        }
+      },
+      "data": null
+    },
+    "other-history": {
+      "status": 200,
+      "error": null,
+      "data": {
+        "items": [
+          {
+            "id": 5,
+            "user_id": 9,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 2,
+            "relation_type": "FAMILY",
+            "status": "PENDING",
+            "reviewer_id": null,
+            "review_reason": null,
+            "requested_at": "2026-09-23T02:54:08.350941Z",
+            "reviewed_at": null
+          }
+        ],
+        "next_cursor": null
+      }
+    },
+    "finish-negative-fixture": {
+      "status": 200,
+      "error": null,
+      "data": {
+        "id": 5,
+        "user_id": 9,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 2,
+        "relation_type": "FAMILY",
+        "status": "REJECTED",
+        "reviewer_id": 5,
+        "review_reason": "bind015-919b885f73ff API negative fixture complete",
+        "requested_at": "2026-09-23T02:54:08.350941Z",
+        "reviewed_at": "2026-09-23T02:54:08.510925Z"
+      }
+    },
+    "repeat-rejection": {
+      "status": 409,
+      "error": {
+        "code": "RES.ALREADY_PROCESSED",
+        "message": "Bind request has already been processed",
+        "details": {}
+      },
+      "data": null
+    },
+    "repeat-approval": {
+      "status": 409,
+      "error": {
+        "code": "RES.ALREADY_PROCESSED",
+        "message": "Bind request has already been processed",
+        "details": {}
+      },
+      "data": null
+    }
+  },
+  "requests": [
+    {
+      "label": "invalid-relation",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR",
+      "request_id_hash": "b54b31937db6f1f8"
+    },
+    {
+      "label": "forged-user",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR",
+      "request_id_hash": "707f904d49324478"
+    },
+    {
+      "label": "false-scope",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 422,
+      "error_code": "RES.INVALID_INPUT",
+      "request_id_hash": "44072f4109772a2d"
+    },
+    {
+      "label": "duplicate-active",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 409,
+      "error_code": "RES.DUPLICATE_ACTIVE_RELATION",
+      "request_id_hash": "3cad07cc983cb378"
+    },
+    {
+      "label": "before-race",
+      "method": "GET",
+      "path": "/resident-bind-requests/mine",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "669e185c59e88274"
+    },
+    {
+      "label": "concurrent-2",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "3cb003ff1c5996f2"
+    },
+    {
+      "label": "concurrent-1",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 409,
+      "error_code": "RES.DUPLICATE_PENDING",
+      "request_id_hash": "c5aeea2c272f2ab2"
+    },
+    {
+      "label": "duplicate-pending-other-type",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 409,
+      "error_code": "RES.DUPLICATE_PENDING",
+      "request_id_hash": "68aa525ffbd27e47"
+    },
+    {
+      "label": "resident-cannot-approve",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/5/approve",
+      "params": [],
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "a40978fdc0495b9a"
+    },
+    {
+      "label": "resident-cannot-reject",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/5/reject",
+      "params": [],
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "f64d32b6ee99a222"
+    },
+    {
+      "label": "empty-review-reason",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/5/reject",
+      "params": [],
+      "status": 422,
+      "error_code": "RES.INVALID_INPUT",
+      "request_id_hash": "72b6a96144d23e4c"
+    },
+    {
+      "label": "other-history",
+      "method": "GET",
+      "path": "/resident-bind-requests/mine",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "ddcdcfb33bf6e619"
+    },
+    {
+      "label": "finish-negative-fixture",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/5/reject",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "04d25e44368c4037"
+    },
+    {
+      "label": "repeat-rejection",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/5/reject",
+      "params": [],
+      "status": 409,
+      "error_code": "RES.ALREADY_PROCESSED",
+      "request_id_hash": "de70f331290c0e9f"
+    },
+    {
+      "label": "repeat-approval",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/4/approve",
+      "params": [],
+      "status": 409,
+      "error_code": "RES.ALREADY_PROCESSED",
+      "request_id_hash": "9b911b2ee81cbe11"
+    }
+  ],
+  "database": "127.0.0.1:3307/property_ai_auth001_test",
+  "mode": "Authenticated API negative cases, not UI; SELECT-only SQL; unique queue metadata, no message content.",
+  "revision": "20260919_0009",
+  "persisted": {
+    "requests": [
+      {
+        "id": 3,
+        "user_id": 8,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 2,
+        "relation_type": "TENANT",
+        "status": "REJECTED",
+        "reviewer_id": 5,
+        "review_reason": "bind015-919b885f73ff 请补充租赁授权证明后重新申请",
+        "requested_at": "2026-09-23 02:48:33.270997",
+        "reviewed_at": "2026-09-23 02:50:27.754073"
+      },
+      {
+        "id": 4,
+        "user_id": 8,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 2,
+        "relation_type": "TENANT",
+        "status": "APPROVED",
+        "reviewer_id": 5,
+        "review_reason": null,
+        "requested_at": "2026-09-23 02:51:43.585542",
+        "reviewed_at": "2026-09-23 02:51:57.856704"
+      },
+      {
+        "id": 5,
+        "user_id": 9,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 2,
+        "relation_type": "FAMILY",
+        "status": "REJECTED",
+        "reviewer_id": 5,
+        "review_reason": "bind015-919b885f73ff API negative fixture complete",
+        "requested_at": "2026-09-23 02:54:08.350941",
+        "reviewed_at": "2026-09-23 02:54:08.510925"
+      }
+    ],
+    "relations": [
+      {
+        "id": 3,
+        "user_id": 8,
+        "house_id": 2,
+        "relation_type": "TENANT",
+        "status": "ACTIVE",
+        "bind_request_id": 4,
+        "valid_from": "2026-09-23 02:51:57.856704",
+        "valid_to": null
+      }
+    ],
+    "audits": [
+      {
+        "id": 87,
+        "actor_user_id": 8,
+        "action": "RESIDENT_BIND_REQUEST_CREATED",
+        "resource_type": "RESIDENT_BIND_REQUEST",
+        "resource_id": 3,
+        "tenant_id": 1,
+        "property_id": 1,
+        "created_at": "2026-09-23 02:48:33.275388"
+      },
+      {
+        "id": 89,
+        "actor_user_id": 5,
+        "action": "RESIDENT_BIND_REQUEST_REJECTED",
+        "resource_type": "RESIDENT_BIND_REQUEST",
+        "resource_id": 3,
+        "tenant_id": 1,
+        "property_id": 1,
+        "created_at": "2026-09-23 02:50:27.754576"
+      },
+      {
+        "id": 91,
+        "actor_user_id": 8,
+        "action": "RESIDENT_BIND_REQUEST_CREATED",
+        "resource_type": "RESIDENT_BIND_REQUEST",
+        "resource_id": 4,
+        "tenant_id": 1,
+        "property_id": 1,
+        "created_at": "2026-09-23 02:51:43.588661"
+      },
+      {
+        "id": 93,
+        "actor_user_id": 5,
+        "action": "RESIDENT_BIND_REQUEST_APPROVED",
+        "resource_type": "RESIDENT_BIND_REQUEST",
+        "resource_id": 4,
+        "tenant_id": 1,
+        "property_id": 1,
+        "created_at": "2026-09-23 02:51:57.868388"
+      },
+      {
+        "id": 96,
+        "actor_user_id": 9,
+        "action": "RESIDENT_BIND_REQUEST_CREATED",
+        "resource_type": "RESIDENT_BIND_REQUEST",
+        "resource_id": 5,
+        "tenant_id": 1,
+        "property_id": 1,
+        "created_at": "2026-09-23 02:54:08.355118"
+      },
+      {
+        "id": 97,
+        "actor_user_id": 5,
+        "action": "RESIDENT_BIND_REQUEST_REJECTED",
+        "resource_type": "RESIDENT_BIND_REQUEST",
+        "resource_id": 5,
+        "tenant_id": 1,
+        "property_id": 1,
+        "created_at": "2026-09-23 02:54:08.511440"
+      }
+    ]
+  },
+  "queue": {
+    "vhost": "property_ai_auth001",
+    "actual_output": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nproperty_ai.auth001.dlq\t2\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1\nceleryev.a0f6731e-e837-40b3-8bf2-6a14c3f0bd01\t0\t0\t1\n",
+    "message_content_read": false,
+    "shared_vhost_accessed": false
+  },
+  "collected_at_utc": "2026-09-23T02:54:09.277985+00:00",
+  "status": "API_DB_PASS_PENDING_INDEPENDENT_REVIEW"
+}

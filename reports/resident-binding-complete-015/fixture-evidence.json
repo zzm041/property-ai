@@ -1,0 +1,249 @@
+{
+  "task_id": "RESIDENT-BINDING-COMPLETE-015",
+  "run_id": "bind015-919b885f73ff",
+  "base_sha": "0726d89203343a318a41e5f88c42eec316161d37",
+  "database": "127.0.0.1:3307/property_ai_auth001_test",
+  "revision": "20260919_0009",
+  "mode": "Normal SMS API authentication and authorized manager house API. Reuses the newly restored 014 organization, not lost historical objects. No direct SQL mutation.",
+  "identities": {
+    "resident": {
+      "user_id": 8,
+      "roles": [],
+      "scopes": []
+    },
+    "other": {
+      "user_id": 9,
+      "roles": [],
+      "scopes": []
+    },
+    "manager": {
+      "user_id": 5,
+      "roles": [
+        "TENANT_ADMIN"
+      ],
+      "scopes": [
+        {
+          "role_code": "TENANT_ADMIN",
+          "scope_type": "TENANT",
+          "tenant_id": 1,
+          "property_id": null,
+          "permissions": [
+            "ai_analysis:read",
+            "ai_analysis:review",
+            "announcement:draft",
+            "announcement:publish",
+            "announcement:read",
+            "attendance:check_in",
+            "attendance:check_out",
+            "attendance:read",
+            "audit:read",
+            "dispatch_recommendation:read",
+            "employee:manage",
+            "employee:read",
+            "incident:manage",
+            "incident:read",
+            "knowledge:manage",
+            "knowledge:read",
+            "property:manage",
+            "property:read",
+            "resident_binding:read",
+            "resident_binding:review",
+            "resident_relation:read",
+            "role:manage",
+            "role:read",
+            "sla:manage",
+            "stats:read",
+            "work_order:cancel",
+            "work_order:decide",
+            "work_order:dispatch",
+            "work_order:process",
+            "work_order:read",
+            "work_order:resolve"
+          ]
+        }
+      ]
+    }
+  },
+  "house": {
+    "id": 2,
+    "tenant_id": 1,
+    "property_id": 1,
+    "unit_id": 1,
+    "room_no": "015-5f73ff",
+    "floor": 1,
+    "status": "ACTIVE"
+  },
+  "requests": [
+    {
+      "label": "login-resident-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d8155874bb09b641"
+    },
+    {
+      "label": "login-resident-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "91d617978283a300"
+    },
+    {
+      "label": "login-resident-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2f24384945360b03"
+    },
+    {
+      "label": "login-resident-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "56d2da0ef17eaa13"
+    },
+    {
+      "label": "verify-resident",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9ed93c295a7392e9"
+    },
+    {
+      "label": "profile-resident",
+      "method": "PATCH",
+      "path": "/me/profile",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "8c76064a728c572a"
+    },
+    {
+      "label": "login-other-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "fb8a8018b35475db"
+    },
+    {
+      "label": "login-other-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c690d7f8aa0da86a"
+    },
+    {
+      "label": "login-other-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "55f951c770ae5c7b"
+    },
+    {
+      "label": "login-other-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c2a88285e0bee66a"
+    },
+    {
+      "label": "verify-other",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6d55db19553c2617"
+    },
+    {
+      "label": "profile-other",
+      "method": "PATCH",
+      "path": "/me/profile",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "100f49b01071bcf2"
+    },
+    {
+      "label": "login-manager-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "482765e316bedac8"
+    },
+    {
+      "label": "login-manager-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9bccfac0baca7217"
+    },
+    {
+      "label": "login-manager-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "780e5087ec65af82"
+    },
+    {
+      "label": "login-manager-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "be2c04a3f379d925"
+    },
+    {
+      "label": "verify-manager",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "db6e482ff044befb"
+    },
+    {
+      "label": "unit-check",
+      "method": "GET",
+      "path": "/buildings/1/units",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c6431fb8e5410bc7"
+    },
+    {
+      "label": "house-create",
+      "method": "POST",
+      "path": "/admin/houses",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "ef83b54004c26b41"
+    }
+  ]
+}

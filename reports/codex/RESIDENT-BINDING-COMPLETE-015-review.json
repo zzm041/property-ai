@@ -1,0 +1,117 @@
+{
+  "task_id": "RESIDENT-BINDING-COMPLETE-015",
+  "phase": "review",
+  "reviewed_head": "d8993fa557ee7683ec7946509b7d7d6ae58b0b22",
+  "decision": "PASS",
+  "actions_or_findings": [
+    {
+      "title": "BIND015-C1 VERIFIED：四类关系与提交守卫",
+      "path": "miniprogram/pages/houses/houses.js:1",
+      "trigger": "住户选择房屋关系、切换地址，或在请求尚未结束时重复提交。",
+      "rationale": "对比基线0726d892的5文件diff并检查调用上下文：OWNER/TENANT/FAMILY/AUTHORIZED_OTHER映射既有API；未选择关系不默认为OWNER；地址切换立即清空下级房屋，版本标记阻止旧响应覆盖新选择，提交守卫持续到列表刷新完成。保存的42项专项结果包含四类payload映射、三级响应竞争、旧错误、空目录、卸载和重复提交。没有发现本轮CURRENT_TASK_BLOCKER。"
+    },
+    {
+      "title": "BIND015-C2 VERIFIED：驳回、重新申请及关系持久化",
+      "path": "reports/resident-binding-complete-015/page-evidence.json",
+      "trigger": "正常住户提出TENANT申请，管理人员填写真实驳回理由，再经住户重新申请、批准、刷新及重新登录。",
+      "rationale": "已实际打开全部9张PNG，并读取页面状态、实际请求及SQL/审计证据。run bind015-919b885f73ff中，住户8为房屋2创建申请3，管理员5驳回；申请3的具体原因在居民页面可见。重新申请产生独立申请4，批准形成relation3/TENANT/ACTIVE；刷新和正常重登后仍保留原申请3及理由。管理账号为TENANT_ADMIN而非SYSTEM；空驳回原因在页面明确被拒绝。"
+    },
+    {
+      "title": "BIND015-C3 VERIFIED：复用服务规则及负向证据",
+      "path": "backend/app/service/resident.py",
+      "trigger": "非法关系、伪造用户或scope、已有有效关系、并发申请、无权审批、重复审批与跨用户历史查询。",
+      "rationale": "实际读取既有API/schema/Service/Repository：认证身份决定申请人，房屋决定真实scope，审批按目标资源重新授权，事务与审计留在Service。API证据记录非法关系/伪造用户/错误scope的422、有效关系及重复申请的409、住户审批403、其他用户/mine不返回申请3/4。Barrier并发产生一200一409及唯一申请5；重复审批409。只读SQL显示房屋2恰有3条申请、1条有效关系、6条匹配操作者的审计，无覆盖历史或SQL改状态证据。"
+    },
+    {
+      "title": "BIND015-N1 NON_BLOCKING：一次客户端完成事件未保存",
+      "path": "reports/resident-binding-complete-015/rejection-server-log.json",
+      "trigger": "首次成功驳回后，采集器过早读到旧的空理由错误并断开，未保存申请3驳回的wx.request completion。",
+      "rationale": "不能声称所有页面写入都有完整客户端完成行。已核对原API日志490–491行：同一路由、同一request_id在02:50:27Z完成200，与DB审核时间、操作者及居民页面理由一致。补证明确标记为服务器来源，未冒充客户端事件，未重放业务。review.md及page-evidence.last_error保留了中断事实；足以接受本轮闭环，采集缺口继续明示。"
+    },
+    {
+      "title": "BIND015-N2 NON_BLOCKING：完成后的跟踪更新",
+      "path": "reports/project-handoff.md; reports/mp-current-full-regression/coverage-matrix.json",
+      "trigger": "本独立复审结果保存后。",
+      "rationale": "审查时交接仍将015标为进行中，矩阵四项当前视图仍引用旧版本。主会话应保存本JSON并只更新RES-HOUSE-CASCADE、RES-BIND-APPLY、MGR-BIND-REJECT、RES-AFTER-APPROVE对应当前overlay，保留原83项和历史结果。不得把本次非OWNER闭环升级为全部正式房屋选择体验或Production V1完成。"
+    },
+    {
+      "title": "BIND015-N3 NON_BLOCKING：正式展示与规模边界保留",
+      "path": "miniprogram/pages/houses/houses.wxml; miniprogram/pages/supervisor/bindings.wxml; miniprogram/services/api.js",
+      "trigger": "正式用户阅读原始UTC/内部编号，或目录、有效房屋及管理审核队列超过现有单页容量。",
+      "rationale": "截图仍显示原始UTC、内部房屋编号和部分英文状态；既有目录、有效房屋及管理队列分页能力未由本轮补全。这些是已识别正式UX/规模缺口，不是015新增阻塞；应继续保留，不通过本次scoped PASS消除。"
+    },
+    {
+      "title": "BIND015-R1 RELEASE_BLOCKER：真实环境与完整V1尚未验收",
+      "path": "reports/resident-binding-complete-015/review.md; reports/project-handoff.md",
+      "trigger": "将本轮本地Development结果用于真实身份、真机、模型或正式发布结论。",
+      "rationale": "本轮使用正常认证链和Development短信，后端仍为已核对的65f20c5运行源码；015只改变前端及测试。证据对应AUTH001@0009及独占vhost/queue，主队列0 ready/0 unacked/1 consumer，历史DLQ2未触碰。真实短信/微信、bge-m3/Qwen、production RAG、安全/规模/部署及其他V1发布缺口保持开放；0010仍未获批。"
+    }
+  ],
+  "evidence_paths": [
+    "AGENTS.md",
+    ".cursor/rules/project.mdc",
+    "docs/01-PRD.md",
+    "docs/02-ROLES-PERMISSIONS.md",
+    "docs/06-API-CONTRACT.md",
+    "docs/07-SECURITY-PRIVACY.md",
+    "miniprogram/pages/houses/houses.js",
+    "miniprogram/pages/houses/houses.wxml",
+    "miniprogram/pages/supervisor/bindings.js",
+    "miniprogram/pages/supervisor/bindings.wxml",
+    "miniprogram/services/api.js",
+    "miniprogram/utils/ui.js",
+    "backend/app/api/v1/resident.py",
+    "backend/app/api/v1/admin_resident.py",
+    "backend/app/schema/resident.py",
+    "backend/app/service/resident.py",
+    "backend/app/repository/resident.py",
+    "backend/app/service/property_catalog.py",
+    "backend/tests/conftest.py",
+    "backend/tests/unit/test_resident_binding_page.py",
+    "backend/tests/unit/test_resident_authorization.py",
+    "reports/resident-binding-complete-015/focused.txt",
+    "reports/resident-binding-complete-015/prepare-fixture.py",
+    "reports/resident-binding-complete-015/run-page-evidence.js",
+    "reports/resident-binding-complete-015/verify-api-db.py",
+    "reports/resident-binding-complete-015/fixture-evidence.json",
+    "reports/resident-binding-complete-015/page-evidence.json",
+    "reports/resident-binding-complete-015/api-database-queue-evidence.json",
+    "reports/resident-binding-complete-015/runtime-environment.json",
+    "reports/resident-binding-complete-015/rejection-server-log.json",
+    "reports/resident-binding-complete-015/review.md",
+    "reports/resident-binding-complete-015/00-relationship-selection.png",
+    "reports/resident-binding-complete-015/01-tenant-pending.png",
+    "reports/resident-binding-complete-015/02-empty-review-reason.png",
+    "reports/resident-binding-complete-015/03-manager-rejected.png",
+    "reports/resident-binding-complete-015/04-resident-rejection-reason.png",
+    "reports/resident-binding-complete-015/05-reapplication-pending.png",
+    "reports/resident-binding-complete-015/06-manager-approved.png",
+    "reports/resident-binding-complete-015/07-active-relation-refresh.png",
+    "reports/resident-binding-complete-015/08-active-relation-relogin.png",
+    "tmp/auth001-runtime/api-65f20c5-wo014.stdout.log:490",
+    "tmp/auth001-runtime/worker-65f20c5-wo014.stdout.log:1",
+    "reports/project-handoff.md",
+    "reports/mp-current-full-regression/coverage-matrix.json",
+    "reports/codex/review-schema.json"
+  ],
+  "unverified": [
+    "本复审会话没有运行测试、操作页面、发出业务请求或访问数据库/队列；测试和运行结论来自已保存证据的独立核对，而非独立重跑。",
+    "实际持久化UI闭环使用TENANT；四类关系的请求映射有单元覆盖，FAMILY另有API并发证据，未声称四类都完成独立完整页面审批流程。",
+    "Picker使用实际元素的automator change事件，不是原生滚轮或真机操作验收。",
+    "三级地址乱序、旧错误和卸载路径为页面handler模拟测试，未声称在真实网络中逐项制造乱序。",
+    "首次成功驳回缺少客户端completion，已用同一既有服务器日志、DB审计及页面结果补充，仍保留该证据限制。",
+    "未新增真实跨tenant/property管理身份组合的运行回归、目录大规模分页验收或性能测试。",
+    "真实外部Provider、真实模型、真机及完整Production V1未验证。"
+  ],
+  "session_note": "独立只读上下文 /root/bind015_independent_review，round-1，基线0726d89203343a318a41e5f88c42eec316161d37至产品d8993fa557ee7683ec7946509b7d7d6ae58b0b22。仅执行文件/Git/哈希读取并用view_image打开9张截图；未写文件、未调用CLI审查wrapper、未创建子审查者、未运行测试或业务。最终核对产品diff未变化。project.config.json实测SHA256仍为342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F。",
+  "task_result": "scoped local DEVELOPMENT PASS，round-1，零产品返修。需求、5文件修改、42 passed保存输出、实际页面/请求、同一业务对象的DB/审计和隔离环境证据相互吻合；无CURRENT_TASK_BLOCKER。不是正式发布或完整V1通过。",
+  "product_gap_changes": [
+    "关闭本轮四类关系页面选择、具体驳回原因展示、合法重新申请及历史保留的接线缺口。",
+    "关闭本轮地址级联旧响应覆盖和提交/审批进行中重复触发的页面守卫缺口。",
+    "RES-HOUSE-CASCADE、RES-BIND-APPLY、MGR-BIND-REJECT、RES-AFTER-APPROVE可增加d8993fa版本的当前有效overlay；不改写旧83项结果。",
+    "正式房屋选择UX/规模、真实Provider/模型、production RAG及所有其他既有发布阻塞保持开放；ACCOUNT-MERGE/0010不因本轮通过而获得批准。"
+  ],
+  "schedule_risk": "本切片没有新增环境、Migration、依赖或费用需求。后续进度仍受真实模型资源、未批准业务政策及生产验收约束；不得用本地Development证据换算完整V1完成度。",
+  "next_action": "主会话原样保存独立review JSON，更新现有handoff和四项current overlay，记录N1证据限制并关闭N2跟踪待更新项；仅提交015产品/脱敏证据/跟踪文件，排除预存配置与私密checkpoint。无需重跑已通过的013、014或015业务，直接选择下一项已批准且不依赖新Migration或外部费用的current-schema缺口。",
+  "approval_requests": []
+}

@@ -1,0 +1,1000 @@
+{
+  "task_id": "RESIDENT-BINDING-COMPLETE-015",
+  "run_id": "bind015-919b885f73ff",
+  "code_sha": "d8993fa557ee7683ec7946509b7d7d6ae58b0b22",
+  "steps": {
+    "00-relationship-selection": {
+      "items": [],
+      "requests": [],
+      "error": "",
+      "selectedHouseId": 2,
+      "relationIndex": 1,
+      "relationNames": [
+        "业主",
+        "租户",
+        "家属",
+        "其他授权住户"
+      ]
+    },
+    "01-tenant-pending": {
+      "items": [],
+      "requests": [
+        {
+          "id": 3,
+          "user_id": 8,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 2,
+          "relation_type": "TENANT",
+          "status": "PENDING",
+          "reviewer_id": null,
+          "review_reason": null,
+          "requested_at": "2026-09-23T02:48:33.270997Z",
+          "reviewed_at": null,
+          "relationLabel": "租户",
+          "statusLabel": "待审核"
+        }
+      ],
+      "error": "",
+      "selectedHouseId": 1,
+      "relationIndex": 1,
+      "relationNames": [
+        "业主",
+        "租户",
+        "家属",
+        "其他授权住户"
+      ]
+    },
+    "02-empty-review-reason": {
+      "items": [
+        {
+          "id": 3,
+          "user_id": 8,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 2,
+          "relation_type": "TENANT",
+          "status": "PENDING",
+          "reviewer_id": null,
+          "review_reason": null,
+          "requested_at": "2026-09-23T02:48:33.270997Z",
+          "reviewed_at": null
+        }
+      ],
+      "error": "请输入1至500字的驳回原因",
+      "rejectReason": "",
+      "propertyId": "1",
+      "tenantId": "1"
+    },
+    "03-manager-rejected": {
+      "items": [],
+      "error": "",
+      "rejectReason": "",
+      "propertyId": "1",
+      "tenantId": "1"
+    },
+    "04-resident-rejection-reason": {
+      "items": [],
+      "requests": [
+        {
+          "id": 3,
+          "user_id": 8,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 2,
+          "relation_type": "TENANT",
+          "status": "REJECTED",
+          "reviewer_id": 5,
+          "review_reason": "bind015-919b885f73ff 请补充租赁授权证明后重新申请",
+          "requested_at": "2026-09-23T02:48:33.270997Z",
+          "reviewed_at": "2026-09-23T02:50:27.754073Z",
+          "relationLabel": "租户",
+          "statusLabel": "已驳回"
+        }
+      ],
+      "error": "",
+      "selectedHouseId": 1,
+      "relationIndex": -1,
+      "relationNames": [
+        "业主",
+        "租户",
+        "家属",
+        "其他授权住户"
+      ]
+    },
+    "05-reapplication-pending": {
+      "items": [],
+      "requests": [
+        {
+          "id": 3,
+          "user_id": 8,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 2,
+          "relation_type": "TENANT",
+          "status": "REJECTED",
+          "reviewer_id": 5,
+          "review_reason": "bind015-919b885f73ff 请补充租赁授权证明后重新申请",
+          "requested_at": "2026-09-23T02:48:33.270997Z",
+          "reviewed_at": "2026-09-23T02:50:27.754073Z",
+          "relationLabel": "租户",
+          "statusLabel": "已驳回"
+        },
+        {
+          "id": 4,
+          "user_id": 8,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 2,
+          "relation_type": "TENANT",
+          "status": "PENDING",
+          "reviewer_id": null,
+          "review_reason": null,
+          "requested_at": "2026-09-23T02:51:43.585542Z",
+          "reviewed_at": null,
+          "relationLabel": "租户",
+          "statusLabel": "待审核"
+        }
+      ],
+      "error": "",
+      "selectedHouseId": 1,
+      "relationIndex": 1,
+      "relationNames": [
+        "业主",
+        "租户",
+        "家属",
+        "其他授权住户"
+      ]
+    },
+    "06-manager-approved": {
+      "items": [],
+      "error": "",
+      "rejectReason": "",
+      "propertyId": "1",
+      "tenantId": "1"
+    },
+    "07-active-relation-refresh": {
+      "items": [
+        {
+          "relation_id": 3,
+          "house_id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "room_no": "015-5f73ff",
+          "relation_type": "TENANT",
+          "status": "ACTIVE",
+          "valid_from": "2026-09-23T02:51:57.856704Z",
+          "valid_to": null,
+          "relationLabel": "租户",
+          "statusLabel": "ACTIVE"
+        }
+      ],
+      "requests": [
+        {
+          "id": 3,
+          "user_id": 8,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 2,
+          "relation_type": "TENANT",
+          "status": "REJECTED",
+          "reviewer_id": 5,
+          "review_reason": "bind015-919b885f73ff 请补充租赁授权证明后重新申请",
+          "requested_at": "2026-09-23T02:48:33.270997Z",
+          "reviewed_at": "2026-09-23T02:50:27.754073Z",
+          "relationLabel": "租户",
+          "statusLabel": "已驳回"
+        },
+        {
+          "id": 4,
+          "user_id": 8,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 2,
+          "relation_type": "TENANT",
+          "status": "APPROVED",
+          "reviewer_id": 5,
+          "review_reason": null,
+          "requested_at": "2026-09-23T02:51:43.585542Z",
+          "reviewed_at": "2026-09-23T02:51:57.856704Z",
+          "relationLabel": "租户",
+          "statusLabel": "已通过"
+        }
+      ],
+      "error": "",
+      "selectedHouseId": 0,
+      "relationIndex": -1,
+      "relationNames": [
+        "业主",
+        "租户",
+        "家属",
+        "其他授权住户"
+      ]
+    },
+    "08-active-relation-relogin": {
+      "items": [
+        {
+          "relation_id": 3,
+          "house_id": 2,
+          "tenant_id": 1,
+          "property_id": 1,
+          "room_no": "015-5f73ff",
+          "relation_type": "TENANT",
+          "status": "ACTIVE",
+          "valid_from": "2026-09-23T02:51:57.856704Z",
+          "valid_to": null,
+          "relationLabel": "租户",
+          "statusLabel": "ACTIVE"
+        }
+      ],
+      "requests": [
+        {
+          "id": 3,
+          "user_id": 8,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 2,
+          "relation_type": "TENANT",
+          "status": "REJECTED",
+          "reviewer_id": 5,
+          "review_reason": "bind015-919b885f73ff 请补充租赁授权证明后重新申请",
+          "requested_at": "2026-09-23T02:48:33.270997Z",
+          "reviewed_at": "2026-09-23T02:50:27.754073Z",
+          "relationLabel": "租户",
+          "statusLabel": "已驳回"
+        },
+        {
+          "id": 4,
+          "user_id": 8,
+          "tenant_id": 1,
+          "property_id": 1,
+          "house_id": 2,
+          "relation_type": "TENANT",
+          "status": "APPROVED",
+          "reviewer_id": 5,
+          "review_reason": null,
+          "requested_at": "2026-09-23T02:51:43.585542Z",
+          "reviewed_at": "2026-09-23T02:51:57.856704Z",
+          "relationLabel": "租户",
+          "statusLabel": "已通过"
+        }
+      ],
+      "error": "",
+      "selectedHouseId": 1,
+      "relationIndex": -1,
+      "relationNames": [
+        "业主",
+        "租户",
+        "家属",
+        "其他授权住户"
+      ]
+    }
+  },
+  "requests": [
+    {
+      "path": "/resident-bind-requests/mine?limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "a10b49a4326c4704a4a6e83a67fb8056",
+      "response": {
+        "items": [],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T02:46:35.302Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/me/houses",
+      "method": "GET",
+      "status": 200,
+      "request_id": "dd8ec3222a3540258847ac3e07e83226",
+      "received_at_utc": "2026-09-23T02:46:35.304Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/properties?limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "db7220850b8042dd9c6faa9b143e7094",
+      "received_at_utc": "2026-09-23T02:46:35.320Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/properties/1/buildings",
+      "method": "GET",
+      "status": 200,
+      "request_id": "5c6b55c8b6f841cfb73a50566942d7d6",
+      "received_at_utc": "2026-09-23T02:46:35.362Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/buildings/1/units",
+      "method": "GET",
+      "status": 200,
+      "request_id": "d32591743c8a40c1b8307e1bb3325546",
+      "received_at_utc": "2026-09-23T02:46:35.399Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/units/1/houses",
+      "method": "GET",
+      "status": 200,
+      "request_id": "9d38c2ed075649faa8fda4d6a0cd3386",
+      "received_at_utc": "2026-09-23T02:46:35.438Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/resident-bind-requests/mine?limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "2196f4ccf3e544c38a3c1a36399c3979",
+      "response": {
+        "items": [],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T02:48:22.538Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/me/houses",
+      "method": "GET",
+      "status": 200,
+      "request_id": "6f1febe13fc3469eb052449671db6dda",
+      "received_at_utc": "2026-09-23T02:48:22.539Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/properties?limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "5b073ee1621d44b098254ce69b10a2c1",
+      "received_at_utc": "2026-09-23T02:48:22.542Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/properties/1/buildings",
+      "method": "GET",
+      "status": 200,
+      "request_id": "a8961ac473d248f88331caafdc38b250",
+      "received_at_utc": "2026-09-23T02:48:22.574Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/buildings/1/units",
+      "method": "GET",
+      "status": 200,
+      "request_id": "c494c534a73047abb475d4b38abe64ee",
+      "received_at_utc": "2026-09-23T02:48:22.610Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/units/1/houses",
+      "method": "GET",
+      "status": 200,
+      "request_id": "d905b962bc614d9c9897ff029b711f3a",
+      "received_at_utc": "2026-09-23T02:48:22.642Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/resident-bind-requests",
+      "method": "POST",
+      "status": 200,
+      "request_id": "d1f97ef55f21431e8ba39b9215da32da",
+      "request": {
+        "house_id": 2,
+        "relation_type": "TENANT"
+      },
+      "response": {
+        "id": 3,
+        "user_id": 8,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 2,
+        "relation_type": "TENANT",
+        "status": "PENDING",
+        "reviewer_id": null,
+        "review_reason": null,
+        "requested_at": "2026-09-23T02:48:33.270997Z",
+        "reviewed_at": null
+      },
+      "received_at_utc": "2026-09-23T02:48:33.283Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/properties?limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "08c18f15828544c08e46758d670a9368",
+      "received_at_utc": "2026-09-23T02:48:33.309Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/resident-bind-requests/mine?limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "08ccfb128abe43c8a7237ff84ee0f7b0",
+      "response": {
+        "items": [
+          {
+            "id": 3,
+            "user_id": 8,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 2,
+            "relation_type": "TENANT",
+            "status": "PENDING",
+            "reviewer_id": null,
+            "review_reason": null,
+            "requested_at": "2026-09-23T02:48:33.270997Z",
+            "reviewed_at": null
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T02:48:33.311Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/me/houses",
+      "method": "GET",
+      "status": 200,
+      "request_id": "e555bb7277be494b84a1025f37083fa4",
+      "received_at_utc": "2026-09-23T02:48:33.311Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/properties/1/buildings",
+      "method": "GET",
+      "status": 200,
+      "request_id": "b2ec69982fb24f58867dbe3b0c0be8a5",
+      "received_at_utc": "2026-09-23T02:48:33.332Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/buildings/1/units",
+      "method": "GET",
+      "status": 200,
+      "request_id": "571c663033614c3d999db4472096721e",
+      "received_at_utc": "2026-09-23T02:48:33.363Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/units/1/houses",
+      "method": "GET",
+      "status": 200,
+      "request_id": "369bec412eb449d6a2fb031cd0070d7a",
+      "received_at_utc": "2026-09-23T02:48:33.392Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/properties?limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "64ceee3e98cf4ade9c1bcee420cc4397",
+      "received_at_utc": "2026-09-23T02:48:45.325Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/admin/resident-bind-requests?property_id=1&tenant_id=1",
+      "method": "GET",
+      "status": 200,
+      "request_id": "715b1447e47d4918826dfe3016f9b617",
+      "response": {
+        "items": [
+          {
+            "id": 3,
+            "user_id": 8,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 2,
+            "relation_type": "TENANT",
+            "status": "PENDING",
+            "reviewer_id": null,
+            "review_reason": null,
+            "requested_at": "2026-09-23T02:48:33.270997Z",
+            "reviewed_at": null
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T02:48:46.257Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/resident-bind-requests/mine?limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "7934d83c2d6546959f34b69d2fbf1832",
+      "response": {
+        "items": [
+          {
+            "id": 3,
+            "user_id": 8,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 2,
+            "relation_type": "TENANT",
+            "status": "REJECTED",
+            "reviewer_id": 5,
+            "review_reason": "bind015-919b885f73ff 请补充租赁授权证明后重新申请",
+            "requested_at": "2026-09-23T02:48:33.270997Z",
+            "reviewed_at": "2026-09-23T02:50:27.754073Z"
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T02:51:21.921Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/me/houses",
+      "method": "GET",
+      "status": 200,
+      "request_id": "a008f7eb77b54e088e6786b44c3b86d2",
+      "received_at_utc": "2026-09-23T02:51:21.922Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/properties?limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "f1b1224943064390a6a9a09de70dc15f",
+      "received_at_utc": "2026-09-23T02:51:21.923Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/properties/1/buildings",
+      "method": "GET",
+      "status": 200,
+      "request_id": "1c49640984244b8a9d8a89c0218b1e3f",
+      "received_at_utc": "2026-09-23T02:51:21.957Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/buildings/1/units",
+      "method": "GET",
+      "status": 200,
+      "request_id": "a6513304f9c04806b955d7f7885ac467",
+      "received_at_utc": "2026-09-23T02:51:21.991Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/units/1/houses",
+      "method": "GET",
+      "status": 200,
+      "request_id": "d782d528112d489186327d45cb38f873",
+      "received_at_utc": "2026-09-23T02:51:22.032Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/resident-bind-requests",
+      "method": "POST",
+      "status": 200,
+      "request_id": "d7205e7e84da4e049ef7b6e755cabcf4",
+      "request": {
+        "house_id": 2,
+        "relation_type": "TENANT"
+      },
+      "response": {
+        "id": 4,
+        "user_id": 8,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 2,
+        "relation_type": "TENANT",
+        "status": "PENDING",
+        "reviewer_id": null,
+        "review_reason": null,
+        "requested_at": "2026-09-23T02:51:43.585542Z",
+        "reviewed_at": null
+      },
+      "received_at_utc": "2026-09-23T02:51:43.596Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/resident-bind-requests/mine?limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "d03c0eabe3a547f1b83abd75b4bc6b9b",
+      "response": {
+        "items": [
+          {
+            "id": 3,
+            "user_id": 8,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 2,
+            "relation_type": "TENANT",
+            "status": "REJECTED",
+            "reviewer_id": 5,
+            "review_reason": "bind015-919b885f73ff 请补充租赁授权证明后重新申请",
+            "requested_at": "2026-09-23T02:48:33.270997Z",
+            "reviewed_at": "2026-09-23T02:50:27.754073Z"
+          },
+          {
+            "id": 4,
+            "user_id": 8,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 2,
+            "relation_type": "TENANT",
+            "status": "PENDING",
+            "reviewer_id": null,
+            "review_reason": null,
+            "requested_at": "2026-09-23T02:51:43.585542Z",
+            "reviewed_at": null
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T02:51:43.620Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/me/houses",
+      "method": "GET",
+      "status": 200,
+      "request_id": "7a5826f0bc094a859acf7a7d932f926e",
+      "received_at_utc": "2026-09-23T02:51:43.621Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/properties?limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "8be7cfbde5cd4c168f029e873e6dbdb2",
+      "received_at_utc": "2026-09-23T02:51:43.622Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/properties/1/buildings",
+      "method": "GET",
+      "status": 200,
+      "request_id": "0a906fd2ab084c8397b9086d2900ae8b",
+      "received_at_utc": "2026-09-23T02:51:43.642Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/buildings/1/units",
+      "method": "GET",
+      "status": 200,
+      "request_id": "c3babaede6344bb4b54ab9363d46db17",
+      "received_at_utc": "2026-09-23T02:51:43.664Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/units/1/houses",
+      "method": "GET",
+      "status": 200,
+      "request_id": "8beef2be03564a45bb7ae27eb3a62c3a",
+      "received_at_utc": "2026-09-23T02:51:43.686Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/properties?limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "41d678b83cd24193b3219ea400f99d2c",
+      "received_at_utc": "2026-09-23T02:51:56.717Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/admin/resident-bind-requests?property_id=1&tenant_id=1",
+      "method": "GET",
+      "status": 200,
+      "request_id": "2adb0ea785424c719bcc2ded8b491f99",
+      "response": {
+        "items": [
+          {
+            "id": 4,
+            "user_id": 8,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 2,
+            "relation_type": "TENANT",
+            "status": "PENDING",
+            "reviewer_id": null,
+            "review_reason": null,
+            "requested_at": "2026-09-23T02:51:43.585542Z",
+            "reviewed_at": null
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T02:51:57.677Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/admin/resident-bind-requests/4/approve",
+      "method": "POST",
+      "status": 200,
+      "request_id": "755d8de4ebab4fc286dabf512b0343a8",
+      "request": {},
+      "response": {
+        "id": 4,
+        "user_id": 8,
+        "tenant_id": 1,
+        "property_id": 1,
+        "house_id": 2,
+        "relation_type": "TENANT",
+        "status": "APPROVED",
+        "reviewer_id": 5,
+        "review_reason": null,
+        "requested_at": "2026-09-23T02:51:43.585542Z",
+        "reviewed_at": "2026-09-23T02:51:57.856704Z"
+      },
+      "received_at_utc": "2026-09-23T02:51:57.891Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/admin/resident-bind-requests?property_id=1&tenant_id=1",
+      "method": "GET",
+      "status": 200,
+      "request_id": "1077ad96c58b4456a272af4999e576f9",
+      "response": {
+        "items": [],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T02:51:57.913Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/resident-bind-requests/mine?limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "d4a3f3fb29c64eb79b85e528e7a3a0fc",
+      "response": {
+        "items": [
+          {
+            "id": 3,
+            "user_id": 8,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 2,
+            "relation_type": "TENANT",
+            "status": "REJECTED",
+            "reviewer_id": 5,
+            "review_reason": "bind015-919b885f73ff 请补充租赁授权证明后重新申请",
+            "requested_at": "2026-09-23T02:48:33.270997Z",
+            "reviewed_at": "2026-09-23T02:50:27.754073Z"
+          },
+          {
+            "id": 4,
+            "user_id": 8,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 2,
+            "relation_type": "TENANT",
+            "status": "APPROVED",
+            "reviewer_id": 5,
+            "review_reason": null,
+            "requested_at": "2026-09-23T02:51:43.585542Z",
+            "reviewed_at": "2026-09-23T02:51:57.856704Z"
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T02:52:30.075Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/me/houses",
+      "method": "GET",
+      "status": 200,
+      "request_id": "daac917ef7d041dfafc278d072be4a2a",
+      "received_at_utc": "2026-09-23T02:52:30.081Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/properties?limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "847570c23a814d238f2c690379430c4c",
+      "received_at_utc": "2026-09-23T02:52:30.084Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/properties/1/buildings",
+      "method": "GET",
+      "status": 200,
+      "request_id": "d3f1c76c23624e508645586d31684a1a",
+      "received_at_utc": "2026-09-23T02:52:30.113Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/buildings/1/units",
+      "method": "GET",
+      "status": 200,
+      "request_id": "b93ca642507d48138800a6cfbcc90de5",
+      "received_at_utc": "2026-09-23T02:52:30.139Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/units/1/houses",
+      "method": "GET",
+      "status": 200,
+      "request_id": "0e54f26932274b3f9638f354847904c7",
+      "received_at_utc": "2026-09-23T02:52:30.164Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/resident-bind-requests/mine?limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "5f3192532f4e4ea4a93934c75e0ac36a",
+      "response": {
+        "items": [
+          {
+            "id": 3,
+            "user_id": 8,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 2,
+            "relation_type": "TENANT",
+            "status": "REJECTED",
+            "reviewer_id": 5,
+            "review_reason": "bind015-919b885f73ff 请补充租赁授权证明后重新申请",
+            "requested_at": "2026-09-23T02:48:33.270997Z",
+            "reviewed_at": "2026-09-23T02:50:27.754073Z"
+          },
+          {
+            "id": 4,
+            "user_id": 8,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 2,
+            "relation_type": "TENANT",
+            "status": "APPROVED",
+            "reviewer_id": 5,
+            "review_reason": null,
+            "requested_at": "2026-09-23T02:51:43.585542Z",
+            "reviewed_at": "2026-09-23T02:51:57.856704Z"
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T02:52:30.446Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/me/houses",
+      "method": "GET",
+      "status": 200,
+      "request_id": "beb3c4b6b63d4b90aa85a89044386135",
+      "received_at_utc": "2026-09-23T02:52:30.447Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/properties?limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "c58119add3234eea8a2b61bd83c5b373",
+      "received_at_utc": "2026-09-23T02:52:30.448Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/properties/1/buildings",
+      "method": "GET",
+      "status": 200,
+      "request_id": "9db67ea26e8d40c4a704d6278fe3fd67",
+      "received_at_utc": "2026-09-23T02:52:30.467Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/buildings/1/units",
+      "method": "GET",
+      "status": 200,
+      "request_id": "8dffb2aa6b8d476188eb052d339b018c",
+      "received_at_utc": "2026-09-23T02:52:30.487Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/units/1/houses",
+      "method": "GET",
+      "status": 200,
+      "request_id": "ad89d44eb23745c6a164ab43de375b23",
+      "received_at_utc": "2026-09-23T02:52:30.506Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/resident-bind-requests/mine?limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "67e7f87df3b148929f29c4514a847a81",
+      "response": {
+        "items": [
+          {
+            "id": 3,
+            "user_id": 8,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 2,
+            "relation_type": "TENANT",
+            "status": "REJECTED",
+            "reviewer_id": 5,
+            "review_reason": "bind015-919b885f73ff 请补充租赁授权证明后重新申请",
+            "requested_at": "2026-09-23T02:48:33.270997Z",
+            "reviewed_at": "2026-09-23T02:50:27.754073Z"
+          },
+          {
+            "id": 4,
+            "user_id": 8,
+            "tenant_id": 1,
+            "property_id": 1,
+            "house_id": 2,
+            "relation_type": "TENANT",
+            "status": "APPROVED",
+            "reviewer_id": 5,
+            "review_reason": null,
+            "requested_at": "2026-09-23T02:51:43.585542Z",
+            "reviewed_at": "2026-09-23T02:51:57.856704Z"
+          }
+        ],
+        "next_cursor": null
+      },
+      "received_at_utc": "2026-09-23T02:53:38.215Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/me/houses",
+      "method": "GET",
+      "status": 200,
+      "request_id": "dea37f05efa944aabe857c3da45bf5f1",
+      "received_at_utc": "2026-09-23T02:53:38.217Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/properties?limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "94fc98db23d74b91a70fa4ce2ff48805",
+      "received_at_utc": "2026-09-23T02:53:38.219Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/properties/1/buildings",
+      "method": "GET",
+      "status": 200,
+      "request_id": "750bf48027824c74b306adddd207d19a",
+      "received_at_utc": "2026-09-23T02:53:38.245Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/buildings/1/units",
+      "method": "GET",
+      "status": 200,
+      "request_id": "a3d8340795f748d4a0d06ad6e90945b2",
+      "received_at_utc": "2026-09-23T02:53:38.271Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    },
+    {
+      "path": "/units/1/houses",
+      "method": "GET",
+      "status": 200,
+      "request_id": "679526372db4410a9dd8a9678ca2c8a4",
+      "received_at_utc": "2026-09-23T02:53:38.295Z",
+      "source": "real wx.request; origin forwarded unchanged"
+    }
+  ],
+  "screenshots": [
+    "00-relationship-selection.png",
+    "01-tenant-pending.png",
+    "02-empty-review-reason.png",
+    "03-manager-rejected.png",
+    "04-resident-rejection-reason.png",
+    "05-reapplication-pending.png",
+    "06-manager-approved.png",
+    "07-active-relation-refresh.png",
+    "08-active-relation-relogin.png"
+  ],
+  "mode": "WeChat DevTools real controls, Development SMS, real AUTH001 API/DB; picker change uses supported automator trigger, not native picker wheel/physical-device acceptance",
+  "last_error": "Error: rejected: 请输入1至500字的驳回原因\n    at ready (D:\\property-ai\\reports\\resident-binding-complete-015\\run-page-evidence.js:39:59)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async main (D:\\property-ai\\reports\\resident-binding-complete-015\\run-page-evidence.js:201:7)",
+  "status": "PAGE_PASS_PENDING_INDEPENDENT_REVIEW",
+  "limits": [
+    "Picker values were selected using the supported automator element change event, not native wheel interaction.",
+    "Normal page controls and actual wx.request were used; no frontend business-state injection or fabricated successful responses.",
+    "Development SMS inbox supplies synthetic one-time codes. No Seed login, real SMS provider, physical device or production acceptance.",
+    "Four relation choices were exercised on the control; the persisted UI workflow uses TENANT. Other relation payload mappings have unit coverage."
+  ],
+  "project_config_sha256": "342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F"
+}

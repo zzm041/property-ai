@@ -1,0 +1,26 @@
+{
+  "task_id": "RESIDENT-BINDING-COMPLETE-015",
+  "run_id": "bind015-919b885f73ff",
+  "product_sha": "d8993fa557ee7683ec7946509b7d7d6ae58b0b22",
+  "backend_launch_product": "65f20c5a288b2b8e027c8b80fefbe6cfed439d14",
+  "code_boundary": "015 changes only two page pairs and one unit test file. Backend/API/Worker source is unchanged since the retained 014 launch; neither process was replaced.",
+  "observed_date": "2026-09-23",
+  "interpreter": "D:/property-ai/tmp/uv-python/cpython-3.12.10-windows-x86_64-none/python.exe",
+  "python_version_architecture": "CPython 3.12.10 AMD64; retained approved recovery runtime",
+  "dependency_reuse": "-I launcher, explicit project .venv/Lib/site-packages; Worker child has PYTHONNOUSERSITE=1 and exact project package/backend paths. No installation or upgrade.",
+  "actual_processes": [
+    {"pid":39184,"parent_pid":42548,"command":"python.exe -I D:/property-ai/tmp/run_auth001_recovered.py api"},
+    {"pid":3364,"parent_pid":42548,"command":"python.exe -I D:/property-ai/tmp/run_auth001_recovered.py worker"},
+    {"pid":29484,"parent_pid":3364,"command":"python.exe -m celery -A app.worker.celery_app:celery_app worker -Q property_ai.auth001 --pool=solo --loglevel=info --hostname=auth001@%h"}
+  ],
+  "process_source": "Actual Get-CimInstance Win32_Process output for these three exact PIDs; each executable matches the recovered interpreter path.",
+  "actual_listeners": [
+    {"address":"127.0.0.1","port":8083,"pid":39184},
+    {"address":"::","port":9440,"pid":38020}
+  ],
+  "actual_api_startup": "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True",
+  "actual_worker_startup": "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True; worker_queue=property_ai.auth001 pool=solo",
+  "startup_sources": ["tmp/auth001-runtime/api-65f20c5-wo014.stdout.log","tmp/auth001-runtime/worker-65f20c5-wo014.stdout.log"],
+  "project_config_sha256": "342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F",
+  "limits": ["No 8082 or shared-vhost operation. No queue contents inspected, no DLQ replay/clear.","No 0010 or migration, no dependency changes, no real provider/device/production claim.","Old pre-restoration AUTH001 objects remain lost. The reused tenant/property/manager are the new 014 restoration objects, and the 015 resident/house/application IDs are new run-bound objects."]
+}

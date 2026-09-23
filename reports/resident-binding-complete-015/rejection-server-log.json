@@ -1,0 +1,10 @@
+{
+  "task_id": "RESIDENT-BINDING-COMPLETE-015",
+  "run_id": "bind015-919b885f73ff",
+  "source": "tmp/auth001-runtime/api-65f20c5-wo014.stdout.log lines490-491; read-only exact-route extraction after independent reviewer identified missing client completion",
+  "reason": "The first successful manager rejection completed after the page evidence helper exited early and disconnected its wx.request recorder. This is server evidence, not a fabricated replacement for missing client completion. No business action repeated.",
+  "events": [
+    {"method":"POST","path":"/api/v1/admin/resident-bind-requests/3/reject","event":"request_started","service":"api","request_id":"57243c139c804c98bd72ca79ba9e1174","logger":"app.core.request_context","level":"info","timestamp":"2026-09-23T02:50:27.726590Z"},
+    {"method":"POST","path":"/api/v1/admin/resident-bind-requests/3/reject","status_code":200,"latency_ms":85.03,"event":"request_completed","service":"api","request_id":"57243c139c804c98bd72ca79ba9e1174","logger":"app.core.request_context","level":"info","timestamp":"2026-09-23T02:50:27.811894Z"}
+  ]
+}
