@@ -1,9 +1,13 @@
 <view class="loading" wx:if="{{loading}}">加载中...</view>
 <view class="card" wx:if="{{workOrder}}">
   <view>工单 {{workOrder.id}}</view>
-  <view>状态 {{workOrder.status}}</view>
+  <view>状态 {{statusLabel}}</view>
+  <view class="empty">时间按小区时区 {{timezoneLabel}} 显示</view>
+  <view class="empty">提交时间 {{createdAtLabel}}</view>
+  <view wx:if="{{assigneeLabel}}">最近处理人员 {{assigneeLabel}}</view>
+  <view class="empty" wx:if="{{assigneeLabel || processHistory.length}}">人员为当前展示名，非历史姓名快照</view>
   <view wx:if="{{autoDispatched}}">系统已自动派单</view>
-  <view wx:if="{{workOrder.process_reason && workOrder.process_reason != 'NONE'}}">原因 {{workOrder.process_reason}}</view>
+  <view wx:if="{{workOrder.process_reason && workOrder.process_reason != 'NONE'}}">进展 {{reasonLabel}}</view>
   <view class="empty" wx:if="{{item.text}}">{{item.text}}</view>
   <view wx:if="{{item.extra_notes}}">
     <view>补充说明</view>
@@ -13,8 +17,8 @@
 <view class="card" wx:if="{{media.length}}">
   <view>工单附件（保留全部历史）</view>
   <view wx:for="{{media}}" wx:key="id">
-    <view>{{item.taken_phase}} {{item.kind}}</view>
-    <view class="empty">上传时间 {{item.created_at}}</view>
+    <view>{{item.phaseLabel}} · {{item.kindLabel}}</view>
+    <view class="empty">上传时间 {{item.createdAtLabel}}</view>
     <button class="btn" wx:if="{{item.kind === 'IMAGE'}}" data-file-id="{{item.file_id}}" bindtap="previewMedia">查看图片</button>
     <button class="btn" wx:if="{{item.kind === 'AUDIO'}}" data-file-id="{{item.file_id}}" bindtap="playMedia">播放语音</button>
   </view>
@@ -32,11 +36,11 @@
   <button class="btn btn-secondary" data-action="cancel" bindtap="cancel" disabled="{{loading}}">撤销工单</button>
 </view>
 <view class="card" wx:for="{{processHistory}}" wx:for-item="cycle" wx:key="id">
-  <view>第 {{cycle.cycle_no}} 轮处理 · 员工 {{cycle.assignee_id}}</view>
-  <view class="empty">开始时间 {{cycle.started_at}}</view>
+  <view>第 {{cycle.cycle_no}} 轮处理 · {{cycle.assigneeLabel}}</view>
+  <view class="empty">开始时间 {{cycle.startedAtLabel}}</view>
   <view wx:if="{{cycle.receipt}}">
     <view>处理回执</view>
-    <view>问题类型 {{cycle.receipt.problem_type}}</view>
+    <view>问题类型 {{cycle.receipt.problemTypeLabel}}</view>
     <view>处理方式与过程 {{cycle.receipt.method}}</view>
     <view wx:if="{{cycle.receipt.materials}}">使用材料 {{cycle.receipt.materials}}</view>
     <view wx:if="{{cycle.receipt.fee_flag === 'RECORDED'}}">费用记录 ¥{{cycle.receipt.fee_amount}}</view>
@@ -44,14 +48,14 @@
     <view>员工处理结果：{{cycle.receipt.resolved ? '已处理' : '未解决'}}</view>
     <view wx:if="{{cycle.receipt.unresolved_reason}}">未解决原因 {{cycle.receipt.unresolved_reason}}</view>
     <view wx:if="{{cycle.receipt.follow_up}}">后续处理 {{cycle.receipt.follow_up}}</view>
-    <view>完成时间 {{cycle.receipt.finished_at}}</view>
+    <view>完成时间 {{cycle.receipt.finishedAtLabel}}</view>
   </view>
   <view class="empty" wx:else>{{cycle.ended_at ? '本轮处理已结束，未提交回执' : '本轮处理中，尚未提交回执'}}</view>
   <view wx:for="{{cycle.feedbacks}}" wx:for-item="feedback" wx:key="id">
     <view wx:if="{{feedback.unresolved_flag}}">住户反馈未解决：{{feedback.comment}}</view>
     <view wx:elif="{{feedback.confirmed}}">住户已确认解决</view>
     <view wx:if="{{feedback.rating != null}}">住户评价 {{feedback.rating}} 分 {{feedback.comment}}</view>
-    <view class="empty">反馈时间 {{feedback.created_at}}</view>
+    <view class="empty">反馈时间 {{feedback.createdAtLabel}}</view>
   </view>
 </view>
 <view class="card" wx:if="{{canConfirm || canReopen}}">
@@ -71,12 +75,13 @@
   <view>我的评价</view>
   <view>{{latestRating.rating}} 分</view>
   <view class="empty" wx:if="{{latestRating.comment}}">{{latestRating.comment}}</view>
-  <view class="empty">评价时间 {{latestRating.created_at}}</view>
+  <view class="empty">评价时间 {{latestRating.createdAtLabel}}</view>
 </view>
 <view class="card" wx:if="{{logs.length}}">
   <view>历史</view>
   <view wx:for="{{logs}}" wx:key="id">
-    {{item.from_status || "创建"}} → {{item.to_status}} {{item.event_code}}
+    <view>{{item.fromStatusLabel}} → {{item.toStatusLabel}} · {{item.eventLabel}}</view>
+    <view class="empty">{{item.actorLabel}} · {{item.createdAtLabel}}</view>
     <text wx:if="{{item.reason}}">（{{item.reason}}）</text>
   </view>
 </view>

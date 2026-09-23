@@ -256,6 +256,13 @@ class WorkOrderData(BaseModel):
     sla_overdue: bool = False
 
 
+class WorkOrderDisplayData(BaseModel):
+    property_timezone: str = "UTC"
+    # Current account display names, not immutable historical identity snapshots.
+    assignee_names: dict[int, str] = Field(default_factory=dict)
+    timestamp_labels: dict[str, str] = Field(default_factory=dict)
+
+
 class WorkOrderDetailData(BaseModel):
     work_order: WorkOrderData
     text: str | None = None
@@ -267,6 +274,7 @@ class WorkOrderDetailData(BaseModel):
     receipts: list[WorkOrderReceiptData] = Field(default_factory=list)
     feedbacks: list[WorkOrderFeedbackData] = Field(default_factory=list)
     logs: list[WorkOrderLogData] = Field(default_factory=list)
+    display: WorkOrderDisplayData = Field(default_factory=WorkOrderDisplayData)
 
 
 class WorkOrderListData(BaseModel):

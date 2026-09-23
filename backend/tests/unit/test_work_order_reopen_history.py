@@ -227,7 +227,7 @@ def test_detail_serializes_all_receipts_and_feedback_by_actual_process_id():
         uploader_user_id=46, created_at=NOW,
     )
     service.get_work_order_detail.return_value = (
-        record(), None, (media,), (), processes, receipts, (feedback,), (),
+        record(), None, (media,), (), processes, receipts, (feedback,), (), {},
     )
     request = Request({"type": "http", "headers": []})
     request.state.request_id = "wo014-detail"

@@ -34,7 +34,10 @@ Page({
     return require("../../services/api")
       .listWorkOrders(afterId, PAGE_SIZE)
       .then((data) => {
-        const incoming = (data && data.items) || [];
+        const display = require("../../utils/work-order-display");
+        const incoming = ((data && data.items) || []).map(item => ({
+          ...item, statusLabel: display.statusLabel(item.status), createdAtLabel: display.utcLabel(item.created_at),
+        }));
         const nextCursor = data && data.next_cursor;
         if (
           append &&

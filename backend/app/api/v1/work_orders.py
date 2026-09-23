@@ -1,6 +1,7 @@
 """Resident WorkOrder create, read, append, cancel, confirm, reopen, and rate."""
 
 from typing import Annotated
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, Header, Query, Request
 from sqlalchemy.orm import Session
@@ -9,6 +10,7 @@ from app.api.dependencies.auth import get_current_principal
 from app.api.dependencies.db import get_db_session
 from app.core.config import Settings, get_settings
 from app.core.errors import AppError, WorkOrderErrorCode
+from app.core.time import validate_timezone
 from app.domain.iam import Principal
 from app.schema.common import request_id_for, success_envelope
 from app.schema.work_order import (
@@ -21,6 +23,7 @@ from app.schema.work_order import (
     WorkOrderAssignmentData,
     WorkOrderData,
     WorkOrderDetailData,
+    WorkOrderDisplayData,
     WorkOrderFeedbackData,
     WorkOrderListData,
     WorkOrderLogData,
@@ -75,6 +78,41 @@ def _require_idempotency_key(idempotency_key: str | None) -> str:
             status_code=422,
         )
     return idempotency_key.strip()
+
+
+def work_order_display_data(
+    detail: WorkOrderDetailData, context: dict[str, object]
+) -> WorkOrderDisplayData:
+    """Add labels without replacing raw UTC fields or using the device timezone."""
+    timezone_name = context.get("property_timezone") or "UTC"
+    try:
+        timezone = validate_timezone(timezone_name)
+    except (TypeError, ValueError):
+        timezone_name, timezone = "UTC", UTC
+    labels: dict[str, str] = {}
+
+    def visit(value):
+        if isinstance(value, list):
+            for item in value:
+                visit(item)
+        elif isinstance(value, dict):
+            for key, item in value.items():
+                if key.endswith("_at") and isinstance(item, str):
+                    instant = datetime.fromisoformat(item.replace("Z", "+00:00"))
+                    # Schema-validated persisted timestamps are aware UTC.
+                    if instant.tzinfo is not None:
+                        local = instant.astimezone(timezone)
+                        offset = local.strftime("%z")
+                        labels[item] = local.strftime("%Y-%m-%d %H:%M:%S") + f" UTC{offset[:3]}:{offset[3:]}"
+                elif isinstance(item, (dict, list)):
+                    visit(item)
+
+    visit(detail.model_dump(mode="json", exclude={"display"}))
+    return WorkOrderDisplayData(
+        property_timezone=timezone_name,
+        assignee_names=context.get("assignee_names") or {},
+        timestamp_labels=labels,
+    )
 
 
 @router.post("/work-orders")
@@ -147,6 +185,7 @@ def get_work_order(
         receipts,
         feedbacks,
         logs,
+        display_context,
     ) = service.get_work_order_detail(actor=actor, work_order_id=work_order_id)
     process_by_id = {item.id: item for item in processes}
     detail = WorkOrderDetailData(
@@ -234,6 +273,7 @@ def get_work_order(
             for item in logs
         ],
     )
+    detail.display = work_order_display_data(detail, display_context)
     return success_envelope(request, detail.model_dump(mode="json"))
 
 

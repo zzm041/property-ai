@@ -31,7 +31,7 @@ const api = {
 };
 vm.runInNewContext(fs.readFileSync(path.join(root, 'miniprogram/pages/work-orders/detail.js'), 'utf8'), {
   Page: definition => { page = definition; },
-  require: name => name === '../../services/api' ? api : name === '../../services/auth' ? { setLastWorkOrderId() {} } : require(path.join(root, 'miniprogram/utils/ui.js')),
+  require: name => name === '../../services/api' ? api : name === '../../services/auth' ? { setLastWorkOrderId() {} } : require(path.join(root, 'miniprogram/pages/work-orders', name)),
   wx: {}, setTimeout, clearTimeout,
 });
 page.setData = values => Object.assign(page.data, values);

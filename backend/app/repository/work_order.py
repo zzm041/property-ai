@@ -64,6 +64,33 @@ class WorkOrderRepository:
     def get_property(self, property_id: int) -> Property | None:
         return self._session.get(Property, property_id)
 
+    def get_display_context(self, record: WorkOrder) -> dict[str, object]:
+        """Only the authorized order's scoped participants, never a user directory."""
+        timezone_name = self._session.scalar(
+            select(Property.timezone).where(
+                Property.id == record.property_id, Property.tenant_id == record.tenant_id
+            )
+        )
+        if timezone_name is None:
+            return {"property_timezone": "UTC", "assignee_names": {}}
+        participants = select(WorkOrderAssignment.employee_id).where(
+            WorkOrderAssignment.work_order_id == record.id,
+            WorkOrderAssignment.tenant_id == record.tenant_id,
+            WorkOrderAssignment.property_id == record.property_id,
+        ).union(select(WorkOrderProcess.assignee_id).where(
+            WorkOrderProcess.work_order_id == record.id,
+            WorkOrderProcess.tenant_id == record.tenant_id,
+            WorkOrderProcess.property_id == record.property_id,
+        ))
+        names = self._session.execute(
+            select(Employee.id, User.display_name)
+            .join(User, User.id == Employee.user_id)
+            .where(Employee.tenant_id == record.tenant_id, Employee.id.in_(participants))
+        ).all()
+        return {"property_timezone": timezone_name, "assignee_names": {
+            employee_id: name for employee_id, name in names if name and name.strip()
+        }}
+
     def get_property_for_update(self, property_id: int) -> Property | None:
         return self._session.scalar(
             select(Property).where(Property.id == property_id).with_for_update()

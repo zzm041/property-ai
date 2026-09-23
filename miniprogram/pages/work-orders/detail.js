@@ -13,6 +13,11 @@ Page({
     item: null,
     workOrder: null,
     autoDispatched: false,
+    statusLabel: "",
+    reasonLabel: "",
+    timezoneLabel: "UTC",
+    createdAtLabel: "",
+    assigneeLabel: "",
     latestReceipt: null,
     processHistory: [],
     reopenReason: "",
@@ -57,11 +62,12 @@ Page({
         .workOrder(this.id)
         .then((item) => {
           const workOrder = workOrderOf(item);
+          const display = require("../../utils/work-order-display").presentDetail(item);
           const status = workOrder ? workOrder.status : "";
-          const assignments = (item && item.assignments) || [];
-          const receipts = (item && item.receipts) || [];
-          const feedbacks = (item && item.feedbacks) || [];
-          const processHistory = ((item && item.processes) || []).map((process) => ({
+          const assignments = display.assignments;
+          const receipts = display.receipts;
+          const feedbacks = display.feedbacks;
+          const processHistory = display.processes.map((process) => ({
             ...process,
             receipt: receipts.find((receipt) => receipt.process_id === process.id) || null,
             feedbacks: feedbacks.filter((feedback) => feedback.process_id === process.id),
@@ -75,14 +81,19 @@ Page({
           this.setData({
             item,
             workOrder,
+            statusLabel: display.statusLabel,
+            reasonLabel: display.reasonLabel,
+            timezoneLabel: display.timezoneLabel,
+            createdAtLabel: display.createdAtLabel,
+            assigneeLabel: currentAssignment ? currentAssignment.assigneeLabel : "",
             autoDispatched:
               Boolean(currentAssignment) &&
               currentAssignment.reason === "AUTO_DISPATCH" &&
               currentAssignment.assigned_by_user_id == null,
             latestReceipt: receipts.length ? receipts[receipts.length - 1] : null,
             processHistory,
-            media: (item && item.media) || [],
-            logs: (item && item.logs) || [],
+            media: display.media,
+            logs: display.logs,
             feedbacks,
             latestRating,
             canConfirm: status === "WAIT_CONFIRM",

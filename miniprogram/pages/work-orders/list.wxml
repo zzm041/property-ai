@@ -2,8 +2,8 @@
 <view class="empty" wx:if="{{!loading && !items.length}}">暂无工单</view>
 <view class="card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="open">
   <view>工单 {{item.id}}</view>
-  <view>状态 {{item.status}}</view>
-  <view class="empty">提交时间 {{item.created_at}}</view>
+  <view>状态 {{item.statusLabel}}</view>
+  <view class="empty">提交时间 {{item.createdAtLabel}}</view>
 </view>
 <button class="btn" data-action="load-more" wx:if="{{hasMore}}" bindtap="loadMore" disabled="{{loading}}">加载更多</button>
 <view class="empty" wx:if="{{!loading && items.length && !hasMore}}">已加载全部工单</view>

@@ -597,6 +597,7 @@ class WorkOrderService:
         tuple[WorkOrderReceipt, ...],
         tuple[WorkOrderFeedback, ...],
         tuple[WorkOrderLog, ...],
+        dict[str, object],
     ]:
         record = self.get_work_order(actor=actor, work_order_id=work_order_id)
         return (
@@ -608,6 +609,7 @@ class WorkOrderService:
             self._repository.list_receipts(record.id),
             self._repository.list_feedbacks(record.id),
             self._repository.list_logs(record.id),
+            self._repository.get_display_context(record),
         )
 
     def list_supervisor_queue(

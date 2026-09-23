@@ -489,6 +489,7 @@ def test_detail_returns_saved_rating_and_cancel_reason() -> None:
         (),
         (feedback,),
         (log,),
+        {},
     )
 
     detail = get_work_order(61, _request(), MagicMock(), service)["data"]
