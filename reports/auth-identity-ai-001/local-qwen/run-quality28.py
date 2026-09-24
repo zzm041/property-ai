@@ -41,6 +41,10 @@ class PhotoStorage:
     def get_object(self,key):return self.images[key]
 
 def main():
+    if '--supplement' in sys.argv:
+        sys.argv.remove('--supplement')
+        runpy.run_path(str(OUT/'run-approved-supplement.py'), run_name='__main__')
+        return
     parser=argparse.ArgumentParser();parser.add_argument('--round',type=int,choices=range(4),required=True);args=parser.parse_args()
     target=OUT/f'quality28-round{args.round}.json'
     assert not target.exists(),'Recorded round is immutable: inspect or explicit new repair round; no replay'

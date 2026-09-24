@@ -1,0 +1,78 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-602\",\"object\":\"chat.completion\",\"created\":1790281756,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"water_supply\\\",\\n  \\\"subcategory\\\": \\\"洗手盆排水接头渗漏\\\",\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p4\\\",\\n  \\\"summary\\\": \\\"洗手盆排水接头缓慢渗水，地上仅有几滴水，附近无电器。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":982,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens\":103,\"total_tokens\":1085}}\n",
+  "raw_response_sha256": "b0843e83fd40579ec45910b0f02a05b9ab1216d9046aa305173da6aa0782eb08",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-003",
+    "tags": [
+      "漏水",
+      "技能单值",
+      "无据风险"
+    ],
+    "report": "洗手盆排水接头缓慢渗水，地上只有几滴水，附近没有电器，请检查接头。",
+    "history": [
+      [
+        "ELECTRICAL",
+        "CLOSED",
+        "厨房电线过热，维修完成"
+      ]
+    ],
+    "facts": [
+      "接头慢渗",
+      "少量水滴",
+      "无电器"
+    ],
+    "forbidden": [
+      "漏电",
+      "燃气泄漏",
+      "大面积淹水",
+      "plumber/electrician",
+      "水管爆裂"
+    ],
+    "accept": [
+      [
+        "water_supply",
+        "plumber",
+        [
+          "none"
+        ]
+      ]
+    ],
+    "manual": "RULES"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "water_supply",
+      "subcategory": "洗手盆排水接头渗漏",
+      "severity": "low",
+      "priority": "p4",
+      "summary": "洗手盆排水接头缓慢渗水，地上仅有几滴水，附近无电器。",
+      "risk": "none",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.95
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24 20:29:12.280967+00:00",
+      "latency_ms": 4625,
+      "request_id": "supplement-GOLD-003",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1085
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v8-maintenance",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "7bc504bd6fe287075fd7b4cd14d08ab944d70bfd"
+}

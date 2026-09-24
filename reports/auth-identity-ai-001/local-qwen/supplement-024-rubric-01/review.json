@@ -1,0 +1,51 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "supplement_id": "SUPPLEMENT-024-RUBRIC-01",
+  "reviewer": "/root/review025_round1",
+  "review_mode": "INDEPENDENT_READ_ONLY",
+  "base_sha": "7bc504bd6fe287075fd7b4cd14d08ab944d70bfd",
+  "head_sha": "7bc504bd6fe287075fd7b4cd14d08ab944d70bfd",
+  "verdict": "NOT_READY",
+  "conclusion": "停止本次补充诊断合理。第5例是当前职责规则下的核心分流错误，不是旧细分工种金标造成的假失败。不得继续第6请求或切换业务。",
+  "current_task_blockers": [],
+  "findings": [
+    {
+      "id": "SUPPLEMENT-024-RUBRIC-01-C1",
+      "classification": "RELEASE_BLOCKER",
+      "scope": "本地4B业务切换与真实自动派单验收",
+      "location": [
+        "backend/app/domain/ai.py:209",
+        "backend/app/domain/ai.py:222",
+        "backend/app/domain/ai.py:116",
+        "backend/app/domain/ai.py:295"
+      ],
+      "evidence": "request-05/raw-response.json: category=cleaning, required_skill=maintenance, confidence=0.95",
+      "trigger": "清扫报修存在具备CLEANING职责/技能、没有MAINTENANCE技能的合法保洁人员。",
+      "impact": "映射CLEANING职责和MAINTENANCE技能，不适用普通维修免细分技能规则，合法人员被SKILL_MISMATCH排除。",
+      "boundary": "原始输出结合真实代码推导的资格排除风险；没有实际派单，不能称已经错派。中文事实和none/low/p4没有危险编造。"
+    }
+  ],
+  "evidence_checked": {
+    "original_records": "实际读取5例request/raw-response/response/reservation/supervision/judgement；逐份验证响应哈希、副本和评语绑定。",
+    "cases": "001–004保留当前事实、中文摘要和普通维修组分流；002/003未复制历史危险事实；004未将用户猜测升级为确诊。仅认可这4例，不推算完整集通过率。",
+    "limits": "5次预留、5份响应、每次attempt=1，无第6请求；首预留至005结束约147秒；单次2.391–7.141秒；最低RAM9254MiB、VRAM余量5230MiB。",
+    "configuration": "loopback11435，同一qwen3.5:4b，temperature0，thinking关闭，512输出，同一v8；digest及采集器哈希与冻结匹配。",
+    "collector": "核对排他写入、发送前计数、未知结果禁止重放、逐例评语门、停止标记、32上限、30分钟窗口、专属子进程超时、trust_env=False。",
+    "tests": "读取最新12passed及此前11passed、1failed/11passed；失败为测试过早替换Client影响注解导入，修正后保留历史；不累计重复数字。",
+    "history": "12项冻结文件哈希匹配；旧诊断路径无新已跟踪差异，run-quality28只增补充入口；旧28例/128请求/3of3未追认通过。"
+  },
+  "materials_read": [
+    "README/frozen-inputs/runtime/stop/image-dependency-blocked",
+    "request-01 through05 all指定证据",
+    "run-approved-supplement.py/run-quality28 diff/test_approved_supplement.py/run-supplement-tests.py/test logs",
+    "backend/app/domain/ai.py/private frozen analysis v8"
+  ],
+  "unverified": [
+    "剩余19文字未运行；Pillow缺失，图片转换0推理0，不计通过或本轮图像失败。",
+    "未验证真实AUTO、人员业务结果、通知、页面、DB或生产。",
+    "digest/版本/驻留基于记录和检查逻辑；复审无服务查询。",
+    "超时只终止自身子进程，服务端完成UNKNOWN，未验证服务终止。",
+    "未审查A/026，未运行测试/模型/页面/API/DB/队列，未写文件/建子审查者。"
+  ],
+  "next_action": "保存独立复审与失败，保持NOT_READY及本次停止。可离线收敛职责输出一致性修正方案，但不改原答案、不放宽职责、不追加推理；新调用另获明确有界批准。A/026继续。"
+}

@@ -1,6 +1,12 @@
 # Self-hosted inference recommendation (AUTH-IDENTITY-AI-001-C)
 
-## Actionable approval request — 2026-09-25, NOT APPROVED
+## Approved supplement result — 2026-09-25: NOT_READY, stopped
+
+SUPPLEMENT-024-RUBRIC-01 used5/32 allowed requests before its mandatory semantic stop, not a new repair round. Independent readonly `/root/review025_round1` confirms NOT_READY (`local-qwen/supplement-024-rubric-01/review.json`). Four observed Chinese ordinary-maintenance cases correctly separate current facts/history/guessing; fifth ordinary cleaning outputs cleaning + maintenance, which excludes otherwise eligible CLEANING-only staff under the actual unchanged duty rules. This is a code-grounded routing risk, not observed real misassignment. No sixth request, no model/business switch. Remaining19texts and4photos unverified. Pillow is missing in the approved explicit dependency reuse: no image conversion/inference or dependency install. Original28/128calls/3of3 remain immutable; this does not reject all Qwen/4B models.
+
+Next recommendation: offline design of cross-field duty consistency validation with a visible bounded failure, retaining actual CLEANING/SECURITY boundaries and normal unified-maintenance routing. Do not silently coerce original answers or count them passed. A further prompt/protocol change or diagnostic requires a new explicit bounded approval; none is executed. Image path additionally needs a separately approved isolated Pillow dependency plan. Real AUTO, voice, RAG and production gates remain open. No current subscription usage observable; manage against owner53percent baseline and fixed2026-09-27 14:00 Asia/Shanghai deadline, reserving candidate integration budget.
+
+## Historical approval request — approved once, now stopped as recorded above
 
 Request **one explicitly authorized supplemental diagnostic** under SELFHOST-AI-LOCAL-001, label SUPPLEMENT-024-RUBRIC-01. Original3/3automaticrepairs exhausted and28case/128requesthistory remain immutable. This is not restarting those rounds or executing the superseded v7/thinking/schema proposal below. New evidence is needed because product024now uses `wo-analysis-v8-maintenance`, never validated with real4B, and PHOTO004lost its final vision response to the original image/contextbudget.025Developmentrecovery is not substitute model evidence.
 

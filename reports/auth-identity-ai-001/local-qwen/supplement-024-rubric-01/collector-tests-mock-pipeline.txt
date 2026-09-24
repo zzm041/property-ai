@@ -1,0 +1,91 @@
+...........F                                                             [100%]
+================================== FAILURES ===================================
+___ test_frozen_text_child_uses_mock_transport_and_saves_original_response ____
+
+tmp_path = WindowsPath('D:/property-ai/tmp/supplement-tests-0a8160f0e30a4eef8a9adc1a3039f122/test_frozen_text_child_uses_mo0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021B3A3EA5A0>
+
+    def test_frozen_text_child_uses_mock_transport_and_saves_original_response(tmp_path, monkeypatch):
+        import httpx
+        original_client = httpx.Client
+        def factory(*args, **kwargs):
+            kwargs['transport'] = httpx.MockTransport(lambda request: httpx.Response(200, text=response(value())))
+            return original_client(*args, **kwargs)
+        monkeypatch.setattr(httpx, 'Client', factory)
+        g = h['child'].__globals__
+        # frozen() keeps the actual approved inputs; only output is a fresh pytest path.
+        root, manifest = h['frozen']()
+        monkeypatch.setitem(g, 'frozen', lambda: (root, manifest))
+        monkeypatch.setitem(g, 'OUT', tmp_path)
+        folder = tmp_path / 'request-01'; folder.mkdir()
+        append(folder / 'reservation.json', {'number': 1})
+>       h['child'](1)
+
+reports\auth-identity-ai-001\local-qwen\test_approved_supplement.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+reports\auth-identity-ai-001\local-qwen\run-approved-supplement.py:172: in child
+    from app.provider.factory import build_llm_provider
+backend\app\provider\factory.py:4: in <module>
+    from app.provider.asr import ASRProvider, DevelopmentASRProvider, HttpASRProvider
+backend\app\provider\asr\__init__.py:13: in <module>
+    from app.provider.http import request_json
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    """Shared HTTP mapping for production providers. Never log secrets."""
+    
+    from collections.abc import Mapping
+    from ipaddress import ip_address
+    import json
+    import logging
+    import time
+    from typing import Any
+    from urllib.parse import urlsplit
+    
+    import httpx
+    
+    from app.core.logging import get_logger, safe_url_for_log
+    from app.provider.errors import (
+        ProviderInvalidOutputError,
+        ProviderRateLimitError,
+        ProviderTimeoutError,
+        ProviderUnavailableError,
+    )
+    
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("httpcore").setLevel(logging.WARNING)
+    logger = get_logger(__name__)
+    
+    
+    def _loopback_target(url: str) -> bool:
+        """Classify literal loopback targets without DNS or substring matching."""
+        try:
+            host = urlsplit(url).hostname
+            return host is not None and ip_address(host).is_loopback
+        except ValueError:
+            return False
+    
+    
+    def request_json(
+        *,
+        method: str,
+        url: str,
+        timeout_seconds: float,
+        headers: Mapping[str, str] | None = None,
+        json_body: Mapping[str, Any] | None = None,
+        data: Any = None,
+        files: Any = None,
+        params: Mapping[str, str] | None = None,
+>       client: httpx.Client | None = None,
+        provider: str = "provider",
+        operation: str = "request",
+    ) -> Any:
+E   TypeError: unsupported operand type(s) for |: 'function' and 'NoneType'
+
+backend\app\provider\http.py:45: TypeError
+=========================== short test summary info ===========================
+FAILED reports/auth-identity-ai-001/local-qwen/test_approved_supplement.py::test_frozen_text_child_uses_mock_transport_and_saves_original_response
+1 failed, 11 passed in 0.45s
+D:\property-ai\.venv\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))

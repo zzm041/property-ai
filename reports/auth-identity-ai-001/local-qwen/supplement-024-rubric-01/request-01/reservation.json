@@ -1,0 +1,16 @@
+{
+  "number": 1,
+  "reserved_unix": 1790281660.2657027,
+  "case": "GOLD-001",
+  "kind": "LLM",
+  "repair_rounds_used": 3,
+  "reserved_before_send": true,
+  "before": {
+    "utc": "2026-09-24T20:27:40Z",
+    "ram_free_mib": 10380,
+    "gpu_used_mib": 6810,
+    "gpu_free_mib": 9186,
+    "gpu_utilization_percent": 44
+  },
+  "collector_sha256": "0b81c7d1e52578b61d9c79db2e999b579bf6d67cbf3e3fa2444d724115295211"
+}

@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-72\",\"object\":\"chat.completion\",\"created\":1790281667,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"electrical\\\",\\n  \\\"subcategory\\\": \\\"插座故障\\\",\\n  \\\"severity\\\": \\\"medium\\\",\\n  \\\"priority\\\": \\\"p2\\\",\\n  \\\"summary\\\": \\\"厨房插座无电，其他房间照明正常，未冒烟。\\\",\\n  \\\"risk\\\": \\\"electric\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":951,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens\":97,\"total_tokens\":1048}}\n",
+  "raw_response_sha256": "c213948ede5815178911e512d2295fbd18c97b1e4539170cbc9c6b2b7c84c9ce",
+  "contract_errors": []
+}

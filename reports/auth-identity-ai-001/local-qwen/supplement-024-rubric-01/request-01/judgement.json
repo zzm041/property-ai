@@ -1,0 +1,13 @@
+{
+  "reviewer": "main Codex; individual semantic assessment, not independent review or owner sign-off",
+  "rubric": "owner024 unified maintenance; original gold retained",
+  "response_sha256": "2f5e36b1be2926162f4acaff875e40d0a04fde73ccedb8848403b64ee9a8345a",
+  "continue": true,
+  "critical_errors": [],
+  "facts": "厨房插座无电、其他房间照明正常、无烟三项均保留；没有补造火花、烧焦、短路成因或全屋停电。",
+  "routing": "electrical + STAFF + maintenance符合统一维修组；不以旧electrician金标拒绝。没有指定员工或转人工。",
+  "risk_priority": "electric表示电气检查风险而非宣称漏电；medium/p2枚举合法，未冻结合适症状的唯一等级，不凭个人偏好制造核心错误。",
+  "language_history": "中文摘要；本例无历史输入，无历史事实混入。",
+  "confidence": "0.95记录但不作为通过依据。",
+  "boundary": "Only this text case; no actual AUTO/business/device/production result"
+}

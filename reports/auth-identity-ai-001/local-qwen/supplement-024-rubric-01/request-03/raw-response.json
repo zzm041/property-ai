@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-602\",\"object\":\"chat.completion\",\"created\":1790281756,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"water_supply\\\",\\n  \\\"subcategory\\\": \\\"洗手盆排水接头渗漏\\\",\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p4\\\",\\n  \\\"summary\\\": \\\"洗手盆排水接头缓慢渗水，地上仅有几滴水，附近无电器。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":982,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens\":103,\"total_tokens\":1085}}\n",
+  "raw_response_sha256": "b0843e83fd40579ec45910b0f02a05b9ab1216d9046aa305173da6aa0782eb08",
+  "contract_errors": []
+}

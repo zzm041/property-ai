@@ -1,0 +1,72 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-72\",\"object\":\"chat.completion\",\"created\":1790281667,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"electrical\\\",\\n  \\\"subcategory\\\": \\\"插座故障\\\",\\n  \\\"severity\\\": \\\"medium\\\",\\n  \\\"priority\\\": \\\"p2\\\",\\n  \\\"summary\\\": \\\"厨房插座无电，其他房间照明正常，未冒烟。\\\",\\n  \\\"risk\\\": \\\"electric\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":951,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens\":97,\"total_tokens\":1048}}\n",
+  "raw_response_sha256": "c213948ede5815178911e512d2295fbd18c97b1e4539170cbc9c6b2b7c84c9ce",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-001",
+    "tags": [
+      "中文摘要",
+      "电气基线",
+      "否定"
+    ],
+    "report": "厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+    "history": [],
+    "facts": [
+      "厨房插座无电",
+      "其他房间正常",
+      "没有冒烟"
+    ],
+    "forbidden": [
+      "火花",
+      "烧焦",
+      "全屋停电",
+      "已确定短路"
+    ],
+    "accept": [
+      [
+        "electrical",
+        "electrician",
+        [
+          "none",
+          "electric"
+        ]
+      ]
+    ],
+    "manual": "RULES"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "electrical",
+      "subcategory": "插座故障",
+      "severity": "medium",
+      "priority": "p2",
+      "summary": "厨房插座无电，其他房间照明正常，未冒烟。",
+      "risk": "electric",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.95
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24 20:27:41.282069+00:00",
+      "latency_ms": 6003,
+      "request_id": "supplement-GOLD-001",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1048
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v8-maintenance",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "7bc504bd6fe287075fd7b4cd14d08ab944d70bfd"
+}

@@ -1,0 +1,7 @@
+{
+  "status": "IMAGE_BRANCH_BLOCKED",
+  "dependency": "Pillow not installed in explicitly reused project dependencies",
+  "installed_or_upgraded": false,
+  "image_transformations": 0,
+  "action": "Only text stages may continue; no alternative image library or installation authorized"
+}

@@ -1,0 +1,14 @@
+{
+  "supplement_id": "SUPPLEMENT-024-RUBRIC-01",
+  "status": "NOT_READY",
+  "reason": "CRITICAL_SEMANTIC_FAILURE_CLEANING_MAINTENANCE_SKILL_MISMATCH",
+  "number": 5,
+  "reserved_requests": 5,
+  "responses_received": 5,
+  "further_requests_allowed_in_this_run": false,
+  "repair_rounds_used": 3,
+  "images_executed": 0,
+  "image_dependency_blocked": "Pillow missing in approved reused dependencies",
+  "business_switch": false,
+  "original_history_unchanged": true
+}

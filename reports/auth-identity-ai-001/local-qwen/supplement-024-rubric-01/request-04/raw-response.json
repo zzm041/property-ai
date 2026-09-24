@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-866\",\"object\":\"chat.completion\",\"created\":1790281780,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"hvac\\\",\\n  \\\"subcategory\\\": \\\"制冷效果不足\\\",\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p4\\\",\\n  \\\"summary\\\": \\\"空调可开机出风但不凉，无漏水及异味。用户怀疑是否缺制冷剂。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.85\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":954,\"prompt_tokens_details\":{\"cached_tokens\":470},\"completion_tokens\":103,\"total_tokens\":1057}}\n",
+  "raw_response_sha256": "8a25cbe513ef7ba9385314c9b8f9eb5976a7b128f872813169f7d4233b581dc7",
+  "contract_errors": []
+}

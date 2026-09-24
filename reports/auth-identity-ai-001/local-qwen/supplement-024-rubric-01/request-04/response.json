@@ -1,0 +1,69 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-866\",\"object\":\"chat.completion\",\"created\":1790281780,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"hvac\\\",\\n  \\\"subcategory\\\": \\\"制冷效果不足\\\",\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p4\\\",\\n  \\\"summary\\\": \\\"空调可开机出风但不凉，无漏水及异味。用户怀疑是否缺制冷剂。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.85\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":954,\"prompt_tokens_details\":{\"cached_tokens\":470},\"completion_tokens\":103,\"total_tokens\":1057}}\n",
+  "raw_response_sha256": "8a25cbe513ef7ba9385314c9b8f9eb5976a7b128f872813169f7d4233b581dc7",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-004",
+    "tags": [
+      "空调",
+      "猜测"
+    ],
+    "report": "空调可以开机，出风但不凉，没有漏水，也没有异味。我不知道是不是缺制冷剂。",
+    "history": [],
+    "facts": [
+      "开机出风不凉",
+      "无漏水异味",
+      "原因未知"
+    ],
+    "forbidden": [
+      "确认缺制冷剂",
+      "压缩机损坏",
+      "无法启动"
+    ],
+    "accept": [
+      [
+        "hvac",
+        "hvac",
+        [
+          "none"
+        ]
+      ]
+    ],
+    "manual": "RULES"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "hvac",
+      "subcategory": "制冷效果不足",
+      "severity": "low",
+      "priority": "p4",
+      "summary": "空调可开机出风但不凉，无漏水及异味。用户怀疑是否缺制冷剂。",
+      "risk": "none",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.85
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24 20:29:39.691451+00:00",
+      "latency_ms": 1299,
+      "request_id": "supplement-GOLD-004",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1057
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v8-maintenance",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "7bc504bd6fe287075fd7b4cd14d08ab944d70bfd"
+}
