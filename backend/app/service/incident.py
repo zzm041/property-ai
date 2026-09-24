@@ -166,12 +166,14 @@ class IncidentService:
                 and item.status == "PENDING_ASSIGNMENT"
                 and item.current_assignment_id is None
             ):
-                pending = self._session.info.setdefault(
-                    "pending_incident_redispatch",
-                    {},
-                )
-                pending[item.id] = f"incident:{incident.id}:redispatch:{item.id}"
-                self._session.info["incident_redispatch_settings"] = self._settings
+                if self._settings.durable_tasks_enabled:
+                    from app.service.task_intent import ANALYZE, register_intent
+                    register_intent(self._session, operation=ANALYZE, resource=item,
+                                    request_id=f"incident:{incident.id}:redispatch:{item.id}")
+                else:
+                    pending = self._session.info.setdefault("pending_incident_redispatch", {})
+                    pending[item.id] = f"incident:{incident.id}:redispatch:{item.id}"
+                    self._session.info["incident_redispatch_settings"] = self._settings
         links = self._ai.list_incident_work_orders(incident.id)
         incident.work_order_count = len(links)
         incident.first_seen_at = min(

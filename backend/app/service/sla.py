@@ -423,6 +423,9 @@ class SlaService:
                 resource_type="WORK_ORDER",
                 resource_id=record.id,
             )
+        if self._settings.durable_tasks_enabled and self._settings.should_enqueue_ai_on_create:
+            from app.service.task_intent import ANALYZE, register_intent
+            register_intent(self._session, operation=ANALYZE, resource=record, request_id=request_id)
         return len(recipients), request_id
 
     def _escalate_response_timeout(
@@ -490,6 +493,8 @@ class SlaService:
         return len(recipients)
 
     def _enqueue_redispatch(self, work_order_id: int, request_id: str) -> bool:
+        if self._settings.durable_tasks_enabled:
+            return False
         if not self._settings.should_enqueue_ai_on_create:
             return False
         from app.worker.enqueue import enqueue_celery_task

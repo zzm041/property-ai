@@ -81,6 +81,7 @@ from app.repository.identity import IdentityRepository
 from app.repository.work_order import WorkOrderRepository
 from app.service.audit import AuditService
 from app.service.analysis_attempt import accepts_attempt, claim_attempt, owns_attempt
+from app.service.task_intent import require_execution_lease
 from app.service.auth import AuthService
 from app.service.rbac import RbacService
 
@@ -231,6 +232,7 @@ class AnalysisService:
     ) -> str:
         with begin_owned_transaction(self._session):
             record = self._work_orders.get_work_order_for_update(work_order_id)
+            require_execution_lease(self._session)
             current = self._ai.get_current_analysis_for_update(work_order_id)
             if (
                 record is None
@@ -352,6 +354,7 @@ class AnalysisService:
                 if actor is not None:
                     self._authorize_review(actor, work_order_id)
                 record = self._work_orders.get_work_order_for_update(work_order_id)
+                require_execution_lease(self._session)
                 if record is None:
                     return None
                 if record.status not in {WorkOrderStatus.PENDING_ANALYSIS.value, WorkOrderStatus.PENDING_ASSIGNMENT.value}:
@@ -842,6 +845,7 @@ class AnalysisService:
         try:
             with begin_owned_transaction(self._session):
                 record = self._work_orders.get_work_order_for_update(snapshot.work_order_id)
+                require_execution_lease(self._session)
                 analysis = self._ai.get_current_analysis_for_update(snapshot.work_order_id)
                 if record is None or analysis is None:
                     return None
@@ -926,6 +930,7 @@ class AnalysisService:
         """Fresh-session failure boundary. Never claim persistence if it raises."""
         with begin_owned_transaction(self._session):
             record = self._work_orders.get_work_order_for_update(work_order_id)
+            require_execution_lease(self._session)
             if record is None or record.status not in {"PENDING_ANALYSIS", "PENDING_ASSIGNMENT"}:
                 return False
             current = self._ai.get_current_analysis_for_update(work_order_id)

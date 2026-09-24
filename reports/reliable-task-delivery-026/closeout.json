@@ -1,0 +1,26 @@
+{
+  "observed_utc": "2026-09-24T21:20:01.866155+00:00",
+  "actual_processes": [
+    {
+      "ProcessId": 44224,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -I -X utf8 D:\\property-ai\\reports\\reliable-task-delivery-026\\launch-026.py api --run-id rt026-91880f6aeb --label api03",
+      "Created": "2026-09-25T04:56:53.7663840+08:00"
+    },
+    {
+      "ProcessId": 47600,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -I -X utf8 D:\\property-ai\\reports\\reliable-task-delivery-026\\launch-026.py worker --run-id rt026-91880f6aeb --label worker03",
+      "Created": "2026-09-25T04:57:46.0166000+08:00"
+    }
+  ],
+  "queue_metadata": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nproperty_ai.auth001.dlq\t7\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1",
+  "publisher_still_running": false,
+  "current_source_hash": "fe9fcdd742ffe6331fb440f94019a067a9325aaa9a9b91c2d8a009ea615c8926",
+  "loaded_runtime_source_hash": "57d5f9f8ffbd65b0f571d75ee4fbcea34a7af02cefe82c500d97bc5c68428aa6",
+  "runtime_boundary": "API/Worker still dedicated test chain, no final takeover/commitackfix load, no claim of defaultparameter/candidate rollout",
+  "closed_run": "rt026-91880f6aeb",
+  "new_recovery_intent_list": [],
+  "quota": "unobservable; owner53percent baseline only",
+  "deadline": "2026-09-27T14:00:00+08:00"
+}

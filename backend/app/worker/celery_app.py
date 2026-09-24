@@ -62,7 +62,7 @@ def create_celery_app() -> Celery:
             },
         },
         timezone="UTC",
-        imports=("app.worker.tasks",),
+        imports=("app.worker.tasks", "app.worker.task_intents"),
     )
     return app
 

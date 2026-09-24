@@ -78,6 +78,8 @@ def enqueue_ingestion(
     version: int,
     request_id: str,
 ) -> None:
+    if settings.durable_tasks_enabled:
+        return  # Service committed a typed durable intent alongside this version.
     enqueue_celery_task(
         settings=settings,
         celery_task=ingest_knowledge_task,

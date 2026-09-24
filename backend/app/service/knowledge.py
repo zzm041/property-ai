@@ -46,6 +46,7 @@ from app.repository.property import PropertyRepository
 from app.service.audit import AuditService
 from app.service.auth import AuthService
 from app.service.rbac import RbacService
+from app.service.task_intent import require_execution_lease
 
 T = TypeVar("T")
 KnowledgeDetail = tuple[
@@ -300,6 +301,7 @@ class KnowledgeService:
         rebuild: bool,
     ) -> dict[str, object] | None:
         with begin_owned_transaction(self._session):
+            intent = require_execution_lease(self._session)
             job = self._repository.get_ingestion_job_for_update(
                 document_id=document_id,
                 version=version,
@@ -311,7 +313,7 @@ class KnowledgeService:
                 and not rebuild
             ):
                 return {"done": KnowledgeIngestionStatus.SUCCEEDED.value}
-            if self._claim_is_held(job):
+            if intent is None and self._claim_is_held(job):
                 return {"done": KnowledgeIngestionStatus.PROCESSING.value}
             document = self._repository.get_document(document_id)
             version_row = self._repository.get_version(
@@ -330,7 +332,7 @@ class KnowledgeService:
                 return {"done": KnowledgeIngestionStatus.FAILED.value}
             job.status = KnowledgeIngestionStatus.PROCESSING.value
             job.started_at = utc_now()
-            job.attempt = (job.attempt or 0) + 1
+            job.attempt = intent.execution_attempt if intent is not None else (job.attempt or 0) + 1
             job.error_code = None
             claimed_attempt = job.attempt
             try:
@@ -398,6 +400,7 @@ class KnowledgeService:
         claimed_version: int,
     ) -> None:
         with begin_owned_transaction(self._session):
+            require_execution_lease(self._session)
             job = self._repository.get_ingestion_job_for_update(
                 document_id=document_id,
                 version=version,
@@ -426,6 +429,7 @@ class KnowledgeService:
         request_id: str,
     ) -> str:
         with begin_owned_transaction(self._session):
+            require_execution_lease(self._session)
             job = self._repository.get_ingestion_job_for_update(
                 document_id=document_id,
                 version=version,
@@ -629,6 +633,9 @@ class KnowledgeService:
                 status=KnowledgeIngestionStatus.PENDING.value,
             )
         )
+        if self._settings.durable_tasks_enabled:
+            from app.service.task_intent import INGEST, register_intent
+            register_intent(self._session, operation=INGEST, resource=job, request_id=request_id)
         self._audit.append(
             action=AuditAction.KNOWLEDGE_DOCUMENT_CREATED,
             resource_type=AuditResourceType.KNOWLEDGE_DOCUMENT,
@@ -709,6 +716,9 @@ class KnowledgeService:
                 status=KnowledgeIngestionStatus.PENDING.value,
             )
         )
+        if self._settings.durable_tasks_enabled:
+            from app.service.task_intent import INGEST, register_intent
+            register_intent(self._session, operation=INGEST, resource=job, request_id=request_id)
         self._audit.append(
             action=AuditAction.KNOWLEDGE_DOCUMENT_VERSION_CREATED,
             resource_type=AuditResourceType.KNOWLEDGE_DOCUMENT,

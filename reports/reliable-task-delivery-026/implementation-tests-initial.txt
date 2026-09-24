@@ -1,0 +1,481 @@
+.........................................FFFFFF.F..F..F............      [100%]
+================================== FAILURES ===================================
+_ test_exhaustion_never_overwrites_terminal_new_version_or_attempt[PENDING_ANALYSIS-1-False-True] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002269CB58170>
+status = 'PENDING_ANALYSIS', version = 1, newer = False, allowed = True
+
+    @pytest.mark.parametrize('status,version,newer,allowed', [
+        ('PENDING_ANALYSIS',1,False,True), ('PENDING_ASSIGNMENT',2,False,True),
+        ('CANCELLED',2,False,False), ('CLOSED',7,False,False),
+        ('PENDING_ANALYSIS',2,False,False), ('PENDING_ANALYSIS',1,True,False),
+    ])
+    def test_exhaustion_never_overwrites_terminal_new_version_or_attempt(monkeypatch,status,version,newer,allowed):
+        monkeypatch.setattr('app.service.analysis.begin_owned_transaction',lambda _:nullcontext())
+        s = AnalysisService.__new__(AnalysisService); s._session=MagicMock()
+        s._work_orders=repo(claim(attempt=4 if newer else 1)); s._ai=MagicMock()
+        s._work_orders.get_work_order_for_update.return_value=record(status,version)
+        s._work_orders.get_active_assignment.return_value=None
+        analysis=NS(id=7,input_hash='hash',status='COMPLETED' if status=='PENDING_ASSIGNMENT' else 'PROCESSING',error_code=None)
+        s._ai.get_current_analysis_for_update.return_value=analysis
+        s._append_failure_audit=MagicMock()
+>       assert s.record_database_exhaustion(work_order_id=30,request_id='final',context=context(3)) is allowed
+
+backend\tests\unit\test_database_recovery_025.py:180: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\app\service\analysis.py:933: in record_database_exhaustion
+    require_execution_lease(self._session)
+backend\app\service\task_intent.py:64: in require_execution_lease
+    require_owned_transaction(session)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+session = <MagicMock id='2364861153888'>
+
+    def require_owned_transaction(session: Session) -> None:
+        """Refuse work unless this Session has an active owner-matched transaction."""
+    
+        transaction = _active_transaction(session)
+        if transaction is None:
+            raise TransactionContractError(
+                "Composition entry requires an owned active transaction"
+            )
+        if _owned_count(session) < 1:
+            raise TransactionContractError(
+                "Composition entry requires an owned active transaction"
+            )
+        if session.info.get(OWNED_TXN_OBJ_KEY) is not transaction:
+>           raise TransactionContractError(
+                "Composition entry does not match the current transaction owner"
+            )
+E           app.core.database.TransactionContractError: Composition entry does not match the current transaction owner
+
+backend\app\core\database.py:101: TransactionContractError
+_ test_exhaustion_never_overwrites_terminal_new_version_or_attempt[PENDING_ASSIGNMENT-2-False-True] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002269CB54110>
+status = 'PENDING_ASSIGNMENT', version = 2, newer = False, allowed = True
+
+    @pytest.mark.parametrize('status,version,newer,allowed', [
+        ('PENDING_ANALYSIS',1,False,True), ('PENDING_ASSIGNMENT',2,False,True),
+        ('CANCELLED',2,False,False), ('CLOSED',7,False,False),
+        ('PENDING_ANALYSIS',2,False,False), ('PENDING_ANALYSIS',1,True,False),
+    ])
+    def test_exhaustion_never_overwrites_terminal_new_version_or_attempt(monkeypatch,status,version,newer,allowed):
+        monkeypatch.setattr('app.service.analysis.begin_owned_transaction',lambda _:nullcontext())
+        s = AnalysisService.__new__(AnalysisService); s._session=MagicMock()
+        s._work_orders=repo(claim(attempt=4 if newer else 1)); s._ai=MagicMock()
+        s._work_orders.get_work_order_for_update.return_value=record(status,version)
+        s._work_orders.get_active_assignment.return_value=None
+        analysis=NS(id=7,input_hash='hash',status='COMPLETED' if status=='PENDING_ASSIGNMENT' else 'PROCESSING',error_code=None)
+        s._ai.get_current_analysis_for_update.return_value=analysis
+        s._append_failure_audit=MagicMock()
+>       assert s.record_database_exhaustion(work_order_id=30,request_id='final',context=context(3)) is allowed
+
+backend\tests\unit\test_database_recovery_025.py:180: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\app\service\analysis.py:933: in record_database_exhaustion
+    require_execution_lease(self._session)
+backend\app\service\task_intent.py:64: in require_execution_lease
+    require_owned_transaction(session)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+session = <MagicMock id='2364861145808'>
+
+    def require_owned_transaction(session: Session) -> None:
+        """Refuse work unless this Session has an active owner-matched transaction."""
+    
+        transaction = _active_transaction(session)
+        if transaction is None:
+            raise TransactionContractError(
+                "Composition entry requires an owned active transaction"
+            )
+        if _owned_count(session) < 1:
+            raise TransactionContractError(
+                "Composition entry requires an owned active transaction"
+            )
+        if session.info.get(OWNED_TXN_OBJ_KEY) is not transaction:
+>           raise TransactionContractError(
+                "Composition entry does not match the current transaction owner"
+            )
+E           app.core.database.TransactionContractError: Composition entry does not match the current transaction owner
+
+backend\app\core\database.py:101: TransactionContractError
+_ test_exhaustion_never_overwrites_terminal_new_version_or_attempt[CANCELLED-2-False-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002269CB2C0B0>
+status = 'CANCELLED', version = 2, newer = False, allowed = False
+
+    @pytest.mark.parametrize('status,version,newer,allowed', [
+        ('PENDING_ANALYSIS',1,False,True), ('PENDING_ASSIGNMENT',2,False,True),
+        ('CANCELLED',2,False,False), ('CLOSED',7,False,False),
+        ('PENDING_ANALYSIS',2,False,False), ('PENDING_ANALYSIS',1,True,False),
+    ])
+    def test_exhaustion_never_overwrites_terminal_new_version_or_attempt(monkeypatch,status,version,newer,allowed):
+        monkeypatch.setattr('app.service.analysis.begin_owned_transaction',lambda _:nullcontext())
+        s = AnalysisService.__new__(AnalysisService); s._session=MagicMock()
+        s._work_orders=repo(claim(attempt=4 if newer else 1)); s._ai=MagicMock()
+        s._work_orders.get_work_order_for_update.return_value=record(status,version)
+        s._work_orders.get_active_assignment.return_value=None
+        analysis=NS(id=7,input_hash='hash',status='COMPLETED' if status=='PENDING_ASSIGNMENT' else 'PROCESSING',error_code=None)
+        s._ai.get_current_analysis_for_update.return_value=analysis
+        s._append_failure_audit=MagicMock()
+>       assert s.record_database_exhaustion(work_order_id=30,request_id='final',context=context(3)) is allowed
+
+backend\tests\unit\test_database_recovery_025.py:180: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\app\service\analysis.py:933: in record_database_exhaustion
+    require_execution_lease(self._session)
+backend\app\service\task_intent.py:64: in require_execution_lease
+    require_owned_transaction(session)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+session = <MagicMock id='2364860973376'>
+
+    def require_owned_transaction(session: Session) -> None:
+        """Refuse work unless this Session has an active owner-matched transaction."""
+    
+        transaction = _active_transaction(session)
+        if transaction is None:
+            raise TransactionContractError(
+                "Composition entry requires an owned active transaction"
+            )
+        if _owned_count(session) < 1:
+            raise TransactionContractError(
+                "Composition entry requires an owned active transaction"
+            )
+        if session.info.get(OWNED_TXN_OBJ_KEY) is not transaction:
+>           raise TransactionContractError(
+                "Composition entry does not match the current transaction owner"
+            )
+E           app.core.database.TransactionContractError: Composition entry does not match the current transaction owner
+
+backend\app\core\database.py:101: TransactionContractError
+_ test_exhaustion_never_overwrites_terminal_new_version_or_attempt[CLOSED-7-False-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002269CB35040>
+status = 'CLOSED', version = 7, newer = False, allowed = False
+
+    @pytest.mark.parametrize('status,version,newer,allowed', [
+        ('PENDING_ANALYSIS',1,False,True), ('PENDING_ASSIGNMENT',2,False,True),
+        ('CANCELLED',2,False,False), ('CLOSED',7,False,False),
+        ('PENDING_ANALYSIS',2,False,False), ('PENDING_ANALYSIS',1,True,False),
+    ])
+    def test_exhaustion_never_overwrites_terminal_new_version_or_attempt(monkeypatch,status,version,newer,allowed):
+        monkeypatch.setattr('app.service.analysis.begin_owned_transaction',lambda _:nullcontext())
+        s = AnalysisService.__new__(AnalysisService); s._session=MagicMock()
+        s._work_orders=repo(claim(attempt=4 if newer else 1)); s._ai=MagicMock()
+        s._work_orders.get_work_order_for_update.return_value=record(status,version)
+        s._work_orders.get_active_assignment.return_value=None
+        analysis=NS(id=7,input_hash='hash',status='COMPLETED' if status=='PENDING_ASSIGNMENT' else 'PROCESSING',error_code=None)
+        s._ai.get_current_analysis_for_update.return_value=analysis
+        s._append_failure_audit=MagicMock()
+>       assert s.record_database_exhaustion(work_order_id=30,request_id='final',context=context(3)) is allowed
+
+backend\tests\unit\test_database_recovery_025.py:180: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\app\service\analysis.py:933: in record_database_exhaustion
+    require_execution_lease(self._session)
+backend\app\service\task_intent.py:64: in require_execution_lease
+    require_owned_transaction(session)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+session = <MagicMock id='2364861021168'>
+
+    def require_owned_transaction(session: Session) -> None:
+        """Refuse work unless this Session has an active owner-matched transaction."""
+    
+        transaction = _active_transaction(session)
+        if transaction is None:
+            raise TransactionContractError(
+                "Composition entry requires an owned active transaction"
+            )
+        if _owned_count(session) < 1:
+            raise TransactionContractError(
+                "Composition entry requires an owned active transaction"
+            )
+        if session.info.get(OWNED_TXN_OBJ_KEY) is not transaction:
+>           raise TransactionContractError(
+                "Composition entry does not match the current transaction owner"
+            )
+E           app.core.database.TransactionContractError: Composition entry does not match the current transaction owner
+
+backend\app\core\database.py:101: TransactionContractError
+_ test_exhaustion_never_overwrites_terminal_new_version_or_attempt[PENDING_ANALYSIS-2-False-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002269CB09B20>
+status = 'PENDING_ANALYSIS', version = 2, newer = False, allowed = False
+
+    @pytest.mark.parametrize('status,version,newer,allowed', [
+        ('PENDING_ANALYSIS',1,False,True), ('PENDING_ASSIGNMENT',2,False,True),
+        ('CANCELLED',2,False,False), ('CLOSED',7,False,False),
+        ('PENDING_ANALYSIS',2,False,False), ('PENDING_ANALYSIS',1,True,False),
+    ])
+    def test_exhaustion_never_overwrites_terminal_new_version_or_attempt(monkeypatch,status,version,newer,allowed):
+        monkeypatch.setattr('app.service.analysis.begin_owned_transaction',lambda _:nullcontext())
+        s = AnalysisService.__new__(AnalysisService); s._session=MagicMock()
+        s._work_orders=repo(claim(attempt=4 if newer else 1)); s._ai=MagicMock()
+        s._work_orders.get_work_order_for_update.return_value=record(status,version)
+        s._work_orders.get_active_assignment.return_value=None
+        analysis=NS(id=7,input_hash='hash',status='COMPLETED' if status=='PENDING_ASSIGNMENT' else 'PROCESSING',error_code=None)
+        s._ai.get_current_analysis_for_update.return_value=analysis
+        s._append_failure_audit=MagicMock()
+>       assert s.record_database_exhaustion(work_order_id=30,request_id='final',context=context(3)) is allowed
+
+backend\tests\unit\test_database_recovery_025.py:180: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\app\service\analysis.py:933: in record_database_exhaustion
+    require_execution_lease(self._session)
+backend\app\service\task_intent.py:64: in require_execution_lease
+    require_owned_transaction(session)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+session = <MagicMock id='2364860659088'>
+
+    def require_owned_transaction(session: Session) -> None:
+        """Refuse work unless this Session has an active owner-matched transaction."""
+    
+        transaction = _active_transaction(session)
+        if transaction is None:
+            raise TransactionContractError(
+                "Composition entry requires an owned active transaction"
+            )
+        if _owned_count(session) < 1:
+            raise TransactionContractError(
+                "Composition entry requires an owned active transaction"
+            )
+        if session.info.get(OWNED_TXN_OBJ_KEY) is not transaction:
+>           raise TransactionContractError(
+                "Composition entry does not match the current transaction owner"
+            )
+E           app.core.database.TransactionContractError: Composition entry does not match the current transaction owner
+
+backend\app\core\database.py:101: TransactionContractError
+_ test_exhaustion_never_overwrites_terminal_new_version_or_attempt[PENDING_ANALYSIS-1-True-False] _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002269CB49A00>
+status = 'PENDING_ANALYSIS', version = 1, newer = True, allowed = False
+
+    @pytest.mark.parametrize('status,version,newer,allowed', [
+        ('PENDING_ANALYSIS',1,False,True), ('PENDING_ASSIGNMENT',2,False,True),
+        ('CANCELLED',2,False,False), ('CLOSED',7,False,False),
+        ('PENDING_ANALYSIS',2,False,False), ('PENDING_ANALYSIS',1,True,False),
+    ])
+    def test_exhaustion_never_overwrites_terminal_new_version_or_attempt(monkeypatch,status,version,newer,allowed):
+        monkeypatch.setattr('app.service.analysis.begin_owned_transaction',lambda _:nullcontext())
+        s = AnalysisService.__new__(AnalysisService); s._session=MagicMock()
+        s._work_orders=repo(claim(attempt=4 if newer else 1)); s._ai=MagicMock()
+        s._work_orders.get_work_order_for_update.return_value=record(status,version)
+        s._work_orders.get_active_assignment.return_value=None
+        analysis=NS(id=7,input_hash='hash',status='COMPLETED' if status=='PENDING_ASSIGNMENT' else 'PROCESSING',error_code=None)
+        s._ai.get_current_analysis_for_update.return_value=analysis
+        s._append_failure_audit=MagicMock()
+>       assert s.record_database_exhaustion(work_order_id=30,request_id='final',context=context(3)) is allowed
+
+backend\tests\unit\test_database_recovery_025.py:180: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\app\service\analysis.py:933: in record_database_exhaustion
+    require_execution_lease(self._session)
+backend\app\service\task_intent.py:64: in require_execution_lease
+    require_owned_transaction(session)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+session = <MagicMock id='2364861098432'>
+
+    def require_owned_transaction(session: Session) -> None:
+        """Refuse work unless this Session has an active owner-matched transaction."""
+    
+        transaction = _active_transaction(session)
+        if transaction is None:
+            raise TransactionContractError(
+                "Composition entry requires an owned active transaction"
+            )
+        if _owned_count(session) < 1:
+            raise TransactionContractError(
+                "Composition entry requires an owned active transaction"
+            )
+        if session.info.get(OWNED_TXN_OBJ_KEY) is not transaction:
+>           raise TransactionContractError(
+                "Composition entry does not match the current transaction owner"
+            )
+E           app.core.database.TransactionContractError: Composition entry does not match the current transaction owner
+
+backend\app\core\database.py:101: TransactionContractError
+_____ test_fenced_committed_analysis_survives_changed_historical_context ______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002269CBF0D70>
+
+    def test_fenced_committed_analysis_survives_changed_historical_context(monkeypatch):
+        from app.core.config import Settings
+        from app.core.time import utc_now
+        monkeypatch.setattr('app.service.analysis.begin_owned_transaction',lambda _:nullcontext())
+        s=AnalysisService.__new__(AnalysisService);s._session=MagicMock();s._settings=Settings(_env_file=None)
+        s._clock=utc_now;s._task_context=context(2);s._work_orders=repo(claim());s._ai=MagicMock()
+        r=record('PENDING_ASSIGNMENT',2);r.house_id=3;r.created_at=utc_now()
+        s._work_orders.get_work_order_for_update.return_value=r
+        s._work_orders.get_content.return_value=NS(text='unchanged tap leak',extra_notes='',asr_text=None)
+        s._ai.list_media_with_files.return_value=()
+        s._ai.get_analysis_context.return_value={'recent_house_orders':[{'status':'PROCESSING'}]}
+        s._ai.get_building_id.return_value=4
+        s._ai.get_current_analysis_for_update.return_value=NS(id=7,analysis_version=1,status='COMPLETED',input_hash='hash')
+>       snap=s._prepare(work_order_id=30,request_id='retry-same-input')
+
+backend\tests\unit\test_database_recovery_025.py:208: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\app\service\analysis.py:357: in _prepare
+    require_execution_lease(self._session)
+backend\app\service\task_intent.py:64: in require_execution_lease
+    require_owned_transaction(session)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+session = <MagicMock id='2364861776576'>
+
+    def require_owned_transaction(session: Session) -> None:
+        """Refuse work unless this Session has an active owner-matched transaction."""
+    
+        transaction = _active_transaction(session)
+        if transaction is None:
+            raise TransactionContractError(
+                "Composition entry requires an owned active transaction"
+            )
+        if _owned_count(session) < 1:
+            raise TransactionContractError(
+                "Composition entry requires an owned active transaction"
+            )
+        if session.info.get(OWNED_TXN_OBJ_KEY) is not transaction:
+>           raise TransactionContractError(
+                "Composition entry does not match the current transaction owner"
+            )
+E           app.core.database.TransactionContractError: Composition entry does not match the current transaction owner
+
+backend\app\core\database.py:101: TransactionContractError
+_______________ test_tenant_manager_can_create_tenant_document ________________
+
+    def test_tenant_manager_can_create_tenant_document() -> None:
+        actor = _principal(OrganizationScope(ScopeType.TENANT, tenant_id=10))
+        service, repository, properties, audit = _service(actor)
+        properties.get_tenant.return_value = SimpleNamespace(id=10, status="ACTIVE")
+    
+>       document, job = service._create_document(
+            actor=actor,
+            property_id=None,
+            title="  enterprise guide  ",
+            document_type="GUIDE",
+            visibility="RESIDENT",
+            source_text="The service desk is open every day.",
+            request_id="knowledge-create",
+            claimed_tenant_id=10,
+        )
+
+backend\tests\unit\test_knowledge_management.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\app\service\knowledge.py:638: in _create_document
+    register_intent(self._session, operation=INGEST, resource=job, request_id=request_id)
+backend\app\service\task_intent.py:73: in register_intent
+    require_owned_transaction(session)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+session = <MagicMock id='2364861043520'>
+
+    def require_owned_transaction(session: Session) -> None:
+        """Refuse work unless this Session has an active owner-matched transaction."""
+    
+        transaction = _active_transaction(session)
+        if transaction is None:
+            raise TransactionContractError(
+                "Composition entry requires an owned active transaction"
+            )
+        if _owned_count(session) < 1:
+            raise TransactionContractError(
+                "Composition entry requires an owned active transaction"
+            )
+        if session.info.get(OWNED_TXN_OBJ_KEY) is not transaction:
+>           raise TransactionContractError(
+                "Composition entry does not match the current transaction owner"
+            )
+E           app.core.database.TransactionContractError: Composition entry does not match the current transaction owner
+
+backend\app\core\database.py:101: TransactionContractError
+_________ test_create_version_locks_document_and_records_pending_job __________
+
+    def test_create_version_locks_document_and_records_pending_job() -> None:
+        actor = _principal(
+            OrganizationScope(
+                ScopeType.PROPERTY,
+                tenant_id=10,
+                property_id=20,
+            )
+        )
+        service, repository, _properties, audit = _service(actor)
+        document = KnowledgeDocument(
+            id=71,
+            tenant_id=10,
+            property_id=20,
+            title="property guide",
+            document_type="GUIDE",
+            visibility="RESIDENT",
+            status="ACTIVE",
+            current_version=1,
+            created_by_user_id=actor.user_id,
+        )
+        repository.get_document_for_update.return_value = document
+        repository.next_version_for_update.return_value = 2
+    
+>       version, job = service._create_version(
+            actor=actor,
+            document_id=document.id,
+            source_text="Second version content.",
+            request_id="knowledge-version",
+            claimed_tenant_id=10,
+            claimed_property_id=20,
+        )
+
+backend\tests\unit\test_knowledge_management.py:168: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\app\service\knowledge.py:721: in _create_version
+    register_intent(self._session, operation=INGEST, resource=job, request_id=request_id)
+backend\app\service\task_intent.py:73: in register_intent
+    require_owned_transaction(session)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+session = <MagicMock id='2364863477232'>
+
+    def require_owned_transaction(session: Session) -> None:
+        """Refuse work unless this Session has an active owner-matched transaction."""
+    
+        transaction = _active_transaction(session)
+        if transaction is None:
+            raise TransactionContractError(
+                "Composition entry requires an owned active transaction"
+            )
+        if _owned_count(session) < 1:
+            raise TransactionContractError(
+                "Composition entry requires an owned active transaction"
+            )
+        if session.info.get(OWNED_TXN_OBJ_KEY) is not transaction:
+>           raise TransactionContractError(
+                "Composition entry does not match the current transaction owner"
+            )
+E           app.core.database.TransactionContractError: Composition entry does not match the current transaction owner
+
+backend\app\core\database.py:101: TransactionContractError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:40
+  D:\property-ai\.venv\Lib\site-packages\starlette\testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\unit\test_database_recovery_025.py::test_exhaustion_never_overwrites_terminal_new_version_or_attempt[PENDING_ANALYSIS-1-False-True]
+FAILED backend\tests\unit\test_database_recovery_025.py::test_exhaustion_never_overwrites_terminal_new_version_or_attempt[PENDING_ASSIGNMENT-2-False-True]
+FAILED backend\tests\unit\test_database_recovery_025.py::test_exhaustion_never_overwrites_terminal_new_version_or_attempt[CANCELLED-2-False-False]
+FAILED backend\tests\unit\test_database_recovery_025.py::test_exhaustion_never_overwrites_terminal_new_version_or_attempt[CLOSED-7-False-False]
+FAILED backend\tests\unit\test_database_recovery_025.py::test_exhaustion_never_overwrites_terminal_new_version_or_attempt[PENDING_ANALYSIS-2-False-False]
+FAILED backend\tests\unit\test_database_recovery_025.py::test_exhaustion_never_overwrites_terminal_new_version_or_attempt[PENDING_ANALYSIS-1-True-False]
+FAILED backend\tests\unit\test_database_recovery_025.py::test_fenced_committed_analysis_survives_changed_historical_context
+FAILED backend\tests\unit\test_knowledge_management.py::test_tenant_manager_can_create_tenant_document
+FAILED backend\tests\unit\test_knowledge_management.py::test_create_version_locks_document_and_records_pending_job
+9 failed, 58 passed, 1 warning in 0.66s
+D:\property-ai\.venv\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))

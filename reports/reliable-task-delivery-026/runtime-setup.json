@@ -1,0 +1,153 @@
+{
+  "run_id": "rt026-91880f6aeb",
+  "requests": [
+    {
+      "label": "manager-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "07b3e1ab9aa0bd91"
+    },
+    {
+      "label": "manager-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6d0db613b4de4272"
+    },
+    {
+      "label": "manager-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9d6fd39f835b5844"
+    },
+    {
+      "label": "manager-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a6b42c86f84e1902"
+    },
+    {
+      "label": "check-manager",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "10f2487356d1fb1b"
+    },
+    {
+      "label": "resident-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a2a7af51c5dd0955"
+    },
+    {
+      "label": "resident-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a36b667ff9b4a226"
+    },
+    {
+      "label": "resident-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "ca06c324afff15ca"
+    },
+    {
+      "label": "resident-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "581f6e6cb087916c"
+    },
+    {
+      "label": "check-resident",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "afa9667bcf947166"
+    },
+    {
+      "label": "staff-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c006127333e8ed15"
+    },
+    {
+      "label": "staff-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2cef06da5f952c1e"
+    },
+    {
+      "label": "staff-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9a31bedded6a68fb"
+    },
+    {
+      "label": "staff-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a5d2c4e52998b0b2"
+    },
+    {
+      "label": "check-staff",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "7e15ae3fb012a57d"
+    }
+  ],
+  "property_id": 3,
+  "employee_id": 5,
+  "normal_auth": true,
+  "daily": [
+    {
+      "business_date": "2026-09-25",
+      "current_load": 0,
+      "on_duty": "ON_DUTY"
+    }
+  ],
+  "active_assignments": 0,
+  "new_orders": 0,
+  "protected_old_orders": "no operations"
+}

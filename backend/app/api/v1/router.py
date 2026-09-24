@@ -23,6 +23,7 @@ from app.api.v1.resident import router as resident_router
 from app.api.v1.staff_attendance import router as staff_attendance_router
 from app.api.v1.staff_work_orders import router as staff_work_orders_router
 from app.api.v1.supervisor_ai import router as supervisor_ai_router
+from app.api.v1.task_intents import router as task_intents_router
 from app.api.v1.supervisor_incidents import router as supervisor_incidents_router
 from app.api.v1.supervisor_staff import router as supervisor_staff_router
 from app.api.v1.supervisor_work_orders import router as supervisor_work_orders_router
@@ -49,6 +50,7 @@ def build_api_router(settings: Settings) -> APIRouter:
     router.include_router(staff_work_orders_router)
     router.include_router(supervisor_work_orders_router)
     router.include_router(supervisor_ai_router)
+    router.include_router(task_intents_router)
     router.include_router(supervisor_incidents_router)
     router.include_router(admin_announcements_router)
     router.include_router(announcements_router)

@@ -171,6 +171,7 @@ def test_budget_exhaustion_uses_fresh_failure_boundary_not_fourth_retry(monkeypa
 def test_exhaustion_never_overwrites_terminal_new_version_or_attempt(monkeypatch,status,version,newer,allowed):
     monkeypatch.setattr('app.service.analysis.begin_owned_transaction',lambda _:nullcontext())
     s = AnalysisService.__new__(AnalysisService); s._session=MagicMock()
+    s._session.info = {}  # This legacy-path fixture has no durable execution lease.
     s._work_orders=repo(claim(attempt=4 if newer else 1)); s._ai=MagicMock()
     s._work_orders.get_work_order_for_update.return_value=record(status,version)
     s._work_orders.get_active_assignment.return_value=None
@@ -197,6 +198,7 @@ def test_fenced_committed_analysis_survives_changed_historical_context(monkeypat
     from app.core.time import utc_now
     monkeypatch.setattr('app.service.analysis.begin_owned_transaction',lambda _:nullcontext())
     s=AnalysisService.__new__(AnalysisService);s._session=MagicMock();s._settings=Settings(_env_file=None)
+    s._session.info = {}
     s._clock=utc_now;s._task_context=context(2);s._work_orders=repo(claim());s._ai=MagicMock()
     r=record('PENDING_ASSIGNMENT',2);r.house_id=3;r.created_at=utc_now()
     s._work_orders.get_work_order_for_update.return_value=r

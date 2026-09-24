@@ -1,0 +1,566 @@
+{
+  "before": {
+    "observed_utc": "2026-09-24T20:48:05.751668+00:00",
+    "head": "7bc504bd6fe287075fd7b4cd14d08ab944d70bfd",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "processes": [],
+    "container": {
+      "id": "fa78177adc270834bd1c25e63cb86b1d6a7fd3f7cfb2faa66c5ac4f67ab0d66f",
+      "image": "mysql:8.0.41",
+      "running": true,
+      "ports": {
+        "3306/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "3307"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "3307"
+          }
+        ]
+      },
+      "mounts": [],
+      "tmpfs": {
+        "/var/lib/mysql": ""
+      },
+      "existing_wildcard_publish": true
+    },
+    "revision": "20260924_0011_contact_phone",
+    "counts": {
+      "ai_call_logs": 35,
+      "alembic_version": 1,
+      "announcement_reviews": 0,
+      "announcement_scopes": 0,
+      "announcements": 0,
+      "attendance_records": 7,
+      "audit_logs": 694,
+      "auth_sessions": 116,
+      "buildings": 14,
+      "departments": 0,
+      "dispatch_recommendations": 55,
+      "duties": 1,
+      "employee_daily_statuses": 7,
+      "employee_duties": 5,
+      "employee_invites": 5,
+      "employee_properties": 10,
+      "employee_skills": 2,
+      "employees": 5,
+      "file_objects": 3,
+      "houses": 67,
+      "idempotency_records": 35,
+      "incident_work_orders": 0,
+      "incidents": 0,
+      "knowledge_chunks": 0,
+      "knowledge_document_versions": 0,
+      "knowledge_documents": 0,
+      "knowledge_ingestion_jobs": 0,
+      "notification_deliveries": 302,
+      "notifications": 302,
+      "password_reset_tickets": 1,
+      "permissions": 33,
+      "properties": 3,
+      "resident_bind_requests": 118,
+      "resident_house_relations": 65,
+      "role_permissions": 47,
+      "roles": 3,
+      "skills": 1,
+      "sla_clocks": 35,
+      "sla_policies": 0,
+      "sms_challenges": 107,
+      "tenants": 1,
+      "units": 14,
+      "user_passwords": 1,
+      "user_phones": 15,
+      "user_roles": 14,
+      "user_wechats": 0,
+      "users": 15,
+      "visual_challenges": 110,
+      "work_order_analyses": 31,
+      "work_order_assignments": 32,
+      "work_order_contents": 35,
+      "work_order_feedbacks": 26,
+      "work_order_logs": 312,
+      "work_order_media": 3,
+      "work_order_processes": 26,
+      "work_order_receipts": 26,
+      "work_orders": 35
+    },
+    "protected": {
+      "12": {
+        "work_orders": {
+          "count": 1,
+          "sha256": "4e67d79e88f223c4939e5d8be550964968e49264f249002918f50e4ecea0b576"
+        },
+        "work_order_analyses": {
+          "count": 1,
+          "sha256": "c397d3ca9dde9ebe5a00322b06d1747909c9b99ac06883770d18606dc9639011"
+        },
+        "work_order_assignments": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "work_order_logs": {
+          "count": 1,
+          "sha256": "1f5f28816dbf6d79a67b8d4627740bad6d54a1d6d87e5d812f055c2e65ee0e21"
+        },
+        "ai_call_logs": {
+          "count": 1,
+          "sha256": "fc879975e508b0865c433677a4695ed599e35905282c3e550f9e6cf2009d3f2f"
+        }
+      },
+      "24": {
+        "work_orders": {
+          "count": 1,
+          "sha256": "2f836d8d807fc40631702fa5d8692b6c7a7da7c07df4099ddec13f8ab1ce7668"
+        },
+        "work_order_analyses": {
+          "count": 1,
+          "sha256": "1fd0cc31bf8f29284054252de55fd965c66c85cd9718bfc0f01e4ae0b9bff7e5"
+        },
+        "work_order_assignments": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "work_order_logs": {
+          "count": 1,
+          "sha256": "d96f1c426ab848c769362bdc8ed237965bde5cf1ab798f768a76a11aedea75fa"
+        },
+        "ai_call_logs": {
+          "count": 1,
+          "sha256": "7f7b14b559303ddb703d62a96733672a162f28f60178d0b3efe7d81d4e64ee51"
+        }
+      },
+      "25": {
+        "work_orders": {
+          "count": 1,
+          "sha256": "c97eab20a29c3b926d9ea8a3f9a1ab63f8ced29ee7be41a1a07052abc5694afd"
+        },
+        "work_order_analyses": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "work_order_assignments": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "work_order_logs": {
+          "count": 1,
+          "sha256": "4e000b7d6a0a009264638dac6f1f9fd162e9e4ab1d7430cbc460b8c7afdbd45d"
+        },
+        "ai_call_logs": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      },
+      "30": {
+        "work_orders": {
+          "count": 1,
+          "sha256": "f2fe2159cbd00388ae3e6b7ab57e59a511ba7fcd5ed96d86ded7d2bc83a142ea"
+        },
+        "work_order_analyses": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "work_order_assignments": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "work_order_logs": {
+          "count": 1,
+          "sha256": "1291389c3ca1b836b49c4be623feba8cf74c5e6142e3e779a8002bbc77b9d50b"
+        },
+        "ai_call_logs": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      },
+      "34": {
+        "work_orders": {
+          "count": 1,
+          "sha256": "90e7d63ee5f7a87857beae45a174cde14441c675f6bf2ebd14e5e72298d57b95"
+        },
+        "work_order_analyses": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "work_order_assignments": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "work_order_logs": {
+          "count": 2,
+          "sha256": "e5ddde5ee241085c5561f4c038b64681ac4779b51b0872f19516a41fa933b88e"
+        },
+        "ai_call_logs": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      }
+    },
+    "active_other_db_connections": 0,
+    "queue_metadata": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t0\nproperty_ai.auth001.dlq\t7\t0\t0",
+    "config_sha256": "342ed0b61fe9c74e7a5ce82198c8f36bd9341d5cda83de2c408f33256867fe1f"
+  },
+  "after": {
+    "observed_utc": "2026-09-24T20:48:07.381445+00:00",
+    "head": "7bc504bd6fe287075fd7b4cd14d08ab944d70bfd",
+    "database": "127.0.0.1:3307/property_ai_auth001_test",
+    "processes": [],
+    "container": {
+      "id": "fa78177adc270834bd1c25e63cb86b1d6a7fd3f7cfb2faa66c5ac4f67ab0d66f",
+      "image": "mysql:8.0.41",
+      "running": true,
+      "ports": {
+        "3306/tcp": [
+          {
+            "HostIp": "0.0.0.0",
+            "HostPort": "3307"
+          },
+          {
+            "HostIp": "::",
+            "HostPort": "3307"
+          }
+        ]
+      },
+      "mounts": [],
+      "tmpfs": {
+        "/var/lib/mysql": ""
+      },
+      "existing_wildcard_publish": true
+    },
+    "revision": "20260925_0012_task_intents",
+    "counts": {
+      "ai_call_logs": 35,
+      "alembic_version": 1,
+      "announcement_reviews": 0,
+      "announcement_scopes": 0,
+      "announcements": 0,
+      "attendance_records": 7,
+      "audit_logs": 694,
+      "auth_sessions": 116,
+      "buildings": 14,
+      "departments": 0,
+      "dispatch_recommendations": 55,
+      "duties": 1,
+      "employee_daily_statuses": 7,
+      "employee_duties": 5,
+      "employee_invites": 5,
+      "employee_properties": 10,
+      "employee_skills": 2,
+      "employees": 5,
+      "file_objects": 3,
+      "houses": 67,
+      "idempotency_records": 35,
+      "incident_work_orders": 0,
+      "incidents": 0,
+      "knowledge_chunks": 0,
+      "knowledge_document_versions": 0,
+      "knowledge_documents": 0,
+      "knowledge_ingestion_jobs": 0,
+      "notification_deliveries": 302,
+      "notifications": 302,
+      "password_reset_tickets": 1,
+      "permissions": 33,
+      "properties": 3,
+      "resident_bind_requests": 118,
+      "resident_house_relations": 65,
+      "role_permissions": 47,
+      "roles": 3,
+      "skills": 1,
+      "sla_clocks": 35,
+      "sla_policies": 0,
+      "sms_challenges": 107,
+      "task_intents": 0,
+      "tenants": 1,
+      "units": 14,
+      "user_passwords": 1,
+      "user_phones": 15,
+      "user_roles": 14,
+      "user_wechats": 0,
+      "users": 15,
+      "visual_challenges": 110,
+      "work_order_analyses": 31,
+      "work_order_assignments": 32,
+      "work_order_contents": 35,
+      "work_order_feedbacks": 26,
+      "work_order_logs": 312,
+      "work_order_media": 3,
+      "work_order_processes": 26,
+      "work_order_receipts": 26,
+      "work_orders": 35
+    },
+    "protected": {
+      "12": {
+        "work_orders": {
+          "count": 1,
+          "sha256": "4e67d79e88f223c4939e5d8be550964968e49264f249002918f50e4ecea0b576"
+        },
+        "work_order_analyses": {
+          "count": 1,
+          "sha256": "c397d3ca9dde9ebe5a00322b06d1747909c9b99ac06883770d18606dc9639011"
+        },
+        "work_order_assignments": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "work_order_logs": {
+          "count": 1,
+          "sha256": "1f5f28816dbf6d79a67b8d4627740bad6d54a1d6d87e5d812f055c2e65ee0e21"
+        },
+        "ai_call_logs": {
+          "count": 1,
+          "sha256": "fc879975e508b0865c433677a4695ed599e35905282c3e550f9e6cf2009d3f2f"
+        }
+      },
+      "24": {
+        "work_orders": {
+          "count": 1,
+          "sha256": "2f836d8d807fc40631702fa5d8692b6c7a7da7c07df4099ddec13f8ab1ce7668"
+        },
+        "work_order_analyses": {
+          "count": 1,
+          "sha256": "1fd0cc31bf8f29284054252de55fd965c66c85cd9718bfc0f01e4ae0b9bff7e5"
+        },
+        "work_order_assignments": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "work_order_logs": {
+          "count": 1,
+          "sha256": "d96f1c426ab848c769362bdc8ed237965bde5cf1ab798f768a76a11aedea75fa"
+        },
+        "ai_call_logs": {
+          "count": 1,
+          "sha256": "7f7b14b559303ddb703d62a96733672a162f28f60178d0b3efe7d81d4e64ee51"
+        }
+      },
+      "25": {
+        "work_orders": {
+          "count": 1,
+          "sha256": "c97eab20a29c3b926d9ea8a3f9a1ab63f8ced29ee7be41a1a07052abc5694afd"
+        },
+        "work_order_analyses": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "work_order_assignments": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "work_order_logs": {
+          "count": 1,
+          "sha256": "4e000b7d6a0a009264638dac6f1f9fd162e9e4ab1d7430cbc460b8c7afdbd45d"
+        },
+        "ai_call_logs": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      },
+      "30": {
+        "work_orders": {
+          "count": 1,
+          "sha256": "f2fe2159cbd00388ae3e6b7ab57e59a511ba7fcd5ed96d86ded7d2bc83a142ea"
+        },
+        "work_order_analyses": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "work_order_assignments": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "work_order_logs": {
+          "count": 1,
+          "sha256": "1291389c3ca1b836b49c4be623feba8cf74c5e6142e3e779a8002bbc77b9d50b"
+        },
+        "ai_call_logs": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      },
+      "34": {
+        "work_orders": {
+          "count": 1,
+          "sha256": "90e7d63ee5f7a87857beae45a174cde14441c675f6bf2ebd14e5e72298d57b95"
+        },
+        "work_order_analyses": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "work_order_assignments": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "work_order_logs": {
+          "count": 2,
+          "sha256": "e5ddde5ee241085c5561f4c038b64681ac4779b51b0872f19516a41fa933b88e"
+        },
+        "ai_call_logs": {
+          "count": 0,
+          "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      }
+    },
+    "active_other_db_connections": 0,
+    "task_intents_structure": {
+      "columns": [
+        "id",
+        "tenant_id",
+        "property_id",
+        "operation",
+        "resource_id",
+        "resource_version",
+        "generation",
+        "request_id",
+        "task_id",
+        "status",
+        "publish_attempt",
+        "execution_attempt",
+        "available_at",
+        "lease_token",
+        "lease_until",
+        "last_error_code",
+        "published_at",
+        "finished_at",
+        "created_at",
+        "updated_at"
+      ],
+      "indexes": [
+        {
+          "name": "fk_task_intents_property_tenant",
+          "column_names": [
+            "property_id",
+            "tenant_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "ix_task_intents_due",
+          "column_names": [
+            "status",
+            "available_at",
+            "id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "ix_task_intents_expired",
+          "column_names": [
+            "status",
+            "lease_until",
+            "id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "ix_task_intents_scope",
+          "column_names": [
+            "tenant_id",
+            "property_id",
+            "id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "uq_task_intents_resource_generation",
+          "column_names": [
+            "operation",
+            "resource_id",
+            "resource_version",
+            "generation"
+          ],
+          "unique": true,
+          "type": "UNIQUE"
+        },
+        {
+          "name": "uq_task_intents_task_id",
+          "column_names": [
+            "task_id"
+          ],
+          "unique": true,
+          "type": "UNIQUE"
+        }
+      ],
+      "unique": [
+        {
+          "name": "uq_task_intents_resource_generation",
+          "column_names": [
+            "operation",
+            "resource_id",
+            "resource_version",
+            "generation"
+          ],
+          "duplicates_index": "uq_task_intents_resource_generation"
+        },
+        {
+          "name": "uq_task_intents_task_id",
+          "column_names": [
+            "task_id"
+          ],
+          "duplicates_index": "uq_task_intents_task_id"
+        }
+      ],
+      "checks": [
+        {
+          "name": "ck_task_intents_attempt_nonnegative",
+          "sqltext": "((`publish_attempt` >= 0) and (`execution_attempt` >= 0))"
+        },
+        {
+          "name": "ck_task_intents_lease_consistent",
+          "sqltext": "(((cast(`status` as char charset binary) in (_utf8mb4'PUBLISHING',_utf8mb4'PROCESSING')) and (`lease_token` is not null) and (`lease_until` is not null)) or ((cast(`status` as char charset binary) not in (_utf8mb4'PUBLISHING',_utf8mb4'PROCESSING')) and (`lease_token` is null) and (`lease_until` is null)))"
+        },
+        {
+          "name": "ck_task_intents_operation",
+          "sqltext": "(cast(`operation` as char charset binary) in (_utf8mb4'ANALYZE_WORK_ORDER',_utf8mb4'INGEST_KNOWLEDGE',_utf8mb4'DELIVER_NOTIFICATION'))"
+        },
+        {
+          "name": "ck_task_intents_positive_resource",
+          "sqltext": "((`resource_id` > 0) and (`resource_version` > 0) and (`generation` > 0))"
+        },
+        {
+          "name": "ck_task_intents_status",
+          "sqltext": "(cast(`status` as char charset binary) in (_utf8mb4'PENDING',_utf8mb4'PUBLISHING',_utf8mb4'PUBLISHED',_utf8mb4'PROCESSING',_utf8mb4'RETRY_WAIT',_utf8mb4'SUCCEEDED',_utf8mb4'FAILED',_utf8mb4'CANCELLED'))"
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "fk_task_intents_property_tenant",
+          "constrained_columns": [
+            "property_id",
+            "tenant_id"
+          ],
+          "referred_schema": null,
+          "referred_table": "properties",
+          "referred_columns": [
+            "id",
+            "tenant_id"
+          ],
+          "options": {
+            "onupdate": "RESTRICT",
+            "ondelete": "RESTRICT"
+          }
+        },
+        {
+          "name": "fk_task_intents_tenant_id_tenants",
+          "constrained_columns": [
+            "tenant_id"
+          ],
+          "referred_schema": null,
+          "referred_table": "tenants",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {
+            "onupdate": "RESTRICT",
+            "ondelete": "RESTRICT"
+          }
+        }
+      ]
+    },
+    "queue_metadata": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t0\nproperty_ai.auth001.dlq\t7\t0\t0",
+    "config_sha256": "342ed0b61fe9c74e7a5ce82198c8f36bd9341d5cda83de2c408f33256867fe1f"
+  },
+  "result": "APPLIED_ONLY_0012_OLD_COUNTS_AND_PROTECTED_UNCHANGED",
+  "backup_restore_tested": false
+}

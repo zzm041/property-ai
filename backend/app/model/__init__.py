@@ -1,6 +1,7 @@
 """SQLAlchemy 2.x models. Schema changes are managed only by Alembic."""
 
 from app.model.base import Base
+from app.model.task_intent import TaskIntent
 from app.model.identity import (
     AuditLog,
     Permission,

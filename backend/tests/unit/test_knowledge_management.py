@@ -53,7 +53,7 @@ def _service(actor: Principal) -> tuple[KnowledgeService, MagicMock, MagicMock, 
         property_repository=properties,
         audit_service=audit,
         principal_loader=lambda _user_id: actor,
-        settings=MagicMock(),
+        settings=MagicMock(durable_tasks_enabled=False),
     )
     return service, repository, properties, audit
 

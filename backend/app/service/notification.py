@@ -21,6 +21,7 @@ from app.provider.errors import (
 from app.provider.factory import build_notification_provider
 from app.repository.knowledge import KnowledgeRepository
 from app.worker.enqueue import schedule_notification_delivery
+from app.service.task_intent import require_execution_lease
 
 logger = get_logger(__name__)
 
@@ -73,6 +74,11 @@ class NotificationService:
                 status="PENDING",
             )
         )
+        if self._settings.durable_tasks_enabled:
+            from app.service.task_intent import DELIVER, register_intent
+            register_intent(self._session, operation=DELIVER, resource=delivery,
+                            request_id=f"notification-{record.id}")
+            return record
         pending = self._session.info.setdefault("pending_notification_deliveries", [])
         pending.append(delivery.id)
         self._session.info["notification_settings"] = self._settings
@@ -183,6 +189,15 @@ class NotificationService:
 
         with begin_owned_transaction(self._session):
             now = utc_now()
+            intent = require_execution_lease(self._session)
+            if intent is not None:
+                delivery = self._session.get(NotificationDelivery, delivery_id, with_for_update=True)
+                if delivery is not None and delivery.status == "PENDING":
+                    # The outer durable lease supersedes an expired/lost execution.
+                    # Keep a single budget, including crashes before the push.
+                    delivery.next_retry_at = now
+                    delivery.attempt = intent.execution_attempt - 1
+                    self._session.flush()
             claim_code = f"{DELIVERY_CLAIM_PREFIX}{uuid4().hex}"
             delivery = self._repository.claim_pending_delivery(
                 delivery_id,
@@ -224,6 +239,7 @@ class NotificationService:
 
         with begin_owned_transaction(self._session):
             if outcome == "SUCCEEDED":
+                require_execution_lease(self._session)
                 self._repository.finish_claimed_delivery(
                     delivery_id=int(snapshot["delivery_id"]),
                     attempt=int(snapshot["attempt"]),
@@ -236,6 +252,7 @@ class NotificationService:
                 )
                 return
             if outcome == "FAILED":
+                require_execution_lease(self._session)
                 self._repository.finish_claimed_delivery(
                     delivery_id=int(snapshot["delivery_id"]),
                     attempt=int(snapshot["attempt"]),
@@ -248,6 +265,7 @@ class NotificationService:
                 )
                 return
             if outcome == "RETRY":
+                require_execution_lease(self._session)
                 attempt = int(snapshot["attempt"])
                 self._repository.finish_claimed_delivery(
                     delivery_id=int(snapshot["delivery_id"]),
@@ -261,6 +279,7 @@ class NotificationService:
                     update_lease=True,
                 )
                 return
+            require_execution_lease(self._session)
             self._repository.finish_claimed_delivery(
                 delivery_id=int(snapshot["delivery_id"]),
                 attempt=int(snapshot["attempt"]),

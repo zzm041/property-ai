@@ -207,3 +207,13 @@
 ## 9. 小程序对应关系
 
 同一微信小程序调用上述 API。角色只影响可见路径；越权一律 403 `IAM.FORBIDDEN`，不返回其他租户数据。
+
+## 10. 可靠任务接管（026，负责人已批准的0012范围）
+
+业务提交与 `task_intents` 同事务。API成功不等于异步完成，PUBLISHED/Celery task_success也不等于业务成功。Worker复用原分析、派单、入库和通知服务；租约、重试预算与幂等由持久意图管理。启用前必须应用获批准的0012并配置有界投递进程；`DURABLE_TASKS_ENABLED` 默认关闭，不自动迁移或回放历史数据。
+
+- `GET /admin/task-intents/{id}`：读取准确任务的状态、资源ID/版本、generation、发布/执行计数和稳定错误；不返回输入正文、电话、凭据或执行租约token。
+- `POST /admin/task-intents/{id}/retry`：只有明确FAILED任务可接管，请求仅有 `reason_code=DEPENDENCY_RECOVERED|OPERATOR_VERIFIED`，禁止任意task名/Scope/载荷。资源必须仍可处理；取消、结束、新业务版本或新任务优先。保留旧generation和失败，持锁建立唯一新generation并写TASK_INTENT_RETRIED审计；重复请求不再建立第二条或重置旧计数。该入口是异常接管，不参与普通逐单派单。
+- 按原资源及最新认证主体核对权限：分析使用 `ai_analysis:review`，知识使用 `knowledge:manage`，通知运维使用对应组织的 `property:manage`。不得混拼不同角色/租户的权限与范围。不可见ID统一404 `TASK.NOT_FOUND` 防止枚举；状态冲突409 `TASK.CONFLICT`，未启用409 `TASK.NOT_ENABLED`，非法输入422。
+- 自动投递最多5次（1/2/4/8秒退避），分析/入库执行最多3次、通知4次，不能叠乘Celery重试。执行租约120秒、心跳20秒、单次硬期限900秒；投递租约15秒、确认未领取期限120秒。只有明确操作员接管才创建下一generation；正常重投不增加generation。
+- 系统允许消息重复，业务派单和员工占用不得重复。外部通知在供应商未提供幂等保障时不承诺exactly-once。隔离演练只处理具名新intent清单，不扫描历史工单或消费历史DLQ。

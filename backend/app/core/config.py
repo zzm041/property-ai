@@ -84,6 +84,8 @@ class Settings(BaseSettings):
     ai_context_recent_orders_limit: int = Field(default=5, ge=0, le=20)
     ai_context_recent_days: int = Field(default=30, ge=1, le=365)
     ai_enqueue_on_create: bool = False
+    # Staged rollout: opt in only after0012, never silently detect/create tables.
+    durable_tasks_enabled: bool = False
     ai_auto_assign: bool = False
     dispatch_weight_duty: float = Field(default=0.25, ge=0, le=1)
     dispatch_weight_skill: float = Field(default=0.20, ge=0, le=1)

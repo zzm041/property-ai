@@ -1,0 +1,3073 @@
+[
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "task_id": "RELIABLE-TASK-DELIVERY-026",
+      "component": "api",
+      "label": "api01",
+      "run_id": "rt026-91880f6aeb",
+      "pid": 11424,
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "source_sha256": "57d5f9f8ffbd65b0f571d75ee4fbcea34a7af02cefe82c500d97bc5c68428aa6",
+      "head": "7bc504bd6fe287075fd7b4cd14d08ab944d70bfd",
+      "database": "127.0.0.1:3307/property_ai_auth001_test@0012",
+      "vhost": "property_ai_auth001",
+      "queue": "property_ai.auth001",
+      "provider": "Development",
+      "durable_tasks_enabled": true,
+      "test_timing": {
+        "publish_lease": 5,
+        "claim_deadline": 8,
+        "execution_lease": 5,
+        "heartbeat": 1,
+        "execution_deadline": 60
+      },
+      "utc": "2026-09-24T20:53:13.593491+00:00"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "app_env": "test",
+      "event": "application_started",
+      "service": "api",
+      "logger": "app.main",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:14.644934Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-manager-challenge",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.417621Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "status_code": 200,
+      "latency_ms": 59.51,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-manager-challenge",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.477629Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-manager-sms-send",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.479129Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "status_code": 200,
+      "latency_ms": 16.28,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-manager-sms-send",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.495141Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/test-inbox",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-manager-sms-inbox",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.496631Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/test-inbox",
+      "status_code": 200,
+      "latency_ms": 1.21,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-manager-sms-inbox",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.498131Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-manager-sms-login",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.499130Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "status_code": 200,
+      "latency_ms": 67.96,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-manager-sms-login",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.567304Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-check-manager",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.569304Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status_code": 200,
+      "latency_ms": 17.02,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-check-manager",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.586303Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-resident-challenge",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.588105Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "status_code": 200,
+      "latency_ms": 6.65,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-resident-challenge",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.594398Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-resident-sms-send",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.595899Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "status_code": 200,
+      "latency_ms": 11.71,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-resident-sms-send",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.607400Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/test-inbox",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-resident-sms-inbox",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.608900Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/test-inbox",
+      "status_code": 200,
+      "latency_ms": 1.11,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-resident-sms-inbox",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.609900Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-resident-sms-login",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.610900Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "status_code": 200,
+      "latency_ms": 13.51,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-resident-sms-login",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.624490Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-check-resident",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.625901Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status_code": 200,
+      "latency_ms": 10.9,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-check-resident",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.636900Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-staff-challenge",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.637898Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "status_code": 200,
+      "latency_ms": 6.36,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-staff-challenge",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.644488Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-staff-sms-send",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.645899Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "status_code": 200,
+      "latency_ms": 10.75,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-staff-sms-send",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.656400Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/test-inbox",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-staff-sms-inbox",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.657425Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/test-inbox",
+      "status_code": 200,
+      "latency_ms": 1.31,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-staff-sms-inbox",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.658899Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-staff-sms-login",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.659902Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "status_code": 200,
+      "latency_ms": 12.9,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-staff-sms-login",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.672907Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-check-staff",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.674909Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status_code": 200,
+      "latency_ms": 13.46,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-check-staff",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:53:32.688523Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/work-orders",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-case-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:56:32.273864Z"
+    }
+  },
+  {
+    "label": "api01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "source": "explicit026testcontrol",
+      "stage": "before_business_commit",
+      "intent_id": 2,
+      "utc": "2026-09-24T20:56:32.323363+00:00"
+    }
+  },
+  {
+    "label": "api02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "task_id": "RELIABLE-TASK-DELIVERY-026",
+      "component": "api",
+      "label": "api02",
+      "run_id": "rt026-91880f6aeb",
+      "pid": 7364,
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "source_sha256": "57d5f9f8ffbd65b0f571d75ee4fbcea34a7af02cefe82c500d97bc5c68428aa6",
+      "head": "7bc504bd6fe287075fd7b4cd14d08ab944d70bfd",
+      "database": "127.0.0.1:3307/property_ai_auth001_test@0012",
+      "vhost": "property_ai_auth001",
+      "queue": "property_ai.auth001",
+      "provider": "Development",
+      "durable_tasks_enabled": true,
+      "test_timing": {
+        "publish_lease": 5,
+        "claim_deadline": 8,
+        "execution_lease": 5,
+        "heartbeat": 1,
+        "execution_deadline": 60
+      },
+      "utc": "2026-09-24T20:56:34.529176+00:00"
+    }
+  },
+  {
+    "label": "api02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "app_env": "test",
+      "event": "application_started",
+      "service": "api",
+      "logger": "app.main",
+      "level": "info",
+      "timestamp": "2026-09-24T20:56:35.517953Z"
+    }
+  },
+  {
+    "label": "api02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/healthz",
+      "event": "request_started",
+      "service": "api",
+      "request_id": "2b397324daf74b52bffaa0ece3995884",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:56:36.318329Z"
+    }
+  },
+  {
+    "label": "api02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/healthz",
+      "status_code": 200,
+      "latency_ms": 9.66,
+      "event": "request_completed",
+      "service": "api",
+      "request_id": "2b397324daf74b52bffaa0ece3995884",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:56:36.328373Z"
+    }
+  },
+  {
+    "label": "api02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/work-orders",
+      "event": "request_started",
+      "service": "api",
+      "request_id": "rt026-91880f6aeb-case-one",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:56:52.177500Z"
+    }
+  },
+  {
+    "label": "api02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "source": "explicit026testcontrol",
+      "stage": "committed_before_publish",
+      "intent_id": 37,
+      "utc": "2026-09-24T20:56:52.339063+00:00"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "task_id": "RELIABLE-TASK-DELIVERY-026",
+      "component": "api",
+      "label": "api03",
+      "run_id": "rt026-91880f6aeb",
+      "pid": 44224,
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "source_sha256": "57d5f9f8ffbd65b0f571d75ee4fbcea34a7af02cefe82c500d97bc5c68428aa6",
+      "head": "7bc504bd6fe287075fd7b4cd14d08ab944d70bfd",
+      "database": "127.0.0.1:3307/property_ai_auth001_test@0012",
+      "vhost": "property_ai_auth001",
+      "queue": "property_ai.auth001",
+      "provider": "Development",
+      "durable_tasks_enabled": true,
+      "test_timing": {
+        "publish_lease": 5,
+        "claim_deadline": 8,
+        "execution_lease": 5,
+        "heartbeat": 1,
+        "execution_deadline": 60
+      },
+      "utc": "2026-09-24T20:56:54.282609+00:00"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "app_env": "test",
+      "event": "application_started",
+      "service": "api",
+      "logger": "app.main",
+      "level": "info",
+      "timestamp": "2026-09-24T20:56:55.265924Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/healthz",
+      "event": "request_started",
+      "request_id": "0c021fb672f8436e8ebcf5b4ed400f49",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:56:56.220824Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/healthz",
+      "status_code": 200,
+      "latency_ms": 9.73,
+      "event": "request_completed",
+      "request_id": "0c021fb672f8436e8ebcf5b4ed400f49",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:56:56.230330Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:24.850884Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 140.58,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:24.991114Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:25.197883Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 25.48,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:25.223383Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:25.430123Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 23.94,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:25.454121Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:25.660370Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 26.55,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:25.686871Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:25.895774Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 31.77,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:25.927772Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:26.135986Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 34.18,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:26.169987Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:26.379361Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 36.8,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:26.415861Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:26.626117Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 34.43,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:26.660667Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:26.870190Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 35.38,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:26.905189Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:27.113559Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 34.77,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:27.148059Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:27.357953Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 31.88,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:27.389952Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:27.599081Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 32.04,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:27.631080Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:27.838891Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 38.14,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:27.876891Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:28.084268Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 32.92,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:28.117290Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:28.322850Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 23.26,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:28.346351Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:28.552501Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 23.53,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:28.576001Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.586752Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 24.21,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.610675Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/37/accept",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-one-accept",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.612175Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/37/accept",
+      "status_code": 200,
+      "latency_ms": 42.35,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-one-accept",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.654959Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.656459Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 22.48,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.679242Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/37/start",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-one-start",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.680751Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/37/start",
+      "status_code": 200,
+      "latency_ms": 30.61,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-one-start",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.711655Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.712761Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 22.93,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.736155Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/37/receipts",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-one-receipt",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.737654Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/37/receipts",
+      "status_code": 200,
+      "latency_ms": 33.48,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-one-receipt",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.771154Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.772654Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 23.7,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.796155Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/work-orders/37/confirm",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-one-confirm",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.797655Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/work-orders/37/confirm",
+      "status_code": 200,
+      "latency_ms": 76.78,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-one-confirm",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.874611Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.875944Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/37",
+      "status_code": 200,
+      "latency_ms": 22.75,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-one",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.898408Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/work-orders",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-case-two",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.914408Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/work-orders",
+      "status_code": 200,
+      "latency_ms": 36.6,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-case-two",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.950923Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/38",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-two",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.051795Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/38",
+      "status_code": 200,
+      "latency_ms": 22.11,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-two",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.073746Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/38/accept",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-two-accept",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.075248Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/38/accept",
+      "status_code": 200,
+      "latency_ms": 26.32,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-two-accept",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.101838Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/38",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-two",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.103443Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/38",
+      "status_code": 200,
+      "latency_ms": 21.39,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-two",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.124597Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/38/start",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-two-start",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.126098Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/38/start",
+      "status_code": 200,
+      "latency_ms": 24.44,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-two-start",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.150598Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/38",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-two",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.152099Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/38",
+      "status_code": 200,
+      "latency_ms": 22.07,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-two",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.174103Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/38/receipts",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-two-receipt",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.176099Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/38/receipts",
+      "status_code": 200,
+      "latency_ms": 26.07,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-two-receipt",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.202097Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/38",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-two",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.203729Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/38",
+      "status_code": 200,
+      "latency_ms": 20.92,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-two",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.224597Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/work-orders/38/confirm",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-two-confirm",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.226098Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/work-orders/38/confirm",
+      "status_code": 200,
+      "latency_ms": 39.07,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-two-confirm",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.265024Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/38",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-detail-two",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.266578Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "GET",
+      "path": "/api/v1/work-orders/38",
+      "status_code": 200,
+      "latency_ms": 22.17,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-detail-two",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.289023Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/work-orders",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-case-permanent",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.322701Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/work-orders",
+      "status_code": 200,
+      "latency_ms": 28.02,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-case-permanent",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.350534Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/admin/knowledge-documents",
+      "event": "request_started",
+      "request_id": "rt026-91880f6aeb-knowledge",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:12.623802Z"
+    }
+  },
+  {
+    "label": "api03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "method": "POST",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status_code": 200,
+      "latency_ms": 28.16,
+      "event": "request_completed",
+      "request_id": "rt026-91880f6aeb-knowledge",
+      "service": "api",
+      "logger": "app.core.request_context",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:12.652300Z"
+    }
+  },
+  {
+    "label": "publisher01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "task_id": "RELIABLE-TASK-DELIVERY-026",
+      "component": "publisher",
+      "label": "publisher01",
+      "run_id": "rt026-91880f6aeb",
+      "pid": 27836,
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "source_sha256": "57d5f9f8ffbd65b0f571d75ee4fbcea34a7af02cefe82c500d97bc5c68428aa6",
+      "head": "7bc504bd6fe287075fd7b4cd14d08ab944d70bfd",
+      "database": "127.0.0.1:3307/property_ai_auth001_test@0012",
+      "vhost": "property_ai_auth001",
+      "queue": "property_ai.auth001",
+      "provider": "Development",
+      "durable_tasks_enabled": true,
+      "test_timing": {
+        "publish_lease": 5,
+        "claim_deadline": 8,
+        "execution_lease": 5,
+        "heartbeat": 1,
+        "execution_deadline": 60
+      },
+      "utc": "2026-09-24T20:56:57.587988+00:00"
+    }
+  },
+  {
+    "label": "publisher01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "source": "explicit026testcontrol",
+      "stage": "published_before_writeback",
+      "intent_id": 4,
+      "utc": "2026-09-24T20:56:57.780203+00:00"
+    }
+  },
+  {
+    "label": "publisher02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "task_id": "RELIABLE-TASK-DELIVERY-026",
+      "component": "publisher",
+      "label": "publisher02",
+      "run_id": "rt026-91880f6aeb",
+      "pid": 14152,
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "source_sha256": "57d5f9f8ffbd65b0f571d75ee4fbcea34a7af02cefe82c500d97bc5c68428aa6",
+      "head": "7bc504bd6fe287075fd7b4cd14d08ab944d70bfd",
+      "database": "127.0.0.1:3307/property_ai_auth001_test@0012",
+      "vhost": "property_ai_auth001",
+      "queue": "property_ai.auth001",
+      "provider": "Development",
+      "durable_tasks_enabled": true,
+      "test_timing": {
+        "publish_lease": 5,
+        "claim_deadline": 8,
+        "execution_lease": 5,
+        "heartbeat": 1,
+        "execution_deadline": 60
+      },
+      "utc": "2026-09-24T20:56:59.778338+00:00"
+    }
+  },
+  {
+    "label": "worker01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "task_id": "RELIABLE-TASK-DELIVERY-026",
+      "component": "worker",
+      "label": "worker01",
+      "run_id": "rt026-91880f6aeb",
+      "pid": 43700,
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "source_sha256": "57d5f9f8ffbd65b0f571d75ee4fbcea34a7af02cefe82c500d97bc5c68428aa6",
+      "head": "7bc504bd6fe287075fd7b4cd14d08ab944d70bfd",
+      "database": "127.0.0.1:3307/property_ai_auth001_test@0012",
+      "vhost": "property_ai_auth001",
+      "queue": "property_ai.auth001",
+      "provider": "Development",
+      "durable_tasks_enabled": true,
+      "test_timing": {
+        "publish_lease": 5,
+        "claim_deadline": 8,
+        "execution_lease": 5,
+        "heartbeat": 1,
+        "execution_deadline": 60
+      },
+      "utc": "2026-09-24T20:57:21.952414+00:00"
+    }
+  },
+  {
+    "label": "worker01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Connected to amqp://[redacted]:[redacted]@127.0.0.1:5672/property_ai_auth001",
+      "app_env": "test",
+      "service": "worker",
+      "logger": "celery.worker.consumer.connection",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:22.543665Z"
+    }
+  },
+  {
+    "label": "worker01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "auth001@DESKTOP-8NHSE12 ready.",
+      "app_env": "test",
+      "service": "worker",
+      "logger": "celery.apps.worker",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:22.614206Z"
+    }
+  },
+  {
+    "label": "worker01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[468028d9-ea98-4b91-83e3-450ff63cbbcd] received",
+      "app_env": "test",
+      "service": "worker",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:22.614661Z"
+    }
+  },
+  {
+    "label": "worker01",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "{\"source\": \"explicit026testcontrol\", \"stage\": \"claimed_before_domain\", \"intent_id\": 4, \"utc\": \"2026-09-24T20:57:22.683187+00:00\"}",
+      "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "service": "worker",
+      "logger": "celery.redirected",
+      "level": "warning",
+      "timestamp": "2026-09-24T20:57:22.683187Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "task_id": "RELIABLE-TASK-DELIVERY-026",
+      "component": "worker",
+      "label": "worker02",
+      "run_id": "rt026-91880f6aeb",
+      "pid": 42060,
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "source_sha256": "57d5f9f8ffbd65b0f571d75ee4fbcea34a7af02cefe82c500d97bc5c68428aa6",
+      "head": "7bc504bd6fe287075fd7b4cd14d08ab944d70bfd",
+      "database": "127.0.0.1:3307/property_ai_auth001_test@0012",
+      "vhost": "property_ai_auth001",
+      "queue": "property_ai.auth001",
+      "provider": "Development",
+      "durable_tasks_enabled": true,
+      "test_timing": {
+        "publish_lease": 5,
+        "claim_deadline": 8,
+        "execution_lease": 5,
+        "heartbeat": 1,
+        "execution_deadline": 60
+      },
+      "utc": "2026-09-24T20:57:24.615087+00:00"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Connected to amqp://[redacted]:[redacted]@127.0.0.1:5672/property_ai_auth001",
+      "service": "worker",
+      "app_env": "test",
+      "logger": "celery.worker.consumer.connection",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:25.146947Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "auth001@DESKTOP-8NHSE12 ready.",
+      "service": "worker",
+      "app_env": "test",
+      "logger": "celery.apps.worker",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:25.214883Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[468028d9-ea98-4b91-83e3-450ff63cbbcd] received",
+      "service": "worker",
+      "app_env": "test",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:25.215384Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[468028d9-ea98-4b91-83e3-450ff63cbbcd] succeeded in 0.030999999988125637s: 'IGNORED'",
+      "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "service": "worker",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:25.248402Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[468028d9-ea98-4b91-83e3-450ff63cbbcd] received",
+      "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "service": "worker",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:25.248903Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[468028d9-ea98-4b91-83e3-450ff63cbbcd] succeeded in 0.03200000000651926s: 'IGNORED'",
+      "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "service": "worker",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:25.287909Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[468028d9-ea98-4b91-83e3-450ff63cbbcd] received",
+      "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "service": "worker",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:25.288408Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[468028d9-ea98-4b91-83e3-450ff63cbbcd] succeeded in 0.030999999988125637s: 'IGNORED'",
+      "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "service": "worker",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:25.316508Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[468028d9-ea98-4b91-83e3-450ff63cbbcd] received",
+      "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "service": "worker",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:25.317009Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[468028d9-ea98-4b91-83e3-450ff63cbbcd] succeeded in 0.031000000017229468s: 'IGNORED'",
+      "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "service": "worker",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:25.348514Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[468028d9-ea98-4b91-83e3-450ff63cbbcd] received",
+      "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "service": "worker",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:28.120291Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "work_order_id": 37,
+      "employee_id": 5,
+      "assignment_id": 33,
+      "score": 0.6593,
+      "request_id": "rt026-91880f6aeb-case-one",
+      "event": "auto_dispatch_assigned",
+      "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "service": "worker",
+      "logger": "app.service.auto_dispatch",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:28.420065Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "work_order_id": 37,
+      "analysis_id": 33,
+      "outcome": "ASSIGNED",
+      "request_id": "rt026-91880f6aeb-case-one",
+      "event": "auto_redispatch_outcome",
+      "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "service": "worker",
+      "logger": "app.service.analysis",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:28.422065Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[468028d9-ea98-4b91-83e3-450ff63cbbcd] succeeded in 0.35999999998603016s: 'SUCCEEDED'",
+      "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "service": "worker",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:28.485754Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.tasks.retry_waiting_dispatch_task[be9d3776-8a7f-47e3-878b-6124b8c634cd] received",
+      "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "service": "worker",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.870408Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.tasks.retry_waiting_dispatch_task[be9d3776-8a7f-47e3-878b-6124b8c634cd] succeeded in 0.03200000000651926s: {'scanned': 0, 'assigned': 0, 'waiting': 0, 'unavailable_reassigned': 0}",
+      "task_id": "be9d3776-8a7f-47e3-878b-6124b8c634cd",
+      "operation": "app.worker.tasks.retry_waiting_dispatch_task",
+      "service": "worker",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:43.910468Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[5120275a-f92c-4a2c-b13c-8baa5bb5bb1c] received",
+      "task_id": "be9d3776-8a7f-47e3-878b-6124b8c634cd",
+      "operation": "app.worker.tasks.retry_waiting_dispatch_task",
+      "service": "worker",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:44.182256Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "work_order_id": 38,
+      "employee_id": 5,
+      "assignment_id": 34,
+      "score": 0.7603,
+      "request_id": "rt026-91880f6aeb-case-two",
+      "event": "auto_dispatch_assigned",
+      "task_id": "5120275a-f92c-4a2c-b13c-8baa5bb5bb1c",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "service": "worker",
+      "logger": "app.service.auto_dispatch",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:44.426582Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "work_order_id": 38,
+      "analysis_id": 34,
+      "outcome": "ASSIGNED",
+      "request_id": "rt026-91880f6aeb-case-two",
+      "event": "auto_redispatch_outcome",
+      "task_id": "5120275a-f92c-4a2c-b13c-8baa5bb5bb1c",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "service": "worker",
+      "logger": "app.service.analysis",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:44.428155Z"
+    }
+  },
+  {
+    "label": "worker02",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "{\"source\": \"explicit026testcontrol\", \"stage\": \"domain_committed_before_intent_finish\", \"intent_id\": 13, \"utc\": \"2026-09-24T20:57:44.478806+00:00\"}",
+      "task_id": "5120275a-f92c-4a2c-b13c-8baa5bb5bb1c",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "service": "worker",
+      "logger": "celery.redirected",
+      "level": "warning",
+      "timestamp": "2026-09-24T20:57:44.478806Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "task_id": "RELIABLE-TASK-DELIVERY-026",
+      "component": "worker",
+      "label": "worker03",
+      "run_id": "rt026-91880f6aeb",
+      "pid": 47600,
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "source_sha256": "57d5f9f8ffbd65b0f571d75ee4fbcea34a7af02cefe82c500d97bc5c68428aa6",
+      "head": "7bc504bd6fe287075fd7b4cd14d08ab944d70bfd",
+      "database": "127.0.0.1:3307/property_ai_auth001_test@0012",
+      "vhost": "property_ai_auth001",
+      "queue": "property_ai.auth001",
+      "provider": "Development",
+      "durable_tasks_enabled": true,
+      "test_timing": {
+        "publish_lease": 5,
+        "claim_deadline": 8,
+        "execution_lease": 5,
+        "heartbeat": 1,
+        "execution_deadline": 60
+      },
+      "utc": "2026-09-24T20:57:46.516933+00:00"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Connected to amqp://[redacted]:[redacted]@127.0.0.1:5672/property_ai_auth001",
+      "service": "worker",
+      "app_env": "test",
+      "logger": "celery.worker.consumer.connection",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:47.019355Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "auth001@DESKTOP-8NHSE12 ready.",
+      "service": "worker",
+      "app_env": "test",
+      "logger": "celery.apps.worker",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:47.084954Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[5120275a-f92c-4a2c-b13c-8baa5bb5bb1c] received",
+      "service": "worker",
+      "app_env": "test",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:47.085453Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[5120275a-f92c-4a2c-b13c-8baa5bb5bb1c] succeeded in 0.062000000005355105s: 'IGNORED'",
+      "service": "worker",
+      "task_id": "5120275a-f92c-4a2c-b13c-8baa5bb5bb1c",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:57:47.139157Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.tasks.retry_waiting_dispatch_task[7fa85bc9-9c5f-4db9-84dd-6a3c95aa34be] received",
+      "service": "worker",
+      "task_id": "5120275a-f92c-4a2c-b13c-8baa5bb5bb1c",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.263024Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.tasks.retry_waiting_dispatch_task[7fa85bc9-9c5f-4db9-84dd-6a3c95aa34be] succeeded in 0.030999999988125637s: {'scanned': 0, 'assigned': 0, 'waiting': 0, 'unavailable_reassigned': 0}",
+      "service": "worker",
+      "task_id": "7fa85bc9-9c5f-4db9-84dd-6a3c95aa34be",
+      "operation": "app.worker.tasks.retry_waiting_dispatch_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:05.296023Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[45a4ca8a-75ab-41ff-94b9-1345abdd81d9] received",
+      "service": "worker",
+      "task_id": "7fa85bc9-9c5f-4db9-84dd-6a3c95aa34be",
+      "operation": "app.worker.tasks.retry_waiting_dispatch_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:06.274087Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[45a4ca8a-75ab-41ff-94b9-1345abdd81d9] succeeded in 0.046999999991385266s: 'FAILED'",
+      "service": "worker",
+      "task_id": "45a4ca8a-75ab-41ff-94b9-1345abdd81d9",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:06.314190Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[45a4ca8a-75ab-41ff-94b9-1345abdd81d9] received",
+      "service": "worker",
+      "task_id": "45a4ca8a-75ab-41ff-94b9-1345abdd81d9",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:08.300471Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[45a4ca8a-75ab-41ff-94b9-1345abdd81d9] succeeded in 0.0470000000204891s: 'FAILED'",
+      "service": "worker",
+      "task_id": "45a4ca8a-75ab-41ff-94b9-1345abdd81d9",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:08.349063Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[45a4ca8a-75ab-41ff-94b9-1345abdd81d9] received",
+      "service": "worker",
+      "task_id": "45a4ca8a-75ab-41ff-94b9-1345abdd81d9",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:12.338242Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[45a4ca8a-75ab-41ff-94b9-1345abdd81d9] succeeded in 0.062000000005355105s: 'FAILED'",
+      "service": "worker",
+      "task_id": "45a4ca8a-75ab-41ff-94b9-1345abdd81d9",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:12.399376Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[cc89534f-091b-43de-8016-44c6a1a53219] received",
+      "service": "worker",
+      "task_id": "45a4ca8a-75ab-41ff-94b9-1345abdd81d9",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:14.374388Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[cc89534f-091b-43de-8016-44c6a1a53219] succeeded in 2.7660000000032596s: 'SUCCEEDED'",
+      "service": "worker",
+      "task_id": "cc89534f-091b-43de-8016-44c6a1a53219",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:58:17.140926Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[2e507b7c-8cf4-4a08-a4e2-35ad757e36af] received",
+      "service": "worker",
+      "task_id": "cc89534f-091b-43de-8016-44c6a1a53219",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:28.613961Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[2e507b7c-8cf4-4a08-a4e2-35ad757e36af] succeeded in 0.07800000000861473s: 'SUCCEEDED'",
+      "service": "worker",
+      "task_id": "2e507b7c-8cf4-4a08-a4e2-35ad757e36af",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:28.684102Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[84104e1d-6bb9-4f59-afd0-f4ac8c2bada6] received",
+      "service": "worker",
+      "task_id": "2e507b7c-8cf4-4a08-a4e2-35ad757e36af",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:28.685152Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[84104e1d-6bb9-4f59-afd0-f4ac8c2bada6] succeeded in 0.07800000000861473s: 'SUCCEEDED'",
+      "service": "worker",
+      "task_id": "84104e1d-6bb9-4f59-afd0-f4ac8c2bada6",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:28.762980Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[5d8cd05f-b986-45ec-8865-c8569ea96869] received",
+      "service": "worker",
+      "task_id": "84104e1d-6bb9-4f59-afd0-f4ac8c2bada6",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:28.763426Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[5d8cd05f-b986-45ec-8865-c8569ea96869] succeeded in 0.0629999999946449s: 'SUCCEEDED'",
+      "service": "worker",
+      "task_id": "5d8cd05f-b986-45ec-8865-c8569ea96869",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:28.837855Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[530b8af2-f13c-447a-9a75-56647ffe2c1e] received",
+      "service": "worker",
+      "task_id": "5d8cd05f-b986-45ec-8865-c8569ea96869",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:28.837855Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[530b8af2-f13c-447a-9a75-56647ffe2c1e] succeeded in 0.062000000005355105s: 'SUCCEEDED'",
+      "service": "worker",
+      "task_id": "530b8af2-f13c-447a-9a75-56647ffe2c1e",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:28.890506Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[0b4040c5-7206-49b1-a86b-b02284638cb8] received",
+      "service": "worker",
+      "task_id": "530b8af2-f13c-447a-9a75-56647ffe2c1e",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:28.891005Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[0b4040c5-7206-49b1-a86b-b02284638cb8] succeeded in 0.046999999991385266s: 'SUCCEEDED'",
+      "service": "worker",
+      "task_id": "0b4040c5-7206-49b1-a86b-b02284638cb8",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:28.939658Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[6f8cf36f-26a2-4120-91ce-17b4db43a3ca] received",
+      "service": "worker",
+      "task_id": "0b4040c5-7206-49b1-a86b-b02284638cb8",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:28.940158Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[6f8cf36f-26a2-4120-91ce-17b4db43a3ca] succeeded in 0.046999999991385266s: 'SUCCEEDED'",
+      "service": "worker",
+      "task_id": "6f8cf36f-26a2-4120-91ce-17b4db43a3ca",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:28.992658Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[d1868972-9c58-4410-8340-b63750360c46] received",
+      "service": "worker",
+      "task_id": "6f8cf36f-26a2-4120-91ce-17b4db43a3ca",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:28.993658Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[d1868972-9c58-4410-8340-b63750360c46] succeeded in 0.07800000000861473s: 'SUCCEEDED'",
+      "service": "worker",
+      "task_id": "d1868972-9c58-4410-8340-b63750360c46",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.070237Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[cebde460-25d8-437b-a447-19b926c97084] received",
+      "service": "worker",
+      "task_id": "d1868972-9c58-4410-8340-b63750360c46",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.070734Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[cebde460-25d8-437b-a447-19b926c97084] succeeded in 0.09400000001187436s: 'SUCCEEDED'",
+      "service": "worker",
+      "task_id": "cebde460-25d8-437b-a447-19b926c97084",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.151463Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[5bbda98d-6a8c-4b7e-8429-51681b642fed] received",
+      "service": "worker",
+      "task_id": "cebde460-25d8-437b-a447-19b926c97084",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.152378Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[5bbda98d-6a8c-4b7e-8429-51681b642fed] succeeded in 0.062000000005355105s: 'SUCCEEDED'",
+      "service": "worker",
+      "task_id": "5bbda98d-6a8c-4b7e-8429-51681b642fed",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.227928Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[85e2d668-1cdf-4aec-808b-ac315af9863d] received",
+      "service": "worker",
+      "task_id": "5bbda98d-6a8c-4b7e-8429-51681b642fed",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.228494Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[85e2d668-1cdf-4aec-808b-ac315af9863d] succeeded in 0.0779999999795109s: 'SUCCEEDED'",
+      "service": "worker",
+      "task_id": "85e2d668-1cdf-4aec-808b-ac315af9863d",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.302257Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[1be240d3-6add-4d72-a9e4-ce7cd8c53727] received",
+      "service": "worker",
+      "task_id": "85e2d668-1cdf-4aec-808b-ac315af9863d",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.302760Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[1be240d3-6add-4d72-a9e4-ce7cd8c53727] succeeded in 0.07800000000861473s: 'SUCCEEDED'",
+      "service": "worker",
+      "task_id": "1be240d3-6add-4d72-a9e4-ce7cd8c53727",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.382275Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[489ff51c-71c0-49bb-b5ea-b83e6722a98d] received",
+      "service": "worker",
+      "task_id": "1be240d3-6add-4d72-a9e4-ce7cd8c53727",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.382775Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[489ff51c-71c0-49bb-b5ea-b83e6722a98d] succeeded in 0.0629999999946449s: 'SUCCEEDED'",
+      "service": "worker",
+      "task_id": "489ff51c-71c0-49bb-b5ea-b83e6722a98d",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.436762Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[d29e16d6-6987-4db9-94b9-b53e0b2fa844] received",
+      "service": "worker",
+      "task_id": "489ff51c-71c0-49bb-b5ea-b83e6722a98d",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.437264Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[d29e16d6-6987-4db9-94b9-b53e0b2fa844] succeeded in 0.062000000005355105s: 'SUCCEEDED'",
+      "service": "worker",
+      "task_id": "d29e16d6-6987-4db9-94b9-b53e0b2fa844",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.496918Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[327f001b-0379-4eb6-9ea0-217ff8d28a46] received",
+      "service": "worker",
+      "task_id": "d29e16d6-6987-4db9-94b9-b53e0b2fa844",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.497502Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[327f001b-0379-4eb6-9ea0-217ff8d28a46] succeeded in 0.046999999991385266s: 'SUCCEEDED'",
+      "service": "worker",
+      "task_id": "327f001b-0379-4eb6-9ea0-217ff8d28a46",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.547990Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[854b35fe-bd9d-4c3d-8a7a-18c51ea4ac77] received",
+      "service": "worker",
+      "task_id": "327f001b-0379-4eb6-9ea0-217ff8d28a46",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.548920Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[854b35fe-bd9d-4c3d-8a7a-18c51ea4ac77] succeeded in 0.0629999999946449s: 'SUCCEEDED'",
+      "service": "worker",
+      "task_id": "854b35fe-bd9d-4c3d-8a7a-18c51ea4ac77",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.617968Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[7c38553b-b618-473c-8f95-263aa1121355] received",
+      "service": "worker",
+      "task_id": "854b35fe-bd9d-4c3d-8a7a-18c51ea4ac77",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.618419Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[7c38553b-b618-473c-8f95-263aa1121355] succeeded in 0.07800000000861473s: 'SUCCEEDED'",
+      "service": "worker",
+      "task_id": "7c38553b-b618-473c-8f95-263aa1121355",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.686272Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[fc844f42-9937-410a-b7b5-235725b05bb0] received",
+      "service": "worker",
+      "task_id": "7c38553b-b618-473c-8f95-263aa1121355",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.worker.strategy",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.687274Z"
+    }
+  },
+  {
+    "label": "worker03",
+    "stream": "stdout",
+    "source": "actual process JSON log",
+    "record": {
+      "event": "Task app.worker.task_intents.execute_task_intent_task[fc844f42-9937-410a-b7b5-235725b05bb0] succeeded in 0.062000000005355105s: 'SUCCEEDED'",
+      "service": "worker",
+      "task_id": "fc844f42-9937-410a-b7b5-235725b05bb0",
+      "operation": "app.worker.task_intents.execute_task_intent_task",
+      "logger": "celery.app.trace",
+      "level": "info",
+      "timestamp": "2026-09-24T20:59:29.754005Z"
+    }
+  }
+]

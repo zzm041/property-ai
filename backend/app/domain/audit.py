@@ -9,6 +9,7 @@ from app.domain.iam import OrganizationScope, ScopeType
 
 
 class AuditAction(StrEnum):
+    TASK_INTENT_RETRIED = "TASK_INTENT_RETRIED"
     DEV_AUTH_TOKEN_ISSUED = "DEV_AUTH_TOKEN_ISSUED"
     WECHAT_AUTH_TOKEN_ISSUED = "WECHAT_AUTH_TOKEN_ISSUED"
     AUTH_SMS_TOKEN_ISSUED = "AUTH_SMS_TOKEN_ISSUED"
@@ -111,6 +112,7 @@ class AuditResourceType(StrEnum):
     USER_WECHAT = "USER_WECHAT"
     AUTH_SESSION = "AUTH_SESSION"
     EMPLOYEE_INVITE = "EMPLOYEE_INVITE"
+    TASK_INTENT = "TASK_INTENT"
 
 
 class AuditSource(StrEnum):
@@ -674,6 +676,12 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             resource_type=AuditResourceType.SLA_POLICY,
             allowed_detail_keys=_SLA_POLICY_CHANGED_DETAIL_KEYS,
             required_detail_keys=_SLA_POLICY_CHANGED_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.TENANT, ScopeType.PROPERTY}),
+        ),
+        AuditAction.TASK_INTENT_RETRIED: AuditActionPolicy(
+            resource_type=AuditResourceType.TASK_INTENT,
+            allowed_detail_keys=frozenset({"previous_id", "generation", "reason_code"}),
+            required_detail_keys=frozenset({"previous_id", "generation", "reason_code"}),
             allowed_scope_types=frozenset({ScopeType.TENANT, ScopeType.PROPERTY}),
         ),
     }

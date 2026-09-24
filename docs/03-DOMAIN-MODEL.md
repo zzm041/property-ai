@@ -111,7 +111,7 @@
 | `AiCallLog` | 模型调用：prompt_version, model_version, latency, tokens, error |
 | `AuditLog` | 安全与管理审计：actor_user_id, tenant_id, property_id, action, resource_type, resource_id, request_id, created_at |
 | `IdempotencyRecord` | 幂等键 |
-| `RequestOutbox` 可选 | V1 可用通知表代替完整 outbox |
+| `TaskIntent`（026批准修订） | `task_intents`：业务同事务的类型化任务意图、有限投递/执行计数及租约；关联既有分析/知识任务/通知记录，不复制业务引擎。0012唯一父版本0011，当前仅批准AUTH001迁移，无历史回填。 |
 
 ## 3. ER 关系说明
 

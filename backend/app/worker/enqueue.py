@@ -74,6 +74,8 @@ def enqueue_celery_task(
 
 
 def schedule_notification_delivery(settings: Settings, delivery_id: int) -> bool:
+    if settings.durable_tasks_enabled:
+        return False  # Existing intent publisher owns retries; never bypass its persisted budget.
     from app.worker.tasks import deliver_notification_task
 
     return enqueue_celery_task(

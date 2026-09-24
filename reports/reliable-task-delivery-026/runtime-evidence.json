@@ -1,0 +1,1229 @@
+{
+  "task_id": "RELIABLE-TASK-DELIVERY-026",
+  "run_id": "rt026-91880f6aeb",
+  "mode": "real normal API/DB/independent Worker + explicitly marked test controls; no UI or model calls",
+  "steps": {
+    "w1": {
+      "checkpoint": {
+        "stage": "before_business_commit",
+        "intent_id": 2,
+        "pid": 11424,
+        "run_id": "rt026-91880f6aeb",
+        "utc": "2026-09-24T20:56:32.323363+00:00"
+      },
+      "termination": {
+        "identity": {
+          "ProcessId": 11424,
+          "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+          "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -I -X utf8 D:\\property-ai\\reports\\reliable-task-delivery-026\\launch-026.py api --run-id rt026-91880f6aeb --label api01",
+          "created": "2026-09-25T04:53:13.0555620+08:00"
+        },
+        "method": "real Windows process termination",
+        "terminated": true,
+        "counters": {
+          "api_publisher": 1,
+          "worker": 0
+        }
+      },
+      "client_outcome": "ReadError",
+      "no_committed_work_or_intent": true,
+      "seconds": 4.079
+    },
+    "w2": {
+      "checkpoint": {
+        "stage": "committed_before_publish",
+        "intent_id": 37,
+        "pid": 7364,
+        "run_id": "rt026-91880f6aeb",
+        "utc": "2026-09-24T20:56:52.339063+00:00"
+      },
+      "termination": {
+        "identity": {
+          "ProcessId": 7364,
+          "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+          "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -I -X utf8 D:\\property-ai\\reports\\reliable-task-delivery-026\\launch-026.py api --run-id rt026-91880f6aeb --label api02",
+          "created": "2026-09-25T04:56:33.8860570+08:00"
+        },
+        "method": "real Windows process termination",
+        "terminated": true,
+        "counters": {
+          "api_publisher": 2,
+          "worker": 0
+        }
+      },
+      "client_outcome": "ReadError",
+      "work_order_id": 37,
+      "committed_intent": {
+        "id": 4,
+        "operation": "ANALYZE_WORK_ORDER",
+        "resource_id": 37,
+        "resource_version": 1,
+        "generation": 1,
+        "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+        "status": "PENDING",
+        "publish_attempt": 0,
+        "execution_attempt": 0,
+        "lease_token": null,
+        "lease_until": null,
+        "last_error_code": null,
+        "finished_at": null
+      },
+      "seconds": 4.078
+    },
+    "w3": {
+      "checkpoint": {
+        "stage": "published_before_writeback",
+        "intent_id": 4,
+        "pid": 27836,
+        "run_id": "rt026-91880f6aeb",
+        "utc": "2026-09-24T20:56:57.780203+00:00"
+      },
+      "termination": {
+        "identity": {
+          "ProcessId": 27836,
+          "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+          "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -I -X utf8 D:\\property-ai\\reports\\reliable-task-delivery-026\\launch-026.py publisher --run-id rt026-91880f6aeb --label publisher01",
+          "created": "2026-09-25T04:56:57.0764520+08:00"
+        },
+        "method": "real Windows process termination",
+        "terminated": true,
+        "counters": {
+          "api_publisher": 3,
+          "worker": 0
+        }
+      },
+      "before": {
+        "id": 4,
+        "operation": "ANALYZE_WORK_ORDER",
+        "resource_id": 37,
+        "resource_version": 1,
+        "generation": 1,
+        "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+        "status": "PUBLISHING",
+        "publish_attempt": 1,
+        "execution_attempt": 0,
+        "lease_token": "50d6dece08f0442c801288c9f5b6da04",
+        "lease_until": "2026-09-24 20:57:02.707142",
+        "last_error_code": null,
+        "finished_at": null
+      },
+      "automatic_republished": {
+        "id": 4,
+        "operation": "ANALYZE_WORK_ORDER",
+        "resource_id": 37,
+        "resource_version": 1,
+        "generation": 1,
+        "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+        "status": "PUBLISHED",
+        "publish_attempt": 2,
+        "execution_attempt": 0,
+        "lease_token": null,
+        "lease_until": null,
+        "last_error_code": null,
+        "finished_at": null
+      },
+      "seconds": 6.953
+    },
+    "w4": {
+      "checkpoint": {
+        "stage": "claimed_before_domain",
+        "intent_id": 4,
+        "pid": 43700,
+        "run_id": "rt026-91880f6aeb",
+        "utc": "2026-09-24T20:57:22.683187+00:00"
+      },
+      "termination": {
+        "identity": {
+          "ProcessId": 43700,
+          "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+          "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -I -X utf8 D:\\property-ai\\reports\\reliable-task-delivery-026\\launch-026.py worker --run-id rt026-91880f6aeb --label worker01",
+          "created": "2026-09-25T04:57:21.4590490+08:00"
+        },
+        "method": "real Windows process termination",
+        "terminated": true,
+        "counters": {
+          "api_publisher": 3,
+          "worker": 1
+        }
+      },
+      "old_claim": {
+        "id": 4,
+        "operation": "ANALYZE_WORK_ORDER",
+        "resource_id": 37,
+        "resource_version": 1,
+        "generation": 1,
+        "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+        "status": "PROCESSING",
+        "publish_attempt": 4,
+        "execution_attempt": 1,
+        "lease_token": "ab39b2eb256e48f390f30515ca4a344a",
+        "lease_until": "2026-09-24 20:57:27.660663",
+        "last_error_code": null,
+        "finished_at": null
+      },
+      "recovered": {
+        "id": 37,
+        "intent": {
+          "id": 4,
+          "operation": "ANALYZE_WORK_ORDER",
+          "resource_id": 37,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+          "status": "SUCCEEDED",
+          "publish_attempt": 5,
+          "execution_attempt": 2,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:57:28.481253"
+        },
+        "work": [
+          {
+            "id": 37,
+            "status": "ASSIGNED",
+            "version": 3,
+            "current_assignment_id": 33
+          }
+        ],
+        "analysis": [
+          {
+            "id": 33,
+            "analysis_version": 1,
+            "status": "COMPLETED",
+            "input_hash": "21128eb933128a9b3f266fe131cfd01796f554596a1b5afc79dc1a19f4355c49",
+            "error_code": null
+          }
+        ],
+        "assignments": [
+          {
+            "id": 33,
+            "employee_id": 5,
+            "status": "ACTIVE",
+            "assigned_source": "AUTO",
+            "assigned_by_user_id": null
+          }
+        ],
+        "calls": [
+          {
+            "id": 36,
+            "provider_type": "LLM",
+            "attempt": 2,
+            "status": "SUCCESS",
+            "model_version": "dev-llm-v1"
+          }
+        ],
+        "logs": [
+          {
+            "id": 315,
+            "event_code": "CREATE",
+            "payload_json": {
+              "event_code": "CREATE"
+            }
+          },
+          {
+            "id": 316,
+            "event_code": "AI_TASK_ATTEMPT",
+            "payload_json": {
+              "attempt": 2,
+              "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+              "input_hash": "21128eb933128a9b3f266fe131cfd01796f554596a1b5afc79dc1a19f4355c49",
+              "analysis_id": 33,
+              "from_status": "PENDING_ANALYSIS",
+              "execution_token": "8be0081057234ece9c935b9575c5c8c8",
+              "analysis_version": 1,
+              "work_order_version": 1
+            }
+          },
+          {
+            "id": 317,
+            "event_code": "ANALYZE",
+            "payload_json": {
+              "event_code": "ANALYZE",
+              "reason_code": "AI_ANALYSIS"
+            }
+          },
+          {
+            "id": 318,
+            "event_code": "ASSIGN",
+            "payload_json": {
+              "event_code": "ASSIGN",
+              "employee_id": 5,
+              "incident_id": null,
+              "reason_code": "AUTO_ASSIGN",
+              "assigned_source": "AUTO"
+            }
+          }
+        ],
+        "employee_load": [
+          {
+            "business_date": "2026-09-25",
+            "current_load": 1,
+            "on_duty": "ON_DUTY"
+          }
+        ],
+        "contact_snapshot_matches": true
+      },
+      "old_token_rejected": true,
+      "token_check_mode": "direct CAS negative, not recovery operation",
+      "seconds": 7.203
+    },
+    "w5": {
+      "checkpoint": {
+        "stage": "domain_committed_before_intent_finish",
+        "intent_id": 13,
+        "pid": 42060,
+        "run_id": "rt026-91880f6aeb",
+        "utc": "2026-09-24T20:57:44.478806+00:00"
+      },
+      "termination": {
+        "identity": {
+          "ProcessId": 42060,
+          "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+          "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -I -X utf8 D:\\property-ai\\reports\\reliable-task-delivery-026\\launch-026.py worker --run-id rt026-91880f6aeb --label worker02",
+          "created": "2026-09-25T04:57:24.1085160+08:00"
+        },
+        "method": "real Windows process termination",
+        "terminated": true,
+        "counters": {
+          "api_publisher": 3,
+          "worker": 2
+        }
+      },
+      "before": {
+        "id": 38,
+        "intent": {
+          "id": 13,
+          "operation": "ANALYZE_WORK_ORDER",
+          "resource_id": 38,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "5120275a-f92c-4a2c-b13c-8baa5bb5bb1c",
+          "status": "PROCESSING",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": "e5eca15587524537b7a0d779dab0b738",
+          "lease_until": "2026-09-24 20:57:49.196726",
+          "last_error_code": null,
+          "finished_at": null
+        },
+        "work": [
+          {
+            "id": 38,
+            "status": "ASSIGNED",
+            "version": 3,
+            "current_assignment_id": 34
+          }
+        ],
+        "analysis": [
+          {
+            "id": 34,
+            "analysis_version": 1,
+            "status": "COMPLETED",
+            "input_hash": "46a9fb202c6699b35dd83aad85f31efe24d2d8a3ce227dcd1d2f2de9325b6341",
+            "error_code": null
+          }
+        ],
+        "assignments": [
+          {
+            "id": 34,
+            "employee_id": 5,
+            "status": "ACTIVE",
+            "assigned_source": "AUTO",
+            "assigned_by_user_id": null
+          }
+        ],
+        "calls": [
+          {
+            "id": 37,
+            "provider_type": "LLM",
+            "attempt": 1,
+            "status": "SUCCESS",
+            "model_version": "dev-llm-v1"
+          }
+        ],
+        "logs": [
+          {
+            "id": 324,
+            "event_code": "CREATE",
+            "payload_json": {
+              "event_code": "CREATE"
+            }
+          },
+          {
+            "id": 325,
+            "event_code": "AI_TASK_ATTEMPT",
+            "payload_json": {
+              "attempt": 1,
+              "task_id": "5120275a-f92c-4a2c-b13c-8baa5bb5bb1c",
+              "input_hash": "46a9fb202c6699b35dd83aad85f31efe24d2d8a3ce227dcd1d2f2de9325b6341",
+              "analysis_id": 34,
+              "from_status": "PENDING_ANALYSIS",
+              "execution_token": "e5eca15587524537b7a0d779dab0b738",
+              "analysis_version": 1,
+              "work_order_version": 1
+            }
+          },
+          {
+            "id": 326,
+            "event_code": "ANALYZE",
+            "payload_json": {
+              "event_code": "ANALYZE",
+              "reason_code": "AI_ANALYSIS"
+            }
+          },
+          {
+            "id": 327,
+            "event_code": "ASSIGN",
+            "payload_json": {
+              "event_code": "ASSIGN",
+              "employee_id": 5,
+              "incident_id": null,
+              "reason_code": "AUTO_ASSIGN",
+              "assigned_source": "AUTO"
+            }
+          }
+        ],
+        "employee_load": [
+          {
+            "business_date": "2026-09-25",
+            "current_load": 1,
+            "on_duty": "ON_DUTY"
+          }
+        ],
+        "contact_snapshot_matches": true
+      },
+      "after": {
+        "id": 38,
+        "intent": {
+          "id": 13,
+          "operation": "ANALYZE_WORK_ORDER",
+          "resource_id": 38,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "5120275a-f92c-4a2c-b13c-8baa5bb5bb1c",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:57:52.213321"
+        },
+        "work": [
+          {
+            "id": 38,
+            "status": "ASSIGNED",
+            "version": 3,
+            "current_assignment_id": 34
+          }
+        ],
+        "analysis": [
+          {
+            "id": 34,
+            "analysis_version": 1,
+            "status": "COMPLETED",
+            "input_hash": "46a9fb202c6699b35dd83aad85f31efe24d2d8a3ce227dcd1d2f2de9325b6341",
+            "error_code": null
+          }
+        ],
+        "assignments": [
+          {
+            "id": 34,
+            "employee_id": 5,
+            "status": "ACTIVE",
+            "assigned_source": "AUTO",
+            "assigned_by_user_id": null
+          }
+        ],
+        "calls": [
+          {
+            "id": 37,
+            "provider_type": "LLM",
+            "attempt": 1,
+            "status": "SUCCESS",
+            "model_version": "dev-llm-v1"
+          }
+        ],
+        "logs": [
+          {
+            "id": 324,
+            "event_code": "CREATE",
+            "payload_json": {
+              "event_code": "CREATE"
+            }
+          },
+          {
+            "id": 325,
+            "event_code": "AI_TASK_ATTEMPT",
+            "payload_json": {
+              "attempt": 1,
+              "task_id": "5120275a-f92c-4a2c-b13c-8baa5bb5bb1c",
+              "input_hash": "46a9fb202c6699b35dd83aad85f31efe24d2d8a3ce227dcd1d2f2de9325b6341",
+              "analysis_id": 34,
+              "from_status": "PENDING_ANALYSIS",
+              "execution_token": "e5eca15587524537b7a0d779dab0b738",
+              "analysis_version": 1,
+              "work_order_version": 1
+            }
+          },
+          {
+            "id": 326,
+            "event_code": "ANALYZE",
+            "payload_json": {
+              "event_code": "ANALYZE",
+              "reason_code": "AI_ANALYSIS"
+            }
+          },
+          {
+            "id": 327,
+            "event_code": "ASSIGN",
+            "payload_json": {
+              "event_code": "ASSIGN",
+              "employee_id": 5,
+              "incident_id": null,
+              "reason_code": "AUTO_ASSIGN",
+              "assigned_source": "AUTO"
+            }
+          }
+        ],
+        "employee_load": [
+          {
+            "business_date": "2026-09-25",
+            "current_load": 1,
+            "on_duty": "ON_DUTY"
+          }
+        ],
+        "contact_snapshot_matches": true
+      },
+      "business_committed_before_intent_finish_and_ACK": true,
+      "seconds": 8.828
+    },
+    "end": {
+      "permanent": {
+        "id": 39,
+        "intent": {
+          "id": 22,
+          "operation": "ANALYZE_WORK_ORDER",
+          "resource_id": 39,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "45a4ca8a-75ab-41ff-94b9-1345abdd81d9",
+          "status": "FAILED",
+          "publish_attempt": 3,
+          "execution_attempt": 3,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": "AI.UNAVAILABLE",
+          "finished_at": "2026-09-24 20:58:12.389142"
+        },
+        "work": [
+          {
+            "id": 39,
+            "status": "PENDING_ANALYSIS",
+            "version": 1,
+            "current_assignment_id": null
+          }
+        ],
+        "analysis": [],
+        "assignments": [],
+        "calls": [],
+        "logs": [
+          {
+            "id": 333,
+            "event_code": "CREATE",
+            "payload_json": {
+              "event_code": "CREATE"
+            }
+          },
+          {
+            "id": 334,
+            "event_code": "AI_TASK_FAILED",
+            "payload_json": {
+              "attempt": 3,
+              "task_id": "45a4ca8a-75ab-41ff-94b9-1345abdd81d9",
+              "intent_id": 22,
+              "error_code": "AI.UNAVAILABLE",
+              "work_order_version": 1
+            }
+          }
+        ],
+        "employee_load": [
+          {
+            "business_date": "2026-09-25",
+            "current_load": 0,
+            "on_duty": "ON_DUTY"
+          }
+        ],
+        "contact_snapshot_matches": true
+      },
+      "knowledge": {
+        "document_id": 1,
+        "version": 1,
+        "job_status": "PENDING",
+        "content_hash": "b400d2b7274680653ada9d01614b9f063ad6576a558f7f6dc9dca64206d39a83"
+      },
+      "all_intents": [
+        {
+          "id": 4,
+          "operation": "ANALYZE_WORK_ORDER",
+          "resource_id": 37,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "468028d9-ea98-4b91-83e3-450ff63cbbcd",
+          "status": "SUCCEEDED",
+          "publish_attempt": 5,
+          "execution_attempt": 2,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:57:28.481253"
+        },
+        {
+          "id": 13,
+          "operation": "ANALYZE_WORK_ORDER",
+          "resource_id": 38,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "5120275a-f92c-4a2c-b13c-8baa5bb5bb1c",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:57:52.213321"
+        },
+        {
+          "id": 22,
+          "operation": "ANALYZE_WORK_ORDER",
+          "resource_id": 39,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "45a4ca8a-75ab-41ff-94b9-1345abdd81d9",
+          "status": "FAILED",
+          "publish_attempt": 3,
+          "execution_attempt": 3,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": "AI.UNAVAILABLE",
+          "finished_at": "2026-09-24 20:58:12.389142"
+        },
+        {
+          "id": 23,
+          "operation": "INGEST_KNOWLEDGE",
+          "resource_id": 1,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "cc89534f-091b-43de-8016-44c6a1a53219",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:58:17.137426"
+        }
+      ],
+      "notification_delivery": "real Development Provider, no external exactly-once claim",
+      "seconds": 12.265
+    },
+    "notifications": {
+      "intents": [
+        {
+          "id": 3,
+          "operation": "DELIVER_NOTIFICATION",
+          "resource_id": 304,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "2e507b7c-8cf4-4a08-a4e2-35ad757e36af",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:59:28.680603"
+        },
+        {
+          "id": 5,
+          "operation": "DELIVER_NOTIFICATION",
+          "resource_id": 305,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "84104e1d-6bb9-4f59-afd0-f4ac8c2bada6",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:59:28.758927"
+        },
+        {
+          "id": 6,
+          "operation": "DELIVER_NOTIFICATION",
+          "resource_id": 306,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "5d8cd05f-b986-45ec-8865-c8569ea96869",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:59:28.832740"
+        },
+        {
+          "id": 7,
+          "operation": "DELIVER_NOTIFICATION",
+          "resource_id": 307,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "530b8af2-f13c-447a-9a75-56647ffe2c1e",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:59:28.886506"
+        },
+        {
+          "id": 8,
+          "operation": "DELIVER_NOTIFICATION",
+          "resource_id": 308,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "0b4040c5-7206-49b1-a86b-b02284638cb8",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:59:28.935745"
+        },
+        {
+          "id": 9,
+          "operation": "DELIVER_NOTIFICATION",
+          "resource_id": 309,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "6f8cf36f-26a2-4120-91ce-17b4db43a3ca",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:59:28.988158"
+        },
+        {
+          "id": 10,
+          "operation": "DELIVER_NOTIFICATION",
+          "resource_id": 310,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "d1868972-9c58-4410-8340-b63750360c46",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:59:29.066324"
+        },
+        {
+          "id": 11,
+          "operation": "DELIVER_NOTIFICATION",
+          "resource_id": 311,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "cebde460-25d8-437b-a447-19b926c97084",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:59:29.147008"
+        },
+        {
+          "id": 12,
+          "operation": "DELIVER_NOTIFICATION",
+          "resource_id": 312,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "5bbda98d-6a8c-4b7e-8429-51681b642fed",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:59:29.222964"
+        },
+        {
+          "id": 14,
+          "operation": "DELIVER_NOTIFICATION",
+          "resource_id": 313,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "85e2d668-1cdf-4aec-808b-ac315af9863d",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:59:29.297874"
+        },
+        {
+          "id": 15,
+          "operation": "DELIVER_NOTIFICATION",
+          "resource_id": 314,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "1be240d3-6add-4d72-a9e4-ce7cd8c53727",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:59:29.378275"
+        },
+        {
+          "id": 16,
+          "operation": "DELIVER_NOTIFICATION",
+          "resource_id": 315,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "489ff51c-71c0-49bb-b5ea-b83e6722a98d",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:59:29.433263"
+        },
+        {
+          "id": 17,
+          "operation": "DELIVER_NOTIFICATION",
+          "resource_id": 316,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "d29e16d6-6987-4db9-94b9-b53e0b2fa844",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:59:29.492425"
+        },
+        {
+          "id": 18,
+          "operation": "DELIVER_NOTIFICATION",
+          "resource_id": 317,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "327f001b-0379-4eb6-9ea0-217ff8d28a46",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:59:29.544434"
+        },
+        {
+          "id": 19,
+          "operation": "DELIVER_NOTIFICATION",
+          "resource_id": 318,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "854b35fe-bd9d-4c3d-8a7a-18c51ea4ac77",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:59:29.613924"
+        },
+        {
+          "id": 20,
+          "operation": "DELIVER_NOTIFICATION",
+          "resource_id": 319,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "7c38553b-b618-473c-8f95-263aa1121355",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:59:29.682774"
+        },
+        {
+          "id": 21,
+          "operation": "DELIVER_NOTIFICATION",
+          "resource_id": 320,
+          "resource_version": 1,
+          "generation": 1,
+          "task_id": "fc844f42-9937-410a-b7b5-235725b05bb0",
+          "status": "SUCCEEDED",
+          "publish_attempt": 1,
+          "execution_attempt": 1,
+          "lease_token": null,
+          "lease_until": null,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 20:59:29.749857"
+        }
+      ],
+      "correction": "Initial collector selected request marker only, omitting notification-ID-correlated intents. Added exact authoritative work-order join; no new business, no history scan or manual send.",
+      "seconds": 2.563
+    }
+  },
+  "requests": [
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "one-accept",
+      "method": "POST",
+      "path": "/staff/work-orders/37/accept",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "79cfedf8ff8557d2"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "one-start",
+      "method": "POST",
+      "path": "/staff/work-orders/37/start",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e17e7a482429e9a1"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "one-receipt",
+      "method": "POST",
+      "path": "/staff/work-orders/37/receipts",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "715feeb3e49c5475"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "one-confirm",
+      "method": "POST",
+      "path": "/work-orders/37/confirm",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "8dc27459ae7099c0"
+    },
+    {
+      "label": "detail-one",
+      "method": "GET",
+      "path": "/work-orders/37",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d26e6a3f98b7e99a"
+    },
+    {
+      "label": "case-two",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "473d97bdc26f74a8"
+    },
+    {
+      "label": "detail-two",
+      "method": "GET",
+      "path": "/work-orders/38",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "23d492036c7643cd"
+    },
+    {
+      "label": "two-accept",
+      "method": "POST",
+      "path": "/staff/work-orders/38/accept",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6004232ad5793b61"
+    },
+    {
+      "label": "detail-two",
+      "method": "GET",
+      "path": "/work-orders/38",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "23d492036c7643cd"
+    },
+    {
+      "label": "two-start",
+      "method": "POST",
+      "path": "/staff/work-orders/38/start",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "fc8e7d7996851adb"
+    },
+    {
+      "label": "detail-two",
+      "method": "GET",
+      "path": "/work-orders/38",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "23d492036c7643cd"
+    },
+    {
+      "label": "two-receipt",
+      "method": "POST",
+      "path": "/staff/work-orders/38/receipts",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a6dc13a0cb063f6b"
+    },
+    {
+      "label": "detail-two",
+      "method": "GET",
+      "path": "/work-orders/38",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "23d492036c7643cd"
+    },
+    {
+      "label": "two-confirm",
+      "method": "POST",
+      "path": "/work-orders/38/confirm",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "09416ac40cd7aefc"
+    },
+    {
+      "label": "detail-two",
+      "method": "GET",
+      "path": "/work-orders/38",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "23d492036c7643cd"
+    },
+    {
+      "label": "case-permanent",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "ad9f9487df8048c1"
+    },
+    {
+      "label": "knowledge",
+      "method": "POST",
+      "path": "/admin/knowledge-documents",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2ab1615000acb2a3"
+    }
+  ],
+  "updated_utc": "2026-09-24T20:59:29.870934+00:00"
+}

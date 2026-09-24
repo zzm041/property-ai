@@ -562,7 +562,8 @@ class WorkOrderService:
                 severity=severity,
                 claimed_tenant_id=claimed_tenant_id,
                 claimed_property_id=claimed_property_id,
-            )
+            ),
+            analysis_request_id=request_id,
         )
         if created:
             self._enqueue_analysis(record.id, request_id, version=record.version)
@@ -609,6 +610,8 @@ class WorkOrderService:
         return self._execute(operation)
 
     def _enqueue_analysis(self, work_order_id: int, request_id: str, *, version: int | None = None) -> None:
+        if self._settings.durable_tasks_enabled:
+            return  # Already persisted in the business transaction; publisher is the backstop.
         if not self._settings.should_enqueue_ai_on_create:
             return
         from app.worker.enqueue import enqueue_celery_task
@@ -762,7 +765,8 @@ class WorkOrderService:
                 file_ids=file_ids,
                 taken_phase=taken_phase,
                 version=version,
-            )
+            ),
+            analysis_request_id=request_id,
         )
         if record.status == WorkOrderStatus.PENDING_ANALYSIS.value:
             self._enqueue_analysis(record.id, request_id, version=record.version)
@@ -837,7 +841,8 @@ class WorkOrderService:
                 request_id=request_id,
                 reason=reason.strip(),
                 version=version,
-            )
+            ),
+            analysis_request_id=request_id,
         )
         if record.status == WorkOrderStatus.PENDING_ASSIGNMENT.value:
             self._enqueue_analysis(record.id, request_id, version=record.version)
@@ -961,7 +966,8 @@ class WorkOrderService:
                 request_id=request_id,
                 reason=reason.strip(),
                 version=version,
-            )
+            ),
+            analysis_request_id=request_id,
         )
         self._enqueue_analysis(record.id, request_id, version=record.version)
         return record
@@ -2989,12 +2995,23 @@ class WorkOrderService:
             )
         return current
 
-    def _execute(self, operation: Callable[[], T], *, composing: bool = False) -> T:
+    def _execute(self, operation: Callable[[], T], *, composing: bool = False, analysis_request_id: str | None = None) -> T:
         from app.core.database import run_composing_transaction, run_owned_transaction
 
         try:
             runner = run_composing_transaction if composing else run_owned_transaction
-            return runner(self._session, operation)
+            def with_intent():
+                result = operation()
+                if (analysis_request_id is not None and self._settings.durable_tasks_enabled
+                        and self._settings.should_enqueue_ai_on_create):
+                    record = result[0] if isinstance(result, tuple) else result
+                    created = result[1] if isinstance(result, tuple) else True
+                    if created and record.status in {"PENDING_ANALYSIS", "PENDING_ASSIGNMENT"}:
+                        from app.service.task_intent import ANALYZE, register_intent
+                        register_intent(self._session, operation=ANALYZE, resource=record,
+                                        request_id=analysis_request_id)
+                return result
+            return runner(self._session, with_intent)
         except AppError:
             raise
         except IntegrityError as exc:

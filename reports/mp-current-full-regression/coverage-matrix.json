@@ -2270,26 +2270,43 @@
     "preservation": "83 original IDs/historical results unchanged;12/24/25 protected;DLQ7=old5+new30/34,none read/replayed;no modelcalls/Migration/0010/config changes",
     "release_gaps": "Only bounded transient DB software recovery; process loss, commit/enqueue gap, real uncertainCOMMIT, Redis+Broker failure, prolongedDBoutage/production reliability remain.28case/3of3/NOT_READY/extra32NOT_APPROVED retained."
   },
+  "selfhost_supplement_024_rubric_01": {
+    "task_id": "SELFHOST-AI-LOCAL-001",
+    "supplement_id": "SUPPLEMENT-024-RUBRIC-01",
+    "status": "NOT_READY_FOR_BUSINESS_SWITCH",
+    "evidence_version": "ba064647e602e3dea808f65a60039a8b73934599",
+    "calls": "Approved once, stopped at5/32 requests under semantic stop; no6th request/secondround, original28/128calls/3of3 preserved",
+    "result": "001-004 scoped Chinese facts/history/guessing correct;005 cleaning+maintenance excludes eligible CLEANING-only staff under actual rules. Inferred routing risk, not observed business misassignment.",
+    "images": "Pillow missing in explicit approved environment;0 converted/0 inferred, not image quality PASS or failure",
+    "independent_review": "reports/auth-identity-ai-001/local-qwen/supplement-024-rubric-01/review.json; NOT_READY, readonly no service actions",
+    "next_action": "Offline duty/output-consistency plan; any new protocol/inference budget, isolated image dependency or business switch requires explicit approval; no paid route"
+  },
   "reliable_task_delivery_026": {
     "task_id": "RELIABLE-TASK-DELIVERY-026",
     "base_sha": "2642207abffdf2e1bb882b27fb91117f619768eb",
-    "status": "SCHEMA_APPROVAL_REQUIRED_NOT_RUNTIME_PASS",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
     "scope": "One end-to-end commit-intent-publication-claim-result-ack/recovery milestone; five finite windows, no025rerun",
     "prepared": "Exacttarget/revision/overwrite guard plus new readonly hostD snapshot; original83/current83/results retained, no completion percentage",
-    "proposal": "reports/reliable-task-delivery-026/README.md; proposed0012task_intents parent0011, NOT_CREATED/NOT_EXECUTED; no0010",
-    "snapshot": "reports/reliable-task-delivery-026/snapshot.json; actual capture only, restoration unverified",
+    "proposal": "Owner approved7bc504b complete proposal;0012created/appliedonlyAUTH001 parent0011, no oldtables/backfill/0010; reports/reliable-task-delivery-026/migration-result.json",
+    "snapshot": "Originalsnapshot retained; fresh paused-writer hostbackup fresh-snapshot.json, independentverifiedSHA39bbabdf6e89907094dd74182917d83b2b3021150711f5d50d5e5967b1b1dfb6; originalcounts/protectedhashesunchanged; restoreunverified",
     "reuse": "025 analysis reuse, task/version/owner fences, transactions,Assignment/load idempotence; existing knowledgejobs/notificationdeliveries andCelerylateACK/confirm",
-    "gaps": "Missing durable analysisintent and consistent bounded missing-message/process-lease recovery across criticalasync flows; shared3307wildcardbinding noted but unchanged",
-    "model_gate": "SELFHOST-AI existing28/3of3/NOT_READY preserved; explicitv8/1024imagecopy supplement32max request remains unapproved, no calls/download/businessswitch",
-    "independent_review": "reports/reliable-task-delivery-026/review-round1.json; separate readonly round1 READY_FOR_APPROVAL only, zero current blockers; no runtime/test/business/model operations, private backup hash independently checked",
-    "next_action": "Save preparation only; obtain0012andseparatemodeldiagnosticapproval; no runtimePASS until five-window contract met"
+    "gaps": "026-R1-01 closed by independentround2; onefix,82directunit/1warning. Fivewindows rt026-91880f6aeb271.03s/3orders/1version completed; finalfix/takeover onlyunit, notloaded in previousruntime. Fullproduction durability/defaultdeployment/restore/3307binding stillopen; no025businessrerun.",
+    "model_gate": "Bseparatelyapprovedonce then5calls semanticstopNOT_READY; no furtherinference/businessswitch/weights. Original28/3of3kept.",
+    "independent_review": "review-runtime-round2.json PASS_SCOPED_LOCAL_DEVELOPMENT;026-R1-01CLOSED,onefix;25finalfiles matchreview-fix1-manifest.json/82testresult; originalR1 andpreparation kept",
+    "next_action": "Save scopedcode/evidence; keep runtime57d5pre-takeover/fix hash distinct from finalsource; no newdrill, no newgenerationruntime claimed",
+    "current_status_overlays": [
+      {"id":"V1-WORKER-ASYNC","implementation_status":"Typed same-transaction intents; bounded confirmed publisher, persistent attempts/leases/heartbeat, terminal reconciliation and existing domain adapters","verification_status":"026_PASS_SCOPED_LOCAL_DEVELOPMENT","evidence_version":"026runtime-final.json + review-fix1-manifest.json + review-runtime-round2.json","remaining_gap":"Default supervised rollout, final fixes runtime integration and production durability/real providers","next_action":"Preserve completed bounded drill; final candidate integration only when appropriate"},
+      {"id":"V1-AI-FAIL-CREATE","implementation_status":"025 retained;026 closes proved commit/publish/process-loss gaps and stable bounded exhaustion","verification_status":"025_026_PASS_SCOPED_LOCAL_DEVELOPMENT","evidence_version":"025originals +026runrt026-91880f6aeb/82tests/independentround2","remaining_gap":"Production and simultaneous infrastructure/disaster failure; not all unknownCOMMITwindows proved live","next_action":"Do not replayprotected12/24/25/30/34/39 or closeddrill"},
+      {"id":"V1-NTF-RETRY","implementation_status":"Existing delivery records share durableintent counter budget and finite recovery; normal notifications delivered in026","verification_status":"026_PASS_SCOPED_LOCAL_DEVELOPMENT","evidence_version":"026runtime-evidence.notifications/review-runtime-round2.json","remaining_gap":"Real externalpush uncertain window/provider idempotence andproduction delivery","next_action":"Keep businessAssignment separate from notificationretry; no historicalDLQ replay"},
+      {"id":"V1-BACKUP-RESTORE","implementation_status":"ExactAUTH001 guarded hostbackup captured before0012, olddatafingerprints verified","verification_status":"PARTIAL_BACKUP_CAPTURE_ONLY_RESTORE_UNVERIFIED","evidence_version":"026fresh-snapshot/migration-result/independentbackuphash","remaining_gap":"Actual isolatedrestore/production backup recovery acceptance","next_action":"Request precise restoretarget authorization before anyrestore; keep bothhostbackups"}
+    ]
   },
   "current_effective_view": {
     "generated_at": "2026-09-25",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
     "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs), then notification_events_inbox_013.current_status_overlays (2 IDs)",
     "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs), then manager_wo_cancel_017 (1 composite ID, remains PARTIAL), then house_csv_roundtrip_018 (1 existing ID), then ai_analysis_input_019 (3 existing IDs; real-model statuses remain BLOCKED), then resident_wo_presentation_020 (1 existing ID; release gaps retained), then notification_presentation_021 (1 existing ID; explicitUTC not Property-local/outbound acceptance), then ai_fallback_runtime_022 (1 existing ID; Development injected failure only)",
-    "latest_additional_overlay_source": "resident_house_select_023 (WO-CREATE only), evaluation_calibration_20260924 (3 existing IDs, modelNOT_READY retained), then maintenance_contact_dispatch_024 (3 existing IDs; owner ordinary-group/contact change), then db_task_recovery_025 (2 existing IDs; bounded transient DB software recovery, other reliability/model release gaps retained)",
+    "latest_additional_overlay_source": "resident_house_select_023 (WO-CREATE only), evaluation_calibration_20260924 (3 existing IDs), maintenance_contact_dispatch_024 (3 existing IDs), db_task_recovery_025 (2 existing IDs), reliable_task_delivery_026 (4 existing IDs, boundedDevelopment only), selfhost_supplement_024_rubric_01 (SELFHOST-AI retainsNOT_READY; no percentage/extra_v1 double count)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced. Old AUTH001 objects were lost on the 2026-09-23 tmpfs stop; historical evidence remains version-bound, not current-object proof.",
     "row_count": 83,
     "rows": [
@@ -2666,8 +2683,8 @@
         "current_implementation": "Approved free local2B/4B weights and real Ollama inference exist;4B Q4_K_M fixed24text+4photos baseline plus3repairs saved128calls. No general Qwen/4B disqualification; tested combination remains NOT_READY.",
         "verification_mode_status": "REAL_LOCAL_DIAGNOSTICS_NOT_READY_FOR_BUSINESS_SWITCH",
         "evidence_version": "e65b4d7 real2B failure;95654578605adb745c27aa29a3d0111611f4c0bd quality28-round0..3, immutable gold/photos and independent NEEDS_CHANGES; current interpretation in calibration v1",
-        "remaining_gap": "Unsupported HVAC-only selection, incomplete PHOTO004 vision protocol, raw-enum compliance; capability/multiple-trade rubric needs narrow clarification. Real AUTO/RAG, real-device/production quality, reliability and performance not accepted. No requirement for paid GPU or property-specific official benchmark.",
-        "next_action": "No new calls/model/download/runtime switch;3/3 not reset and32call proposal NOT_APPROVED. Reconcile rubric/protocol before any bounded execution request; keep wholeV1 plan and release gaps, not mandatory manual diversion."
+        "remaining_gap": "Owner024 ordinary unified-maintenance rule supersedes exclusivewater/electric gates, not original failures. B approvedonce then005actualcleaning/maintenance mismatch prevents READY;19texts/4photos untested thissupplement, Pillowmissing, priorPHOTO004truncation retained. RealAUTO/RAG/device/production stillopen; not disqualificationofallQwen/4B.",
+        "next_action": "Use ba064647e602e3dea808f65a60039a8b73934599 B independentNOT_READY and5rawresponses; no6thcall/secondround/businessswitch. Offlineprotocolplan then exactnewapproval; retain3of3/history and fullV1 scope."
       },
       {
         "requirement_id": "REAL-SMS",
@@ -2855,9 +2872,9 @@
       },
       {
         "requirement_id": "V1-NTF-RETRY",
-        "current_implementation": "bounded_retry_claim_and_due_compensation_wired",
-        "verification_mode_status": "PASS_SCOPED_LOCAL",
-        "evidence_version": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea / a5433ffc1147c6ed73d259059dd78567131da4ac",
+        "current_implementation": "Existing delivery records share026durableintent attempt budget/lease recovery; normalnewnotifications delivered without duplicateAssignment",
+        "verification_mode_status": "026_PASS_SCOPED_LOCAL_DEVELOPMENT",
+        "evidence_version": "Prior2c2872fa/a5433ffc retained;026runtime-evidence.notifications,82tests,review-runtime-round2.json +review-fix1-manifest.json",
         "remaining_gap": "生产Provider、真实uncertain窗口和完整DLQ/replay验收",
         "next_action": "保留有限重试证据；生产资源具备后补Provider与DLQ验收"
       },
@@ -2871,19 +2888,19 @@
       },
       {
         "requirement_id": "V1-WORKER-ASYNC",
-        "current_implementation": "isolated_worker_present",
-        "verification_mode_status": "PARTIAL",
-        "evidence_version": "d144bcddcfc24e6e9eaf60509acd124711bc0561",
-        "remaining_gap": "production reliability, real providers and complete DLQ/replay acceptance",
-        "next_action": "仅针对所列剩余缺口补实现或证据"
+        "current_implementation": "026same-transaction typedintents, boundedpublication/claim/leases/heartbeat, finitefailure, resultreconciliation andscopedexplicitgenerationtakeover",
+        "verification_mode_status": "026_PASS_SCOPED_LOCAL_DEVELOPMENT",
+        "evidence_version": "PriorisolatedWorker retained;026runrt026-91880f6aeb/runtimehash57d5f9f8,82unit,25filefinalmanifest/independentround2",
+        "remaining_gap": "Finalfix/takeover onlyunit notloaded; defaultsupervisedrollout/productiondurability, realproviders, dualfailure/disasterrestore; no globalDLQreplay acceptance",
+        "next_action": "Keep fivewindowrunclosed andprotectedhistory; finalcandidate integration notfull025rerun"
       },
       {
         "requirement_id": "V1-BACKUP-RESTORE",
-        "current_implementation": "不属于小程序页面、应单独后端验证",
-        "verification_mode_status": "none:NOT_IMPLEMENTED",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "备份与恢复验收",
-        "next_action": "按依赖顺序实施，保留本ID在分母中"
+        "current_implementation": "ExactAUTH001 guarded hostbackup captured before0012, oldcounts/protectedfingerprints verified; backupsoutsidecontainer retained",
+        "verification_mode_status": "PARTIAL_BACKUP_CAPTURE_ONLY_RESTORE_UNVERIFIED",
+        "evidence_version": "026fresh-snapshot/migration-result/independenthash39bbabdf6e89907094dd74182917d83b2b3021150711f5d50d5e5967b1b1dfb6",
+        "remaining_gap": "实际隔离恢复、生产备份恢复及灾难恢复验收",
+        "next_action": "明确恢复目标另行批准前不恢复；不覆盖现有资产"
       },
       {
         "requirement_id": "V1-PERF-RELEASE",
@@ -2927,11 +2944,11 @@
       },
       {
         "requirement_id": "V1-AI-FAIL-CREATE",
-        "current_implementation": "022 creation/fallback retained;025 fresh-session finite DB retry, task/input/version fencing, committed-analysis reuse and stable exhaustion with visible resident notice.",
-        "verification_mode_status": "025_PASS_SCOPED_LOCAL_DEVELOPMENT_TRANSIENT_DB_RECOVERY",
+        "current_implementation": "022/025 retained;026same-transaction intent and proved commit/publish/process-loss recovery, stable finitefailure; finalCOMMITackreconciliation guarded beforeexhaustion.",
+        "verification_mode_status": "025_026_PASS_SCOPED_LOCAL_DEVELOPMENT",
         "evidence_version": "6a12ff140a555556103e6b389acb994fe98ae7fe backendhash4d43d0643e07db25356d97418c090febfce0b33fecb33366d0c2504d96107953 equals reviewed/runtimeWIP;run db025-4efe90cf93;225 scoped unit,6screenshots,API/DB/Worker;old022 preserved",
-        "remaining_gap": "Process crash, commit/enqueue gap, real unknownCOMMIT, dualRedis/Broker failure and prolongedDBoutage remain;30 test-fixture failure and34 expectedexhaustion retained. RealQwen/production/device/release not passed.",
-        "next_action": "Independent round2PASS; save exact commit binding, no replay of12/24/25/30/34 or historicalDLQ. Next commit-to-enqueue/process-loss work must stay bounded and separately approve anyschema/sharedenvironment need."
+        "remaining_gap": "026provedfivewindows closed, finalcommitackfix onlyunit. BroaderunknownCOMMIT, dualRedis/Broker, prolongedoutage/disaster/production remain;30/34oldfailures andnew39exhaustion preserved. RealQwen/device/release not passed.",
+        "next_action": "Use026runtime-final/review-fix1-manifest/independentround2 asadditional evidence; no replay ofprotectedobjects/historicalDLQ orcloseddrill. Finalcandidateintegration separate."
       },
       {
         "requirement_id": "V1-AUTO-DISPATCH-FILTER",

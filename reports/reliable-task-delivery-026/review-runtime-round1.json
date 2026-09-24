@@ -1,0 +1,59 @@
+{
+  "task_id": "RELIABLE-TASK-DELIVERY-026",
+  "review_round": 1,
+  "review_mode": "INDEPENDENT_READ_ONLY",
+  "reviewer": "/root/review025_round1",
+  "base_sha": "7bc504bd6fe287075fd7b4cd14d08ab944d70bfd",
+  "head_sha": "ba064647e602e3dea808f65a60039a8b73934599",
+  "version_boundary": "HEAD only B evidence commit; A WIP is bound in review-input-manifest.json. Five-window runtime source57d5f9f8ffbd65b0f571d75ee4fbcea34a7af02cefe82c500d97bc5c68428aa6 excludes later takeover API.",
+  "verdict": "NEEDS_CHANGES",
+  "findings": [
+    {
+      "id": "026-R1-01",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "priority": "P1",
+      "location": [
+        "backend/app/service/task_intent.py:177",
+        "backend/app/worker/task_intents.py:158",
+        "backend/app/worker/task_intents.py:168"
+      ],
+      "title": "最后一次提交确认丢失时，已成功业务可能永久记为任务失败",
+      "trigger": "最后一次领域提交实际成功但收到2013等暂时错误，进入finish(FAILED,retryable=True)且执行预算已满。",
+      "impact": "finish未先核对领域结果，直接_fail；领域SUCCEEDED但intentFAILED，终态不再被publisher扫描自动修正。",
+      "evidence": "_reconcile仅在claim调用，finish失败直接落FAILED；_fail避免覆盖成功领域记录却不修正intent。源码确定遗漏，非本轮已观察故障。",
+      "minimal_fix": "新事务持有有效token和领域锁后，在失败/重试/耗尽判断前_reconcile；已提交则记录真实终态，不调用Provider/派单。补末次通知、知识、分析已提交及未成功单元。",
+      "retest_boundary": "不重跑五窗口或业务对象；同task round2窄复核。"
+    }
+  ],
+  "accepted_evidence": [
+    "run rt026-91880f6aeb 271.03s,3API/publisher+2Worker真实精确终止。",
+    "提交前无幽灵；37自动补发/重复/Worker丢失恢复，1Development分析+1AUTO。",
+    "38结果提交至ACK间中断，恢复不增加调用/Assignment/占用；37/38CLOSED负载0。",
+    "39连续3次测试不可用后FAILED+AI_TASK_FAILED，无分析/Assignment/无限重试。",
+    "知识1/v1独立Worker Development激活，新通知成功；queue0/0/1,DLQ7未消费。",
+    "0011到0012AUTH001新增单表结构准确、原计数/保护哈希保持。",
+    "独立核对新备份674573bytes SHA39bbabdf6e89907094dd74182917d83b2b3021150711f5d50d5e5967b1b1dfb6匹配，不读SQL正文。",
+    "77passed1warning有效，fixtures原断言保留，不累加历史。"
+  ],
+  "release_blockers_retained": [
+    "灾难恢复/共享双故障/生产耐久性/部署未验收。",
+    "外部通知无Provider幂等则不保证exactly-once。",
+    "3307通配绑定未改。",
+    "真实模型/RAG/Production未通过；B NOT_READY，0010不执行。"
+  ],
+  "non_blocking_boundaries": [
+    "管理接管API有权限/幂等/版本/审计unit，未运行livegenerationretry。",
+    "专用测试launcher/短租约，不是默认部署参数或新增API已加载。",
+    "备份不是恢复验证；无本轮UI，不重跑025/全仓。"
+  ],
+  "materials_read": [
+    "TaskIntent model/repository/service/Worker/API",
+    "0012 migration, scripts/ops/publish_task_intents.py",
+    "直接业务接入diff/025保护/knowledge notification上下文",
+    "test_task_intents_026 and精确fixtures",
+    "README,fresh-snapshot,migration-result,runtime-evidence,runtime-final,process-events,launch-026,77testlog",
+    "handoff增量；排除B/预存配置"
+  ],
+  "reviewer_limits": "未写文件/运行测试/页面/模型/业务API/DB/队列/创建其他reviewer。",
+  "next_action": "只修复026-R1-01，保留原证据和问题历史，round2窄复核。"
+}
