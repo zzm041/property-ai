@@ -21,7 +21,20 @@
   "independent_decision": "NEEDS_CHANGES / NOT_READY_FOR_SWITCH",
   "final_verified_port_evidence": "post-quality28-state-confirmed.json; earlier post-quality28-state.json empty listener list was an access-denied limitation, not absence proof",
   "runtime_now": {"isolated_model_pid":2152,"model_endpoint":"http://127.0.0.1:11435","api_8083_at_receipt":"NOT_LISTENING","old_api_worker_pids":"ABSENT","api_worker_started_or_changed":false,"last_recorded_business_configuration":"e65b4d7/2B, historical not confirmed running","business_database_or_queue_access":false,"order12_replayed_or_modified":false},
-  "next_action": "No further inference under exhausted 3-round allowance. Obtain approval for the exact revised bounded diagnostic protocol in quality28-assessment.md before implementation/calls; NOT a business switch request. Preserve fixed gold and all failed outputs. No0010/newcollection/fees/newweights/shared services.",
+  "next_action": "No further inference under exhausted 3-round allowance. Apply owner calibration v1 in quality28-assessment.md; resolve only documented capability/policy ambiguities and reconsider v7 blanket abstention before presenting any bounded diagnostic proposal. Proposed extra32calls NOT_APPROVED, not a business-switch request. Continue independent current-schema software planning without repeating accepted slices. Preserve fixed gold/all failures; no0010/newcollection/fees/newweights/shared services.",
+  "evaluation_calibration_20260924": {
+    "source_evidence_head": "95654578605adb745c27aa29a3d0111611f4c0bd",
+    "mode": "DOCUMENT_SOURCE_SAVED_OUTPUT_AND_ACTUAL_IMAGE_REVIEW_ONLY",
+    "new_inference_calls": 0,
+    "repair_counter_reset": false,
+    "raw_outputs_gold_images_or_prior_review_changed": false,
+    "additional_32_call_proposal": "NOT_APPROVED_REQUIRES_RUBRIC_AND_PROTOCOL_RECONCILIATION",
+    "business_switch": "NOT_APPROVED",
+    "runtime_now_field_provenance": "Historical post-quality28-state-confirmed.json observation, not rechecked during calibration",
+    "assessment_section": "quality28-assessment.md: 2026-09-24 evaluation calibration v1",
+    "interpretation": "Normal sufficient reports plus eligible staff require system-owned AUTO; no universal Qwen/4B rejection or mandatory property benchmark/fine-tuning. Separate core error, wording/subtype, capability/gold ambiguity and protocol failure. Diagnostic business_fallback is low-confidence/OTHER only, not complete operational fallback or actual AUTO.",
+    "independent_acceptance": "Prior NEEDS_CHANGES retained; supporting read-only catalog/code review is not a new model PASS"
+  },
   "historical_pre_resume_checkpoint": {
   "task_id":"SELFHOST-AI-LOCAL-001",
   "checkpoint_date":"2026-09-24 Asia/Shanghai",

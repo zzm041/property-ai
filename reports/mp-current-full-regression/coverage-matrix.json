@@ -2209,12 +2209,47 @@
       }
     ]
   },
+  "evaluation_calibration_20260924": {
+    "task_id": "SELFHOST-AI-LOCAL-001",
+    "evidence_head": "95654578605adb745c27aa29a3d0111611f4c0bd",
+    "scope": "Existing specs, direct source, saved28case rounds and actual4photos only; no new inference/tests/business requests, no policy implementation or acceptance upgrade",
+    "status": "NOT_READY_FOR_BUSINESS_SWITCH_REPAIRS_3_OF_3",
+    "additional_32_calls": "NOT_APPROVED",
+    "calibration": "reports/auth-identity-ai-001/local-qwen/quality28-assessment.md: evaluation calibration v1",
+    "whole_v1_plan": "reports/project-handoff.md: Whole Production V1 continuity;83IDs are retained evidence, not the complete product definition",
+    "current_status_overlays": [
+      {
+        "id": "WO-AUTO-DISPATCH",
+        "implementation_status": "Existing system-owned eligibility/ranking/AUTO/notification and scoped Development cross-process evidence retained. Real local2B order12 failed semantic quality;4B diagnosis is read-only, not business dispatch.",
+        "verification_status": "PASS_SCOPED_DEVELOPMENT_REAL_AUTO_NOT_ACCEPTED",
+        "evidence_version": "Prior staff/019/022 evidence retained; e65b4d7 localqwen-b1090f3deaa3 failed2B order12;95654578605adb745c27aa29a3d0111611f4c0bd fixed28 saved diagnostics/reviews",
+        "remaining_gap": "Normal sufficient reports with eligible staff must actually create AUTO Assignment/notification without manager per-order action. Real4B quality/protocol, unnecessary manual diversion, end-to-end latency and production acceptance remain open.",
+        "next_action": "Keep order12 unchanged and023/proxy PASS; resolve only documented capability/risk ambiguities, no further inference under exhausted3/3. Extra32calls and later4B business switch each require explicit approval. Continue independent current-schema gaps."
+      },
+      {
+        "id": "SELFHOST-AI",
+        "implementation_status": "Approved free local2B/4B weights and real Ollama inference exist;4B Q4_K_M fixed24text+4photos baseline plus3repairs saved128calls. No general Qwen/4B disqualification; tested combination remains NOT_READY.",
+        "verification_status": "REAL_LOCAL_DIAGNOSTICS_NOT_READY_FOR_BUSINESS_SWITCH",
+        "evidence_version": "e65b4d7 real2B failure;95654578605adb745c27aa29a3d0111611f4c0bd quality28-round0..3, immutable gold/photos and independent NEEDS_CHANGES; current interpretation in calibration v1",
+        "remaining_gap": "Unsupported HVAC-only selection, incomplete PHOTO004 vision protocol, raw-enum compliance; capability/multiple-trade rubric needs narrow clarification. Real AUTO/RAG, real-device/production quality, reliability and performance not accepted. No requirement for paid GPU or property-specific official benchmark.",
+        "next_action": "No new calls/model/download/runtime switch;3/3 not reset and32call proposal NOT_APPROVED. Reconcile rubric/protocol before any bounded execution request; keep wholeV1 plan and release gaps, not mandatory manual diversion."
+      },
+      {
+        "id": "V1-REAL-ASR-VLM",
+        "implementation_status": "019 multi-image provenance/Development wiring retained; actual4B repair-photo diagnostics now exist, distinct from blue/red calibration. Three final vision responses complete, PHOTO004 truncated; no business or comprehensive visual-quality PASS.",
+        "verification_status": "REAL_VLM_READ_ONLY_DIAGNOSTICS_INCOMPLETE_REAL_ASR_UNVERIFIED",
+        "evidence_version": "Prior019 version-bound evidence;95654578605adb745c27aa29a3d0111611f4c0bd fixed28 round0..3 originals/photos/review; calibration v1 separates main visible content from nonessential subtype",
+        "remaining_gap": "Complete image protocol, fact-faithful safe routing and real ASR/business usage; native picker/device, production media/security/runtime/release. No internal-fault or exact-part-identification perfection requirement.",
+        "next_action": "Preserve original photos/answers and PHOTO004 context failure; do not infer all4B unsuitable or text fallback equals image PASS. No new inference/preprocessing/model change without bounded approval; real RAG/new1024d remains separate."
+      }
+    ]
+  },
   "current_effective_view": {
     "generated_at": "2026-09-24",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
     "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs), then notification_events_inbox_013.current_status_overlays (2 IDs)",
     "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs), then manager_wo_cancel_017 (1 composite ID, remains PARTIAL), then house_csv_roundtrip_018 (1 existing ID), then ai_analysis_input_019 (3 existing IDs; real-model statuses remain BLOCKED), then resident_wo_presentation_020 (1 existing ID; release gaps retained), then notification_presentation_021 (1 existing ID; explicitUTC not Property-local/outbound acceptance), then ai_fallback_runtime_022 (1 existing ID; Development injected failure only)",
-    "latest_additional_overlay_source": "resident_house_select_023 (WO-CREATE only, scoped address-selection software; no SELFHOST/AUTO/Production upgrade)",
+    "latest_additional_overlay_source": "resident_house_select_023 (WO-CREATE only), then evaluation_calibration_20260924 (3 existing IDs, real local diagnostics recognized but NOT_READY; no AUTO/SELFHOST/Production PASS upgrade)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced. Old AUTH001 objects were lost on the 2026-09-23 tmpfs stop; historical evidence remains version-bound, not current-object proof.",
     "row_count": 83,
     "rows": [
@@ -2420,11 +2455,11 @@
       },
       {
         "requirement_id": "WO-AUTO-DISPATCH",
-        "current_implementation": "Retained managed-staff rule-owned AUTO;019 adds scoped bounded context, all-report-image calls, valid usage and explicit blank-image INVALID fallback.",
-        "verification_mode_status": "PASS_SCOPED_DEVELOPMENT_CROSS_PROCESS_REAL_MODEL_BLOCKED",
-        "evidence_version": "Prior version-bound evidence retained;019 d1c4e9f page/API/Worker run ai019-e4b477cee2ff, FIX1 b52178c0cb5179eb60c394490f64b23b7125daad focused106 + runtime metadata",
-        "remaining_gap": "Real operator-controlled Qwen/ASR, production Worker/provider quality/security/capacity/release; no real-model or native-picker claim.",
-        "next_action": "Keep real text/image/voice acceptance behind existing resource approval; continue020 resident presentation without schema/dependency/fee or business replay."
+        "current_implementation": "Existing system-owned eligibility/ranking/AUTO/notification and scoped Development cross-process evidence retained. Real local2B order12 failed semantic quality;4B diagnosis is read-only, not business dispatch.",
+        "verification_mode_status": "PASS_SCOPED_DEVELOPMENT_REAL_AUTO_NOT_ACCEPTED",
+        "evidence_version": "Prior staff/019/022 evidence retained; e65b4d7 localqwen-b1090f3deaa3 failed2B order12;95654578605adb745c27aa29a3d0111611f4c0bd fixed28 saved diagnostics/reviews",
+        "remaining_gap": "Normal sufficient reports with eligible staff must actually create AUTO Assignment/notification without manager per-order action. Real4B quality/protocol, unnecessary manual diversion, end-to-end latency and production acceptance remain open.",
+        "next_action": "Keep order12 unchanged and023/proxy PASS; resolve only documented capability/risk ambiguities, no further inference under exhausted3/3. Extra32calls and later4B business switch each require explicit approval. Continue independent current-schema gaps."
       },
       {
         "requirement_id": "WO-STAFF-PROCESS",
@@ -2588,11 +2623,11 @@
       },
       {
         "requirement_id": "SELFHOST-AI",
-        "current_implementation": "Qwen adapters and019 input/provenance wiring verified with Development/mocked providers; concrete model/GPU/budget proposal retained, no real model deployed.",
-        "verification_mode_status": "SOFTWARE_WIRING_PASS_REAL_SELFHOST_INFERENCE_BLOCKED",
-        "evidence_version": "Prior version-bound evidence retained;019 d1c4e9f page/API/Worker run ai019-e4b477cee2ff, FIX1 b52178c0cb5179eb60c394490f64b23b7125daad focused106 + runtime metadata",
-        "remaining_gap": "Approved operator-controlled host, pinned weights/runtime and real business quality. Proposed48GPUh/200GB/USD100 not approved; Fake/healthz is not realAI.",
-        "next_action": "Keep real text/image/voice acceptance behind existing resource approval; continue020 resident presentation without schema/dependency/fee or business replay."
+        "current_implementation": "Approved free local2B/4B weights and real Ollama inference exist;4B Q4_K_M fixed24text+4photos baseline plus3repairs saved128calls. No general Qwen/4B disqualification; tested combination remains NOT_READY.",
+        "verification_mode_status": "REAL_LOCAL_DIAGNOSTICS_NOT_READY_FOR_BUSINESS_SWITCH",
+        "evidence_version": "e65b4d7 real2B failure;95654578605adb745c27aa29a3d0111611f4c0bd quality28-round0..3, immutable gold/photos and independent NEEDS_CHANGES; current interpretation in calibration v1",
+        "remaining_gap": "Unsupported HVAC-only selection, incomplete PHOTO004 vision protocol, raw-enum compliance; capability/multiple-trade rubric needs narrow clarification. Real AUTO/RAG, real-device/production quality, reliability and performance not accepted. No requirement for paid GPU or property-specific official benchmark.",
+        "next_action": "No new calls/model/download/runtime switch;3/3 not reset and32call proposal NOT_APPROVED. Reconcile rubric/protocol before any bounded execution request; keep wholeV1 plan and release gaps, not mandatory manual diversion."
       },
       {
         "requirement_id": "REAL-SMS",
@@ -2828,11 +2863,11 @@
       },
       {
         "requirement_id": "V1-REAL-ASR-VLM",
-        "current_implementation": "019 processes all REPORT images with individual provenance/fallback; actual two-image Development Worker/storage and mocked LLM/VLM/ASR usage verified.",
-        "verification_mode_status": "DEVELOPMENT_SOFTWARE_PASS_REAL_ASR_VLM_BLOCKED",
-        "evidence_version": "Prior version-bound evidence retained;019 d1c4e9f page/API/Worker run ai019-e4b477cee2ff, FIX1 b52178c0cb5179eb60c394490f64b23b7125daad focused106 + runtime metadata",
-        "remaining_gap": "Real ASR/VLM quality/live usage, representative media, native picker/device, production runtime and release remain unverified.",
-        "next_action": "Keep real text/image/voice acceptance behind existing resource approval; continue020 resident presentation without schema/dependency/fee or business replay."
+        "current_implementation": "019 multi-image provenance/Development wiring retained; actual4B repair-photo diagnostics now exist, distinct from blue/red calibration. Three final vision responses complete, PHOTO004 truncated; no business or comprehensive visual-quality PASS.",
+        "verification_mode_status": "REAL_VLM_READ_ONLY_DIAGNOSTICS_INCOMPLETE_REAL_ASR_UNVERIFIED",
+        "evidence_version": "Prior019 version-bound evidence;95654578605adb745c27aa29a3d0111611f4c0bd fixed28 round0..3 originals/photos/review; calibration v1 separates main visible content from nonessential subtype",
+        "remaining_gap": "Complete image protocol, fact-faithful safe routing and real ASR/business usage; native picker/device, production media/security/runtime/release. No internal-fault or exact-part-identification perfection requirement.",
+        "next_action": "Preserve original photos/answers and PHOTO004 context failure; do not infer all4B unsuitable or text fallback equals image PASS. No new inference/preprocessing/model change without bounded approval; real RAG/new1024d remains separate."
       },
       {
         "requirement_id": "V1-AUTH-LOCKOUT",
