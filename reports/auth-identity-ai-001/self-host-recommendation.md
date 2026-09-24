@@ -1,6 +1,12 @@
 # Self-hosted inference recommendation (AUTH-IDENTITY-AI-001-C)
 
-## Current controlled checkpoint — 2026-09-24
+## Current controlled checkpoint — 2026-09-24 resumed diagnosis
+
+**NOT_READY_FOR_BUSINESS_SWITCH; same-task repairs3/3 exhausted.** Fixed24text+4repairphoto set was run serially after the unchanged guards were satisfied: baseline plus3repairs,32requests each/128total; no altered samples or answer edits. Last v7/repair-photo-v4 still misclassifies facilities/no-primary multi-fault reports, invents specialization, and PHOTO004 again truncates at4096 before valid vision JSON. Chinese summaries improved, but this is not realAUTO/SELFHOST/Production PASS. Actual per-case raw inputs/outputs/hashes/tokens/resources are `local-qwen/quality28-round{0,1,2,3}.json`; individual model-assisted judgments, failure history, tests and the not-yet-approved next protocol are in `local-qwen/quality28-assessment.md`. Separate readonly review files: `../codex/SELFHOST-AI-LOCAL-001-QUALITY28-{baseline,final}-review.json`. Do not run a fourth prompt repair or switch business configuration implicitly.
+
+Only isolated Ollama11435 was restarted (PID2152,0.34.2,same4B/singlemodel/no-cloud). 8083 was offline and oldAPI/WorkerPIDs absent; they were not restarted. Last recorded e65b4d7/2B configuration remains historical, not live verification. NoDB/queue operation/order12 replay occurred. Aggregate measured minimumfreeRAM14489MiB/GPU10366MiB; per-call0.414–4.666seconds across four prompts, with cache and only sparse whole-machine sampling—not productionp95 or exclusiveVRAM. Exact runtime `local-qwen/diagnostic-runtime28.json`. Final scoped tests51passed/1warning, not a semantic-modelPASS. Interpreter/models/runtimebackups retained ignored; nofee/download0010/newcollection.
+
+## Historical pre-resume checkpoint — 2026-09-24
 
 Owner explicitly chose **暂不释放，保留诊断断点** after actual freeRAM3381/3562MiB fell below the unchanged4500MiB start guard. No24-case text or repair-photo inference was sent this round. `local-qwen/gold-set-24.json` is fixed before calls (gold24-v1/SHA256 c3c93b419b7d5dea12b529152cde661c16826cc708b1d80d5b26d39d70ddfc1f); raw blocked run remains `gold24-v3-results.json`, completed0/24. This is an environment pause, not a new4B quality failure or PASS. No promise of low-pressure operation at current machine load. Existing correct4B single case and2B order12 failure remain unchanged; READY_SCOPED_LOCAL_READ_ONLY_DIAGNOSTICS is the only model-stage acceptance.
 

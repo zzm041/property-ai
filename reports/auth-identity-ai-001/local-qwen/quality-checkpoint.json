@@ -1,4 +1,28 @@
 {
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "checkpoint_date": "2026-09-24 Asia/Shanghai",
+  "status": "NOT_READY_FOR_BUSINESS_SWITCH_REPAIR_LIMIT_3_OF_3",
+  "current_base_sha": "13786627b05120613ba4649da14be606cd58c10e",
+  "model": "qwen3.5:4b Q4_K_M",
+  "digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "rounds": ["quality28-round0.json", "quality28-round1.json", "quality28-round2.json", "quality28-round3.json"],
+  "distinct_cases": 28,
+  "inference_requests_per_round": 32,
+  "inference_requests_total": 128,
+  "repair_rounds_used": 3,
+  "resource_guards_lowered": false,
+  "fixed_gold_or_original_images_changed": false,
+  "answer_edited": false,
+  "current_prompt_wip": "wo-analysis-v7 / repair-photo-v4: NOT_ACCEPTED_FOR_BUSINESS_LOAD",
+  "focused_tests": "focused-quality28-repair3.txt: 51 passed, 1 warning; existing asyncio warning also recorded",
+  "assessment": "quality28-assessment.md",
+  "independent_baseline_review": "../../codex/SELFHOST-AI-LOCAL-001-QUALITY28-baseline-review.json",
+  "independent_final_review": "../../codex/SELFHOST-AI-LOCAL-001-QUALITY28-final-review.json",
+  "independent_decision": "NEEDS_CHANGES / NOT_READY_FOR_SWITCH",
+  "final_verified_port_evidence": "post-quality28-state-confirmed.json; earlier post-quality28-state.json empty listener list was an access-denied limitation, not absence proof",
+  "runtime_now": {"isolated_model_pid":2152,"model_endpoint":"http://127.0.0.1:11435","api_8083_at_receipt":"NOT_LISTENING","old_api_worker_pids":"ABSENT","api_worker_started_or_changed":false,"last_recorded_business_configuration":"e65b4d7/2B, historical not confirmed running","business_database_or_queue_access":false,"order12_replayed_or_modified":false},
+  "next_action": "No further inference under exhausted 3-round allowance. Obtain approval for the exact revised bounded diagnostic protocol in quality28-assessment.md before implementation/calls; NOT a business switch request. Preserve fixed gold and all failed outputs. No0010/newcollection/fees/newweights/shared services.",
+  "historical_pre_resume_checkpoint": {
   "task_id":"SELFHOST-AI-LOCAL-001",
   "checkpoint_date":"2026-09-24 Asia/Shanghai",
   "status":"PAUSED_RESOURCE_HEADROOM_OWNER_ACKNOWLEDGED",
@@ -20,4 +44,5 @@
   "runtime":{"api_pid":33592,"worker_pid":42984,"startup_source":"e65b4d7fb0e9541695fdcb9a1f1b216d97dbf6c2","business_model":"qwen3.5:2b","changed_this_round":false,"new_successful_business_writes":false,"separate_023_requests":"Normal authentication, reads and three denied API creates; no new work order, inference, task replay or state change","last_order":"12/PENDING_ANALYSIS/v1/zeroAssignment retained, no replay","database":"127.0.0.1:3307/property_ai_auth001_test@20260919_0009","rabbit_vhost":"property_ai_auth001","rabbit_queue":"property_ai.auth001","queue":"0ready/0unacked/1consumer;DLQ3 untouched"},
   "resume":"After owner releases memory, recheck live resources/loopback/single-model/source hashes. Use run-gold24.py --resume-zero-call-resource-block only for this zero-call checkpoint; immutable initial blocked artifact is preserved. Do not repeat saved calls, edit answers or alter fixed gold to fit outputs. Photo runner remains to be implemented/checked before bounded calls. Individual case review must be recorded as actual main/independent model-assisted review, not fictional human-owner sign-off.",
   "approval_gates":["After sufficient gold/photo/Chinese/history/error/resource/proxy evidence, explicitly request 8083 plus AUTH001 Worker 4B switch and a NEW marked synthetic business run. No implicit READY authorization.","No replay or mutation of order12; retain2B failure and4B one-case correct evidence.","Real bge-m3/reranker/new1024d isolated collection require separate environment approval; existing8d collection untouched.","No0010, fees, additional models,8082/sharedvhost/DLQ message contents,protectedconfig,push/reset/restore."]
+  }
 }

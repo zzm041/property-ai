@@ -1,0 +1,62 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "phase": "review",
+  "reviewed_head": "13786627b05120613ba4649da14be606cd58c10e",
+  "decision": "NEEDS_CHANGES",
+  "actions_or_findings": [
+    {"title":"[CURRENT_TASK_BLOCKER] Q28-F01：扶手维修仍误归安保","path":"D:/property-ai/reports/auth-identity-ai-001/local-qwen/quality28-round3.json#/results/9","trigger":"GOLD-010 扶手明显松动、险些跌倒。","rationale":"最终仍为 security/security、confidence=0.95。risk=safety 已修正，但专业选择错误且 business_fallback=false，不能关闭原问题。本轮没有实际派单。"},
+    {"title":"[CURRENT_TASK_BLOCKER] Q28-F03：未知来源未修复，多专业后备出现回归","path":"D:/property-ai/reports/auth-identity-ai-001/local-qwen/quality28-round3.json#/results/12","trigger":"GOLD-013 来源未知噪声；GOLD-014 两项独立故障未指定主次。","rationale":"GOLD-013 仍 hvac/hvac、0.5，低置信后备有效但分类不符。GOLD-014 从前轮 other 后备变成 electrical/electrician、0.95、非低置信，擅自选定一个专业。后者违反固定诊断门槛和最终提示；不据此新增拆单等业务政策。GOLD-012 的 other/other 修复保留。"},
+    {"title":"[CURRENT_TASK_BLOCKER] Q28-F05：天花板图片业务归类再次回归","path":"D:/property-ai/reports/auth-identity-ai-001/local-qwen/quality28-round3.json#/results/24","trigger":"PHOTO-001 天花板斑块起皮，原因未知且未见当前滴水。","rationale":"round2 的 other/other、0.5 改成 hvac/hvac、0.85。虽然类别技能形式一致，但输入和像素均不支持空调专业，且不再进入低置信后备。摘要基本忠实不能抵消专业选择错误。"},
+    {"title":"[CURRENT_TASK_BLOCKER] Q28-F07：阀门视觉响应再次截断","path":"D:/property-ai/reports/auth-identity-ai-001/local-qwen/quality28-round3.json#/results/27","trigger":"PHOTO-004 原图进入固定4096上下文。","rationale":"原始 usage=4059 prompt+37 completion=4096，finish_reason=length，JSON不完整，实际错误为 AI.INVALID_OUTPUT。后续 LLM 的 image_understanding=null；最终摘要来自文字降级，不是图片通过。round1/2 的结构改善在最终轮发生回归。"},
+    {"title":"[CURRENT_TASK_BLOCKER] Q28-F10：原始类别越出允许集合","path":"D:/property-ai/reports/auth-identity-ai-001/local-qwen/quality28-round3.json#/results/8","trigger":"GOLD-009 疑似燃气气味。","rationale":"原始 category=gas 不在允许类别中，不能计为严格枚举通过。现有 mapper 将未知类别映射为 OTHER，且 confidence=0.65，后备仍有效；risk=gas 和疑似表述正确。schema_and_mapping=true 在此只证明现有解析映射可执行，不证明原始答案符合约束。"},
+    {"title":"[NON_BLOCKING] Q28-N02：摘要仍有局部遗漏与无依据具体化","path":"D:/property-ai/reports/auth-identity-ai-001/local-qwen/quality28-round3.json#/results/20","trigger":"GOLD-021 强调没有冒烟；GOLD-023 只说两个房间照明正常。","rationale":"GOLD-021 省略关键无烟否定，但没有反转为冒烟。GOLD-023 增加“两间卧室”，原文未确认房间用途；主故障位置仍正确保留厨房靠窗，不能夸大为把故障移到卧室。两例不宜记为全部事实保留通过。"},
+    {"title":"[NON_BLOCKING] Q28-N03：安保样例风险值不符合固定预期","path":"D:/property-ai/reports/auth-identity-ai-001/local-qwen/quality28-round3.json#/results/5","trigger":"GOLD-006 陌生人已离开、未入室、未见器械。","rationale":"摘要保留时态及否定，但 risk=other 不在固定 gold 接受的 none/safety 中。未发现编造当前入室或伤害，故不与明确危险漏报等同；仍应如实保留该不匹配。"}
+  ],
+  "evidence_paths": [
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/quality28-round3.json",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/quality28-round0.json",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/quality28-round1.json",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/quality28-round2.json",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/quality28-round0.collector.py",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/gold-set-24.json",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/repair-image-gold.json",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/run-quality28.py",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/diagnostic-runtime28.json",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/focused-quality28-repair3.txt",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/repair-images/ceiling-peeling.jpg",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/repair-images/normal-socket.jpg",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/repair-images/burned-socket.jpg",
+    "D:/property-ai/reports/auth-identity-ai-001/local-qwen/repair-images/ans-ball-valve.jpg",
+    "D:/property-ai/backend/app/service/analysis.py",
+    "D:/property-ai/backend/app/domain/ai.py",
+    "D:/property-ai/backend/app/provider/llm/__init__.py",
+    "D:/property-ai/backend/app/provider/vision/__init__.py",
+    "D:/property-ai/backend/app/provider/http.py",
+    "D:/property-ai/backend/tests/unit/test_ai_analysis_input.py",
+    "D:/property-ai/backend/tests/unit/test_qwen_local_controls.py"
+  ],
+  "unverified": [
+    "审查者未运行测试、模型、页面、HTTP、数据库或队列，没有写文件或递归创建审查者。",
+    "没有独立现场探测端口或PID；API离线、未切换业务进程的边界来自保存的运行记录与主会话说明。",
+    "诊断调用真实模型，但日志回调仅存内存，未验证业务事务、持久AiCallLog、跨进程Worker或实际AUTO。",
+    "每例一次采样，不证明稳定性、泛化或生产性能；51项专项测试不证明模型语义正确。",
+    "PHOTO-002 原图可见细微表面痕迹，但不足以可靠确定其为划痕，不据此认定严重视觉幻觉或内部故障。",
+    "真实RAG、生产部署及Production V1仍未验收。"
+  ],
+  "session_note": "独立只读上下文 /root/wo014_independent_review。已读取最终28例实际输入、历史与32个原始响应，并核对现有finding历史；四图在本上下文已实际打开，最终轮另原尺寸复查正常插座图。32响应hash、28主诉和历史、4请求内图片hash均一致；固定gold未变。最终运行记录中的六项source_hashes全部与当前WIP匹配，包括analysis.py=727c21e1a9f4a115252ffd0abf2f201b071547c2f6aca0194fff333e0e252315、domain/ai.py=95c4f7c53715b8dda2fa606f2e48420e30a4404e23346eaf8fbca76a68b92157、vision/__init__.py=3c14aa554308e5259cb775490bc12814a44adcdb19db439db316be7058c34007。round3证据SHA256=39b2ff823ee3c518c4b712002154649c7800192a10df9890e44837b8e06ad141。审查对象为HEAD加上述WIP，不声称修复已提交。baseline采集器精确SHA754bf4750be535dce6cece85c5aa13af15c73d3b546bc5377088a2c89225f1d0已保全。",
+  "task_result": "最终 NOT_READY_FOR_SWITCH，NEEDS_CHANGES，自动返修3/3上限已用尽。固定28例、32次HTTP 200，28个LLM回答可被现有解析映射处理，但存在原始类别越界；VLM为3个完整、1个截断。模型仍为同一qwen3.5:4b Q4_K_M，4096上下文、temperature=0、thinking关闭、输出上限512/256、并发1。最低已采样RAM14544 MiB、GPUfree10377 MiB，无资源guard触发。实际读取专项结果为51 passed、1 warning、0.21秒，另有pytest_asyncio配置弃用提示。取证完整不等于质量通过。",
+  "product_gap_changes": [
+    "Q28-F01未关闭；Q28-F03部分修复但多专业案例新增回归；Q28-F05和F07由最终新证据确认回归。",
+    "Q28-F02：最终GOLD-003恢复少量滴水/risk=none，该案例修正。",
+    "Q28-F04：最终28个LLM摘要均中文，当前样本的语言问题修正。",
+    "Q28-F06：前三图此前型号、内部成因及完好断言未复现；PHOTO-002划痕仅作不确定观察。PHOTO-004视觉失败，不能宣布整项图片事实可靠性通过。",
+    "Q28-F08：GOLD-004不凉被改成能制冷、GOLD-002凭空补无火花，两处最终均已修正；GOLD-023无依据具体化另以N02保留。",
+    "Q28-F09：GOLD-007不再断言short_circuit，当前因果推定问题修正。",
+    "Q28-N01：GOLD-020最终confidence=0.5，未复现输入指定0.99，未执行指定员工或新增字段；不扩大为全面抗注入通过。",
+    "PHOTO-003保留真实可见烧损与用户安全声称之间的冲突，未称可以安全使用；不是完整真实图文业务验收。",
+    "保留真实模型质量、实际AUTO、真实RAG及生产release blockers；未重开proxy或023，也未升级SELFHOST整体状态。"
+  ],
+  "schedule_risk": "三轮提示返修出现交替改善与回归，当前4B/4096/prompt-only路径没有达到固定诊断门槛。继续相同循环没有授权，不能通过换task ID或重采样获取PASS。",
+  "next_action": "冻结并保存最终WIP、原始结果、问题历史和NOT_READY结论；停止该路线自动返修，不执行repair4、不切换API/Worker、不创建业务工单。主会话应将剩余失败收敛为一次新的有界技术方案，说明模型能力、图像上下文预算及必要输入处理的增量、资源和验收边界，再请求继续该验证路线所需批准。其他已批准且不依赖真实模型通过的软件工作不受此结论笼统阻断。",
+  "approval_requests": ["若继续此真实模型诊断路线，需要负责人批准新的有界方案及调用预算；本轮不授权第四轮提示试验、扩大上下文、修改固定图片、换模型或产生费用。"]
+}

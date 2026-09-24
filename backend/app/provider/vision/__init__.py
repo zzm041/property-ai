@@ -59,6 +59,7 @@ class QwenVLMProvider:
     """Qwen-VL compatible adapter. Reads only the authorized storage object."""
 
     model_version = "qwen-vl"
+    prompt_version = "repair-photo-v4"
 
     def __init__(
         self,
@@ -105,8 +106,8 @@ class QwenVLMProvider:
                             {
                                 "type": "text",
                                 "text": (
-                                    "Describe this property repair photo as JSON "
-                                    "with keys description, labels, confidence."
+                                    "JSON:description(中文8字物体通称及明显破损，禁止完好/正常/细类),"
+                                    "labels:[],confidence"
                                 ),
                             },
                             {

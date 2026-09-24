@@ -1,0 +1,22 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "phase": "gold28-readonly",
+  "launched_at_utc": "2026-09-24T12:11:27.3811764Z",
+  "pid": 2152,
+  "executable": "C:\\Users\\lmj\\AppData\\Local\\Programs\\Ollama\\ollama.exe",
+  "host": "127.0.0.1:11435",
+  "models": "D:\\property-ai\\tmp\\selfhost-ai-local\\models",
+  "no_cloud": true,
+  "max_loaded_models": 1,
+  "concurrency": 1,
+  "context_length": 4096,
+  "keep_alive": "30s",
+  "gpu_reserved_bytes": 2147483648,
+  "old_pid_absent": true,
+  "api_worker_changed": false,
+  "business_port_8083_listening_before": false,
+  "global_settings_changed": false,
+  "log_directory": "D:\\property-ai\\tmp\\selfhost-ai-local\\quality28-20260924",
+  "status": "READY_NO_INFERENCE",
+  "version": "0.34.2"
+}

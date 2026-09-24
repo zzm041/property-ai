@@ -1,0 +1,14 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "at_utc": "2026-09-24T12:40:40.8525546Z",
+  "listeners": [],
+  "old_api_pid_exists": false,
+  "old_worker_pid_exists": false,
+  "protected_config_sha256": "342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F",
+  "business_db_queue_access_this_round": false,
+  "api_worker_changed": false,
+  "inference_rounds_completed": 4,
+  "inference_requests_total": 128,
+  "repair_rounds_used": 3,
+  "decision": "NOT_READY_FOR_BUSINESS_SWITCH"
+}

@@ -27,6 +27,9 @@ def test_request_controls_are_explicit_and_default_payload_unchanged(vision, bou
         if vision:
             content = body["messages"][0]["content"]
             assert content[1]["image_url"]["url"].startswith("data:image/png;base64,")
+            assert '中文8字' in content[0]['text']
+            assert '物体通称及明显破损，禁止完好/正常/细类' in content[0]['text']
+            assert QwenVLMProvider.prompt_version == 'repair-photo-v4'
         return httpx.Response(200, json={"choices": [{"message": {"content": json.dumps({"description": "synthetic", "labels": [], "confidence": 0.5})}}]})
 
     storage = DevelopmentStorageProvider()

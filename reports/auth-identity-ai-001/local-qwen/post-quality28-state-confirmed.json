@@ -1,0 +1,23 @@
+{
+  "task_id": "SELFHOST-AI-LOCAL-001",
+  "at_utc": "2026-09-24T12:41:29.9504507Z",
+  "method": "Successful read-only elevated Get-NetTCPConnection",
+  "listeners": [
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 11435,
+      "OwningProcess": 2152
+    }
+  ],
+  "prior_probe_limitation": "post-quality28-state.json suppressed a CIM access-denied error; empty listeners there does NOT establish port status. This verified record supersedes only that inference.",
+  "old_api_pid_exists": false,
+  "old_worker_pid_exists": false,
+  "owned_model_process": [
+    {
+      "Id": 2152,
+      "ProcessName": "ollama",
+      "StartTime": "2026-09-24T20:11:27.3553311+08:00"
+    }
+  ],
+  "business_requests_or_writes": false
+}
