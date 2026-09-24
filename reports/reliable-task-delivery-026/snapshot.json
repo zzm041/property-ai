@@ -1,0 +1,34 @@
+{
+  "task_id": "RELIABLE-TASK-DELIVERY-026",
+  "run_id": "rt026-53c980ed1f2a",
+  "observed_utc": "2026-09-24T18:21:47.415271+00:00",
+  "database": "property_ai_auth001_test",
+  "revision": "20260924_0011_contact_phone",
+  "container": {
+    "id": "fa78177adc270834bd1c25e63cb86b1d6a7fd3f7cfb2faa66c5ac4f67ab0d66f",
+    "image": "mysql:8.0.41",
+    "running": true,
+    "ports": {
+      "3306/tcp": [
+        {
+          "HostIp": "0.0.0.0",
+          "HostPort": "3307"
+        },
+        {
+          "HostIp": "::",
+          "HostPort": "3307"
+        }
+      ]
+    },
+    "mounts": [],
+    "tmpfs": {
+      "/var/lib/mysql": ""
+    },
+    "existing_wildcard_publish": true
+  },
+  "private_host_path": "D:\\property-ai\\tmp\\reliable-task-delivery-026\\backups\\rt026-53c980ed1f2a\\auth001-0011.sql",
+  "bytes": 674573,
+  "sha256": "14cd4ab5c113ec9d66a08d682716a2ab8f0768f1137a834020b388efbbccefba",
+  "mode": "readonly logical snapshot; no restore validation yet",
+  "retention": "host D: retained; ignored private asset, no cleanup or Git submission"
+}

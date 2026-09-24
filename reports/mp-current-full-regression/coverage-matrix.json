@@ -2270,6 +2270,20 @@
     "preservation": "83 original IDs/historical results unchanged;12/24/25 protected;DLQ7=old5+new30/34,none read/replayed;no modelcalls/Migration/0010/config changes",
     "release_gaps": "Only bounded transient DB software recovery; process loss, commit/enqueue gap, real uncertainCOMMIT, Redis+Broker failure, prolongedDBoutage/production reliability remain.28case/3of3/NOT_READY/extra32NOT_APPROVED retained."
   },
+  "reliable_task_delivery_026": {
+    "task_id": "RELIABLE-TASK-DELIVERY-026",
+    "base_sha": "2642207abffdf2e1bb882b27fb91117f619768eb",
+    "status": "SCHEMA_APPROVAL_REQUIRED_NOT_RUNTIME_PASS",
+    "scope": "One end-to-end commit-intent-publication-claim-result-ack/recovery milestone; five finite windows, no025rerun",
+    "prepared": "Exacttarget/revision/overwrite guard plus new readonly hostD snapshot; original83/current83/results retained, no completion percentage",
+    "proposal": "reports/reliable-task-delivery-026/README.md; proposed0012task_intents parent0011, NOT_CREATED/NOT_EXECUTED; no0010",
+    "snapshot": "reports/reliable-task-delivery-026/snapshot.json; actual capture only, restoration unverified",
+    "reuse": "025 analysis reuse, task/version/owner fences, transactions,Assignment/load idempotence; existing knowledgejobs/notificationdeliveries andCelerylateACK/confirm",
+    "gaps": "Missing durable analysisintent and consistent bounded missing-message/process-lease recovery across criticalasync flows; shared3307wildcardbinding noted but unchanged",
+    "model_gate": "SELFHOST-AI existing28/3of3/NOT_READY preserved; explicitv8/1024imagecopy supplement32max request remains unapproved, no calls/download/businessswitch",
+    "independent_review": "reports/reliable-task-delivery-026/review-round1.json; separate readonly round1 READY_FOR_APPROVAL only, zero current blockers; no runtime/test/business/model operations, private backup hash independently checked",
+    "next_action": "Save preparation only; obtain0012andseparatemodeldiagnosticapproval; no runtimePASS until five-window contract met"
+  },
   "current_effective_view": {
     "generated_at": "2026-09-25",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",

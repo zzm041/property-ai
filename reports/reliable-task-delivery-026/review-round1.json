@@ -1,0 +1,71 @@
+{
+  "task_id": "RELIABLE-TASK-DELIVERY-026",
+  "review_round": 1,
+  "review_mode": "INDEPENDENT_READ_ONLY",
+  "base_sha": "2642207abffdf2e1bb882b27fb91117f619768eb",
+  "head_sha": "2642207abffdf2e1bb882b27fb91117f619768eb",
+  "verdict": "READY_FOR_APPROVAL",
+  "verdict_scope": "仅表示本轮设计、备份准备及审批材料可以提交负责人决定；不表示0012已批准、故障恢复运行通过或Production通过。",
+  "findings": [],
+  "checked": [
+    {
+      "condition": "0012范围及现有机制复用",
+      "result": "方案仅新增task_intents，父版本为0011；不修改历史Migration、不使用0010、不回填或扫描旧工单。复用025的事务、版本/所有者隔离、分析复用和Assignment/负载幂等，以及现有知识任务、通知投递记录。"
+    },
+    {
+      "condition": "有界任务恢复设计",
+      "result": "包含事务内持久意图、确认发布、稳定task_id、租约与令牌隔离、持久尝试计数、有限退避和耗尽状态。注明WorkOrder→intent→分析/Assignment锁序；外部调用不持有数据库锁。设计未声称外部通知exactly-once。"
+    },
+    {
+      "condition": "五窗口验收与操作边界",
+      "result": "明确最多3个新合成工单、1个知识版本及正常通知；演练总时限15分钟、单故障窗口120秒；最多3次专属API/publisher及2次专属Worker终止。只允许本轮精确intent，不启动全库扫描、不触及历史工单/DLQ或共享服务。尚未执行。"
+    },
+    {
+      "condition": "备份目标、覆盖及凭据保护",
+      "result": "脚本在连接和文件创建前约束test模式、mysql+pymysql、127.0.0.1:3307、AUTH001及0011；核对全InnoDB和对应容器端口。输出使用新run目录及排他文件创建；不存在恢复、迁移、删除或容器启动操作。真实密码不进入宿主命令参数、公开结果或新配置文件。"
+    },
+    {
+      "condition": "实际备份及测试证据",
+      "result": "读取17 passed、1 warning的新专项结果，未重跑。实际文件为674573字节，独立计算SHA256与snapshot.json一致：14cd4ab5c113ec9d66a08d682716a2ab8f0768f1137a834020b388efbbccefba。确认位于项目D盘ignored资产目录；未读取SQL正文。仅证明备份捕获，不证明恢复成功。"
+    },
+    {
+      "condition": "跟踪记录与模型审批边界",
+      "result": "matrix只新增026审批门元数据，未升级原83项/current83或025结果。handoff保留完整V1缺口及带前提的工时估计。模型补充请求保留旧28例、3/3及NOT_READY，32次上限仍NOT_APPROVED，不包含自动切换业务、下载或收费授权。"
+    }
+  ],
+  "materials_read": [
+    "AGENTS.md",
+    ".cursor/rules/project.mdc",
+    "reports/reliable-task-delivery-026/README.md",
+    "scripts/ops/auth001_recovery_snapshot.py",
+    "backend/tests/unit/test_recovery_snapshot_guard.py",
+    "reports/reliable-task-delivery-026/preflight.py",
+    "reports/reliable-task-delivery-026/receipt.json",
+    "reports/reliable-task-delivery-026/snapshot.json",
+    "reports/reliable-task-delivery-026/snapshot-guard-tests-container-binding.txt",
+    "reports/project-handoff.md增量",
+    "reports/mp-current-full-regression/coverage-matrix.json增量",
+    "reports/auth-identity-ai-001/self-host-recommendation.md补充请求",
+    "直接相关的knowledge/notification模型、Service与Worker调用上下文"
+  ],
+  "unverified": [
+    "未执行0012，也未验证实际表、约束、索引及迁移结果。",
+    "未实施或运行五窗口故障演练；租约隔离、持久计数与现有Celery重试共享同一预算仍须由实现及专项证据证明。",
+    "未验证SQL恢复、灾难恢复、持续生产负载或共享依赖同时故障。",
+    "未运行任何模型、页面、测试、业务请求、数据库或队列操作；receipt中的运行状态属于已保存证据，不是本复审实时查询。",
+    "备份超时处理只终止专属docker客户端，不保证容器内mysqldump同步退出；若发生该失败路径，必须核对实际运行状态，不能宣称已完全停止或自动重试。"
+  ],
+  "retained_release_blockers": [
+    "现有3307的0.0.0.0/::映射保留为环境安全缺口，本轮未修改。",
+    "真实模型、真实RAG、生产可靠性、恢复演练及正式发布验收仍未完成。",
+    "0010、1024维新集合、额外推理、4B业务切换和费用仍分别等待授权。"
+  ],
+  "next_action": "保存本轮独立复审及准确审批正文，向负责人申请0012限定建表/迁移与五窗口演练；模型32次补充诊断作为可独立选择的另一项申请。获得对应批准前不得执行，026继续保持SCHEMA_APPROVAL_REQUIRED_NOT_RUNTIME_PASS。",
+  "reviewer_actions": {
+    "workspace_writes": 0,
+    "tests_run": 0,
+    "business_or_database_or_queue_requests": 0,
+    "model_calls": 0,
+    "child_reviewers_created": 0
+  }
+}
