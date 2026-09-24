@@ -6,6 +6,49 @@ SUPPLEMENT-024-RUBRIC-01 used5/32 allowed requests before its mandatory semantic
 
 Next recommendation: offline design of cross-field duty consistency validation with a visible bounded failure, retaining actual CLEANING/SECURITY boundaries and normal unified-maintenance routing. Do not silently coerce original answers or count them passed. A further prompt/protocol change or diagnostic requires a new explicit bounded approval; none is executed. Image path additionally needs a separately approved isolated Pillow dependency plan. Real AUTO, voice, RAG and production gates remain open. No current subscription usage observable; manage against owner53percent baseline and fixed2026-09-27 14:00 Asia/Shanghai deadline, reserving candidate integration budget.
 
+## Next resource approval scope — official metadata checked 2026-09-25; not executed
+
+One recommendation: free local models, separate retained runtime environments, serial loading. This metadata-only inventory does **not** authorize a sixth supplement call, new model downloads, dependency installation, a business Provider switch or a new Milvus collection. Keep the current 4B NOT_READY result and all original evidence.
+
+### Image preparation: one isolated package, separately gated
+
+Proposed package: `Pillow==12.3.0`, `pillow-12.3.0-cp312-cp312-win_amd64.whl`, **7,227,137 bytes**, SHA256 `a2b55dd6b2a4c4b7d87ffa56bdb33fdc5fdb9a462173861a7bc097f17d91cb09`. Official metadata lists this CPython3.12/Windows x64 wheel as not yanked, with no required extra package. Proposed target: `D:\property-ai\tmp\selfhost-ai-local\image-tools\site-packages`, explicitly loaded only by the image preparation helper; do not modify the old `.venv`, project lock or global Python. If separately approved, verify the wheel before installation and preserve original photos and proportional <=1024px PNG copies. This only enables preparation, not further inference or image-quality PASS. [Official Pillow version metadata](https://pypi.org/pypi/pillow/12.3.0/json).
+
+### Fixed ASR / real RAG download manifest: proposal only
+
+| Candidate | Immutable repository revision | Weight allowlist | Weight bytes |
+| --- | --- | --- | ---: |
+| Qwen/Qwen3-ASR-0.6B | `5eb144179a02acc5e5ba31e748d22b0cf3e303b0` | `model.safetensors` | 1,876,091,704 |
+| BAAI/bge-m3 | `5617a9f61b028005a4858fdac845db406aefb181` | `pytorch_model.bin`, `colbert_linear.pt`, `sparse_linear.pt` | 2,273,250,020 |
+| BAAI/bge-reranker-v2-m3 | `953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e` | `model.safetensors` | 2,271,071,852 |
+
+Official metadata: [Qwen ASR file listing](https://huggingface.co/api/models/Qwen/Qwen3-ASR-0.6B?blobs=true), [bge-m3 file listing](https://huggingface.co/api/models/BAAI/bge-m3?blobs=true), [reranker file listing](https://huggingface.co/api/models/BAAI/bge-reranker-v2-m3?blobs=true). These are upstream declarations, not hashes of locally downloaded files. No weight was downloaded for this inventory.
+
+Weights total **6,420,413,576 bytes** (about5.979GiB). Selected weights plus the following configuration/tokenizer files total **6,469,222,802 bytes**, excluding packages/cache/README/duplicate ONNX exports:
+
+- ASR: `chat_template.json`, `config.json`, `generation_config.json`, `merges.txt`, `preprocessor_config.json`, `tokenizer_config.json`, `vocab.json`.
+- bge-m3: `1_Pooling/config.json`, `config.json`, `config_sentence_transformers.json`, `modules.json`, `sentence_bert_config.json`, `sentencepiece.bpe.model`, `special_tokens_map.json`, `tokenizer.json`, `tokenizer_config.json`.
+- Reranker: `config.json`, `sentencepiece.bpe.model`, `special_tokens_map.json`, `tokenizer.json`, `tokenizer_config.json`.
+
+Upstream weight SHA256 declarations, in the table's file order:
+
+```text
+ASR/model.safetensors: 79d6cbd4c98c7bbffe9db2edac07f56cd6637d0d5944b27f6c2b8353840323ea
+bge-m3/pytorch_model.bin: b5e0ce3470abf5ef3831aa1bd5553b486803e83251590ab7ff35a117cf6aad38
+bge-m3/colbert_linear.pt: 19bfbae397c2b7524158c919d0e9b19393c5639d098f0a66932c91ed8f5f9abb
+bge-m3/sparse_linear.pt: 45c93804d2142b8f6d7ec6914ae23a1eee9c6a1d27d83d908a20d2afb3595ad9
+reranker/model.safetensors: d9e3e081faff1eefb84019509b2f5558fd74c1a05a2c7db22f74174fcedb5286
+```
+
+Proposed retained root: `D:\property-ai\tmp\selfhost-ai-local\models-hf\<model-name>\<revision>`. Runtime installation is **not yet a ready-to-execute approval request**: complete compatible package pins/wheel hashes, CPU/CUDA PyTorch choice, Windows compatibility, package download total and actual RAM/VRAM fit remain UNKNOWN. Do not install unbounded dependency ranges or describe weight size as runtime memory.
+
+- ASR environment proposal: `D:\property-ai\tmp\selfhost-ai-runtime\asr-006\.venv`; existing candidate `qwen-asr==0.0.6` with Transformers backend, no vLLM/FlashAttention/ForcedAligner. Its metadata pins `transformers==4.57.6`, `accelerate==1.12.0`, `nagisa==0.2.11`, `soynlp==0.0.493` and declares further audio/UI dependencies; this is not a single-package install. [Official package metadata](https://pypi.org/pypi/qwen-asr/0.0.6/json).
+- BGE environment proposal: `D:\property-ai\tmp\selfhost-ai-runtime\bge-142\.venv`, existing candidate `FlagEmbedding==1.4.2`. Keep it separate from the ASR Transformer pin; resolve a complete compatible lock before seeking environment installation approval. [Official package metadata](https://pypi.org/pypi/FlagEmbedding/1.4.2/json).
+- Integration still needed: local wrappers matching the existing ASR transcription, embedding and rerank Provider contracts. Loading a model does not prove API compatibility, voice understanding or authorized retrieval. First validate synthetic audio transcription; separately ingest authorized synthetic documents, verify real1024d retrieval/reranking, citations/version/scope negatives, then bounded quality/latency. Load only one model at a time; preserve resource guards.
+- Exact new collection proposal: **`knowledge_chunks_auth001_bgem3_1024`**, only after explicit creation/real-RAG authorization and live existence/dimension checks. This proposed name supersedes the older candidate spelling below, not any existing collection. The current `knowledge_chunks_auth001` Development8d collection must remain unchanged; no delete/rebuild or silent dimension change.
+
+No fee/GPU rental recommendation is added. Fixed weights/Pillow are concrete future approval items; unresolved runtime pins and resource fit are preparation gaps, not hidden permissions. Merge0010, target deployment/shared3307 binding, credentials/device and backup restore approvals remain in the existing handoff rather than being bundled into this model request.
+
 ## Historical approval request — approved once, now stopped as recorded above
 
 Request **one explicitly authorized supplemental diagnostic** under SELFHOST-AI-LOCAL-001, label SUPPLEMENT-024-RUBRIC-01. Original3/3automaticrepairs exhausted and28case/128requesthistory remain immutable. This is not restarting those rounds or executing the superseded v7/thinking/schema proposal below. New evidence is needed because product024now uses `wo-analysis-v8-maintenance`, never validated with real4B, and PHOTO004lost its final vision response to the original image/contextbudget.025Developmentrecovery is not substitute model evidence.

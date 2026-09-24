@@ -2,6 +2,8 @@
 
 ## Approved implementation and bounded runtime — 2026-09-25: scoped local Development PASS
 
+Saved product/evidence **ed66d37d2315ca26a8b60aaa48443193201f7b84**; binding-only later tracking does not change reviewed source or require rerun. `closeout.json` confirms boundedpublisher naturallyexited, API/Worker stillpriorcontrolledsource, finalfix/takeover notloaded. No additional business or model operation during closeout.
+
 Owner approved the exact7bc504b proposal below;0012 was created/applied only to AUTH001 with0011 parent. Old approval-only paragraphs below remain historical, superseded here. Fresh paused-writer hostsnapshot and additive migration are `fresh-snapshot.json` / `migration-result.json`; old table counts/protected12/24/25/30/34 fingerprints unchanged. Backup capture is not tested restore.0010absent; no old migrations edited.
 
 Real Development drill `rt026-91880f6aeb` is **finished and must not restart**:271.03seconds including final bindings; exactly3dedicatedAPI/publisher kills and2dedicatedWorker kills. One rolled-back insert before COMMIT, then3committedneworders37/38/39 and document1/version1. No old objects changed. `runtime-evidence.json` w1–w5 binds real checkpoints/process identity/terminations/DB outcomes; `runtime-final.json` binds terminal objects, jobs/chunks/load, process source hashes and queue metadata. `process-events.json` preserves actual structured process events, not narration. Initial collection typo used nonexistent knowledge_chunk column names (readonly1054); corrected actualversion/vector_id then only re-read, no business rerun. Notification collector initially selected request markers and omitted notification-ID-based intent correlation; `notifications` step joins exactnewWO IDs and lets existing publisher handle them, no manual send/newnotification/oldscan.
@@ -25,7 +27,7 @@ Base/head2642207abffdf2e1bb882b27fb91117f619768eb; product6a12ff140a555556103e6b
 - `worker/celery_app.py` already enables late ACK, reject-on-loss, publisher confirm and prefetch1; these handle messages that exist, not the absent-message commit gap.025 already supplies analysis-result reuse, owned transactions, WorkOrder journal task/attempt fencing and Assignment/global-occupancy idempotency. Reuse these, do not implement another analysis/dispatch engine.
 - Schema source and actual selected table metadata agree: no general task/outbox intent table. Current0011 follows0009,0010absent. The03domain specification calls RequestOutbox optional/notifications sufficient; current owner five-window requirement makes a durable cross-operation intent necessary. Document-only recommendation here, no migration/model/repository/table has been created.
 
-## Single minimum migration request — NOT APPROVED / NOT CREATED
+## Historical minimum migration request — approved and applied as recorded above
 
 Recommend **20260925_0012_task_intents**, sole parent **20260924_0011_contact_phone**. One new table `task_intents`, no changes/backfill to existing tables or historical migrations. Do not use0010. The same typed infrastructure covers analysis, knowledge ingestion and notification delivery; existing domain job/delivery rows remain authoritative business outcomes, not copied business data.
 

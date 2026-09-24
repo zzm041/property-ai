@@ -2283,6 +2283,7 @@
   },
   "reliable_task_delivery_026": {
     "task_id": "RELIABLE-TASK-DELIVERY-026",
+    "product_commit": "ed66d37d2315ca26a8b60aaa48443193201f7b84",
     "base_sha": "2642207abffdf2e1bb882b27fb91117f619768eb",
     "status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
     "scope": "One end-to-end commit-intent-publication-claim-result-ack/recovery milestone; five finite windows, no025rerun",
