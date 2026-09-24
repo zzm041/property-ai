@@ -2248,6 +2248,7 @@
     "task_id": "MAINTENANCE-CONTACT-DISPATCH-024",
     "requirement_version": "2026-09-24-v2-owner-approved",
     "base_sha": "954b8549b500fc89cec86f0ab1b3bce96672e5a8",
+    "product_commit": "ec9c1a716501c22ebb6e9f62b93722006e661a3e",
     "status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
     "independent_review": "reports/maintenance-contact-dispatch-024/review-round2.json; separate readonly round2, both round1 blockers closed; release024-REL-01 retained",
     "migration": "Approved0011 contact-only nullable column, parent0009, only AUTH001 executed; never0010",
@@ -2445,7 +2446,7 @@
         "requirement_id": "WO-CREATE",
         "current_implementation": "023 selection retained;024 required independent contact snapshot/default/confirmation, masked role-scoped reveal+audit. Account rebind leaves history unchanged.",
         "verification_mode_status": "024_PASS_SCOPED_LOCAL_DEVELOPMENT",
-        "evidence_version": "954b854 +024 WIP; reports/maintenance-contact-dispatch-024;305unit/17screenshots/API/DB/Worker; real28/29 tasks overlap3.146656s without overassign. Prior version-bound results preserved.",
+        "evidence_version": "ec9c1a716501c22ebb6e9f62b93722006e661a3e; reviewed precommit backend fingerprint equals committed/runtime source; reports/maintenance-contact-dispatch-024;305unit/17screenshots/API/DB/Worker; real28/29 tasks overlap3.146656s without overassign. Prior version-bound results preserved.",
         "remaining_gap": "RealQwen/AUTO/RAG/device/production remain unaccepted;24/25 beyond-timeout lock fixture preserved PENDING_ANALYSIS with2new isolatedDLQ messages. No0010/modelcalls/fees. Existing requirement history retained.",
         "next_action": "024 readonly round2 passed; runtime8083/AUTH001 same024 Development source, originalsolo restored; next bounded reliable-task failure recovery024-REL-01, never replay12 or historicalDLQ."
       },
@@ -2605,7 +2606,7 @@
         "requirement_id": "STAFF-DEPT-SKILL-UI",
         "current_implementation": "Existing UI preserved; real MAINTENANCE duty and effective appointments, no ordinary trade-exclusive gate; exact STAFF/property synchronization on claim/appointment/reenable/end.",
         "verification_mode_status": "024_PASS_SCOPED_LOCAL_DEVELOPMENT",
-        "evidence_version": "954b854 +024 WIP; reports/maintenance-contact-dispatch-024;305unit/17screenshots/API/DB/Worker; real28/29 tasks overlap3.146656s without overassign. Prior version-bound results preserved.",
+        "evidence_version": "ec9c1a716501c22ebb6e9f62b93722006e661a3e; reviewed precommit backend fingerprint equals committed/runtime source; reports/maintenance-contact-dispatch-024;305unit/17screenshots/API/DB/Worker; real28/29 tasks overlap3.146656s without overassign. Prior version-bound results preserved.",
         "remaining_gap": "RealQwen/AUTO/RAG/device/production remain unaccepted;24/25 beyond-timeout lock fixture preserved PENDING_ANALYSIS with2new isolatedDLQ messages. No0010/modelcalls/fees. Existing requirement history retained.",
         "next_action": "024 readonly round2 passed; runtime8083/AUTH001 same024 Development source, originalsolo restored; next bounded reliable-task failure recovery024-REL-01, never replay12 or historicalDLQ."
       },
@@ -2909,7 +2910,7 @@
         "requirement_id": "V1-AUTO-DISPATCH-FILTER",
         "current_implementation": "Global idle ACTIVE reservations, persistent assignment-history rotation, Employee mutex and current-read recheck; durable waiting and automatic bounded recovery without extra model calls.",
         "verification_mode_status": "024_PASS_SCOPED_LOCAL_DEVELOPMENT",
-        "evidence_version": "954b854 +024 WIP; reports/maintenance-contact-dispatch-024;305unit/17screenshots/API/DB/Worker; real28/29 tasks overlap3.146656s without overassign. Prior version-bound results preserved.",
+        "evidence_version": "ec9c1a716501c22ebb6e9f62b93722006e661a3e; reviewed precommit backend fingerprint equals committed/runtime source; reports/maintenance-contact-dispatch-024;305unit/17screenshots/API/DB/Worker; real28/29 tasks overlap3.146656s without overassign. Prior version-bound results preserved.",
         "remaining_gap": "RealQwen/AUTO/RAG/device/production remain unaccepted;24/25 beyond-timeout lock fixture preserved PENDING_ANALYSIS with2new isolatedDLQ messages. No0010/modelcalls/fees. Existing requirement history retained.",
         "next_action": "024 readonly round2 passed; runtime8083/AUTH001 same024 Development source, originalsolo restored; next bounded reliable-task failure recovery024-REL-01, never replay12 or historicalDLQ."
       },

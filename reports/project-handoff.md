@@ -2,6 +2,8 @@
 
 ## Active MAINTENANCE-CONTACT-DISPATCH-024 — requirement version 2026-09-24 v2
 
+Saved product/evidence commit **ec9c1a716501c22ebb6e9f62b93722006e661a3e**; scoped local DEVELOPMENT PASS. Post-commit backend diff hash exactly matches independent-review and running8083/Worker source below. Subsequent tracking-only commit does not change that runtime version; no duplicate validation/restart.
+
 Owner supersedes ordinary repair trade-exclusive filtering and proposed default multi-trade splitting. Baseline954b8549b500fc89cec86f0ab1b3bce96672e5a8. Main Codex implements; separate reviewer readonly. Completion: actual contact snapshot/privacy/idempotency chain plus real MAINTENANCE qualification, global idle reservation, fair turn, concurrency/retry and preserved risk/incident/history rules. Scoped unit/software evidence and real runtime/page/model evidence remain distinct. No unrelated PASS rerun;023/proxy and immutable28case/3of3 history retained. No additional model calls or business switch authorized.
 
 Initial direct inspection found no contact snapshot and no generic persistent waiting redispatch sweep. Both now have scoped implementation and new runtime evidence; this paragraph does not supersede the original baseline/history.

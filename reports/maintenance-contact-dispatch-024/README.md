@@ -2,6 +2,8 @@
 
 Requirement2026-09-24v2; baseline954b8549b500fc89cec86f0ab1b3bce96672e5a8; main implementation, separate readonly review. Status: PASS_SCOPED_LOCAL_DEVELOPMENT, independent round2 (`review-round2.json`); both round1 blockers closed, release finding024-REL-01 retained. Reviewer inspected actual17screenshots/source/raw saved evidence, did not rerun tests/pages/API/DB/queue. No fullV1/realAI/production claim.
 
+Saved product/evidence commit: `ec9c1a716501c22ebb6e9f62b93722006e661a3e`. Post-commit Git diff from baseline for backend/app hashes to `f69072620e1b97fb57968e0098faf4a39b4533035d0f98a908eac61cae0129b1`, exactly matching reviewed/running source; no restart or duplicate business operation needed. Review JSON retains actual pre-commit HEAD rather than pretending reviewer inspected a future commit. Known private-context values absent from scoped published text; protected config excluded. Raw fault log preserves two SQL-line trailing spaces instead of rewriting captured output; other staged whitespace checks passed.
+
 ## User capabilities and evidence
 
 - Confirm required per-report contact, default from current ACTIVE phone, alternate allowed; canonical value participates in create idempotency. Missing/empty/invalid/Unicode422; same key same13; changed contact409. Shared list/details DTO never returns full phone. Explicit reporter/current assignee/scoped manager reveal audited and no-store; outsider/unrelated/former staff denied. Normal phone rebind changes current default but leaves13's snapshot;14/15 screenshots supplement proves relogin and required error. Simulated numbers are not actually dialed; contact entry/wiring only, no claim of a real phone call.
