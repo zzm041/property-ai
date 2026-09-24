@@ -1,0 +1,135 @@
+{
+  "observed_utc": "2026-09-24T22:23:02.002878+00:00",
+  "run_id": "rt026n-c58b1554bf",
+  "events": [
+    {
+      "component": "supervisor",
+      "pid": 42948,
+      "run_id": "rt026n-c58b1554bf",
+      "head": "41db9a71923268f1ce0238860dfea5bed7bc67ed",
+      "source_sha256": "fe9fcdd742ffe6331fb440f94019a067a9325aaa9a9b91c2d8a009ea615c8926",
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "default_timing": {
+        "publish_lease": 15,
+        "claim_deadline": 120,
+        "execution_lease": 120,
+        "heartbeat": 20,
+        "execution_deadline": 900
+      },
+      "providers": "Development",
+      "durable": true,
+      "database": "127.0.0.1:3307/property_ai_auth001_test@0012",
+      "vhost": "property_ai_auth001",
+      "queue": "property_ai.auth001",
+      "utc": "2026-09-24T21:50:42.965244+00:00"
+    },
+    {
+      "component": "publisher",
+      "pid": 20380,
+      "run_id": "rt026n-c58b1554bf",
+      "head": "41db9a71923268f1ce0238860dfea5bed7bc67ed",
+      "source_sha256": "fe9fcdd742ffe6331fb440f94019a067a9325aaa9a9b91c2d8a009ea615c8926",
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "default_timing": {
+        "publish_lease": 15,
+        "claim_deadline": 120,
+        "execution_lease": 120,
+        "heartbeat": 20,
+        "execution_deadline": 900
+      },
+      "providers": "Development",
+      "durable": true,
+      "database": "127.0.0.1:3307/property_ai_auth001_test@0012",
+      "vhost": "property_ai_auth001",
+      "queue": "property_ai.auth001",
+      "utc": "2026-09-24T21:50:43.439969+00:00"
+    },
+    {
+      "source": "local-publisher-supervisor",
+      "cycle": 1,
+      "exit_code": 0,
+      "consecutive_failures": 0
+    },
+    {
+      "component": "publisher",
+      "pid": 4720,
+      "run_id": "rt026n-c58b1554bf",
+      "head": "41db9a71923268f1ce0238860dfea5bed7bc67ed",
+      "source_sha256": "8862cd011d23a9c7cb23244b2775841aaa52e3997e35b4f90dc8d83071a66f0c",
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "default_timing": {
+        "publish_lease": 15,
+        "claim_deadline": 120,
+        "execution_lease": 120,
+        "heartbeat": 20,
+        "execution_deadline": 900
+      },
+      "providers": "Development",
+      "durable": true,
+      "database": "127.0.0.1:3307/property_ai_auth001_test@0012",
+      "vhost": "property_ai_auth001",
+      "queue": "property_ai.auth001",
+      "utc": "2026-09-24T22:05:45.052114+00:00"
+    },
+    {
+      "source": "local-publisher-supervisor",
+      "cycle": 2,
+      "exit_code": 0,
+      "consecutive_failures": 0
+    },
+    {
+      "component": "publisher",
+      "pid": 39812,
+      "run_id": "rt026n-c58b1554bf",
+      "head": "41db9a71923268f1ce0238860dfea5bed7bc67ed",
+      "runtime_product_commit": "ed66d37d2315ca26a8b60aaa48443193201f7b84",
+      "app_source_root": "D:\\property-ai\\tmp\\reliable-task-delivery-026\\normal-integration\\source-ed66d37\\backend\\app",
+      "source_sha256": "fe9fcdd742ffe6331fb440f94019a067a9325aaa9a9b91c2d8a009ea615c8926",
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "default_timing": {
+        "publish_lease": 15,
+        "claim_deadline": 120,
+        "execution_lease": 120,
+        "heartbeat": 20,
+        "execution_deadline": 900
+      },
+      "providers": "Development",
+      "durable": true,
+      "database": "127.0.0.1:3307/property_ai_auth001_test@0012",
+      "vhost": "property_ai_auth001",
+      "queue": "property_ai.auth001",
+      "utc": "2026-09-24T22:20:46.818315+00:00"
+    }
+  ],
+  "current_publisher": {
+    "ProcessId": 39812,
+    "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+    "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -I -X utf8 D:\\property-ai\\reports\\reliable-task-delivery-026\\normal-integration.py publisher",
+    "created": "2026-09-25T06:20:46.2069840+08:00"
+  },
+  "unchanged_api_worker_supervisor": {
+    "api": {
+      "ProcessId": 30836,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -I -X utf8 D:\\property-ai\\reports\\reliable-task-delivery-026\\normal-integration.py api",
+      "created": "2026-09-25T05:50:41.1114130+08:00"
+    },
+    "worker": {
+      "ProcessId": 40816,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -I -X utf8 D:\\property-ai\\reports\\reliable-task-delivery-026\\normal-integration.py worker",
+      "created": "2026-09-25T05:50:41.8061460+08:00"
+    },
+    "supervisor": {
+      "ProcessId": 42948,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -I -X utf8 D:\\property-ai\\reports\\reliable-task-delivery-026\\normal-integration.py supervisor",
+      "created": "2026-09-25T05:50:42.5002340+08:00"
+    }
+  },
+  "completed_intents_unchanged": true,
+  "queue_metadata": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nproperty_ai.auth001.dlq\t7\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1",
+  "retained_drift": "Second publisher loaded workspace AI WIP at22:05:45Z; no new business was submitted, selected terminal task records are unchanged. This interval is not claimed same-source runtime.",
+  "correction": "Next natural child uses reviewed ed66d37 snapshot and asserts canonical hash before service connection; no forced restart, process termination, business or inference.",
+  "limits": "Two natural finite exits only, not production24x7 or crash/endurance proof. Scope remains exact completed run; historical tasks not scanned."
+}

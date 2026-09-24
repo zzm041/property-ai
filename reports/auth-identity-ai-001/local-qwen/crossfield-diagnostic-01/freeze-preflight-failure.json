@@ -1,0 +1,7 @@
+{
+  "stage": "freeze process identity before inference",
+  "model_requests": 0,
+  "cause": "CIM timestamp seven fractional digits versus previously saved six digits; same instant and process, but string equality rejected",
+  "retained": "frozen-inputs.json and private frozen/ are preserved incomplete initial freeze; not used for inference",
+  "fix": "Compare parsed offset-aware instants, preserve exact executable comparison. Final frozen-inputs-v2.json and frozen-v2/ bind corrected collector before any inference. No sample, prompt or model change after an answer."
+}

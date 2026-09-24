@@ -1,0 +1,22 @@
+{
+  "continue": false,
+  "source": "main implementer inspected original input/output; independent review pending",
+  "response_sha256": "b82dd69f3822a5671e29419bd0c352d198962f21b2a77cbce0f3488f94783999",
+  "note": "GOLD006摘要/安保职责/时态正确，但subcategory unauthorized_access_attempt新增未被按铃拍门事实证明的进入企图；不是仅因英文扣分。该值被保存并用于Incident精确聚合，违反当前事实及事件分类约束。独立只读复核支持关键STOP。未发生业务错派或实际事件污染；原输出不改，本轮无第3次调用。",
+  "raw_vs_effective": {
+    "category": "SECURITY",
+    "subcategory": "unauthorized_access_attempt",
+    "severity": "MEDIUM",
+    "priority": "HIGH",
+    "summary": "有陌生人在楼道反复按门铃并拍门，现已离开，未进入屋内，未见器械。",
+    "risk": "none",
+    "required_role": "STAFF",
+    "required_skill": "SECURITY",
+    "required_duty": "SECURITY",
+    "confidence": 0.95,
+    "low_confidence": false,
+    "raw_required_skill": "security",
+    "skill_mapping_applied": false,
+    "dispatch_contract_version": "category-duty-skill-v1"
+  }
+}

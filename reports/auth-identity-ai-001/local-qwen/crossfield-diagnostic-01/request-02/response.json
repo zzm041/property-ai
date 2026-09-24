@@ -1,0 +1,71 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-849\",\"object\":\"chat.completion\",\"created\":1790287541,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"security\\\",\\n  \\\"subcategory\\\": \\\"unauthorized_access_attempt\\\",\\n  \\\"severity\\\": \\\"medium\\\",\\n  \\\"priority\\\": \\\"p2\\\",\\n  \\\"summary\\\": \\\"有陌生人在楼道反复按门铃并拍门，现已离开，未进入屋内，未见器械。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"security\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":993,\"prompt_tokens_details\":{\"cached_tokens\":480},\"completion_tokens\":106,\"total_tokens\":1099}}\n",
+  "raw_response_sha256": "f9af44008c62a2722e2f963ffffdca3a33af1a58f7c3d4e40feb9eefa4c09879",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-006",
+    "tags": [
+      "安保",
+      "时态"
+    ],
+    "report": "刚才有陌生人在楼道反复按门铃并拍门，现在已经离开，未进入屋内，也未见器械，请安保核实。",
+    "history": [],
+    "facts": [
+      "曾按铃拍门",
+      "已离开",
+      "未入室"
+    ],
+    "forbidden": [
+      "持刀",
+      "正在入室",
+      "已发生盗窃",
+      "认定犯罪身份"
+    ],
+    "accept": [
+      [
+        "security",
+        "security",
+        [
+          "none",
+          "safety"
+        ]
+      ]
+    ],
+    "manual": "RULES"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "security",
+      "subcategory": "unauthorized_access_attempt",
+      "severity": "medium",
+      "priority": "p2",
+      "summary": "有陌生人在楼道反复按门铃并拍门，现已离开，未进入屋内，未见器械。",
+      "risk": "none",
+      "required_role": "STAFF",
+      "required_skill": "security",
+      "confidence": 0.95
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24 22:05:40.498175+00:00",
+      "latency_ms": 801,
+      "request_id": "supplement-GOLD-006",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1099
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v9-duty-contract",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "41db9a71923268f1ce0238860dfea5bed7bc67ed"
+}

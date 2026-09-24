@@ -1,0 +1,60 @@
+{
+  "task_id": "RELIABLE-TASK-DELIVERY-026",
+  "scope": "NORMAL_RUNTIME_INTEGRATION_SOURCE_PINNING_ADDENDUM",
+  "review_type": "INDEPENDENT_READ_ONLY",
+  "reviewer": "/root/review025_round1",
+  "verdict": "PASS_SCOPED_LOCAL_DEVELOPMENT",
+  "prior_review": {
+    "record": "normal-integration/review.json",
+    "provenance": "已返回同一审查者根据压缩前审查摘要重构的记录；明确不是逐字原文，也不是主会话自评。"
+  },
+  "current_task_blockers": [],
+  "verified": [
+    "运行分支优先从source-ed66d37/backend导入app；缺少固定快照时拒绝启动，不回退到工作区。",
+    "serve在configured及服务连接前强校验fe9fcdd742ffe6331fb440f94019a067a9325aaa9a9b91c2d8a009ea615c8926。",
+    "固定快照内18个相关产品模块匹配既有审查清单；压缩包校验与pin-check一致。",
+    "自然周期日志记录20380和4720分别正常exit 0，随后39812于2026-09-24T22:20:46.818315Z从固定快照启动，源码哈希恢复为fe9fcdd…。",
+    "保存的只读收尾记录显示当前run任务未变化，队列0 ready / 0 unacked / 1 consumer，历史DLQ仍为7。"
+  ],
+  "retained_history": {
+    "source_drift": "第二子进程4720于22:05:45Z确实加载工作区8862cd…源码。该周期不得追认为同源运行；固定快照不覆盖此事实。",
+    "business_boundary": "保存记录说明该期间未新增业务，本run已终态任务未变化；没有用重跑工单或强制终止来生成修复证据。"
+  },
+  "finding_updates": [
+    {
+      "id": "026-NORMAL-N1",
+      "status": "CLOSED_FOR_BOUNDED_NATURAL_RESTART_ONLY",
+      "basis": "已补两次自然退出及第三子实际启动证据；不延伸为生产24x7验收。"
+    }
+  ],
+  "actually_read": [
+    "normal-integration.py固定导入路径及新增启动哈希断言",
+    "scripts/ops/supervise_task_publisher.py",
+    "scripts/ops/auth001_isolated_runtime.py必要导入上下文",
+    "normal-integration/pin-check.json",
+    "normal-integration/supervision-natural-cycles.json",
+    "既有review-fix1-manifest及固定快照文件哈希"
+  ],
+  "unverified": [
+    "新增哈希拒绝分支未由审查者执行负向测试。",
+    "只证明本地有限自然续跑及源码隔离，不证明生产持续运行、灾备恢复或全部故障窗口。",
+    "本次未运行测试、业务、API、数据库、队列、页面或模型；未修改文件。",
+    "真实AI/RAG、0010及既有发布阻塞全部保留。"
+  ],
+  "next_action": "保存本附加审查及源码漂移历史，保持固定运行快照；无需重跑已完成业务。",
+  "subsequent_test_addendum_from_same_readonly_reviewer": {
+    "task_id": "RELIABLE-TASK-DELIVERY-026",
+    "scope": "SNAPSHOT_HASH_GUARD_TEST_ADDENDUM",
+    "verdict": "CONFIRMED_SCOPED_UNIT_EVIDENCE",
+    "findings": [],
+    "verified": [
+      "新增参数化测试覆盖哈希不匹配时拒绝启动，configured调用次数为0。",
+      "哈希匹配时允许进入configured替身，随即停止，不连接真实服务。",
+      "运行器使用-k snapshot_hash，仅选择新增两例。",
+      "实际日志为2 passed、6 deselected、1 warning，未重跑原6例。"
+    ],
+    "boundary": "这是Mock控制下的入口执行顺序证据，不是实际篡改快照或服务故障演练。审查者仅读取源码和日志，未运行测试或业务操作。",
+    "prior_reviews": "原独立审查及源码漂移历史保持不变；本附注补充此前未覆盖的哈希拒绝分支单元证据。",
+    "excluded": "未核验新模型下载，不重新审查模型结果；NOT_READY结论保持。"
+  }
+}

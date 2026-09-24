@@ -552,7 +552,9 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
         AuditAction.WORK_ORDER_AI_ANALYSIS_COMPLETED: AuditActionPolicy(
             resource_type=AuditResourceType.WORK_ORDER_ANALYSIS,
             allowed_detail_keys=frozenset(
-                {"work_order_id", "analysis_id", "status", "confidence"}
+                {"work_order_id", "analysis_id", "status", "confidence",
+                 "dispatch_contract_version", "raw_required_skill",
+                 "effective_required_skill", "skill_mapping_applied"}
             ),
             required_detail_keys=frozenset(
                 {"work_order_id", "analysis_id", "status"}

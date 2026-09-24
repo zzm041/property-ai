@@ -1,0 +1,748 @@
+{
+  "run_id": "rt026n-c58b1554bf",
+  "steps": {
+    "auth": {
+      "formal_auth": true,
+      "daily": {
+        "business_date": "2026-09-25",
+        "attendance": {
+          "id": 7,
+          "employee_id": 5,
+          "tenant_id": 1,
+          "property_id": 3,
+          "business_date": "2026-09-25",
+          "check_in_at": "2026-09-24T17:13:49.333937Z",
+          "check_out_at": null,
+          "source": "STAFF_SELF"
+        },
+        "daily_status": {
+          "id": 7,
+          "employee_id": 5,
+          "tenant_id": 1,
+          "property_id": 3,
+          "business_date": "2026-09-25",
+          "on_duty": "ON_DUTY",
+          "leave_type": null,
+          "current_load": 0
+        }
+      },
+      "identity_ids": {
+        "manager": 5,
+        "resident": 14,
+        "staff": 15
+      }
+    },
+    "normal_AUTO": {
+      "work": [
+        {
+          "id": 40,
+          "status": "ASSIGNED",
+          "version": 3,
+          "current_assignment_id": 35
+        }
+      ],
+      "assignments": [
+        {
+          "id": 35,
+          "employee_id": 5,
+          "assigned_source": "AUTO",
+          "status": "ACTIVE"
+        }
+      ],
+      "analysis": [
+        {
+          "id": 35,
+          "status": "COMPLETED",
+          "analysis_version": 1,
+          "error_code": null
+        }
+      ],
+      "calls": [
+        {
+          "id": 38,
+          "provider_type": "LLM",
+          "attempt": 1,
+          "status": "SUCCESS",
+          "model_version": "dev-llm-v1"
+        }
+      ],
+      "intents": [
+        {
+          "id": 25,
+          "operation": "ANALYZE_WORK_ORDER",
+          "resource_id": 40,
+          "generation": 1,
+          "status": "SUCCEEDED",
+          "execution_attempt": 1,
+          "publish_attempt": 1,
+          "task_id": "bc290feb-0788-45f9-bed6-ff8a5588a025",
+          "resource_version": 1,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 21:50:58.205817"
+        }
+      ]
+    },
+    "release_normal_capacity": {
+      "work_order_id": 40,
+      "status": "CLOSED",
+      "purpose": "release the single real idle slot for recovery case; not025rerun"
+    },
+    "formal_recovery": {
+      "work": [
+        {
+          "id": 41,
+          "status": "ASSIGNED",
+          "version": 3,
+          "current_assignment_id": 36
+        }
+      ],
+      "assignments": [
+        {
+          "id": 36,
+          "employee_id": 5,
+          "assigned_source": "AUTO",
+          "status": "ACTIVE"
+        }
+      ],
+      "analysis": [
+        {
+          "id": 36,
+          "status": "COMPLETED",
+          "analysis_version": 1,
+          "error_code": null
+        }
+      ],
+      "calls": [
+        {
+          "id": 39,
+          "provider_type": "LLM",
+          "attempt": 1,
+          "status": "SUCCESS",
+          "model_version": "dev-llm-v1"
+        }
+      ],
+      "intents": [
+        {
+          "id": 34,
+          "operation": "ANALYZE_WORK_ORDER",
+          "resource_id": 41,
+          "generation": 1,
+          "status": "FAILED",
+          "execution_attempt": 3,
+          "publish_attempt": 3,
+          "task_id": "60477863-bcd9-423c-8955-2d723c286cab",
+          "resource_version": 1,
+          "last_error_code": "AI.UNAVAILABLE",
+          "finished_at": "2026-09-24 21:51:06.077860"
+        },
+        {
+          "id": 35,
+          "operation": "ANALYZE_WORK_ORDER",
+          "resource_id": 41,
+          "generation": 2,
+          "status": "SUCCEEDED",
+          "execution_attempt": 1,
+          "publish_attempt": 1,
+          "task_id": "486314ed-7403-42cd-ba32-9ca691bcab89",
+          "resource_version": 1,
+          "last_error_code": null,
+          "finished_at": "2026-09-24 21:51:08.503265"
+        }
+      ],
+      "old_unchanged_sha256": "b6c6202cb70272fd91554863b7320526fd2155bcd93788367ee2d42ded741966",
+      "denied_status": 404,
+      "managed": {
+        "id": 34,
+        "operation": "ANALYZE_WORK_ORDER",
+        "resource_id": 41,
+        "resource_version": 1,
+        "generation": 1,
+        "status": "FAILED",
+        "publish_attempt": 3,
+        "execution_attempt": 3,
+        "last_error_code": "AI.UNAVAILABLE",
+        "finished_at": "2026-09-24T21:51:06.077860+00:00"
+      },
+      "new": {
+        "id": 35,
+        "operation": "ANALYZE_WORK_ORDER",
+        "resource_id": 41,
+        "resource_version": 1,
+        "generation": 2,
+        "status": "PENDING",
+        "publish_attempt": 0,
+        "execution_attempt": 0,
+        "last_error_code": null,
+        "finished_at": null
+      },
+      "duplicate": {
+        "id": 35,
+        "operation": "ANALYZE_WORK_ORDER",
+        "resource_id": 41,
+        "resource_version": 1,
+        "generation": 2,
+        "status": "PENDING",
+        "publish_attempt": 0,
+        "execution_attempt": 0,
+        "last_error_code": null,
+        "finished_at": null
+      },
+      "audits": [
+        {
+          "id": 729,
+          "actor_user_id": 5,
+          "action": "TASK_INTENT_RETRIED",
+          "resource_id": 35,
+          "details_json": "{\"generation\": 2, \"previous_id\": 34, \"reason_code\": \"DEPENDENCY_RECOVERED\"}"
+        }
+      ]
+    }
+  },
+  "requests": [
+    {
+      "label": "resident-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "17c13b61fedfec66"
+    },
+    {
+      "label": "resident-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "5e6b979243ccfc57"
+    },
+    {
+      "label": "resident-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "cf54129db87ee0d0"
+    },
+    {
+      "label": "resident-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "08a61ca9326b74c0"
+    },
+    {
+      "label": "identity-resident",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "98d2a62d3ce648e5"
+    },
+    {
+      "label": "staff-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d231f359f94578a7"
+    },
+    {
+      "label": "staff-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "8096660fafa5af92"
+    },
+    {
+      "label": "staff-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "dcaace3ab992f7d8"
+    },
+    {
+      "label": "staff-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "190c4db2a85de962"
+    },
+    {
+      "label": "identity-staff",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "ee8a78bb9f8f4cf0"
+    },
+    {
+      "label": "manager-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9436552c27dae5c3"
+    },
+    {
+      "label": "manager-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9b5951043023f17a"
+    },
+    {
+      "label": "manager-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c8f9ab2a241d8d47"
+    },
+    {
+      "label": "manager-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2eb979b6148a1c85"
+    },
+    {
+      "label": "identity-manager",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "4256c990287a0c54"
+    },
+    {
+      "label": "attendance",
+      "method": "GET",
+      "path": "/staff/attendance/today",
+      "params": [
+        "property_id",
+        "tenant_id"
+      ],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9247d763a1801e2e"
+    },
+    {
+      "label": "create-normal",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "f9ad775e1187cb9f"
+    },
+    {
+      "label": "detail",
+      "method": "GET",
+      "path": "/work-orders/40",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "129e9cae108876b0"
+    },
+    {
+      "label": "detail",
+      "method": "GET",
+      "path": "/work-orders/40",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "129e9cae108876b0"
+    },
+    {
+      "label": "detail",
+      "method": "GET",
+      "path": "/work-orders/40",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "129e9cae108876b0"
+    },
+    {
+      "label": "detail",
+      "method": "GET",
+      "path": "/work-orders/40",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "129e9cae108876b0"
+    },
+    {
+      "label": "accept",
+      "method": "POST",
+      "path": "/staff/work-orders/40/accept",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "5290a7d23553b57a"
+    },
+    {
+      "label": "detail",
+      "method": "GET",
+      "path": "/work-orders/40",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "129e9cae108876b0"
+    },
+    {
+      "label": "start",
+      "method": "POST",
+      "path": "/staff/work-orders/40/start",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "4b1a5f2edf3d129a"
+    },
+    {
+      "label": "detail",
+      "method": "GET",
+      "path": "/work-orders/40",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "129e9cae108876b0"
+    },
+    {
+      "label": "receipt",
+      "method": "POST",
+      "path": "/staff/work-orders/40/receipts",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "276026b355c2cac5"
+    },
+    {
+      "label": "detail",
+      "method": "GET",
+      "path": "/work-orders/40",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "129e9cae108876b0"
+    },
+    {
+      "label": "confirm",
+      "method": "POST",
+      "path": "/work-orders/40/confirm",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6f06604b80ad6238"
+    },
+    {
+      "label": "detail",
+      "method": "GET",
+      "path": "/work-orders/40",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "129e9cae108876b0"
+    },
+    {
+      "label": "create-recovery",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "faf1788a002df6db"
+    },
+    {
+      "label": "retry-denied",
+      "method": "POST",
+      "path": "/admin/task-intents/34/retry",
+      "params": [],
+      "status": 404,
+      "error_code": "TASK.NOT_FOUND",
+      "request_id_hash": "c319c07d84228252"
+    },
+    {
+      "label": "inspect-failed",
+      "method": "GET",
+      "path": "/admin/task-intents/34",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "f1a5b0cbc7cc8c60"
+    },
+    {
+      "label": "retry-authorized",
+      "method": "POST",
+      "path": "/admin/task-intents/34/retry",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "18d48e611c17e853"
+    },
+    {
+      "label": "retry-duplicate",
+      "method": "POST",
+      "path": "/admin/task-intents/34/retry",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a6b19a906a4784dd"
+    },
+    {
+      "label": "detail",
+      "method": "GET",
+      "path": "/work-orders/41",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "129e9cae108876b0"
+    },
+    {
+      "label": "detail",
+      "method": "GET",
+      "path": "/work-orders/41",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "129e9cae108876b0"
+    },
+    {
+      "label": "detail",
+      "method": "GET",
+      "path": "/work-orders/41",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "129e9cae108876b0"
+    },
+    {
+      "label": "detail",
+      "method": "GET",
+      "path": "/work-orders/41",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "129e9cae108876b0"
+    },
+    {
+      "label": "detail",
+      "method": "GET",
+      "path": "/work-orders/41",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "129e9cae108876b0"
+    }
+  ],
+  "final_intents": [
+    {
+      "id": 24,
+      "operation": "DELIVER_NOTIFICATION",
+      "resource_id": 321,
+      "generation": 1,
+      "status": "SUCCEEDED",
+      "execution_attempt": 1,
+      "publish_attempt": 1,
+      "task_id": "39ac6d9f-4dbc-40ec-9565-30d8afeaa3ea",
+      "resource_version": 1,
+      "last_error_code": null,
+      "finished_at": "2026-09-24 21:50:57.754570"
+    },
+    {
+      "id": 25,
+      "operation": "ANALYZE_WORK_ORDER",
+      "resource_id": 40,
+      "generation": 1,
+      "status": "SUCCEEDED",
+      "execution_attempt": 1,
+      "publish_attempt": 1,
+      "task_id": "bc290feb-0788-45f9-bed6-ff8a5588a025",
+      "resource_version": 1,
+      "last_error_code": null,
+      "finished_at": "2026-09-24 21:50:58.205817"
+    },
+    {
+      "id": 26,
+      "operation": "DELIVER_NOTIFICATION",
+      "resource_id": 322,
+      "generation": 1,
+      "status": "SUCCEEDED",
+      "execution_attempt": 1,
+      "publish_attempt": 1,
+      "task_id": "03554aa0-2894-4b82-a574-8ffef3369519",
+      "resource_version": 1,
+      "last_error_code": null,
+      "finished_at": "2026-09-24 21:50:59.818972"
+    },
+    {
+      "id": 27,
+      "operation": "DELIVER_NOTIFICATION",
+      "resource_id": 323,
+      "generation": 1,
+      "status": "SUCCEEDED",
+      "execution_attempt": 1,
+      "publish_attempt": 1,
+      "task_id": "54fa1eb5-1bdf-4823-b5b2-ae01396360aa",
+      "resource_version": 1,
+      "last_error_code": null,
+      "finished_at": "2026-09-24 21:50:59.904380"
+    },
+    {
+      "id": 28,
+      "operation": "DELIVER_NOTIFICATION",
+      "resource_id": 324,
+      "generation": 1,
+      "status": "SUCCEEDED",
+      "execution_attempt": 1,
+      "publish_attempt": 1,
+      "task_id": "80c924c0-d9b6-498b-8919-f0d584bcdeea",
+      "resource_version": 1,
+      "last_error_code": null,
+      "finished_at": "2026-09-24 21:50:59.986019"
+    },
+    {
+      "id": 29,
+      "operation": "DELIVER_NOTIFICATION",
+      "resource_id": 325,
+      "generation": 1,
+      "status": "SUCCEEDED",
+      "execution_attempt": 1,
+      "publish_attempt": 1,
+      "task_id": "8d9b7a04-fe9d-4791-a032-f7c456a14aab",
+      "resource_version": 1,
+      "last_error_code": null,
+      "finished_at": "2026-09-24 21:51:00.067431"
+    },
+    {
+      "id": 30,
+      "operation": "DELIVER_NOTIFICATION",
+      "resource_id": 326,
+      "generation": 1,
+      "status": "SUCCEEDED",
+      "execution_attempt": 1,
+      "publish_attempt": 1,
+      "task_id": "c013aaa2-ad10-41f5-a985-449c1aae477c",
+      "resource_version": 1,
+      "last_error_code": null,
+      "finished_at": "2026-09-24 21:51:00.155341"
+    },
+    {
+      "id": 31,
+      "operation": "DELIVER_NOTIFICATION",
+      "resource_id": 327,
+      "generation": 1,
+      "status": "SUCCEEDED",
+      "execution_attempt": 1,
+      "publish_attempt": 1,
+      "task_id": "bab3911c-7d45-4bb8-8d61-65afe59b4a61",
+      "resource_version": 1,
+      "last_error_code": null,
+      "finished_at": "2026-09-24 21:51:00.217200"
+    },
+    {
+      "id": 32,
+      "operation": "DELIVER_NOTIFICATION",
+      "resource_id": 328,
+      "generation": 1,
+      "status": "SUCCEEDED",
+      "execution_attempt": 1,
+      "publish_attempt": 1,
+      "task_id": "c9a1d002-a8f4-47ff-9f8a-50fcecdf4bbc",
+      "resource_version": 1,
+      "last_error_code": null,
+      "finished_at": "2026-09-24 21:51:00.273861"
+    },
+    {
+      "id": 33,
+      "operation": "DELIVER_NOTIFICATION",
+      "resource_id": 329,
+      "generation": 1,
+      "status": "SUCCEEDED",
+      "execution_attempt": 1,
+      "publish_attempt": 1,
+      "task_id": "79e1975a-d5b9-482a-82ff-b0f60a8bb084",
+      "resource_version": 1,
+      "last_error_code": null,
+      "finished_at": "2026-09-24 21:51:00.341418"
+    },
+    {
+      "id": 34,
+      "operation": "ANALYZE_WORK_ORDER",
+      "resource_id": 41,
+      "generation": 1,
+      "status": "FAILED",
+      "execution_attempt": 3,
+      "publish_attempt": 3,
+      "task_id": "60477863-bcd9-423c-8955-2d723c286cab",
+      "resource_version": 1,
+      "last_error_code": "AI.UNAVAILABLE",
+      "finished_at": "2026-09-24 21:51:06.077860"
+    },
+    {
+      "id": 35,
+      "operation": "ANALYZE_WORK_ORDER",
+      "resource_id": 41,
+      "generation": 2,
+      "status": "SUCCEEDED",
+      "execution_attempt": 1,
+      "publish_attempt": 1,
+      "task_id": "486314ed-7403-42cd-ba32-9ca691bcab89",
+      "resource_version": 1,
+      "last_error_code": null,
+      "finished_at": "2026-09-24 21:51:08.503265"
+    },
+    {
+      "id": 36,
+      "operation": "DELIVER_NOTIFICATION",
+      "resource_id": 330,
+      "generation": 1,
+      "status": "SUCCEEDED",
+      "execution_attempt": 1,
+      "publish_attempt": 1,
+      "task_id": "bca10e65-b35f-4eae-a476-d841548b23a6",
+      "resource_version": 1,
+      "last_error_code": null,
+      "finished_at": "2026-09-24 21:51:10.225807"
+    },
+    {
+      "id": 37,
+      "operation": "DELIVER_NOTIFICATION",
+      "resource_id": 331,
+      "generation": 1,
+      "status": "SUCCEEDED",
+      "execution_attempt": 1,
+      "publish_attempt": 1,
+      "task_id": "8f7468be-1c7a-42c1-996a-f8f404eb13a8",
+      "resource_version": 1,
+      "last_error_code": null,
+      "finished_at": "2026-09-24 21:51:10.321434"
+    }
+  ],
+  "employee_load": [
+    {
+      "business_date": "2026-09-25",
+      "current_load": 1,
+      "on_duty": "ON_DUTY"
+    }
+  ]
+}

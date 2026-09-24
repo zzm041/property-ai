@@ -1,0 +1,22 @@
+{
+  "continue": true,
+  "source": "main implementer inspected original input/output; independent review pending",
+  "response_sha256": "dae5ef5bb40e357983d975fc47fcd80b5cfa112c9b04aeaf5c3b0cb4d943137e",
+  "note": "逐项核对GOLD005：纸盒与纸屑、清扫需求、可通行及否定均保留；cleaning/cleaning与真实保洁目录一致，无维修组混入，none/low/p4无危险编造。仅本例接受，旧B失败不改。",
+  "raw_vs_effective": {
+    "category": "CLEANING",
+    "subcategory": "垃圾清理",
+    "severity": "LOW",
+    "priority": "LOW",
+    "summary": "楼道角落散落几张纸和空纸盒，需要清扫；通道可正常通行，无液体、碎玻璃或其他异常。",
+    "risk": "none",
+    "required_role": "STAFF",
+    "required_skill": "CLEANING",
+    "required_duty": "CLEANING",
+    "confidence": 0.95,
+    "low_confidence": false,
+    "raw_required_skill": "cleaning",
+    "skill_mapping_applied": false,
+    "dispatch_contract_version": "category-duty-skill-v1"
+  }
+}

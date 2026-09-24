@@ -22,6 +22,7 @@ BASE = Path(__file__).parent
 OUT = BASE / 'supplement-024-rubric-01'
 MODEL = 'qwen3.5:4b'
 DIGEST = '2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd'
+EXPECTED_PROMPT_VERSION = 'wo-analysis-v8-maintenance'
 site.addsitedir(str(ROOT / '.venv/Lib/site-packages'))
 sys.path.insert(0, str(ROOT / 'backend'))
 
@@ -175,7 +176,7 @@ def child(number):
     ns = runpy.run_path(str(root / 'backend/app/service/analysis.py'))
     AnalysisService, AnalysisSnapshot, MediaRef = (ns[n] for n in ('AnalysisService', 'AnalysisSnapshot', 'MediaRef'))
     from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
-    assert WORK_ORDER_ANALYSIS_PROMPT_VERSION == 'wo-analysis-v8-maintenance'
+    assert WORK_ORDER_ANALYSIS_PROMPT_VERSION == EXPECTED_PROMPT_VERSION
     assert QwenVLMProvider.prompt_version == 'repair-photo-v4'
     plan = plans()[number - 1]; case, kind = plan['case'], plan['kind']
     folder = OUT / f'request-{number:02d}'

@@ -1,0 +1,49 @@
+{
+  "task_id": "CROSSFIELD-DIAGNOSTIC-01",
+  "review_type": "INDEPENDENT_READ_ONLY",
+  "reviewer": "/root/review025_round1",
+  "capture_note": "Structured result returned by the separate read-only reviewer; main session saved it without changing its verdict or findings.",
+  "head_sha": "41db9a71923268f1ce0238860dfea5bed7bc67ed",
+  "verdict": "NOT_READY",
+  "action": "STOP_ADDITIONAL_INFERENCE",
+  "findings": [
+    {
+      "id": "CROSSFIELD-R1-01",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "reports/auth-identity-ai-001/local-qwen/crossfield-diagnostic-01/request-02/raw-response.json",
+      "trigger": "GOLD-006仅报告陌生人反复按铃拍门、已经离开、未入室、未见器械；模型却输出subcategory=unauthorized_access_attempt。",
+      "issue": "该子类增加未经证实的进入企图，不仅是英文措辞。实际v9请求要求子类描述观察事实，不推断未确认意图；没有正式目录将此词定义为普通按铃拍门现象。",
+      "impact": "子类会持久化，并参与事件精确聚合，可能造成事件分类污染。这里是代码路径所证明的风险，不是已经发生真实事件污染或错派。",
+      "evidence": [
+        "backend/app/service/analysis.py:704：实际提示禁止子类推断未确认原因或犯罪意图。",
+        "backend/app/service/analysis.py:993、908：保存原子类并传给事件聚合。",
+        "backend/app/service/incident.py:81、92、116：按子类查找及建立事件。",
+        "backend/app/repository/ai.py:456、479：按子类精确匹配。",
+        "request-02原始响应SHA256=f9af44008c62a2722e2f963ffffdca3a33af1a58f7c3d4e40feb9eefa4c09879"
+      ],
+      "limits": "security/security分流、中文摘要及离开/未入室/未见器械事实均正确。模型没有声称正在入室、持械或盗窃；confidence=0.95本身不是错误依据。",
+      "next_action": "保留原始结果并记录停止；不能手改答案、重置返修次数或继续消耗剩余额度来绕过本次关键失败。"
+    }
+  ],
+  "accepted_partial_results": {
+    "GOLD-005": "当前事实、否定及cleaning/cleaning一致；仅本例通过，不追认旧失败。",
+    "source_change": "已核对category→duty→skill映射、原始技能保存、审计和派单快照增量，未发现另一个本轮阻断源码问题；未知特殊技能和原高风险保护保留。",
+    "tests": "实际读取108 passed、1 warning及3 passed日志；3项采集器测试包含Mock HTTP，不是真实模型质量证据。",
+    "integrity": "frozen-inputs-v2的16项文件，当前文件与冻结副本SHA256均匹配。",
+    "calls": "保存证据为2次文字请求、0次图片推理；两次均收到完整响应，无截断或自动重试证据。",
+    "resources": "两次监督记录分别约5.984秒、1.953秒；最低记录空闲RAM12586MiB、GPU10506MiB，未触发保护阈值。"
+  },
+  "images_actually_viewed": [
+    "ceiling-peeling.jpg：涂层剥落及棕黄斑块，不能据此确定正在滴水或成因。",
+    "normal-socket.jpg：可见插座，无可见烧损烟火，不能证明带电或内部安全。",
+    "burned-socket.jpg：插孔附近明显黑色烧损，无当前冒烟证据。",
+    "ans-ball-valve.jpg：独立蓝色手柄阀门，不能据此推断漏水、内部压力或损坏。"
+  ],
+  "unverified": [
+    "其余固定文字样本、全部图片模型输出及图文冲突处理。",
+    "真实AUTO业务闭环、真实RAG、生产质量和持续性能。",
+    "本审查没有运行测试、模型、页面、API、数据库或队列，也没有写文件。",
+    "026 supervisor后续源码漂移问题不纳入本次模型判据。"
+  ],
+  "release_boundary": "保持NOT_READY；旧28例、128次、3/3及旧补充诊断结果不变。两例结果不能升级为READY_FOR_BUSINESS_SWITCH，也不能推导所有Qwen或4B模型都不适用。"
+}

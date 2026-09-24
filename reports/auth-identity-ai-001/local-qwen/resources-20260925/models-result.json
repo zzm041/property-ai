@@ -1,0 +1,9 @@
+{
+  "action": "models",
+  "started_utc": "2026-09-24T21:54:00.673278+00:00",
+  "files": [],
+  "disk_free_before": 73925799936,
+  "status": "STOPPED",
+  "error_type": "ConnectError",
+  "finished_utc": "2026-09-24T21:54:29.467046+00:00"
+}

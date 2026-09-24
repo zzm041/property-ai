@@ -1,0 +1,20 @@
+{
+  "supplement_id": "CROSSFIELD-DIAGNOSTIC-01",
+  "verified_at_utc": "2026-09-24T22:04:20.090268+00:00",
+  "pid": 2152,
+  "process_created_at": "2026-09-24T20:11:27.355331+08:00",
+  "executable": "C:\\Users\\lmj\\AppData\\Local\\Programs\\Ollama\\ollama.exe",
+  "listener": "127.0.0.1:11435",
+  "listener_owner_matches": true,
+  "launch_config_source": "reports/auth-identity-ai-001/local-qwen/diagnostic-runtime28.json; same process creation time and PID as the controlled launch",
+  "no_cloud": true,
+  "concurrency": 1,
+  "max_loaded_models": 1,
+  "context_length": 4096,
+  "model_directory": "D:\\property-ai\\tmp\\selfhost-ai-local\\models",
+  "ram_free_mib_observed": 10474,
+  "gpu_free_mib_observed": 9176,
+  "inference_calls_this_check": 0,
+  "new_server_starts": 0,
+  "boundary": "CIM and listener checked live; existing same-process launch settings retained; version/digest/residency rechecked before each request"
+}

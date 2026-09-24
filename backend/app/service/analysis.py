@@ -712,6 +712,8 @@ class AnalysisService:
             "无法确定是否属于普通维修且信息确实不足时用other/other并降低confidence。"
             "category允许water_supply/electrical/hvac/cleaning/security/other。"
             "清扫使用cleaning/cleaning；人员治安security/security。"
+            "这两类不属于普通维修：先依据事实确定category，再填写该类别对应的技能；"
+            "不能把维修组的maintenance填给cleaning或security。"
             "模型不选员工，服务端负责真实维修组、空闲与公平次序。"
             "设施损坏不属于人员治安；不能因出现人身安全风险就选security。\n"
             "4. risk独立于专业和置信度：疑似燃气气味仍标gas；明确跌倒等人身危险标safety；"
@@ -994,7 +996,9 @@ class AnalysisService:
         analysis.summary = mapped.summary
         analysis.risk = mapped.risk.value
         analysis.required_role = mapped.required_role
-        analysis.required_skill = mapped.required_skill
+        # Keep the original model skill, not the derived execution skill. Stored
+        # analysis is remapped through the same contract for subsequent dispatch.
+        analysis.required_skill = mapped.raw_required_skill or mapped.required_skill
         analysis.confidence = Decimal(str(mapped.confidence))
 
     def _transition_analyzed(self, record: WorkOrder, request_id: str) -> None:
@@ -1238,6 +1242,10 @@ class AnalysisService:
                 "analysis_id": analysis.id,
                 "status": analysis.status,
                 "confidence": mapped.confidence,
+                "dispatch_contract_version": mapped.dispatch_contract_version,
+                "raw_required_skill": mapped.raw_required_skill or mapped.required_skill,
+                "effective_required_skill": mapped.required_skill,
+                "skill_mapping_applied": mapped.skill_mapping_applied,
             },
         )
 

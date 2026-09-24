@@ -1,0 +1,26 @@
+{
+  "action": "pillow",
+  "started_utc": "2026-09-24T21:52:42.182952+00:00",
+  "files": [
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-local\\image-tools\\pillow-12.3.0-cp312-cp312-win_amd64.whl",
+      "bytes": 7227137,
+      "sha256": "a2b55dd6b2a4c4b7d87ffa56bdb33fdc5fdb9a462173861a7bc097f17d91cb09",
+      "verification_mode": "sha256",
+      "upstream_digest": "a2b55dd6b2a4c4b7d87ffa56bdb33fdc5fdb9a462173861a7bc097f17d91cb09",
+      "reused": false
+    }
+  ],
+  "disk_free_before": 73948336128,
+  "install_exit": 0,
+  "install_output": "Using CPython 3.12.10 interpreter at: tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\nResolved 1 package in 3ms\nPrepared 1 package in 282ms\nInstalled 1 package in 61ms\n + pillow==12.3.0 (from file:///D:/property-ai/tmp/selfhost-ai-local/image-tools/pillow-12.3.0-cp312-cp312-win_amd64.whl)\n",
+  "loaded": {
+    "version": "12.3.0",
+    "module": "D:\\property-ai\\tmp\\selfhost-ai-local\\image-tools\\site-packages\\PIL\\__init__.py",
+    "native": "D:\\property-ai\\tmp\\selfhost-ai-local\\image-tools\\site-packages\\PIL\\_imaging.cp312-win_amd64.pyd",
+    "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+    "old_venv_unchanged": true
+  },
+  "status": "PREPARED_NOT_MODEL_RUNTIME_PASS",
+  "finished_utc": "2026-09-24T21:52:44.992182+00:00"
+}

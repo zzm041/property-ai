@@ -1,0 +1,8 @@
+{
+  "source_sha256": "fe9fcdd742ffe6331fb440f94019a067a9325aaa9a9b91c2d8a009ea615c8926",
+  "module": "D:\\property-ai\\tmp\\reliable-task-delivery-026\\normal-integration\\source-ed66d37\\backend\\app\\core\\config.py",
+  "archive_sha256": "6ad26f4e2e20180bd7ade2d1ac7fe0dd160dccfeb18ce09b3f40a400b2abaf33",
+  "business_calls": 0,
+  "model_calls": 0,
+  "reason": "Future naturally restarted publishers use reviewed product snapshot, not concurrent workspace AI changes"
+}

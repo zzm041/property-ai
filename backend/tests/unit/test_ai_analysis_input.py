@@ -157,7 +157,7 @@ def test_versioned_prompt_keeps_context_as_json_evidence_and_usage_separate():
     payload, error, _ = s._run_llm(snapshot(context=context), asr_text=None, vision_text='images', request_id='req', attempt=1)
     assert error is None and dict(payload) == SUCCESS_ANALYSIS
     call = s._llm.structured_completion.call_args.kwargs
-    assert call['prompt_version'] == 'wo-analysis-v8-maintenance'
+    assert call['prompt_version'] == 'wo-analysis-v9-duty-contract'
     assert 'summary 必须用简体中文' in call['prompt']
     assert '仅是过去记录' in call['prompt']
     assert '多项普通维修不必拆单或选唯一工种' in call['prompt']
@@ -221,6 +221,7 @@ def test_call_log_uses_existing_column_and_never_invents_missing_usage(monkeypat
 def test_retry_of_old_failed_analysis_updates_prompt_provenance_and_context_hash(monkeypatch):
     monkeypatch.setattr('app.service.analysis.begin_owned_transaction', lambda _: nullcontext())
     s = service()
+    s._session.info = {}  # This direct legacy prepare fixture has no durable lease.
     s._work_orders = MagicMock()
     s._ai = MagicMock()
     record = WorkOrder(id=30, house_id=4, tenant_id=2, property_id=3, reporter_user_id=8,

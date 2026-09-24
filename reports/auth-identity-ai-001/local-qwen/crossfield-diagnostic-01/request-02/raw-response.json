@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-849\",\"object\":\"chat.completion\",\"created\":1790287541,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"security\\\",\\n  \\\"subcategory\\\": \\\"unauthorized_access_attempt\\\",\\n  \\\"severity\\\": \\\"medium\\\",\\n  \\\"priority\\\": \\\"p2\\\",\\n  \\\"summary\\\": \\\"有陌生人在楼道反复按门铃并拍门，现已离开，未进入屋内，未见器械。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"security\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":993,\"prompt_tokens_details\":{\"cached_tokens\":480},\"completion_tokens\":106,\"total_tokens\":1099}}\n",
+  "raw_response_sha256": "f9af44008c62a2722e2f963ffffdca3a33af1a58f7c3d4e40feb9eefa4c09879",
+  "contract_errors": []
+}

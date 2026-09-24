@@ -63,7 +63,8 @@ ANNOUNCEMENT_READ = "announcement:read"
 ANNOUNCEMENT_DRAFT = "announcement:draft"
 ANNOUNCEMENT_PUBLISH = "announcement:publish"
 
-WORK_ORDER_ANALYSIS_PROMPT_VERSION = "wo-analysis-v8-maintenance"
+WORK_ORDER_ANALYSIS_PROMPT_VERSION = "wo-analysis-v9-duty-contract"
+DISPATCH_CONTRACT_VERSION = "category-duty-skill-v1"
 INCIDENT_SUMMARY_PROMPT_VERSION = "incident-summary-v1"
 ANNOUNCEMENT_DRAFT_PROMPT_VERSION = "announcement-draft-v1"
 
@@ -176,6 +177,9 @@ class MappedAnalysis:
     required_duty: str
     confidence: float
     low_confidence: bool
+    raw_required_skill: str | None = None
+    skill_mapping_applied: bool = False
+    dispatch_contract_version: str = DISPATCH_CONTRACT_VERSION
 
 
 def map_analysis_output(
@@ -206,7 +210,15 @@ def map_analysis_output(
     role = output.required_role.strip().upper()
     if role not in {"STAFF", "SUPERVISOR"}:
         raise ValueError("required_role is not a supported value")
-    skill = _SKILL_ALIASES.get(output.required_skill.casefold(), output.required_skill.upper())
+    raw_skill = _SKILL_ALIASES.get(output.required_skill.casefold(), output.required_skill.upper())
+    skill = raw_skill
+    # Existing category/duty catalogue uniquely defines ordinary cleaning and
+    # security. Generic trade labels are redundant, not a second duty decision.
+    # Unknown/custom restricted skills remain hard restrictions, never erased.
+    if category in {WorkOrderCategory.CLEANING, WorkOrderCategory.SECURITY} and raw_skill in (
+        ORDINARY_MAINTENANCE_SKILLS | {"CLEANING", "SECURITY"}
+    ):
+        skill = _DUTY_FOR_CATEGORY[category]
     low = output.confidence < threshold or not recognized_category or (
         category is WorkOrderCategory.OTHER and skill != "MAINTENANCE"
     )
@@ -222,6 +234,8 @@ def map_analysis_output(
         required_duty=_DUTY_FOR_CATEGORY[category],
         confidence=output.confidence,
         low_confidence=low,
+        raw_required_skill=output.required_skill,
+        skill_mapping_applied=skill != raw_skill,
     )
 
 

@@ -92,7 +92,7 @@ def test_staff_or_higher_roles_are_consistent_in_analysis_and_assignment() -> No
 def test_idempotent_create_replay_enqueues_analysis_only_for_new_order() -> None:
     service = WorkOrderService.__new__(WorkOrderService)
     record = _pending_order()
-    service._execute = lambda operation: operation()
+    service._execute = lambda operation, **kwargs: operation()
     service._create_work_order = MagicMock(
         side_effect=((record, True), (record, False))
     )

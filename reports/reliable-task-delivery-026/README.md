@@ -1,6 +1,16 @@
 # RELIABLE-TASK-DELIVERY-026 — one bounded delivery/recovery milestone
 
-## Approved implementation and bounded runtime — 2026-09-25: scoped local Development PASS
+## Normal reviewed-source integration completed — 2026-09-25
+
+`normal-integration/` now supersedes the older “final source not loaded / no live generation retry” status below. **PASS_SCOPED_LOCAL_DEVELOPMENT**, independent `review.json` plus `review-source-pinning.json`; first normal review record explicitly reconstructed by the same reviewer after context compaction, not main-session self-review. No five-window/82-test/024/025 rerun and no UI/real-model claim.
+
+Run `rt026n-c58b1554bf`: only WO40/41, no knowledge version. WO40 one AUTO35 then legal CLOSED; WO41 precise generation1 Development failure intent34 exhausts3, resident retry404, authorized manager formal retry creates intent35generation2 → oneAUTO36. Duplicate retry same successor, original failed row unchanged, audit729 unique,11 new notification intents SUCCEEDED. Exact API/DB/request/object correspondence is in `business.json`. Default15/120/120/20/900 timings, AUTH001@0012/vhostproperty_ai_auth001/queueproperty_ai.auth001, all Development. Six new supervisor tests plus two isolated snapshot-guard tests (6deselected) are separate from prior82.
+
+Runtime API30836/Worker40816 loaded reviewed producted66d37/canonicalhashfe9fcdd742ffe6331fb440f94019a067a9325aaa9a9b91c2d8a009ea615c8926. Supervisor42948 naturally restarted20380→4720→39812; no forced kill to create continuity evidence. Second publisher4720 loaded concurrent workspaceAIWIP8862…: retain this source-drift interval, never call it same-source. New startup chain pins retained ed66d37 snapshot and checks hash before service connections;39812 actually loaded fixed root/hash at22:20:46Z. `supervision-natural-cycles.json` confirms exact run intent records unchanged, queue0/0/1,DLQ7untouched. Snapshot/archive retained underignoredtmp, not a git restore. 026-NORMAL-N1 closed only for bounded natural restart; production24x7/global deployment remains open. No diagnosticv9 business rollout.
+
+Next: preserve completed integration; target supervision/restore/binding/realproviders need the consolidated approval package in existing handoff/self-host-recommendation. Owner baseline40%, reserve15points; fixeddeadline2026-09-27 14:00Asia/Shanghai unchanged, actualbalanceunknown. Pure tracking commits do not require restarts or new business evidence.
+
+## Historical implementation and five-window runtime — before normal integration
 
 Saved product/evidence **ed66d37d2315ca26a8b60aaa48443193201f7b84**; binding-only later tracking does not change reviewed source or require rerun. `closeout.json` confirms boundedpublisher naturallyexited, API/Worker stillpriorcontrolledsource, finalfix/takeover notloaded. No additional business or model operation during closeout.
 

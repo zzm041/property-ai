@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-375\",\"object\":\"chat.completion\",\"created\":1790287511,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"cleaning\\\",\\n  \\\"subcategory\\\": \\\"垃圾清理\\\",\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p4\\\",\\n  \\\"summary\\\": \\\"楼道角落散落几张纸和空纸盒，需要清扫；通道可正常通行，无液体、碎玻璃或其他异常。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"cleaning\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":992,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens\":110,\"total_tokens\":1102}}\n",
+  "raw_response_sha256": "631df9524d2f9d6de2844a33f78fd10c331eee22a96736232905c8441ba30f39",
+  "contract_errors": []
+}
