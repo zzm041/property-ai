@@ -2244,12 +2244,24 @@
       }
     ]
   },
+  "maintenance_contact_dispatch_024": {
+    "task_id": "MAINTENANCE-CONTACT-DISPATCH-024",
+    "requirement_version": "2026-09-24-v2-owner-approved",
+    "base_sha": "954b8549b500fc89cec86f0ab1b3bce96672e5a8",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
+    "independent_review": "reports/maintenance-contact-dispatch-024/review-round2.json; separate readonly round2, both round1 blockers closed; release024-REL-01 retained",
+    "migration": "Approved0011 contact-only nullable column, parent0009, only AUTH001 executed; never0010",
+    "evidence": "reports/maintenance-contact-dispatch-024/README.md",
+    "overlay_ids": ["WO-CREATE", "STAFF-DEPT-SKILL-UI", "V1-AUTO-DISPATCH-FILTER"],
+    "retention": "No original IDs/results/denominator removed or counted again; no completion percentage. Model28/3of3 and protectedorder12 unchanged.",
+    "release_gaps": "RealAI/RAG/device/production and transient database2013 recovery retained; no sharedDLQ consumption."
+  },
   "current_effective_view": {
-    "generated_at": "2026-09-24",
+    "generated_at": "2026-09-25",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
     "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs), then notification_events_inbox_013.current_status_overlays (2 IDs)",
     "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs), then manager_wo_cancel_017 (1 composite ID, remains PARTIAL), then house_csv_roundtrip_018 (1 existing ID), then ai_analysis_input_019 (3 existing IDs; real-model statuses remain BLOCKED), then resident_wo_presentation_020 (1 existing ID; release gaps retained), then notification_presentation_021 (1 existing ID; explicitUTC not Property-local/outbound acceptance), then ai_fallback_runtime_022 (1 existing ID; Development injected failure only)",
-    "latest_additional_overlay_source": "resident_house_select_023 (WO-CREATE only), then evaluation_calibration_20260924 (3 existing IDs, real local diagnostics recognized but NOT_READY; no AUTO/SELFHOST/Production PASS upgrade)",
+    "latest_additional_overlay_source": "resident_house_select_023 (WO-CREATE only), evaluation_calibration_20260924 (3 existing IDs, modelNOT_READY retained), then maintenance_contact_dispatch_024 (3 existing IDs; owner ordinary-group/contact change, new scoped Development software evidence only)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced. Old AUTH001 objects were lost on the 2026-09-23 tmpfs stop; historical evidence remains version-bound, not current-object proof.",
     "row_count": 83,
     "rows": [
@@ -2431,11 +2443,11 @@
       },
       {
         "requirement_id": "WO-CREATE",
-        "current_implementation": "Normal resident report selects full address from current server-authorized effective houses; real cursor pagination, validated preference, empty/stale/load guards and existing create/idempotency rules, no editable internal house ID.",
-        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_ADDRESS_SELECTION",
-        "evidence_version": "Product87792ee/runtimee65b4d7; originalsinglecreate localqwen-b1090f3deaa3 order12; remaining runhouse023-2b77fb2237aa atd97fcb4; independentround1PASS/zero repairs;48retained scopedpasses,9inspectedPNG,15APIchecks,SELECTDB anduniquequeue0/0/1.",
-        "remaining_gap": "Formal responsive/physical-device/native-media/production scale remains. 2B order12 failure is preserved without replay. 4B fixed28-case baseline plus3repairs completed after unchanged resource guards passed:128requests, final independentNEEDS_CHANGES/NOT_READY_FOR_SWITCH, wrong trade selection and PHOTO004 truncation remain. See quality28-assessment.md and QUALITY28-final-review.json. No AUTO/SELFHOST/Production promotion; no business runtime switch.",
-        "next_action": "Preserve023/proxy PASS without rerun. Same-task model repair allowance3/3 exhausted; await the exact bounded protocol comparison approval in quality28-assessment.md before further inference. API8083/oldWorker observed offline, not restarted; e65b4d7/2B is historical config. Business4B switch remains separately gated after qualityREADY. No0010/1024d/fees/newweights."
+        "current_implementation": "023 selection retained;024 required independent contact snapshot/default/confirmation, masked role-scoped reveal+audit. Account rebind leaves history unchanged.",
+        "verification_mode_status": "024_PASS_SCOPED_LOCAL_DEVELOPMENT",
+        "evidence_version": "954b854 +024 WIP; reports/maintenance-contact-dispatch-024;305unit/17screenshots/API/DB/Worker; real28/29 tasks overlap3.146656s without overassign. Prior version-bound results preserved.",
+        "remaining_gap": "RealQwen/AUTO/RAG/device/production remain unaccepted;24/25 beyond-timeout lock fixture preserved PENDING_ANALYSIS with2new isolatedDLQ messages. No0010/modelcalls/fees. Existing requirement history retained.",
+        "next_action": "024 readonly round2 passed; runtime8083/AUTH001 same024 Development source, originalsolo restored; next bounded reliable-task failure recovery024-REL-01, never replay12 or historicalDLQ."
       },
       {
         "requirement_id": "WO-MEDIA-NATIVE",
@@ -2591,11 +2603,11 @@
       },
       {
         "requirement_id": "STAFF-DEPT-SKILL-UI",
-        "current_implementation": "implemented_and_page_wired_for_existing_department_duty_skill_property_capacity_and_history",
-        "verification_mode_status": "PASS_SCOPED_LOCAL",
-        "evidence_version": "8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
-        "remaining_gap": "broader production acceptance",
-        "next_action": "preserve scoped evidence; revalidate after related staff-management changes"
+        "current_implementation": "Existing UI preserved; real MAINTENANCE duty and effective appointments, no ordinary trade-exclusive gate; exact STAFF/property synchronization on claim/appointment/reenable/end.",
+        "verification_mode_status": "024_PASS_SCOPED_LOCAL_DEVELOPMENT",
+        "evidence_version": "954b854 +024 WIP; reports/maintenance-contact-dispatch-024;305unit/17screenshots/API/DB/Worker; real28/29 tasks overlap3.146656s without overassign. Prior version-bound results preserved.",
+        "remaining_gap": "RealQwen/AUTO/RAG/device/production remain unaccepted;24/25 beyond-timeout lock fixture preserved PENDING_ANALYSIS with2new isolatedDLQ messages. No0010/modelcalls/fees. Existing requirement history retained.",
+        "next_action": "024 readonly round2 passed; runtime8083/AUTH001 same024 Development source, originalsolo restored; next bounded reliable-task failure recovery024-REL-01, never replay12 or historicalDLQ."
       },
       {
         "requirement_id": "KNOWLEDGE-INGEST-UI",
@@ -2895,11 +2907,11 @@
       },
       {
         "requirement_id": "V1-AUTO-DISPATCH-FILTER",
-        "current_implementation": "managed_staff_constraints_drive_dispatch_snapshot",
-        "verification_mode_status": "PASS_SCOPED_FAKE",
-        "evidence_version": "78fdcedcef93b57ef0af19308d128d5947ba06da / 8db1d2b47a466380f0d9a8a17c5e9a19871ec7a3",
-        "remaining_gap": "real-model and full production-policy acceptance",
-        "next_action": "仅针对所列剩余缺口补实现或证据"
+        "current_implementation": "Global idle ACTIVE reservations, persistent assignment-history rotation, Employee mutex and current-read recheck; durable waiting and automatic bounded recovery without extra model calls.",
+        "verification_mode_status": "024_PASS_SCOPED_LOCAL_DEVELOPMENT",
+        "evidence_version": "954b854 +024 WIP; reports/maintenance-contact-dispatch-024;305unit/17screenshots/API/DB/Worker; real28/29 tasks overlap3.146656s without overassign. Prior version-bound results preserved.",
+        "remaining_gap": "RealQwen/AUTO/RAG/device/production remain unaccepted;24/25 beyond-timeout lock fixture preserved PENDING_ANALYSIS with2new isolatedDLQ messages. No0010/modelcalls/fees. Existing requirement history retained.",
+        "next_action": "024 readonly round2 passed; runtime8083/AUTH001 same024 Development source, originalsolo restored; next bounded reliable-task failure recovery024-REL-01, never replay12 or historicalDLQ."
       },
       {
         "requirement_id": "V1-NTF-EVENTS",

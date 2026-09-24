@@ -1,0 +1,782 @@
+{
+  "run_id": "maint024-42193bfcfb",
+  "target": "127.0.0.1:3307/property_ai_auth001_test",
+  "revision": "20260924_0011_contact_phone",
+  "manager_id": 5,
+  "existing_staff": [
+    {
+      "id": 2,
+      "tenant_id": 1,
+      "status": "ACTIVE",
+      "max_capacity": 8
+    },
+    {
+      "id": 1,
+      "tenant_id": 1,
+      "status": "ACTIVE",
+      "max_capacity": 8
+    }
+  ],
+  "prior_orders": [
+    {
+      "id": 1,
+      "status": "CLOSED",
+      "version": 10
+    },
+    {
+      "id": 2,
+      "status": "CLOSED",
+      "version": 13
+    },
+    {
+      "id": 3,
+      "status": "CLOSED",
+      "version": 10
+    },
+    {
+      "id": 4,
+      "status": "CLOSED",
+      "version": 10
+    },
+    {
+      "id": 5,
+      "status": "CANCELLED",
+      "version": 4
+    },
+    {
+      "id": 6,
+      "status": "CANCELLED",
+      "version": 5
+    },
+    {
+      "id": 7,
+      "status": "CLOSED",
+      "version": 8
+    },
+    {
+      "id": 8,
+      "status": "CLOSED",
+      "version": 8
+    },
+    {
+      "id": 9,
+      "status": "ASSIGNED",
+      "version": 3
+    },
+    {
+      "id": 10,
+      "status": "ASSIGNED",
+      "version": 3
+    },
+    {
+      "id": 11,
+      "status": "PENDING_ANALYSIS",
+      "version": 1
+    },
+    {
+      "id": 12,
+      "status": "PENDING_ANALYSIS",
+      "version": 1
+    }
+  ],
+  "api_setup_requests": [
+    {
+      "label": "manager-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d34cb9582e5bff09"
+    },
+    {
+      "label": "manager-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e207c3c30934a366"
+    },
+    {
+      "label": "manager-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d7899f815d73934f"
+    },
+    {
+      "label": "manager-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "29e1a7bd24209ff0"
+    },
+    {
+      "label": "manager-me",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "8cc912046043a498"
+    },
+    {
+      "label": "resident-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "824fb91d2bb5d7ac"
+    },
+    {
+      "label": "resident-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a1bc1bdd97da42ae"
+    },
+    {
+      "label": "resident-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "5a8e1219d68e17d1"
+    },
+    {
+      "label": "resident-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "631cc73f02e0df83"
+    },
+    {
+      "label": "resident-me",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "33db5d83c9f0e138"
+    },
+    {
+      "label": "profile-resident",
+      "method": "PATCH",
+      "path": "/me/profile",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69589fab1a453725"
+    },
+    {
+      "label": "staff1-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "21d26b0fbcfbeea6"
+    },
+    {
+      "label": "staff1-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d99e95a80819533b"
+    },
+    {
+      "label": "staff1-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9985635f771c8388"
+    },
+    {
+      "label": "staff1-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c27b9b9f88ae6801"
+    },
+    {
+      "label": "staff1-me",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "35b4bbe3696de499"
+    },
+    {
+      "label": "profile-staff1",
+      "method": "PATCH",
+      "path": "/me/profile",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1e9a65a5d88b87b4"
+    },
+    {
+      "label": "staff2-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1bdf71f8701e01b4"
+    },
+    {
+      "label": "staff2-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1b477a55ce95df17"
+    },
+    {
+      "label": "staff2-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "f94dd49be9519ee9"
+    },
+    {
+      "label": "staff2-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "cb6ee1fa45987f05"
+    },
+    {
+      "label": "staff2-me",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "27d24bc89123af02"
+    },
+    {
+      "label": "profile-staff2",
+      "method": "PATCH",
+      "path": "/me/profile",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "f15aedc41fb14a76"
+    },
+    {
+      "label": "outsider-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "b522a2f102346ae3"
+    },
+    {
+      "label": "outsider-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "ede24f86833a3999"
+    },
+    {
+      "label": "outsider-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "b5f79ec580ec8761"
+    },
+    {
+      "label": "outsider-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "b84eba97e0d6b769"
+    },
+    {
+      "label": "outsider-me",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "87e9b2390e1545f2"
+    },
+    {
+      "label": "profile-outsider",
+      "method": "PATCH",
+      "path": "/me/profile",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "42111c075776261a"
+    },
+    {
+      "label": "catalog",
+      "method": "GET",
+      "path": "/admin/employee-catalog",
+      "params": [
+        "property_id",
+        "tenant_id"
+      ],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a3949cb386d3b863"
+    },
+    {
+      "label": "employee-staff1",
+      "method": "POST",
+      "path": "/admin/employees",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "4b228257aedb772f"
+    },
+    {
+      "label": "invite-staff1",
+      "method": "POST",
+      "path": "/admin/employees/3/invites",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "467f855db3d21cd5"
+    },
+    {
+      "label": "claim-staff1",
+      "method": "POST",
+      "path": "/staff/employee-claim",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "515c3b467c249b27"
+    },
+    {
+      "label": "employee-staff2",
+      "method": "POST",
+      "path": "/admin/employees",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "003a0bf748a8a9e5"
+    },
+    {
+      "label": "invite-staff2",
+      "method": "POST",
+      "path": "/admin/employees/4/invites",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d7689deb1323a947"
+    },
+    {
+      "label": "claim-staff2",
+      "method": "POST",
+      "path": "/staff/employee-claim",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c1c185bb30b04fe1"
+    },
+    {
+      "label": "building-a",
+      "method": "POST",
+      "path": "/admin/buildings",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c376efa5211d6b1f"
+    },
+    {
+      "label": "unit-a",
+      "method": "POST",
+      "path": "/admin/units",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d13266318a82abe8"
+    },
+    {
+      "label": "house-a",
+      "method": "POST",
+      "path": "/admin/houses",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1739dc104704ab28"
+    },
+    {
+      "label": "binding-a",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "21cc107cd31abff7"
+    },
+    {
+      "label": "approve-a",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/109/approve",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "3c18d9189e1d91fb"
+    },
+    {
+      "label": "building-b",
+      "method": "POST",
+      "path": "/admin/buildings",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "8598d5308e685420"
+    },
+    {
+      "label": "unit-b",
+      "method": "POST",
+      "path": "/admin/units",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c2b86cb5ca49a087"
+    },
+    {
+      "label": "house-b",
+      "method": "POST",
+      "path": "/admin/houses",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9d4dede8fb689023"
+    },
+    {
+      "label": "binding-b",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "ed6e2525b3d5b17d"
+    },
+    {
+      "label": "approve-b",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/110/approve",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "89809ee7c0e8291b"
+    },
+    {
+      "label": "building-c",
+      "method": "POST",
+      "path": "/admin/buildings",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "093e79bdfe2ec44c"
+    },
+    {
+      "label": "unit-c",
+      "method": "POST",
+      "path": "/admin/units",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "5873ea0e60040516"
+    },
+    {
+      "label": "house-c",
+      "method": "POST",
+      "path": "/admin/houses",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "134704722baeaf40"
+    },
+    {
+      "label": "binding-c",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c04ad5bf36a00bc5"
+    },
+    {
+      "label": "approve-c",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/111/approve",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9e0137b600f60390"
+    }
+  ],
+  "steps": {
+    "login-manager": "authentication stored privately",
+    "login-resident": "authentication stored privately",
+    "profile-resident": {
+      "user_id": 10,
+      "status": "ACTIVE",
+      "display_name": "maint024-42193bfcfb-resident",
+      "roles": [],
+      "permissions": [],
+      "scopes": [],
+      "profile_completed": true
+    },
+    "login-staff1": "authentication stored privately",
+    "profile-staff1": {
+      "user_id": 11,
+      "status": "ACTIVE",
+      "display_name": "maint024-42193bfcfb-staff1",
+      "roles": [],
+      "permissions": [],
+      "scopes": [],
+      "profile_completed": true
+    },
+    "login-staff2": "authentication stored privately",
+    "profile-staff2": {
+      "user_id": 12,
+      "status": "ACTIVE",
+      "display_name": "maint024-42193bfcfb-staff2",
+      "roles": [],
+      "permissions": [],
+      "scopes": [],
+      "profile_completed": true
+    },
+    "login-outsider": "authentication stored privately",
+    "profile-outsider": {
+      "user_id": 13,
+      "status": "ACTIVE",
+      "display_name": "maint024-42193bfcfb-outsider",
+      "roles": [],
+      "permissions": [],
+      "scopes": [],
+      "profile_completed": true
+    },
+    "employee-staff1": {
+      "id": 3,
+      "user_id": null,
+      "tenant_id": 1,
+      "employee_no": "maint024-42193bfcfb-staff1",
+      "department_id": null,
+      "status": "ACTIVE",
+      "max_capacity": 1
+    },
+    "claim-staff1": {
+      "id": 3,
+      "user_id": 11,
+      "tenant_id": 1,
+      "employee_no": "maint024-42193bfcfb-staff1",
+      "department_id": null,
+      "status": "ACTIVE",
+      "max_capacity": 1
+    },
+    "employee-staff2": {
+      "id": 4,
+      "user_id": null,
+      "tenant_id": 1,
+      "employee_no": "maint024-42193bfcfb-staff2",
+      "department_id": null,
+      "status": "ACTIVE",
+      "max_capacity": 1
+    },
+    "claim-staff2": {
+      "id": 4,
+      "user_id": 12,
+      "tenant_id": 1,
+      "employee_no": "maint024-42193bfcfb-staff2",
+      "department_id": null,
+      "status": "ACTIVE",
+      "max_capacity": 1
+    },
+    "building-a": {
+      "id": 3,
+      "tenant_id": 1,
+      "property_id": 1,
+      "code": "maint024-42193bfcfb-a",
+      "name": "024合成维修a"
+    },
+    "unit-a": {
+      "id": 3,
+      "tenant_id": 1,
+      "property_id": 1,
+      "building_id": 3,
+      "code": "01",
+      "name": "测试单元"
+    },
+    "house-a": {
+      "id": 56,
+      "tenant_id": 1,
+      "property_id": 1,
+      "unit_id": 3,
+      "room_no": "2401",
+      "floor": 24,
+      "status": "ACTIVE"
+    },
+    "binding-a": {
+      "id": 109,
+      "user_id": 10,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 56,
+      "relation_type": "TENANT",
+      "status": "PENDING",
+      "reviewer_id": null,
+      "review_reason": null,
+      "requested_at": "2026-09-24T15:39:49.451951Z",
+      "reviewed_at": null
+    },
+    "approve-a": {
+      "id": 109,
+      "user_id": 10,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 56,
+      "relation_type": "TENANT",
+      "status": "APPROVED",
+      "reviewer_id": 5,
+      "review_reason": null,
+      "requested_at": "2026-09-24T15:39:49.451951Z",
+      "reviewed_at": "2026-09-24T15:39:49.484950Z"
+    },
+    "building-b": {
+      "id": 4,
+      "tenant_id": 1,
+      "property_id": 1,
+      "code": "maint024-42193bfcfb-b",
+      "name": "024合成维修b"
+    },
+    "unit-b": {
+      "id": 4,
+      "tenant_id": 1,
+      "property_id": 1,
+      "building_id": 4,
+      "code": "01",
+      "name": "测试单元"
+    },
+    "house-b": {
+      "id": 57,
+      "tenant_id": 1,
+      "property_id": 1,
+      "unit_id": 4,
+      "room_no": "2401",
+      "floor": 24,
+      "status": "ACTIVE"
+    },
+    "binding-b": {
+      "id": 110,
+      "user_id": 10,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 57,
+      "relation_type": "TENANT",
+      "status": "PENDING",
+      "reviewer_id": null,
+      "review_reason": null,
+      "requested_at": "2026-09-24T15:39:49.638599Z",
+      "reviewed_at": null
+    },
+    "approve-b": {
+      "id": 110,
+      "user_id": 10,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 57,
+      "relation_type": "TENANT",
+      "status": "APPROVED",
+      "reviewer_id": 5,
+      "review_reason": null,
+      "requested_at": "2026-09-24T15:39:49.638599Z",
+      "reviewed_at": "2026-09-24T15:39:49.664746Z"
+    },
+    "building-c": {
+      "id": 5,
+      "tenant_id": 1,
+      "property_id": 1,
+      "code": "maint024-42193bfcfb-c",
+      "name": "024合成维修c"
+    },
+    "unit-c": {
+      "id": 5,
+      "tenant_id": 1,
+      "property_id": 1,
+      "building_id": 5,
+      "code": "01",
+      "name": "测试单元"
+    },
+    "house-c": {
+      "id": 58,
+      "tenant_id": 1,
+      "property_id": 1,
+      "unit_id": 5,
+      "room_no": "2401",
+      "floor": 24,
+      "status": "ACTIVE"
+    },
+    "binding-c": {
+      "id": 111,
+      "user_id": 10,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 58,
+      "relation_type": "TENANT",
+      "status": "PENDING",
+      "reviewer_id": null,
+      "review_reason": null,
+      "requested_at": "2026-09-24T15:39:49.789424Z",
+      "reviewed_at": null
+    },
+    "approve-c": {
+      "id": 111,
+      "user_id": 10,
+      "tenant_id": 1,
+      "property_id": 1,
+      "house_id": 58,
+      "relation_type": "TENANT",
+      "status": "APPROVED",
+      "reviewer_id": 5,
+      "review_reason": null,
+      "requested_at": "2026-09-24T15:39:49.789424Z",
+      "reviewed_at": "2026-09-24T15:39:49.818648Z"
+    }
+  },
+  "identities": {
+    "manager": 5,
+    "resident": 10,
+    "staff1": 11,
+    "staff2": 12,
+    "outsider": 13
+  }
+}

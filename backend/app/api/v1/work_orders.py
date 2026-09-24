@@ -3,7 +3,7 @@
 from typing import Annotated
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, Depends, Header, Query, Request
+from fastapi import APIRouter, Depends, Header, Query, Request, Response
 from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_principal
@@ -126,6 +126,7 @@ def create_work_order(
     record = service.create_work_order(
         actor=actor,
         house_id=body.house_id,
+        contact_phone=body.contact_phone,
         request_id=request_id_for(request),
         idempotency_key=_require_idempotency_key(idempotency_key),
         text=body.text,
@@ -167,6 +168,22 @@ def list_my_work_orders(
         request,
         WorkOrderListData(items=items, next_cursor=next_cursor).model_dump(mode="json"),
     )
+
+
+@router.get("/work-orders/{work_order_id}/contact")
+def get_work_order_contact(
+    response: Response,
+    work_order_id: int,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[WorkOrderService, Depends(get_work_order_service)],
+    reveal: bool = False,
+) -> dict[str, object]:
+    response.headers["Cache-Control"] = "no-store"
+    return success_envelope(request, service.get_contact(
+        actor=actor, work_order_id=work_order_id, reveal=reveal,
+        request_id=request_id_for(request),
+    ))
 
 
 @router.get("/work-orders/{work_order_id}")

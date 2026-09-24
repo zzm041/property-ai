@@ -1,0 +1,11 @@
+{
+  "mode": "Actual read-only tool output, UTC+08 local capture 2026-09-25; healthz is not business acceptance",
+  "api_pid": 38328,
+  "worker_pid": 28592,
+  "worker_pool": "solo",
+  "target_database": "127.0.0.1:3307/property_ai_auth001_test@20260924_0011_contact_phone",
+  "vhost": "property_ai_auth001",
+  "queue": "property_ai.auth001",
+  "output": "[\r\n  {\r\n    \"ProcessId\": 38328,\r\n    \"ExecutablePath\": \"D:\\\\property-ai\\\\tmp\\\\uv-python\\\\cpython-3.12.10-windows-x86_64-none\\\\python.exe\",\r\n    \"CommandLine\": \"\\\"D:\\\\property-ai\\\\tmp\\\\uv-python\\\\cpython-3.12.10-windows-x86_64-none\\\\python.exe\\\" -I D:\\\\property-ai\\\\reports\\\\maintenance-contact-dispatch-024\\\\launch-runtime.py api\"\r\n  },\r\n  {\r\n    \"ProcessId\": 28592,\r\n    \"ExecutablePath\": \"D:\\\\property-ai\\\\tmp\\\\uv-python\\\\cpython-3.12.10-windows-x86_64-none\\\\python.exe\",\r\n    \"CommandLine\": \"\\\"D:\\\\property-ai\\\\tmp\\\\uv-python\\\\cpython-3.12.10-windows-x86_64-none\\\\python.exe\\\" -I D:\\\\property-ai\\\\reports\\\\maintenance-contact-dispatch-024\\\\launch-runtime.py worker\"\r\n  }\r\n]\r\nTimeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nproperty_ai.auth001.dlq\t5\t0\t0\nceleryev.9fda93ac-3e06-47f9-9d4b-f3d4dc4aa95a\t0\t0\t1\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1\nInvoke-RestMethod: \r\nLine |\r\n   2 |  …  consumers; Invoke-RestMethod 'http://127.0.0.1:8083/healthz' | Conve …\r\n     |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n     | \r\n{\r\n  \"request_id\": \"1079b397d75646c89b4f244793990dc6\",\r\n  \"error\": {\r\n    \"code\": \"SYS.NOT_FOUND\",\r\n    \"message\": \"Resource not found\",\r\n    \"details\": {}\r\n  }\r\n}\r\n",
+  "exit_code": 1
+}

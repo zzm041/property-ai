@@ -1,0 +1,22 @@
+{
+  "source": "real Celery prerun/postrun metadata correlated with AUTO outcome logs",
+  "intervals": [
+    {
+      "task_id": "24b14393-de79-46f7-8990-5b823b02f9a2",
+      "work_order_id": 28,
+      "thread_id": 46588,
+      "start": "2026-09-24T16:26:14.407508+00:00",
+      "end": "2026-09-24T16:26:17.566759+00:00"
+    },
+    {
+      "task_id": "6c40cd9e-92ed-49ed-85b3-28e2112b0dea",
+      "work_order_id": 29,
+      "thread_id": 27968,
+      "start": "2026-09-24T16:26:14.420103+00:00",
+      "end": "2026-09-24T16:26:17.697294+00:00"
+    }
+  ],
+  "overlap_seconds": 3.146656,
+  "business_result_file": "contended-dispatch-four.json",
+  "same_worker_source_as_api": true
+}

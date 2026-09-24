@@ -1,0 +1,397 @@
+{
+  "run_id": "maint024-42193bfcfb",
+  "steps": {
+    "property": {
+      "id": 2,
+      "tenant_id": 1,
+      "mode": "existing authorized additive PropertyService fixture; not UI evidence"
+    },
+    "end-old-staff1": {
+      "id": 3,
+      "employee_id": 3,
+      "tenant_id": 1,
+      "property_id": 1,
+      "status": "ENDED",
+      "valid_from": "2026-09-24T15:39:49.185374Z",
+      "valid_to": "2026-09-24T15:44:46.724171Z"
+    },
+    "assign-new-staff1": {
+      "id": 5,
+      "employee_id": 3,
+      "tenant_id": 1,
+      "property_id": 2,
+      "status": "ACTIVE",
+      "valid_from": "2026-09-24T15:44:46.766609Z",
+      "valid_to": null
+    },
+    "end-old-staff2": {
+      "id": 4,
+      "employee_id": 4,
+      "tenant_id": 1,
+      "property_id": 1,
+      "status": "ENDED",
+      "valid_from": "2026-09-24T15:39:49.287373Z",
+      "valid_to": "2026-09-24T15:44:46.824979Z"
+    },
+    "assign-new-staff2": {
+      "id": 6,
+      "employee_id": 4,
+      "tenant_id": 1,
+      "property_id": 2,
+      "status": "ACTIVE",
+      "valid_from": "2026-09-24T15:44:46.853505Z",
+      "valid_to": null
+    },
+    "building-a": {
+      "id": 6,
+      "tenant_id": 1,
+      "property_id": 2,
+      "code": "maint024-42193bfcfb-a",
+      "name": "024隔离维修a"
+    },
+    "unit-a": {
+      "id": 6,
+      "tenant_id": 1,
+      "property_id": 2,
+      "building_id": 6,
+      "code": "01",
+      "name": "合成单元"
+    },
+    "house-a": {
+      "id": 59,
+      "tenant_id": 1,
+      "property_id": 2,
+      "unit_id": 6,
+      "room_no": "2401",
+      "floor": 24,
+      "status": "ACTIVE"
+    },
+    "request-a": {
+      "id": 112,
+      "user_id": 10,
+      "tenant_id": 1,
+      "property_id": 2,
+      "house_id": 59,
+      "relation_type": "TENANT",
+      "status": "PENDING",
+      "reviewer_id": null,
+      "review_reason": null,
+      "requested_at": "2026-09-24T15:44:46.967861Z",
+      "reviewed_at": null
+    },
+    "approve-a": {
+      "id": 112,
+      "user_id": 10,
+      "tenant_id": 1,
+      "property_id": 2,
+      "house_id": 59,
+      "relation_type": "TENANT",
+      "status": "APPROVED",
+      "reviewer_id": 5,
+      "review_reason": null,
+      "requested_at": "2026-09-24T15:44:46.967861Z",
+      "reviewed_at": "2026-09-24T15:44:46.994115Z"
+    },
+    "building-b": {
+      "id": 7,
+      "tenant_id": 1,
+      "property_id": 2,
+      "code": "maint024-42193bfcfb-b",
+      "name": "024隔离维修b"
+    },
+    "unit-b": {
+      "id": 7,
+      "tenant_id": 1,
+      "property_id": 2,
+      "building_id": 7,
+      "code": "01",
+      "name": "合成单元"
+    },
+    "house-b": {
+      "id": 60,
+      "tenant_id": 1,
+      "property_id": 2,
+      "unit_id": 7,
+      "room_no": "2401",
+      "floor": 24,
+      "status": "ACTIVE"
+    },
+    "request-b": {
+      "id": 113,
+      "user_id": 10,
+      "tenant_id": 1,
+      "property_id": 2,
+      "house_id": 60,
+      "relation_type": "TENANT",
+      "status": "PENDING",
+      "reviewer_id": null,
+      "review_reason": null,
+      "requested_at": "2026-09-24T15:44:47.108638Z",
+      "reviewed_at": null
+    },
+    "approve-b": {
+      "id": 113,
+      "user_id": 10,
+      "tenant_id": 1,
+      "property_id": 2,
+      "house_id": 60,
+      "relation_type": "TENANT",
+      "status": "APPROVED",
+      "reviewer_id": 5,
+      "review_reason": null,
+      "requested_at": "2026-09-24T15:44:47.108638Z",
+      "reviewed_at": "2026-09-24T15:44:47.134612Z"
+    },
+    "building-c": {
+      "id": 8,
+      "tenant_id": 1,
+      "property_id": 2,
+      "code": "maint024-42193bfcfb-c",
+      "name": "024隔离维修c"
+    },
+    "unit-c": {
+      "id": 8,
+      "tenant_id": 1,
+      "property_id": 2,
+      "building_id": 8,
+      "code": "01",
+      "name": "合成单元"
+    },
+    "house-c": {
+      "id": 61,
+      "tenant_id": 1,
+      "property_id": 2,
+      "unit_id": 8,
+      "room_no": "2401",
+      "floor": 24,
+      "status": "ACTIVE"
+    },
+    "request-c": {
+      "id": 114,
+      "user_id": 10,
+      "tenant_id": 1,
+      "property_id": 2,
+      "house_id": 61,
+      "relation_type": "TENANT",
+      "status": "PENDING",
+      "reviewer_id": null,
+      "review_reason": null,
+      "requested_at": "2026-09-24T15:44:47.233771Z",
+      "reviewed_at": null
+    },
+    "approve-c": {
+      "id": 114,
+      "user_id": 10,
+      "tenant_id": 1,
+      "property_id": 2,
+      "house_id": 61,
+      "relation_type": "TENANT",
+      "status": "APPROVED",
+      "reviewer_id": 5,
+      "review_reason": null,
+      "requested_at": "2026-09-24T15:44:47.233771Z",
+      "reviewed_at": "2026-09-24T15:44:47.259198Z"
+    }
+  },
+  "requests": [
+    {
+      "label": "me",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "31ddc3ec630efc00"
+    },
+    {
+      "label": "staff1-detail",
+      "method": "GET",
+      "path": "/admin/employees/3",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "dea28a76747ef265"
+    },
+    {
+      "label": "end-old-staff1",
+      "method": "POST",
+      "path": "/admin/employees/3/property-assignments/3/end",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "98f3f8d6be8086ba"
+    },
+    {
+      "label": "assign-new-staff1",
+      "method": "POST",
+      "path": "/admin/employees/3/property-assignments",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "ac4a787ef9af3337"
+    },
+    {
+      "label": "staff2-detail",
+      "method": "GET",
+      "path": "/admin/employees/4",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "0c3e847db704c719"
+    },
+    {
+      "label": "end-old-staff2",
+      "method": "POST",
+      "path": "/admin/employees/4/property-assignments/4/end",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "10bddf9c33e76eac"
+    },
+    {
+      "label": "assign-new-staff2",
+      "method": "POST",
+      "path": "/admin/employees/4/property-assignments",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d62d31a416a4b92f"
+    },
+    {
+      "label": "building-a",
+      "method": "POST",
+      "path": "/admin/buildings",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "225b0a486654b327"
+    },
+    {
+      "label": "unit-a",
+      "method": "POST",
+      "path": "/admin/units",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c43404d60beecc91"
+    },
+    {
+      "label": "house-a",
+      "method": "POST",
+      "path": "/admin/houses",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c554166761f909d3"
+    },
+    {
+      "label": "request-a",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d97cc4dc57b7bf08"
+    },
+    {
+      "label": "approve-a",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/112/approve",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "4b49d9ea963fce8e"
+    },
+    {
+      "label": "building-b",
+      "method": "POST",
+      "path": "/admin/buildings",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "83590e1133b9605d"
+    },
+    {
+      "label": "unit-b",
+      "method": "POST",
+      "path": "/admin/units",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "43653e736765fc3d"
+    },
+    {
+      "label": "house-b",
+      "method": "POST",
+      "path": "/admin/houses",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "3a034bec1b12ac51"
+    },
+    {
+      "label": "request-b",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d0813fdbbc8445bf"
+    },
+    {
+      "label": "approve-b",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/113/approve",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "f4383144bf930ec1"
+    },
+    {
+      "label": "building-c",
+      "method": "POST",
+      "path": "/admin/buildings",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "140069ea872978cb"
+    },
+    {
+      "label": "unit-c",
+      "method": "POST",
+      "path": "/admin/units",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "429b1feebea00fd6"
+    },
+    {
+      "label": "house-c",
+      "method": "POST",
+      "path": "/admin/houses",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d3520765d2f61425"
+    },
+    {
+      "label": "request-c",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "986eaf30e4d7ec5b"
+    },
+    {
+      "label": "approve-c",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/114/approve",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "460ab5089b90a002"
+    }
+  ],
+  "reason": "Earlier qualification event recovered historical non12 backlog; no historical output deleted or state restored. New scope uses same real tenant-admin and business APIs; no role widening."
+}

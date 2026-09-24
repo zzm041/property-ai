@@ -81,3 +81,13 @@ def schedule_notification_delivery(settings: Settings, delivery_id: int) -> bool
         event="notification_enqueue_failed",
         extra={"delivery_id": delivery_id},
     )
+
+
+def schedule_dispatch_recovery(settings: Settings) -> bool:
+    """Post-commit availability hint. Durable pending + beat is the backstop."""
+    if not settings.ai_auto_assign or not settings.should_enqueue_ai_on_create:
+        return False
+    from app.worker.tasks import retry_waiting_dispatch_task
+
+    return enqueue_celery_task(settings=settings, celery_task=retry_waiting_dispatch_task,
+                               event="dispatch_recovery_enqueue_failed")

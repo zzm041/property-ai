@@ -254,10 +254,31 @@ def sweep_sla_task() -> dict[str, int]:
         service = SlaService(session, settings=settings)
         completion = service.sweep_due().as_dict()
         assignment = service.sweep_assignment_deadlines().as_dict()
+        unavailable = service.sweep_unavailable_assignments()
+        # Existing bounded beat cadence; use stored analysis, never invoke LLM.
+        dispatch = AnalysisService(session, settings=settings).sweep_waiting_dispatch()
         return {
             **{f"completion_{key}": value for key, value in completion.items()},
             **{f"assignment_{key}": value for key, value in assignment.items()},
+            **{f"dispatch_{key}": value for key, value in dispatch.items()},
+            "unavailable_reassigned": unavailable,
         }
+    finally:
+        session.close()
+        engine.dispose()
+
+
+@celery_app.task(name="app.worker.tasks.retry_waiting_dispatch_task", acks_late=True)
+def retry_waiting_dispatch_task() -> dict[str, int]:
+    """Same bounded recovery after availability changes; no model/SLA replay."""
+    settings = get_settings()
+    engine = create_database_engine(settings.active_database_url)
+    session = Session(bind=engine, autoflush=False, expire_on_commit=False)
+    try:
+        from app.service.sla import SlaService
+        unavailable = SlaService(session, settings=settings).sweep_unavailable_assignments()
+        result = AnalysisService(session, settings=settings).sweep_waiting_dispatch(availability_changed=True)
+        return {**result, "unavailable_reassigned": unavailable}
     finally:
         session.close()
         engine.dispose()

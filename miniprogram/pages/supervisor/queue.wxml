@@ -9,6 +9,7 @@
 <view class="card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="select">
   {{item.id}} {{item.status}} {{item.process_reason}} {{selectedId == item.id ? "已选" : ""}}
 </view>
+<work-order-contact id="order-contact" wx:if="{{selectedId}}" work-order-id="{{selectedId}}" />
 <view class="card" wx:if="{{selectedId && canCancel}}">
   <view>撤销未开工工单 {{selectedId}}（{{selectedStatus}}）</view>
   <textarea placeholder="撤销原因（可选，保留在工单历史）" value="{{cancelReason}}" bindinput="onCancelReason" maxlength="255" disabled="{{loading}}"></textarea>

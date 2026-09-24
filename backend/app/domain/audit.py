@@ -51,6 +51,7 @@ class AuditAction(StrEnum):
     ATTENDANCE_CHECKED_OUT = "ATTENDANCE_CHECKED_OUT"
     ATTENDANCE_STATUS_UPDATED = "ATTENDANCE_STATUS_UPDATED"
     WORK_ORDER_CREATED = "WORK_ORDER_CREATED"
+    WORK_ORDER_CONTACT_READ = "WORK_ORDER_CONTACT_READ"
     WORK_ORDER_ASSIGNED = "WORK_ORDER_ASSIGNED"
     WORK_ORDER_REASSIGNED = "WORK_ORDER_REASSIGNED"
     WORK_ORDER_PROCESS_STARTED = "WORK_ORDER_PROCESS_STARTED"
@@ -466,6 +467,12 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             resource_type=AuditResourceType.EMPLOYEE_DAILY_STATUS,
             allowed_detail_keys=_ATTENDANCE_STATUS_DETAIL_KEYS,
             required_detail_keys=_ATTENDANCE_STATUS_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.WORK_ORDER_CONTACT_READ: AuditActionPolicy(
+            resource_type=AuditResourceType.WORK_ORDER,
+            allowed_detail_keys=frozenset({"work_order_id"}),
+            required_detail_keys=frozenset({"work_order_id"}),
             allowed_scope_types=frozenset({ScopeType.PROPERTY}),
         ),
         AuditAction.WORK_ORDER_CREATED: AuditActionPolicy(

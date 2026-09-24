@@ -17,6 +17,7 @@ const EVENT = {
   REOPEN: "反馈未解决，继续处理", CANCEL: "撤销工单", ARCHIVE: "归档",
   RATE: "服务评价", APPEND: "补充问题", SLA_WARNING: "时限预警",
   SLA_OVERDUE: "已超过处理时限", SLA_RESPONSE_TIMEOUT: "接单响应超时",
+  AUTO_DISPATCH_WAIT: "等待可用人员，系统将自动继续安排",
 };
 const ACTOR = { RESIDENT: "住户", STAFF: "工作人员", SUPERVISOR: "主管", ADMIN: "管理员", SYSTEM: "系统" };
 const PHASE = { REPORT: "报修附件", BEFORE: "处理前", AFTER: "处理后", ON_SITE: "现场附件" };

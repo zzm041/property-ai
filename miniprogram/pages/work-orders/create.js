@@ -28,6 +28,8 @@ Page({
     houseError: "",
     selectedHouseLabel: "",
     text: "",
+    contactPhone: "",
+    contactConfirmed: false,
     fileIds: [],
     mediaHint: "",
     loading: false,
@@ -39,7 +41,20 @@ Page({
     this.unloaded = false;
   },
   onShow() {
+    if (!this.contactDefaultLoaded && !this.contactEdited) {
+      this.contactDefaultLoaded = true;
+      require('../../services/api').contactDefault().then(result => {
+        if (!this.unloaded && !this.contactEdited) this.setData({ contactPhone: result.phone || '', contactConfirmed: false });
+      }).catch(() => { if (!this.unloaded) this.setData({ error: '联系电话默认值读取失败，请手动填写并确认' }); });
+    }
     return this.loadHouses(false);
+  },
+  onContact(e) {
+    this.contactEdited = true;
+    this.setData({ contactPhone: e.detail.value, contactConfirmed: false });
+  },
+  confirmContact(e) {
+    this.setData({ contactConfirmed: e.detail.value.includes('confirmed') });
   },
   onUnload() {
     this.unloaded = true;
@@ -168,8 +183,12 @@ Page({
         throw new Error("请选择本人已绑定的房屋；没有房屋时请先申请绑定");
       }
       if (!this.data.text.trim()) throw new Error("请填写报修说明");
+      const contact = require('../../utils/contact-phone').normalizeContact(this.data.contactPhone);
+      if (!contact) throw new Error('请填写合法联系电话：手机号或含国际区号的号码');
+      if (!this.data.contactConfirmed) throw new Error('请确认本次联系电话');
       const body = {
         house_id: houseId,
+        contact_phone: contact,
         text: this.data.text,
         file_ids: this.data.fileIds.slice(),
       };

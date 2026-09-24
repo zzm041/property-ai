@@ -2,8 +2,8 @@
 
 from datetime import datetime
 
-from sqlalchemy import and_, delete, or_, select
-from sqlalchemy.orm import Session
+from sqlalchemy import and_, delete, func, or_, select
+from sqlalchemy.orm import Session, load_only
 
 from app.model.ai import (
     AiCallLog,
@@ -37,12 +37,37 @@ from app.model.work_order import (
     WorkOrderMedia,
     WorkOrderProcess,
     WorkOrderReceipt,
+    WorkOrderLog,
 )
 
 
 class AiRepository:
     def __init__(self, session: Session) -> None:
         self._session = session
+
+    def list_waiting_dispatch(self, *, retry_before: datetime, limit: int) -> tuple[tuple[int, int], ...]:
+        """Bounded oldest-attempt scan using durable state, never new inference."""
+        latest = select(func.max(WorkOrderAnalysis.id)).where(
+            WorkOrderAnalysis.work_order_id == WorkOrder.id,
+        ).correlate(WorkOrder).scalar_subquery()
+        last_wait = select(func.max(WorkOrderLog.created_at)).where(
+            WorkOrderLog.work_order_id == WorkOrder.id,
+            WorkOrderLog.event_code == "AUTO_DISPATCH_WAIT",
+        ).correlate(WorkOrder).scalar_subquery()
+        rows = self._session.execute(
+            select(WorkOrder.id, WorkOrderAnalysis.id)
+            .join(WorkOrderAnalysis, WorkOrderAnalysis.id == latest)
+            .where(
+                WorkOrder.status == "PENDING_ASSIGNMENT",
+                WorkOrder.current_assignment_id.is_(None),
+                WorkOrderAnalysis.status == "COMPLETED",
+                WorkOrderAnalysis.tenant_id == WorkOrder.tenant_id,
+                WorkOrderAnalysis.property_id == WorkOrder.property_id,
+                WorkOrderAnalysis.risk.not_in(("safety", "gas")),
+                or_(last_wait.is_(None), last_wait <= retry_before),
+            ).order_by(last_wait, WorkOrder.id).limit(min(max(limit, 1), 100))
+        ).all()
+        return tuple((row[0], row[1]) for row in rows)
 
     def get_analysis(self, analysis_id: int) -> WorkOrderAnalysis | None:
         return self._session.get(WorkOrderAnalysis, analysis_id)
@@ -150,7 +175,7 @@ class AiRepository:
             ).order_by(ResidentHouseRelation.id)
         ).all()
         recent = self._session.scalars(
-            select(WorkOrder).where(
+            select(WorkOrder).options(load_only(WorkOrder.id, WorkOrder.category, WorkOrder.status)).where(
                 WorkOrder.house_id == record.house_id,
                 WorkOrder.tenant_id == record.tenant_id,
                 WorkOrder.property_id == record.property_id,
@@ -194,7 +219,7 @@ class AiRepository:
             .where(
                 EmployeeDuty.employee_id == employee_id,
                 Duty.status == "ACTIVE",
-            )
+            ).with_for_update(read=True)
         ).all()
         return frozenset(row[0] for row in rows)
 
@@ -205,14 +230,14 @@ class AiRepository:
             .where(
                 EmployeeSkill.employee_id == employee_id,
                 Skill.status == "ACTIVE",
-            )
+            ).with_for_update(read=True)
         ).all()
         return frozenset(row[0] for row in rows)
 
     def get_user_status(self, user_id: int | None) -> str | None:
         if user_id is None:
             return None
-        return self._session.scalar(select(User.status).where(User.id == user_id))
+        return self._session.scalar(select(User.status).where(User.id == user_id).with_for_update(read=True))
 
     def list_employee_role_codes(
         self,
@@ -238,7 +263,7 @@ class AiRepository:
                         & (UserRole.property_id == property_id)
                     )
                 ),
-            )
+            ).with_for_update(read=True)
         ).all()
         return frozenset(row[0] for row in rows)
 
@@ -257,7 +282,7 @@ class AiRepository:
                 EmployeeProperty.valid_from <= now,
                 (EmployeeProperty.valid_to.is_(None))
                 | (EmployeeProperty.valid_to > now),
-            )
+            ).with_for_update(read=True).execution_options(populate_existing=True)
         )
 
     def get_daily_status(
@@ -288,7 +313,7 @@ class AiRepository:
                 AttendanceRecord.property_id == property_id,
                 AttendanceRecord.business_date == business_date,
                 AttendanceRecord.check_out_at.is_(None),
-            )
+            ).with_for_update(read=True).execution_options(populate_existing=True)
         )
 
     def get_dispatch_history(
@@ -453,6 +478,7 @@ class AiRepository:
             .order_by(Incident.id)
             .limit(1)
             .with_for_update()
+            .execution_options(populate_existing=True)
         )
 
     def get_incident(self, incident_id: int) -> Incident | None:

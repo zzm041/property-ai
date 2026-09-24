@@ -530,6 +530,7 @@ class WorkOrderService:
         house_id: int,
         request_id: str,
         idempotency_key: str,
+        contact_phone: str | None = None,
         text: str | None = None,
         file_ids: tuple[int, ...] = (),
         category: str | None = None,
@@ -541,12 +542,19 @@ class WorkOrderService:
         self._require_positive_id(house_id, "house_id")
         self._validate_request_id(request_id)
         self._validate_idempotency_key(idempotency_key)
+        from app.domain.phone import normalize_phone
+
+        contact = normalize_phone(contact_phone)
+        if contact is None or not contact.isascii():
+            raise AppError(code=WorkOrderErrorCode.INVALID_INPUT,
+                           message="A valid contact telephone is required", status_code=422)
         record, created = self._execute(
             lambda: self._create_work_order(
                 actor=actor,
                 house_id=house_id,
                 request_id=request_id,
                 idempotency_key=idempotency_key,
+                contact_phone=contact,
                 text=text,
                 file_ids=file_ids,
                 category=category,
@@ -559,6 +567,46 @@ class WorkOrderService:
         if created:
             self._enqueue_analysis(record.id, request_id)
         return record
+
+    def get_contact(self, *, actor: Principal, work_order_id: int, reveal: bool, request_id: str) -> dict:
+        """Explicit, scoped plaintext access; never returned by common list DTOs."""
+        from app.domain.phone import mask_phone
+
+        self._require_positive_id(work_order_id, "work_order_id")
+        self._validate_request_id(request_id)
+        def operation():
+            current = self._reload_actor(actor)
+            record = self._lock_work_order(work_order_id)
+            scope = self._property_scope(record)
+            scoped = Principal(current.user_id, current.status, current.display_name,
+                               tuple(g for g in current.grants if g.scope.scope_type is not ScopeType.SYSTEM))
+            allowed = record.reporter_user_id == current.user_id
+            if not allowed:
+                management = scoped.has_permission(WORK_ORDER_READ, scope) and (
+                    scoped.has_permission(WORK_ORDER_DISPATCH, scope) or scoped.has_permission(WORK_ORDER_DECIDE, scope))
+                employee = self._employees.get_employee_for_user(current.user_id)
+                assignment = self._repository.get_active_assignment(record.id)
+                responsible = (
+                    scoped.has_permission(WORK_ORDER_READ, scope) and employee is not None
+                    and employee.status == EmployeeStatus.ACTIVE.value
+                    and employee.tenant_id == record.tenant_id and assignment is not None
+                    and assignment.employee_id == employee.id
+                    and self._employees.find_effective_assignment(
+                        employee_id=employee.id, property_id=record.property_id, now=self._clock()) is not None
+                )
+                allowed = management or responsible
+            if not allowed:
+                raise AppError(code=IamErrorCode.FORBIDDEN, message="Contact access denied", status_code=403)
+            phone = record.contact_phone_e164
+            if reveal and phone:
+                self._append_audit(action=AuditAction.WORK_ORDER_CONTACT_READ,
+                    resource_type=AuditResourceType.WORK_ORDER, actor_user_id=current.user_id,
+                    resource_id=record.id, request_id=request_id, scope_type=ScopeType.PROPERTY,
+                    tenant_id=record.tenant_id, property_id=record.property_id,
+                    details={"work_order_id": record.id})
+            return {"collected": bool(phone), "masked_phone": mask_phone(phone) if phone else None,
+                    "phone": phone if reveal else None}
+        return self._execute(operation)
 
     def _enqueue_analysis(self, work_order_id: int, request_id: str) -> None:
         if not self._settings.should_enqueue_ai_on_create:
@@ -729,7 +777,7 @@ class WorkOrderService:
         version: int | None = None,
     ) -> WorkOrder:
         self._validate_request_id(request_id)
-        return self._execute(
+        record = self._execute(
             lambda: self._cancel(
                 actor=actor,
                 work_order_id=work_order_id,
@@ -738,6 +786,10 @@ class WorkOrderService:
                 version=version,
             )
         )
+
+        from app.worker.enqueue import schedule_dispatch_recovery
+        schedule_dispatch_recovery(self._settings)
+        return record
 
     def confirm(
         self,
@@ -748,7 +800,7 @@ class WorkOrderService:
         version: int | None = None,
     ) -> WorkOrder:
         self._validate_request_id(request_id)
-        return self._execute(
+        record = self._execute(
             lambda: self._confirm(
                 actor=actor,
                 work_order_id=work_order_id,
@@ -756,6 +808,10 @@ class WorkOrderService:
                 version=version,
             )
         )
+
+        from app.worker.enqueue import schedule_dispatch_recovery
+        schedule_dispatch_recovery(self._settings)
+        return record
 
     def reopen(
         self,
@@ -1044,6 +1100,7 @@ class WorkOrderService:
         house_id: int,
         request_id: str,
         idempotency_key: str,
+        contact_phone: str,
         text: str | None,
         file_ids: tuple[int, ...],
         category: str | None,
@@ -1062,6 +1119,7 @@ class WorkOrderService:
             )
         request_hash = self._request_hash(
             house_id=house_id,
+            contact_phone=contact_phone,
             text=cleaned_text,
             file_ids=file_ids,
             category=category,
@@ -1159,6 +1217,7 @@ class WorkOrderService:
                 property_id=owned.property_id,
                 house_id=owned.id,
                 reporter_user_id=current.user_id,
+                contact_phone_e164=contact_phone,
                 status=WorkOrderStatus.PENDING_ANALYSIS.value,
                 process_reason=ProcessReason.NONE.value,
                 category=category_value.value,
@@ -1662,11 +1721,10 @@ class WorkOrderService:
             WORK_ORDER_DISPATCH,
             self._property_scope(record),
         )
-        employee = self._employees.get_employee_in_tenant(
-            tenant_id=record.tenant_id,
-            employee_id=employee_id,
-        )
-        if employee is None:
+        # Share the global assignment mutex with AUTO, even for authorized
+        # manual intervention. No business scope is inferred from this lock.
+        employee = self._employees.get_employee_for_update(employee_id)
+        if employee is None or employee.tenant_id != record.tenant_id:
             raise AppError(
                 code=WorkOrderErrorCode.EMPLOYEE_NOT_ELIGIBLE,
                 message="Employee is not eligible for dispatch",
@@ -2717,7 +2775,9 @@ class WorkOrderService:
         if daily is None or daily.on_duty != AttendanceOnDuty.ON_DUTY.value:
             return denied
         if not ignore_capacity and not employee_is_capacity_available(
-            current_load=daily.current_load,
+            current_load=self._repository.employee_global_occupancy(
+                employee_id=employee.id, tenant_id=record.tenant_id, lock=True, collapse_incidents=True,
+            ),
             max_capacity=employee.max_capacity,
         ):
             return denied
@@ -3049,6 +3109,7 @@ class WorkOrderService:
     def _request_hash(
         *,
         house_id: int,
+        contact_phone: str | None = None,
         text: str | None,
         file_ids: tuple[int, ...],
         category: str | None,
@@ -3063,6 +3124,7 @@ class WorkOrderService:
                 category or "",
                 priority or "",
                 severity or "",
+                contact_phone or "",
             )
         )
         return sha256(payload.encode("utf-8")).hexdigest()

@@ -4,6 +4,8 @@
 
 ## 1. 建模原则
 
+2026-09-24 v2 / 024：已批准独立 `20260924_0011_contact_phone`（父 `20260919_0009`），只增 `work_orders.contact_phone_e164 VARCHAR(16) NULL`，无默认/索引/回填。NULL 表示历史未采集，新创建业务必填。该快照不是账号凭证/关联键，不随换号改变。仅授权迁移 127.0.0.1:3307/property_ai_auth001_test；0010/合并/其他环境仍未批准。待派复用 PENDING_ASSIGNMENT、WorkOrderLog.AUTO_DISPATCH_WAIT、已完成分析及现有调度，不为电话借用 JSON，不新建班组或平行派单表。
+
 - `users.id` 是人的内部永久主键；其他表用 `user_id` BIGINT 外键关联。手机号、微信、密码哈希、身份证都不是外键目标或业务主键。
 - BIGINT ID 是否可猜不构成安全边界；资源访问必须执行 RBAC、Tenant/Property Scope、Ownership Policy 与 Anti-IDOR。
 - 物理房屋与人分离。House 不存 `owner_name`。
@@ -79,7 +81,7 @@
 
 | 实体 | 说明 | 关键字段 |
 | --- | --- | --- |
-| `WorkOrder` | 工单头 | tenant_id, property_id, house_id, reporter_user_id, status, process_reason, category, severity, priority, sla_policy_id, incident_id |
+| `WorkOrder` | 工单头 | tenant_id, property_id, house_id, reporter_user_id, contact_phone_e164, status, process_reason, category, severity, priority, sla_policy_id, incident_id |
 | `WorkOrderContent` | 报修内容 | work_order_id, text, asr_text, extra_notes |
 | `WorkOrderMedia` | 图片/语音 | work_order_id, kind, file_id, taken_phase（before/after/on_site） |
 | `WorkOrderAssignment` | 派单记录 | work_order_id, employee_id, assigned_by, assigned_at, accept_at, reject_reason, timeout_at |

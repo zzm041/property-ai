@@ -1,0 +1,3252 @@
+{
+  "task_id": "MAINTENANCE-CONTACT-DISPATCH-024",
+  "run_id": "maint024-42193bfcfb",
+  "captured_at_utc": "2026-09-24T16:27:22.757222+00:00",
+  "mode": "read-only SQL, exact isolated database; no business writes",
+  "orders": {
+    "a": 13,
+    "b": 14,
+    "c": 15,
+    "d": 17,
+    "e": 16,
+    "f": 18,
+    "g": 19,
+    "parallel1": 20,
+    "parallel2": 21,
+    "contended1": 22,
+    "contended2": 23,
+    "contended3": 25,
+    "contended4": 24,
+    "contended5": 27,
+    "contended6": 26,
+    "contended7": 29,
+    "contended8": 28
+  },
+  "schema_and_protected_order": {
+    "database": "property_ai_auth001_test",
+    "revision": [
+      "20260924_0011_contact_phone"
+    ],
+    "columns": [
+      {
+        "name": "tenant_id",
+        "type": "BIGINT",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "property_id",
+        "type": "BIGINT",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "house_id",
+        "type": "BIGINT",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "reporter_user_id",
+        "type": "BIGINT",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "status",
+        "type": "VARCHAR(32)",
+        "nullable": false,
+        "default": "'PENDING_ANALYSIS'"
+      },
+      {
+        "name": "process_reason",
+        "type": "VARCHAR(32)",
+        "nullable": false,
+        "default": "'NONE'"
+      },
+      {
+        "name": "category",
+        "type": "VARCHAR(32)",
+        "nullable": false,
+        "default": "'OTHER'"
+      },
+      {
+        "name": "severity",
+        "type": "VARCHAR(16)",
+        "nullable": false,
+        "default": "'LOW'"
+      },
+      {
+        "name": "priority",
+        "type": "VARCHAR(16)",
+        "nullable": false,
+        "default": "'MEDIUM'"
+      },
+      {
+        "name": "sla_policy_id",
+        "type": "BIGINT",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "incident_id",
+        "type": "BIGINT",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "current_assignment_id",
+        "type": "BIGINT",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "version",
+        "type": "INTEGER",
+        "nullable": false,
+        "default": "'1'"
+      },
+      {
+        "name": "sla_due_at",
+        "type": "DATETIME",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "assigned_at",
+        "type": "DATETIME",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "accepted_at",
+        "type": "DATETIME",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "started_at",
+        "type": "DATETIME",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "resolved_at",
+        "type": "DATETIME",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "closed_at",
+        "type": "DATETIME",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "id",
+        "type": "BIGINT",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "created_at",
+        "type": "DATETIME",
+        "nullable": false,
+        "default": "CURRENT_TIMESTAMP(6)"
+      },
+      {
+        "name": "updated_at",
+        "type": "DATETIME",
+        "nullable": false,
+        "default": "CURRENT_TIMESTAMP(6)"
+      },
+      {
+        "name": "contact_phone_e164",
+        "type": "VARCHAR(16)",
+        "nullable": true,
+        "default": null
+      }
+    ],
+    "table_names_hash": "6dc137db793b2026109a174ac0ad5b441eb55c7de0d09e446b64e2bd412529e3",
+    "work_order_count": 29,
+    "order12_hash_excluding_new_column": "b2fedaa66d1341fe3c027964f058862b7ab51ccfc424cf23b9b7d4223119ab89",
+    "constraints_hash": "8ec3d1e3c126445bd882aed7263a190c84c5fc9fdf020536075044f5b591a21b"
+  },
+  "old_contact_nonnull_count": 0,
+  "work_orders": [
+    {
+      "id": 13,
+      "tenant_id": 1,
+      "property_id": 2,
+      "reporter_user_id": 10,
+      "status": "CLOSED",
+      "version": 8,
+      "current_assignment_id": null,
+      "created_at": "2026-09-24 15:56:48.428027",
+      "closed_at": "2026-09-24 16:00:41.611034"
+    },
+    {
+      "id": 14,
+      "tenant_id": 1,
+      "property_id": 2,
+      "reporter_user_id": 10,
+      "status": "CLOSED",
+      "version": 8,
+      "current_assignment_id": null,
+      "created_at": "2026-09-24 15:59:42.443611",
+      "closed_at": "2026-09-24 16:07:50.269632"
+    },
+    {
+      "id": 15,
+      "tenant_id": 1,
+      "property_id": 2,
+      "reporter_user_id": 10,
+      "status": "CLOSED",
+      "version": 8,
+      "current_assignment_id": null,
+      "created_at": "2026-09-24 16:05:52.602116",
+      "closed_at": "2026-09-24 16:09:18.879313"
+    },
+    {
+      "id": 16,
+      "tenant_id": 1,
+      "property_id": 2,
+      "reporter_user_id": 10,
+      "status": "CLOSED",
+      "version": 12,
+      "current_assignment_id": null,
+      "created_at": "2026-09-24 16:07:49.272059",
+      "closed_at": "2026-09-24 16:11:21.544344"
+    },
+    {
+      "id": 17,
+      "tenant_id": 1,
+      "property_id": 2,
+      "reporter_user_id": 10,
+      "status": "CLOSED",
+      "version": 8,
+      "current_assignment_id": null,
+      "created_at": "2026-09-24 16:07:49.281411",
+      "closed_at": "2026-09-24 16:09:20.497666"
+    },
+    {
+      "id": 18,
+      "tenant_id": 1,
+      "property_id": 2,
+      "reporter_user_id": 10,
+      "status": "CLOSED",
+      "version": 8,
+      "current_assignment_id": null,
+      "created_at": "2026-09-24 16:11:21.645722",
+      "closed_at": "2026-09-24 16:11:23.187413"
+    },
+    {
+      "id": 19,
+      "tenant_id": 1,
+      "property_id": 2,
+      "reporter_user_id": 10,
+      "status": "CLOSED",
+      "version": 8,
+      "current_assignment_id": null,
+      "created_at": "2026-09-24 16:11:23.290167",
+      "closed_at": "2026-09-24 16:11:24.826023"
+    },
+    {
+      "id": 20,
+      "tenant_id": 1,
+      "property_id": 2,
+      "reporter_user_id": 10,
+      "status": "CLOSED",
+      "version": 8,
+      "current_assignment_id": null,
+      "created_at": "2026-09-24 16:15:31.870533",
+      "closed_at": "2026-09-24 16:18:01.183842"
+    },
+    {
+      "id": 21,
+      "tenant_id": 1,
+      "property_id": 2,
+      "reporter_user_id": 10,
+      "status": "CLOSED",
+      "version": 8,
+      "current_assignment_id": null,
+      "created_at": "2026-09-24 16:15:31.885735",
+      "closed_at": "2026-09-24 16:18:01.486154"
+    },
+    {
+      "id": 22,
+      "tenant_id": 1,
+      "property_id": 2,
+      "reporter_user_id": 10,
+      "status": "CLOSED",
+      "version": 8,
+      "current_assignment_id": null,
+      "created_at": "2026-09-24 16:18:02.139739",
+      "closed_at": "2026-09-24 16:19:39.544059"
+    },
+    {
+      "id": 23,
+      "tenant_id": 1,
+      "property_id": 2,
+      "reporter_user_id": 10,
+      "status": "CLOSED",
+      "version": 8,
+      "current_assignment_id": null,
+      "created_at": "2026-09-24 16:18:02.154852",
+      "closed_at": "2026-09-24 16:19:39.885078"
+    },
+    {
+      "id": 24,
+      "tenant_id": 1,
+      "property_id": 2,
+      "reporter_user_id": 10,
+      "status": "PENDING_ANALYSIS",
+      "version": 1,
+      "current_assignment_id": null,
+      "created_at": "2026-09-24 16:19:42.844476",
+      "closed_at": null
+    },
+    {
+      "id": 25,
+      "tenant_id": 1,
+      "property_id": 2,
+      "reporter_user_id": 10,
+      "status": "PENDING_ANALYSIS",
+      "version": 1,
+      "current_assignment_id": null,
+      "created_at": "2026-09-24 16:19:42.863677",
+      "closed_at": null
+    },
+    {
+      "id": 26,
+      "tenant_id": 1,
+      "property_id": 2,
+      "reporter_user_id": 10,
+      "status": "CLOSED",
+      "version": 8,
+      "current_assignment_id": null,
+      "created_at": "2026-09-24 16:22:26.841081",
+      "closed_at": "2026-09-24 16:26:12.544793"
+    },
+    {
+      "id": 27,
+      "tenant_id": 1,
+      "property_id": 2,
+      "reporter_user_id": 10,
+      "status": "CLOSED",
+      "version": 8,
+      "current_assignment_id": null,
+      "created_at": "2026-09-24 16:22:26.842126",
+      "closed_at": "2026-09-24 16:26:12.172519"
+    },
+    {
+      "id": 28,
+      "tenant_id": 1,
+      "property_id": 2,
+      "reporter_user_id": 10,
+      "status": "ASSIGNED",
+      "version": 3,
+      "current_assignment_id": 28,
+      "created_at": "2026-09-24 16:26:14.390642",
+      "closed_at": null
+    },
+    {
+      "id": 29,
+      "tenant_id": 1,
+      "property_id": 2,
+      "reporter_user_id": 10,
+      "status": "ASSIGNED",
+      "version": 3,
+      "current_assignment_id": 29,
+      "created_at": "2026-09-24 16:26:14.392790",
+      "closed_at": null
+    }
+  ],
+  "snapshot_checks": [
+    {
+      "order_id": 13,
+      "collected": true,
+      "matches_original_before_rebind": true,
+      "matches_current_after_rebind": false,
+      "matches_explicit_alternate": false
+    },
+    {
+      "order_id": 14,
+      "collected": true,
+      "matches_original_before_rebind": true,
+      "matches_current_after_rebind": false,
+      "matches_explicit_alternate": false
+    },
+    {
+      "order_id": 15,
+      "collected": true,
+      "matches_original_before_rebind": true,
+      "matches_current_after_rebind": false,
+      "matches_explicit_alternate": false
+    },
+    {
+      "order_id": 16,
+      "collected": true,
+      "matches_original_before_rebind": true,
+      "matches_current_after_rebind": false,
+      "matches_explicit_alternate": false
+    },
+    {
+      "order_id": 17,
+      "collected": true,
+      "matches_original_before_rebind": true,
+      "matches_current_after_rebind": false,
+      "matches_explicit_alternate": false
+    },
+    {
+      "order_id": 18,
+      "collected": true,
+      "matches_original_before_rebind": false,
+      "matches_current_after_rebind": false,
+      "matches_explicit_alternate": true
+    },
+    {
+      "order_id": 19,
+      "collected": true,
+      "matches_original_before_rebind": false,
+      "matches_current_after_rebind": false,
+      "matches_explicit_alternate": true
+    },
+    {
+      "order_id": 20,
+      "collected": true,
+      "matches_original_before_rebind": false,
+      "matches_current_after_rebind": true,
+      "matches_explicit_alternate": false
+    },
+    {
+      "order_id": 21,
+      "collected": true,
+      "matches_original_before_rebind": false,
+      "matches_current_after_rebind": true,
+      "matches_explicit_alternate": false
+    },
+    {
+      "order_id": 22,
+      "collected": true,
+      "matches_original_before_rebind": false,
+      "matches_current_after_rebind": true,
+      "matches_explicit_alternate": false
+    },
+    {
+      "order_id": 23,
+      "collected": true,
+      "matches_original_before_rebind": false,
+      "matches_current_after_rebind": true,
+      "matches_explicit_alternate": false
+    },
+    {
+      "order_id": 24,
+      "collected": true,
+      "matches_original_before_rebind": false,
+      "matches_current_after_rebind": true,
+      "matches_explicit_alternate": false
+    },
+    {
+      "order_id": 25,
+      "collected": true,
+      "matches_original_before_rebind": false,
+      "matches_current_after_rebind": true,
+      "matches_explicit_alternate": false
+    },
+    {
+      "order_id": 26,
+      "collected": true,
+      "matches_original_before_rebind": false,
+      "matches_current_after_rebind": true,
+      "matches_explicit_alternate": false
+    },
+    {
+      "order_id": 27,
+      "collected": true,
+      "matches_original_before_rebind": false,
+      "matches_current_after_rebind": true,
+      "matches_explicit_alternate": false
+    },
+    {
+      "order_id": 28,
+      "collected": true,
+      "matches_original_before_rebind": false,
+      "matches_current_after_rebind": true,
+      "matches_explicit_alternate": false
+    },
+    {
+      "order_id": 29,
+      "collected": true,
+      "matches_original_before_rebind": false,
+      "matches_current_after_rebind": true,
+      "matches_explicit_alternate": false
+    }
+  ],
+  "assignments": [
+    {
+      "id": 13,
+      "work_order_id": 13,
+      "employee_id": 3,
+      "assigned_by_user_id": null,
+      "assigned_source": "AUTO",
+      "status": "ENDED",
+      "assigned_at": "2026-09-24 15:56:48.852029",
+      "ended_at": "2026-09-24 16:00:41.595375",
+      "reason": "AUTO_DISPATCH"
+    },
+    {
+      "id": 14,
+      "work_order_id": 14,
+      "employee_id": 3,
+      "assigned_by_user_id": null,
+      "assigned_source": "AUTO",
+      "status": "ENDED",
+      "assigned_at": "2026-09-24 16:02:13.729686",
+      "ended_at": "2026-09-24 16:07:50.254869",
+      "reason": "AUTO_DISPATCH"
+    },
+    {
+      "id": 15,
+      "work_order_id": 15,
+      "employee_id": 4,
+      "assigned_by_user_id": null,
+      "assigned_source": "AUTO",
+      "status": "ENDED",
+      "assigned_at": "2026-09-24 16:05:53.029611",
+      "ended_at": "2026-09-24 16:09:18.865738",
+      "reason": "AUTO_DISPATCH"
+    },
+    {
+      "id": 16,
+      "work_order_id": 16,
+      "employee_id": 3,
+      "assigned_by_user_id": null,
+      "assigned_source": "AUTO",
+      "status": "REJECTED",
+      "assigned_at": "2026-09-24 16:07:50.845656",
+      "ended_at": "2026-09-24 16:09:20.119201",
+      "reason": "合成验证：本次无法继续接单，保持系统重派与历史。"
+    },
+    {
+      "id": 17,
+      "work_order_id": 17,
+      "employee_id": 4,
+      "assigned_by_user_id": null,
+      "assigned_source": "AUTO",
+      "status": "ENDED",
+      "assigned_at": "2026-09-24 16:09:19.414974",
+      "ended_at": "2026-09-24 16:09:20.484048",
+      "reason": "AUTO_DISPATCH"
+    },
+    {
+      "id": 18,
+      "work_order_id": 16,
+      "employee_id": 4,
+      "assigned_by_user_id": null,
+      "assigned_source": "AUTO",
+      "status": "REASSIGNED",
+      "assigned_at": "2026-09-24 16:09:21.120589",
+      "ended_at": "2026-09-24 16:09:21.713561",
+      "reason": "ASSIGNEE_UNAVAILABLE"
+    },
+    {
+      "id": 19,
+      "work_order_id": 16,
+      "employee_id": 4,
+      "assigned_by_user_id": null,
+      "assigned_source": "AUTO",
+      "status": "ENDED",
+      "assigned_at": "2026-09-24 16:10:23.760378",
+      "ended_at": "2026-09-24 16:11:21.530895",
+      "reason": "AUTO_DISPATCH"
+    },
+    {
+      "id": 20,
+      "work_order_id": 18,
+      "employee_id": 3,
+      "assigned_by_user_id": null,
+      "assigned_source": "AUTO",
+      "status": "ENDED",
+      "assigned_at": "2026-09-24 16:11:22.348527",
+      "ended_at": "2026-09-24 16:11:23.174359",
+      "reason": "AUTO_DISPATCH"
+    },
+    {
+      "id": 21,
+      "work_order_id": 19,
+      "employee_id": 4,
+      "assigned_by_user_id": null,
+      "assigned_source": "AUTO",
+      "status": "ENDED",
+      "assigned_at": "2026-09-24 16:11:23.979179",
+      "ended_at": "2026-09-24 16:11:24.814496",
+      "reason": "AUTO_DISPATCH"
+    },
+    {
+      "id": 22,
+      "work_order_id": 20,
+      "employee_id": 3,
+      "assigned_by_user_id": null,
+      "assigned_source": "AUTO",
+      "status": "ENDED",
+      "assigned_at": "2026-09-24 16:15:32.071153",
+      "ended_at": "2026-09-24 16:18:01.173677",
+      "reason": "AUTO_DISPATCH"
+    },
+    {
+      "id": 23,
+      "work_order_id": 21,
+      "employee_id": 4,
+      "assigned_by_user_id": null,
+      "assigned_source": "AUTO",
+      "status": "ENDED",
+      "assigned_at": "2026-09-24 16:15:36.694937",
+      "ended_at": "2026-09-24 16:18:01.476482",
+      "reason": "AUTO_DISPATCH"
+    },
+    {
+      "id": 24,
+      "work_order_id": 22,
+      "employee_id": 3,
+      "assigned_by_user_id": null,
+      "assigned_source": "AUTO",
+      "status": "ENDED",
+      "assigned_at": "2026-09-24 16:18:10.688137",
+      "ended_at": "2026-09-24 16:19:39.529658",
+      "reason": "AUTO_DISPATCH"
+    },
+    {
+      "id": 25,
+      "work_order_id": 23,
+      "employee_id": 4,
+      "assigned_by_user_id": null,
+      "assigned_source": "AUTO",
+      "status": "ENDED",
+      "assigned_at": "2026-09-24 16:18:16.816910",
+      "ended_at": "2026-09-24 16:19:39.873491",
+      "reason": "AUTO_DISPATCH"
+    },
+    {
+      "id": 26,
+      "work_order_id": 27,
+      "employee_id": 3,
+      "assigned_by_user_id": null,
+      "assigned_source": "AUTO",
+      "status": "ENDED",
+      "assigned_at": "2026-09-24 16:22:29.893934",
+      "ended_at": "2026-09-24 16:26:12.160060",
+      "reason": "AUTO_DISPATCH"
+    },
+    {
+      "id": 27,
+      "work_order_id": 26,
+      "employee_id": 4,
+      "assigned_by_user_id": null,
+      "assigned_source": "AUTO",
+      "status": "ENDED",
+      "assigned_at": "2026-09-24 16:22:33.056794",
+      "ended_at": "2026-09-24 16:26:12.532802",
+      "reason": "AUTO_DISPATCH"
+    },
+    {
+      "id": 28,
+      "work_order_id": 28,
+      "employee_id": 3,
+      "assigned_by_user_id": null,
+      "assigned_source": "AUTO",
+      "status": "ACTIVE",
+      "assigned_at": "2026-09-24 16:26:17.450386",
+      "ended_at": null,
+      "reason": "AUTO_DISPATCH"
+    },
+    {
+      "id": 29,
+      "work_order_id": 29,
+      "employee_id": 4,
+      "assigned_by_user_id": null,
+      "assigned_source": "AUTO",
+      "status": "ACTIVE",
+      "assigned_at": "2026-09-24 16:26:18.395354",
+      "ended_at": null,
+      "reason": "AUTO_DISPATCH"
+    }
+  ],
+  "analysis": [
+    {
+      "id": 13,
+      "work_order_id": 13,
+      "analysis_version": 1,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "required_role": "STAFF",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v8-maintenance"
+    },
+    {
+      "id": 14,
+      "work_order_id": 14,
+      "analysis_version": 1,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "required_role": "STAFF",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v8-maintenance"
+    },
+    {
+      "id": 15,
+      "work_order_id": 15,
+      "analysis_version": 1,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "required_role": "STAFF",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v8-maintenance"
+    },
+    {
+      "id": 16,
+      "work_order_id": 16,
+      "analysis_version": 1,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "required_role": "STAFF",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v8-maintenance"
+    },
+    {
+      "id": 17,
+      "work_order_id": 17,
+      "analysis_version": 1,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "required_role": "STAFF",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v8-maintenance"
+    },
+    {
+      "id": 18,
+      "work_order_id": 18,
+      "analysis_version": 1,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "required_role": "STAFF",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v8-maintenance"
+    },
+    {
+      "id": 19,
+      "work_order_id": 19,
+      "analysis_version": 1,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "required_role": "STAFF",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v8-maintenance"
+    },
+    {
+      "id": 20,
+      "work_order_id": 20,
+      "analysis_version": 1,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "required_role": "STAFF",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v8-maintenance"
+    },
+    {
+      "id": 21,
+      "work_order_id": 21,
+      "analysis_version": 1,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "required_role": "STAFF",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v8-maintenance"
+    },
+    {
+      "id": 22,
+      "work_order_id": 22,
+      "analysis_version": 1,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "required_role": "STAFF",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v8-maintenance"
+    },
+    {
+      "id": 23,
+      "work_order_id": 23,
+      "analysis_version": 1,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "required_role": "STAFF",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v8-maintenance"
+    },
+    {
+      "id": 24,
+      "work_order_id": 24,
+      "analysis_version": 1,
+      "status": "PROCESSING",
+      "category": null,
+      "required_role": null,
+      "required_skill": null,
+      "prompt_version": "wo-analysis-v8-maintenance"
+    },
+    {
+      "id": 26,
+      "work_order_id": 27,
+      "analysis_version": 1,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "required_role": "STAFF",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v8-maintenance"
+    },
+    {
+      "id": 27,
+      "work_order_id": 26,
+      "analysis_version": 1,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "required_role": "STAFF",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v8-maintenance"
+    },
+    {
+      "id": 28,
+      "work_order_id": 28,
+      "analysis_version": 1,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "required_role": "STAFF",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v8-maintenance"
+    },
+    {
+      "id": 29,
+      "work_order_id": 29,
+      "analysis_version": 1,
+      "status": "COMPLETED",
+      "category": "ELECTRICAL",
+      "required_role": "STAFF",
+      "required_skill": "ELECTRICAL",
+      "prompt_version": "wo-analysis-v8-maintenance"
+    }
+  ],
+  "history": [
+    {
+      "id": 101,
+      "work_order_id": 13,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "6692585d9686427e83cbd32beba23d59",
+      "payload_json": "{\"event_code\": \"CREATE\"}"
+    },
+    {
+      "id": 102,
+      "work_order_id": 13,
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "6692585d9686427e83cbd32beba23d59",
+      "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+    },
+    {
+      "id": 103,
+      "work_order_id": 13,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "6692585d9686427e83cbd32beba23d59",
+      "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 3, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+    },
+    {
+      "id": 104,
+      "work_order_id": 14,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "29a54d87d67444fc973442c056564420",
+      "payload_json": "{\"event_code\": \"CREATE\"}"
+    },
+    {
+      "id": 105,
+      "work_order_id": 14,
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "29a54d87d67444fc973442c056564420",
+      "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+    },
+    {
+      "id": 106,
+      "work_order_id": 14,
+      "event_code": "AUTO_DISPATCH_WAIT",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "29a54d87d67444fc973442c056564420",
+      "payload_json": "{\"reason_code\": \"WAITING_IDLE\", \"policy_version\": \"maintenance-group-v1\"}"
+    },
+    {
+      "id": 107,
+      "work_order_id": 13,
+      "event_code": "ACCEPT",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "request_id": "7956c32cdd3b42639a0dff1995b8908a",
+      "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}"
+    },
+    {
+      "id": 108,
+      "work_order_id": 13,
+      "event_code": "START",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "request_id": "b7a1ebcbfb20479297d1ae8633cbccdb",
+      "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}"
+    },
+    {
+      "id": 109,
+      "work_order_id": 13,
+      "event_code": "RECEIPT_RESOLVED",
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "request_id": "cbbcb04c3bfc43deac087c4b4de8281a",
+      "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}"
+    },
+    {
+      "id": 110,
+      "work_order_id": 13,
+      "event_code": "CONFIRM",
+      "from_status": "WAIT_CONFIRM",
+      "to_status": "COMPLETED",
+      "request_id": "8c34ee2cce404c9f93317cf8e3d824a5",
+      "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}"
+    },
+    {
+      "id": 111,
+      "work_order_id": 13,
+      "event_code": "ARCHIVE",
+      "from_status": "COMPLETED",
+      "to_status": "CLOSED",
+      "request_id": "8c34ee2cce404c9f93317cf8e3d824a5",
+      "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}"
+    },
+    {
+      "id": 114,
+      "work_order_id": 14,
+      "event_code": "AUTO_DISPATCH_WAIT",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "dispatch-wait:14:2026-09-24T16:00:41.973378+00:00",
+      "payload_json": "{\"reason_code\": \"WAITING_ELIGIBLE\", \"policy_version\": \"maintenance-group-v1\"}"
+    },
+    {
+      "id": 117,
+      "work_order_id": 14,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "dispatch-wait:14:2026-09-24T16:02:13.677530+00:00",
+      "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 3, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+    },
+    {
+      "id": 120,
+      "work_order_id": 15,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "92b8747a7a7f4f23887dac7ff698f32f",
+      "payload_json": "{\"event_code\": \"CREATE\"}"
+    },
+    {
+      "id": 121,
+      "work_order_id": 15,
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "92b8747a7a7f4f23887dac7ff698f32f",
+      "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+    },
+    {
+      "id": 122,
+      "work_order_id": 15,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "92b8747a7a7f4f23887dac7ff698f32f",
+      "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 4, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+    },
+    {
+      "id": 123,
+      "work_order_id": 16,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "maint024-42193bfcfb-e-concurrent-create",
+      "payload_json": "{\"event_code\": \"CREATE\"}"
+    },
+    {
+      "id": 124,
+      "work_order_id": 17,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "maint024-42193bfcfb-d-concurrent-create",
+      "payload_json": "{\"event_code\": \"CREATE\"}"
+    },
+    {
+      "id": 125,
+      "work_order_id": 16,
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-e-concurrent-create",
+      "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+    },
+    {
+      "id": 126,
+      "work_order_id": 16,
+      "event_code": "AUTO_DISPATCH_WAIT",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-e-concurrent-create",
+      "payload_json": "{\"reason_code\": \"WAITING_IDLE\", \"policy_version\": \"maintenance-group-v1\"}"
+    },
+    {
+      "id": 127,
+      "work_order_id": 17,
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-d-concurrent-create",
+      "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+    },
+    {
+      "id": 128,
+      "work_order_id": 17,
+      "event_code": "AUTO_DISPATCH_WAIT",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-d-concurrent-create",
+      "payload_json": "{\"reason_code\": \"WAITING_IDLE\", \"policy_version\": \"maintenance-group-v1\"}"
+    },
+    {
+      "id": 129,
+      "work_order_id": 14,
+      "event_code": "ACCEPT",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-14-accept",
+      "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}"
+    },
+    {
+      "id": 130,
+      "work_order_id": 14,
+      "event_code": "START",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-14-start",
+      "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}"
+    },
+    {
+      "id": 131,
+      "work_order_id": 14,
+      "event_code": "RECEIPT_RESOLVED",
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-14-receipts",
+      "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}"
+    },
+    {
+      "id": 132,
+      "work_order_id": 14,
+      "event_code": "CONFIRM",
+      "from_status": "WAIT_CONFIRM",
+      "to_status": "COMPLETED",
+      "request_id": "maint024-42193bfcfb-api--work-orders-14-confirm",
+      "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}"
+    },
+    {
+      "id": 133,
+      "work_order_id": 14,
+      "event_code": "ARCHIVE",
+      "from_status": "COMPLETED",
+      "to_status": "CLOSED",
+      "request_id": "maint024-42193bfcfb-api--work-orders-14-confirm",
+      "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}"
+    },
+    {
+      "id": 136,
+      "work_order_id": 16,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "dispatch-wait:16:2026-09-24T16:07:50.754940+00:00",
+      "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 3, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+    },
+    {
+      "id": 137,
+      "work_order_id": 17,
+      "event_code": "AUTO_DISPATCH_WAIT",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "dispatch-wait:17:2026-09-24T16:07:50.955962+00:00",
+      "payload_json": "{\"reason_code\": \"WAITING_IDLE\", \"policy_version\": \"maintenance-group-v1\"}"
+    },
+    {
+      "id": 138,
+      "work_order_id": 15,
+      "event_code": "ACCEPT",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-15-accept",
+      "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}"
+    },
+    {
+      "id": 139,
+      "work_order_id": 15,
+      "event_code": "START",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-15-start",
+      "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}"
+    },
+    {
+      "id": 140,
+      "work_order_id": 15,
+      "event_code": "RECEIPT_RESOLVED",
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-15-receipts",
+      "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}"
+    },
+    {
+      "id": 141,
+      "work_order_id": 15,
+      "event_code": "CONFIRM",
+      "from_status": "WAIT_CONFIRM",
+      "to_status": "COMPLETED",
+      "request_id": "maint024-42193bfcfb-api--work-orders-15-confirm",
+      "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}"
+    },
+    {
+      "id": 142,
+      "work_order_id": 15,
+      "event_code": "ARCHIVE",
+      "from_status": "COMPLETED",
+      "to_status": "CLOSED",
+      "request_id": "maint024-42193bfcfb-api--work-orders-15-confirm",
+      "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}"
+    },
+    {
+      "id": 145,
+      "work_order_id": 17,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "dispatch-wait:17:2026-09-24T16:09:19.335689+00:00",
+      "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 4, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+    },
+    {
+      "id": 146,
+      "work_order_id": 16,
+      "event_code": "REJECT",
+      "from_status": "ASSIGNED",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-16-reject",
+      "payload_json": "{\"event_code\": \"REJECT\", \"reason_code\": \"REJECTED\"}"
+    },
+    {
+      "id": 147,
+      "work_order_id": 17,
+      "event_code": "ACCEPT",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-17-accept",
+      "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}"
+    },
+    {
+      "id": 148,
+      "work_order_id": 17,
+      "event_code": "START",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-17-start",
+      "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}"
+    },
+    {
+      "id": 149,
+      "work_order_id": 16,
+      "event_code": "AUTO_DISPATCH_WAIT",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-16-reject",
+      "payload_json": "{\"reason_code\": \"WAITING_IDLE\", \"policy_version\": \"maintenance-group-v1\"}"
+    },
+    {
+      "id": 150,
+      "work_order_id": 17,
+      "event_code": "RECEIPT_RESOLVED",
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-17-receipts",
+      "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}"
+    },
+    {
+      "id": 151,
+      "work_order_id": 17,
+      "event_code": "CONFIRM",
+      "from_status": "WAIT_CONFIRM",
+      "to_status": "COMPLETED",
+      "request_id": "maint024-42193bfcfb-api--work-orders-17-confirm",
+      "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}"
+    },
+    {
+      "id": 152,
+      "work_order_id": 17,
+      "event_code": "ARCHIVE",
+      "from_status": "COMPLETED",
+      "to_status": "CLOSED",
+      "request_id": "maint024-42193bfcfb-api--work-orders-17-confirm",
+      "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}"
+    },
+    {
+      "id": 155,
+      "work_order_id": 16,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "dispatch-wait:16:2026-09-24T16:09:21.037933+00:00",
+      "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 4, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+    },
+    {
+      "id": 156,
+      "work_order_id": 16,
+      "event_code": "REASSIGN",
+      "from_status": "ASSIGNED",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "sla-assignment:18:assignee_unavailable",
+      "payload_json": "{\"event_code\": \"REASSIGN\", \"employee_id\": 4, \"reason_code\": \"ASSIGNEE_UNAVAILABLE\", \"accept_due_at\": \"2026-09-24T16:39:21.120589+00:00\", \"assignment_id\": 18}"
+    },
+    {
+      "id": 157,
+      "work_order_id": 16,
+      "event_code": "AUTO_DISPATCH_WAIT",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "dispatch-wait:16:2026-09-24T16:09:21.771433+00:00",
+      "payload_json": "{\"reason_code\": \"WAITING_ELIGIBLE\", \"policy_version\": \"maintenance-group-v1\"}"
+    },
+    {
+      "id": 160,
+      "work_order_id": 16,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "dispatch-wait:16:2026-09-24T16:10:23.618082+00:00",
+      "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 4, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+    },
+    {
+      "id": 163,
+      "work_order_id": 16,
+      "event_code": "ACCEPT",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-16-accept",
+      "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}"
+    },
+    {
+      "id": 164,
+      "work_order_id": 16,
+      "event_code": "START",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-16-start",
+      "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}"
+    },
+    {
+      "id": 165,
+      "work_order_id": 16,
+      "event_code": "RECEIPT_RESOLVED",
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-16-receipts",
+      "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}"
+    },
+    {
+      "id": 166,
+      "work_order_id": 16,
+      "event_code": "CONFIRM",
+      "from_status": "WAIT_CONFIRM",
+      "to_status": "COMPLETED",
+      "request_id": "maint024-42193bfcfb-api--work-orders-16-confirm",
+      "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}"
+    },
+    {
+      "id": 167,
+      "work_order_id": 16,
+      "event_code": "ARCHIVE",
+      "from_status": "COMPLETED",
+      "to_status": "CLOSED",
+      "request_id": "maint024-42193bfcfb-api--work-orders-16-confirm",
+      "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}"
+    },
+    {
+      "id": 168,
+      "work_order_id": 18,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "maint024-42193bfcfb-api--work-orders",
+      "payload_json": "{\"event_code\": \"CREATE\"}"
+    },
+    {
+      "id": 171,
+      "work_order_id": 18,
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-api--work-orders",
+      "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+    },
+    {
+      "id": 172,
+      "work_order_id": 18,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "maint024-42193bfcfb-api--work-orders",
+      "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 3, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+    },
+    {
+      "id": 173,
+      "work_order_id": 18,
+      "event_code": "ACCEPT",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-18-accept",
+      "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}"
+    },
+    {
+      "id": 174,
+      "work_order_id": 18,
+      "event_code": "START",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-18-start",
+      "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}"
+    },
+    {
+      "id": 175,
+      "work_order_id": 18,
+      "event_code": "RECEIPT_RESOLVED",
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-18-receipts",
+      "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}"
+    },
+    {
+      "id": 176,
+      "work_order_id": 18,
+      "event_code": "CONFIRM",
+      "from_status": "WAIT_CONFIRM",
+      "to_status": "COMPLETED",
+      "request_id": "maint024-42193bfcfb-api--work-orders-18-confirm",
+      "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}"
+    },
+    {
+      "id": 177,
+      "work_order_id": 18,
+      "event_code": "ARCHIVE",
+      "from_status": "COMPLETED",
+      "to_status": "CLOSED",
+      "request_id": "maint024-42193bfcfb-api--work-orders-18-confirm",
+      "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}"
+    },
+    {
+      "id": 178,
+      "work_order_id": 19,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "maint024-42193bfcfb-api--work-orders",
+      "payload_json": "{\"event_code\": \"CREATE\"}"
+    },
+    {
+      "id": 181,
+      "work_order_id": 19,
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-api--work-orders",
+      "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+    },
+    {
+      "id": 182,
+      "work_order_id": 19,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "maint024-42193bfcfb-api--work-orders",
+      "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 4, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+    },
+    {
+      "id": 183,
+      "work_order_id": 19,
+      "event_code": "ACCEPT",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-19-accept",
+      "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}"
+    },
+    {
+      "id": 184,
+      "work_order_id": 19,
+      "event_code": "START",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-19-start",
+      "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}"
+    },
+    {
+      "id": 185,
+      "work_order_id": 19,
+      "event_code": "RECEIPT_RESOLVED",
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "request_id": "maint024-42193bfcfb-api--staff-work-orders-19-receipts",
+      "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}"
+    },
+    {
+      "id": 186,
+      "work_order_id": 19,
+      "event_code": "CONFIRM",
+      "from_status": "WAIT_CONFIRM",
+      "to_status": "COMPLETED",
+      "request_id": "maint024-42193bfcfb-api--work-orders-19-confirm",
+      "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}"
+    },
+    {
+      "id": 187,
+      "work_order_id": 19,
+      "event_code": "ARCHIVE",
+      "from_status": "COMPLETED",
+      "to_status": "CLOSED",
+      "request_id": "maint024-42193bfcfb-api--work-orders-19-confirm",
+      "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}"
+    },
+    {
+      "id": 192,
+      "work_order_id": 20,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "maint024-42193bfcfb-parallel1-two-worker-create",
+      "payload_json": "{\"event_code\": \"CREATE\"}"
+    },
+    {
+      "id": 193,
+      "work_order_id": 21,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "maint024-42193bfcfb-parallel2-two-worker-create",
+      "payload_json": "{\"event_code\": \"CREATE\"}"
+    },
+    {
+      "id": 194,
+      "work_order_id": 20,
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-parallel1-two-worker-create",
+      "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+    },
+    {
+      "id": 195,
+      "work_order_id": 20,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "maint024-42193bfcfb-parallel1-two-worker-create",
+      "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 3, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+    },
+    {
+      "id": 196,
+      "work_order_id": 21,
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-parallel2-two-worker-create",
+      "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+    },
+    {
+      "id": 197,
+      "work_order_id": 21,
+      "event_code": "AUTO_DISPATCH_WAIT",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-parallel2-two-worker-create",
+      "payload_json": "{\"reason_code\": \"WAITING_IDLE\", \"policy_version\": \"maintenance-group-v1\"}"
+    },
+    {
+      "id": 200,
+      "work_order_id": 21,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "dispatch-wait:21:2026-09-24T16:15:36.614652+00:00",
+      "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 4, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+    },
+    {
+      "id": 201,
+      "work_order_id": 20,
+      "event_code": "ACCEPT",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}"
+    },
+    {
+      "id": 202,
+      "work_order_id": 20,
+      "event_code": "START",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}"
+    },
+    {
+      "id": 203,
+      "work_order_id": 20,
+      "event_code": "RECEIPT_RESOLVED",
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}"
+    },
+    {
+      "id": 204,
+      "work_order_id": 20,
+      "event_code": "CONFIRM",
+      "from_status": "WAIT_CONFIRM",
+      "to_status": "COMPLETED",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}"
+    },
+    {
+      "id": 205,
+      "work_order_id": 20,
+      "event_code": "ARCHIVE",
+      "from_status": "COMPLETED",
+      "to_status": "CLOSED",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}"
+    },
+    {
+      "id": 206,
+      "work_order_id": 21,
+      "event_code": "ACCEPT",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}"
+    },
+    {
+      "id": 207,
+      "work_order_id": 21,
+      "event_code": "START",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}"
+    },
+    {
+      "id": 208,
+      "work_order_id": 21,
+      "event_code": "RECEIPT_RESOLVED",
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}"
+    },
+    {
+      "id": 209,
+      "work_order_id": 21,
+      "event_code": "CONFIRM",
+      "from_status": "WAIT_CONFIRM",
+      "to_status": "COMPLETED",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}"
+    },
+    {
+      "id": 210,
+      "work_order_id": 21,
+      "event_code": "ARCHIVE",
+      "from_status": "COMPLETED",
+      "to_status": "CLOSED",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}"
+    },
+    {
+      "id": 211,
+      "work_order_id": 22,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "maint024-42193bfcfb-contended1-auto-create",
+      "payload_json": "{\"event_code\": \"CREATE\"}"
+    },
+    {
+      "id": 212,
+      "work_order_id": 23,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "maint024-42193bfcfb-contended2-auto-create",
+      "payload_json": "{\"event_code\": \"CREATE\"}"
+    },
+    {
+      "id": 219,
+      "work_order_id": 22,
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-contended1-auto-create",
+      "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+    },
+    {
+      "id": 220,
+      "work_order_id": 22,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "maint024-42193bfcfb-contended1-auto-create",
+      "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 3, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+    },
+    {
+      "id": 221,
+      "work_order_id": 23,
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-contended2-auto-create",
+      "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+    },
+    {
+      "id": 222,
+      "work_order_id": 23,
+      "event_code": "AUTO_DISPATCH_WAIT",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-contended2-auto-create",
+      "payload_json": "{\"reason_code\": \"WAITING_IDLE\", \"policy_version\": \"maintenance-group-v1\"}"
+    },
+    {
+      "id": 225,
+      "work_order_id": 23,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "dispatch-wait:23:2026-09-24T16:18:16.747172+00:00",
+      "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 4, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+    },
+    {
+      "id": 226,
+      "work_order_id": 22,
+      "event_code": "ACCEPT",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}"
+    },
+    {
+      "id": 227,
+      "work_order_id": 22,
+      "event_code": "START",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}"
+    },
+    {
+      "id": 228,
+      "work_order_id": 22,
+      "event_code": "RECEIPT_RESOLVED",
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}"
+    },
+    {
+      "id": 229,
+      "work_order_id": 22,
+      "event_code": "CONFIRM",
+      "from_status": "WAIT_CONFIRM",
+      "to_status": "COMPLETED",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}"
+    },
+    {
+      "id": 230,
+      "work_order_id": 22,
+      "event_code": "ARCHIVE",
+      "from_status": "COMPLETED",
+      "to_status": "CLOSED",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}"
+    },
+    {
+      "id": 231,
+      "work_order_id": 23,
+      "event_code": "ACCEPT",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}"
+    },
+    {
+      "id": 232,
+      "work_order_id": 23,
+      "event_code": "START",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}"
+    },
+    {
+      "id": 233,
+      "work_order_id": 23,
+      "event_code": "RECEIPT_RESOLVED",
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}"
+    },
+    {
+      "id": 234,
+      "work_order_id": 23,
+      "event_code": "CONFIRM",
+      "from_status": "WAIT_CONFIRM",
+      "to_status": "COMPLETED",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}"
+    },
+    {
+      "id": 235,
+      "work_order_id": 23,
+      "event_code": "ARCHIVE",
+      "from_status": "COMPLETED",
+      "to_status": "CLOSED",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}"
+    },
+    {
+      "id": 242,
+      "work_order_id": 24,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "maint024-42193bfcfb-contended4-auto-create",
+      "payload_json": "{\"event_code\": \"CREATE\"}"
+    },
+    {
+      "id": 243,
+      "work_order_id": 25,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "maint024-42193bfcfb-contended3-auto-create",
+      "payload_json": "{\"event_code\": \"CREATE\"}"
+    },
+    {
+      "id": 245,
+      "work_order_id": 26,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "maint024-42193bfcfb-contended6-auto-create",
+      "payload_json": "{\"event_code\": \"CREATE\"}"
+    },
+    {
+      "id": 246,
+      "work_order_id": 27,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "maint024-42193bfcfb-contended5-auto-create",
+      "payload_json": "{\"event_code\": \"CREATE\"}"
+    },
+    {
+      "id": 247,
+      "work_order_id": 27,
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-contended5-auto-create",
+      "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+    },
+    {
+      "id": 248,
+      "work_order_id": 27,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "maint024-42193bfcfb-contended5-auto-create",
+      "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 3, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+    },
+    {
+      "id": 249,
+      "work_order_id": 26,
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-contended6-auto-create",
+      "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+    },
+    {
+      "id": 250,
+      "work_order_id": 26,
+      "event_code": "AUTO_DISPATCH_WAIT",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-contended6-auto-create",
+      "payload_json": "{\"reason_code\": \"WAITING_IDLE\", \"policy_version\": \"maintenance-group-v1\"}"
+    },
+    {
+      "id": 253,
+      "work_order_id": 26,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "dispatch-wait:26:2026-09-24T16:22:32.983997+00:00",
+      "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 4, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+    },
+    {
+      "id": 254,
+      "work_order_id": 27,
+      "event_code": "ACCEPT",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}"
+    },
+    {
+      "id": 255,
+      "work_order_id": 27,
+      "event_code": "START",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}"
+    },
+    {
+      "id": 256,
+      "work_order_id": 27,
+      "event_code": "RECEIPT_RESOLVED",
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}"
+    },
+    {
+      "id": 257,
+      "work_order_id": 27,
+      "event_code": "CONFIRM",
+      "from_status": "WAIT_CONFIRM",
+      "to_status": "COMPLETED",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}"
+    },
+    {
+      "id": 258,
+      "work_order_id": 27,
+      "event_code": "ARCHIVE",
+      "from_status": "COMPLETED",
+      "to_status": "CLOSED",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}"
+    },
+    {
+      "id": 259,
+      "work_order_id": 26,
+      "event_code": "ACCEPT",
+      "from_status": "ASSIGNED",
+      "to_status": "ACCEPTED",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"ACCEPT\", \"reason_code\": \"ACCEPTED\"}"
+    },
+    {
+      "id": 261,
+      "work_order_id": 26,
+      "event_code": "START",
+      "from_status": "ACCEPTED",
+      "to_status": "PROCESSING",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"START\", \"reason_code\": \"STARTED\"}"
+    },
+    {
+      "id": 262,
+      "work_order_id": 26,
+      "event_code": "RECEIPT_RESOLVED",
+      "from_status": "PROCESSING",
+      "to_status": "WAIT_CONFIRM",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"RECEIPT_RESOLVED\", \"reason_code\": \"RESOLVED\"}"
+    },
+    {
+      "id": 264,
+      "work_order_id": 26,
+      "event_code": "CONFIRM",
+      "from_status": "WAIT_CONFIRM",
+      "to_status": "COMPLETED",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"CONFIRM\", \"reason_code\": \"CONFIRMED\"}"
+    },
+    {
+      "id": 265,
+      "work_order_id": 26,
+      "event_code": "ARCHIVE",
+      "from_status": "COMPLETED",
+      "to_status": "CLOSED",
+      "request_id": "maint024-42193bfcfb-contended-fixture",
+      "payload_json": "{\"event_code\": \"ARCHIVE\", \"reason_code\": \"ARCHIVED\"}"
+    },
+    {
+      "id": 270,
+      "work_order_id": 28,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "maint024-42193bfcfb-contended8-auto-create",
+      "payload_json": "{\"event_code\": \"CREATE\"}"
+    },
+    {
+      "id": 271,
+      "work_order_id": 29,
+      "event_code": "CREATE",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "request_id": "maint024-42193bfcfb-contended7-auto-create",
+      "payload_json": "{\"event_code\": \"CREATE\"}"
+    },
+    {
+      "id": 272,
+      "work_order_id": 28,
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-contended8-auto-create",
+      "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+    },
+    {
+      "id": 273,
+      "work_order_id": 29,
+      "event_code": "ANALYZE",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-contended7-auto-create",
+      "payload_json": "{\"event_code\": \"ANALYZE\", \"reason_code\": \"AI_ANALYSIS\"}"
+    },
+    {
+      "id": 274,
+      "work_order_id": 28,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "maint024-42193bfcfb-contended8-auto-create",
+      "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 3, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+    },
+    {
+      "id": 275,
+      "work_order_id": 29,
+      "event_code": "AUTO_DISPATCH_WAIT",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "PENDING_ASSIGNMENT",
+      "request_id": "maint024-42193bfcfb-contended7-auto-create",
+      "payload_json": "{\"reason_code\": \"WAITING_IDLE\", \"policy_version\": \"maintenance-group-v1\"}"
+    },
+    {
+      "id": 278,
+      "work_order_id": 29,
+      "event_code": "ASSIGN",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "ASSIGNED",
+      "request_id": "dispatch-wait:29:2026-09-24T16:26:18.342121+00:00",
+      "payload_json": "{\"event_code\": \"ASSIGN\", \"employee_id\": 4, \"incident_id\": null, \"reason_code\": \"AUTO_ASSIGN\", \"assigned_source\": \"AUTO\"}"
+    }
+  ],
+  "receipts": [
+    {
+      "id": 11,
+      "work_order_id": 13,
+      "assignee_id": 3,
+      "problem_type": "普通维修",
+      "method": "合成验证：已修复插座接触问题并恢复供电；已修复水龙头密封并验证不再滴水。",
+      "resolved": 1
+    },
+    {
+      "id": 12,
+      "work_order_id": 14,
+      "assignee_id": 3,
+      "problem_type": "普通维修",
+      "method": "合成验收：逐项修复电气和滴水现象，逐项复检正常。",
+      "resolved": 1
+    },
+    {
+      "id": 13,
+      "work_order_id": 15,
+      "assignee_id": 4,
+      "problem_type": "普通维修",
+      "method": "合成验收：逐项修复电气和滴水现象，逐项复检正常。",
+      "resolved": 1
+    },
+    {
+      "id": 14,
+      "work_order_id": 17,
+      "assignee_id": 4,
+      "problem_type": "普通维修",
+      "method": "合成验收：逐项修复电气和滴水现象，逐项复检正常。",
+      "resolved": 1
+    },
+    {
+      "id": 15,
+      "work_order_id": 16,
+      "assignee_id": 4,
+      "problem_type": "普通维修",
+      "method": "合成验收：逐项修复电气和滴水现象，逐项复检正常。",
+      "resolved": 1
+    },
+    {
+      "id": 16,
+      "work_order_id": 18,
+      "assignee_id": 3,
+      "problem_type": "普通维修",
+      "method": "合成验收：逐项修复电气和滴水现象，逐项复检正常。",
+      "resolved": 1
+    },
+    {
+      "id": 17,
+      "work_order_id": 19,
+      "assignee_id": 4,
+      "problem_type": "普通维修",
+      "method": "合成验收：逐项修复电气和滴水现象，逐项复检正常。",
+      "resolved": 1
+    },
+    {
+      "id": 18,
+      "work_order_id": 20,
+      "assignee_id": 3,
+      "problem_type": "普通维修",
+      "method": "合成场景逐项完成维修与检查。",
+      "resolved": 1
+    },
+    {
+      "id": 19,
+      "work_order_id": 21,
+      "assignee_id": 4,
+      "problem_type": "普通维修",
+      "method": "合成场景逐项完成维修与检查。",
+      "resolved": 1
+    },
+    {
+      "id": 20,
+      "work_order_id": 22,
+      "assignee_id": 3,
+      "problem_type": "普通维修",
+      "method": "合成场景逐项完成维修与检查。",
+      "resolved": 1
+    },
+    {
+      "id": 21,
+      "work_order_id": 23,
+      "assignee_id": 4,
+      "problem_type": "普通维修",
+      "method": "合成场景逐项完成维修与检查。",
+      "resolved": 1
+    },
+    {
+      "id": 22,
+      "work_order_id": 27,
+      "assignee_id": 3,
+      "problem_type": "普通维修",
+      "method": "合成场景逐项完成维修与检查。",
+      "resolved": 1
+    },
+    {
+      "id": 23,
+      "work_order_id": 26,
+      "assignee_id": 4,
+      "problem_type": "普通维修",
+      "method": "合成场景逐项完成维修与检查。",
+      "resolved": 1
+    }
+  ],
+  "notifications": [
+    {
+      "id": 151,
+      "resource_id": 13,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 152,
+      "resource_id": 13,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 153,
+      "resource_id": 13,
+      "user_id": 11,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 154,
+      "resource_id": 14,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 155,
+      "resource_id": 13,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 156,
+      "resource_id": 13,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 157,
+      "resource_id": 13,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 158,
+      "resource_id": 13,
+      "user_id": 5,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 159,
+      "resource_id": 13,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 160,
+      "resource_id": 14,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 161,
+      "resource_id": 14,
+      "user_id": 11,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 162,
+      "resource_id": 15,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 163,
+      "resource_id": 15,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 164,
+      "resource_id": 15,
+      "user_id": 12,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 165,
+      "resource_id": 16,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 166,
+      "resource_id": 17,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 167,
+      "resource_id": 14,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 168,
+      "resource_id": 14,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 169,
+      "resource_id": 14,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 170,
+      "resource_id": 14,
+      "user_id": 5,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 171,
+      "resource_id": 14,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 172,
+      "resource_id": 16,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 173,
+      "resource_id": 16,
+      "user_id": 11,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 174,
+      "resource_id": 15,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 175,
+      "resource_id": 15,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 176,
+      "resource_id": 15,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 177,
+      "resource_id": 15,
+      "user_id": 5,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 178,
+      "resource_id": 15,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 179,
+      "resource_id": 17,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 180,
+      "resource_id": 17,
+      "user_id": 12,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 181,
+      "resource_id": 16,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 182,
+      "resource_id": 17,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 183,
+      "resource_id": 17,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 184,
+      "resource_id": 17,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 185,
+      "resource_id": 17,
+      "user_id": 5,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 186,
+      "resource_id": 17,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 187,
+      "resource_id": 16,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 188,
+      "resource_id": 16,
+      "user_id": 12,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 189,
+      "resource_id": 16,
+      "user_id": 5,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 190,
+      "resource_id": 16,
+      "user_id": 12,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 191,
+      "resource_id": 16,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 192,
+      "resource_id": 16,
+      "user_id": 12,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 193,
+      "resource_id": 16,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 194,
+      "resource_id": 16,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 195,
+      "resource_id": 16,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 196,
+      "resource_id": 16,
+      "user_id": 5,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 197,
+      "resource_id": 16,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 198,
+      "resource_id": 18,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 199,
+      "resource_id": 18,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 200,
+      "resource_id": 18,
+      "user_id": 11,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 201,
+      "resource_id": 18,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 202,
+      "resource_id": 18,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 203,
+      "resource_id": 18,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 204,
+      "resource_id": 18,
+      "user_id": 5,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 205,
+      "resource_id": 18,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 206,
+      "resource_id": 19,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 207,
+      "resource_id": 19,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 208,
+      "resource_id": 19,
+      "user_id": 12,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 209,
+      "resource_id": 19,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 210,
+      "resource_id": 19,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 211,
+      "resource_id": 19,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 212,
+      "resource_id": 19,
+      "user_id": 5,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 213,
+      "resource_id": 19,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 214,
+      "resource_id": 20,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 215,
+      "resource_id": 21,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 216,
+      "resource_id": 20,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 217,
+      "resource_id": 20,
+      "user_id": 11,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 218,
+      "resource_id": 21,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 219,
+      "resource_id": 21,
+      "user_id": 12,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 220,
+      "resource_id": 20,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 221,
+      "resource_id": 20,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 222,
+      "resource_id": 20,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 223,
+      "resource_id": 20,
+      "user_id": 5,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 224,
+      "resource_id": 20,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 225,
+      "resource_id": 21,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 226,
+      "resource_id": 21,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 227,
+      "resource_id": 21,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 228,
+      "resource_id": 21,
+      "user_id": 5,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 229,
+      "resource_id": 21,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 230,
+      "resource_id": 22,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 231,
+      "resource_id": 23,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 232,
+      "resource_id": 22,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 233,
+      "resource_id": 22,
+      "user_id": 11,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 234,
+      "resource_id": 23,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 235,
+      "resource_id": 23,
+      "user_id": 12,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 236,
+      "resource_id": 22,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 237,
+      "resource_id": 22,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 238,
+      "resource_id": 22,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 239,
+      "resource_id": 22,
+      "user_id": 5,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 240,
+      "resource_id": 22,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 241,
+      "resource_id": 23,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 242,
+      "resource_id": 23,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 243,
+      "resource_id": 23,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 244,
+      "resource_id": 23,
+      "user_id": 5,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 245,
+      "resource_id": 23,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 246,
+      "resource_id": 24,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 247,
+      "resource_id": 25,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 248,
+      "resource_id": 26,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 249,
+      "resource_id": 27,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 250,
+      "resource_id": 27,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 251,
+      "resource_id": 27,
+      "user_id": 11,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 252,
+      "resource_id": 26,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 253,
+      "resource_id": 26,
+      "user_id": 12,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 254,
+      "resource_id": 27,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 255,
+      "resource_id": 27,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 256,
+      "resource_id": 27,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 257,
+      "resource_id": 27,
+      "user_id": 5,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 258,
+      "resource_id": 27,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 259,
+      "resource_id": 26,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 260,
+      "resource_id": 26,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 261,
+      "resource_id": 26,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 262,
+      "resource_id": 26,
+      "user_id": 5,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 263,
+      "resource_id": 26,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 264,
+      "resource_id": 28,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 265,
+      "resource_id": 29,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 266,
+      "resource_id": 28,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 267,
+      "resource_id": 28,
+      "user_id": 11,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 268,
+      "resource_id": 29,
+      "user_id": 10,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    },
+    {
+      "id": 269,
+      "resource_id": 29,
+      "user_id": 12,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "channel": "IN_APP"
+    }
+  ],
+  "contact_audits": [
+    {
+      "id": 461,
+      "actor_user_id": 10,
+      "resource_id": 13,
+      "tenant_id": 1,
+      "property_id": 2,
+      "details_json": "{\"work_order_id\": 13}"
+    },
+    {
+      "id": 480,
+      "actor_user_id": 11,
+      "resource_id": 14,
+      "tenant_id": 1,
+      "property_id": 2,
+      "details_json": "{\"work_order_id\": 14}"
+    },
+    {
+      "id": 485,
+      "actor_user_id": 5,
+      "resource_id": 14,
+      "tenant_id": 1,
+      "property_id": 2,
+      "details_json": "{\"work_order_id\": 14}"
+    },
+    {
+      "id": 499,
+      "actor_user_id": 10,
+      "resource_id": 14,
+      "tenant_id": 1,
+      "property_id": 2,
+      "details_json": "{\"work_order_id\": 14}"
+    },
+    {
+      "id": 500,
+      "actor_user_id": 11,
+      "resource_id": 14,
+      "tenant_id": 1,
+      "property_id": 2,
+      "details_json": "{\"work_order_id\": 14}"
+    },
+    {
+      "id": 501,
+      "actor_user_id": 5,
+      "resource_id": 14,
+      "tenant_id": 1,
+      "property_id": 2,
+      "details_json": "{\"work_order_id\": 14}"
+    },
+    {
+      "id": 544,
+      "actor_user_id": 10,
+      "resource_id": 13,
+      "tenant_id": 1,
+      "property_id": 2,
+      "details_json": "{\"work_order_id\": 13}"
+    },
+    {
+      "id": 552,
+      "actor_user_id": 10,
+      "resource_id": 18,
+      "tenant_id": 1,
+      "property_id": 2,
+      "details_json": "{\"work_order_id\": 18}"
+    },
+    {
+      "id": 560,
+      "actor_user_id": 10,
+      "resource_id": 19,
+      "tenant_id": 1,
+      "property_id": 2,
+      "details_json": "{\"work_order_id\": 19}"
+    },
+    {
+      "id": 574,
+      "actor_user_id": 10,
+      "resource_id": 13,
+      "tenant_id": 1,
+      "property_id": 2,
+      "details_json": "{\"work_order_id\": 13}"
+    }
+  ],
+  "employees": [
+    {
+      "id": 3,
+      "user_id": 11,
+      "tenant_id": 1,
+      "status": "ACTIVE",
+      "max_capacity": 1
+    },
+    {
+      "id": 4,
+      "user_id": 12,
+      "tenant_id": 1,
+      "status": "ACTIVE",
+      "max_capacity": 1
+    }
+  ],
+  "skill_counts": [
+    {
+      "id": 3,
+      "skill_count": 0
+    },
+    {
+      "id": 4,
+      "skill_count": 0
+    }
+  ],
+  "appointments": [
+    {
+      "id": 3,
+      "employee_id": 3,
+      "property_id": 1,
+      "status": "ENDED",
+      "valid_from": "2026-09-24 15:39:49.185374",
+      "valid_to": "2026-09-24 15:44:46.724171"
+    },
+    {
+      "id": 4,
+      "employee_id": 4,
+      "property_id": 1,
+      "status": "ENDED",
+      "valid_from": "2026-09-24 15:39:49.287373",
+      "valid_to": "2026-09-24 15:44:46.824979"
+    },
+    {
+      "id": 5,
+      "employee_id": 3,
+      "property_id": 2,
+      "status": "ENDED",
+      "valid_from": "2026-09-24 15:44:46.766609",
+      "valid_to": "2026-09-24 15:56:31.580826"
+    },
+    {
+      "id": 6,
+      "employee_id": 4,
+      "property_id": 2,
+      "status": "ENDED",
+      "valid_from": "2026-09-24 15:44:46.853505",
+      "valid_to": "2026-09-24 15:56:31.765478"
+    },
+    {
+      "id": 7,
+      "employee_id": 3,
+      "property_id": 2,
+      "status": "ACTIVE",
+      "valid_from": "2026-09-24 15:56:31.672282",
+      "valid_to": null
+    },
+    {
+      "id": 8,
+      "employee_id": 4,
+      "property_id": 2,
+      "status": "ENDED",
+      "valid_from": "2026-09-24 15:56:31.808980",
+      "valid_to": "2026-09-24 16:09:21.689520"
+    },
+    {
+      "id": 9,
+      "employee_id": 4,
+      "property_id": 2,
+      "status": "ACTIVE",
+      "valid_from": "2026-09-24 16:10:23.575435",
+      "valid_to": null
+    }
+  ],
+  "runtime": {
+    "api-03": {
+      "task_id": "MAINTENANCE-CONTACT-DISPATCH-024",
+      "component": "api",
+      "head_sha": "954b8549b500fc89cec86f0ab1b3bce96672e5a8",
+      "backend_app_wip_diff_sha256": "f69072620e1b97fb57968e0098faf4a39b4533035d0f98a908eac61cae0129b1",
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "module_root": "D:\\property-ai\\backend\\app",
+      "target": "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True",
+      "prompt_version": "wo-analysis-v8-maintenance",
+      "providers": "Development only; no real inference",
+      "check_only": false,
+      "observed_threads_2": false,
+      "observed_threads_4": false
+    },
+    "worker-04": {
+      "task_id": "MAINTENANCE-CONTACT-DISPATCH-024",
+      "component": "worker",
+      "head_sha": "954b8549b500fc89cec86f0ab1b3bce96672e5a8",
+      "backend_app_wip_diff_sha256": "f69072620e1b97fb57968e0098faf4a39b4533035d0f98a908eac61cae0129b1",
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "module_root": "D:\\property-ai\\backend\\app",
+      "target": "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True",
+      "prompt_version": "wo-analysis-v8-maintenance",
+      "providers": "Development only; no real inference",
+      "check_only": false,
+      "observed_threads_2": true,
+      "observed_threads_4": false
+    },
+    "worker-05": {
+      "task_id": "MAINTENANCE-CONTACT-DISPATCH-024",
+      "component": "worker",
+      "head_sha": "954b8549b500fc89cec86f0ab1b3bce96672e5a8",
+      "backend_app_wip_diff_sha256": "f69072620e1b97fb57968e0098faf4a39b4533035d0f98a908eac61cae0129b1",
+      "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "module_root": "D:\\property-ai\\backend\\app",
+      "target": "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True",
+      "prompt_version": "wo-analysis-v8-maintenance",
+      "providers": "Development only; no real inference",
+      "check_only": false,
+      "observed_threads_2": false,
+      "observed_threads_4": true
+    }
+  }
+}

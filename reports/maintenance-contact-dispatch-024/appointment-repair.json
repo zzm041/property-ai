@@ -1,0 +1,142 @@
+{
+  "run_id": "maint024-42193bfcfb",
+  "steps": {
+    "staff1-ended": {
+      "id": 5,
+      "employee_id": 3,
+      "tenant_id": 1,
+      "property_id": 2,
+      "status": "ENDED",
+      "valid_from": "2026-09-24T15:44:46.766609Z",
+      "valid_to": "2026-09-24T15:56:31.580826Z"
+    },
+    "staff1": {
+      "id": 7,
+      "employee_id": 3,
+      "tenant_id": 1,
+      "property_id": 2,
+      "status": "ACTIVE",
+      "valid_from": "2026-09-24T15:56:31.672282Z",
+      "valid_to": null
+    },
+    "staff2-ended": {
+      "id": 6,
+      "employee_id": 4,
+      "tenant_id": 1,
+      "property_id": 2,
+      "status": "ENDED",
+      "valid_from": "2026-09-24T15:44:46.853505Z",
+      "valid_to": "2026-09-24T15:56:31.765478Z"
+    },
+    "staff2": {
+      "id": 8,
+      "employee_id": 4,
+      "tenant_id": 1,
+      "property_id": 2,
+      "status": "ACTIVE",
+      "valid_from": "2026-09-24T15:56:31.808980Z",
+      "valid_to": null
+    }
+  },
+  "requests": [
+    {
+      "label": "staff1-before",
+      "method": "GET",
+      "path": "/admin/employees/3",
+      "params": [],
+      "status": 401,
+      "error_code": "AUTH.TOKEN_EXPIRED",
+      "request_id_hash": "bb396185c57bd519"
+    },
+    {
+      "label": "manager-auth-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1ff2deb6d5ae5423"
+    },
+    {
+      "label": "manager-auth-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "505f573e4b43d636"
+    },
+    {
+      "label": "manager-auth-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "addea551365b6ad1"
+    },
+    {
+      "label": "manager-auth-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "552196a5cf6965fd"
+    },
+    {
+      "label": "staff1-before",
+      "method": "GET",
+      "path": "/admin/employees/3",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "bb396185c57bd519"
+    },
+    {
+      "label": "staff1-end",
+      "method": "POST",
+      "path": "/admin/employees/3/property-assignments/5/end",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "cf1b8d89fd9182e1"
+    },
+    {
+      "label": "staff1-reappoint",
+      "method": "POST",
+      "path": "/admin/employees/3/property-assignments",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1c1370f45a3c78c2"
+    },
+    {
+      "label": "staff2-before",
+      "method": "GET",
+      "path": "/admin/employees/4",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "32aef4bea0833420"
+    },
+    {
+      "label": "staff2-end",
+      "method": "POST",
+      "path": "/admin/employees/4/property-assignments/6/end",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "901712cb775a3e19"
+    },
+    {
+      "label": "staff2-reappoint",
+      "method": "POST",
+      "path": "/admin/employees/4/property-assignments",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "66de7eb8d3d4941c"
+    }
+  ]
+}

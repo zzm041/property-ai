@@ -1,0 +1,213 @@
+{
+  "run_id": "maint024-42193bfcfb",
+  "requests": [
+    {
+      "label": "auto-create",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "b497891afe72690c"
+    },
+    {
+      "label": "auto-create",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6e8518bf4e57a3b8"
+    },
+    {
+      "label": "fixture",
+      "method": "GET",
+      "path": "/work-orders/27",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "80ffd89472af20e2"
+    },
+    {
+      "label": "fixture",
+      "method": "GET",
+      "path": "/work-orders/26",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "80ffd89472af20e2"
+    },
+    {
+      "label": "fixture",
+      "method": "GET",
+      "path": "/work-orders/27",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "80ffd89472af20e2"
+    },
+    {
+      "label": "fixture",
+      "method": "GET",
+      "path": "/work-orders/26",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "80ffd89472af20e2"
+    },
+    {
+      "label": "fixture",
+      "method": "GET",
+      "path": "/work-orders/27",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "80ffd89472af20e2"
+    },
+    {
+      "label": "fixture",
+      "method": "GET",
+      "path": "/work-orders/26",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "80ffd89472af20e2"
+    },
+    {
+      "label": "fixture",
+      "method": "POST",
+      "path": "/staff/attendance/checkin",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "80ffd89472af20e2"
+    },
+    {
+      "label": "fixture",
+      "method": "GET",
+      "path": "/work-orders/27",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "80ffd89472af20e2"
+    },
+    {
+      "label": "fixture",
+      "method": "GET",
+      "path": "/work-orders/26",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "80ffd89472af20e2"
+    },
+    {
+      "label": "fixture",
+      "method": "GET",
+      "path": "/work-orders/27",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "80ffd89472af20e2"
+    },
+    {
+      "label": "fixture",
+      "method": "GET",
+      "path": "/work-orders/26",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "80ffd89472af20e2"
+    },
+    {
+      "label": "fixture",
+      "method": "GET",
+      "path": "/work-orders/27",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "80ffd89472af20e2"
+    },
+    {
+      "label": "fixture",
+      "method": "GET",
+      "path": "/work-orders/26",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "80ffd89472af20e2"
+    },
+    {
+      "label": "fixture",
+      "method": "GET",
+      "path": "/work-orders/27",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "80ffd89472af20e2"
+    },
+    {
+      "label": "fixture",
+      "method": "GET",
+      "path": "/work-orders/26",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "80ffd89472af20e2"
+    },
+    {
+      "label": "fixture",
+      "method": "GET",
+      "path": "/work-orders/27",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "80ffd89472af20e2"
+    },
+    {
+      "label": "fixture",
+      "method": "GET",
+      "path": "/work-orders/26",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "80ffd89472af20e2"
+    }
+  ],
+  "steps": {
+    "prepared": true,
+    "prelock_idle": {
+      "active": 0,
+      "reserved": 0,
+      "ready": 0
+    },
+    "lock_fixture": {
+      "employee": 3,
+      "seconds": 3.5,
+      "operation": "SELECT FOR UPDATE then rollback; no DML; only this run synthetic Employee"
+    },
+    "created": {
+      "contended5": 27,
+      "contended6": 26
+    },
+    "one_slot": {
+      "orders": [
+        {
+          "id": 27,
+          "status": "ASSIGNED"
+        },
+        {
+          "id": 26,
+          "status": "PENDING_ASSIGNMENT"
+        }
+      ],
+      "active_assignments": 1,
+      "auto_no_human_actor": true
+    },
+    "restored": true
+  },
+  "prior_timeout_orders_preserved": [
+    25,
+    24
+  ],
+  "status": "BUSINESS_STATE_PASS_REQUIRE_WORKER_OVERLAP_LOG"
+}

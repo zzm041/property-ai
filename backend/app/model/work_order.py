@@ -244,6 +244,8 @@ class WorkOrder(BigIntPrimaryKeyMixin, TimestampMixin, Base):
     )
     property_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     house_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    # Report-time snapshot; never synchronized with account identity changes.
+    contact_phone_e164: Mapped[str | None] = mapped_column(String(16), nullable=True)
     reporter_user_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey(

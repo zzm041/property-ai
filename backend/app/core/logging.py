@@ -42,12 +42,16 @@ _REDACT_TOKENS = (
     "challenge_answer",
     "reset_token",
     "captcha",
+    "phone",
 )
 _BEARER_RE = re.compile(r"bearer\s+[A-Za-z0-9._\-+=/]+", re.I)
 _JWT_RE = re.compile(r"eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}")
 _URL_USERINFO_RE = re.compile(r"([a-z][a-z0-9+.-]*://)([^/@\s]+):([^@/\s]+)@", re.I)
 _QUERY_SECRET_RE = re.compile(
     r"(?i)(secret|password|passwd|api_key|access_token|js_code|code|token)=([^\s&\"']+)"
+)
+_PHONE_FIELD_RE = re.compile(
+    r'''(?i)(["']?(?:contact_phone_e164|contact_phone|phone_e164|phone)["']?\s*[:=]\s*)(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[^\s,;&}\]]+)'''
 )
 _JSON_SECRET_RE = re.compile(
     r'(?i)("(?:password|passwd|api_key|apikey|session_key|sessionkey|secret|authorization|access_token|refresh_token|otp|sms_code|verification_code|code)"\s*:\s*)"(?:\\.|[^"\\])*"'
@@ -75,6 +79,7 @@ def redact_text(value: str) -> str:
     text = _QUERY_SECRET_RE.sub(lambda match: f"{match.group(1)}={_REDACTED}", text)
     text = _JSON_SECRET_RE.sub(rf'\1"{_REDACTED}"', text)
     text = _REPR_SECRET_RE.sub(lambda match: f"{match.group(1)}{match.group(2)}{_REDACTED}{match.group(2)}", text)
+    text = _PHONE_FIELD_RE.sub(lambda match: f"{match.group(1)}{_REDACTED}", text)
     return text
 
 

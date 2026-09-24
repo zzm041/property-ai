@@ -142,7 +142,7 @@ class EmployeeService:
     ) -> Employee:
         self._require_positive_id(employee_id, "employee_id")
         self._validate_request_id(request_id)
-        return self._execute(
+        return self._execute_availability(
             lambda: self._update_employee(
                 actor=actor,
                 employee_id=employee_id,
@@ -332,7 +332,7 @@ class EmployeeService:
         self._require_positive_id(employee_id, "employee_id")
         self._require_positive_id(property_id, "property_id")
         self._validate_request_id(request_id)
-        return self._execute(
+        return self._execute_availability(
             lambda: self._assign_property(
                 actor=actor,
                 employee_id=employee_id,
@@ -350,7 +350,7 @@ class EmployeeService:
     ) -> EmployeeProperty:
         self._require_positive_id(assignment_id, "assignment_id")
         self._validate_request_id(request_id)
-        return self._execute(
+        return self._execute_availability(
             lambda: self._end_assignment(
                 actor=actor,
                 assignment_id=assignment_id,
@@ -368,7 +368,7 @@ class EmployeeService:
     ) -> tuple[AttendanceRecord, EmployeeDailyStatus]:
         self._require_positive_id(property_id, "property_id")
         self._validate_request_id(request_id)
-        return self._execute(
+        return self._execute_availability(
             lambda: self._check_in(
                 actor=actor,
                 property_id=property_id,
@@ -387,7 +387,7 @@ class EmployeeService:
     ) -> tuple[AttendanceRecord, EmployeeDailyStatus]:
         self._require_positive_id(property_id, "property_id")
         self._validate_request_id(request_id)
-        return self._execute(
+        return self._execute_availability(
             lambda: self._check_out(
                 actor=actor,
                 property_id=property_id,
@@ -408,7 +408,7 @@ class EmployeeService:
     ) -> tuple[AttendanceRecord, EmployeeDailyStatus]:
         self._require_positive_id(property_id, "property_id")
         self._validate_request_id(request_id)
-        return self._execute(
+        return self._execute_availability(
             lambda: self._update_my_status(
                 actor=actor,
                 property_id=property_id,
@@ -618,7 +618,7 @@ class EmployeeService:
         clear_department: bool = False,
     ) -> Employee:
         current = self._reload_actor(actor)
-        employee = self._repository.get_employee(employee_id)
+        employee = self._repository.get_employee_for_update(employee_id)
         if employee is None:
             raise AppError(
                 code=EmployeeErrorCode.EMPLOYEE_NOT_FOUND,
@@ -646,6 +646,13 @@ class EmployeeService:
             if employee.status != next_status:
                 employee.status = next_status
                 details["status"] = employee.status
+                if next_status == EmployeeStatus.ACTIVE.value and employee.user_id is not None:
+                    from app.service.employee_identity import grant_claimed_staff_property
+                    for appointment in self._repository.list_assignments_for_employee(employee.id, lock=True):
+                        grant_claimed_staff_property(
+                            self._session, employee=employee, assignment=appointment,
+                            actor_user_id=current.user_id, request_id=request_id,
+                        )
         if clear_department and department_id is not None:
             raise AppError(
                 code=EmployeeErrorCode.INVALID_INPUT,
@@ -767,7 +774,7 @@ class EmployeeService:
         request_id: str,
     ) -> EmployeeProperty:
         current = self._reload_actor(actor)
-        employee = self._repository.get_employee(employee_id)
+        employee = self._repository.get_employee_for_update(employee_id)
         if employee is None:
             raise AppError(
                 code=EmployeeErrorCode.EMPLOYEE_NOT_FOUND,
@@ -806,6 +813,9 @@ class EmployeeService:
                 "property_id": property_record.id,
             },
         )
+        from app.service.employee_identity import grant_claimed_staff_property
+        grant_claimed_staff_property(self._session, employee=employee, assignment=assignment,
+                                    actor_user_id=current.user_id, request_id=request_id)
         return assignment
 
     def _end_assignment(
@@ -816,7 +826,7 @@ class EmployeeService:
         request_id: str,
     ) -> EmployeeProperty:
         current = self._reload_actor(actor)
-        assignment = self._repository.get_assignment_for_update(assignment_id)
+        assignment = self._repository.get_assignment(assignment_id)
         if assignment is None:
             raise AppError(
                 code=EmployeeErrorCode.ASSIGNMENT_NOT_FOUND,
@@ -832,6 +842,9 @@ class EmployeeService:
                 property_id=assignment.property_id,
             ),
         )
+        # Same mutex/order as claim, appointment creation and auto dispatch.
+        employee = self._repository.get_employee_for_update(assignment.employee_id)
+        assignment = self._repository.get_assignment_for_update(assignment_id)
         if assignment.status != EmployeePropertyStatus.ACTIVE.value:
             raise AppError(
                 code=EmployeeErrorCode.CONFLICT,
@@ -857,6 +870,10 @@ class EmployeeService:
                 "property_id": assignment.property_id,
             },
         )
+        from app.service.employee_identity import revoke_ended_staff_property
+        revoke_ended_staff_property(self._session, employee=employee,
+                                    property_id=assignment.property_id,
+                                    actor_user_id=current.user_id, request_id=request_id)
         return assignment
 
     def _check_in(
@@ -1523,6 +1540,15 @@ class EmployeeService:
                 message="Employee operation could not be completed",
                 status_code=500,
             ) from exc
+
+    def _execute_availability(self, operation: Callable[[], T]) -> T:
+        result = self._execute(operation)
+        # Only after the owned commit succeeds. Failed enqueue is observable;
+        # existing beat discovers the durable pending work without this hint.
+        from app.core.config import get_settings
+        from app.worker.enqueue import schedule_dispatch_recovery
+        schedule_dispatch_recovery(get_settings())
+        return result
 
     @staticmethod
     def _is_expected_duplicate(

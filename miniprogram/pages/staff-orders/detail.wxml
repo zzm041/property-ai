@@ -1,6 +1,9 @@
 <view class="loading" wx:if="{{loading}}">加载中...</view>
+<work-order-contact id="order-contact" wx:if="{{workOrder}}" work-order-id="{{workOrder.id}}" />
 <view class="card" wx:if="{{workOrder}}">
   <view>工单 {{workOrder.id}}</view>
+  <view>本次报修全部事项：{{item.text || item.asr_text}}</view>
+  <view wx:if="{{item.extra_notes}}">补充问题：{{item.extra_notes}}</view>
   <view>状态 {{workOrder.status}}</view>
   <view wx:if="{{workOrder.process_reason != 'NONE'}}">处理原因 {{workOrder.process_reason}}</view>
   <button class="btn" wx:if="{{workOrder.incident_id}}" bindtap="openIncident">查看本人参与的集中事件</button>
@@ -23,7 +26,7 @@
     <view class="field-label">问题类型（必填）</view>
     <input class="field" placeholder="例如：电气维修" value="{{problemType}}" bindinput="onProblemType" maxlength="64" />
     <view class="field-label">处理方式与过程（必填）</view>
-    <textarea class="field" placeholder="说明检查、处理步骤和结果" value="{{method}}" bindinput="onMethod" maxlength="255"></textarea>
+    <textarea class="field" placeholder="逐项说明全部报修问题的处理结果，不遗漏次要事项" value="{{method}}" bindinput="onMethod" maxlength="255"></textarea>
     <view class="field-label">使用材料</view>
     <input class="field" placeholder="无材料可留空" value="{{materials}}" bindinput="onMaterials" maxlength="255" />
     <view class="switch-row">
@@ -34,7 +37,7 @@
     <view class="field-label">后续处理方式</view>
     <input class="field" placeholder="无需跟进可留空" value="{{followUp}}" bindinput="onFollowUp" maxlength="255" />
     <view class="switch-row">
-      <text>问题已解决</text>
+      <text>本次全部问题均已解决（有未完成事项请关闭并说明）</text>
       <switch checked="{{receiptResolved}}" bindchange="onReceiptResolved" />
     </view>
     <textarea wx:if="{{!receiptResolved}}" class="field" placeholder="未解决原因（必填）" value="{{unresolvedReason}}" bindinput="onUnresolvedReason" maxlength="255"></textarea>

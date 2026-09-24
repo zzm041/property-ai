@@ -18,12 +18,14 @@
     <view class="picker">部门：{{departmentOptions[createDepartmentIndex].name}}</view>
   </picker>
   <view class="field-title">职责</view>
+  <view class="hint">普通维修请选择 MAINTENANCE 维修职责并建立有效小区任职。水、电、空调及一般设施由同一维修组统筹，不要求逐项技能标签。</view>
   <checkbox-group bindchange="onCreateDuties">
     <label class="choice" wx:for="{{duties}}" wx:key="id">
       <checkbox value="{{item.id}}" />{{item.name}}
     </label>
   </checkbox-group>
   <view class="field-title">技能</view>
+  <view class="hint">技能资料保留用于展示及特殊限制；普通维修自动派给全局空闲人员，按最近派单顺序轮转。容量为上限，不代表忙碌时自动追加普通工单。</view>
   <checkbox-group bindchange="onCreateSkills">
     <label class="choice" wx:for="{{skills}}" wx:key="id">
       <checkbox value="{{item.id}}" />{{item.name}}

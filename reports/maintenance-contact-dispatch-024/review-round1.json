@@ -1,0 +1,21 @@
+{
+  "task_id": "MAINTENANCE-CONTACT-DISPATCH-024",
+  "review_round": 1,
+  "reviewer": "/root/review_024_round1",
+  "reviewer_mode": "INDEPENDENT_READ_ONLY",
+  "base_sha": "954b8549b500fc89cec86f0ab1b3bce96672e5a8",
+  "head_sha": "954b8549b500fc89cec86f0ab1b3bce96672e5a8",
+  "reviewed_state": "024 source WIP, migration output and unit test source; before page/runtime acceptance",
+  "verdict": "NEEDS_CHANGES",
+  "record_kind": "Main session faithful structured transcription of separate review response, not a new reviewer verdict",
+  "findings": [
+    {"id":"024-R1-01","classification":"CURRENT_TASK_BLOCKER","priority":"P2","location":"backend/app/repository/work_order.py:213-225","trigger":"Yesterday open attendance with ON_DUTY, no current property-day checkin, and ASSIGNED work.","impact":"MAX(business_date) excludes the unavailable employee from recovery, so later current-day recheck never sees the order.","required_change":"Use the same Property current business date in scan and transaction recheck; regress yesterday-open and different timezones."},
+    {"id":"024-R1-02","classification":"CURRENT_TASK_BLOCKER","priority":"P2","location":"backend/app/schema/work_order.py:28-31; backend/app/service/work_order.py:547-550","trigger":"Direct API contact includes fullwidth or other Unicode digits.","impact":"Python normalizer accepts Unicode digits while JS rejects them; persisted value is not ASCII E.164.","required_change":"Reject or explicitly normalize to ASCII consistently; test Schema and Service, never rewrite history."}
+  ],
+  "checked_conditions": ["Real MAINTENANCE duty/scope/appointment/attendance preserved; ordinary trade tag gates removed", "Global ACTIVE unended reservations and Employee transactional locking recheck", "Assignment-history rotation and incident shared-capacity behavior", "Durable waiting and stored-analysis retry without model call", "Independent contact snapshot/hash, no shared WorkOrderData plaintext", "Reporter/current employee/scoped manager only; SYSTEM-only denied; phone-free audit and no-store", "0011 only approved nullable column, parent0009, no0010"],
+  "actual_read": ["AGENTS.md", ".cursor/rules/project.mdc", "024 scoped product diff and directly related source/tests", "docs/05-AI-DISPATCH-SPEC.md", "docs/04-WORKORDER-STATE-MACHINE.md", "docs/07-SECURITY-PRIVACY.md", "024 PRD/API/model diff", "reports/maintenance-contact-dispatch-024/migration.jsonl", "reports/project-handoff.md"],
+  "evidence_assessment": {"migration":"Saved output: only approved column; prior12 rows/nulls, order12 hash, constraints unchanged.","tests":"101/203 reported by main; test source inspected, raw test output not then saved; no rerun by reviewer.","runtime":"No page/API/DB/queue/model action or screenshot review by reviewer."},
+  "unverified": ["Live concurrency", "Actual three-role contact pages/privacy", "Identity phone rebind snapshot", "Cross-process recovery/idempotency", "Reject/timeout/incident/notification combined runtime", "Final raw tests and tracking/version binding"],
+  "next_action": "Fix the two findings, regress only related code, add post-commit bounded availability hint with beat backstop, preserve order12 and obtain scoped runtime/page evidence. Same task and repair count.",
+  "boundaries": "No writes, tests, live requests, inference or recursive reviewer by independent agent; not Production/real AI/overall task PASS."
+}

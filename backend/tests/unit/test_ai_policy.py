@@ -117,7 +117,8 @@ def test_hard_filter_and_deterministic_ranking() -> None:
         required_skill="ELECTRICAL",
         required_duty="MAINTENANCE",
     )
-    assert [item[0].employee_id for item in ranked] == [2, 1]
+    # New ordinary maintenance policy queues busy people even below max capacity.
+    assert [item[0].employee_id for item in ranked] == [2]
 
 
 def test_hard_filter_rejects_full_capacity() -> None:

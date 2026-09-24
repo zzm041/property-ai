@@ -1,0 +1,373 @@
+[2026-09-25 00:19:48,153: WARNING/MainProcess] 2026-09-25 00:19:48 [error    ] auto_dispatch_failed           operation=app.worker.tasks.analyze_work_order_task request_id=maint024-42193bfcfb-contended4-auto-create service=worker task_id=62758c2f-49d0-4c2e-842b-18768d75b7bc work_order_id=24
+Traceback (most recent call last):
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 782, in _read_bytes
+    data = self._rfile.read(num_bytes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\socket.py", line 720, in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+TimeoutError: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+    result.read()
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 744, in _read_packet
+    packet_header = self._read_bytes(4)
+                    ^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 788, in _read_bytes
+    raise err.OperationalError(
+pymysql.err.OperationalError: (2013, 'Lost connection to MySQL server during query (timed out)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\property-ai\backend\app\service\auto_dispatch.py", line 150, in maybe_assign
+    outcome = self._commit_auto_assignment(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\backend\app\service\auto_dispatch.py", line 377, in _commit_auto_assignment
+    employee = self._employees.get_employee_for_update(winner.employee_id)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\backend\app\repository\employee.py", line 32, in get_employee_for_update
+    return self._session.scalar(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2410, in scalar
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 2247, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\orm\context.py", line 305, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1418, in execute
+    return meth(
+           ^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\sql\elements.py", line 515, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1640, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+    result.read()
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 744, in _read_packet
+    packet_header = self._read_bytes(4)
+                    ^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 788, in _read_bytes
+    raise err.OperationalError(
+sqlalchemy.exc.OperationalError: (pymysql.err.OperationalError) (2013, 'Lost connection to MySQL server during query (timed out)')
+[SQL: SELECT employees.user_id, employees.tenant_id, employees.employee_no, employees.department_id, employees.status, employees.max_capacity, employees.id, employees.created_at, employees.updated_at 
+FROM employees 
+WHERE employees.id = %(id_1)s FOR UPDATE]
+[parameters: {'id_1': 3}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[2026-09-25 00:19:48,154: WARNING/MainProcess] 2026-09-25 00:19:48 [info     ] auto_dispatch_outcome          analysis_id=24 operation=app.worker.tasks.analyze_work_order_task outcome=ASSIGN_FAILED request_id=maint024-42193bfcfb-contended4-auto-create service=worker task_id=62758c2f-49d0-4c2e-842b-18768d75b7bc work_order_id=24
+[2026-09-25 00:19:48,211: WARNING/MainProcess] 2026-09-25 00:19:48 [error    ] failed_task_recorded           dlq=property_ai.auth001.dlq dlq_ok=True error_code=[redacted] operation=app.worker.tasks.analyze_work_order_task redis_ok=True request_id=maint024-42193bfcfb-contended4-auto-create service=worker task_id=62758c2f-49d0-4c2e-842b-18768d75b7bc work_order_id=24
+[2026-09-25 00:19:48,212: WARNING/MainProcess] 2026-09-25 00:19:48 [error    ] celery_task_failed             error_code=[redacted] operation=app.worker.tasks.analyze_work_order_task queue=property_ai.auth001.dlq request_id=maint024-42193bfcfb-contended4-auto-create retries=0 service=worker task_id=62758c2f-49d0-4c2e-842b-18768d75b7bc work_order_id=24
+Traceback (most recent call last):
+  File "D:\property-ai\.venv\Lib\site-packages\celery\app\trace.py", line 453, in trace_task
+    R = retval = fun(*args, **kwargs)
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\celery\app\trace.py", line 736, in __protected_call__
+    return self.run(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\backend\app\worker\tasks.py", line 79, in analyze_work_order_task
+    analysis = AnalysisService(session, settings=settings).analyze_work_order(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\backend\app\service\analysis.py", line 182, in analyze_work_order
+    return self._apply(
+           ^^^^^^^^^^^^
+  File "D:\property-ai\backend\app\service\analysis.py", line 892, in _apply
+    raise AppError(
+celery.utils.serialization.UnpickleableExceptionWrapper: AppError('AI analysis could not be stored')
+[2026-09-25 00:19:48,212: ERROR/MainProcess] Task app.worker.tasks.analyze_work_order_task[62758c2f-49d0-4c2e-842b-18768d75b7bc] raised unexpected: UnpickleableExceptionWrapper('app.core.errors', 'AppError', ('AI analysis could not be stored',), "AppError('AI analysis could not be stored')")
+Traceback (most recent call last):
+  File "D:\property-ai\.venv\Lib\site-packages\celery\app\trace.py", line 453, in trace_task
+    R = retval = fun(*args, **kwargs)
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\celery\app\trace.py", line 736, in __protected_call__
+    return self.run(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\backend\app\worker\tasks.py", line 79, in analyze_work_order_task
+    analysis = AnalysisService(session, settings=settings).analyze_work_order(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\backend\app\service\analysis.py", line 182, in analyze_work_order
+    return self._apply(
+           ^^^^^^^^^^^^
+  File "D:\property-ai\backend\app\service\analysis.py", line 892, in _apply
+    raise AppError(
+celery.utils.serialization.UnpickleableExceptionWrapper: AppError('AI analysis could not be stored')
+[2026-09-25 00:19:51,719: WARNING/MainProcess] 2026-09-25 00:19:51 [error    ] failed_task_recorded           dlq=property_ai.auth001.dlq dlq_ok=True error_code=[redacted] operation=app.worker.tasks.analyze_work_order_task redis_ok=True request_id=maint024-42193bfcfb-contended3-auto-create service=worker task_id=820e84fb-fd4c-4b87-b92c-c0c5aa19075d work_order_id=25
+[2026-09-25 00:19:51,720: WARNING/MainProcess] 2026-09-25 00:19:51 [error    ] celery_task_failed             error_code=[redacted] operation=app.worker.tasks.analyze_work_order_task queue=property_ai.auth001.dlq request_id=maint024-42193bfcfb-contended3-auto-create retries=0 service=worker task_id=820e84fb-fd4c-4b87-b92c-c0c5aa19075d work_order_id=25
+Traceback (most recent call last):
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 782, in _read_bytes
+    data = self._rfile.read(num_bytes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\socket.py", line 720, in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+TimeoutError: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+    result.read()
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 744, in _read_packet
+    packet_header = self._read_bytes(4)
+                    ^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 788, in _read_bytes
+    raise err.OperationalError(
+pymysql.err.OperationalError: (2013, 'Lost connection to MySQL server during query (timed out)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\property-ai\.venv\Lib\site-packages\celery\app\trace.py", line 453, in trace_task
+    R = retval = fun(*args, **kwargs)
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\celery\app\trace.py", line 736, in __protected_call__
+    return self.run(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\backend\app\worker\tasks.py", line 79, in analyze_work_order_task
+    analysis = AnalysisService(session, settings=settings).analyze_work_order(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\backend\app\service\analysis.py", line 163, in analyze_work_order
+    snapshot = self._prepare(
+               ^^^^^^^^^^^^^^
+  File "D:\property-ai\backend\app\service\analysis.py", line 450, in _prepare
+    analysis = self._ai.add_analysis(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\backend\app\repository\ai.py", line 97, in add_analysis
+    self._session.flush()
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 4352, in flush
+    self._flush(objects)
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 4487, in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 4448, in _flush
+    flush_context.execute()
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1418, in execute
+    return meth(
+           ^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\sql\elements.py", line 515, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1640, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+    result.read()
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 744, in _read_packet
+    packet_header = self._read_bytes(4)
+                    ^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 788, in _read_bytes
+    raise err.OperationalError(
+sqlalchemy.exc.OperationalError: (pymysql.err.OperationalError) (2013, 'Lost connection to MySQL server during query (timed out)')
+[SQL: INSERT INTO work_order_analyses (tenant_id, property_id, work_order_id, analysis_version, status, category, subcategory, severity, priority, summary, risk, required_role, required_skill, confidence, input_hash, prompt_version, error_code, created_at, updated_at) VALUES (%(tenant_id)s, %(property_id)s, %(work_order_id)s, %(analysis_version)s, %(status)s, %(category)s, %(subcategory)s, %(severity)s, %(priority)s, %(summary)s, %(risk)s, %(required_role)s, %(required_skill)s, %(confidence)s, %(input_hash)s, %(prompt_version)s, %(error_code)s, %(created_at)s, %(updated_at)s)]
+[parameters: {'tenant_id': 1, 'property_id': 2, 'work_order_id': 25, 'analysis_version': 1, 'status': 'PROCESSING', 'category': None, 'subcategory': None, 'severity': None, 'priority': None, 'summary': None, 'risk': None, 'required_role': None, 'required_skill': None, 'confidence': None, 'input_hash': '23035f3d78c110761de38e82e26b9f93a6ec49de93921fd093b668eb714c969a', 'prompt_version': 'wo-analysis-v8-maintenance', 'error_code': None, 'created_at': datetime.datetime(2026, 9, 24, 16, 19, 46, 625328), 'updated_at': datetime.datetime(2026, 9, 24, 16, 19, 46, 625328)}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[2026-09-25 00:19:51,721: ERROR/MainProcess] Task app.worker.tasks.analyze_work_order_task[820e84fb-fd4c-4b87-b92c-c0c5aa19075d] raised unexpected: OperationalError("(pymysql.err.OperationalError) (2013, 'Lost connection to MySQL server during query (timed out)')")
+Traceback (most recent call last):
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 782, in _read_bytes
+    data = self._rfile.read(num_bytes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\socket.py", line 720, in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+TimeoutError: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+    result.read()
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 744, in _read_packet
+    packet_header = self._read_bytes(4)
+                    ^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 788, in _read_bytes
+    raise err.OperationalError(
+pymysql.err.OperationalError: (2013, 'Lost connection to MySQL server during query (timed out)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\property-ai\.venv\Lib\site-packages\celery\app\trace.py", line 453, in trace_task
+    R = retval = fun(*args, **kwargs)
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\celery\app\trace.py", line 736, in __protected_call__
+    return self.run(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\backend\app\worker\tasks.py", line 79, in analyze_work_order_task
+    analysis = AnalysisService(session, settings=settings).analyze_work_order(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\backend\app\service\analysis.py", line 163, in analyze_work_order
+    snapshot = self._prepare(
+               ^^^^^^^^^^^^^^
+  File "D:\property-ai\backend\app\service\analysis.py", line 450, in _prepare
+    analysis = self._ai.add_analysis(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\backend\app\repository\ai.py", line 97, in add_analysis
+    self._session.flush()
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 4352, in flush
+    self._flush(objects)
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 4487, in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\util\langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\orm\session.py", line 4448, in _flush
+    flush_context.execute()
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\orm\unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\orm\persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\orm\persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1418, in execute
+    return meth(
+           ^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\sql\elements.py", line 515, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1640, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "D:\property-ai\.venv\Lib\site-packages\sqlalchemy\engine\default.py", line 941, in do_execute
+    cursor.execute(statement, parameters)
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\cursors.py", line 153, in execute
+    result = self._query(query)
+             ^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\cursors.py", line 322, in _query
+    conn.query(q)
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 563, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 825, in _read_query_result
+    result.read()
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 1199, in read
+    first_packet = self.connection._read_packet()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 744, in _read_packet
+    packet_header = self._read_bytes(4)
+                    ^^^^^^^^^^^^^^^^^^^
+  File "D:\property-ai\.venv\Lib\site-packages\pymysql\connections.py", line 788, in _read_bytes
+    raise err.OperationalError(
+sqlalchemy.exc.OperationalError: (pymysql.err.OperationalError) (2013, 'Lost connection to MySQL server during query (timed out)')
+[SQL: INSERT INTO work_order_analyses (tenant_id, property_id, work_order_id, analysis_version, status, category, subcategory, severity, priority, summary, risk, required_role, required_skill, confidence, input_hash, prompt_version, error_code, created_at, updated_at) VALUES (%(tenant_id)s, %(property_id)s, %(work_order_id)s, %(analysis_version)s, %(status)s, %(category)s, %(subcategory)s, %(severity)s, %(priority)s, %(summary)s, %(risk)s, %(required_role)s, %(required_skill)s, %(confidence)s, %(input_hash)s, %(prompt_version)s, %(error_code)s, %(created_at)s, %(updated_at)s)]
+[parameters: {'tenant_id': 1, 'property_id': 2, 'work_order_id': 25, 'analysis_version': 1, 'status': 'PROCESSING', 'category': None, 'subcategory': None, 'severity': None, 'priority': None, 'summary': None, 'risk': None, 'required_role': None, 'required_skill': None, 'confidence': None, 'input_hash': '23035f3d78c110761de38e82e26b9f93a6ec49de93921fd093b668eb714c969a', 'prompt_version': 'wo-analysis-v8-maintenance', 'error_code': None, 'created_at': datetime.datetime(2026, 9, 24, 16, 19, 46, 625328), 'updated_at': datetime.datetime(2026, 9, 24, 16, 19, 46, 625328)}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)

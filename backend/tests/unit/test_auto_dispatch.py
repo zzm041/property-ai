@@ -102,6 +102,7 @@ def test_idempotent_create_replay_enqueues_analysis_only_for_new_order() -> None
         "house_id": 1,
         "request_id": "request-idempotent-create",
         "idempotency_key": "idempotent-create-key",
+        "contact_phone": "+8613800000123",
         "text": "socket is sparking",
     }
 
@@ -337,6 +338,7 @@ def test_incident_follower_reuses_full_primary_without_duplicate_load(monkeypatc
     record.incident_id = 501
     employee = SimpleNamespace(
         id=7,
+        tenant_id=record.tenant_id,
         user_id=17,
         status="ACTIVE",
         max_capacity=2,
@@ -365,7 +367,8 @@ def test_incident_follower_reuses_full_primary_without_duplicate_load(monkeypatc
         timezone="Asia/Shanghai"
     )
     service._work_orders.get_sla_clock_for_update.return_value = None
-    service._employees.get_employee.return_value = employee
+    service._employees.get_employee_for_update.return_value = employee
+    service._work_orders.employee_global_occupancy.return_value = 2
     service._employees.get_daily_status_for_update.return_value = daily
     service._ai.get_incident_for_update.return_value = incident
     service._ai.get_attendance.return_value = SimpleNamespace(

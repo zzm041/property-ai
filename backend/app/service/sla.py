@@ -274,6 +274,42 @@ class SlaService:
                 counts["redispatch_enqueued"] += 1
         return AssignmentSlaSweepResult(**counts)
 
+    def sweep_unavailable_assignments(self) -> int:
+        """Only unaccepted unavailable reservations; never close processing work."""
+        from app.repository.ai import AiRepository
+        ai = AiRepository(self._session)
+        now = utc_now()
+        with begin_owned_transaction(self._session):
+            ids = self._repository.list_unavailable_unaccepted(now=now)
+        changed = 0
+        for work_order_id in ids:
+            with begin_owned_transaction(self._session):
+                record = self._repository.get_work_order_for_update(work_order_id)
+                if record is None or record.status != "ASSIGNED":
+                    continue
+                assignment = self._repository.get_active_assignment_for_update(record.id)
+                if assignment is None:
+                    continue
+                employee = self._employees.get_employee_for_update(assignment.employee_id)
+                property_record = self._repository.get_property(record.property_id)
+                if property_record is None:
+                    continue
+                day = current_business_date(property_record.timezone, clock=lambda: now)
+                daily = self._employees.get_daily_status_for_update(employee_id=assignment.employee_id, property_id=record.property_id, business_date=day)
+                effective = ai.get_effective_property(employee_id=assignment.employee_id, property_id=record.property_id, now=now)
+                attendance = ai.get_attendance(employee_id=assignment.employee_id, property_id=record.property_id, business_date=day)
+                available = (employee is not None and employee.status == "ACTIVE"
+                             and ai.get_user_status(employee.user_id) == "ACTIVE" and effective is not None
+                             and daily is not None and daily.on_duty == "ON_DUTY" and attendance is not None)
+                if available:
+                    continue
+                outcome = self._expire_unaccepted_assignment(record=record,
+                    clock=self._repository.get_sla_clock_for_update(record.id), now=now,
+                    notifier=NotificationService(self._session, settings=self._settings),
+                    reason_code="ASSIGNEE_UNAVAILABLE")
+                changed += int(outcome is not None)
+        return changed
+
     def _expire_unaccepted_assignment(
         self,
         *,
@@ -281,21 +317,24 @@ class SlaService:
         clock,
         now: datetime,
         notifier: NotificationService,
+        reason_code: str = "SLA_ACCEPT_TIMEOUT",
     ) -> tuple[int, str] | None:
         assignment = self._repository.get_active_assignment_for_update(record.id)
         if (
             assignment is None
             or record.current_assignment_id != assignment.id
-            or now < clock.accept_due_at
+            or (reason_code == "SLA_ACCEPT_TIMEOUT" and (clock is None or now < clock.accept_due_at))
         ):
             return None
-        request_id = f"sla-assignment:{assignment.id}:accept-timeout"
+        suffix = "accept-timeout" if reason_code == "SLA_ACCEPT_TIMEOUT" else reason_code.lower()
+        request_id = f"sla-assignment:{assignment.id}:{suffix}"
         assignee_user_id = self._repository.get_active_assignee_user_id(record.id)
         employee = self._employees.get_employee(assignment.employee_id)
         assignment.status = AssignmentStatus.REASSIGNED.value
-        assignment.timeout_at = now
+        if reason_code == "SLA_ACCEPT_TIMEOUT":
+            assignment.timeout_at = now
         assignment.ended_at = now
-        assignment.reason = "SLA_ACCEPT_TIMEOUT"
+        assignment.reason = reason_code
         from app.service.incident import IncidentCapacityService
 
         release_load = IncidentCapacityService(
@@ -343,10 +382,10 @@ class SlaService:
                 request_id=request_id,
                 payload_json={
                     "event_code": WorkOrderEvent.REASSIGN.value,
-                    "reason_code": "SLA_ACCEPT_TIMEOUT",
+                    "reason_code": reason_code,
                     "assignment_id": assignment.id,
                     "employee_id": assignment.employee_id,
-                    "accept_due_at": clock.accept_due_at.isoformat(),
+                    "accept_due_at": None if clock is None else clock.accept_due_at.isoformat(),
                 },
             )
         )
@@ -363,7 +402,7 @@ class SlaService:
                 "work_order_id": record.id,
                 "employee_id": assignment.employee_id,
                 "status": record.status,
-                "reason_code": "SLA_ACCEPT_TIMEOUT",
+                "reason_code": reason_code,
             },
         )
         recipients = set(
@@ -379,8 +418,8 @@ class SlaService:
                 tenant_id=record.tenant_id,
                 property_id=record.property_id,
                 user_id=user_id,
-                title="Work order accept timeout",
-                body="The assignment timed out and was returned for automatic dispatch",
+                title="工单等待重新派单",
+                body="原派单已失效，系统将继续安排处理人员",
                 resource_type="WORK_ORDER",
                 resource_id=record.id,
             )

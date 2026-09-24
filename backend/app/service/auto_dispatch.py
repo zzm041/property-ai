@@ -20,6 +20,7 @@ from app.domain.ai import (
     MappedAnalysis,
     hard_filter_candidate,
     rank_candidates,
+    ordinary_maintenance,
 )
 from app.domain.audit import AuditAction, AuditResourceType
 from app.domain.employee import AttendanceOnDuty, EmployeeStatus
@@ -140,6 +141,7 @@ class AutoDispatchService:
             return "ALREADY_ASSIGNED"
         ranked, filter_snapshot = self._evaluate_live_candidates(record, mapped)
         if not ranked:
+            self._record_wait(record, filter_snapshot, request_id)
             return "NO_ELIGIBLE"
         for winner, score, reasons in ranked:
             notification_snapshot = _notification_intent_snapshot(self._session)
@@ -181,7 +183,26 @@ class AutoDispatchService:
                     request_id=request_id,
                 )
                 return "ASSIGN_FAILED"
+        # The transactional recheck may have found a new reservation. Refresh
+        # the reasons instead of presenting the initial idle snapshot as truth.
+        _, refreshed_snapshot = self._evaluate_live_candidates(record, mapped)
+        self._record_wait(record, refreshed_snapshot, request_id)
         return "NO_ELIGIBLE"
+
+    def _record_wait(self, record: WorkOrder, snapshot: tuple, request_id: str, *, reason_code: str | None = None) -> None:
+        """Durable scheduling event, not a terminal failure or phone storage."""
+        if self._work_orders.has_dispatch_wait_attempt(work_order_id=record.id, request_id=request_id):
+            return
+        reasons = {item.get("filter_reason") for item in snapshot}
+        reason = reason_code or ("WAITING_IDLE" if reasons & {"BUSY", "CAPACITY_FULL"} else "WAITING_ELIGIBLE")
+        self._work_orders.add_log(WorkOrderLog(
+            tenant_id=record.tenant_id, property_id=record.property_id,
+            work_order_id=record.id, actor_user_id=None, actor_type="SYSTEM",
+            from_status=record.status, to_status=record.status,
+            process_reason=record.process_reason, event_code="AUTO_DISPATCH_WAIT",
+            request_id=request_id,
+            payload_json={"reason_code": reason, "policy_version": "maintenance-group-v1"},
+        ))
 
     def _evaluate_live_candidates(
         self,
@@ -241,7 +262,12 @@ class AutoDispatchService:
                 employee_id=employee.id,
                 duty_codes=self._ai.list_employee_duties(employee.id),
                 skill_codes=self._ai.list_employee_skills(employee.id),
-                current_load=0 if daily is None else daily.current_load,
+                current_load=self._work_orders.employee_global_occupancy(
+                    employee_id=employee.id, tenant_id=record.tenant_id,
+                ) if ordinary_maintenance(mapped.required_duty, mapped.required_skill) else (0 if daily is None else daily.current_load),
+                last_assignment_id=self._work_orders.employee_last_assignment_id(
+                    employee_id=employee.id, tenant_id=record.tenant_id,
+                ),
                 max_capacity=employee.max_capacity,
                 on_duty=daily is not None
                 and daily.on_duty == AttendanceOnDuty.ON_DUTY.value,
@@ -313,6 +339,7 @@ class AutoDispatchService:
                     "skill_codes": sorted(candidate.skill_codes),
                     "current_load": candidate.current_load,
                     "max_capacity": candidate.max_capacity,
+                    "last_assignment_id": candidate.last_assignment_id,
                     "check_in_at": (
                         None
                         if candidate.check_in_at is None
@@ -347,8 +374,8 @@ class AutoDispatchService:
             assignments=prior_assignments,
         ):
             return "NO_ELIGIBLE"
-        employee = self._employees.get_employee(winner.employee_id)
-        if employee is None or employee.status != EmployeeStatus.ACTIVE.value:
+        employee = self._employees.get_employee_for_update(winner.employee_id)
+        if employee is None or employee.tenant_id != record.tenant_id or employee.status != EmployeeStatus.ACTIVE.value:
             return "NO_ELIGIBLE"
         property_record = self._work_orders.get_property(record.property_id)
         if property_record is None:
@@ -371,7 +398,10 @@ class AutoDispatchService:
             and incident.primary_work_order_id != record.id
             and incident.primary_employee_id == employee.id
         )
-        if daily.current_load >= employee.max_capacity and not incident_follow:
+        load = self._work_orders.employee_global_occupancy(
+            employee_id=employee.id, tenant_id=record.tenant_id, lock=True,
+        ) if ordinary_maintenance(mapped.required_duty, mapped.required_skill) else daily.current_load
+        if load >= employee.max_capacity and not incident_follow:
             return "NO_ELIGIBLE"
         attendance = self._ai.get_attendance(
             employee_id=employee.id,
@@ -396,7 +426,7 @@ class AutoDispatchService:
             employee_id=employee.id,
             duty_codes=self._ai.list_employee_duties(employee.id),
             skill_codes=self._ai.list_employee_skills(employee.id),
-            current_load=daily.current_load,
+            current_load=load,
             max_capacity=employee.max_capacity,
             on_duty=daily.on_duty == AttendanceOnDuty.ON_DUTY.value,
             employee_active=employee.status == EmployeeStatus.ACTIVE.value,
@@ -425,12 +455,14 @@ class AutoDispatchService:
             "category": mapped.category.value,
             "required_skill": mapped.required_skill,
             "required_duty": mapped.required_duty,
+            "dispatch_policy": "maintenance-group-v1",
+            "ordinary_maintenance": ordinary_maintenance(mapped.required_duty, mapped.required_skill),
             "confidence": mapped.confidence,
             "risk": mapped.risk.value,
             "incident_id": None if incident is None else incident.id,
             "incident_follow": incident_follow,
             "incident_capacity_owner": incident is not None and not incident_follow,
-            "current_load": winner.current_load,
+            "current_load": load,
             "max_capacity": winner.max_capacity,
             "filter_snapshot": {
                 "weights": {

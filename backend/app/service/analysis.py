@@ -186,6 +186,32 @@ class AnalysisService:
             attempt=attempt,
         )
 
+    def sweep_waiting_dispatch(self, *, limit: int = 100, availability_changed: bool = False) -> dict[str, int]:
+        """Bounded recovery from durable waiting state, without provider calls."""
+        if not self._settings.ai_auto_assign:
+            return {"scanned": 0, "assigned": 0, "waiting": 0}
+        with begin_owned_transaction(self._session):
+            items = self._ai.list_waiting_dispatch(
+                retry_before=self._clock() - timedelta(seconds=0 if availability_changed else self._settings.sla_sweep_interval_seconds),
+                limit=limit,
+            )
+        result = {"scanned": 0, "assigned": 0, "waiting": 0}
+        for work_order_id, analysis_id in items:
+            try:
+                outcome = self._retry_auto_dispatch_from_existing(
+                    work_order_id=work_order_id, analysis_id=analysis_id,
+                    request_id=f"dispatch-wait:{work_order_id}:{self._clock().isoformat()}",
+                )
+            except SQLAlchemyError:
+                # One transient lock failure must not stop the remaining batch.
+                # Durable PENDING remains discoverable next tick.
+                self._session.rollback()
+                logger.warning("dispatch_wait_retry_later", work_order_id=work_order_id)
+                outcome = "RETRY_LATER"
+            result["scanned"] += 1
+            result["assigned" if outcome == "ASSIGNED" else "waiting"] += 1
+        return result
+
     def _retry_auto_dispatch_from_existing(
         self,
         *,
@@ -205,9 +231,12 @@ class AnalysisService:
             ):
                 return "STALE_STATUS"
             mapped = self._mapped_from_stored_analysis(current)
-            if mapped is None:
-                return "INVALID_ANALYSIS"
             from app.service.auto_dispatch import AutoDispatchService
+
+            dispatcher = AutoDispatchService(self._session, settings=self._settings)
+            if mapped is None:
+                dispatcher._record_wait(record, (), request_id, reason_code="INVALID_STORED_ANALYSIS")
+                return "INVALID_ANALYSIS"
 
             outcome = AutoDispatchService(
                 self._session,
@@ -217,6 +246,8 @@ class AnalysisService:
                 mapped=mapped,
                 request_id=request_id,
             )
+            if outcome not in {"ASSIGNED", "NO_ELIGIBLE", "ALREADY_ASSIGNED", "STALE_STATUS"}:
+                dispatcher._record_wait(record, (), request_id, reason_code=outcome)
             logger.info(
                 "auto_redispatch_outcome",
                 work_order_id=record.id,
@@ -628,12 +659,15 @@ class AnalysisService:
             "2. summary和subcategory只用中文描述实际现象，subcategory也不得推断未确认的内部原因、犯罪意图。"
             "用户猜测与图像猜测均不能升级为事实。图像无可见损伤不等于功能完好或安全；"
             "不能添加用户未说过的确认、检测、安装、受伤、完好或已修复事实。\n"
-            "3. 先判断本次证据是否足以确定单一专业：本次事实互相矛盾、现象来源不明、"
-            "多个专业无主次时，category和required_skill均用other，confidence低于0.70。"
-            "若专业明确而内部原因未知，可按专业分类但不要猜原因。"
-            "category/required_skill只能选择一组，分别填入两个字段："
-            "供排水water_supply/plumber；电气electrical/electrician；空调hvac/hvac；"
-            "清扫cleaning/cleaning；人员治安security/security；其余other/other。"
+            "3. 普通维修由实际MAINTENANCE维修组统筹，required_skill填maintenance。"
+            "水、电、空调、墙面和一般设施按可观察现象保留category；"
+            "多项普通维修不必拆单或选唯一工种，summary用中文分项完整列出所有当前问题，"
+            "不遗漏次要事项，混合或一般设施使用other/maintenance。"
+            "内部原因未知不等于不能分流；事实矛盾须保留不确定性，不自行确诊。"
+            "无法确定是否属于普通维修且信息确实不足时用other/other并降低confidence。"
+            "category允许water_supply/electrical/hvac/cleaning/security/other。"
+            "清扫使用cleaning/cleaning；人员治安security/security。"
+            "模型不选员工，服务端负责真实维修组、空闲与公平次序。"
             "设施损坏不属于人员治安；不能因出现人身安全风险就选security。\n"
             "4. risk独立于专业和置信度：疑似燃气气味仍标gas；明确跌倒等人身危险标safety；"
             "可见烧损、火花标electric；持续积水扩散标flooding。"
@@ -971,7 +1005,12 @@ class AnalysisService:
                 employee_id=employee.id,
                 duty_codes=self._ai.list_employee_duties(employee.id),
                 skill_codes=self._ai.list_employee_skills(employee.id),
-                current_load=0 if daily is None else daily.current_load,
+                current_load=self._work_orders.employee_global_occupancy(
+                    employee_id=employee.id, tenant_id=record.tenant_id,
+                ) if mapped.required_duty == "MAINTENANCE" else (0 if daily is None else daily.current_load),
+                last_assignment_id=self._work_orders.employee_last_assignment_id(
+                    employee_id=employee.id, tenant_id=record.tenant_id,
+                ),
                 max_capacity=employee.max_capacity,
                 on_duty=daily is not None
                 and daily.on_duty == AttendanceOnDuty.ON_DUTY.value,
@@ -988,6 +1027,8 @@ class AnalysisService:
                     property_id=record.property_id,
                 ),
                 primary_incident_handler=employee.id == primary_employee_id,
+                incident_follow=(incident is not None and incident.primary_work_order_id != record.id
+                                 and employee.id == primary_employee_id),
                 average_response_seconds=response,
                 completion_rate=completion,
                 average_rating=rating,

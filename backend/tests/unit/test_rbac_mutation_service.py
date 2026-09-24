@@ -95,7 +95,7 @@ def _build_service(
         code="property:read",
         name="Read property",
     )
-    repository.find_user_role.return_value = None
+    repository.find_user_role_for_update.return_value = None
     repository.find_role_permission.return_value = None
     property_repository.get_tenant.return_value = object()
     property_repository.get_property.return_value = object()
@@ -301,7 +301,7 @@ def test_authoritative_property_mismatch_is_invalid_scope() -> None:
 
 def test_duplicate_precheck_returns_stable_error() -> None:
     service, _, repository, _, audit_service, _ = _build_service()
-    repository.find_user_role.return_value = UserRole(id=99)
+    repository.find_user_role_for_update.return_value = UserRole(id=99)
 
     with pytest.raises(AppError) as captured:
         service.grant_user_role(

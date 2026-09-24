@@ -1,4 +1,5 @@
 <view class="loading" wx:if="{{loading}}">加载中...</view>
+<work-order-contact id="order-contact" wx:if="{{workOrder}}" work-order-id="{{workOrder.id}}" />
 <view class="card" wx:if="{{workOrder}}">
   <view>工单 {{workOrder.id}}</view>
   <view>状态 {{statusLabel}}</view>

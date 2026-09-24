@@ -51,6 +51,7 @@ class FilterReason(StrEnum):
     CAPACITY_FULL = "CAPACITY_FULL"
     NO_STAFF_ROLE = "NO_STAFF_ROLE"
     RECENTLY_REJECTED = "RECENTLY_REJECTED"
+    BUSY = "BUSY"
 
 
 AI_ANALYSIS_READ = "ai_analysis:read"
@@ -62,7 +63,7 @@ ANNOUNCEMENT_READ = "announcement:read"
 ANNOUNCEMENT_DRAFT = "announcement:draft"
 ANNOUNCEMENT_PUBLISH = "announcement:publish"
 
-WORK_ORDER_ANALYSIS_PROMPT_VERSION = "wo-analysis-v7"
+WORK_ORDER_ANALYSIS_PROMPT_VERSION = "wo-analysis-v8-maintenance"
 INCIDENT_SUMMARY_PROMPT_VERSION = "incident-summary-v1"
 ANNOUNCEMENT_DRAFT_PROMPT_VERSION = "announcement-draft-v1"
 
@@ -104,7 +105,16 @@ _SKILL_ALIASES = {
     "hvac": "HVAC",
     "cleaning": "CLEANING",
     "security": "SECURITY",
+    "maintenance": "MAINTENANCE",
 }
+
+# Owner requirement MAINTENANCE-CONTACT-DISPATCH-024. Explicit special skills
+# remain hard constraints; ordinary trade labels are not exclusive licenses.
+ORDINARY_MAINTENANCE_SKILLS = frozenset({"PLUMBING", "ELECTRICAL", "HVAC", "MAINTENANCE"})
+
+
+def ordinary_maintenance(required_duty: str | None, required_skill: str | None) -> bool:
+    return required_duty == "MAINTENANCE" and required_skill in ORDINARY_MAINTENANCE_SKILLS
 
 _DUTY_FOR_CATEGORY = {
     WorkOrderCategory.PLUMBING: "MAINTENANCE",
@@ -176,6 +186,7 @@ def map_analysis_output(
     category = _CATEGORY_ALIASES.get(output.category) or _CATEGORY_ALIASES.get(
         output.category.casefold()
     )
+    recognized_category = category is not None
     if category is None:
         category = WorkOrderCategory.OTHER
     priority = _PRIORITY_ALIASES.get(output.priority) or _PRIORITY_ALIASES.get(
@@ -196,7 +207,9 @@ def map_analysis_output(
     if role not in {"STAFF", "SUPERVISOR"}:
         raise ValueError("required_role is not a supported value")
     skill = _SKILL_ALIASES.get(output.required_skill.casefold(), output.required_skill.upper())
-    low = output.confidence < threshold or category is WorkOrderCategory.OTHER
+    low = output.confidence < threshold or not recognized_category or (
+        category is WorkOrderCategory.OTHER and skill != "MAINTENANCE"
+    )
     return MappedAnalysis(
         category=category,
         subcategory=output.subcategory[:64],
@@ -232,6 +245,7 @@ class DispatchCandidate:
     average_response_seconds: float | None = None
     completion_rate: float | None = None
     average_rating: float | None = None
+    last_assignment_id: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -278,10 +292,13 @@ def hard_filter_candidate(
         return FilterReason.NO_STAFF_ROLE
     if required_duty and required_duty not in candidate.duty_codes:
         return FilterReason.DUTY_MISMATCH
-    if required_skill and required_skill not in candidate.skill_codes:
+    maintenance = ordinary_maintenance(required_duty, required_skill)
+    if required_skill and not maintenance and required_skill not in candidate.skill_codes:
         return FilterReason.SKILL_MISMATCH
     if candidate.current_load >= candidate.max_capacity and not candidate.incident_follow:
         return FilterReason.CAPACITY_FULL
+    if maintenance and candidate.current_load > 0 and not candidate.incident_follow:
+        return FilterReason.BUSY
     return None
 
 
@@ -294,7 +311,8 @@ def score_candidate(
 ) -> tuple[float, tuple[str, ...]]:
     reasons: list[str] = []
     duty_score = 1.0 if required_duty and required_duty in candidate.duty_codes else 0.0
-    skill_score = 1.0 if required_skill and required_skill in candidate.skill_codes else 0.0
+    maintenance = ordinary_maintenance(required_duty, required_skill)
+    skill_score = 1.0 if not maintenance and required_skill and required_skill in candidate.skill_codes else 0.0
     capacity = (
         (candidate.max_capacity - candidate.current_load) / candidate.max_capacity
         if candidate.max_capacity > 0
@@ -340,6 +358,8 @@ def score_candidate(
         reasons.append("PRIMARY_INCIDENT_HANDLER")
     if candidate.incident_follow:
         reasons.append("INCIDENT_FOLLOW")
+    if maintenance:
+        reasons.extend(("MAINTENANCE_GROUP", "GLOBAL_IDLE", "LEAST_RECENT_ASSIGNMENT"))
     return round(score, 4), tuple(reasons)
 
 
@@ -365,6 +385,15 @@ def rank_candidates(
             weights=weights,
         )
         eligible.append((candidate, score, reasons))
+    if ordinary_maintenance(required_duty, required_skill):
+        # Assignment IDs are persistent chronological turn tickets, across all
+        # service properties. ID is only the initial equal-history tie-break.
+        eligible.sort(key=lambda item: (
+            -int(item[0].incident_follow),
+            item[0].last_assignment_id,
+            item[0].employee_id,
+        ))
+        return tuple(eligible)
     eligible.sort(
         key=lambda item: (
             -int(item[0].primary_incident_handler),

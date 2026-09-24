@@ -145,6 +145,8 @@ def test_recently_rejecting_employee_is_filtered_before_ranking() -> None:
         SimpleNamespace(id=9, user_id=19, status=EmployeeStatus.ACTIVE.value, max_capacity=8),
     )
     service._ai.list_property_employees.return_value = employees
+    service._work_orders.employee_global_occupancy.return_value = 0
+    service._work_orders.employee_last_assignment_id.return_value = 0
     service._ai.get_building_id.return_value = 9
     service._ai.get_effective_property.return_value = SimpleNamespace(id=1)
     service._ai.get_daily_status.return_value = SimpleNamespace(

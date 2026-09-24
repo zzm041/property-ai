@@ -1,0 +1,8 @@
+Actual output; prior root /healthz 404 kept in runtime-current.json; correct API path below.
+{
+  "request_id": "ec789e9e93b7431fa393d59f2e162f7c",
+  "data": {
+    "status": "ok"
+  }
+}
+{"task_id": "MAINTENANCE-CONTACT-DISPATCH-024", "component": "worker", "head_sha": "954b8549b500fc89cec86f0ab1b3bce96672e5a8", "backend_app_wip_diff_sha256": "f69072620e1b97fb57968e0098faf4a39b4533035d0f98a908eac61cae0129b1", "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe", "module_root": "D:\\property-ai\\backend\\app", "target": "serving=127.0.0.1:3307/property_ai_auth001_test api=127.0.0.1:8083/api/v1 queue=property_ai.auth001 vhost=property_ai_auth001 redis_db=12 milvus_collection=knowledge_chunks_auth001 ai_auto_assign=True ai_enqueue_on_create=True", "prompt_version": "wo-analysis-v8-maintenance", "providers": "Development only; no real inference", "check_only": false}

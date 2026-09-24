@@ -84,7 +84,7 @@ def test_concurrent_duplicate_capability_link_is_an_idempotent_noop() -> None:
 def test_repeated_capability_update_does_not_write_false_audit_delta() -> None:
     employee = _employee()
     repository = MagicMock()
-    repository.get_employee.return_value = employee
+    repository.get_employee_for_update.return_value = employee
     repository.list_assignments_for_employee.return_value = ()
     service = EmployeeService.__new__(EmployeeService)
     service._repository = repository
@@ -112,7 +112,7 @@ def test_repeated_capability_update_does_not_write_false_audit_delta() -> None:
 def test_capability_update_audits_only_links_inserted_by_this_request() -> None:
     employee = _employee()
     repository = MagicMock()
-    repository.get_employee.return_value = employee
+    repository.get_employee_for_update.return_value = employee
     repository.list_assignments_for_employee.return_value = ()
     service = EmployeeService.__new__(EmployeeService)
     service._repository = repository

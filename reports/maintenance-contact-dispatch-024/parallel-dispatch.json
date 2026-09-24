@@ -1,0 +1,282 @@
+{
+  "run_id": "maint024-42193bfcfb",
+  "steps": {
+    "off_duty": true,
+    "created": {
+      "parallel1": 20,
+      "parallel2": 21
+    },
+    "single_available_slot": {
+      "orders": [
+        {
+          "id": 20,
+          "status": "ASSIGNED"
+        },
+        {
+          "id": 21,
+          "status": "PENDING_ASSIGNMENT"
+        }
+      ],
+      "active_assignments": 1,
+      "auto_employee": 3
+    },
+    "restored": true,
+    "availability_auto_resume": {
+      "orders": [
+        20,
+        21
+      ],
+      "distinct_employees": [
+        3,
+        4
+      ]
+    }
+  },
+  "requests": [
+    {
+      "label": "second-off-duty",
+      "method": "PATCH",
+      "path": "/staff/attendance/status",
+      "params": [],
+      "status": 422,
+      "error_code": "EMP.INVALID_INPUT",
+      "request_id_hash": "9fdcfe2e5b35e9f5"
+    },
+    {
+      "label": "second-checkout",
+      "method": "POST",
+      "path": "/staff/attendance/checkout",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a684fe67fe6424db"
+    },
+    {
+      "label": "two-worker-create",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "90f447a4b6b772d2"
+    },
+    {
+      "label": "two-worker-create",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1c58156800896e6e"
+    },
+    {
+      "label": "inspect-parallel1",
+      "method": "GET",
+      "path": "/work-orders/20",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "0765f97c5b704707"
+    },
+    {
+      "label": "inspect-parallel2",
+      "method": "GET",
+      "path": "/work-orders/21",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "7dda766713c771f1"
+    },
+    {
+      "label": "inspect-parallel1",
+      "method": "GET",
+      "path": "/work-orders/20",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "0765f97c5b704707"
+    },
+    {
+      "label": "inspect-parallel2",
+      "method": "GET",
+      "path": "/work-orders/21",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "7dda766713c771f1"
+    },
+    {
+      "label": "second-checkin",
+      "method": "POST",
+      "path": "/staff/attendance/checkin",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d7b6800c50c552ad"
+    },
+    {
+      "label": "final-parallel1",
+      "method": "GET",
+      "path": "/work-orders/20",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "19d5d28dda74184c"
+    },
+    {
+      "label": "final-parallel2",
+      "method": "GET",
+      "path": "/work-orders/21",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2df3d02f89100d6e"
+    },
+    {
+      "label": "final-parallel1",
+      "method": "GET",
+      "path": "/work-orders/20",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "19d5d28dda74184c"
+    },
+    {
+      "label": "final-parallel2",
+      "method": "GET",
+      "path": "/work-orders/21",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2df3d02f89100d6e"
+    },
+    {
+      "label": "final-parallel1",
+      "method": "GET",
+      "path": "/work-orders/20",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "19d5d28dda74184c"
+    },
+    {
+      "label": "final-parallel2",
+      "method": "GET",
+      "path": "/work-orders/21",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2df3d02f89100d6e"
+    },
+    {
+      "label": "final-parallel1",
+      "method": "GET",
+      "path": "/work-orders/20",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "19d5d28dda74184c"
+    },
+    {
+      "label": "final-parallel2",
+      "method": "GET",
+      "path": "/work-orders/21",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2df3d02f89100d6e"
+    },
+    {
+      "label": "final-parallel1",
+      "method": "GET",
+      "path": "/work-orders/20",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "19d5d28dda74184c"
+    },
+    {
+      "label": "final-parallel2",
+      "method": "GET",
+      "path": "/work-orders/21",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2df3d02f89100d6e"
+    },
+    {
+      "label": "final-parallel1",
+      "method": "GET",
+      "path": "/work-orders/20",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "19d5d28dda74184c"
+    },
+    {
+      "label": "final-parallel2",
+      "method": "GET",
+      "path": "/work-orders/21",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2df3d02f89100d6e"
+    },
+    {
+      "label": "final-parallel1",
+      "method": "GET",
+      "path": "/work-orders/20",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "19d5d28dda74184c"
+    },
+    {
+      "label": "final-parallel2",
+      "method": "GET",
+      "path": "/work-orders/21",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2df3d02f89100d6e"
+    },
+    {
+      "label": "final-parallel1",
+      "method": "GET",
+      "path": "/work-orders/20",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "19d5d28dda74184c"
+    },
+    {
+      "label": "final-parallel2",
+      "method": "GET",
+      "path": "/work-orders/21",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2df3d02f89100d6e"
+    },
+    {
+      "label": "final-parallel1",
+      "method": "GET",
+      "path": "/work-orders/20",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "19d5d28dda74184c"
+    },
+    {
+      "label": "final-parallel2",
+      "method": "GET",
+      "path": "/work-orders/21",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2df3d02f89100d6e"
+    }
+  ],
+  "worker_pool": "threads concurrency=2, same AUTH001 worker/queue/vhost/source",
+  "status": "PASS_REAL_PARALLEL_WORKER_SOFTWARE"
+}

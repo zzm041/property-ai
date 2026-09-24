@@ -31,6 +31,7 @@ class EmployeeRepository:
     def get_employee_for_update(self, employee_id: int) -> Employee | None:
         return self._session.scalar(
             select(Employee).where(Employee.id == employee_id).with_for_update()
+            .execution_options(populate_existing=True)
         )
 
     def get_employee_in_tenant(
@@ -210,6 +211,9 @@ class EmployeeRepository:
         ).all()
         return tuple(int(item) for item in rows if item is not None)
 
+    def get_assignment(self, assignment_id: int) -> EmployeeProperty | None:
+        return self._session.get(EmployeeProperty, assignment_id)
+
     def get_assignment_for_update(
         self,
         assignment_id: int,
@@ -217,19 +221,23 @@ class EmployeeRepository:
         return self._session.scalar(
             select(EmployeeProperty)
             .where(EmployeeProperty.id == assignment_id)
+            .execution_options(populate_existing=True)
             .with_for_update()
         )
 
     def list_assignments_for_employee(
         self,
         employee_id: int,
+        *,
+        lock: bool = False,
     ) -> tuple[EmployeeProperty, ...]:
+        statement = select(EmployeeProperty).where(
+            EmployeeProperty.employee_id == employee_id
+        ).order_by(EmployeeProperty.id)
+        if lock:
+            statement = statement.execution_options(populate_existing=True).with_for_update()
         return tuple(
-            self._session.scalars(
-                select(EmployeeProperty)
-                .where(EmployeeProperty.employee_id == employee_id)
-                .order_by(EmployeeProperty.id)
-            ).all()
+            self._session.scalars(statement).all()
         )
 
     def list_employees_for_property(
@@ -372,6 +380,7 @@ class EmployeeRepository:
                 EmployeeDailyStatus.business_date == business_date,
             )
             .with_for_update()
+            .execution_options(populate_existing=True)
         )
 
     def get_daily_status(

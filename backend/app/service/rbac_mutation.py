@@ -234,7 +234,7 @@ class RbacMutationService:
         target_user = self._require_user(target_user_id)
         role = self._require_role(role_code)
         self._require_authoritative_scope(validated_scope)
-        existing = self._repository.find_user_role(
+        existing = self._repository.find_user_role_for_update(
             user_id=target_user.id,
             role_id=role.id,
             scope=validated_scope,

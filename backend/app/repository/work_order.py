@@ -19,7 +19,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.model.property import House, Property
-from app.model.employee import Employee
+from app.model.employee import Employee, EmployeeProperty, EmployeeDailyStatus, AttendanceRecord
 from app.model.identity import Permission, RolePermission, User, UserRole
 from app.model.work_order import (
     FileObject,
@@ -56,6 +56,7 @@ class WorkOrderRepository:
             select(WorkOrder)
             .where(WorkOrder.id == work_order_id)
             .with_for_update()
+            .execution_options(populate_existing=True)
         )
 
     def get_house(self, house_id: int) -> House | None:
@@ -201,6 +202,47 @@ class WorkOrderRepository:
             ).all()
         )
 
+    def list_unavailable_unaccepted(self, *, now: datetime, limit: int = 100) -> tuple[int, ...]:
+        from app.core.time import current_business_date
+
+        properties = self._session.execute(
+            select(Property.id, Property.timezone).join(WorkOrder, WorkOrder.property_id == Property.id)
+            .where(WorkOrder.status == "ASSIGNED").distinct()
+        ).all()
+        if not properties:
+            return ()
+        # Same zoneinfo policy as attendance; no MySQL timezone-table dependency.
+        today = case(*[(WorkOrder.property_id == property_id,
+                        current_business_date(zone, clock=lambda: now))
+                       for property_id, zone in properties])
+        effective = select(EmployeeProperty.id).where(
+            EmployeeProperty.employee_id == Employee.id,
+            EmployeeProperty.tenant_id == WorkOrder.tenant_id,
+            EmployeeProperty.property_id == WorkOrder.property_id,
+            EmployeeProperty.status == "ACTIVE", EmployeeProperty.valid_from <= now,
+            or_(EmployeeProperty.valid_to.is_(None), EmployeeProperty.valid_to > now),
+        ).correlate(Employee, WorkOrder).exists()
+        on_duty = select(AttendanceRecord.id).join(EmployeeDailyStatus, and_(
+            EmployeeDailyStatus.employee_id == AttendanceRecord.employee_id,
+            EmployeeDailyStatus.property_id == AttendanceRecord.property_id,
+            EmployeeDailyStatus.business_date == AttendanceRecord.business_date,
+        )).where(
+            AttendanceRecord.employee_id == Employee.id,
+            AttendanceRecord.property_id == WorkOrder.property_id,
+            AttendanceRecord.check_out_at.is_(None),
+            EmployeeDailyStatus.business_date == today,
+            EmployeeDailyStatus.on_duty == "ON_DUTY",
+        ).correlate(Employee, WorkOrder).exists()
+        return tuple(self._session.scalars(
+            select(WorkOrder.id).join(WorkOrderAssignment, WorkOrderAssignment.id == WorkOrder.current_assignment_id)
+            .join(Employee, Employee.id == WorkOrderAssignment.employee_id)
+            .join(User, User.id == Employee.user_id)
+            .where(WorkOrder.status == "ASSIGNED", WorkOrderAssignment.status == "ACTIVE",
+                   WorkOrderAssignment.ended_at.is_(None),
+                   or_(Employee.status != "ACTIVE", User.status != "ACTIVE", ~effective, ~on_duty))
+            .order_by(WorkOrder.id).limit(min(max(limit, 1), 100))
+        ).all())
+
     def get_content(self, work_order_id: int) -> WorkOrderContent | None:
         return self._session.scalar(
             select(WorkOrderContent).where(
@@ -251,6 +293,40 @@ class WorkOrderRepository:
             select(WorkOrderReceipt).where(WorkOrderReceipt.process_id == process_id)
         )
 
+    def employee_global_occupancy(self, *, employee_id: int, tenant_id: int, lock: bool = False, collapse_incidents: bool = False) -> int:
+        """Active reservations, including unaccepted and WAIT_CONFIRM, across properties.
+
+        Caller holds Employee FOR UPDATE when lock=True. A locking current read
+        avoids a stale REPEATABLE READ snapshot after waiting for that mutex.
+        """
+        query = select(WorkOrderAssignment.id).where(
+            WorkOrderAssignment.employee_id == employee_id,
+            WorkOrderAssignment.tenant_id == tenant_id,
+            WorkOrderAssignment.status == "ACTIVE",
+            WorkOrderAssignment.ended_at.is_(None),
+        ).order_by(WorkOrderAssignment.id)
+        if lock:
+            query = query.with_for_update()
+        ids = self._session.scalars(query).all()
+        if not collapse_incidents:
+            return len(ids)
+        units = set()
+        for assignment_id in ids:
+            provenance = self.get_auto_assignment_provenance(assignment_id, for_update=lock)
+            if provenance is not None and (provenance.incident_follow or provenance.incident_capacity_owner):
+                units.add(("incident", provenance.incident_id))
+            else:
+                units.add(("assignment", assignment_id))
+        return len(units)
+
+    def employee_last_assignment_id(self, *, employee_id: int, tenant_id: int) -> int:
+        return int(self._session.scalar(
+            select(WorkOrderAssignment.id).where(
+                WorkOrderAssignment.employee_id == employee_id,
+                WorkOrderAssignment.tenant_id == tenant_id,
+            ).order_by(WorkOrderAssignment.id.desc()).limit(1)
+        ) or 0)
+
     def list_sla_policies_for_property(
         self,
         *,
@@ -298,6 +374,7 @@ class WorkOrderRepository:
             )
             .with_for_update()
             .execution_options(populate_existing=True)
+            .execution_options(populate_existing=True)
         )
 
     def get_content_for_update(self, work_order_id: int) -> WorkOrderContent | None:
@@ -305,6 +382,7 @@ class WorkOrderRepository:
             select(WorkOrderContent)
             .where(WorkOrderContent.work_order_id == work_order_id)
             .with_for_update()
+            .execution_options(populate_existing=True)
         )
 
     def _assignment_extension_table(self) -> Table | None:
@@ -534,6 +612,13 @@ class WorkOrderRepository:
                 WorkOrderLog.request_id == request_id,
             )
         ) is not None
+
+    def has_dispatch_wait_attempt(self, *, work_order_id: int, request_id: str) -> bool:
+        return self._session.scalar(select(WorkOrderLog.id).where(
+            WorkOrderLog.work_order_id == work_order_id,
+            WorkOrderLog.event_code == "AUTO_DISPATCH_WAIT",
+            WorkOrderLog.request_id == request_id,
+        ).limit(1)) is not None
 
     def list_due_sla_clocks_for_update(
         self,

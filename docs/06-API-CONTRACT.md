@@ -7,6 +7,8 @@
 
 本文是契约初稿，不是代码。实现前如需改路径，先改本文并经负责人确认。
 
+2026-09-24 v2 / 024：`POST /work-orders` 新增必填 `contact_phone`，复用 E.164 规范化（中国手机简写、带国际区号固定电话）。缺失/非法422，规范化电话参与幂等哈希，同 key 不同电话409不覆盖。`GET /me/contact-phone` 只读本人 ACTIVE 号码供确认默认值。`GET /work-orders/{id}/contact` 返回 `{collected, masked_phone, phone:null}`；`?reveal=true` 对本人/当前有效负责员工/对应组织授权管理者显式返回完整号码并审计，SYSTEM-only 无明文权限，无关用户/跨域403。电话响应 `Cache-Control:no-store`。列表/通用 WorkOrderData/display 不返回完整号码，历史 NULL 不回填；联系操作不把电话放 URL/模型/公开证据。
+
 资源 ID 是正 BIGINT。ID 可枚举性不能作为安全边界；路径、Header 或 Body 中的 `tenant_id` / `property_id` 仅用于定位上下文，后端必须依据认证用户、组织 Scope、目标资源与数据库关系重新授权并防止 IDOR。
 
 ## 1. 统一响应

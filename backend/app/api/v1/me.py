@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Response
 from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_principal
@@ -16,6 +16,20 @@ from app.schema.identity import GrantedScopeData, MeData
 from app.service.credential_auth import CredentialAuthService
 
 router = APIRouter(tags=["identity"])
+
+
+@router.get("/me/contact-phone")
+def get_contact_default(
+    request: Request,
+    response: Response,
+    principal: Annotated[Principal, Depends(get_current_principal)],
+    session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    from app.repository.credential import CredentialRepository
+
+    response.headers["Cache-Control"] = "no-store"
+    phone = CredentialRepository(session).get_active_phone_for_user(principal.user_id)
+    return success_envelope(request, {"phone": None if phone is None else phone.phone_e164})
 
 
 def _me_data(principal: Principal, *, profile_completed: bool) -> MeData:

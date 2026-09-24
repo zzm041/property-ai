@@ -4,13 +4,16 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator, field_validator
+
+from app.domain.phone import normalize_phone
 
 
 class CreateWorkOrderRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     house_id: int = Field(gt=0)
+    contact_phone: str = Field(min_length=1, max_length=40)
     text: str | None = Field(default=None, max_length=4000)
     file_ids: tuple[int, ...] = ()
     category: str | None = Field(default=None, max_length=32)
@@ -18,6 +21,14 @@ class CreateWorkOrderRequest(BaseModel):
     severity: str | None = Field(default=None, max_length=16)
     tenant_id: int | None = Field(default=None, gt=0)
     property_id: int | None = Field(default=None, gt=0)
+
+    @field_validator("contact_phone")
+    @classmethod
+    def valid_contact(cls, value: str) -> str:
+        phone = normalize_phone(value)
+        if phone is None or not phone.isascii():
+            raise ValueError("A valid report contact telephone is required")
+        return phone
 
 
 class AppendWorkOrderRequest(BaseModel):

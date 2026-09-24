@@ -1,0 +1,2317 @@
+{
+  "run_id": "maint024-42193bfcfb",
+  "mode": "normal API; NOT UI or real-model evidence",
+  "steps": {
+    "contact-privacy-idempotency": {
+      "required_format_unicode": true,
+      "same_key_same_id": 13,
+      "different_contact_conflict": true,
+      "outsider_unrelated_staff_previous_assignee_denied": true,
+      "three_authorized_actors": true,
+      "common_dto_phone_free": true,
+      "cache_control": "no-store"
+    },
+    "concurrent-create-busy": {
+      "orders": {
+        "d": 17,
+        "e": 16
+      },
+      "both_busy_persisted": true,
+      "worker_pool": "solo; concurrent HTTP creation, not parallel Worker transaction stress"
+    },
+    "release-b-auto-d": {
+      "id": 14,
+      "status": "CLOSED",
+      "next_auto": 16,
+      "single_freed_slot_not_overassigned": true
+    },
+    "release-c-auto-e": {
+      "id": 15,
+      "status": "CLOSED",
+      "next_auto": 17
+    },
+    "reject-history-release-resume": {
+      "order": 16,
+      "rejected_employee": 3,
+      "next_auto_employee": 4,
+      "history_retained": true
+    },
+    "end-appointment-auto-release": {
+      "employee": 4,
+      "appointment": 8,
+      "order": 16,
+      "waiting": true,
+      "contact_and_checkin_denied": true
+    },
+    "reappoint-auto-resume": {
+      "order": 16,
+      "new_auto_assignment": 19,
+      "employee": 4
+    },
+    "phone-rebind-independent-snapshot": {
+      "same_user_id": 10,
+      "current_phone_changed": true,
+      "historical_order_contact_unchanged": true,
+      "values": "redacted"
+    },
+    "both-idle-fair-rotation": {
+      "both_idle_least_recent_rotation": [
+        {
+          "order": 18,
+          "auto_employee": 3,
+          "alternate_contact_did_not_change_identity": true
+        },
+        {
+          "order": 19,
+          "auto_employee": 4,
+          "alternate_contact_did_not_change_identity": true
+        }
+      ]
+    }
+  },
+  "requests": [
+    {
+      "label": "resident-normal-auth-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "42a716ea6ae5f75b"
+    },
+    {
+      "label": "resident-normal-auth-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "fe4aeceb2c174933"
+    },
+    {
+      "label": "resident-normal-auth-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "7981a67826ad0cc5"
+    },
+    {
+      "label": "resident-normal-auth-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "91868f06dbc59959"
+    },
+    {
+      "label": "staff1-normal-auth-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1697fcb84a72534c"
+    },
+    {
+      "label": "staff1-normal-auth-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "49f3da8cde7eca7d"
+    },
+    {
+      "label": "staff1-normal-auth-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "7244418f3db3a54c"
+    },
+    {
+      "label": "staff1-normal-auth-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "86ceac5ca311ce49"
+    },
+    {
+      "label": "staff2-normal-auth-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2c121c906a779526"
+    },
+    {
+      "label": "staff2-normal-auth-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1ecbc1e0d6c103e5"
+    },
+    {
+      "label": "staff2-normal-auth-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "5895f35b362b95ca"
+    },
+    {
+      "label": "staff2-normal-auth-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "fdfa5023d483dea6"
+    },
+    {
+      "label": "manager-normal-auth-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d0d2ebd27654cec6"
+    },
+    {
+      "label": "manager-normal-auth-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "062cc5de32df4bcb"
+    },
+    {
+      "label": "manager-normal-auth-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c14e8cd214e3e8da"
+    },
+    {
+      "label": "manager-normal-auth-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d78b5b1edcd059d4"
+    },
+    {
+      "label": "outsider-normal-auth-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6352ddc5f8bd291f"
+    },
+    {
+      "label": "outsider-normal-auth-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6f98c7ce9647d0e0"
+    },
+    {
+      "label": "outsider-normal-auth-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "24f0ba83860f3bbe"
+    },
+    {
+      "label": "outsider-normal-auth-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "10224871c8bd02ec"
+    },
+    {
+      "label": "contact-empty",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR",
+      "request_id_hash": "a507f05741f3b05f"
+    },
+    {
+      "label": "contact-format",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR",
+      "request_id_hash": "af9d68698b57b0b1"
+    },
+    {
+      "label": "contact-unicode",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR",
+      "request_id_hash": "3b928024679a8f26"
+    },
+    {
+      "label": "contact-missing",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 422,
+      "error_code": "SYS.VALIDATION_ERROR",
+      "request_id_hash": "2e05d6ea81fee827"
+    },
+    {
+      "label": "same-key-replay",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2f9df2671838790e"
+    },
+    {
+      "label": "different-contact-conflict",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 409,
+      "error_code": "WO.IDEMPOTENCY_CONFLICT",
+      "request_id_hash": "f5cbdaf80620db48"
+    },
+    {
+      "label": "outsider-unauthorized-14",
+      "method": "GET",
+      "path": "/work-orders/14/contact?reveal=true",
+      "params": [],
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "c6f4e3441959562b"
+    },
+    {
+      "label": "staff2-unauthorized-14",
+      "method": "GET",
+      "path": "/work-orders/14/contact?reveal=true",
+      "params": [],
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "8524e8bf6a75f61e"
+    },
+    {
+      "label": "staff1-unauthorized-13",
+      "method": "GET",
+      "path": "/work-orders/13/contact?reveal=true",
+      "params": [],
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "44648acd2eb3163c"
+    },
+    {
+      "label": "-work-orders-14-contact?reveal=true",
+      "method": "GET",
+      "path": "/work-orders/14/contact?reveal=true",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2b1efc62861e0716"
+    },
+    {
+      "label": "-work-orders-14-contact?reveal=true",
+      "method": "GET",
+      "path": "/work-orders/14/contact?reveal=true",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2b1efc62861e0716"
+    },
+    {
+      "label": "-work-orders-14-contact?reveal=true",
+      "method": "GET",
+      "path": "/work-orders/14/contact?reveal=true",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2b1efc62861e0716"
+    },
+    {
+      "label": "-work-orders-13",
+      "method": "GET",
+      "path": "/work-orders/13",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a99ebb1597865b93"
+    },
+    {
+      "label": "concurrent-create",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a3bd4dfae97484f8"
+    },
+    {
+      "label": "concurrent-create",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "4edb7e17ba5a39e5"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-16",
+      "method": "GET",
+      "path": "/work-orders/16",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e376a5cfb14478f8"
+    },
+    {
+      "label": "-work-orders-14",
+      "method": "GET",
+      "path": "/work-orders/14",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "aa390a962862e424"
+    },
+    {
+      "label": "-staff-work-orders-14-accept",
+      "method": "POST",
+      "path": "/staff/work-orders/14/accept",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "61d4e29c5df2af35"
+    },
+    {
+      "label": "-work-orders-14",
+      "method": "GET",
+      "path": "/work-orders/14",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "aa390a962862e424"
+    },
+    {
+      "label": "-staff-work-orders-14-start",
+      "method": "POST",
+      "path": "/staff/work-orders/14/start",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9135c571b3ea2f9c"
+    },
+    {
+      "label": "-work-orders-14",
+      "method": "GET",
+      "path": "/work-orders/14",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "aa390a962862e424"
+    },
+    {
+      "label": "-staff-work-orders-14-receipts",
+      "method": "POST",
+      "path": "/staff/work-orders/14/receipts",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "57ccb94ebd7a4bfa"
+    },
+    {
+      "label": "-work-orders-14",
+      "method": "GET",
+      "path": "/work-orders/14",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "aa390a962862e424"
+    },
+    {
+      "label": "-work-orders-14-confirm",
+      "method": "POST",
+      "path": "/work-orders/14/confirm",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "5ca0e1a08f9758ee"
+    },
+    {
+      "label": "-work-orders-14",
+      "method": "GET",
+      "path": "/work-orders/14",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "aa390a962862e424"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "resident-normal-auth-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "42a716ea6ae5f75b"
+    },
+    {
+      "label": "resident-normal-auth-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "fe4aeceb2c174933"
+    },
+    {
+      "label": "resident-normal-auth-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "7981a67826ad0cc5"
+    },
+    {
+      "label": "resident-normal-auth-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "91868f06dbc59959"
+    },
+    {
+      "label": "staff1-normal-auth-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1697fcb84a72534c"
+    },
+    {
+      "label": "staff1-normal-auth-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "49f3da8cde7eca7d"
+    },
+    {
+      "label": "staff1-normal-auth-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "7244418f3db3a54c"
+    },
+    {
+      "label": "staff1-normal-auth-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "86ceac5ca311ce49"
+    },
+    {
+      "label": "staff2-normal-auth-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2c121c906a779526"
+    },
+    {
+      "label": "staff2-normal-auth-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1ecbc1e0d6c103e5"
+    },
+    {
+      "label": "staff2-normal-auth-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "5895f35b362b95ca"
+    },
+    {
+      "label": "staff2-normal-auth-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "fdfa5023d483dea6"
+    },
+    {
+      "label": "manager-normal-auth-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d0d2ebd27654cec6"
+    },
+    {
+      "label": "manager-normal-auth-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "062cc5de32df4bcb"
+    },
+    {
+      "label": "manager-normal-auth-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c14e8cd214e3e8da"
+    },
+    {
+      "label": "manager-normal-auth-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d78b5b1edcd059d4"
+    },
+    {
+      "label": "outsider-normal-auth-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6352ddc5f8bd291f"
+    },
+    {
+      "label": "outsider-normal-auth-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6f98c7ce9647d0e0"
+    },
+    {
+      "label": "outsider-normal-auth-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "24f0ba83860f3bbe"
+    },
+    {
+      "label": "outsider-normal-auth-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "10224871c8bd02ec"
+    },
+    {
+      "label": "-work-orders-14",
+      "method": "GET",
+      "path": "/work-orders/14",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "aa390a962862e424"
+    },
+    {
+      "label": "-work-orders-14",
+      "method": "GET",
+      "path": "/work-orders/14",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "aa390a962862e424"
+    },
+    {
+      "label": "-work-orders-14",
+      "method": "GET",
+      "path": "/work-orders/14",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "aa390a962862e424"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-16",
+      "method": "GET",
+      "path": "/work-orders/16",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e376a5cfb14478f8"
+    },
+    {
+      "label": "-work-orders-15",
+      "method": "GET",
+      "path": "/work-orders/15",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "84c1876aa77aef09"
+    },
+    {
+      "label": "-staff-work-orders-15-accept",
+      "method": "POST",
+      "path": "/staff/work-orders/15/accept",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "37a2c89ba3618ba8"
+    },
+    {
+      "label": "-work-orders-15",
+      "method": "GET",
+      "path": "/work-orders/15",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "84c1876aa77aef09"
+    },
+    {
+      "label": "-staff-work-orders-15-start",
+      "method": "POST",
+      "path": "/staff/work-orders/15/start",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "99a7842cfe4e23db"
+    },
+    {
+      "label": "-work-orders-15",
+      "method": "GET",
+      "path": "/work-orders/15",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "84c1876aa77aef09"
+    },
+    {
+      "label": "-staff-work-orders-15-receipts",
+      "method": "POST",
+      "path": "/staff/work-orders/15/receipts",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "bc0597554de8edd8"
+    },
+    {
+      "label": "-work-orders-15",
+      "method": "GET",
+      "path": "/work-orders/15",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "84c1876aa77aef09"
+    },
+    {
+      "label": "-work-orders-15-confirm",
+      "method": "POST",
+      "path": "/work-orders/15/confirm",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "f55b339ca512d04d"
+    },
+    {
+      "label": "-work-orders-15",
+      "method": "GET",
+      "path": "/work-orders/15",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "84c1876aa77aef09"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-16",
+      "method": "GET",
+      "path": "/work-orders/16",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e376a5cfb14478f8"
+    },
+    {
+      "label": "-staff-work-orders-16-reject",
+      "method": "POST",
+      "path": "/staff/work-orders/16/reject",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d2d222e905436c01"
+    },
+    {
+      "label": "-work-orders-16",
+      "method": "GET",
+      "path": "/work-orders/16",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e376a5cfb14478f8"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-staff-work-orders-17-accept",
+      "method": "POST",
+      "path": "/staff/work-orders/17/accept",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d06ee7dd2f942620"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-staff-work-orders-17-start",
+      "method": "POST",
+      "path": "/staff/work-orders/17/start",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "717da61b6b7997d6"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-staff-work-orders-17-receipts",
+      "method": "POST",
+      "path": "/staff/work-orders/17/receipts",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "3579954df2d68fab"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-17-confirm",
+      "method": "POST",
+      "path": "/work-orders/17/confirm",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "f7d4db736923c4ca"
+    },
+    {
+      "label": "-work-orders-17",
+      "method": "GET",
+      "path": "/work-orders/17",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "69465c68db481a36"
+    },
+    {
+      "label": "-work-orders-16",
+      "method": "GET",
+      "path": "/work-orders/16",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e376a5cfb14478f8"
+    },
+    {
+      "label": "-work-orders-16",
+      "method": "GET",
+      "path": "/work-orders/16",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e376a5cfb14478f8"
+    },
+    {
+      "label": "-work-orders-16",
+      "method": "GET",
+      "path": "/work-orders/16",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e376a5cfb14478f8"
+    },
+    {
+      "label": "-admin-employees-4",
+      "method": "GET",
+      "path": "/admin/employees/4",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "f74524278fda2f7c"
+    },
+    {
+      "label": "-admin-employees-4-property-assignments-8-end",
+      "method": "POST",
+      "path": "/admin/employees/4/property-assignments/8/end",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "4eb45d4bb2de7e1b"
+    },
+    {
+      "label": "-work-orders-16",
+      "method": "GET",
+      "path": "/work-orders/16",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e376a5cfb14478f8"
+    },
+    {
+      "label": "-work-orders-16",
+      "method": "GET",
+      "path": "/work-orders/16",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e376a5cfb14478f8"
+    },
+    {
+      "label": "ended-staff-contact-denied",
+      "method": "GET",
+      "path": "/work-orders/16/contact?reveal=true",
+      "params": [],
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "e5a311b012f6f7cb"
+    },
+    {
+      "label": "ended-checkin-denied",
+      "method": "POST",
+      "path": "/staff/attendance/checkin",
+      "params": [],
+      "status": 409,
+      "error_code": "EMP.CHECKIN_DENIED",
+      "request_id_hash": "53850ab27f19ea6b"
+    },
+    {
+      "label": "resident-normal-auth-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "42a716ea6ae5f75b"
+    },
+    {
+      "label": "resident-normal-auth-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "fe4aeceb2c174933"
+    },
+    {
+      "label": "resident-normal-auth-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "7981a67826ad0cc5"
+    },
+    {
+      "label": "resident-normal-auth-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "91868f06dbc59959"
+    },
+    {
+      "label": "staff1-normal-auth-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1697fcb84a72534c"
+    },
+    {
+      "label": "staff1-normal-auth-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "49f3da8cde7eca7d"
+    },
+    {
+      "label": "staff1-normal-auth-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "7244418f3db3a54c"
+    },
+    {
+      "label": "staff1-normal-auth-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "86ceac5ca311ce49"
+    },
+    {
+      "label": "staff2-normal-auth-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2c121c906a779526"
+    },
+    {
+      "label": "staff2-normal-auth-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "1ecbc1e0d6c103e5"
+    },
+    {
+      "label": "staff2-normal-auth-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "5895f35b362b95ca"
+    },
+    {
+      "label": "staff2-normal-auth-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "fdfa5023d483dea6"
+    },
+    {
+      "label": "manager-normal-auth-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d0d2ebd27654cec6"
+    },
+    {
+      "label": "manager-normal-auth-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "062cc5de32df4bcb"
+    },
+    {
+      "label": "manager-normal-auth-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c14e8cd214e3e8da"
+    },
+    {
+      "label": "manager-normal-auth-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d78b5b1edcd059d4"
+    },
+    {
+      "label": "outsider-normal-auth-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6352ddc5f8bd291f"
+    },
+    {
+      "label": "outsider-normal-auth-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6f98c7ce9647d0e0"
+    },
+    {
+      "label": "outsider-normal-auth-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "24f0ba83860f3bbe"
+    },
+    {
+      "label": "outsider-normal-auth-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "10224871c8bd02ec"
+    },
+    {
+      "label": "-admin-employees-4",
+      "method": "GET",
+      "path": "/admin/employees/4",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "f74524278fda2f7c"
+    },
+    {
+      "label": "-work-orders-16",
+      "method": "GET",
+      "path": "/work-orders/16",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e376a5cfb14478f8"
+    },
+    {
+      "label": "ended-staff-contact-denied",
+      "method": "GET",
+      "path": "/work-orders/16/contact?reveal=true",
+      "params": [],
+      "status": 403,
+      "error_code": "IAM.FORBIDDEN",
+      "request_id_hash": "e5a311b012f6f7cb"
+    },
+    {
+      "label": "ended-checkin-denied",
+      "method": "POST",
+      "path": "/staff/attendance/checkin",
+      "params": [],
+      "status": 409,
+      "error_code": "EMP.CHECKIN_DENIED",
+      "request_id_hash": "53850ab27f19ea6b"
+    },
+    {
+      "label": "-admin-employees-4-property-assignments",
+      "method": "POST",
+      "path": "/admin/employees/4/property-assignments",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "d28bc960b2aa6779"
+    },
+    {
+      "label": "-work-orders-16",
+      "method": "GET",
+      "path": "/work-orders/16",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e376a5cfb14478f8"
+    },
+    {
+      "label": "-work-orders-16",
+      "method": "GET",
+      "path": "/work-orders/16",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e376a5cfb14478f8"
+    },
+    {
+      "label": "old-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "23107f11c3761627"
+    },
+    {
+      "label": "old-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "62b7a71fcbf356bc"
+    },
+    {
+      "label": "old-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2f0a200bc1adeb05"
+    },
+    {
+      "label": "new-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6504b4023cd80ec9"
+    },
+    {
+      "label": "new-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "0e58a0968daad907"
+    },
+    {
+      "label": "new-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "b9e165ec8532cd05"
+    },
+    {
+      "label": "-auth-phone-change",
+      "method": "POST",
+      "path": "/auth/phone/change",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "14def0c0eb3e8841"
+    },
+    {
+      "label": "-me",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "53974c1b67f3912a"
+    },
+    {
+      "label": "-me-contact-phone",
+      "method": "GET",
+      "path": "/me/contact-phone",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "b4ef817502d2fc88"
+    },
+    {
+      "label": "-work-orders-13-contact?reveal=true",
+      "method": "GET",
+      "path": "/work-orders/13/contact?reveal=true",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "b311edb419f5e0c1"
+    },
+    {
+      "label": "resident-reuse-session",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "83762bb027156a25"
+    },
+    {
+      "label": "staff1-reuse-session",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "ca63efdcce90dfc4"
+    },
+    {
+      "label": "staff2-reuse-session",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "3041fb6e1c080580"
+    },
+    {
+      "label": "manager-reuse-session",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "12314902e37ab5fe"
+    },
+    {
+      "label": "outsider-reuse-session",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "5d3e1353f242e752"
+    },
+    {
+      "label": "-work-orders-16",
+      "method": "GET",
+      "path": "/work-orders/16",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e376a5cfb14478f8"
+    },
+    {
+      "label": "-staff-work-orders-16-accept",
+      "method": "POST",
+      "path": "/staff/work-orders/16/accept",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "41eb334e92d4db4c"
+    },
+    {
+      "label": "-work-orders-16",
+      "method": "GET",
+      "path": "/work-orders/16",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e376a5cfb14478f8"
+    },
+    {
+      "label": "-staff-work-orders-16-start",
+      "method": "POST",
+      "path": "/staff/work-orders/16/start",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "ef2c7c102a7774ea"
+    },
+    {
+      "label": "-work-orders-16",
+      "method": "GET",
+      "path": "/work-orders/16",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e376a5cfb14478f8"
+    },
+    {
+      "label": "-staff-work-orders-16-receipts",
+      "method": "POST",
+      "path": "/staff/work-orders/16/receipts",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e08942a3758da8da"
+    },
+    {
+      "label": "-work-orders-16",
+      "method": "GET",
+      "path": "/work-orders/16",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e376a5cfb14478f8"
+    },
+    {
+      "label": "-work-orders-16-confirm",
+      "method": "POST",
+      "path": "/work-orders/16/confirm",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "5bae3c8e7197d1e9"
+    },
+    {
+      "label": "-work-orders-16",
+      "method": "GET",
+      "path": "/work-orders/16",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e376a5cfb14478f8"
+    },
+    {
+      "label": "-work-orders",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "488ec402c43a1d9e"
+    },
+    {
+      "label": "-work-orders-18",
+      "method": "GET",
+      "path": "/work-orders/18",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "65ac0a52a63c329a"
+    },
+    {
+      "label": "-work-orders-18",
+      "method": "GET",
+      "path": "/work-orders/18",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "65ac0a52a63c329a"
+    },
+    {
+      "label": "-work-orders-18",
+      "method": "GET",
+      "path": "/work-orders/18",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "65ac0a52a63c329a"
+    },
+    {
+      "label": "-work-orders-18",
+      "method": "GET",
+      "path": "/work-orders/18",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "65ac0a52a63c329a"
+    },
+    {
+      "label": "-work-orders-18-contact?reveal=true",
+      "method": "GET",
+      "path": "/work-orders/18/contact?reveal=true",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "8e77eb5ef3bcf4f0"
+    },
+    {
+      "label": "-me-contact-phone",
+      "method": "GET",
+      "path": "/me/contact-phone",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "b4ef817502d2fc88"
+    },
+    {
+      "label": "-work-orders-18",
+      "method": "GET",
+      "path": "/work-orders/18",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "65ac0a52a63c329a"
+    },
+    {
+      "label": "-staff-work-orders-18-accept",
+      "method": "POST",
+      "path": "/staff/work-orders/18/accept",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "213f833c3eafc0c6"
+    },
+    {
+      "label": "-work-orders-18",
+      "method": "GET",
+      "path": "/work-orders/18",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "65ac0a52a63c329a"
+    },
+    {
+      "label": "-staff-work-orders-18-start",
+      "method": "POST",
+      "path": "/staff/work-orders/18/start",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6e6877a5ecdd3779"
+    },
+    {
+      "label": "-work-orders-18",
+      "method": "GET",
+      "path": "/work-orders/18",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "65ac0a52a63c329a"
+    },
+    {
+      "label": "-staff-work-orders-18-receipts",
+      "method": "POST",
+      "path": "/staff/work-orders/18/receipts",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "ff869ba3b359d6ba"
+    },
+    {
+      "label": "-work-orders-18",
+      "method": "GET",
+      "path": "/work-orders/18",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "65ac0a52a63c329a"
+    },
+    {
+      "label": "-work-orders-18-confirm",
+      "method": "POST",
+      "path": "/work-orders/18/confirm",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9be4a223ee4e651e"
+    },
+    {
+      "label": "-work-orders-18",
+      "method": "GET",
+      "path": "/work-orders/18",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "65ac0a52a63c329a"
+    },
+    {
+      "label": "-work-orders",
+      "method": "POST",
+      "path": "/work-orders",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "488ec402c43a1d9e"
+    },
+    {
+      "label": "-work-orders-19",
+      "method": "GET",
+      "path": "/work-orders/19",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "244dc9d61dfa3b0a"
+    },
+    {
+      "label": "-work-orders-19",
+      "method": "GET",
+      "path": "/work-orders/19",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "244dc9d61dfa3b0a"
+    },
+    {
+      "label": "-work-orders-19",
+      "method": "GET",
+      "path": "/work-orders/19",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "244dc9d61dfa3b0a"
+    },
+    {
+      "label": "-work-orders-19",
+      "method": "GET",
+      "path": "/work-orders/19",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "244dc9d61dfa3b0a"
+    },
+    {
+      "label": "-work-orders-19-contact?reveal=true",
+      "method": "GET",
+      "path": "/work-orders/19/contact?reveal=true",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "bdd8d4b9a3389f67"
+    },
+    {
+      "label": "-me-contact-phone",
+      "method": "GET",
+      "path": "/me/contact-phone",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "b4ef817502d2fc88"
+    },
+    {
+      "label": "-work-orders-19",
+      "method": "GET",
+      "path": "/work-orders/19",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "244dc9d61dfa3b0a"
+    },
+    {
+      "label": "-staff-work-orders-19-accept",
+      "method": "POST",
+      "path": "/staff/work-orders/19/accept",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "50bc24f64f8e066c"
+    },
+    {
+      "label": "-work-orders-19",
+      "method": "GET",
+      "path": "/work-orders/19",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "244dc9d61dfa3b0a"
+    },
+    {
+      "label": "-staff-work-orders-19-start",
+      "method": "POST",
+      "path": "/staff/work-orders/19/start",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "f5dd91e0c4c571d2"
+    },
+    {
+      "label": "-work-orders-19",
+      "method": "GET",
+      "path": "/work-orders/19",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "244dc9d61dfa3b0a"
+    },
+    {
+      "label": "-staff-work-orders-19-receipts",
+      "method": "POST",
+      "path": "/staff/work-orders/19/receipts",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c815b1509367bf4f"
+    },
+    {
+      "label": "-work-orders-19",
+      "method": "GET",
+      "path": "/work-orders/19",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "244dc9d61dfa3b0a"
+    },
+    {
+      "label": "-work-orders-19-confirm",
+      "method": "POST",
+      "path": "/work-orders/19/confirm",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "09ccae759e47342e"
+    },
+    {
+      "label": "-work-orders-19",
+      "method": "GET",
+      "path": "/work-orders/19",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "244dc9d61dfa3b0a"
+    }
+  ],
+  "attempt_errors": [
+    {
+      "type": "RuntimeError",
+      "message": "order 17 not ASSIGNED; is PENDING_ASSIGNMENT"
+    },
+    {
+      "type": "RuntimeError",
+      "message": "ended-checkin-denied failed: HTTP 409 code=EMP.CHECKIN_DENIED"
+    }
+  ],
+  "status": "API_CHECKS_COMPLETED"
+}

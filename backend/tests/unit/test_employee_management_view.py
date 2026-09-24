@@ -174,7 +174,7 @@ def test_catalog_returns_only_departments_available_to_target_property() -> None
 def test_update_employee_can_explicitly_clear_department() -> None:
     employee = _employee()
     repository = MagicMock()
-    repository.get_employee.return_value = employee
+    repository.get_employee_for_update.return_value = employee
     repository.list_assignments_for_employee.return_value = ()
     service = EmployeeService.__new__(EmployeeService)
     service._repository = repository
