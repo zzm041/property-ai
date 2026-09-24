@@ -25,6 +25,7 @@ def enqueue_celery_task(
     args: Sequence[Any] = (),
     event: str,
     extra: dict[str, Any] | None = None,
+    headers: dict[str, Any] | None = None,
     background: Any = None,
     in_process: Callable[..., None] | None = None,
     in_process_args: Sequence[Any] | None = None,
@@ -48,7 +49,8 @@ def enqueue_celery_task(
         return False
 
     try:
-        celery_task.apply_async(args=tuple(args), queue=settings.resolved_celery_queue)
+        options = {"headers": headers} if headers else {}
+        celery_task.apply_async(args=tuple(args), queue=settings.resolved_celery_queue, **options)
         return True
     except Exception:
         from app.worker.failed_tasks import record_failed_task

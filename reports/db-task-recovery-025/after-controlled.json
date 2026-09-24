@@ -1,0 +1,84 @@
+{
+  "task_id": "DB-TASK-RECOVERY-025",
+  "observed_utc": "2026-09-24T17:25:54.990190+00:00",
+  "target": "127.0.0.1:3307/property_ai_auth001_test",
+  "mode": "readonly",
+  "revision": "20260924_0011_contact_phone",
+  "protected": {
+    "12": {
+      "work_orders": {
+        "count": 1,
+        "sha256": "4e67d79e88f223c4939e5d8be550964968e49264f249002918f50e4ecea0b576"
+      },
+      "work_order_analyses": {
+        "count": 1,
+        "sha256": "c397d3ca9dde9ebe5a00322b06d1747909c9b99ac06883770d18606dc9639011"
+      },
+      "work_order_assignments": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "work_order_logs": {
+        "count": 1,
+        "sha256": "1f5f28816dbf6d79a67b8d4627740bad6d54a1d6d87e5d812f055c2e65ee0e21"
+      },
+      "ai_call_logs": {
+        "count": 1,
+        "sha256": "fc879975e508b0865c433677a4695ed599e35905282c3e550f9e6cf2009d3f2f"
+      }
+    },
+    "24": {
+      "work_orders": {
+        "count": 1,
+        "sha256": "2f836d8d807fc40631702fa5d8692b6c7a7da7c07df4099ddec13f8ab1ce7668"
+      },
+      "work_order_analyses": {
+        "count": 1,
+        "sha256": "1fd0cc31bf8f29284054252de55fd965c66c85cd9718bfc0f01e4ae0b9bff7e5"
+      },
+      "work_order_assignments": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "work_order_logs": {
+        "count": 1,
+        "sha256": "d96f1c426ab848c769362bdc8ed237965bde5cf1ab798f768a76a11aedea75fa"
+      },
+      "ai_call_logs": {
+        "count": 1,
+        "sha256": "7f7b14b559303ddb703d62a96733672a162f28f60178d0b3efe7d81d4e64ee51"
+      }
+    },
+    "25": {
+      "work_orders": {
+        "count": 1,
+        "sha256": "c97eab20a29c3b926d9ea8a3f9a1ab63f8ced29ee7be41a1a07052abc5694afd"
+      },
+      "work_order_analyses": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "work_order_assignments": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "work_order_logs": {
+        "count": 1,
+        "sha256": "4e000b7d6a0a009264638dac6f1f9fd162e9e4ab1d7430cbc460b8c7afdbd45d"
+      },
+      "ai_call_logs": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    }
+  },
+  "worker_task_counts": {
+    "active": 0,
+    "reserved": 0,
+    "scheduled": 0
+  },
+  "vhost": "property_ai_auth001",
+  "queue": "property_ai.auth001",
+  "queue_metadata": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nproperty_ai.auth001.dlq\t7\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1\nceleryev.cf8f379d-0eb6-4f29-a4f5-627ccbba0d22\t0\t0\t1",
+  "head": "ada92e14ecbf04435d331fbf64762ad3e897c57c"
+}

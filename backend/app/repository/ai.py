@@ -45,7 +45,7 @@ class AiRepository:
     def __init__(self, session: Session) -> None:
         self._session = session
 
-    def list_waiting_dispatch(self, *, retry_before: datetime, limit: int) -> tuple[tuple[int, int], ...]:
+    def list_waiting_dispatch(self, *, retry_before: datetime, limit: int, work_order_ids: tuple[int, ...] | None = None) -> tuple[tuple[int, int], ...]:
         """Bounded oldest-attempt scan using durable state, never new inference."""
         latest = select(func.max(WorkOrderAnalysis.id)).where(
             WorkOrderAnalysis.work_order_id == WorkOrder.id,
@@ -53,6 +53,14 @@ class AiRepository:
         last_wait = select(func.max(WorkOrderLog.created_at)).where(
             WorkOrderLog.work_order_id == WorkOrder.id,
             WorkOrderLog.event_code == "AUTO_DISPATCH_WAIT",
+        ).correlate(WorkOrder).scalar_subquery()
+        last_failure = select(func.max(WorkOrderLog.id)).where(
+            WorkOrderLog.work_order_id == WorkOrder.id,
+            WorkOrderLog.event_code == "AI_TASK_FAILED",
+        ).correlate(WorkOrder).scalar_subquery()
+        last_attempt = select(func.max(WorkOrderLog.id)).where(
+            WorkOrderLog.work_order_id == WorkOrder.id,
+            WorkOrderLog.event_code == "AI_TASK_ATTEMPT",
         ).correlate(WorkOrder).scalar_subquery()
         rows = self._session.execute(
             select(WorkOrder.id, WorkOrderAnalysis.id)
@@ -65,6 +73,8 @@ class AiRepository:
                 WorkOrderAnalysis.property_id == WorkOrder.property_id,
                 WorkOrderAnalysis.risk.not_in(("safety", "gas")),
                 or_(last_wait.is_(None), last_wait <= retry_before),
+                or_(last_failure.is_(None), last_attempt > last_failure),
+                WorkOrder.id.in_(work_order_ids) if work_order_ids is not None else True,
             ).order_by(last_wait, WorkOrder.id).limit(min(max(limit, 1), 100))
         ).all()
         return tuple((row[0], row[1]) for row in rows)

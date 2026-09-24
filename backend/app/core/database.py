@@ -36,6 +36,7 @@ T = TypeVar("T")
 OWNED_TXN_KEY = "property_ai_owned_transaction"
 OWNED_TXN_OBJ_KEY = "property_ai_owned_transaction_obj"
 RETRYABLE_MYSQL_TRANSACTION_ERROR_CODES = frozenset({1205, 1213})
+RETRYABLE_MYSQL_ANALYSIS_ERROR_CODES = frozenset({1205, 1213, 2006, 2013})
 
 
 class TransactionContractError(RuntimeError):
@@ -53,6 +54,16 @@ def retryable_mysql_transaction_error_code(exc: OperationalError) -> int | None:
     except (TypeError, ValueError):
         return None
     return code if code in RETRYABLE_MYSQL_TRANSACTION_ERROR_CODES else None
+
+
+def retryable_mysql_analysis_error_code(exc: OperationalError) -> int | None:
+    """Analysis operation boundary only: never replay SQL on a broken session."""
+    args = getattr(getattr(exc, "orig", None), "args", ())
+    try:
+        code = int(args[0])
+    except (IndexError, TypeError, ValueError):
+        return None
+    return code if code in RETRYABLE_MYSQL_ANALYSIS_ERROR_CODES else None
 
 
 def _owned_count(session: Session) -> int:

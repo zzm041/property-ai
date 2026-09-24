@@ -1,0 +1,2721 @@
+{
+  "run_id": "db025-4efe90cf93",
+  "steps": {
+    "login": {
+      "user_id": 14,
+      "mode": "normal page SMS/Development OTP"
+    },
+    "01-real-db-retry-auto": {
+      "path": "pages/work-orders/detail",
+      "work_order": {
+        "id": 31,
+        "tenant_id": 1,
+        "property_id": 3,
+        "house_id": 63,
+        "reporter_user_id": 14,
+        "status": "ASSIGNED",
+        "process_reason": "NONE",
+        "category": "ELECTRICAL",
+        "severity": "HIGH",
+        "priority": "HIGH",
+        "version": 3,
+        "current_assignment_id": 30,
+        "incident_id": null,
+        "sla_due_at": "2026-09-25T17:18:12.785627Z",
+        "assigned_at": "2026-09-24T17:18:19.212190Z",
+        "accepted_at": null,
+        "started_at": null,
+        "resolved_at": null,
+        "closed_at": null,
+        "created_at": "2026-09-24T17:18:12.788628Z",
+        "updated_at": "2026-09-24T17:18:19.289359Z",
+        "sla_overdue": false
+      },
+      "statusLabel": "已派单",
+      "recoveryFailed": false,
+      "logs": [
+        {
+          "id": 280,
+          "actor_user_id": 14,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-24T17:18:12.793191Z",
+          "fromStatusLabel": "未创建",
+          "toStatusLabel": "待分析",
+          "eventLabel": "提交报修",
+          "actorLabel": "住户",
+          "createdAtLabel": "2026-09-25 01:18:12 UTC+08:00"
+        },
+        {
+          "id": 281,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "AI_TASK_ATTEMPT",
+          "reason": null,
+          "created_at": "2026-09-24T17:18:12.936616Z",
+          "fromStatusLabel": "待分析",
+          "toStatusLabel": "待分析",
+          "eventLabel": "系统自动分析/恢复尝试",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:18:12 UTC+08:00"
+        },
+        {
+          "id": 282,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "ANALYZE",
+          "reason": null,
+          "created_at": "2026-09-24T17:18:12.975230Z",
+          "fromStatusLabel": "待分析",
+          "toStatusLabel": "待安排人员",
+          "eventLabel": "完成分析",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:18:12 UTC+08:00"
+        },
+        {
+          "id": 283,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "AI_TASK_ATTEMPT",
+          "reason": null,
+          "created_at": "2026-09-24T17:18:19.120469Z",
+          "fromStatusLabel": "待安排人员",
+          "toStatusLabel": "待安排人员",
+          "eventLabel": "系统自动分析/恢复尝试",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:18:19 UTC+08:00"
+        },
+        {
+          "id": 284,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "process_reason": "NONE",
+          "event_code": "ASSIGN",
+          "reason": null,
+          "created_at": "2026-09-24T17:18:19.291958Z",
+          "fromStatusLabel": "待安排人员",
+          "toStatusLabel": "已派单",
+          "eventLabel": "安排处理人员",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:18:19 UTC+08:00"
+        }
+      ],
+      "contact": "collected/masked, no plaintext screenshot"
+    },
+    "02-busy-waiting": {
+      "path": "pages/work-orders/detail",
+      "work_order": {
+        "id": 32,
+        "tenant_id": 1,
+        "property_id": 3,
+        "house_id": 64,
+        "reporter_user_id": 14,
+        "status": "PENDING_ASSIGNMENT",
+        "process_reason": "NONE",
+        "category": "ELECTRICAL",
+        "severity": "HIGH",
+        "priority": "HIGH",
+        "version": 2,
+        "current_assignment_id": null,
+        "incident_id": null,
+        "sla_due_at": "2026-09-25T17:18:19.372674Z",
+        "assigned_at": null,
+        "accepted_at": null,
+        "started_at": null,
+        "resolved_at": null,
+        "closed_at": null,
+        "created_at": "2026-09-24T17:18:19.375739Z",
+        "updated_at": "2026-09-24T17:18:19.596481Z",
+        "sla_overdue": false
+      },
+      "statusLabel": "待安排人员",
+      "recoveryFailed": false,
+      "logs": [
+        {
+          "id": 285,
+          "actor_user_id": 14,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-24T17:18:19.380183Z",
+          "fromStatusLabel": "未创建",
+          "toStatusLabel": "待分析",
+          "eventLabel": "提交报修",
+          "actorLabel": "住户",
+          "createdAtLabel": "2026-09-25 01:18:19 UTC+08:00"
+        },
+        {
+          "id": 286,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "AI_TASK_ATTEMPT",
+          "reason": null,
+          "created_at": "2026-09-24T17:18:19.541779Z",
+          "fromStatusLabel": "待分析",
+          "toStatusLabel": "待分析",
+          "eventLabel": "系统自动分析/恢复尝试",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:18:19 UTC+08:00"
+        },
+        {
+          "id": 287,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "ANALYZE",
+          "reason": null,
+          "created_at": "2026-09-24T17:18:19.597981Z",
+          "fromStatusLabel": "待分析",
+          "toStatusLabel": "待安排人员",
+          "eventLabel": "完成分析",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:18:19 UTC+08:00"
+        },
+        {
+          "id": 288,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "AUTO_DISPATCH_WAIT",
+          "reason": null,
+          "created_at": "2026-09-24T17:18:19.700481Z",
+          "fromStatusLabel": "待安排人员",
+          "toStatusLabel": "待安排人员",
+          "eventLabel": "等待可用人员，系统将自动继续安排",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:18:19 UTC+08:00"
+        }
+      ],
+      "contact": "collected/masked, no plaintext screenshot"
+    },
+    "03-completed-contact": {
+      "path": "pages/work-orders/detail",
+      "work_order": {
+        "id": 31,
+        "tenant_id": 1,
+        "property_id": 3,
+        "house_id": 63,
+        "reporter_user_id": 14,
+        "status": "CLOSED",
+        "process_reason": "NONE",
+        "category": "ELECTRICAL",
+        "severity": "HIGH",
+        "priority": "HIGH",
+        "version": 8,
+        "current_assignment_id": null,
+        "incident_id": null,
+        "sla_due_at": "2026-09-25T17:18:12.785627Z",
+        "assigned_at": "2026-09-24T17:18:19.212190Z",
+        "accepted_at": "2026-09-24T17:20:29.603746Z",
+        "started_at": "2026-09-24T17:20:29.670665Z",
+        "resolved_at": "2026-09-24T17:20:29.740241Z",
+        "closed_at": "2026-09-24T17:20:29.821777Z",
+        "created_at": "2026-09-24T17:18:12.788628Z",
+        "updated_at": "2026-09-24T17:20:29.823695Z",
+        "sla_overdue": false
+      },
+      "statusLabel": "已归档",
+      "recoveryFailed": false,
+      "logs": [
+        {
+          "id": 280,
+          "actor_user_id": 14,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-24T17:18:12.793191Z",
+          "fromStatusLabel": "未创建",
+          "toStatusLabel": "待分析",
+          "eventLabel": "提交报修",
+          "actorLabel": "住户",
+          "createdAtLabel": "2026-09-25 01:18:12 UTC+08:00"
+        },
+        {
+          "id": 281,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "AI_TASK_ATTEMPT",
+          "reason": null,
+          "created_at": "2026-09-24T17:18:12.936616Z",
+          "fromStatusLabel": "待分析",
+          "toStatusLabel": "待分析",
+          "eventLabel": "系统自动分析/恢复尝试",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:18:12 UTC+08:00"
+        },
+        {
+          "id": 282,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "ANALYZE",
+          "reason": null,
+          "created_at": "2026-09-24T17:18:12.975230Z",
+          "fromStatusLabel": "待分析",
+          "toStatusLabel": "待安排人员",
+          "eventLabel": "完成分析",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:18:12 UTC+08:00"
+        },
+        {
+          "id": 283,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "AI_TASK_ATTEMPT",
+          "reason": null,
+          "created_at": "2026-09-24T17:18:19.120469Z",
+          "fromStatusLabel": "待安排人员",
+          "toStatusLabel": "待安排人员",
+          "eventLabel": "系统自动分析/恢复尝试",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:18:19 UTC+08:00"
+        },
+        {
+          "id": 284,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "process_reason": "NONE",
+          "event_code": "ASSIGN",
+          "reason": null,
+          "created_at": "2026-09-24T17:18:19.291958Z",
+          "fromStatusLabel": "待安排人员",
+          "toStatusLabel": "已派单",
+          "eventLabel": "安排处理人员",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:18:19 UTC+08:00"
+        },
+        {
+          "id": 289,
+          "actor_user_id": 15,
+          "actor_type": "STAFF",
+          "from_status": "ASSIGNED",
+          "to_status": "ACCEPTED",
+          "process_reason": "NONE",
+          "event_code": "ACCEPT",
+          "reason": null,
+          "created_at": "2026-09-24T17:20:29.606246Z",
+          "fromStatusLabel": "已派单",
+          "toStatusLabel": "已接单",
+          "eventLabel": "员工接单",
+          "actorLabel": "工作人员",
+          "createdAtLabel": "2026-09-25 01:20:29 UTC+08:00"
+        },
+        {
+          "id": 290,
+          "actor_user_id": 15,
+          "actor_type": "STAFF",
+          "from_status": "ACCEPTED",
+          "to_status": "PROCESSING",
+          "process_reason": "NONE",
+          "event_code": "START",
+          "reason": null,
+          "created_at": "2026-09-24T17:20:29.672204Z",
+          "fromStatusLabel": "已接单",
+          "toStatusLabel": "处理中",
+          "eventLabel": "开始处理",
+          "actorLabel": "工作人员",
+          "createdAtLabel": "2026-09-25 01:20:29 UTC+08:00"
+        },
+        {
+          "id": 291,
+          "actor_user_id": 15,
+          "actor_type": "STAFF",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "process_reason": "NONE",
+          "event_code": "RECEIPT_RESOLVED",
+          "reason": null,
+          "created_at": "2026-09-24T17:20:29.743200Z",
+          "fromStatusLabel": "处理中",
+          "toStatusLabel": "待住户确认",
+          "eventLabel": "提交处理回执",
+          "actorLabel": "工作人员",
+          "createdAtLabel": "2026-09-25 01:20:29 UTC+08:00"
+        },
+        {
+          "id": 292,
+          "actor_user_id": 14,
+          "actor_type": "RESIDENT",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "COMPLETED",
+          "process_reason": "NONE",
+          "event_code": "CONFIRM",
+          "reason": null,
+          "created_at": "2026-09-24T17:20:29.808194Z",
+          "fromStatusLabel": "待住户确认",
+          "toStatusLabel": "已完成",
+          "eventLabel": "住户确认解决",
+          "actorLabel": "住户",
+          "createdAtLabel": "2026-09-25 01:20:29 UTC+08:00"
+        },
+        {
+          "id": 293,
+          "actor_user_id": 14,
+          "actor_type": "SYSTEM",
+          "from_status": "COMPLETED",
+          "to_status": "CLOSED",
+          "process_reason": "NONE",
+          "event_code": "ARCHIVE",
+          "reason": null,
+          "created_at": "2026-09-24T17:20:29.820764Z",
+          "fromStatusLabel": "已完成",
+          "toStatusLabel": "已归档",
+          "eventLabel": "归档",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:20:29 UTC+08:00"
+        }
+      ],
+      "contact": "collected/masked, no plaintext screenshot"
+    },
+    "04-release-auto": {
+      "path": "pages/work-orders/detail",
+      "work_order": {
+        "id": 32,
+        "tenant_id": 1,
+        "property_id": 3,
+        "house_id": 64,
+        "reporter_user_id": 14,
+        "status": "ASSIGNED",
+        "process_reason": "NONE",
+        "category": "ELECTRICAL",
+        "severity": "HIGH",
+        "priority": "HIGH",
+        "version": 3,
+        "current_assignment_id": 31,
+        "incident_id": null,
+        "sla_due_at": "2026-09-25T17:18:19.372674Z",
+        "assigned_at": "2026-09-24T17:20:30.137444Z",
+        "accepted_at": null,
+        "started_at": null,
+        "resolved_at": null,
+        "closed_at": null,
+        "created_at": "2026-09-24T17:18:19.375739Z",
+        "updated_at": "2026-09-24T17:20:30.197700Z",
+        "sla_overdue": false
+      },
+      "statusLabel": "已派单",
+      "recoveryFailed": false,
+      "logs": [
+        {
+          "id": 285,
+          "actor_user_id": 14,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-24T17:18:19.380183Z",
+          "fromStatusLabel": "未创建",
+          "toStatusLabel": "待分析",
+          "eventLabel": "提交报修",
+          "actorLabel": "住户",
+          "createdAtLabel": "2026-09-25 01:18:19 UTC+08:00"
+        },
+        {
+          "id": 286,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "AI_TASK_ATTEMPT",
+          "reason": null,
+          "created_at": "2026-09-24T17:18:19.541779Z",
+          "fromStatusLabel": "待分析",
+          "toStatusLabel": "待分析",
+          "eventLabel": "系统自动分析/恢复尝试",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:18:19 UTC+08:00"
+        },
+        {
+          "id": 287,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "ANALYZE",
+          "reason": null,
+          "created_at": "2026-09-24T17:18:19.597981Z",
+          "fromStatusLabel": "待分析",
+          "toStatusLabel": "待安排人员",
+          "eventLabel": "完成分析",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:18:19 UTC+08:00"
+        },
+        {
+          "id": 288,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "AUTO_DISPATCH_WAIT",
+          "reason": null,
+          "created_at": "2026-09-24T17:18:19.700481Z",
+          "fromStatusLabel": "待安排人员",
+          "toStatusLabel": "待安排人员",
+          "eventLabel": "等待可用人员，系统将自动继续安排",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:18:19 UTC+08:00"
+        },
+        {
+          "id": 294,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "process_reason": "NONE",
+          "event_code": "ASSIGN",
+          "reason": null,
+          "created_at": "2026-09-24T17:20:30.198668Z",
+          "fromStatusLabel": "待安排人员",
+          "toStatusLabel": "已派单",
+          "eventLabel": "安排处理人员",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:20:30 UTC+08:00"
+        }
+      ],
+      "contact": "collected/masked, no plaintext screenshot"
+    },
+    "05-exhaustion-visible": {
+      "path": "pages/work-orders/detail",
+      "work_order": {
+        "id": 34,
+        "tenant_id": 1,
+        "property_id": 3,
+        "house_id": 66,
+        "reporter_user_id": 14,
+        "status": "PENDING_ANALYSIS",
+        "process_reason": "NONE",
+        "category": "OTHER",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "version": 1,
+        "current_assignment_id": null,
+        "incident_id": null,
+        "sla_due_at": "2026-09-25T17:21:08.749484Z",
+        "assigned_at": null,
+        "accepted_at": null,
+        "started_at": null,
+        "resolved_at": null,
+        "closed_at": null,
+        "created_at": "2026-09-24T17:21:08.751986Z",
+        "updated_at": "2026-09-24T17:21:08.751986Z",
+        "sla_overdue": false
+      },
+      "statusLabel": "待分析",
+      "recoveryFailed": true,
+      "logs": [
+        {
+          "id": 302,
+          "actor_user_id": 14,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-24T17:21:08.757485Z",
+          "fromStatusLabel": "未创建",
+          "toStatusLabel": "待分析",
+          "eventLabel": "提交报修",
+          "actorLabel": "住户",
+          "createdAtLabel": "2026-09-25 01:21:08 UTC+08:00"
+        },
+        {
+          "id": 303,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "AI_TASK_FAILED",
+          "reason": null,
+          "created_at": "2026-09-24T17:21:11.931568Z",
+          "fromStatusLabel": "待分析",
+          "toStatusLabel": "待分析",
+          "eventLabel": "自动处理暂时失败，请等待物业处理",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:21:11 UTC+08:00"
+        }
+      ],
+      "contact": "collected/masked, no plaintext screenshot"
+    },
+    "06-uncertain-commit-closed": {
+      "path": "pages/work-orders/detail",
+      "work_order": {
+        "id": 35,
+        "tenant_id": 1,
+        "property_id": 3,
+        "house_id": 67,
+        "reporter_user_id": 14,
+        "status": "CLOSED",
+        "process_reason": "NONE",
+        "category": "ELECTRICAL",
+        "severity": "HIGH",
+        "priority": "HIGH",
+        "version": 8,
+        "current_assignment_id": null,
+        "incident_id": null,
+        "sla_due_at": "2026-09-25T17:21:12.227623Z",
+        "assigned_at": "2026-09-24T17:21:20.674647Z",
+        "accepted_at": "2026-09-24T17:21:21.100860Z",
+        "started_at": "2026-09-24T17:21:21.166468Z",
+        "resolved_at": "2026-09-24T17:21:21.227376Z",
+        "closed_at": "2026-09-24T17:21:21.288309Z",
+        "created_at": "2026-09-24T17:21:12.230545Z",
+        "updated_at": "2026-09-24T17:21:21.290308Z",
+        "sla_overdue": false
+      },
+      "statusLabel": "已归档",
+      "recoveryFailed": false,
+      "logs": [
+        {
+          "id": 304,
+          "actor_user_id": 14,
+          "actor_type": "RESIDENT",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "CREATE",
+          "reason": null,
+          "created_at": "2026-09-24T17:21:12.234046Z",
+          "fromStatusLabel": "未创建",
+          "toStatusLabel": "待分析",
+          "eventLabel": "提交报修",
+          "actorLabel": "住户",
+          "createdAtLabel": "2026-09-25 01:21:12 UTC+08:00"
+        },
+        {
+          "id": 305,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "event_code": "AI_TASK_ATTEMPT",
+          "reason": null,
+          "created_at": "2026-09-24T17:21:18.440149Z",
+          "fromStatusLabel": "待分析",
+          "toStatusLabel": "待分析",
+          "eventLabel": "系统自动分析/恢复尝试",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:21:18 UTC+08:00"
+        },
+        {
+          "id": 306,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "ANALYZE",
+          "reason": null,
+          "created_at": "2026-09-24T17:21:18.497653Z",
+          "fromStatusLabel": "待分析",
+          "toStatusLabel": "待安排人员",
+          "eventLabel": "完成分析",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:21:18 UTC+08:00"
+        },
+        {
+          "id": 307,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "event_code": "AI_TASK_ATTEMPT",
+          "reason": null,
+          "created_at": "2026-09-24T17:21:20.603798Z",
+          "fromStatusLabel": "待安排人员",
+          "toStatusLabel": "待安排人员",
+          "eventLabel": "系统自动分析/恢复尝试",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:21:20 UTC+08:00"
+        },
+        {
+          "id": 308,
+          "actor_user_id": null,
+          "actor_type": "SYSTEM",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "process_reason": "NONE",
+          "event_code": "ASSIGN",
+          "reason": null,
+          "created_at": "2026-09-24T17:21:20.739614Z",
+          "fromStatusLabel": "待安排人员",
+          "toStatusLabel": "已派单",
+          "eventLabel": "安排处理人员",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:21:20 UTC+08:00"
+        },
+        {
+          "id": 309,
+          "actor_user_id": 15,
+          "actor_type": "STAFF",
+          "from_status": "ASSIGNED",
+          "to_status": "ACCEPTED",
+          "process_reason": "NONE",
+          "event_code": "ACCEPT",
+          "reason": null,
+          "created_at": "2026-09-24T17:21:21.103419Z",
+          "fromStatusLabel": "已派单",
+          "toStatusLabel": "已接单",
+          "eventLabel": "员工接单",
+          "actorLabel": "工作人员",
+          "createdAtLabel": "2026-09-25 01:21:21 UTC+08:00"
+        },
+        {
+          "id": 310,
+          "actor_user_id": 15,
+          "actor_type": "STAFF",
+          "from_status": "ACCEPTED",
+          "to_status": "PROCESSING",
+          "process_reason": "NONE",
+          "event_code": "START",
+          "reason": null,
+          "created_at": "2026-09-24T17:21:21.168471Z",
+          "fromStatusLabel": "已接单",
+          "toStatusLabel": "处理中",
+          "eventLabel": "开始处理",
+          "actorLabel": "工作人员",
+          "createdAtLabel": "2026-09-25 01:21:21 UTC+08:00"
+        },
+        {
+          "id": 311,
+          "actor_user_id": 15,
+          "actor_type": "STAFF",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "process_reason": "NONE",
+          "event_code": "RECEIPT_RESOLVED",
+          "reason": null,
+          "created_at": "2026-09-24T17:21:21.229376Z",
+          "fromStatusLabel": "处理中",
+          "toStatusLabel": "待住户确认",
+          "eventLabel": "提交处理回执",
+          "actorLabel": "工作人员",
+          "createdAtLabel": "2026-09-25 01:21:21 UTC+08:00"
+        },
+        {
+          "id": 312,
+          "actor_user_id": 14,
+          "actor_type": "RESIDENT",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "COMPLETED",
+          "process_reason": "NONE",
+          "event_code": "CONFIRM",
+          "reason": null,
+          "created_at": "2026-09-24T17:21:21.278303Z",
+          "fromStatusLabel": "待住户确认",
+          "toStatusLabel": "已完成",
+          "eventLabel": "住户确认解决",
+          "actorLabel": "住户",
+          "createdAtLabel": "2026-09-25 01:21:21 UTC+08:00"
+        },
+        {
+          "id": 313,
+          "actor_user_id": 14,
+          "actor_type": "SYSTEM",
+          "from_status": "COMPLETED",
+          "to_status": "CLOSED",
+          "process_reason": "NONE",
+          "event_code": "ARCHIVE",
+          "reason": null,
+          "created_at": "2026-09-24T17:21:21.287309Z",
+          "fromStatusLabel": "已完成",
+          "toStatusLabel": "已归档",
+          "eventLabel": "归档",
+          "actorLabel": "系统",
+          "createdAtLabel": "2026-09-25 01:21:21 UTC+08:00"
+        }
+      ],
+      "contact": "collected/masked, no plaintext screenshot"
+    }
+  },
+  "requests": [
+    {
+      "path": "/work-orders/31",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "work_order": {
+          "id": 31,
+          "tenant_id": 1,
+          "property_id": 3,
+          "house_id": 63,
+          "reporter_user_id": 14,
+          "status": "ASSIGNED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 3,
+          "current_assignment_id": 30,
+          "incident_id": null,
+          "sla_due_at": "2026-09-25T17:18:12.785627Z",
+          "assigned_at": "2026-09-24T17:18:19.212190Z",
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-24T17:18:12.788628Z",
+          "updated_at": "2026-09-24T17:18:19.289359Z",
+          "sla_overdue": false
+        },
+        "text": "db025-4efe90cf93 dispatch：水龙头滴水，插座不通电，无烟无火花无焦味，普通维修组统一处理。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 30,
+            "employee_id": 5,
+            "assigned_by_user_id": null,
+            "status": "ACTIVE",
+            "assigned_at": "2026-09-24T17:18:19.212190Z",
+            "accept_at": null,
+            "ended_at": null,
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 280,
+            "actor_user_id": 14,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:12.793191Z"
+          },
+          {
+            "id": 281,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_ATTEMPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:12.936616Z"
+          },
+          {
+            "id": 282,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:12.975230Z"
+          },
+          {
+            "id": 283,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_ATTEMPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.120469Z"
+          },
+          {
+            "id": 284,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.291958Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {
+            "5": "db025-4efe90cf93-staff"
+          },
+          "timestamp_labels": {
+            "2026-09-25T17:18:12.785627Z": "2026-09-26 01:18:12 UTC+08:00",
+            "2026-09-24T17:18:19.212190Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:12.788628Z": "2026-09-25 01:18:12 UTC+08:00",
+            "2026-09-24T17:18:19.289359Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:12.793191Z": "2026-09-25 01:18:12 UTC+08:00",
+            "2026-09-24T17:18:12.936616Z": "2026-09-25 01:18:12 UTC+08:00",
+            "2026-09-24T17:18:12.975230Z": "2026-09-25 01:18:12 UTC+08:00",
+            "2026-09-24T17:18:19.120469Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.291958Z": "2026-09-25 01:18:19 UTC+08:00"
+          }
+        }
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:20:02.542Z"
+    },
+    {
+      "path": "/work-orders/31/contact?reveal=false",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "collected": true,
+        "masked_phone": "[redacted]",
+        "phone": "[redacted]"
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:20:02.573Z"
+    },
+    {
+      "path": "/work-orders/31",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "work_order": {
+          "id": 31,
+          "tenant_id": 1,
+          "property_id": 3,
+          "house_id": 63,
+          "reporter_user_id": 14,
+          "status": "ASSIGNED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 3,
+          "current_assignment_id": 30,
+          "incident_id": null,
+          "sla_due_at": "2026-09-25T17:18:12.785627Z",
+          "assigned_at": "2026-09-24T17:18:19.212190Z",
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-24T17:18:12.788628Z",
+          "updated_at": "2026-09-24T17:18:19.289359Z",
+          "sla_overdue": false
+        },
+        "text": "db025-4efe90cf93 dispatch：水龙头滴水，插座不通电，无烟无火花无焦味，普通维修组统一处理。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 30,
+            "employee_id": 5,
+            "assigned_by_user_id": null,
+            "status": "ACTIVE",
+            "assigned_at": "2026-09-24T17:18:19.212190Z",
+            "accept_at": null,
+            "ended_at": null,
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 280,
+            "actor_user_id": 14,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:12.793191Z"
+          },
+          {
+            "id": 281,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_ATTEMPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:12.936616Z"
+          },
+          {
+            "id": 282,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:12.975230Z"
+          },
+          {
+            "id": 283,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_ATTEMPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.120469Z"
+          },
+          {
+            "id": 284,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.291958Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {
+            "5": "db025-4efe90cf93-staff"
+          },
+          "timestamp_labels": {
+            "2026-09-25T17:18:12.785627Z": "2026-09-26 01:18:12 UTC+08:00",
+            "2026-09-24T17:18:19.212190Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:12.788628Z": "2026-09-25 01:18:12 UTC+08:00",
+            "2026-09-24T17:18:19.289359Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:12.793191Z": "2026-09-25 01:18:12 UTC+08:00",
+            "2026-09-24T17:18:12.936616Z": "2026-09-25 01:18:12 UTC+08:00",
+            "2026-09-24T17:18:12.975230Z": "2026-09-25 01:18:12 UTC+08:00",
+            "2026-09-24T17:18:19.120469Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.291958Z": "2026-09-25 01:18:19 UTC+08:00"
+          }
+        }
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:20:03.114Z"
+    },
+    {
+      "path": "/work-orders/32",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "work_order": {
+          "id": 32,
+          "tenant_id": 1,
+          "property_id": 3,
+          "house_id": 64,
+          "reporter_user_id": 14,
+          "status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 2,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-25T17:18:19.372674Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-24T17:18:19.375739Z",
+          "updated_at": "2026-09-24T17:18:19.596481Z",
+          "sla_overdue": false
+        },
+        "text": "db025-4efe90cf93 busy：水龙头滴水，插座不通电，无烟无火花无焦味，普通维修组统一处理。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 285,
+            "actor_user_id": 14,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.380183Z"
+          },
+          {
+            "id": 286,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_ATTEMPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.541779Z"
+          },
+          {
+            "id": 287,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.597981Z"
+          },
+          {
+            "id": 288,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "AUTO_DISPATCH_WAIT",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.700481Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-25T17:18:19.372674Z": "2026-09-26 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.375739Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.596481Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.380183Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.541779Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.597981Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.700481Z": "2026-09-25 01:18:19 UTC+08:00"
+          }
+        }
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:20:04.984Z"
+    },
+    {
+      "path": "/work-orders/32/contact?reveal=false",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "collected": true,
+        "masked_phone": "[redacted]",
+        "phone": "[redacted]"
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:20:05.008Z"
+    },
+    {
+      "path": "/work-orders/32",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "work_order": {
+          "id": 32,
+          "tenant_id": 1,
+          "property_id": 3,
+          "house_id": 64,
+          "reporter_user_id": 14,
+          "status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 2,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-25T17:18:19.372674Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-24T17:18:19.375739Z",
+          "updated_at": "2026-09-24T17:18:19.596481Z",
+          "sla_overdue": false
+        },
+        "text": "db025-4efe90cf93 busy：水龙头滴水，插座不通电，无烟无火花无焦味，普通维修组统一处理。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 285,
+            "actor_user_id": 14,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.380183Z"
+          },
+          {
+            "id": 286,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_ATTEMPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.541779Z"
+          },
+          {
+            "id": 287,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.597981Z"
+          },
+          {
+            "id": 288,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "AUTO_DISPATCH_WAIT",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.700481Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-25T17:18:19.372674Z": "2026-09-26 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.375739Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.596481Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.380183Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.541779Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.597981Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.700481Z": "2026-09-25 01:18:19 UTC+08:00"
+          }
+        }
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:20:05.566Z"
+    },
+    {
+      "path": "/work-orders/32",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "work_order": {
+          "id": 32,
+          "tenant_id": 1,
+          "property_id": 3,
+          "house_id": 64,
+          "reporter_user_id": 14,
+          "status": "PENDING_ASSIGNMENT",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 2,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-25T17:18:19.372674Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-24T17:18:19.375739Z",
+          "updated_at": "2026-09-24T17:18:19.596481Z",
+          "sla_overdue": false
+        },
+        "text": "db025-4efe90cf93 busy：水龙头滴水，插座不通电，无烟无火花无焦味，普通维修组统一处理。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 285,
+            "actor_user_id": 14,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.380183Z"
+          },
+          {
+            "id": 286,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_ATTEMPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.541779Z"
+          },
+          {
+            "id": 287,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.597981Z"
+          },
+          {
+            "id": 288,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "AUTO_DISPATCH_WAIT",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.700481Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-25T17:18:19.372674Z": "2026-09-26 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.375739Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.596481Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.380183Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.541779Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.597981Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.700481Z": "2026-09-25 01:18:19 UTC+08:00"
+          }
+        }
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:20:06.626Z"
+    },
+    {
+      "path": "/work-orders/31",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "work_order": {
+          "id": 31,
+          "tenant_id": 1,
+          "property_id": 3,
+          "house_id": 63,
+          "reporter_user_id": 14,
+          "status": "CLOSED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 8,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-25T17:18:12.785627Z",
+          "assigned_at": "2026-09-24T17:18:19.212190Z",
+          "accepted_at": "2026-09-24T17:20:29.603746Z",
+          "started_at": "2026-09-24T17:20:29.670665Z",
+          "resolved_at": "2026-09-24T17:20:29.740241Z",
+          "closed_at": "2026-09-24T17:20:29.821777Z",
+          "created_at": "2026-09-24T17:18:12.788628Z",
+          "updated_at": "2026-09-24T17:20:29.823695Z",
+          "sla_overdue": false
+        },
+        "text": "db025-4efe90cf93 dispatch：水龙头滴水，插座不通电，无烟无火花无焦味，普通维修组统一处理。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 30,
+            "employee_id": 5,
+            "assigned_by_user_id": null,
+            "status": "ENDED",
+            "assigned_at": "2026-09-24T17:18:19.212190Z",
+            "accept_at": "2026-09-24T17:20:29.603746Z",
+            "ended_at": "2026-09-24T17:20:29.809195Z",
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [
+          {
+            "id": 24,
+            "cycle_no": 1,
+            "assignee_id": 5,
+            "started_at": "2026-09-24T17:20:29.670665Z",
+            "ended_at": "2026-09-24T17:20:29.740241Z"
+          }
+        ],
+        "receipts": [
+          {
+            "id": 24,
+            "process_id": 24,
+            "cycle_no": 1,
+            "assignee_id": 5,
+            "problem_type": "普通维修",
+            "method": "合成验证：修复水龙头滴水并检查插座供电，逐项验证两个问题解决。",
+            "materials": null,
+            "fee_amount": null,
+            "fee_flag": "NONE",
+            "resolved": true,
+            "unresolved_reason": null,
+            "follow_up": null,
+            "finished_at": "2026-09-24T17:20:29.740241Z"
+          }
+        ],
+        "feedbacks": [
+          {
+            "id": 25,
+            "process_id": 24,
+            "actor_user_id": 14,
+            "confirmed": true,
+            "rating": null,
+            "comment": null,
+            "unresolved_flag": false,
+            "created_at": "2026-09-24T17:20:29.805195Z"
+          }
+        ],
+        "logs": [
+          {
+            "id": 280,
+            "actor_user_id": 14,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:12.793191Z"
+          },
+          {
+            "id": 281,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_ATTEMPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:12.936616Z"
+          },
+          {
+            "id": 282,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:12.975230Z"
+          },
+          {
+            "id": 283,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_ATTEMPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.120469Z"
+          },
+          {
+            "id": 284,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.291958Z"
+          },
+          {
+            "id": 289,
+            "actor_user_id": 15,
+            "actor_type": "STAFF",
+            "from_status": "ASSIGNED",
+            "to_status": "ACCEPTED",
+            "process_reason": "NONE",
+            "event_code": "ACCEPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:20:29.606246Z"
+          },
+          {
+            "id": 290,
+            "actor_user_id": 15,
+            "actor_type": "STAFF",
+            "from_status": "ACCEPTED",
+            "to_status": "PROCESSING",
+            "process_reason": "NONE",
+            "event_code": "START",
+            "reason": null,
+            "created_at": "2026-09-24T17:20:29.672204Z"
+          },
+          {
+            "id": 291,
+            "actor_user_id": 15,
+            "actor_type": "STAFF",
+            "from_status": "PROCESSING",
+            "to_status": "WAIT_CONFIRM",
+            "process_reason": "NONE",
+            "event_code": "RECEIPT_RESOLVED",
+            "reason": null,
+            "created_at": "2026-09-24T17:20:29.743200Z"
+          },
+          {
+            "id": 292,
+            "actor_user_id": 14,
+            "actor_type": "RESIDENT",
+            "from_status": "WAIT_CONFIRM",
+            "to_status": "COMPLETED",
+            "process_reason": "NONE",
+            "event_code": "CONFIRM",
+            "reason": null,
+            "created_at": "2026-09-24T17:20:29.808194Z"
+          },
+          {
+            "id": 293,
+            "actor_user_id": 14,
+            "actor_type": "SYSTEM",
+            "from_status": "COMPLETED",
+            "to_status": "CLOSED",
+            "process_reason": "NONE",
+            "event_code": "ARCHIVE",
+            "reason": null,
+            "created_at": "2026-09-24T17:20:29.820764Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {
+            "5": "db025-4efe90cf93-staff"
+          },
+          "timestamp_labels": {
+            "2026-09-25T17:18:12.785627Z": "2026-09-26 01:18:12 UTC+08:00",
+            "2026-09-24T17:18:19.212190Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:20:29.603746Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:20:29.670665Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:20:29.740241Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:20:29.821777Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:18:12.788628Z": "2026-09-25 01:18:12 UTC+08:00",
+            "2026-09-24T17:20:29.823695Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:20:29.809195Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:20:29.805195Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:18:12.793191Z": "2026-09-25 01:18:12 UTC+08:00",
+            "2026-09-24T17:18:12.936616Z": "2026-09-25 01:18:12 UTC+08:00",
+            "2026-09-24T17:18:12.975230Z": "2026-09-25 01:18:12 UTC+08:00",
+            "2026-09-24T17:18:19.120469Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.291958Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:20:29.606246Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:20:29.672204Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:20:29.743200Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:20:29.808194Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:20:29.820764Z": "2026-09-25 01:20:29 UTC+08:00"
+          }
+        }
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:20:45.520Z"
+    },
+    {
+      "path": "/work-orders/31/contact?reveal=false",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "collected": true,
+        "masked_phone": "[redacted]",
+        "phone": "[redacted]"
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:20:45.550Z"
+    },
+    {
+      "path": "/work-orders/31",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "work_order": {
+          "id": 31,
+          "tenant_id": 1,
+          "property_id": 3,
+          "house_id": 63,
+          "reporter_user_id": 14,
+          "status": "CLOSED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 8,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-25T17:18:12.785627Z",
+          "assigned_at": "2026-09-24T17:18:19.212190Z",
+          "accepted_at": "2026-09-24T17:20:29.603746Z",
+          "started_at": "2026-09-24T17:20:29.670665Z",
+          "resolved_at": "2026-09-24T17:20:29.740241Z",
+          "closed_at": "2026-09-24T17:20:29.821777Z",
+          "created_at": "2026-09-24T17:18:12.788628Z",
+          "updated_at": "2026-09-24T17:20:29.823695Z",
+          "sla_overdue": false
+        },
+        "text": "db025-4efe90cf93 dispatch：水龙头滴水，插座不通电，无烟无火花无焦味，普通维修组统一处理。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 30,
+            "employee_id": 5,
+            "assigned_by_user_id": null,
+            "status": "ENDED",
+            "assigned_at": "2026-09-24T17:18:19.212190Z",
+            "accept_at": "2026-09-24T17:20:29.603746Z",
+            "ended_at": "2026-09-24T17:20:29.809195Z",
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [
+          {
+            "id": 24,
+            "cycle_no": 1,
+            "assignee_id": 5,
+            "started_at": "2026-09-24T17:20:29.670665Z",
+            "ended_at": "2026-09-24T17:20:29.740241Z"
+          }
+        ],
+        "receipts": [
+          {
+            "id": 24,
+            "process_id": 24,
+            "cycle_no": 1,
+            "assignee_id": 5,
+            "problem_type": "普通维修",
+            "method": "合成验证：修复水龙头滴水并检查插座供电，逐项验证两个问题解决。",
+            "materials": null,
+            "fee_amount": null,
+            "fee_flag": "NONE",
+            "resolved": true,
+            "unresolved_reason": null,
+            "follow_up": null,
+            "finished_at": "2026-09-24T17:20:29.740241Z"
+          }
+        ],
+        "feedbacks": [
+          {
+            "id": 25,
+            "process_id": 24,
+            "actor_user_id": 14,
+            "confirmed": true,
+            "rating": null,
+            "comment": null,
+            "unresolved_flag": false,
+            "created_at": "2026-09-24T17:20:29.805195Z"
+          }
+        ],
+        "logs": [
+          {
+            "id": 280,
+            "actor_user_id": 14,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:12.793191Z"
+          },
+          {
+            "id": 281,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_ATTEMPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:12.936616Z"
+          },
+          {
+            "id": 282,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:12.975230Z"
+          },
+          {
+            "id": 283,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_ATTEMPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.120469Z"
+          },
+          {
+            "id": 284,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.291958Z"
+          },
+          {
+            "id": 289,
+            "actor_user_id": 15,
+            "actor_type": "STAFF",
+            "from_status": "ASSIGNED",
+            "to_status": "ACCEPTED",
+            "process_reason": "NONE",
+            "event_code": "ACCEPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:20:29.606246Z"
+          },
+          {
+            "id": 290,
+            "actor_user_id": 15,
+            "actor_type": "STAFF",
+            "from_status": "ACCEPTED",
+            "to_status": "PROCESSING",
+            "process_reason": "NONE",
+            "event_code": "START",
+            "reason": null,
+            "created_at": "2026-09-24T17:20:29.672204Z"
+          },
+          {
+            "id": 291,
+            "actor_user_id": 15,
+            "actor_type": "STAFF",
+            "from_status": "PROCESSING",
+            "to_status": "WAIT_CONFIRM",
+            "process_reason": "NONE",
+            "event_code": "RECEIPT_RESOLVED",
+            "reason": null,
+            "created_at": "2026-09-24T17:20:29.743200Z"
+          },
+          {
+            "id": 292,
+            "actor_user_id": 14,
+            "actor_type": "RESIDENT",
+            "from_status": "WAIT_CONFIRM",
+            "to_status": "COMPLETED",
+            "process_reason": "NONE",
+            "event_code": "CONFIRM",
+            "reason": null,
+            "created_at": "2026-09-24T17:20:29.808194Z"
+          },
+          {
+            "id": 293,
+            "actor_user_id": 14,
+            "actor_type": "SYSTEM",
+            "from_status": "COMPLETED",
+            "to_status": "CLOSED",
+            "process_reason": "NONE",
+            "event_code": "ARCHIVE",
+            "reason": null,
+            "created_at": "2026-09-24T17:20:29.820764Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {
+            "5": "db025-4efe90cf93-staff"
+          },
+          "timestamp_labels": {
+            "2026-09-25T17:18:12.785627Z": "2026-09-26 01:18:12 UTC+08:00",
+            "2026-09-24T17:18:19.212190Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:20:29.603746Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:20:29.670665Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:20:29.740241Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:20:29.821777Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:18:12.788628Z": "2026-09-25 01:18:12 UTC+08:00",
+            "2026-09-24T17:20:29.823695Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:20:29.809195Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:20:29.805195Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:18:12.793191Z": "2026-09-25 01:18:12 UTC+08:00",
+            "2026-09-24T17:18:12.936616Z": "2026-09-25 01:18:12 UTC+08:00",
+            "2026-09-24T17:18:12.975230Z": "2026-09-25 01:18:12 UTC+08:00",
+            "2026-09-24T17:18:19.120469Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.291958Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:20:29.606246Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:20:29.672204Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:20:29.743200Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:20:29.808194Z": "2026-09-25 01:20:29 UTC+08:00",
+            "2026-09-24T17:20:29.820764Z": "2026-09-25 01:20:29 UTC+08:00"
+          }
+        }
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:20:46.081Z"
+    },
+    {
+      "path": "/work-orders/32",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "work_order": {
+          "id": 32,
+          "tenant_id": 1,
+          "property_id": 3,
+          "house_id": 64,
+          "reporter_user_id": 14,
+          "status": "ASSIGNED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 3,
+          "current_assignment_id": 31,
+          "incident_id": null,
+          "sla_due_at": "2026-09-25T17:18:19.372674Z",
+          "assigned_at": "2026-09-24T17:20:30.137444Z",
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-24T17:18:19.375739Z",
+          "updated_at": "2026-09-24T17:20:30.197700Z",
+          "sla_overdue": false
+        },
+        "text": "db025-4efe90cf93 busy：水龙头滴水，插座不通电，无烟无火花无焦味，普通维修组统一处理。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 31,
+            "employee_id": 5,
+            "assigned_by_user_id": null,
+            "status": "ACTIVE",
+            "assigned_at": "2026-09-24T17:20:30.137444Z",
+            "accept_at": null,
+            "ended_at": null,
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 285,
+            "actor_user_id": 14,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.380183Z"
+          },
+          {
+            "id": 286,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_ATTEMPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.541779Z"
+          },
+          {
+            "id": 287,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.597981Z"
+          },
+          {
+            "id": 288,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "AUTO_DISPATCH_WAIT",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.700481Z"
+          },
+          {
+            "id": 294,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-24T17:20:30.198668Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {
+            "5": "db025-4efe90cf93-staff"
+          },
+          "timestamp_labels": {
+            "2026-09-25T17:18:19.372674Z": "2026-09-26 01:18:19 UTC+08:00",
+            "2026-09-24T17:20:30.137444Z": "2026-09-25 01:20:30 UTC+08:00",
+            "2026-09-24T17:18:19.375739Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:20:30.197700Z": "2026-09-25 01:20:30 UTC+08:00",
+            "2026-09-24T17:18:19.380183Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.541779Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.597981Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.700481Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:20:30.198668Z": "2026-09-25 01:20:30 UTC+08:00"
+          }
+        }
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:20:48.004Z"
+    },
+    {
+      "path": "/work-orders/32/contact?reveal=false",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "collected": true,
+        "masked_phone": "[redacted]",
+        "phone": "[redacted]"
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:20:48.031Z"
+    },
+    {
+      "path": "/work-orders/32",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "work_order": {
+          "id": 32,
+          "tenant_id": 1,
+          "property_id": 3,
+          "house_id": 64,
+          "reporter_user_id": 14,
+          "status": "ASSIGNED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 3,
+          "current_assignment_id": 31,
+          "incident_id": null,
+          "sla_due_at": "2026-09-25T17:18:19.372674Z",
+          "assigned_at": "2026-09-24T17:20:30.137444Z",
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-24T17:18:19.375739Z",
+          "updated_at": "2026-09-24T17:20:30.197700Z",
+          "sla_overdue": false
+        },
+        "text": "db025-4efe90cf93 busy：水龙头滴水，插座不通电，无烟无火花无焦味，普通维修组统一处理。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 31,
+            "employee_id": 5,
+            "assigned_by_user_id": null,
+            "status": "ACTIVE",
+            "assigned_at": "2026-09-24T17:20:30.137444Z",
+            "accept_at": null,
+            "ended_at": null,
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 285,
+            "actor_user_id": 14,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.380183Z"
+          },
+          {
+            "id": 286,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_ATTEMPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.541779Z"
+          },
+          {
+            "id": 287,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.597981Z"
+          },
+          {
+            "id": 288,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "AUTO_DISPATCH_WAIT",
+            "reason": null,
+            "created_at": "2026-09-24T17:18:19.700481Z"
+          },
+          {
+            "id": 294,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-24T17:20:30.198668Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {
+            "5": "db025-4efe90cf93-staff"
+          },
+          "timestamp_labels": {
+            "2026-09-25T17:18:19.372674Z": "2026-09-26 01:18:19 UTC+08:00",
+            "2026-09-24T17:20:30.137444Z": "2026-09-25 01:20:30 UTC+08:00",
+            "2026-09-24T17:18:19.375739Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:20:30.197700Z": "2026-09-25 01:20:30 UTC+08:00",
+            "2026-09-24T17:18:19.380183Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.541779Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.597981Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:18:19.700481Z": "2026-09-25 01:18:19 UTC+08:00",
+            "2026-09-24T17:20:30.198668Z": "2026-09-25 01:20:30 UTC+08:00"
+          }
+        }
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:20:48.565Z"
+    },
+    {
+      "path": "/work-orders/34",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "work_order": {
+          "id": 34,
+          "tenant_id": 1,
+          "property_id": 3,
+          "house_id": 66,
+          "reporter_user_id": 14,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-25T17:21:08.749484Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-24T17:21:08.751986Z",
+          "updated_at": "2026-09-24T17:21:08.751986Z",
+          "sla_overdue": false
+        },
+        "text": "db025-4efe90cf93 persistent：水龙头滴水，插座不通电，无烟无火花无焦味，普通维修组统一处理。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 302,
+            "actor_user_id": 14,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:08.757485Z"
+          },
+          {
+            "id": 303,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_FAILED",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:11.931568Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-25T17:21:08.749484Z": "2026-09-26 01:21:08 UTC+08:00",
+            "2026-09-24T17:21:08.751986Z": "2026-09-25 01:21:08 UTC+08:00",
+            "2026-09-24T17:21:08.757485Z": "2026-09-25 01:21:08 UTC+08:00",
+            "2026-09-24T17:21:11.931568Z": "2026-09-25 01:21:11 UTC+08:00"
+          }
+        }
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:21:51.510Z"
+    },
+    {
+      "path": "/work-orders/34/contact?reveal=false",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "collected": true,
+        "masked_phone": "[redacted]",
+        "phone": "[redacted]"
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:21:51.542Z"
+    },
+    {
+      "path": "/work-orders/34",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "work_order": {
+          "id": 34,
+          "tenant_id": 1,
+          "property_id": 3,
+          "house_id": 66,
+          "reporter_user_id": 14,
+          "status": "PENDING_ANALYSIS",
+          "process_reason": "NONE",
+          "category": "OTHER",
+          "severity": "LOW",
+          "priority": "MEDIUM",
+          "version": 1,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-25T17:21:08.749484Z",
+          "assigned_at": null,
+          "accepted_at": null,
+          "started_at": null,
+          "resolved_at": null,
+          "closed_at": null,
+          "created_at": "2026-09-24T17:21:08.751986Z",
+          "updated_at": "2026-09-24T17:21:08.751986Z",
+          "sla_overdue": false
+        },
+        "text": "db025-4efe90cf93 persistent：水龙头滴水，插座不通电，无烟无火花无焦味，普通维修组统一处理。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [],
+        "processes": [],
+        "receipts": [],
+        "feedbacks": [],
+        "logs": [
+          {
+            "id": 302,
+            "actor_user_id": 14,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:08.757485Z"
+          },
+          {
+            "id": 303,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_FAILED",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:11.931568Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {},
+          "timestamp_labels": {
+            "2026-09-25T17:21:08.749484Z": "2026-09-26 01:21:08 UTC+08:00",
+            "2026-09-24T17:21:08.751986Z": "2026-09-25 01:21:08 UTC+08:00",
+            "2026-09-24T17:21:08.757485Z": "2026-09-25 01:21:08 UTC+08:00",
+            "2026-09-24T17:21:11.931568Z": "2026-09-25 01:21:11 UTC+08:00"
+          }
+        }
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:21:52.081Z"
+    },
+    {
+      "path": "/work-orders/35",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "work_order": {
+          "id": 35,
+          "tenant_id": 1,
+          "property_id": 3,
+          "house_id": 67,
+          "reporter_user_id": 14,
+          "status": "CLOSED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 8,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-25T17:21:12.227623Z",
+          "assigned_at": "2026-09-24T17:21:20.674647Z",
+          "accepted_at": "2026-09-24T17:21:21.100860Z",
+          "started_at": "2026-09-24T17:21:21.166468Z",
+          "resolved_at": "2026-09-24T17:21:21.227376Z",
+          "closed_at": "2026-09-24T17:21:21.288309Z",
+          "created_at": "2026-09-24T17:21:12.230545Z",
+          "updated_at": "2026-09-24T17:21:21.290308Z",
+          "sla_overdue": false
+        },
+        "text": "db025-4efe90cf93 commit：水龙头滴水，插座不通电，无烟无火花无焦味，普通维修组统一处理。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 32,
+            "employee_id": 5,
+            "assigned_by_user_id": null,
+            "status": "ENDED",
+            "assigned_at": "2026-09-24T17:21:20.674647Z",
+            "accept_at": "2026-09-24T17:21:21.100860Z",
+            "ended_at": "2026-09-24T17:21:21.279303Z",
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [
+          {
+            "id": 26,
+            "cycle_no": 1,
+            "assignee_id": 5,
+            "started_at": "2026-09-24T17:21:21.166468Z",
+            "ended_at": "2026-09-24T17:21:21.227376Z"
+          }
+        ],
+        "receipts": [
+          {
+            "id": 26,
+            "process_id": 26,
+            "cycle_no": 1,
+            "assignee_id": 5,
+            "problem_type": "普通维修",
+            "method": "合成验证：修复水龙头滴水并检查插座供电，逐项验证两个问题解决。",
+            "materials": null,
+            "fee_amount": null,
+            "fee_flag": "NONE",
+            "resolved": true,
+            "unresolved_reason": null,
+            "follow_up": null,
+            "finished_at": "2026-09-24T17:21:21.227376Z"
+          }
+        ],
+        "feedbacks": [
+          {
+            "id": 27,
+            "process_id": 26,
+            "actor_user_id": 14,
+            "confirmed": true,
+            "rating": null,
+            "comment": null,
+            "unresolved_flag": false,
+            "created_at": "2026-09-24T17:21:21.276303Z"
+          }
+        ],
+        "logs": [
+          {
+            "id": 304,
+            "actor_user_id": 14,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:12.234046Z"
+          },
+          {
+            "id": 305,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_ATTEMPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:18.440149Z"
+          },
+          {
+            "id": 306,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:18.497653Z"
+          },
+          {
+            "id": 307,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_ATTEMPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:20.603798Z"
+          },
+          {
+            "id": 308,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:20.739614Z"
+          },
+          {
+            "id": 309,
+            "actor_user_id": 15,
+            "actor_type": "STAFF",
+            "from_status": "ASSIGNED",
+            "to_status": "ACCEPTED",
+            "process_reason": "NONE",
+            "event_code": "ACCEPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:21.103419Z"
+          },
+          {
+            "id": 310,
+            "actor_user_id": 15,
+            "actor_type": "STAFF",
+            "from_status": "ACCEPTED",
+            "to_status": "PROCESSING",
+            "process_reason": "NONE",
+            "event_code": "START",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:21.168471Z"
+          },
+          {
+            "id": 311,
+            "actor_user_id": 15,
+            "actor_type": "STAFF",
+            "from_status": "PROCESSING",
+            "to_status": "WAIT_CONFIRM",
+            "process_reason": "NONE",
+            "event_code": "RECEIPT_RESOLVED",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:21.229376Z"
+          },
+          {
+            "id": 312,
+            "actor_user_id": 14,
+            "actor_type": "RESIDENT",
+            "from_status": "WAIT_CONFIRM",
+            "to_status": "COMPLETED",
+            "process_reason": "NONE",
+            "event_code": "CONFIRM",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:21.278303Z"
+          },
+          {
+            "id": 313,
+            "actor_user_id": 14,
+            "actor_type": "SYSTEM",
+            "from_status": "COMPLETED",
+            "to_status": "CLOSED",
+            "process_reason": "NONE",
+            "event_code": "ARCHIVE",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:21.287309Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {
+            "5": "db025-4efe90cf93-staff"
+          },
+          "timestamp_labels": {
+            "2026-09-25T17:21:12.227623Z": "2026-09-26 01:21:12 UTC+08:00",
+            "2026-09-24T17:21:20.674647Z": "2026-09-25 01:21:20 UTC+08:00",
+            "2026-09-24T17:21:21.100860Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:21.166468Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:21.227376Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:21.288309Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:12.230545Z": "2026-09-25 01:21:12 UTC+08:00",
+            "2026-09-24T17:21:21.290308Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:21.279303Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:21.276303Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:12.234046Z": "2026-09-25 01:21:12 UTC+08:00",
+            "2026-09-24T17:21:18.440149Z": "2026-09-25 01:21:18 UTC+08:00",
+            "2026-09-24T17:21:18.497653Z": "2026-09-25 01:21:18 UTC+08:00",
+            "2026-09-24T17:21:20.603798Z": "2026-09-25 01:21:20 UTC+08:00",
+            "2026-09-24T17:21:20.739614Z": "2026-09-25 01:21:20 UTC+08:00",
+            "2026-09-24T17:21:21.103419Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:21.168471Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:21.229376Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:21.278303Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:21.287309Z": "2026-09-25 01:21:21 UTC+08:00"
+          }
+        }
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:21:53.982Z"
+    },
+    {
+      "path": "/work-orders/35/contact?reveal=false",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "collected": true,
+        "masked_phone": "[redacted]",
+        "phone": "[redacted]"
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:21:54.002Z"
+    },
+    {
+      "path": "/work-orders/35",
+      "method": "GET",
+      "status": 200,
+      "data": {
+        "work_order": {
+          "id": 35,
+          "tenant_id": 1,
+          "property_id": 3,
+          "house_id": 67,
+          "reporter_user_id": 14,
+          "status": "CLOSED",
+          "process_reason": "NONE",
+          "category": "ELECTRICAL",
+          "severity": "HIGH",
+          "priority": "HIGH",
+          "version": 8,
+          "current_assignment_id": null,
+          "incident_id": null,
+          "sla_due_at": "2026-09-25T17:21:12.227623Z",
+          "assigned_at": "2026-09-24T17:21:20.674647Z",
+          "accepted_at": "2026-09-24T17:21:21.100860Z",
+          "started_at": "2026-09-24T17:21:21.166468Z",
+          "resolved_at": "2026-09-24T17:21:21.227376Z",
+          "closed_at": "2026-09-24T17:21:21.288309Z",
+          "created_at": "2026-09-24T17:21:12.230545Z",
+          "updated_at": "2026-09-24T17:21:21.290308Z",
+          "sla_overdue": false
+        },
+        "text": "db025-4efe90cf93 commit：水龙头滴水，插座不通电，无烟无火花无焦味，普通维修组统一处理。",
+        "asr_text": null,
+        "extra_notes": null,
+        "media": [],
+        "assignments": [
+          {
+            "id": 32,
+            "employee_id": 5,
+            "assigned_by_user_id": null,
+            "status": "ENDED",
+            "assigned_at": "2026-09-24T17:21:20.674647Z",
+            "accept_at": "2026-09-24T17:21:21.100860Z",
+            "ended_at": "2026-09-24T17:21:21.279303Z",
+            "reason": "AUTO_DISPATCH"
+          }
+        ],
+        "processes": [
+          {
+            "id": 26,
+            "cycle_no": 1,
+            "assignee_id": 5,
+            "started_at": "2026-09-24T17:21:21.166468Z",
+            "ended_at": "2026-09-24T17:21:21.227376Z"
+          }
+        ],
+        "receipts": [
+          {
+            "id": 26,
+            "process_id": 26,
+            "cycle_no": 1,
+            "assignee_id": 5,
+            "problem_type": "普通维修",
+            "method": "合成验证：修复水龙头滴水并检查插座供电，逐项验证两个问题解决。",
+            "materials": null,
+            "fee_amount": null,
+            "fee_flag": "NONE",
+            "resolved": true,
+            "unresolved_reason": null,
+            "follow_up": null,
+            "finished_at": "2026-09-24T17:21:21.227376Z"
+          }
+        ],
+        "feedbacks": [
+          {
+            "id": 27,
+            "process_id": 26,
+            "actor_user_id": 14,
+            "confirmed": true,
+            "rating": null,
+            "comment": null,
+            "unresolved_flag": false,
+            "created_at": "2026-09-24T17:21:21.276303Z"
+          }
+        ],
+        "logs": [
+          {
+            "id": 304,
+            "actor_user_id": 14,
+            "actor_type": "RESIDENT",
+            "from_status": null,
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "CREATE",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:12.234046Z"
+          },
+          {
+            "id": 305,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ANALYSIS",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_ATTEMPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:18.440149Z"
+          },
+          {
+            "id": 306,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ANALYSIS",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "ANALYZE",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:18.497653Z"
+          },
+          {
+            "id": 307,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "PENDING_ASSIGNMENT",
+            "process_reason": "NONE",
+            "event_code": "AI_TASK_ATTEMPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:20.603798Z"
+          },
+          {
+            "id": 308,
+            "actor_user_id": null,
+            "actor_type": "SYSTEM",
+            "from_status": "PENDING_ASSIGNMENT",
+            "to_status": "ASSIGNED",
+            "process_reason": "NONE",
+            "event_code": "ASSIGN",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:20.739614Z"
+          },
+          {
+            "id": 309,
+            "actor_user_id": 15,
+            "actor_type": "STAFF",
+            "from_status": "ASSIGNED",
+            "to_status": "ACCEPTED",
+            "process_reason": "NONE",
+            "event_code": "ACCEPT",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:21.103419Z"
+          },
+          {
+            "id": 310,
+            "actor_user_id": 15,
+            "actor_type": "STAFF",
+            "from_status": "ACCEPTED",
+            "to_status": "PROCESSING",
+            "process_reason": "NONE",
+            "event_code": "START",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:21.168471Z"
+          },
+          {
+            "id": 311,
+            "actor_user_id": 15,
+            "actor_type": "STAFF",
+            "from_status": "PROCESSING",
+            "to_status": "WAIT_CONFIRM",
+            "process_reason": "NONE",
+            "event_code": "RECEIPT_RESOLVED",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:21.229376Z"
+          },
+          {
+            "id": 312,
+            "actor_user_id": 14,
+            "actor_type": "RESIDENT",
+            "from_status": "WAIT_CONFIRM",
+            "to_status": "COMPLETED",
+            "process_reason": "NONE",
+            "event_code": "CONFIRM",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:21.278303Z"
+          },
+          {
+            "id": 313,
+            "actor_user_id": 14,
+            "actor_type": "SYSTEM",
+            "from_status": "COMPLETED",
+            "to_status": "CLOSED",
+            "process_reason": "NONE",
+            "event_code": "ARCHIVE",
+            "reason": null,
+            "created_at": "2026-09-24T17:21:21.287309Z"
+          }
+        ],
+        "display": {
+          "property_timezone": "Asia/Shanghai",
+          "assignee_names": {
+            "5": "db025-4efe90cf93-staff"
+          },
+          "timestamp_labels": {
+            "2026-09-25T17:21:12.227623Z": "2026-09-26 01:21:12 UTC+08:00",
+            "2026-09-24T17:21:20.674647Z": "2026-09-25 01:21:20 UTC+08:00",
+            "2026-09-24T17:21:21.100860Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:21.166468Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:21.227376Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:21.288309Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:12.230545Z": "2026-09-25 01:21:12 UTC+08:00",
+            "2026-09-24T17:21:21.290308Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:21.279303Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:21.276303Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:12.234046Z": "2026-09-25 01:21:12 UTC+08:00",
+            "2026-09-24T17:21:18.440149Z": "2026-09-25 01:21:18 UTC+08:00",
+            "2026-09-24T17:21:18.497653Z": "2026-09-25 01:21:18 UTC+08:00",
+            "2026-09-24T17:21:20.603798Z": "2026-09-25 01:21:20 UTC+08:00",
+            "2026-09-24T17:21:20.739614Z": "2026-09-25 01:21:20 UTC+08:00",
+            "2026-09-24T17:21:21.103419Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:21.168471Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:21.229376Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:21.278303Z": "2026-09-25 01:21:21 UTC+08:00",
+            "2026-09-24T17:21:21.287309Z": "2026-09-25 01:21:21 UTC+08:00"
+          }
+        }
+      },
+      "source": "real origin-forwarded wx.request",
+      "received_utc": "2026-09-24T17:21:54.555Z"
+    }
+  ],
+  "screenshots": [
+    "01-real-db-retry-auto.png",
+    "02-busy-waiting.png",
+    "03-completed-contact.png",
+    "04-release-auto.png",
+    "05-exhaustion-visible.png",
+    "06-uncertain-commit-closed.png"
+  ]
+}

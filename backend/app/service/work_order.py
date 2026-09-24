@@ -565,7 +565,7 @@ class WorkOrderService:
             )
         )
         if created:
-            self._enqueue_analysis(record.id, request_id)
+            self._enqueue_analysis(record.id, request_id, version=record.version)
         return record
 
     def get_contact(self, *, actor: Principal, work_order_id: int, reveal: bool, request_id: str) -> dict:
@@ -608,7 +608,7 @@ class WorkOrderService:
                     "phone": phone if reveal else None}
         return self._execute(operation)
 
-    def _enqueue_analysis(self, work_order_id: int, request_id: str) -> None:
+    def _enqueue_analysis(self, work_order_id: int, request_id: str, *, version: int | None = None) -> None:
         if not self._settings.should_enqueue_ai_on_create:
             return
         from app.worker.enqueue import enqueue_celery_task
@@ -620,6 +620,7 @@ class WorkOrderService:
             args=(work_order_id, request_id),
             event="ai_enqueue_failed",
             extra={"work_order_id": work_order_id},
+            headers={"analysis_expected_version": version} if version is not None else None,
         )
 
     def get_work_order(self, *, actor: Principal, work_order_id: int) -> WorkOrder:
@@ -764,7 +765,7 @@ class WorkOrderService:
             )
         )
         if record.status == WorkOrderStatus.PENDING_ANALYSIS.value:
-            self._enqueue_analysis(record.id, request_id)
+            self._enqueue_analysis(record.id, request_id, version=record.version)
         return record
 
     def cancel(
@@ -839,7 +840,7 @@ class WorkOrderService:
             )
         )
         if record.status == WorkOrderStatus.PENDING_ASSIGNMENT.value:
-            self._enqueue_analysis(record.id, request_id)
+            self._enqueue_analysis(record.id, request_id, version=record.version)
         return record
 
     def rate(
@@ -962,7 +963,7 @@ class WorkOrderService:
                 version=version,
             )
         )
-        self._enqueue_analysis(record.id, request_id)
+        self._enqueue_analysis(record.id, request_id, version=record.version)
         return record
 
     def start(

@@ -108,7 +108,7 @@ def test_analysis_task_rolls_back_and_retries_mysql_deadlock(monkeypatch) -> Non
     with pytest.raises(RetryScheduled):
         analyze_work_order_task.run(21, "incident-concurrent-request")
 
-    session.rollback.assert_called_once_with()
-    retry.assert_called_once_with(exc=deadlock, countdown=1)
+    session.invalidate.assert_called_once_with()
+    retry.assert_called_once_with(exc=deadlock, countdown=1, headers={"analysis_recovery": None})
     session.close.assert_called_once_with()
     engine.dispose.assert_called_once_with()

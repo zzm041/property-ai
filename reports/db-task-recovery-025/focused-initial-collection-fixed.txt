@@ -1,0 +1,252 @@
+D:\property-ai\.venv\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))
+.......................................F.....................F.......... [ 32%]
+F...............................................F....................... [ 65%]
+........................................................................ [ 97%]
+.....                                                                    [100%]
+================================== FAILURES ===================================
+__________ test_analysis_task_rolls_back_and_retries_mysql_deadlock ___________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000208E6B06120>
+
+    def test_analysis_task_rolls_back_and_retries_mysql_deadlock(monkeypatch) -> None:
+        class RetryScheduled(Exception):
+            pass
+    
+        engine = MagicMock()
+        session = MagicMock()
+        service = MagicMock()
+        deadlock = OperationalError("statement", {}, Exception(1213, "deadlock"))
+        service.analyze_work_order.side_effect = deadlock
+        retry = MagicMock(side_effect=RetryScheduled)
+        monkeypatch.setattr("app.worker.tasks.create_database_engine", lambda _url: engine)
+        monkeypatch.setattr("app.worker.tasks.Session", lambda **_kwargs: session)
+        monkeypatch.setattr("app.worker.tasks.AnalysisService", lambda *_args, **_kwargs: service)
+        monkeypatch.setattr(analyze_work_order_task, "retry", retry)
+    
+        with pytest.raises(RetryScheduled):
+            analyze_work_order_task.run(21, "incident-concurrent-request")
+    
+>       session.rollback.assert_called_once_with()
+
+backend\tests\unit\test_celery_ai_task.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <MagicMock name='mock.rollback' id='2237253335712'>, args = ()
+kwargs = {}, msg = "Expected 'rollback' to be called once. Called 0 times."
+
+    def assert_called_once_with(self, /, *args, **kwargs):
+        """assert that the mock was called exactly once and that that call was
+        with the specified arguments."""
+        if not self.call_count == 1:
+            msg = ("Expected '%s' to be called once. Called %s times.%s"
+                   % (self._mock_name or 'mock',
+                      self.call_count,
+                      self._calls_repr()))
+>           raise AssertionError(msg)
+E           AssertionError: Expected 'rollback' to be called once. Called 0 times.
+
+tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\unittest\mock.py:960: AssertionError
+---------------------------- Captured stdout call -----------------------------
+{"work_order_id": 21, "mysql_error_code": 1213, "attempt": 1, "task_id": "135d0d11-7976-4ff5-bfb6-0dbedca447b3", "event": "ai_analysis_transaction_retry", "service": "api", "logger": "app.worker.tasks", "level": "warning", "timestamp": "2026-09-24T17:05:37.660063Z"}
+------------------------------ Captured log call ------------------------------
+WARNING  app.worker.tasks:tasks.py:131 {'work_order_id': 21, 'mysql_error_code': 1213, 'attempt': 1, 'task_id': '135d0d11-7976-4ff5-bfb6-0dbedca447b3', 'event': 'ai_analysis_transaction_retry', 'service': 'api', 'logger': 'app.worker.tasks', 'level': 'warning', 'timestamp': '2026-09-24T17:05:37.660063Z'}
+_____ test_idempotent_create_replay_enqueues_analysis_only_for_new_order ______
+
+    def test_idempotent_create_replay_enqueues_analysis_only_for_new_order() -> None:
+        service = WorkOrderService.__new__(WorkOrderService)
+        record = _pending_order()
+        service._execute = lambda operation: operation()
+        service._create_work_order = MagicMock(
+            side_effect=((record, True), (record, False))
+        )
+        service._enqueue_analysis = MagicMock()
+        arguments = {
+            "actor": MagicMock(),
+            "house_id": 1,
+            "request_id": "request-idempotent-create",
+            "idempotency_key": "idempotent-create-key",
+            "contact_phone": "+8613800000123",
+            "text": "socket is sparking",
+        }
+    
+        first = service.create_work_order(**arguments)
+        replay = service.create_work_order(**arguments)
+    
+        assert first is record
+        assert replay is record
+>       service._enqueue_analysis.assert_called_once_with(
+            record.id,
+            "request-idempotent-create",
+        )
+
+backend\tests\unit\test_auto_dispatch.py:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\unittest\mock.py:961: in assert_called_once_with
+    return self.assert_called_with(*args, **kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <MagicMock id='2237252681168'>, args = (11, 'request-idempotent-create')
+kwargs = {}, expected = call(11, 'request-idempotent-create')
+actual = call(11, 'request-idempotent-create', version=1)
+_error_message = <function NonCallableMock.assert_called_with.<locals>._error_message at 0x00000208E6A85E40>
+cause = None
+
+    def assert_called_with(self, /, *args, **kwargs):
+        """assert that the last call was made with the specified arguments.
+    
+        Raises an AssertionError if the args and keyword args passed in are
+        different to the last call to the mock."""
+        if self.call_args is None:
+            expected = self._format_mock_call_signature(args, kwargs)
+            actual = 'not called.'
+            error_message = ('expected call not found.\nExpected: %s\n  Actual: %s'
+                    % (expected, actual))
+            raise AssertionError(error_message)
+    
+        def _error_message():
+            msg = self._format_mock_failure_message(args, kwargs)
+            return msg
+        expected = self._call_matcher(_Call((args, kwargs), two=True))
+        actual = self._call_matcher(self.call_args)
+        if actual != expected:
+            cause = expected if isinstance(expected, Exception) else None
+>           raise AssertionError(_error_message()) from cause
+E           AssertionError: expected call not found.
+E           Expected: mock(11, 'request-idempotent-create')
+E             Actual: mock(11, 'request-idempotent-create', version=1)
+
+tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\unittest\mock.py:949: AssertionError
+_______ test_reject_enqueues_redispatch_only_after_business_transaction _______
+
+    def test_reject_enqueues_redispatch_only_after_business_transaction() -> None:
+        service = WorkOrderService.__new__(WorkOrderService)
+        record = _pending_order()
+        record.status = "PENDING_ASSIGNMENT"
+        service._validate_request_id = MagicMock()
+        service._reject = MagicMock(return_value=record)
+        service._execute = MagicMock(side_effect=lambda operation: operation())
+        service._enqueue_analysis = MagicMock()
+    
+        result = service.reject(
+            actor=MagicMock(),
+            work_order_id=record.id,
+            request_id="reject-redispatch",
+            reason="skill mismatch",
+            version=3,
+        )
+    
+        assert result is record
+        service._execute.assert_called_once()
+>       service._enqueue_analysis.assert_called_once_with(record.id, "reject-redispatch")
+
+backend\tests\unit\test_auto_reassign_exception.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\unittest\mock.py:961: in assert_called_once_with
+    return self.assert_called_with(*args, **kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <MagicMock id='2237253225840'>, args = (41, 'reject-redispatch')
+kwargs = {}, expected = call(41, 'reject-redispatch')
+actual = call(41, 'reject-redispatch', version=4)
+_error_message = <function NonCallableMock.assert_called_with.<locals>._error_message at 0x00000208E6A867A0>
+cause = None
+
+    def assert_called_with(self, /, *args, **kwargs):
+        """assert that the last call was made with the specified arguments.
+    
+        Raises an AssertionError if the args and keyword args passed in are
+        different to the last call to the mock."""
+        if self.call_args is None:
+            expected = self._format_mock_call_signature(args, kwargs)
+            actual = 'not called.'
+            error_message = ('expected call not found.\nExpected: %s\n  Actual: %s'
+                    % (expected, actual))
+            raise AssertionError(error_message)
+    
+        def _error_message():
+            msg = self._format_mock_failure_message(args, kwargs)
+            return msg
+        expected = self._call_matcher(_Call((args, kwargs), two=True))
+        actual = self._call_matcher(self.call_args)
+        if actual != expected:
+            cause = expected if isinstance(expected, Exception) else None
+>           raise AssertionError(_error_message()) from cause
+E           AssertionError: expected call not found.
+E           Expected: mock(41, 'reject-redispatch')
+E             Actual: mock(41, 'reject-redispatch', version=4)
+
+tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\unittest\mock.py:949: AssertionError
+__________ test_pending_append_enqueues_fresh_analysis_after_commit ___________
+
+    def test_pending_append_enqueues_fresh_analysis_after_commit() -> None:
+        service = WorkOrderService.__new__(WorkOrderService)
+        pending = _record(43)
+        service._validate_request_id = MagicMock()
+        service._execute = MagicMock(return_value=pending)
+        service._enqueue_analysis = MagicMock()
+    
+        assert (
+            service.append_content(
+                actor=MagicMock(),
+                work_order_id=pending.id,
+                request_id="wo012-append-reanalyze",
+                text="new safety detail",
+            )
+            is pending
+        )
+>       service._enqueue_analysis.assert_called_once_with(
+            pending.id, "wo012-append-reanalyze"
+        )
+
+backend\tests\unit\test_resident_work_order_actions.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\unittest\mock.py:961: in assert_called_once_with
+    return self.assert_called_with(*args, **kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <MagicMock id='2237257187408'>, args = (43, 'wo012-append-reanalyze')
+kwargs = {}, expected = call(43, 'wo012-append-reanalyze')
+actual = call(43, 'wo012-append-reanalyze', version=4)
+_error_message = <function NonCallableMock.assert_called_with.<locals>._error_message at 0x00000208E6B67D80>
+cause = None
+
+    def assert_called_with(self, /, *args, **kwargs):
+        """assert that the last call was made with the specified arguments.
+    
+        Raises an AssertionError if the args and keyword args passed in are
+        different to the last call to the mock."""
+        if self.call_args is None:
+            expected = self._format_mock_call_signature(args, kwargs)
+            actual = 'not called.'
+            error_message = ('expected call not found.\nExpected: %s\n  Actual: %s'
+                    % (expected, actual))
+            raise AssertionError(error_message)
+    
+        def _error_message():
+            msg = self._format_mock_failure_message(args, kwargs)
+            return msg
+        expected = self._call_matcher(_Call((args, kwargs), two=True))
+        actual = self._call_matcher(self.call_args)
+        if actual != expected:
+            cause = expected if isinstance(expected, Exception) else None
+>           raise AssertionError(_error_message()) from cause
+E           AssertionError: expected call not found.
+E           Expected: mock(43, 'wo012-append-reanalyze')
+E             Actual: mock(43, 'wo012-append-reanalyze', version=4)
+
+tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\unittest\mock.py:949: AssertionError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:40
+  D:\property-ai\.venv\Lib\site-packages\starlette\testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\unit\test_celery_ai_task.py::test_analysis_task_rolls_back_and_retries_mysql_deadlock
+FAILED backend\tests\unit\test_auto_dispatch.py::test_idempotent_create_replay_enqueues_analysis_only_for_new_order
+FAILED backend\tests\unit\test_auto_reassign_exception.py::test_reject_enqueues_redispatch_only_after_business_transaction
+FAILED backend\tests\unit\test_resident_work_order_actions.py::test_pending_append_enqueues_fresh_analysis_after_commit
+4 failed, 217 passed, 1 warning in 0.93s

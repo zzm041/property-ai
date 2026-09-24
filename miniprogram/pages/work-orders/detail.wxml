@@ -3,6 +3,7 @@
 <view class="card" wx:if="{{workOrder}}">
   <view>工单 {{workOrder.id}}</view>
   <view>状态 {{statusLabel}}</view>
+  <view class="error" wx:if="{{recoveryFailed}}">自动处理暂时失败，重试次数已用尽。工单已保留，请等待物业处理；无需重复报修。</view>
   <view class="empty">时间按小区时区 {{timezoneLabel}} 显示</view>
   <view class="empty">提交时间 {{createdAtLabel}}</view>
   <view wx:if="{{assigneeLabel}}">最近处理人员 {{assigneeLabel}}</view>

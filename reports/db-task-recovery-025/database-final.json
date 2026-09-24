@@ -1,0 +1,1469 @@
+{
+  "task_id": "DB-TASK-RECOVERY-025",
+  "run_id": "db025-4efe90cf93",
+  "observed_utc": "2026-09-24T17:30:27.341897+00:00",
+  "mode": "exact-run readonly DB; exact new failed-task record; no DLQ message read",
+  "source_sha256": "4d43d0643e07db25356d97418c090febfce0b33fecb33366d0c2504d96107953",
+  "orders": {
+    "prepare": {
+      "order": {
+        "id": 30,
+        "tenant_id": 1,
+        "property_id": 3,
+        "reporter_user_id": 14,
+        "status": "PENDING_ANALYSIS",
+        "version": 1,
+        "current_assignment_id": null
+      },
+      "analyses": [],
+      "calls": [],
+      "assignments": [],
+      "logs": [
+        {
+          "id": 279,
+          "event_code": "CREATE",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "actor_user_id": 14,
+          "payload_json": {
+            "event_code": "CREATE"
+          },
+          "created_at": "2026-09-24 17:16:11.447946"
+        }
+      ],
+      "notifications": [
+        {
+          "id": 276,
+          "user_id": 14,
+          "title": "工单已创建",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 30
+        }
+      ],
+      "deliveries": [
+        {
+          "id": 276,
+          "notification_id": 276,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        }
+      ],
+      "audits": [
+        {
+          "id": 669,
+          "actor_user_id": 14,
+          "action": "WORK_ORDER_CREATED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 30,
+          "details_json": {
+            "status": "PENDING_ANALYSIS",
+            "category": "OTHER",
+            "priority": "MEDIUM",
+            "work_order_id": 30
+          },
+          "created_at": "2026-09-24 17:16:11.452184"
+        }
+      ],
+      "contact_snapshot_matches": true
+    },
+    "dispatch": {
+      "order": {
+        "id": 31,
+        "tenant_id": 1,
+        "property_id": 3,
+        "reporter_user_id": 14,
+        "status": "CLOSED",
+        "version": 8,
+        "current_assignment_id": null
+      },
+      "analyses": [
+        {
+          "id": 30,
+          "analysis_version": 1,
+          "status": "COMPLETED",
+          "input_hash": "c0a9c1547fe7cca7c41c219ee179166eb44df6745352083fd45bd6cd9732502e",
+          "error_code": null
+        }
+      ],
+      "calls": [
+        {
+          "id": 33,
+          "provider_type": "LLM",
+          "attempt": 1,
+          "status": "SUCCESS",
+          "model_version": "dev-llm-v1"
+        }
+      ],
+      "assignments": [
+        {
+          "id": 30,
+          "employee_id": 5,
+          "status": "ENDED",
+          "assigned_source": "AUTO",
+          "assigned_by_user_id": null
+        }
+      ],
+      "logs": [
+        {
+          "id": 280,
+          "event_code": "CREATE",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "actor_user_id": 14,
+          "payload_json": {
+            "event_code": "CREATE"
+          },
+          "created_at": "2026-09-24 17:18:12.793191"
+        },
+        {
+          "id": 281,
+          "event_code": "AI_TASK_ATTEMPT",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ANALYSIS",
+          "actor_user_id": null,
+          "payload_json": {
+            "attempt": 1,
+            "task_id": "53d07ea4-62c3-48de-b7fc-29f9788b779a",
+            "input_hash": "c0a9c1547fe7cca7c41c219ee179166eb44df6745352083fd45bd6cd9732502e",
+            "analysis_id": 30,
+            "from_status": "PENDING_ANALYSIS",
+            "execution_token": "5d7cfd8c8a874812a9232f4e7fb1468c",
+            "analysis_version": 1,
+            "work_order_version": 1
+          },
+          "created_at": "2026-09-24 17:18:12.936616"
+        },
+        {
+          "id": 282,
+          "event_code": "ANALYZE",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "actor_user_id": null,
+          "payload_json": {
+            "event_code": "ANALYZE",
+            "reason_code": "AI_ANALYSIS"
+          },
+          "created_at": "2026-09-24 17:18:12.975230"
+        },
+        {
+          "id": 283,
+          "event_code": "AI_TASK_ATTEMPT",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "PENDING_ASSIGNMENT",
+          "actor_user_id": null,
+          "payload_json": {
+            "attempt": 2,
+            "task_id": "53d07ea4-62c3-48de-b7fc-29f9788b779a",
+            "input_hash": "c0a9c1547fe7cca7c41c219ee179166eb44df6745352083fd45bd6cd9732502e",
+            "analysis_id": 30,
+            "from_status": "PENDING_ASSIGNMENT",
+            "execution_token": "cc7ea0116c63466cab713a54e6ed95b5",
+            "analysis_version": 1,
+            "work_order_version": 2
+          },
+          "created_at": "2026-09-24 17:18:19.120469"
+        },
+        {
+          "id": 284,
+          "event_code": "ASSIGN",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "actor_user_id": null,
+          "payload_json": {
+            "event_code": "ASSIGN",
+            "employee_id": 5,
+            "incident_id": null,
+            "reason_code": "AUTO_ASSIGN",
+            "assigned_source": "AUTO"
+          },
+          "created_at": "2026-09-24 17:18:19.291958"
+        },
+        {
+          "id": 289,
+          "event_code": "ACCEPT",
+          "from_status": "ASSIGNED",
+          "to_status": "ACCEPTED",
+          "actor_user_id": 15,
+          "payload_json": {
+            "event_code": "ACCEPT",
+            "reason_code": "ACCEPTED"
+          },
+          "created_at": "2026-09-24 17:20:29.606246"
+        },
+        {
+          "id": 290,
+          "event_code": "START",
+          "from_status": "ACCEPTED",
+          "to_status": "PROCESSING",
+          "actor_user_id": 15,
+          "payload_json": {
+            "event_code": "START",
+            "reason_code": "STARTED"
+          },
+          "created_at": "2026-09-24 17:20:29.672204"
+        },
+        {
+          "id": 291,
+          "event_code": "RECEIPT_RESOLVED",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "actor_user_id": 15,
+          "payload_json": {
+            "event_code": "RECEIPT_RESOLVED",
+            "reason_code": "RESOLVED"
+          },
+          "created_at": "2026-09-24 17:20:29.743200"
+        },
+        {
+          "id": 292,
+          "event_code": "CONFIRM",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "COMPLETED",
+          "actor_user_id": 14,
+          "payload_json": {
+            "event_code": "CONFIRM",
+            "reason_code": "CONFIRMED"
+          },
+          "created_at": "2026-09-24 17:20:29.808194"
+        },
+        {
+          "id": 293,
+          "event_code": "ARCHIVE",
+          "from_status": "COMPLETED",
+          "to_status": "CLOSED",
+          "actor_user_id": 14,
+          "payload_json": {
+            "event_code": "ARCHIVE",
+            "reason_code": "ARCHIVED"
+          },
+          "created_at": "2026-09-24 17:20:29.820764"
+        }
+      ],
+      "notifications": [
+        {
+          "id": 277,
+          "user_id": 14,
+          "title": "工单已创建",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 31
+        },
+        {
+          "id": 278,
+          "user_id": 14,
+          "title": "工单已派单",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 31
+        },
+        {
+          "id": 279,
+          "user_id": 15,
+          "title": "工单已派单",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 31
+        },
+        {
+          "id": 281,
+          "user_id": 14,
+          "title": "工单已接单",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 31
+        },
+        {
+          "id": 282,
+          "user_id": 14,
+          "title": "工单开始处理",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 31
+        },
+        {
+          "id": 283,
+          "user_id": 14,
+          "title": "工单待确认",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 31
+        },
+        {
+          "id": 284,
+          "user_id": 5,
+          "title": "工单已完成",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 31
+        },
+        {
+          "id": 285,
+          "user_id": 14,
+          "title": "工单已完成",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 31
+        }
+      ],
+      "deliveries": [
+        {
+          "id": 277,
+          "notification_id": 277,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 278,
+          "notification_id": 278,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 279,
+          "notification_id": 279,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 281,
+          "notification_id": 281,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 282,
+          "notification_id": 282,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 283,
+          "notification_id": 283,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 284,
+          "notification_id": 284,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 285,
+          "notification_id": 285,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        }
+      ],
+      "audits": [
+        {
+          "id": 670,
+          "actor_user_id": 14,
+          "action": "WORK_ORDER_CREATED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 31,
+          "details_json": {
+            "status": "PENDING_ANALYSIS",
+            "category": "OTHER",
+            "priority": "MEDIUM",
+            "work_order_id": 31
+          },
+          "created_at": "2026-09-24 17:18:12.795129"
+        },
+        {
+          "id": 671,
+          "actor_user_id": null,
+          "action": "WORK_ORDER_AI_ANALYSIS_COMPLETED",
+          "resource_type": "WORK_ORDER_ANALYSIS",
+          "resource_id": 30,
+          "details_json": {
+            "status": "COMPLETED",
+            "confidence": 0.86,
+            "analysis_id": 30,
+            "work_order_id": 31
+          },
+          "created_at": "2026-09-24 17:18:13.023615"
+        },
+        {
+          "id": 672,
+          "actor_user_id": null,
+          "action": "WORK_ORDER_ASSIGNED",
+          "resource_type": "WORK_ORDER_ASSIGNMENT",
+          "resource_id": 30,
+          "details_json": {
+            "status": "ASSIGNED",
+            "employee_id": 5,
+            "work_order_id": 31
+          },
+          "created_at": "2026-09-24 17:18:19.300457"
+        },
+        {
+          "id": 677,
+          "actor_user_id": 15,
+          "action": "WORK_ORDER_ACCEPTED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 31,
+          "details_json": {
+            "status": "ACCEPTED",
+            "employee_id": 5,
+            "work_order_id": 31
+          },
+          "created_at": "2026-09-24 17:20:29.611747"
+        },
+        {
+          "id": 678,
+          "actor_user_id": 15,
+          "action": "WORK_ORDER_PROCESS_STARTED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 31,
+          "details_json": {
+            "status": "PROCESSING",
+            "work_order_id": 31
+          },
+          "created_at": "2026-09-24 17:20:29.678187"
+        },
+        {
+          "id": 679,
+          "actor_user_id": 15,
+          "action": "WORK_ORDER_RESOLVED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 31,
+          "details_json": {
+            "status": "WAIT_CONFIRM",
+            "work_order_id": 31
+          },
+          "created_at": "2026-09-24 17:20:29.746196"
+        },
+        {
+          "id": 680,
+          "actor_user_id": 14,
+          "action": "WORK_ORDER_CLOSED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 31,
+          "details_json": {
+            "status": "CLOSED",
+            "work_order_id": 31
+          },
+          "created_at": "2026-09-24 17:20:29.822695"
+        }
+      ],
+      "contact_snapshot_matches": true
+    },
+    "busy": {
+      "order": {
+        "id": 32,
+        "tenant_id": 1,
+        "property_id": 3,
+        "reporter_user_id": 14,
+        "status": "CLOSED",
+        "version": 8,
+        "current_assignment_id": null
+      },
+      "analyses": [
+        {
+          "id": 31,
+          "analysis_version": 1,
+          "status": "COMPLETED",
+          "input_hash": "58c42213ee281a27f0e2e82dc3d79110217b8d5256aa220d4417c6e009fd548e",
+          "error_code": null
+        }
+      ],
+      "calls": [
+        {
+          "id": 34,
+          "provider_type": "LLM",
+          "attempt": 1,
+          "status": "SUCCESS",
+          "model_version": "dev-llm-v1"
+        }
+      ],
+      "assignments": [
+        {
+          "id": 31,
+          "employee_id": 5,
+          "status": "ENDED",
+          "assigned_source": "AUTO",
+          "assigned_by_user_id": null
+        }
+      ],
+      "logs": [
+        {
+          "id": 285,
+          "event_code": "CREATE",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "actor_user_id": 14,
+          "payload_json": {
+            "event_code": "CREATE"
+          },
+          "created_at": "2026-09-24 17:18:19.380183"
+        },
+        {
+          "id": 286,
+          "event_code": "AI_TASK_ATTEMPT",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ANALYSIS",
+          "actor_user_id": null,
+          "payload_json": {
+            "attempt": 1,
+            "task_id": "cb9cd773-9ab2-4fcc-bb4f-9e903bc362ab",
+            "input_hash": "58c42213ee281a27f0e2e82dc3d79110217b8d5256aa220d4417c6e009fd548e",
+            "analysis_id": 31,
+            "from_status": "PENDING_ANALYSIS",
+            "execution_token": "2043c54e3a3e4388beab1f976dd1d143",
+            "analysis_version": 1,
+            "work_order_version": 1
+          },
+          "created_at": "2026-09-24 17:18:19.541779"
+        },
+        {
+          "id": 287,
+          "event_code": "ANALYZE",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "actor_user_id": null,
+          "payload_json": {
+            "event_code": "ANALYZE",
+            "reason_code": "AI_ANALYSIS"
+          },
+          "created_at": "2026-09-24 17:18:19.597981"
+        },
+        {
+          "id": 288,
+          "event_code": "AUTO_DISPATCH_WAIT",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "PENDING_ASSIGNMENT",
+          "actor_user_id": null,
+          "payload_json": {
+            "reason_code": "WAITING_IDLE",
+            "policy_version": "maintenance-group-v1"
+          },
+          "created_at": "2026-09-24 17:18:19.700481"
+        },
+        {
+          "id": 294,
+          "event_code": "ASSIGN",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "actor_user_id": null,
+          "payload_json": {
+            "event_code": "ASSIGN",
+            "employee_id": 5,
+            "incident_id": null,
+            "reason_code": "AUTO_ASSIGN",
+            "assigned_source": "AUTO"
+          },
+          "created_at": "2026-09-24 17:20:30.198668"
+        },
+        {
+          "id": 295,
+          "event_code": "ACCEPT",
+          "from_status": "ASSIGNED",
+          "to_status": "ACCEPTED",
+          "actor_user_id": 15,
+          "payload_json": {
+            "event_code": "ACCEPT",
+            "reason_code": "ACCEPTED"
+          },
+          "created_at": "2026-09-24 17:21:02.039383"
+        },
+        {
+          "id": 296,
+          "event_code": "START",
+          "from_status": "ACCEPTED",
+          "to_status": "PROCESSING",
+          "actor_user_id": 15,
+          "payload_json": {
+            "event_code": "START",
+            "reason_code": "STARTED"
+          },
+          "created_at": "2026-09-24 17:21:02.099984"
+        },
+        {
+          "id": 297,
+          "event_code": "RECEIPT_RESOLVED",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "actor_user_id": 15,
+          "payload_json": {
+            "event_code": "RECEIPT_RESOLVED",
+            "reason_code": "RESOLVED"
+          },
+          "created_at": "2026-09-24 17:21:02.164984"
+        },
+        {
+          "id": 298,
+          "event_code": "CONFIRM",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "COMPLETED",
+          "actor_user_id": 14,
+          "payload_json": {
+            "event_code": "CONFIRM",
+            "reason_code": "CONFIRMED"
+          },
+          "created_at": "2026-09-24 17:21:02.224063"
+        },
+        {
+          "id": 299,
+          "event_code": "ARCHIVE",
+          "from_status": "COMPLETED",
+          "to_status": "CLOSED",
+          "actor_user_id": 14,
+          "payload_json": {
+            "event_code": "ARCHIVE",
+            "reason_code": "ARCHIVED"
+          },
+          "created_at": "2026-09-24 17:21:02.232561"
+        }
+      ],
+      "notifications": [
+        {
+          "id": 280,
+          "user_id": 14,
+          "title": "工单已创建",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 32
+        },
+        {
+          "id": 286,
+          "user_id": 14,
+          "title": "工单已派单",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 32
+        },
+        {
+          "id": 287,
+          "user_id": 15,
+          "title": "工单已派单",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 32
+        },
+        {
+          "id": 288,
+          "user_id": 14,
+          "title": "工单已接单",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 32
+        },
+        {
+          "id": 289,
+          "user_id": 14,
+          "title": "工单开始处理",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 32
+        },
+        {
+          "id": 290,
+          "user_id": 14,
+          "title": "工单待确认",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 32
+        },
+        {
+          "id": 291,
+          "user_id": 5,
+          "title": "工单已完成",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 32
+        },
+        {
+          "id": 292,
+          "user_id": 14,
+          "title": "工单已完成",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 32
+        }
+      ],
+      "deliveries": [
+        {
+          "id": 280,
+          "notification_id": 280,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 286,
+          "notification_id": 286,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 287,
+          "notification_id": 287,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 288,
+          "notification_id": 288,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 289,
+          "notification_id": 289,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 290,
+          "notification_id": 290,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 291,
+          "notification_id": 291,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 292,
+          "notification_id": 292,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        }
+      ],
+      "audits": [
+        {
+          "id": 673,
+          "actor_user_id": 14,
+          "action": "WORK_ORDER_CREATED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 32,
+          "details_json": {
+            "status": "PENDING_ANALYSIS",
+            "category": "OTHER",
+            "priority": "MEDIUM",
+            "work_order_id": 32
+          },
+          "created_at": "2026-09-24 17:18:19.383258"
+        },
+        {
+          "id": 674,
+          "actor_user_id": null,
+          "action": "WORK_ORDER_AI_ANALYSIS_COMPLETED",
+          "resource_type": "WORK_ORDER_ANALYSIS",
+          "resource_id": 31,
+          "details_json": {
+            "status": "COMPLETED",
+            "confidence": 0.86,
+            "analysis_id": 31,
+            "work_order_id": 32
+          },
+          "created_at": "2026-09-24 17:18:19.650571"
+        },
+        {
+          "id": 681,
+          "actor_user_id": null,
+          "action": "WORK_ORDER_ASSIGNED",
+          "resource_type": "WORK_ORDER_ASSIGNMENT",
+          "resource_id": 31,
+          "details_json": {
+            "status": "ASSIGNED",
+            "employee_id": 5,
+            "work_order_id": 32
+          },
+          "created_at": "2026-09-24 17:20:30.249554"
+        },
+        {
+          "id": 682,
+          "actor_user_id": 15,
+          "action": "WORK_ORDER_ACCEPTED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 32,
+          "details_json": {
+            "status": "ACCEPTED",
+            "employee_id": 5,
+            "work_order_id": 32
+          },
+          "created_at": "2026-09-24 17:21:02.044418"
+        },
+        {
+          "id": 683,
+          "actor_user_id": 15,
+          "action": "WORK_ORDER_PROCESS_STARTED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 32,
+          "details_json": {
+            "status": "PROCESSING",
+            "work_order_id": 32
+          },
+          "created_at": "2026-09-24 17:21:02.104985"
+        },
+        {
+          "id": 684,
+          "actor_user_id": 15,
+          "action": "WORK_ORDER_RESOLVED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 32,
+          "details_json": {
+            "status": "WAIT_CONFIRM",
+            "work_order_id": 32
+          },
+          "created_at": "2026-09-24 17:21:02.166484"
+        },
+        {
+          "id": 685,
+          "actor_user_id": 14,
+          "action": "WORK_ORDER_CLOSED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 32,
+          "details_json": {
+            "status": "CLOSED",
+            "work_order_id": 32
+          },
+          "created_at": "2026-09-24 17:21:02.234561"
+        }
+      ],
+      "contact_snapshot_matches": true
+    },
+    "cancel": {
+      "order": {
+        "id": 33,
+        "tenant_id": 1,
+        "property_id": 3,
+        "reporter_user_id": 14,
+        "status": "CANCELLED",
+        "version": 2,
+        "current_assignment_id": null
+      },
+      "analyses": [],
+      "calls": [],
+      "assignments": [],
+      "logs": [
+        {
+          "id": 300,
+          "event_code": "CREATE",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "actor_user_id": 14,
+          "payload_json": {
+            "event_code": "CREATE"
+          },
+          "created_at": "2026-09-24 17:21:02.311121"
+        },
+        {
+          "id": 301,
+          "event_code": "CANCEL",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "CANCELLED",
+          "actor_user_id": 14,
+          "payload_json": {
+            "reason": "025合成验证：恢复期间正常撤销",
+            "event_code": "CANCEL",
+            "reason_code": "CANCELLED"
+          },
+          "created_at": "2026-09-24 17:21:02.585638"
+        }
+      ],
+      "notifications": [
+        {
+          "id": 293,
+          "user_id": 14,
+          "title": "工单已创建",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 33
+        }
+      ],
+      "deliveries": [
+        {
+          "id": 293,
+          "notification_id": 293,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        }
+      ],
+      "audits": [
+        {
+          "id": 686,
+          "actor_user_id": 14,
+          "action": "WORK_ORDER_CREATED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 33,
+          "details_json": {
+            "status": "PENDING_ANALYSIS",
+            "category": "OTHER",
+            "priority": "MEDIUM",
+            "work_order_id": 33
+          },
+          "created_at": "2026-09-24 17:21:02.313122"
+        },
+        {
+          "id": 687,
+          "actor_user_id": 14,
+          "action": "WORK_ORDER_CANCELLED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 33,
+          "details_json": {
+            "status": "CANCELLED",
+            "work_order_id": 33
+          },
+          "created_at": "2026-09-24 17:21:02.590638"
+        }
+      ],
+      "contact_snapshot_matches": true
+    },
+    "persistent": {
+      "order": {
+        "id": 34,
+        "tenant_id": 1,
+        "property_id": 3,
+        "reporter_user_id": 14,
+        "status": "PENDING_ANALYSIS",
+        "version": 1,
+        "current_assignment_id": null
+      },
+      "analyses": [],
+      "calls": [],
+      "assignments": [],
+      "logs": [
+        {
+          "id": 302,
+          "event_code": "CREATE",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "actor_user_id": 14,
+          "payload_json": {
+            "event_code": "CREATE"
+          },
+          "created_at": "2026-09-24 17:21:08.757485"
+        },
+        {
+          "id": 303,
+          "event_code": "AI_TASK_FAILED",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ANALYSIS",
+          "actor_user_id": null,
+          "payload_json": {
+            "attempt": 3,
+            "task_id": "1ccdacd9-2e91-4d52-b659-c50c8f896af0",
+            "error_code": "AI.DATABASE_RETRY_EXHAUSTED",
+            "analysis_id": null,
+            "work_order_version": 1
+          },
+          "created_at": "2026-09-24 17:21:11.931568"
+        }
+      ],
+      "notifications": [
+        {
+          "id": 294,
+          "user_id": 14,
+          "title": "工单已创建",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 34
+        }
+      ],
+      "deliveries": [
+        {
+          "id": 294,
+          "notification_id": 294,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        }
+      ],
+      "audits": [
+        {
+          "id": 688,
+          "actor_user_id": 14,
+          "action": "WORK_ORDER_CREATED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 34,
+          "details_json": {
+            "status": "PENDING_ANALYSIS",
+            "category": "OTHER",
+            "priority": "MEDIUM",
+            "work_order_id": 34
+          },
+          "created_at": "2026-09-24 17:21:08.759985"
+        }
+      ],
+      "contact_snapshot_matches": true
+    },
+    "commit": {
+      "order": {
+        "id": 35,
+        "tenant_id": 1,
+        "property_id": 3,
+        "reporter_user_id": 14,
+        "status": "CLOSED",
+        "version": 8,
+        "current_assignment_id": null
+      },
+      "analyses": [
+        {
+          "id": 32,
+          "analysis_version": 1,
+          "status": "COMPLETED",
+          "input_hash": "da3163522c29935e8d40fa13e3c98084b689e69b80d78a8107b8ba58cb77e7df",
+          "error_code": null
+        }
+      ],
+      "calls": [
+        {
+          "id": 35,
+          "provider_type": "LLM",
+          "attempt": 2,
+          "status": "SUCCESS",
+          "model_version": "dev-llm-v1"
+        }
+      ],
+      "assignments": [
+        {
+          "id": 32,
+          "employee_id": 5,
+          "status": "ENDED",
+          "assigned_source": "AUTO",
+          "assigned_by_user_id": null
+        }
+      ],
+      "logs": [
+        {
+          "id": 304,
+          "event_code": "CREATE",
+          "from_status": null,
+          "to_status": "PENDING_ANALYSIS",
+          "actor_user_id": 14,
+          "payload_json": {
+            "event_code": "CREATE"
+          },
+          "created_at": "2026-09-24 17:21:12.234046"
+        },
+        {
+          "id": 305,
+          "event_code": "AI_TASK_ATTEMPT",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ANALYSIS",
+          "actor_user_id": null,
+          "payload_json": {
+            "attempt": 2,
+            "task_id": "ce33d4b3-384b-4029-8bef-2dadf125836a",
+            "input_hash": "da3163522c29935e8d40fa13e3c98084b689e69b80d78a8107b8ba58cb77e7df",
+            "analysis_id": 32,
+            "from_status": "PENDING_ANALYSIS",
+            "execution_token": "0e6e7c36689643da9222e5677806b980",
+            "analysis_version": 1,
+            "work_order_version": 1
+          },
+          "created_at": "2026-09-24 17:21:18.440149"
+        },
+        {
+          "id": 306,
+          "event_code": "ANALYZE",
+          "from_status": "PENDING_ANALYSIS",
+          "to_status": "PENDING_ASSIGNMENT",
+          "actor_user_id": null,
+          "payload_json": {
+            "event_code": "ANALYZE",
+            "reason_code": "AI_ANALYSIS"
+          },
+          "created_at": "2026-09-24 17:21:18.497653"
+        },
+        {
+          "id": 307,
+          "event_code": "AI_TASK_ATTEMPT",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "PENDING_ASSIGNMENT",
+          "actor_user_id": null,
+          "payload_json": {
+            "attempt": 3,
+            "task_id": "ce33d4b3-384b-4029-8bef-2dadf125836a",
+            "input_hash": "da3163522c29935e8d40fa13e3c98084b689e69b80d78a8107b8ba58cb77e7df",
+            "analysis_id": 32,
+            "from_status": "PENDING_ASSIGNMENT",
+            "execution_token": "a245c3b89ded460dafd97b950bac876f",
+            "analysis_version": 1,
+            "work_order_version": 2
+          },
+          "created_at": "2026-09-24 17:21:20.603798"
+        },
+        {
+          "id": 308,
+          "event_code": "ASSIGN",
+          "from_status": "PENDING_ASSIGNMENT",
+          "to_status": "ASSIGNED",
+          "actor_user_id": null,
+          "payload_json": {
+            "event_code": "ASSIGN",
+            "employee_id": 5,
+            "incident_id": null,
+            "reason_code": "AUTO_ASSIGN",
+            "assigned_source": "AUTO"
+          },
+          "created_at": "2026-09-24 17:21:20.739614"
+        },
+        {
+          "id": 309,
+          "event_code": "ACCEPT",
+          "from_status": "ASSIGNED",
+          "to_status": "ACCEPTED",
+          "actor_user_id": 15,
+          "payload_json": {
+            "event_code": "ACCEPT",
+            "reason_code": "ACCEPTED"
+          },
+          "created_at": "2026-09-24 17:21:21.103419"
+        },
+        {
+          "id": 310,
+          "event_code": "START",
+          "from_status": "ACCEPTED",
+          "to_status": "PROCESSING",
+          "actor_user_id": 15,
+          "payload_json": {
+            "event_code": "START",
+            "reason_code": "STARTED"
+          },
+          "created_at": "2026-09-24 17:21:21.168471"
+        },
+        {
+          "id": 311,
+          "event_code": "RECEIPT_RESOLVED",
+          "from_status": "PROCESSING",
+          "to_status": "WAIT_CONFIRM",
+          "actor_user_id": 15,
+          "payload_json": {
+            "event_code": "RECEIPT_RESOLVED",
+            "reason_code": "RESOLVED"
+          },
+          "created_at": "2026-09-24 17:21:21.229376"
+        },
+        {
+          "id": 312,
+          "event_code": "CONFIRM",
+          "from_status": "WAIT_CONFIRM",
+          "to_status": "COMPLETED",
+          "actor_user_id": 14,
+          "payload_json": {
+            "event_code": "CONFIRM",
+            "reason_code": "CONFIRMED"
+          },
+          "created_at": "2026-09-24 17:21:21.278303"
+        },
+        {
+          "id": 313,
+          "event_code": "ARCHIVE",
+          "from_status": "COMPLETED",
+          "to_status": "CLOSED",
+          "actor_user_id": 14,
+          "payload_json": {
+            "event_code": "ARCHIVE",
+            "reason_code": "ARCHIVED"
+          },
+          "created_at": "2026-09-24 17:21:21.287309"
+        }
+      ],
+      "notifications": [
+        {
+          "id": 295,
+          "user_id": 14,
+          "title": "工单已创建",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 35
+        },
+        {
+          "id": 296,
+          "user_id": 14,
+          "title": "工单已派单",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 35
+        },
+        {
+          "id": 297,
+          "user_id": 15,
+          "title": "工单已派单",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 35
+        },
+        {
+          "id": 298,
+          "user_id": 14,
+          "title": "工单已接单",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 35
+        },
+        {
+          "id": 299,
+          "user_id": 14,
+          "title": "工单开始处理",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 35
+        },
+        {
+          "id": 300,
+          "user_id": 14,
+          "title": "工单待确认",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 35
+        },
+        {
+          "id": 301,
+          "user_id": 5,
+          "title": "工单已完成",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 35
+        },
+        {
+          "id": 302,
+          "user_id": 14,
+          "title": "工单已完成",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 35
+        }
+      ],
+      "deliveries": [
+        {
+          "id": 295,
+          "notification_id": 295,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 296,
+          "notification_id": 296,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 297,
+          "notification_id": 297,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 298,
+          "notification_id": 298,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 299,
+          "notification_id": 299,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 300,
+          "notification_id": 300,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 301,
+          "notification_id": 301,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        },
+        {
+          "id": 302,
+          "notification_id": 302,
+          "status": "SUCCEEDED",
+          "attempt": 1,
+          "last_error_code": null
+        }
+      ],
+      "audits": [
+        {
+          "id": 689,
+          "actor_user_id": 14,
+          "action": "WORK_ORDER_CREATED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 35,
+          "details_json": {
+            "status": "PENDING_ANALYSIS",
+            "category": "OTHER",
+            "priority": "MEDIUM",
+            "work_order_id": 35
+          },
+          "created_at": "2026-09-24 17:21:12.236487"
+        },
+        {
+          "id": 690,
+          "actor_user_id": null,
+          "action": "WORK_ORDER_AI_ANALYSIS_COMPLETED",
+          "resource_type": "WORK_ORDER_ANALYSIS",
+          "resource_id": 32,
+          "details_json": {
+            "status": "COMPLETED",
+            "confidence": 0.86,
+            "analysis_id": 32,
+            "work_order_id": 35
+          },
+          "created_at": "2026-09-24 17:21:18.537820"
+        },
+        {
+          "id": 691,
+          "actor_user_id": null,
+          "action": "WORK_ORDER_ASSIGNED",
+          "resource_type": "WORK_ORDER_ASSIGNMENT",
+          "resource_id": 32,
+          "details_json": {
+            "status": "ASSIGNED",
+            "employee_id": 5,
+            "work_order_id": 35
+          },
+          "created_at": "2026-09-24 17:21:20.745113"
+        },
+        {
+          "id": 692,
+          "actor_user_id": 15,
+          "action": "WORK_ORDER_ACCEPTED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 35,
+          "details_json": {
+            "status": "ACCEPTED",
+            "employee_id": 5,
+            "work_order_id": 35
+          },
+          "created_at": "2026-09-24 17:21:21.108462"
+        },
+        {
+          "id": 693,
+          "actor_user_id": 15,
+          "action": "WORK_ORDER_PROCESS_STARTED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 35,
+          "details_json": {
+            "status": "PROCESSING",
+            "work_order_id": 35
+          },
+          "created_at": "2026-09-24 17:21:21.172970"
+        },
+        {
+          "id": 694,
+          "actor_user_id": 15,
+          "action": "WORK_ORDER_RESOLVED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 35,
+          "details_json": {
+            "status": "WAIT_CONFIRM",
+            "work_order_id": 35
+          },
+          "created_at": "2026-09-24 17:21:21.230875"
+        },
+        {
+          "id": 695,
+          "actor_user_id": 14,
+          "action": "WORK_ORDER_CLOSED",
+          "resource_type": "WORK_ORDER",
+          "resource_id": 35,
+          "details_json": {
+            "status": "CLOSED",
+            "work_order_id": 35
+          },
+          "created_at": "2026-09-24 17:21:21.289308"
+        }
+      ],
+      "contact_snapshot_matches": true
+    }
+  },
+  "revision": "20260924_0011_contact_phone",
+  "protected": {
+    "12": {
+      "work_orders": {
+        "count": 1,
+        "sha256": "4e67d79e88f223c4939e5d8be550964968e49264f249002918f50e4ecea0b576"
+      },
+      "work_order_analyses": {
+        "count": 1,
+        "sha256": "c397d3ca9dde9ebe5a00322b06d1747909c9b99ac06883770d18606dc9639011"
+      },
+      "work_order_assignments": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "work_order_logs": {
+        "count": 1,
+        "sha256": "1f5f28816dbf6d79a67b8d4627740bad6d54a1d6d87e5d812f055c2e65ee0e21"
+      },
+      "ai_call_logs": {
+        "count": 1,
+        "sha256": "fc879975e508b0865c433677a4695ed599e35905282c3e550f9e6cf2009d3f2f"
+      }
+    },
+    "24": {
+      "work_orders": {
+        "count": 1,
+        "sha256": "2f836d8d807fc40631702fa5d8692b6c7a7da7c07df4099ddec13f8ab1ce7668"
+      },
+      "work_order_analyses": {
+        "count": 1,
+        "sha256": "1fd0cc31bf8f29284054252de55fd965c66c85cd9718bfc0f01e4ae0b9bff7e5"
+      },
+      "work_order_assignments": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "work_order_logs": {
+        "count": 1,
+        "sha256": "d96f1c426ab848c769362bdc8ed237965bde5cf1ab798f768a76a11aedea75fa"
+      },
+      "ai_call_logs": {
+        "count": 1,
+        "sha256": "7f7b14b559303ddb703d62a96733672a162f28f60178d0b3efe7d81d4e64ee51"
+      }
+    },
+    "25": {
+      "work_orders": {
+        "count": 1,
+        "sha256": "c97eab20a29c3b926d9ea8a3f9a1ab63f8ced29ee7be41a1a07052abc5694afd"
+      },
+      "work_order_analyses": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "work_order_assignments": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "work_order_logs": {
+        "count": 1,
+        "sha256": "4e000b7d6a0a009264638dac6f1f9fd162e9e4ab1d7430cbc460b8c7afdbd45d"
+      },
+      "ai_call_logs": {
+        "count": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    }
+  },
+  "protected_12_24_25_unchanged": true,
+  "employee_load": [
+    {
+      "employee_id": 5,
+      "property_id": 3,
+      "business_date": "2026-09-25",
+      "current_load": 0
+    }
+  ],
+  "new_exhaustion_record": {
+    "record_id": "1ccdacd9-2e91-4d52-b659-c50c8f896af0",
+    "task_id": "1ccdacd9-2e91-4d52-b659-c50c8f896af0",
+    "operation": "app.worker.tasks.analyze_work_order_task",
+    "error_code": "AI.DATABASE_RETRY_EXHAUSTED",
+    "recorded_at": "2026-09-24T17:21:11.962025Z",
+    "queue": "property_ai.auth001",
+    "dlq": "property_ai.auth001.dlq",
+    "status": "RECORDED",
+    "replayed": false,
+    "current_attempt": 0,
+    "current_attempt_meaning": "explicit replay count, not automatic Celery attempt (3)"
+  }
+}

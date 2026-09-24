@@ -6,7 +6,7 @@ from datetime import timedelta
 from typing import Any
 
 from sqlalchemy import MetaData, Table, inspect as sa_inspect, insert
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings
@@ -171,6 +171,11 @@ class AutoDispatchService:
                     request_id=request_id,
                 )
                 return "ALREADY_ASSIGNED"
+            except OperationalError:
+                # A disconnect/deadlock invalidates the outer operation, not
+                # just this candidate. Its owner must discard the transaction.
+                _restore_notification_intents(self._session, notification_snapshot)
+                raise
             except Exception:
                 nested.rollback()
                 _restore_notification_intents(

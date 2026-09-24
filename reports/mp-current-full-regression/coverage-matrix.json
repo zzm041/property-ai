@@ -2257,12 +2257,24 @@
     "retention": "No original IDs/results/denominator removed or counted again; no completion percentage. Model28/3of3 and protectedorder12 unchanged.",
     "release_gaps": "RealAI/RAG/device/production and transient database2013 recovery retained; no sharedDLQ consumption."
   },
+  "db_task_recovery_025": {
+    "task_id": "DB-TASK-RECOVERY-025",
+    "base_sha": "ada92e14ecbf04435d331fbf64762ad3e897c57c",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
+    "independent_review": "reports/db-task-recovery-025/review-round2.json; one repair round, both R1 CLOSED;024-REL-01 only transient subset closed",
+    "source_sha256": "4d43d0643e07db25356d97418c090febfce0b33fecb33366d0c2504d96107953",
+    "evidence": "reports/db-task-recovery-025/README.md; run db025-4efe90cf93;225 scoped unit/1warning;6PNG;exact API/DB/Worker logs",
+    "overlay_ids": ["V1-AI-FAIL-CREATE", "V1-AUTO-DISPATCH-FILTER"],
+    "bounded_results": "31 reservation2013 automatic retry;32 busy release AUTO;33 cancellation safe exit;34 attempt3 exhaustion visible;35 prepare2013 plus simulated lostack automatic recovery.30 fixture failure retained, not counted as PASS.31/32/35 each one Development call/one AUTO and CLOSED.",
+    "preservation": "83 original IDs/historical results unchanged;12/24/25 protected;DLQ7=old5+new30/34,none read/replayed;no modelcalls/Migration/0010/config changes",
+    "release_gaps": "Only bounded transient DB software recovery; process loss, commit/enqueue gap, real uncertainCOMMIT, Redis+Broker failure, prolongedDBoutage/production reliability remain.28case/3of3/NOT_READY/extra32NOT_APPROVED retained."
+  },
   "current_effective_view": {
     "generated_at": "2026-09-25",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
     "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs), then notification_events_inbox_013.current_status_overlays (2 IDs)",
     "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs), then manager_wo_cancel_017 (1 composite ID, remains PARTIAL), then house_csv_roundtrip_018 (1 existing ID), then ai_analysis_input_019 (3 existing IDs; real-model statuses remain BLOCKED), then resident_wo_presentation_020 (1 existing ID; release gaps retained), then notification_presentation_021 (1 existing ID; explicitUTC not Property-local/outbound acceptance), then ai_fallback_runtime_022 (1 existing ID; Development injected failure only)",
-    "latest_additional_overlay_source": "resident_house_select_023 (WO-CREATE only), evaluation_calibration_20260924 (3 existing IDs, modelNOT_READY retained), then maintenance_contact_dispatch_024 (3 existing IDs; owner ordinary-group/contact change, new scoped Development software evidence only)",
+    "latest_additional_overlay_source": "resident_house_select_023 (WO-CREATE only), evaluation_calibration_20260924 (3 existing IDs, modelNOT_READY retained), then maintenance_contact_dispatch_024 (3 existing IDs; owner ordinary-group/contact change), then db_task_recovery_025 (2 existing IDs; bounded transient DB software recovery, other reliability/model release gaps retained)",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced. Old AUTH001 objects were lost on the 2026-09-23 tmpfs stop; historical evidence remains version-bound, not current-object proof.",
     "row_count": 83,
     "rows": [
@@ -2900,19 +2912,19 @@
       },
       {
         "requirement_id": "V1-AI-FAIL-CREATE",
-        "current_implementation": "Existing page/API creation and isolated Worker failure fallback preserved;022 repairs exception-log ordering without changing dispatch/FSM.",
-        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_INJECTED_FAILURE",
-        "evidence_version": "Business/page d5c9098c59b1d67af34b59b859006bf1369eb0ed runfallback022-de3bddec846a; loggingfix/tests/restoredruntime08adb3dd4f25e41fc9f31b750994ac7a38e72bf8",
-        "remaining_gap": "No live Worker failure re-exercised after logging-only fix. Real Qwen/provider/network outage, production reliability/DLQ replay/device/security/scale and formalrelease remain unverified.",
-        "next_action": "Preserve022 failureobject/record, no replay. Next RESIDENT-HOUSE-SELECT-023 closes existing normalreport house-selection/internalID UX using authorized current-schema data; real-model resources remain approval-gated."
+        "current_implementation": "022 creation/fallback retained;025 fresh-session finite DB retry, task/input/version fencing, committed-analysis reuse and stable exhaustion with visible resident notice.",
+        "verification_mode_status": "025_PASS_SCOPED_LOCAL_DEVELOPMENT_TRANSIENT_DB_RECOVERY",
+        "evidence_version": "ada92e1+025WIP backendhash4d43d0643e07db25356d97418c090febfce0b33fecb33366d0c2504d96107953;run db025-4efe90cf93;225 scoped unit,6screenshots,API/DB/Worker;old022 preserved",
+        "remaining_gap": "Process crash, commit/enqueue gap, real unknownCOMMIT, dualRedis/Broker failure and prolongedDBoutage remain;30 test-fixture failure and34 expectedexhaustion retained. RealQwen/production/device/release not passed.",
+        "next_action": "Independent round2PASS; save exact commit binding, no replay of12/24/25/30/34 or historicalDLQ. Next commit-to-enqueue/process-loss work must stay bounded and separately approve anyschema/sharedenvironment need."
       },
       {
         "requirement_id": "V1-AUTO-DISPATCH-FILTER",
-        "current_implementation": "Global idle ACTIVE reservations, persistent assignment-history rotation, Employee mutex and current-read recheck; durable waiting and automatic bounded recovery without extra model calls.",
-        "verification_mode_status": "024_PASS_SCOPED_LOCAL_DEVELOPMENT",
-        "evidence_version": "ec9c1a716501c22ebb6e9f62b93722006e661a3e; reviewed precommit backend fingerprint equals committed/runtime source; reports/maintenance-contact-dispatch-024;305unit/17screenshots/API/DB/Worker; real28/29 tasks overlap3.146656s without overassign. Prior version-bound results preserved.",
-        "remaining_gap": "RealQwen/AUTO/RAG/device/production remain unaccepted;24/25 beyond-timeout lock fixture preserved PENDING_ANALYSIS with2new isolatedDLQ messages. No0010/modelcalls/fees. Existing requirement history retained.",
-        "next_action": "024 readonly round2 passed; runtime8083/AUTH001 same024 Development source, originalsolo restored; next bounded reliable-task failure recovery024-REL-01, never replay12 or historicalDLQ."
+        "current_implementation": "024 unified MAINTENANCE/global idle/fairness/durable waiting preserved;025 analysis commit separated from dispatch, fresh-state ownership/Assignment/occupancy recheck after transient DB error, same-analysis retry avoids new model call.",
+        "verification_mode_status": "024_AND_025_PASS_SCOPED_LOCAL_DEVELOPMENT",
+        "evidence_version": "024ec9c1a716501c22ebb6e9f62b93722006e661a3e retained;025ada92e1+backendhash4d43d0643e07db25356d97418c090febfce0b33fecb33366d0c2504d96107953;run db025-4efe90cf93;31/32/35oneAUTO each,duplicate no extra occupancy;contact/busy/recovery combined",
+        "remaining_gap": "RealQwenAUTO/RAG/device/production and broader reliability not accepted.24/25remainoriginalfailures;30fixturefailure/34exhaustionretained;no historicalreplay. Ordinarytrade skill exclusivity not restored.",
+        "next_action": "025independentround2PASS; only covered024-REL-01 transient recovery subset closed. Maintain normalWorkerwithouttestcontrols;do not repeat combinedregression;no0010/fees/newmodelcalls."
       },
       {
         "requirement_id": "V1-NTF-EVENTS",

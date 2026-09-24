@@ -1,0 +1,133 @@
+{
+  "task_id": "DB-TASK-RECOVERY-025",
+  "review_round": 2,
+  "repair_rounds_used": 1,
+  "reviewer": "/root/review025_round1",
+  "reviewer_mode": "INDEPENDENT_READ_ONLY",
+  "base_sha": "ada92e14ecbf04435d331fbf64762ad3e897c57c",
+  "head_sha": "ada92e14ecbf04435d331fbf64762ad3e897c57c",
+  "reviewed_state": "025产品WIP、225项专项输出、新合成运行证据、6张实际截图及本轮规格和跟踪增量，尚未提交",
+  "backend_app_source_sha256": "4d43d0643e07db25356d97418c090febfce0b33fecb33366d0c2504d96107953",
+  "verdict": "PASS_SCOPED_LOCAL_DEVELOPMENT",
+  "overall_production_verdict": "NOT_PASSED",
+  "real_model_verdict": "NOT_READY_FOR_BUSINESS_SWITCH",
+  "conclusion": "本轮有界暂时数据库故障恢复的软件能力通过限定的Development验收。真实2013后的自动继续、已提交分析复用、重复执行不重复派单、取消期间旧任务退出和预算耗尽的明确提示，均有相互对应的源码、专项、API、数据库、独立Worker和页面证据。两项round1问题已关闭，无新增已确认CURRENT_TASK_BLOCKER。该结论不关闭全部生产可靠性，也不追认历史失败对象成功。",
+  "closed_findings": [
+    {
+      "id": "025-R1-01",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "priority": "P2",
+      "status": "CLOSED",
+      "location": "backend/app/repository/work_order.py:get_display_context/latest_analysis_attempt",
+      "trigger": "初版将新增方法插入既有详情展示方法中途。",
+      "impact": "正常工单详情的展示上下文会隐式返回None。",
+      "resolution": "新增方法移至完整展示方法之后。",
+      "evidence": "实际repository返回值回归、225项专项输出，以及本轮正常工单详情页面和真实请求。"
+    },
+    {
+      "id": "025-R1-02",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "priority": "P2",
+      "status": "CLOSED",
+      "location": "backend/app/service/analysis.py:_prepare",
+      "trigger": "分析已提交、派单发生暂时错误后，同房较早工单的状态或摘要改变，导致重建历史上下文哈希变化。",
+      "impact": "当前输入版本未变化的有效分析可能被跳过，自动重试正常退出却没有重新派单。",
+      "resolution": "复用结果必须通过已有任务所有者、工单版本及持久分析ID/输入哈希校验；可变历史旁证不再阻断明确的派单恢复边界。",
+      "evidence": "变历史上下文复用及新工单版本拒绝专项；工单31、35实际重试复用同一分析且各只有一次Development调用。"
+    }
+  ],
+  "current_task_blockers": [],
+  "findings": [
+    {
+      "id": "024-REL-01",
+      "classification": "RELEASE_BLOCKER",
+      "status": "PARTIALLY_CLOSED_SCOPED_TRANSIENT_DB_RECOVERY",
+      "location": "reports/db-task-recovery-025/README.md; docs/11-OPERATIONS.md",
+      "trigger": "进程丢失、业务提交后未入队、真实COMMIT网络不确定性、Redis与Broker同时故障或长期数据库不可用。",
+      "impact": "本轮证据不足以证明上述场景下的完整生产恢复与防丢单能力。",
+      "evidence": "本轮仅覆盖指定新对象的真实2013，以及明确标注的操作边界模拟；未进行上述生产故障演练。",
+      "next_action": "仅关闭已验证的暂时数据库软件恢复子项，保留其他可靠性缺口；新增Schema、共享环境操作或历史失败重放必须另行获得准确授权。"
+    }
+  ],
+  "checked_conditions": [
+    "仅1205、1213、2006、2013属于分析任务自动重试白名单；没有将所有Exception加入重试，也没有增加read_timeout。",
+    "沿用最多两次追加尝试及1/2秒退避；失效Session丢弃，新尝试从Service事务边界重新读取状态。",
+    "现有WorkOrderLog追加任务、attempt、执行所有者、工单版本及分析输入事实；应用与派单前检查当前所有者和版本。",
+    "分析提交与派单事务分离，已保存且对应当前输入的分析用于恢复，不机械重复调用模型。",
+    "现有Assignment、员工互斥、全局占用、统一维修组、公平及容量规则保留；没有恢复普通维修细分技能硬门槛。",
+    "耗尽通过稳定AI.DATABASE_RETRY_EXHAUSTED及AI_TASK_FAILED表达；数据库不可写时不谎称失败状态已持久化。",
+    "已耗尽任务不能被待派扫描无预算重复处理；过时任务同步既有失败任务跟踪为IGNORED_EXPIRED的单元路径已核对。",
+    "六个新对象的联系电话快照正确，普通详情不暴露完整号码，实际截图仅显示掩码。",
+    "没有新迁移、历史任务重放、全库Beat或全量sweeper；故障控制绑定本轮新run并已撤下。",
+    "矩阵保留83个原始ID及83个唯一当前行，仅更新两个既有需求的025覆盖层；历史结果和生产缺口保留。",
+    "真实模型方案已按统一维修组调整评估口径，未删除事实、风险、事件分类和图片预算要求；28例、3/3、NOT_READY和额外32次未批准状态保留。"
+  ],
+  "actual_read": [
+    "AGENTS.md及.cursor/rules/project.mdc",
+    "025实际产品diff及analysis、analysis_attempt、auto_dispatch、WorkOrder、数据库事务、Celery、失败任务跟踪和页面提示的必要调用上下文",
+    "025相关测试源码及focused-source-v1.txt、focused-round1-fixes.txt",
+    "024原fault-injection-2013.log及独立review-round2.json中的故障边界",
+    "025 README.md、review-history.json及运行和页面取证脚本",
+    "before.json、after-controlled.json、after-restored.json",
+    "setup.json、runtime-evidence.json、database-final.json、page-evidence.json",
+    "api-01.stdout.txt、worker-01/02/03.stdout.txt的启动、故障、重试和完成记录，以及log-manifest.json、task-timeline.json",
+    "01至06六张PNG，全部实际通过图像工具查看",
+    "docs/05-AI-DISPATCH-SPEC.md及docs/11-OPERATIONS.md本轮增量",
+    "reports/auth-identity-ai-001/self-host-recommendation.md本轮增量",
+    "reports/project-handoff.md及coverage-matrix.json本轮增量",
+    "实际HEAD、差异检查及用户预存project.config.json的SHA256"
+  ],
+  "evidence_assessment": {
+    "tests": {
+      "result": "225 passed, 1 warning",
+      "scope": "12个直接相关纯单元文件；另有pytest_asyncio配置弃用提示。",
+      "reviewer_action": "读取实际输出和相关测试源码，没有由复审者重新运行测试。"
+    },
+    "run_id": "db025-4efe90cf93",
+    "objects": {
+      "30": "初次before_cursor_execute测试夹具导致真实2013被rollback InterfaceError掩盖，未恢复。失败日志、对象和新增DLQ保留，不计PASS，不重放。",
+      "31": "员工预占边界真实2013，同一Celery任务attempt1至2自动继续；同一已提交分析、一次Development调用、一个AUTO Assignment。重复投递后分析、Assignment、日志及负载不增加；正常业务最终CLOSED。",
+      "32": "唯一维修人员被31占用时持久等待；31正常确认释放后自动派发，未额外调用模型，最终CLOSED。",
+      "33": "精确边界模拟2013期间正常取消，重试读取CANCELLED后退出；无分析、模型调用或Assignment。",
+      "34": "三次精确模拟2013后停止；数据库失败日志携带attempt3和稳定错误，页面显示重试耗尽。现有Redis失败记录为RECORDED且未重放，其current_attempt0明确表示显式重放次数而非自动尝试次数。",
+      "35": "attempt1发生真实prepare2013；attempt2实际提交分析后模拟丢失确认；attempt3读取持久结果并AUTO，只有一次Development调用和一个Assignment，最终CLOSED。"
+    },
+    "correspondence": {
+      "assignments": "工单31/32/35分别对应Assignment30/31/32，均为AUTO，assigned_by_user_id为空；各有且仅有一条对应WORK_ORDER_ASSIGNED审计。",
+      "notifications": "三张成功工单各8条正常生命周期通知，对应投递均SUCCEEDED；派单通知分别面向住户和负责员工，不是重复派单。",
+      "load": "新员工5具有真实MAINTENANCE职责、无细分技能、容量1；运行中占用1，全部完成后为0。",
+      "protected_history": "工单12、24、25在工单、分析、Assignment、日志、AI调用五类记录中的前后数量及完整行哈希一致。",
+      "contact": "六个新工单的独立联系电话快照均与本次提交一致；没有以账号换号覆盖历史快照的本轮改动。"
+    },
+    "pages": {
+      "screenshots_inspected": 6,
+      "supported": "正常住户短信登录、真实详情导航和刷新；31恢复后AUTO、32忙碌等待及释放后AUTO、31/35完整回执与CLOSED、34明确耗尽提示和联系电话掩码。",
+      "boundary": "建单、处理和确认属于正常API业务证据，不冒充页面按钮操作；页面证据由真实转发wx.request、同对象页面状态及实际截图组成。没有对合成号码实际拨号。"
+    },
+    "runtime": {
+      "api": "8083，记录PID22912",
+      "worker": "独占正常Worker，记录PID5088；受控故障Worker已在空闲后退出",
+      "source": "API与正常Worker均为ada92e1加025WIP，canonical-LF后端源码指纹4d43d0643e07db25356d97418c090febfce0b33fecb33366d0c2504d96107953",
+      "python": "保留的CPython3.12.10解释器，显式复用项目.venv依赖",
+      "database": "127.0.0.1:3307/property_ai_auth001_test@20260924_0011_contact_phone",
+      "rabbitmq": "vhost property_ai_auth001；queue property_ai.auth001；0 ready / 0 unacked / 1 consumer",
+      "dlq": "7条：原有5条加本轮30夹具失败和34预期耗尽；无消息读取、消费、清除或重放",
+      "worker_idle": "active/reserved/scheduled均为0",
+      "providers": "Development；没有真实Qwen推理、4B业务切换或新模型下载",
+      "beat": "未启动"
+    },
+    "protected_config_sha256": "342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F"
+  },
+  "unverified": [
+    "实际COMMIT确认丢失的网络故障；本轮是实际提交后显式模拟错误。",
+    "prepare提交确认丢失、dispatch提交确认丢失的独立实机案例。",
+    "进程崩溃、提交后未入队、Redis和Broker同时故障、长期数据库不可用及生产负载。",
+    "2006和更广泛1205/1213实机故障场景；本轮这些错误主要由白名单和专项机制验证。",
+    "新输入、新owner、过时attempt及数据库仍不可用的部分分支为单元/静态证据，不是各自独立运行演练。",
+    "历史失败工单12/24/25及本轮30/34没有恢复，不能因本次PASS追认它们成功。",
+    "真实Qwen理解与AUTO、真实bge-m3/reranker/RAG、真机及Production发布验收。",
+    "0010及ACCOUNT-MERGE继续未批准。"
+  ],
+  "next_action": "保存本独立复审JSON，将025及两个既有需求的当前覆盖视图升级为限定的scoped local DEVELOPMENT PASS，关闭两项R1问题，并仅关闭024-REL-01已覆盖的暂时数据库恢复子项。保留原失败证据、全部生产及真实模型缺口；短组合回归已经取得，不重复执行。按准确路径保存代码和脱敏证据，排除预存配置与运行私密资料，并核对提交后的源码与运行指纹一致。",
+  "reviewer_boundaries": "本独立会话只读取源码、文件、保存的输出并实际查看六张截图。未写文件、运行测试、操作页面、发起业务/API请求、连接数据库或队列、调用模型，也未创建其他审查者。运行结论依据实施会话保存的原始证据与独立源码核对，不以退出码、单个PASS字段或主会话自评替代。"
+}

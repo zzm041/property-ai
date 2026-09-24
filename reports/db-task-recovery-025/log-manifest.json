@@ -1,0 +1,58 @@
+[
+  {
+    "source": "tmp\\db-task-recovery-025\\api-01.stdout.log",
+    "public": "api-01.stdout.txt",
+    "source_sha256": "f5d09e5a5476c175b74a7f60194878d659eb2bdb95903dfed8e871ae359319c9",
+    "public_sha256": "f5d09e5a5476c175b74a7f60194878d659eb2bdb95903dfed8e871ae359319c9",
+    "scrubbing": "product redact_text + exact synthetic phones and session tokens"
+  },
+  {
+    "source": "tmp\\db-task-recovery-025\\api-01.stderr.log",
+    "public": "api-01.stderr.txt",
+    "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scrubbing": "product redact_text + exact synthetic phones and session tokens"
+  },
+  {
+    "source": "tmp\\db-task-recovery-025\\worker-01.stdout.log",
+    "public": "worker-01.stdout.txt",
+    "source_sha256": "b78bab7b675ec8f448ee2d883f602be7fc29b4768072674731a18562fbff55c1",
+    "public_sha256": "d5a0c30bdbdacfebf1c22331c91ab962c0daaff65a0b7f2f64655318e6b09a6a",
+    "scrubbing": "product redact_text + exact synthetic phones and session tokens"
+  },
+  {
+    "source": "tmp\\db-task-recovery-025\\worker-01.stderr.log",
+    "public": "worker-01.stderr.txt",
+    "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scrubbing": "product redact_text + exact synthetic phones and session tokens"
+  },
+  {
+    "source": "tmp\\db-task-recovery-025\\worker-02.stdout.log",
+    "public": "worker-02.stdout.txt",
+    "source_sha256": "47a3fff26644a1e7451d1efc26d976671b5a5a300ce291515f8900826204dda8",
+    "public_sha256": "08044d9e224fe6fb0c7231a001a08c316f4e2a5c0b650e52fc779b5f40beb69f",
+    "scrubbing": "product redact_text + exact synthetic phones and session tokens"
+  },
+  {
+    "source": "tmp\\db-task-recovery-025\\worker-02.stderr.log",
+    "public": "worker-02.stderr.txt",
+    "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scrubbing": "product redact_text + exact synthetic phones and session tokens"
+  },
+  {
+    "source": "tmp\\db-task-recovery-025\\worker-03.stdout.log",
+    "public": "worker-03.stdout.txt",
+    "source_sha256": "c4ce84db256fe696e2211a31814ee411af883c412119b29f2cf155c45955e79a",
+    "public_sha256": "e46e1000f36b4016547275341274ca9a2c7ddd5f64a1cdac6472749bf3a83128",
+    "scrubbing": "product redact_text + exact synthetic phones and session tokens"
+  },
+  {
+    "source": "tmp\\db-task-recovery-025\\worker-03.stderr.log",
+    "public": "worker-03.stderr.txt",
+    "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scrubbing": "product redact_text + exact synthetic phones and session tokens"
+  }
+]

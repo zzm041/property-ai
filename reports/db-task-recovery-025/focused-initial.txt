@@ -1,0 +1,15 @@
+ImportError while loading conftest 'D:\property-ai\backend\tests\conftest.py'.
+backend\tests\conftest.py:15: in <module>
+    from app.main import create_app  # noqa: E402
+backend\app\main.py:9: in <module>
+    from app.api.v1.router import build_api_router
+backend\app\api\v1\router.py:7: in <module>
+    from app.api.v1.admin_knowledge import router as admin_knowledge_router
+backend\app\api\v1\admin_knowledge.py:26: in <module>
+    from app.worker.tasks import ingest_knowledge_task, run_ingest_knowledge
+backend\app\worker\tasks.py:23: in <module>
+    from app.service.analysis import AnalysisService
+E     File "D:\property-ai\backend\app\service\analysis.py", line 421
+E       return claim_attempt(self._work_orders, record, AnalysisSnapshot(
+E
+E   SyntaxError: expected 'else' after 'if' expression

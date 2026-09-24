@@ -114,6 +114,7 @@ def test_idempotent_create_replay_enqueues_analysis_only_for_new_order() -> None
     service._enqueue_analysis.assert_called_once_with(
         record.id,
         "request-idempotent-create",
+        version=record.version,
     )
 
 

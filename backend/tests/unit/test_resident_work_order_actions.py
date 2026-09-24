@@ -179,7 +179,7 @@ def test_pending_append_enqueues_fresh_analysis_after_commit() -> None:
         is pending
     )
     service._enqueue_analysis.assert_called_once_with(
-        pending.id, "wo012-append-reanalyze"
+        pending.id, "wo012-append-reanalyze", version=pending.version
     )
 
     pending.status = WorkOrderStatus.PENDING_ASSIGNMENT.value

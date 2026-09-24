@@ -14,6 +14,7 @@ Page({
     workOrder: null,
     autoDispatched: false,
     statusLabel: "",
+    recoveryFailed: false,
     reasonLabel: "",
     timezoneLabel: "UTC",
     createdAtLabel: "",
@@ -82,6 +83,7 @@ Page({
             item,
             workOrder,
             statusLabel: display.statusLabel,
+            recoveryFailed: display.recoveryFailed,
             reasonLabel: display.reasonLabel,
             timezoneLabel: display.timezoneLabel,
             createdAtLabel: display.createdAtLabel,
@@ -115,6 +117,7 @@ Page({
     }
     if (
       (status === "PENDING_ANALYSIS" || status === "PENDING_ASSIGNMENT") &&
+      !this.data.recoveryFailed &&
       this._pollCount < 20
     ) {
       this._pollCount += 1;

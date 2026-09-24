@@ -1,0 +1,498 @@
+{
+  "run_id": "db025-4efe90cf93",
+  "steps": {
+    "normal_auth": true,
+    "manager_role": "TENANT_ADMIN",
+    "property_fixture": "existing additive PropertyService (not UI)",
+    "property_id": 3,
+    "employee_id": 5,
+    "duties": [
+      "MAINTENANCE"
+    ],
+    "skill_ids": [],
+    "capacity": 1,
+    "invite_claim": "normal API",
+    "houses": {
+      "prepare": 62,
+      "dispatch": 63,
+      "busy": 64,
+      "cancel": 65,
+      "persistent": 66,
+      "commit": 67
+    },
+    "business_orders": 0
+  },
+  "requests": [
+    {
+      "label": "manager-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "88c462bfc03b6345"
+    },
+    {
+      "label": "manager-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "ec7994b4ec3be44c"
+    },
+    {
+      "label": "manager-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a6562e0ac69aef50"
+    },
+    {
+      "label": "manager-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e3ccd4431175b141"
+    },
+    {
+      "label": "manager-me",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a9098178820a76f9"
+    },
+    {
+      "label": "resident-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "08b4104ce20faaf8"
+    },
+    {
+      "label": "resident-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "460a7aab2775cb71"
+    },
+    {
+      "label": "resident-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "150cd72c573369c7"
+    },
+    {
+      "label": "resident-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "dba2ac6192bafad3"
+    },
+    {
+      "label": "resident-me",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e352e28e2ecdddf1"
+    },
+    {
+      "label": "profile-resident",
+      "method": "PATCH",
+      "path": "/me/profile",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "888f82e91c185b0a"
+    },
+    {
+      "label": "staff-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "fd335e7bf94b2fd4"
+    },
+    {
+      "label": "staff-sms-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e24fb3c243d564b7"
+    },
+    {
+      "label": "staff-sms-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a7c17815b3016314"
+    },
+    {
+      "label": "staff-sms-login",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "8cd4056f6539fab7"
+    },
+    {
+      "label": "staff-me",
+      "method": "GET",
+      "path": "/me",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "bb27f928f5b73405"
+    },
+    {
+      "label": "profile-staff",
+      "method": "PATCH",
+      "path": "/me/profile",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "fef0f16f3605f9c6"
+    },
+    {
+      "label": "catalog",
+      "method": "GET",
+      "path": "/admin/employee-catalog",
+      "params": [
+        "property_id",
+        "tenant_id"
+      ],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "419a26d16f9ab1c7"
+    },
+    {
+      "label": "employee",
+      "method": "POST",
+      "path": "/admin/employees",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e1980c3bc86f8a62"
+    },
+    {
+      "label": "invite",
+      "method": "POST",
+      "path": "/admin/employees/5/invites",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "34d90e1470650f20"
+    },
+    {
+      "label": "claim",
+      "method": "POST",
+      "path": "/staff/employee-claim",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "311dfe9e1719a0e3"
+    },
+    {
+      "label": "building-prepare",
+      "method": "POST",
+      "path": "/admin/buildings",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "77d9b1d47235478e"
+    },
+    {
+      "label": "unit-prepare",
+      "method": "POST",
+      "path": "/admin/units",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6180004857db6f8b"
+    },
+    {
+      "label": "house-prepare",
+      "method": "POST",
+      "path": "/admin/houses",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "0c6b1c845912c833"
+    },
+    {
+      "label": "bind-prepare",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "fe35faf6800b4417"
+    },
+    {
+      "label": "approve-prepare",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/115/approve",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "5bc90fec8d36ea87"
+    },
+    {
+      "label": "building-dispatch",
+      "method": "POST",
+      "path": "/admin/buildings",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "ea5e619257e3ca47"
+    },
+    {
+      "label": "unit-dispatch",
+      "method": "POST",
+      "path": "/admin/units",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "f136236522c74819"
+    },
+    {
+      "label": "house-dispatch",
+      "method": "POST",
+      "path": "/admin/houses",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c5939ab72f85332e"
+    },
+    {
+      "label": "bind-dispatch",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "0b8e33ebbc685938"
+    },
+    {
+      "label": "approve-dispatch",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/116/approve",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a80dc4d250c56f67"
+    },
+    {
+      "label": "building-busy",
+      "method": "POST",
+      "path": "/admin/buildings",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "ee81ff014a3906af"
+    },
+    {
+      "label": "unit-busy",
+      "method": "POST",
+      "path": "/admin/units",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "c9c3eb74041ea194"
+    },
+    {
+      "label": "house-busy",
+      "method": "POST",
+      "path": "/admin/houses",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "124884e6b469b88c"
+    },
+    {
+      "label": "bind-busy",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "2174e74d9341e13c"
+    },
+    {
+      "label": "approve-busy",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/117/approve",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "8cd03c78dfaa9117"
+    },
+    {
+      "label": "building-cancel",
+      "method": "POST",
+      "path": "/admin/buildings",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "31531e5f32e12e99"
+    },
+    {
+      "label": "unit-cancel",
+      "method": "POST",
+      "path": "/admin/units",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "6a3af5cbef12f732"
+    },
+    {
+      "label": "house-cancel",
+      "method": "POST",
+      "path": "/admin/houses",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "0fdefd24625ab771"
+    },
+    {
+      "label": "bind-cancel",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "e1c40b0b0f20dd47"
+    },
+    {
+      "label": "approve-cancel",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/118/approve",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "5d9ec207341aacc6"
+    },
+    {
+      "label": "building-persistent",
+      "method": "POST",
+      "path": "/admin/buildings",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "a857cd3e9717505c"
+    },
+    {
+      "label": "unit-persistent",
+      "method": "POST",
+      "path": "/admin/units",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "9dfb8b6eb33f217a"
+    },
+    {
+      "label": "house-persistent",
+      "method": "POST",
+      "path": "/admin/houses",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "200013460212ba36"
+    },
+    {
+      "label": "bind-persistent",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "ba9db50852f5ed71"
+    },
+    {
+      "label": "approve-persistent",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/119/approve",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "639f366b6833a41e"
+    },
+    {
+      "label": "building-commit",
+      "method": "POST",
+      "path": "/admin/buildings",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "edd32a8d3a911daf"
+    },
+    {
+      "label": "unit-commit",
+      "method": "POST",
+      "path": "/admin/units",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "556605cf07d76d48"
+    },
+    {
+      "label": "house-commit",
+      "method": "POST",
+      "path": "/admin/houses",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "933daac14279c2f8"
+    },
+    {
+      "label": "bind-commit",
+      "method": "POST",
+      "path": "/resident-bind-requests",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "bda27f5e346264c0"
+    },
+    {
+      "label": "approve-commit",
+      "method": "POST",
+      "path": "/admin/resident-bind-requests/120/approve",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "716b2004ce81b3b1"
+    },
+    {
+      "label": "attendance",
+      "method": "POST",
+      "path": "/staff/attendance/checkin",
+      "params": [],
+      "status": 200,
+      "error_code": null,
+      "request_id_hash": "48864f8c61d21d85"
+    }
+  ]
+}

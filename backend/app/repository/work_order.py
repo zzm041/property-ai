@@ -72,6 +72,7 @@ class WorkOrderRepository:
                 Property.id == record.property_id, Property.tenant_id == record.tenant_id
             )
         )
+
         if timezone_name is None:
             return {"property_timezone": "UTC", "assignee_names": {}}
         participants = select(WorkOrderAssignment.employee_id).where(
@@ -91,6 +92,14 @@ class WorkOrderRepository:
         return {"property_timezone": timezone_name, "assignee_names": {
             employee_id: name for employee_id, name in names if name and name.strip()
         }}
+
+    def latest_analysis_attempt(self, work_order_id: int) -> WorkOrderLog | None:
+        """Call under the work-order mutex; current read, never an RR snapshot."""
+        return self._session.scalar(select(WorkOrderLog).where(
+            WorkOrderLog.work_order_id == work_order_id,
+            WorkOrderLog.event_code == "AI_TASK_ATTEMPT",
+        ).order_by(WorkOrderLog.id.desc()).limit(1).with_for_update()
+            .execution_options(populate_existing=True))
 
     def get_property_for_update(self, property_id: int) -> Property | None:
         return self._session.scalar(

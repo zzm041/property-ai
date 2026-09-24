@@ -55,7 +55,7 @@ def test_reject_enqueues_redispatch_only_after_business_transaction() -> None:
 
     assert result is record
     service._execute.assert_called_once()
-    service._enqueue_analysis.assert_called_once_with(record.id, "reject-redispatch")
+    service._enqueue_analysis.assert_called_once_with(record.id, "reject-redispatch", version=record.version)
 
 
 def test_final_analysis_skip_attempts_redispatch_without_provider_recall() -> None:

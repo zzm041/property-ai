@@ -10,6 +10,8 @@ const REASON = {
   EXTERNAL_COORDINATION: "物业继续处理中", REASSIGN_REQUIRED: "等待重新安排人员",
 };
 const EVENT = {
+  AI_TASK_ATTEMPT: "系统自动分析/恢复尝试",
+  AI_TASK_FAILED: "自动处理暂时失败，请等待物业处理",
   CREATE: "提交报修", ANALYZE: "完成分析", ASSIGN: "安排处理人员", REASSIGN: "重新派单",
   ACCEPT: "员工接单", REJECT: "员工拒单", START: "开始处理", PROCESS_UPDATE: "更新处理进展",
   RECEIPT_RESOLVED: "提交处理回执", RECEIPT_UNRESOLVED: "提交未解决回执",
@@ -44,6 +46,8 @@ function presentDetail(item) {
     return name && name.trim() ? `${name}（员工 #${id}）` : `员工 #${id}（未提供展示名）`;
   };
   return {
+    recoveryFailed: ["PENDING_ANALYSIS", "PENDING_ASSIGNMENT"].includes(item.work_order && item.work_order.status) &&
+      (item.logs || []).filter(x => ["AI_TASK_ATTEMPT", "AI_TASK_FAILED"].includes(x.event_code)).sort((a, b) => b.id - a.id)[0]?.event_code === "AI_TASK_FAILED",
     timezoneLabel: display.property_timezone || "UTC",
     statusLabel: statusLabel(item.work_order && item.work_order.status),
     reasonLabel: label(REASON, item.work_order && item.work_order.process_reason, "处理原因"),

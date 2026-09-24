@@ -1,0 +1,34 @@
+{
+  "task_id": "DB-TASK-RECOVERY-025",
+  "source": "Main-session faithful record of separate readonly /root/review025_round1 messages; not a substitute for final independent JSON",
+  "base_sha": "ada92e14ecbf04435d331fbf64762ad3e897c57c",
+  "review_round": 1,
+  "repair_rounds_used": 1,
+  "repair_limit": 3,
+  "findings": [
+    {
+      "id": "025-R1-01",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "backend/app/repository/work_order.py:get_display_context/latest_analysis_attempt",
+      "trigger": "New method was initially inserted before existing display method return body",
+      "impact": "Display context returned None for normal work-order detail",
+      "resolution": "Move method after complete display-context implementation; add real repository return regression",
+      "status": "CLOSED_BY_INDEPENDENT_ROUND2"
+    },
+    {
+      "id": "025-R1-02",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "backend/app/service/analysis.py:_prepare",
+      "trigger": "Analysis committed but dispatch fails; mutable historical context changes reconstructed input hash on retry",
+      "impact": "Current valid stored analysis was not reused and automatic dispatch could be skipped",
+      "resolution": "Reuse only owned committed claim matching analysis ID/version/input hash and current business version; test changed historical context and reject new-input version",
+      "status": "CLOSED_BY_INDEPENDENT_ROUND2"
+    }
+  ],
+  "non_blocking_followups": [
+    "None stale result reports IGNORED_EXPIRED to existing failed-task attempt tracking; unit only, no historical replay",
+    "Export exact new AUTO Assignment audits in readonly verification; no business rerun"
+  ],
+  "verification": "225 passed,1warning in focused-round1-fixes.txt; actual runtime source unchanged after tests",
+  "reviewer_boundary": "Separate context reads source/evidence and actually views screenshots; no tests/pages/requests/database/queue/model operation, no writes or children"
+}

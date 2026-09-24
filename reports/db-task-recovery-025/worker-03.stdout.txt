@@ -1,0 +1,29 @@
+{"task_id": "DB-TASK-RECOVERY-025", "component": "worker", "source_sha256": "4d43d0643e07db25356d97418c090febfce0b33fecb33366d0c2504d96107953", "head": "ada92e14ecbf04435d331fbf64762ad3e897c57c", "pid": 5088, "python": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe", "module_root": "D:\\property-ai\\backend\\app", "database": "127.0.0.1:3307/property_ai_auth001_test@0011", "vhost": "property_ai_auth001", "queue": "property_ai.auth001", "providers": "Development only", "controlled_worker": false}
+ 
+ -------------- auth001@DESKTOP-8NHSE12 v5.5.3 (immunity)
+--- ***** ----- 
+-- ******* ---- Windows-11-10.0.26200-SP0 2026-09-25 01:26:24
+- *** --- * --- 
+- ** ---------- [config]
+- ** ---------- .> app:         property_ai:0x224be33aab0
+- ** ---------- .> transport:   amqp://[redacted]:[redacted]@127.0.0.1:5672/property_ai_auth001
+- ** ---------- .> results:     disabled://
+- *** --- * --- .> concurrency: 24 (solo)
+-- ******* ---- .> task events: OFF (enable -E to monitor tasks in this worker)
+--- ***** ----- 
+ -------------- [queues]
+                .> property_ai.auth001 exchange=property_ai.auth001(direct) key=property_ai.auth001
+                
+
+[tasks]
+  . app.worker.tasks.analyze_work_order_task
+  . app.worker.tasks.deliver_notification_task
+  . app.worker.tasks.ingest_knowledge_task
+  . app.worker.tasks.retry_waiting_dispatch_task
+  . app.worker.tasks.schedule_due_notification_deliveries_task
+  . app.worker.tasks.sweep_sla_task
+
+{"event": "Connected to amqp://[redacted]:[redacted]@127.0.0.1:5672/property_ai_auth001", "app_env": "test", "service": "worker", "logger": "celery.worker.consumer.connection", "level": "info", "timestamp": "2026-09-24T17:26:24.765610Z"}
+{"event": "mingle: searching for neighbors", "app_env": "test", "service": "worker", "logger": "celery.worker.consumer.mingle", "level": "info", "timestamp": "2026-09-24T17:26:24.781947Z"}
+{"event": "mingle: all alone", "app_env": "test", "service": "worker", "logger": "celery.worker.consumer.mingle", "level": "info", "timestamp": "2026-09-24T17:26:25.827862Z"}
+{"event": "auth001@DESKTOP-8NHSE12 ready.", "app_env": "test", "service": "worker", "logger": "celery.apps.worker", "level": "info", "timestamp": "2026-09-24T17:26:25.852667Z"}

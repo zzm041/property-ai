@@ -17,7 +17,7 @@ from app.core.config import Settings, get_settings
 from app.core.database import (
     begin_owned_transaction,
     require_owned_transaction,
-    retryable_mysql_transaction_error_code,
+    retryable_mysql_analysis_error_code,
 )
 from app.core.errors import (
     AiErrorCode,
@@ -80,6 +80,7 @@ from app.repository.ai import AiRepository
 from app.repository.identity import IdentityRepository
 from app.repository.work_order import WorkOrderRepository
 from app.service.audit import AuditService
+from app.service.analysis_attempt import accepts_attempt, claim_attempt, owns_attempt
 from app.service.auth import AuthService
 from app.service.rbac import RbacService
 
@@ -159,14 +160,16 @@ class AnalysisService:
         request_id: str,
         attempt: int = 1,
         actor: Principal | None = None,
+        task_context: dict | None = None,
     ) -> WorkOrderAnalysis | None:
+        self._task_context = task_context
         snapshot = self._prepare(
             work_order_id=work_order_id,
             request_id=request_id,
             actor=actor,
         )
         if snapshot is None:
-            return self._ai.get_current_analysis(work_order_id)
+            return None
         if snapshot.skipped:
             # _prepare committed its owned transaction before returning this
             # snapshot. Do not issue an ORM read before opening the redispatch
@@ -179,12 +182,19 @@ class AnalysisService:
             )
             return self._ai.get_current_analysis(work_order_id)
         bundle = self._call_providers(snapshot=snapshot, request_id=request_id, attempt=attempt)
-        return self._apply(
+        analysis = self._apply(
             snapshot=snapshot,
             bundle=bundle,
             request_id=request_id,
             attempt=attempt,
         )
+        # Persist analysis + its business transition before dispatch. A failed
+        # employee reservation must not roll back an already obtained result.
+        if analysis is not None and analysis.status == AnalysisStatus.COMPLETED.value:
+            self._retry_auto_dispatch_from_existing(
+                work_order_id=work_order_id, analysis_id=analysis.id, request_id=request_id,
+            )
+        return analysis
 
     def sweep_waiting_dispatch(self, *, limit: int = 100, availability_changed: bool = False) -> dict[str, int]:
         """Bounded recovery from durable waiting state, without provider calls."""
@@ -230,6 +240,14 @@ class AnalysisService:
                 or current.status != AnalysisStatus.COMPLETED.value
             ):
                 return "STALE_STATUS"
+            context = getattr(self, "_task_context", None)
+            if not owns_attempt(self._work_orders, record, current, context):
+                return "STALE_ATTEMPT"
+            if context:
+                claim = context["claim"]
+                expected = claim["work_order_version"] + (claim["from_status"] == "PENDING_ANALYSIS")
+                if record.version != expected:
+                    return "STALE_VERSION"
             mapped = self._mapped_from_stored_analysis(current)
             from app.service.auto_dispatch import AutoDispatchService
 
@@ -329,13 +347,17 @@ class AnalysisService:
         request_id: str,
         actor: Principal | None = None,
     ) -> AnalysisSnapshot | None:
-        del request_id
         try:
             with begin_owned_transaction(self._session):
                 if actor is not None:
                     self._authorize_review(actor, work_order_id)
                 record = self._work_orders.get_work_order_for_update(work_order_id)
                 if record is None:
+                    return None
+                if record.status not in {WorkOrderStatus.PENDING_ANALYSIS.value, WorkOrderStatus.PENDING_ASSIGNMENT.value}:
+                    return None
+                context_token = getattr(self, "_task_context", None)
+                if not accepts_attempt(self._work_orders, record, context_token):
                     return None
                 content = self._work_orders.get_content(record.id)
                 media_files = self._ai.list_media_with_files(record.id)
@@ -376,14 +398,30 @@ class AnalysisService:
                     }, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
                 ).hexdigest()
                 current = self._ai.get_current_analysis_for_update(record.id)
+                prior_claim = context_token.get("claim") if context_token else None
+                if prior_claim and current is not None and (
+                    current.id != prior_claim["analysis_id"]
+                    or current.input_hash != prior_claim["input_hash"]
+                ):
+                    return None
+                # ASR is an output of this operation. Compare its original
+                # empty-ASR hash too; never accept arbitrary changed input just
+                # because the work order has moved out of PENDING_ANALYSIS.
+                original_input_hash = sha256(json.dumps({
+                    "prompt_version": WORK_ORDER_ANALYSIS_PROMPT_VERSION,
+                    "work_order_id": record.id, "text": text, "asr": "",
+                    "media": media_identity, "context": context,
+                }, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
                 if current is not None and current.status in {
                     AnalysisStatus.COMPLETED.value,
                     AnalysisStatus.LOW_CONFIDENCE.value,
                 } and (
-                    current.input_hash == input_hash
-                    or record.status != WorkOrderStatus.PENDING_ANALYSIS.value
+                    current.input_hash in {input_hash, original_input_hash}
+                    # A committed result belongs to this fenced input version.
+                    # Mutable historical context is not a new resident input.
+                    or bool(prior_claim)
                 ):
-                    return AnalysisSnapshot(
+                    return claim_attempt(self._work_orders, record, AnalysisSnapshot(
                         work_order_id=record.id,
                         tenant_id=record.tenant_id,
                         property_id=record.property_id,
@@ -392,7 +430,7 @@ class AnalysisService:
                         analysis_id=current.id,
                         analysis_version=current.analysis_version,
                         work_order_version=record.version,
-                        input_hash=input_hash,
+                        input_hash=current.input_hash,
                         text=text,
                         existing_asr_text=existing_asr,
                         images=images,
@@ -400,7 +438,11 @@ class AnalysisService:
                         context=context,
                         skipped=True,
                         skip_reason="already_final",
-                    )
+                    ), context_token, request_id)
+                # Input changed but state did not return to analysis: do not
+                # reinterpret an old stored result or force an illegal FSM hop.
+                if record.status != WorkOrderStatus.PENDING_ANALYSIS.value:
+                    return None
                 if current is not None and (
                     (
                         current.status == AnalysisStatus.PROCESSING.value
@@ -458,7 +500,7 @@ class AnalysisService:
                             prompt_version=WORK_ORDER_ANALYSIS_PROMPT_VERSION,
                         )
                     )
-                return AnalysisSnapshot(
+                return claim_attempt(self._work_orders, record, AnalysisSnapshot(
                     work_order_id=record.id,
                     tenant_id=record.tenant_id,
                     property_id=record.property_id,
@@ -473,7 +515,7 @@ class AnalysisService:
                     images=images,
                     audio=audio,
                     context=context,
-                )
+                ), context_token, request_id)
         except IntegrityError:
             existing = self._ai.get_current_analysis(work_order_id)
             if existing is None:
@@ -804,7 +846,9 @@ class AnalysisService:
                 if record is None or analysis is None:
                     return None
                 if analysis.id != snapshot.analysis_id:
-                    return analysis
+                    return None
+                if not owns_attempt(self._work_orders, record, analysis, getattr(self, "_task_context", None)):
+                    return None
                 if analysis.status != AnalysisStatus.PROCESSING.value:
                     return analysis
                 # Keep all reads before the property serialization lock as
@@ -812,8 +856,6 @@ class AnalysisService:
                 # this content lookup can establish a stale consistent snapshot
                 # that later cluster/link reads retain after waiting on the lock.
                 content = self._work_orders.get_content_for_update(record.id)
-                if content is not None and bundle.asr_text:
-                    content.asr_text = bundle.asr_text
                 stale = (
                     record.status != WorkOrderStatus.PENDING_ANALYSIS.value
                     or record.version != snapshot.work_order_version
@@ -830,6 +872,8 @@ class AnalysisService:
                         AiErrorCode.STALE_RESULT,
                     )
                     return analysis
+                if content is not None and bundle.asr_text:
+                    content.asr_text = bundle.asr_text
                 if mapped is None:
                     analysis.status = AnalysisStatus.FAILED.value
                     analysis.error_code = mapped_error or bundle.error_code or AiErrorCode.PROVIDER_FAILED
@@ -860,28 +904,11 @@ class AnalysisService:
                     )
                 self._write_recommendations(record, analysis, mapped, snapshot.building_id)
                 self._append_success_audit(record, analysis, request_id, mapped)
-                if analysis.status == AnalysisStatus.COMPLETED.value:
-                    from app.service.auto_dispatch import AutoDispatchService
-
-                    auto_outcome = AutoDispatchService(
-                        self._session, settings=self._settings
-                    ).maybe_assign(
-                        work_order=record,
-                        mapped=mapped,
-                        request_id=request_id,
-                    )
-                    logger.info(
-                        "auto_dispatch_outcome",
-                        work_order_id=record.id,
-                        analysis_id=analysis.id,
-                        outcome=auto_outcome,
-                        request_id=request_id,
-                    )
                 return analysis
         except AppError:
             raise
         except OperationalError as exc:
-            if retryable_mysql_transaction_error_code(exc) is not None:
+            if retryable_mysql_analysis_error_code(exc) is not None:
                 raise
             raise AppError(
                 code=ErrorCode.INTERNAL_ERROR,
@@ -894,6 +921,47 @@ class AnalysisService:
                 message="AI analysis could not be stored",
                 status_code=500,
             ) from exc
+
+    def record_database_exhaustion(self, *, work_order_id: int, request_id: str, context: dict) -> bool:
+        """Fresh-session failure boundary. Never claim persistence if it raises."""
+        with begin_owned_transaction(self._session):
+            record = self._work_orders.get_work_order_for_update(work_order_id)
+            if record is None or record.status not in {"PENDING_ANALYSIS", "PENDING_ASSIGNMENT"}:
+                return False
+            current = self._ai.get_current_analysis_for_update(work_order_id)
+            latest = self._work_orders.latest_analysis_attempt(work_order_id)
+            payload = latest.payload_json if latest is not None else None
+            if payload:
+                if payload["task_id"] != context["task_id"] or payload["attempt"] > context["attempt"]:
+                    return False
+                if payload["attempt"] == context["attempt"] and payload.get("execution_token") != context["execution_token"]:
+                    return False
+                expected = payload["work_order_version"]
+                if record.status == "PENDING_ASSIGNMENT" and payload["from_status"] == "PENDING_ANALYSIS":
+                    expected += 1
+                if record.version != expected or current is None or current.id != payload["analysis_id"] or current.input_hash != payload["input_hash"]:
+                    return False
+            elif context.get("expected_version") is None or record.version != context["expected_version"]:
+                return False
+            if record.current_assignment_id is not None or self._work_orders.get_active_assignment(record.id) is not None:
+                return False
+            code = AiErrorCode.DATABASE_RETRY_EXHAUSTED
+            if current is not None and current.status == AnalysisStatus.PROCESSING.value:
+                current.status = AnalysisStatus.FAILED.value
+                current.error_code = code
+            self._work_orders.add_log(WorkOrderLog(
+                tenant_id=record.tenant_id, property_id=record.property_id,
+                work_order_id=record.id, actor_user_id=None, actor_type="SYSTEM",
+                from_status=record.status, to_status=record.status,
+                process_reason=record.process_reason, event_code="AI_TASK_FAILED",
+                request_id=request_id, payload_json={"error_code": code,
+                    "task_id": context["task_id"], "attempt": context["attempt"],
+                    "analysis_id": current.id if current is not None else None,
+                    "work_order_version": record.version},
+            ))
+            if current is not None:
+                self._append_failure_audit(record, current, request_id, code)
+            return True
 
     def _validate_payload(
         self,
