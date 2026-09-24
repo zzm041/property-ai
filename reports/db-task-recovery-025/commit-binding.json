@@ -1,0 +1,26 @@
+{
+  "task_id": "DB-TASK-RECOVERY-025",
+  "product_commit": "6a12ff140a555556103e6b389acb994fe98ae7fe",
+  "review": "reports/db-task-recovery-025/review-round2.json",
+  "review_base_sha": "ada92e14ecbf04435d331fbf64762ad3e897c57c",
+  "canonical_backend_source_sha256": "4d43d0643e07db25356d97418c090febfce0b33fecb33366d0c2504d96107953",
+  "reviewed_equals_running_equals_postcommit": true,
+  "canonicalization": "common.source_hash: all backend/app Python paths and SHA256 after CRLF to LF; includes analysis_attempt.py",
+  "postcommit_checks": {
+    "scoped_product_diff_numstat_empty": true,
+    "backend_app_untracked_empty": true,
+    "staged_after_commit_empty": true,
+    "original_83_and_extra_history_unchanged": true,
+    "new_run_credentials_absent_from_public_text": true,
+    "preexisting_config_sha256": "342ed0b61fe9c74e7a5ce82198c8f36bd9341d5cda83de2c408f33256867fe1f"
+  },
+  "excluded_preexisting_dirty": [
+    "backend/app/model/ai.py (line ending only)",
+    "miniprogram/project.config.json",
+    "reports/codex/AUTH-IDENTITY-AI-001-login-review.call.json",
+    "reports/codex/AUTH-IDENTITY-AI-001-login-review.json"
+  ],
+  "excluded_other": "All unrelated untracked evidence, ignored private context/runtime/interpreter/models/backups; no push",
+  "diff_check": "Product/source checks clean; original raw pytest and Worker banners retain trailing whitespace, not reformatted",
+  "runtime_restart_or_business_retest": false
+}

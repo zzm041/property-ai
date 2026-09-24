@@ -2260,6 +2260,7 @@
   "db_task_recovery_025": {
     "task_id": "DB-TASK-RECOVERY-025",
     "base_sha": "ada92e14ecbf04435d331fbf64762ad3e897c57c",
+    "product_commit": "6a12ff140a555556103e6b389acb994fe98ae7fe",
     "status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
     "independent_review": "reports/db-task-recovery-025/review-round2.json; one repair round, both R1 CLOSED;024-REL-01 only transient subset closed",
     "source_sha256": "4d43d0643e07db25356d97418c090febfce0b33fecb33366d0c2504d96107953",
@@ -2914,7 +2915,7 @@
         "requirement_id": "V1-AI-FAIL-CREATE",
         "current_implementation": "022 creation/fallback retained;025 fresh-session finite DB retry, task/input/version fencing, committed-analysis reuse and stable exhaustion with visible resident notice.",
         "verification_mode_status": "025_PASS_SCOPED_LOCAL_DEVELOPMENT_TRANSIENT_DB_RECOVERY",
-        "evidence_version": "ada92e1+025WIP backendhash4d43d0643e07db25356d97418c090febfce0b33fecb33366d0c2504d96107953;run db025-4efe90cf93;225 scoped unit,6screenshots,API/DB/Worker;old022 preserved",
+        "evidence_version": "6a12ff140a555556103e6b389acb994fe98ae7fe backendhash4d43d0643e07db25356d97418c090febfce0b33fecb33366d0c2504d96107953 equals reviewed/runtimeWIP;run db025-4efe90cf93;225 scoped unit,6screenshots,API/DB/Worker;old022 preserved",
         "remaining_gap": "Process crash, commit/enqueue gap, real unknownCOMMIT, dualRedis/Broker failure and prolongedDBoutage remain;30 test-fixture failure and34 expectedexhaustion retained. RealQwen/production/device/release not passed.",
         "next_action": "Independent round2PASS; save exact commit binding, no replay of12/24/25/30/34 or historicalDLQ. Next commit-to-enqueue/process-loss work must stay bounded and separately approve anyschema/sharedenvironment need."
       },
@@ -2922,7 +2923,7 @@
         "requirement_id": "V1-AUTO-DISPATCH-FILTER",
         "current_implementation": "024 unified MAINTENANCE/global idle/fairness/durable waiting preserved;025 analysis commit separated from dispatch, fresh-state ownership/Assignment/occupancy recheck after transient DB error, same-analysis retry avoids new model call.",
         "verification_mode_status": "024_AND_025_PASS_SCOPED_LOCAL_DEVELOPMENT",
-        "evidence_version": "024ec9c1a716501c22ebb6e9f62b93722006e661a3e retained;025ada92e1+backendhash4d43d0643e07db25356d97418c090febfce0b33fecb33366d0c2504d96107953;run db025-4efe90cf93;31/32/35oneAUTO each,duplicate no extra occupancy;contact/busy/recovery combined",
+        "evidence_version": "024ec9c1a716501c22ebb6e9f62b93722006e661a3e retained;0256a12ff140a555556103e6b389acb994fe98ae7fe/backendhash4d43d0643e07db25356d97418c090febfce0b33fecb33366d0c2504d96107953 equals reviewed/runtime;run db025-4efe90cf93;31/32/35oneAUTO each,duplicate no extra occupancy;contact/busy/recovery combined",
         "remaining_gap": "RealQwenAUTO/RAG/device/production and broader reliability not accepted.24/25remainoriginalfailures;30fixturefailure/34exhaustionretained;no historicalreplay. Ordinarytrade skill exclusivity not restored.",
         "next_action": "025independentround2PASS; only covered024-REL-01 transient recovery subset closed. Maintain normalWorkerwithouttestcontrols;do not repeat combinedregression;no0010/fees/newmodelcalls."
       },
