@@ -1,0 +1,27 @@
+{
+  "source_commit": "fe90913a6f3918bca33b2f100137a786a67c4f86",
+  "database": "127.0.0.1:3307/property_ai_auth001_test",
+  "revision": "20260925_0012_task_intents",
+  "work_order": {
+    "id": 12,
+    "status": "PENDING_ANALYSIS",
+    "version": 1,
+    "current_assignment_id": null,
+    "incident_id": null,
+    "contact_collected": false
+  },
+  "analysis": {
+    "id": 12,
+    "status": "LOW_CONFIDENCE",
+    "raw_category": "ELECTRICAL",
+    "raw_required_skill": "ELECTRICAL",
+    "confidence": "0.500",
+    "error_code": "AI.LOW_CONFIDENCE"
+  },
+  "effective_business_results": {
+    "assignments": 0,
+    "incident_links": 0,
+    "work_order_logs": 1
+  },
+  "interpretation": "Raw low-confidence fields were retained, but they did not select staff, reserve capacity, or aggregate an Incident. The legacy work order contact remains explicitly uncollected."
+}

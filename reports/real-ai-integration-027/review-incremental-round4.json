@@ -1,0 +1,65 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-INCREMENTAL",
+  "round": 4,
+  "mode": "INDEPENDENT_READ_ONLY",
+  "reviewed_head": "fe90913a6f3918bca33b2f100137a786a67c4f86",
+  "verdict": "PASS",
+  "verdict_boundary": "仅关闭 027-INC-R3-01，并接受启动哈希保护及运行绑定补充；不是 R3、真实 AUTO、整体 027 或 Production PASS。",
+  "findings": [
+    {
+      "id": "027-INC-R3-01",
+      "status": "CLOSED",
+      "original_classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/reports/real-ai-integration-027/prepare-incident-closeout.py::main",
+      "evidence": [
+        "任何 client 调用之前先保存 run_id 和恢复状态。",
+        "每个槽位在创建请求前持久化 index、request_id、idempotency_key；槽位必须等于已完成数量加一，并限定为 1 至 5。",
+        "响应不确定时保留同一槽位及幂等键，不生成新 run。",
+        "仅 PENDING 且 execution_attempt=0、publish_attempt=0 的精确任务可以执行；SUCCEEDED 仅调和，其他未解决状态阻断后续槽位。",
+        "任务成功后才追加完成记录并清除 pending_slot。",
+        "已有 PUBLIC 完成证据时入口首先拒绝重跑。"
+      ]
+    }
+  ],
+  "new_current_task_blockers": [],
+  "checked": [
+    {
+      "area": "启动保护",
+      "result": "closeout-runtime.py 的 configure 首先比对 EXPECTED_SOURCE_HASH，漂移时在 settings()、数据库连接和 API/Worker 启动前拒绝。现有进程早于该断言；补充材料没有冒称已经重新启动加载新保护。"
+    },
+    {
+      "area": "运行源码绑定",
+      "result": "读取 source-runtime-binding.json；其固定源码哈希与 round3 实际读取的 API/Worker 启动记录相同。保留 round3 已完成的 201 个文件归一化 Git blob 比对，不重新扫描业务或重跑运行。",
+      "source_hash": "dadb2ec0b37145609e09ba27750c14ea94021adda52de2cda4f43792c138b465"
+    },
+    {
+      "area": "11436 边界",
+      "result": "实际读取适配器加载回执、进程记录、启动日志首行及加载路径源码；PID 6876、11436、model-adapter-continuation 路径对应，源码哈希匹配。该源码只允许 rag-answer-v2，工单推理被 RAG_ONLY_NO_AUTO_AUTHORIZATION 拒绝。",
+      "loaded_source_sha256": "be79d98298fc7ffd6a25667089b0566f0a092d0962412bdbd501989e984f3158",
+      "boundary": "这是保存的加载证据与源码检查，不是本审查实时进程或模型账本监测。"
+    }
+  ],
+  "evidence_paths": [
+    "D:/property-ai/reports/real-ai-integration-027/review-incremental-round3.json",
+    "D:/property-ai/reports/real-ai-integration-027/prepare-incident-closeout.py",
+    "D:/property-ai/reports/real-ai-integration-027/closeout-runtime.py",
+    "D:/property-ai/reports/real-ai-integration-027/runtime-closeout/source-runtime-binding.json",
+    "D:/property-ai/reports/real-ai-integration-027/model-adapter-continuation.json",
+    "D:/property-ai/reports/real-ai-integration-027/r2-continuation-process.json",
+    "D:/property-ai/tmp/real-ai-integration-027/runtime/models-continuation.stdout.log",
+    "D:/property-ai/tmp/real-ai-integration-027/runtime/model-adapter-continuation/local_ai_http.py"
+  ],
+  "reviewed_hashes": {
+    "prepare-incident-closeout.py": "2608e65762da60925c48ba59f20273eb4c112b0021afe8558fe7b185233f9076",
+    "closeout-runtime.py": "1179569f4e75cbb762ec7b6fd4c38f9309d9cafb76612679781b3b960289e64a",
+    "source-runtime-binding.json": "ce060fd99a58111a8a5786a5dfc35accec346f3ed1b03d6909b532376fa08311"
+  },
+  "unverified": [
+    "审查者没有运行测试、语法检查、页面、模型、业务请求、数据库、队列或进程操作。",
+    "py_compile、node --check、git diff --check 的 exit 0 是实施方报告；本次未读取其原始输出。",
+    "新恢复守卫未做真实中断重跑演练；当前完成证据保持原样，不要求重建对象。",
+    "round3 页面结论仍仅覆盖历史低置信展示和 Incident OPEN→MONITORING；其他状态流转及补充后重新分析不因此升级。",
+    "R3 NOT_READY、真实 AUTO、整体 027、Production 和其他审批边界全部保留。"
+  ],
+  "next_action": "保存本次原始审查 JSON，将 027-INC-R3-01 标记 CLOSED。结合 round3 已接受的页面/API/DB 证据，仅更新对应 scoped runtime 状态并保存准确文件；不重跑五张工单、截图或工单 12，不由本结论追加模型调用或切换真实 AUTO。"
+}

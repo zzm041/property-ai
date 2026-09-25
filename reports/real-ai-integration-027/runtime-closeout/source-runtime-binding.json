@@ -1,0 +1,40 @@
+{
+  "captured_at": "2026-09-25T19:25:00+08:00",
+  "commit": "fe90913a6f3918bca33b2f100137a786a67c4f86",
+  "git_archive_binding": {
+    "existing_archive": "tmp/production-v1-closeout/source-fe90913.tar",
+    "existing_archive_sha256": "2CB8B8875C785CB88453602E0EEAB777BE158EA928589520791637C516A70A26",
+    "git_get_tar_commit_id": "fe90913a6f3918bca33b2f100137a786a67c4f86",
+    "fresh_read_only_comparison_archive_sha256": "C0C959E707C178673DE39D998C52E634D145ED953414DE64F5FC785D38850774",
+    "fresh_git_get_tar_commit_id": "fe90913a6f3918bca33b2f100137a786a67c4f86",
+    "note": "Tar byte hashes differ because a fresh git archive has different archive metadata; both archives identify the same Git commit. Content hashes below are the binding used by the runtime."
+  },
+  "fixed_source_content": {
+    "backend_app_python_file_count": 165,
+    "backend_app_hash_algorithm": "sha256(json(sorted(relative_posix_path, sha256(file_bytes))))",
+    "existing_snapshot_hash": "dadb2ec0b37145609e09ba27750c14ea94021adda52de2cda4f43792c138b465",
+    "fresh_git_archive_hash": "dadb2ec0b37145609e09ba27750c14ea94021adda52de2cda4f43792c138b465",
+    "auth001_runtime_helper_sha256": "978087CC70E4CBA32DF81B8D84291D4CFBBA4E977774B15F7EC51AE33173B87B",
+    "auth001_runtime_helper_fresh_git_sha256": "978087CC70E4CBA32DF81B8D84291D4CFBBA4E977774B15F7EC51AE33173B87B"
+  },
+  "actual_start_records": {
+    "api": "tmp/production-v1-closeout/api-02.stdout.log line 1: PID40452, commit fe90913, source hash dadb2ec0...",
+    "worker": "tmp/production-v1-closeout/worker-02.stdout.log line 1: PID31884, commit fe90913, source hash dadb2ec0..."
+  },
+  "future_start_guard": {
+    "path": "reports/real-ai-integration-027/closeout-runtime.py",
+    "expected_hash": "dadb2ec0b37145609e09ba27750c14ea94021adda52de2cda4f43792c138b465",
+    "behavior": "refuse startup before settings or service launch if the fixed backend/app source hash changes",
+    "current_process_note": "The already-running processes predate this explicit assertion, but their startup records contain the same hash and the snapshot was independently rebound to the Git object without restarting them."
+  },
+  "adapter_boundary": {
+    "listener_pid_at_capture": 6876,
+    "loaded_source_record": "tmp/real-ai-integration-027/runtime/models-continuation.stdout.log line 1",
+    "loaded_source": "tmp/real-ai-integration-027/runtime/model-adapter-continuation/local_ai_http.py",
+    "loaded_source_sha256": "BE79D98298FC7FFD6A25667089B0566F0A092D0962412BDBD501989E984F3158",
+    "receipt": "reports/real-ai-integration-027/model-adapter-continuation.json",
+    "enforcement": "chat completions accepts only prompt version rag-answer-v2 and rejects work-order inference with RAG_ONLY_NO_AUTO_AUTHORIZATION",
+    "health_inference": false,
+    "new_model_calls_for_this_runtime_closeout": 0
+  }
+}

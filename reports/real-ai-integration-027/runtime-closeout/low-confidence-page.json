@@ -1,0 +1,25 @@
+{
+  "source_commit": "fe90913a6f3918bca33b2f100137a786a67c4f86",
+  "interaction": "WeChat DevTools actual page navigation and origin wx.request",
+  "object": {
+    "work_order_id": 12,
+    "status": "PENDING_ANALYSIS"
+  },
+  "page": {
+    "path": "pages/work-orders/detail",
+    "needs_clarification": true,
+    "message_present": true
+  },
+  "requests": [
+    {
+      "path": "/work-orders/12",
+      "method": "GET",
+      "status": 200,
+      "request_id_hash": "5a54833d917fadd3",
+      "source": "API completion for actual page wx.request"
+    }
+  ],
+  "business_write": false,
+  "protected_order_replayed_or_modified": false,
+  "private_phone_persisted_in_public_evidence": false
+}

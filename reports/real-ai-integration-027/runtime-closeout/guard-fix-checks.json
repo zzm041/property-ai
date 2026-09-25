@@ -1,0 +1,25 @@
+{
+  "recorded_at": "2026-09-25T19:31:12+08:00",
+  "scope": "deterministic checks only; no page, business, database, queue, or model request",
+  "head": "fe90913a6f3918bca33b2f100137a786a67c4f86",
+  "checks": {
+    "python_compile": "PASS",
+    "node_check": "PASS",
+    "git_diff_check": "PASS",
+    "completed_run_refusal": {
+      "status": "PASS",
+      "observed_error": "RuntimeError: public prerequisite evidence already exists; do not duplicate objects"
+    }
+  },
+  "sha256": {
+    "prepare-incident-closeout.py": "cddb046c4279ef21788ee7b43829b7a6e70d5d8b4e807f604dced0325697a7fe",
+    "closeout-runtime.py": "1179569f4e75cbb762ec7b6fd4c38f9309d9cafb76612679781b3b960289e64a",
+    "source-runtime-binding.json": "ce060fd99a58111a8a5786a5dfc35accec346f3ed1b03d6909b532376fa08311"
+  },
+  "business_effects": {
+    "new_work_orders": 0,
+    "page_actions": 0,
+    "model_calls": 0,
+    "queue_messages": 0
+  }
+}

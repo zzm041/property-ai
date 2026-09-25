@@ -1,0 +1,157 @@
+{
+  "task": "Production V1 closeout Incident disposition runtime",
+  "captured_at": "2026-09-25T11:15:38.506881+00:00",
+  "source_commit": "fe90913a6f3918bca33b2f100137a786a67c4f86",
+  "environment": {
+    "database": "AUTH001@0012",
+    "api": "127.0.0.1:8083",
+    "page": "WeChat DevTools",
+    "real_qwen_calls": 0
+  },
+  "incident": {
+    "id": 1,
+    "status": "MONITORING",
+    "work_order_count": 5,
+    "member_ids": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ]
+  },
+  "audit": {
+    "action": "INCIDENT_UPDATED",
+    "actor_present": true,
+    "details": {
+      "reason": "已核实公共区域风险并进入持续监控",
+      "category": "ELECTRICAL",
+      "to_status": "MONITORING",
+      "from_status": "OPEN",
+      "incident_id": 1,
+      "work_order_count": 5
+    },
+    "request_id_present": true
+  },
+  "member_after": [
+    {
+      "work_order_id": 42,
+      "status": "PENDING_ASSIGNMENT",
+      "version": 2,
+      "current_assignment_id": null,
+      "assignment_count": 0,
+      "receipt_count": 0,
+      "feedback_count": 0
+    },
+    {
+      "work_order_id": 43,
+      "status": "PENDING_ASSIGNMENT",
+      "version": 2,
+      "current_assignment_id": null,
+      "assignment_count": 0,
+      "receipt_count": 0,
+      "feedback_count": 0
+    },
+    {
+      "work_order_id": 44,
+      "status": "PENDING_ASSIGNMENT",
+      "version": 2,
+      "current_assignment_id": null,
+      "assignment_count": 0,
+      "receipt_count": 0,
+      "feedback_count": 0
+    },
+    {
+      "work_order_id": 45,
+      "status": "PENDING_ASSIGNMENT",
+      "version": 2,
+      "current_assignment_id": null,
+      "assignment_count": 0,
+      "receipt_count": 0,
+      "feedback_count": 0
+    },
+    {
+      "work_order_id": 46,
+      "status": "PENDING_ASSIGNMENT",
+      "version": 2,
+      "current_assignment_id": null,
+      "assignment_count": 0,
+      "receipt_count": 0,
+      "feedback_count": 0
+    }
+  ],
+  "member_business_records_unchanged": true,
+  "protected_work_orders_unchanged": true,
+  "task_intents": [
+    {
+      "id": 43,
+      "operation": "ANALYZE_WORK_ORDER",
+      "status": "SUCCEEDED",
+      "execution_attempt": 1
+    },
+    {
+      "id": 45,
+      "operation": "ANALYZE_WORK_ORDER",
+      "status": "SUCCEEDED",
+      "execution_attempt": 1
+    },
+    {
+      "id": 47,
+      "operation": "ANALYZE_WORK_ORDER",
+      "status": "SUCCEEDED",
+      "execution_attempt": 1
+    },
+    {
+      "id": 49,
+      "operation": "ANALYZE_WORK_ORDER",
+      "status": "SUCCEEDED",
+      "execution_attempt": 1
+    },
+    {
+      "id": 51,
+      "operation": "ANALYZE_WORK_ORDER",
+      "status": "SUCCEEDED",
+      "execution_attempt": 1
+    }
+  ],
+  "api_checks": [
+    {
+      "label": "manager-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "status": 200
+    },
+    {
+      "label": "manager-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "status": 200
+    },
+    {
+      "label": "manager-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "status": 200
+    },
+    {
+      "label": "manager-verify",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "status": 200
+    },
+    {
+      "label": "current-detail",
+      "method": "GET",
+      "path": "/supervisor/incidents/1",
+      "status": 200
+    },
+    {
+      "label": "stale-write",
+      "method": "POST",
+      "path": "/supervisor/incidents/1/status",
+      "status": 409
+    }
+  ],
+  "stale_expected_updated_at": 409,
+  "private_contact_or_tokens_in_public_evidence": false
+}

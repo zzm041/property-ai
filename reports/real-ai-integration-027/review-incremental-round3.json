@@ -1,0 +1,82 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-INCREMENTAL",
+  "round": 3,
+  "mode": "INDEPENDENT_READ_ONLY",
+  "reviewed_head": "fe90913a6f3918bca33b2f100137a786a67c4f86",
+  "verdict": "NEEDS_CHANGES",
+  "findings": [
+    {
+      "id": "027-INC-R3-01",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "severity": "P2",
+      "location": "D:/property-ai/reports/real-ai-integration-027/prepare-incident-closeout.py:152",
+      "trigger": "首次创建工单已提交，但在收到响应或首次 _save_private(state) 完成前发生中断，随后重新运行准备脚本。",
+      "impact": "新 run_id 和幂等键在首次业务写入前未持久化。重启时若 context.json 尚不存在，会生成另一个 run_id，将已经创建的首单排除在五对象计数之外，可能突破本轮对象上限。",
+      "evidence": [
+        "152–156 行在内存中生成新 run_id。",
+        "167–175 行先发送创建工单请求。",
+        "179 行才首次保存带 run_id 的私有状态。",
+        "PUBLIC.exists() 仅能保护已完成准备的运行，不能保护上述中断窗口。"
+      ],
+      "recommendation": "在任何业务写入前独占持久化 run_id、固定对象上限及每个创建槽位的幂等标识。恢复时使用相同标识，并先调和未确认的创建/任务结果，不能直接换 run 或增加槽位。保留现有成功证据，无需重建对象、重跑页面或恢复历史任务。"
+    }
+  ],
+  "checked": [
+    {
+      "area": "源码及运行绑定",
+      "result": "读取实际 API/Worker 启动日志，两者 source_hash 均为 dadb2ec0b37145609e09ba27750c14ea94021adda52de2cda4f43792c138b465。固定目录 source-fe90913 的 201 个 backend/app 和 scripts/ops 文件，经 CRLF→LF 后 Git blob 均匹配 fe90913，无内容差异。",
+      "boundary": "启动器打印哈希但没有期望哈希强断言；当前绑定已实际核对，不能据此保证将来未经核对的启动也同源。"
+    },
+    {
+      "area": "低置信页面",
+      "result": "实际查看 01-low-confidence-clarification.png：工单 12、待分析、澄清提示、历史电话未采集。GET /work-orders/12 的完成记录为 200，与 DB 中工单 12/version 1、analysis 12/LOW_CONFIDENCE 对应；Assignment 和 Incident link 为零。",
+      "boundary": "本次是历史低置信结果的只读展示验证，不是重新分析、模型质量或新低置信派单链运行验证。未看到工单 12 重放或改写。"
+    },
+    {
+      "area": "Incident 前置",
+      "result": "五个新工单 42–46 经正常认证后的业务 API 创建；精确 ANALYZE intent 43/45/47/49/51 通过 execute_intent 和 Development Provider 同步执行，均 SUCCEEDED、execution_attempt=1，形成 Incident 1。",
+      "boundary": "这是明确标注的同步持久任务服务准备，不是独立 Worker 跨进程执行或真实 Qwen AUTO 证明。"
+    },
+    {
+      "area": "Incident 页面和负向路径",
+      "result": "实际查看 02-incident-monitoring.png：事件 1 为监控中、五张关联工单，页面显示状态更新成功。脚本通过正常导航、输入原因和点击按钮提交；实际 API 完成记录包含 POST /supervisor/incidents/1/status 200。空原因 422、OPEN 直接 CLOSED 409、住户读取/修改 403、旧 expected_updated_at 409 均有保存记录。"
+    },
+    {
+      "area": "审计及成员一致性",
+      "result": "数据库证据中 Incident 1 为 MONITORING；审计为 OPEN→MONITORING，原因与页面输入相同，actor/request_id 存在。五成员状态、版本、当前 Assignment 和 Assignment 数量前后相同，最终 receipt/feedback 均为零。",
+      "boundary": "受保护历史对象一致性仅覆盖脚本比较的 status/version/current_assignment_id/assignment_count，且基线在准备完成后取得；不扩大为整个准备窗口所有历史字段的全量指纹证明。"
+    },
+    {
+      "area": "权限和隐私边界",
+      "result": "已读四份运行/取证脚本和五份 JSON；两张截图及公开 JSON 未见完整手机号、认证 token 或密钥。11436 适配器源码明确拒绝非 rag-answer-v2 的工单推理；当前材料没有真实 AUTO 结果。",
+      "boundary": "未重新核对适配器进程和本轮前后完整模型账本，因此零新增模型调用属于保存记录与调用路径支持的范围，不是本审查独立运行监测。"
+    },
+    {
+      "area": "跟踪状态",
+      "result": "当前 closeout/handoff/matrix 仍保留 Incident runtime pending，尚未因本次证据提前升为完整 PASS；R3 NOT_READY 和 Production 缺口仍保留。"
+    }
+  ],
+  "evidence_paths": [
+    "D:/property-ai/reports/real-ai-integration-027/closeout-runtime.py",
+    "D:/property-ai/reports/real-ai-integration-027/prepare-incident-closeout.py",
+    "D:/property-ai/reports/real-ai-integration-027/verify-incident-closeout.py",
+    "D:/property-ai/reports/real-ai-integration-027/run-closeout-pages.js",
+    "D:/property-ai/reports/real-ai-integration-027/runtime-closeout/low-confidence-page.json",
+    "D:/property-ai/reports/real-ai-integration-027/runtime-closeout/low-confidence-db.json",
+    "D:/property-ai/reports/real-ai-integration-027/runtime-closeout/incident-prerequisite.json",
+    "D:/property-ai/reports/real-ai-integration-027/runtime-closeout/incident-page.json",
+    "D:/property-ai/reports/real-ai-integration-027/runtime-closeout/incident-database.json",
+    "D:/property-ai/reports/real-ai-integration-027/runtime-closeout/01-low-confidence-clarification.png",
+    "D:/property-ai/reports/real-ai-integration-027/runtime-closeout/02-incident-monitoring.png",
+    "D:/property-ai/tmp/production-v1-closeout/api-02.stdout.log",
+    "D:/property-ai/tmp/production-v1-closeout/worker-02.stdout.log"
+  ],
+  "unverified": [
+    "审查者未运行测试、页面、模型、业务请求、数据库或队列检查。",
+    "本次只运行 Incident OPEN→MONITORING；RESOLVED/CLOSED/重开不属于本次实际页面结果。",
+    "低置信补充后产生新分析版本属于既有源码/测试证据，本次未以工单 12 执行。",
+    "真实 Qwen、图片质量、真实 AUTO、完整 R3、整体 027 和 Production 发布仍非 PASS。",
+    "没有新增模型调用、Migration、共享环境变更或正式发布授权。"
+  ],
+  "next_action": "仅修复准备脚本首次写入前的持久预约与恢复守卫，并做无业务副作用的针对性检查；沿用本审查上下文窄复核。不要重建五张工单、重跑截图或重放工单 12。通过后仅升级已证明的澄清展示和 Incident OPEN→MONITORING scoped runtime，并保留所有未验证边界。"
+}

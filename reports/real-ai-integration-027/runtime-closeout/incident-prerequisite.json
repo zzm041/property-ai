@@ -1,0 +1,223 @@
+{
+  "task": "Production V1 closeout Incident disposition prerequisite",
+  "captured_at": "2026-09-25T11:12:49.906071+00:00",
+  "source_commit": "fe90913a6f3918bca33b2f100137a786a67c4f86",
+  "run_id": "incident-closeout-d020aa7150",
+  "environment": {
+    "api": "127.0.0.1:8083",
+    "database": "AUTH001@0012",
+    "provider": "DEVELOPMENT deterministic fixture only",
+    "real_qwen_calls": 0,
+    "queue_messages_sent": 0
+  },
+  "objects": {
+    "work_order_ids": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "intent_ids": [
+      43,
+      45,
+      47,
+      49,
+      51
+    ],
+    "incident_id": 1,
+    "incident_status": "OPEN",
+    "member_count": 5
+  },
+  "member_before": [
+    {
+      "work_order_id": 42,
+      "status": "PENDING_ASSIGNMENT",
+      "version": 2,
+      "current_assignment_id": null,
+      "assignment_count": 0
+    },
+    {
+      "work_order_id": 43,
+      "status": "PENDING_ASSIGNMENT",
+      "version": 2,
+      "current_assignment_id": null,
+      "assignment_count": 0
+    },
+    {
+      "work_order_id": 44,
+      "status": "PENDING_ASSIGNMENT",
+      "version": 2,
+      "current_assignment_id": null,
+      "assignment_count": 0
+    },
+    {
+      "work_order_id": 45,
+      "status": "PENDING_ASSIGNMENT",
+      "version": 2,
+      "current_assignment_id": null,
+      "assignment_count": 0
+    },
+    {
+      "work_order_id": 46,
+      "status": "PENDING_ASSIGNMENT",
+      "version": 2,
+      "current_assignment_id": null,
+      "assignment_count": 0
+    }
+  ],
+  "protected_work_orders_snapshot": [
+    {
+      "work_order_id": 12,
+      "status": "PENDING_ANALYSIS",
+      "version": 1,
+      "current_assignment_id": null,
+      "assignment_count": 0
+    },
+    {
+      "work_order_id": 24,
+      "status": "PENDING_ANALYSIS",
+      "version": 1,
+      "current_assignment_id": null,
+      "assignment_count": 0
+    },
+    {
+      "work_order_id": 25,
+      "status": "PENDING_ANALYSIS",
+      "version": 1,
+      "current_assignment_id": null,
+      "assignment_count": 0
+    },
+    {
+      "work_order_id": 30,
+      "status": "PENDING_ANALYSIS",
+      "version": 1,
+      "current_assignment_id": null,
+      "assignment_count": 0
+    },
+    {
+      "work_order_id": 34,
+      "status": "PENDING_ANALYSIS",
+      "version": 1,
+      "current_assignment_id": null,
+      "assignment_count": 0
+    }
+  ],
+  "api_checks": [
+    {
+      "label": "ready",
+      "method": "GET",
+      "path": "/readyz",
+      "status": 200
+    },
+    {
+      "label": "resident-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "status": 200
+    },
+    {
+      "label": "resident-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "status": 200
+    },
+    {
+      "label": "resident-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "status": 200
+    },
+    {
+      "label": "resident-verify",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "status": 200
+    },
+    {
+      "label": "manager-challenge",
+      "method": "POST",
+      "path": "/auth/challenge",
+      "status": 200
+    },
+    {
+      "label": "manager-send",
+      "method": "POST",
+      "path": "/auth/sms/send",
+      "status": 200
+    },
+    {
+      "label": "manager-inbox",
+      "method": "POST",
+      "path": "/auth/sms/test-inbox",
+      "status": 200
+    },
+    {
+      "label": "manager-verify",
+      "method": "POST",
+      "path": "/auth/sms/login",
+      "status": 200
+    },
+    {
+      "label": "create-1",
+      "method": "POST",
+      "path": "/work-orders",
+      "status": 200
+    },
+    {
+      "label": "create-2",
+      "method": "POST",
+      "path": "/work-orders",
+      "status": 200
+    },
+    {
+      "label": "create-3",
+      "method": "POST",
+      "path": "/work-orders",
+      "status": 200
+    },
+    {
+      "label": "create-4",
+      "method": "POST",
+      "path": "/work-orders",
+      "status": 200
+    },
+    {
+      "label": "create-5",
+      "method": "POST",
+      "path": "/work-orders",
+      "status": 200
+    },
+    {
+      "label": "blank-reason",
+      "method": "POST",
+      "path": "/supervisor/incidents/1/status",
+      "status": 422
+    },
+    {
+      "label": "illegal-open-close",
+      "method": "POST",
+      "path": "/supervisor/incidents/1/status",
+      "status": 409
+    },
+    {
+      "label": "resident-detail-denied",
+      "method": "GET",
+      "path": "/supervisor/incidents/1",
+      "status": 403
+    },
+    {
+      "label": "resident-update-denied",
+      "method": "POST",
+      "path": "/supervisor/incidents/1/status",
+      "status": 403
+    }
+  ],
+  "negative_results": {
+    "blank_reason": 422,
+    "illegal_open_to_closed": 409,
+    "resident_detail": 403,
+    "resident_update": 403
+  },
+  "private_contact_or_tokens_in_public_evidence": false
+}

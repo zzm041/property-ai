@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-09-25T19:14:00+08:00",
+  "source_commit": "fe90913a6f3918bca33b2f100137a786a67c4f86",
+  "source_hash": "dadb2ec0b37145609e09ba27750c14ea94021adda52de2cda4f43792c138b465",
+  "source_snapshot": "tmp/production-v1-closeout/source-fe90913",
+  "api": {
+    "pid_at_capture": 40452,
+    "listener": "127.0.0.1:8083",
+    "startup_record": "tmp/production-v1-closeout/api-02.stdout.log",
+    "health": "ready; mysql/redis/rabbitmq/milvus up"
+  },
+  "worker": {
+    "pid_at_capture": 31884,
+    "queue": "property_ai.auth001",
+    "vhost": "property_ai_auth001",
+    "startup_record": "tmp/production-v1-closeout/worker-02.stdout.log"
+  },
+  "database": "127.0.0.1:3307/property_ai_auth001_test@20260925_0012_task_intents",
+  "queue_after_runtime_checks": {
+    "property_ai.auth001": {"ready": 0, "unacked": 0, "consumers": 1},
+    "property_ai.auth001.dlq": {"ready": 7, "unacked": 0, "consumers": 0},
+    "historical_dlq_read_replayed_or_cleared": false
+  },
+  "provider_boundary": {
+    "adapter_listener_pid_at_capture": 6876,
+    "adapter": "existing R2-only 11436 fixed adapter",
+    "work_order_qwen_protocol_enabled": false,
+    "real_auto_switch_performed": false,
+    "incident_prerequisite_provider": "Development deterministic provider",
+    "real_qwen_calls_for_closeout_runtime": 0
+  },
+  "first_launch_attempt": {
+    "result": "failed before service startup because the frozen helper resolved a private local path inside the source snapshot",
+    "business_requests_sent": 0,
+    "resolution": "kept the frozen helper code and rebound only its local private-path constants to the actual repository; credentials were not copied to the snapshot or public evidence"
+  },
+  "boundary": "This binds one local AUTH001 candidate runtime and the scoped page/API/DB checks. It is not a real-AUTO, R3-quality, production-supervision, scale, target-deployment, or formal-release acceptance."
+}

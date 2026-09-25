@@ -1,0 +1,38 @@
+{
+  "source_commit": "fe90913a6f3918bca33b2f100137a786a67c4f86",
+  "interaction": "WeChat DevTools actual page navigation, textarea input, button tap, and origin wx.request",
+  "object": {
+    "incident_id": 1,
+    "from_status": "OPEN",
+    "to_status": "MONITORING"
+  },
+  "page": {
+    "path": "pages/supervisor/incidents",
+    "can_manage": true,
+    "notice_present": true
+  },
+  "requests": [
+    {
+      "path": "/supervisor/incidents",
+      "method": "GET",
+      "status": 200,
+      "request_id_hash": "d8f4f58b96305dad",
+      "source": "API completion for actual page wx.request"
+    },
+    {
+      "path": "/supervisor/incidents/1",
+      "method": "GET",
+      "status": 200,
+      "request_id_hash": "03fde340497cf97a",
+      "source": "API completion for actual page wx.request"
+    },
+    {
+      "path": "/supervisor/incidents/1/status",
+      "method": "POST",
+      "status": 200,
+      "request_id_hash": "9b94ce9d23a094b4",
+      "source": "API completion for actual page wx.request"
+    }
+  ],
+  "private_phone_or_token_persisted_in_public_evidence": false
+}

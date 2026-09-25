@@ -1,0 +1,33 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-INCREMENTAL",
+  "round": 4,
+  "record_type": "READ_ONLY_HASH_BINDING_ADDENDUM",
+  "verdict": "PASS",
+  "finding": {
+    "id": "027-INC-R3-01",
+    "status": "CLOSED"
+  },
+  "reviewed_file": "D:/property-ai/reports/real-ai-integration-027/prepare-incident-closeout.py",
+  "reviewed_sha256": "cddb046c4279ef21788ee7b43829b7a6e70d5d8b4e807f604dced0325697a7fe",
+  "non_regressive": true,
+  "checked": [
+    "O_CREAT|O_EXCL 锁覆盖整个准备流程；并发启动被拒绝，硬退出遗留锁不被自动绕过。",
+    "正常退出或受控异常由取得锁的执行路径释放锁。",
+    "私有状态先写同目录 .json.next，再通过 os.replace 原子替换；首次 run 标识和槽位预约仍在对应 API 调用之前保存。",
+    "五对象上限、相同幂等键恢复、未知任务状态阻断及已完成运行拒绝逻辑保留。",
+    "实际文件哈希匹配 guard-fix-checks.json；原 round4 审查文件保留旧哈希，本附注绑定最终版本。"
+  ],
+  "new_blockers": [],
+  "evidence_paths": [
+    "D:/property-ai/reports/real-ai-integration-027/prepare-incident-closeout.py",
+    "D:/property-ai/reports/real-ai-integration-027/review-incremental-round4.json",
+    "D:/property-ai/reports/real-ai-integration-027/runtime-closeout/guard-fix-checks.json"
+  ],
+  "unverified": [
+    "已读取实施方保存的语法检查和完成运行拒绝结果；未独立执行检查或故障演练。",
+    "未验证操作系统崩溃或断电下的文件持久性。",
+    "没有运行业务、页面、模型、数据库或队列操作。"
+  ],
+  "unchanged_scope_boundary": "原 round4 的限定 PASS 不变；不扩大为 R3、真实 AUTO、整体 027 或 Production PASS，不授权重跑现有业务或追加模型调用。",
+  "next_action": "追加保存本附注，使用最终哈希绑定交付；无需重复业务取证。"
+}
