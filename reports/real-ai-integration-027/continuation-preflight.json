@@ -1,0 +1,39 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "checkpoint": "R2_CONTINUATION_APPROVED_BUT_NOT_STARTED",
+  "head": "f0c38abb4fe4664de267ab05bbf433e5ae3a689c",
+  "run_id": "ai027-b439223fda",
+  "old_reservations": 29,
+  "old_counts": {"embedding":12,"reranker":8,"qwen":8,"asr":1},
+  "reservation_gate": "BLOCKED_PREVIOUS_REQUEST_COMPLETION_UNKNOWN_NO_REPLAY",
+  "blocking_record": {
+    "id": "call-022",
+    "kind": "asr",
+    "status": "FAILED",
+    "reason": "RESOURCE_FLOOR",
+    "owned_exit_confirmed": "ABSENT",
+    "historical_child_pid": 41248,
+    "record_modified": false
+  },
+  "process_identity": {
+    "recorded_launcher_pid": 38104,
+    "recorded_launcher_created": "2026-09-25T13:08:39.463441+08:00",
+    "actual_server_pid": 30672,
+    "actual_server_created": "2026-09-25T13:08:39.485329+08:00",
+    "relationship": "actual server is the exact venv launcher's child",
+    "listener": "127.0.0.1:11436 owned by 30672",
+    "request_children": 0
+  },
+  "adapter_source": {
+    "review": "review-round3.json PASS_SCOPED_SOFTWARE_FIX",
+    "planned_copy": "tmp/real-ai-integration-027/runtime/model-adapter-request-job",
+    "loaded": false,
+    "reason": "Execution safety approval rejected stopping the child listener because context records the launcher PID. Exact child termination requires owner confirmation after this relationship is disclosed."
+  },
+  "continuation_budget": {
+    "window_started": false,
+    "new_calls": 0,
+    "maximum_if_unblocked": {"seconds":900,"embedding":6,"reranker":6,"qwen":6,"asr":1}
+  },
+  "unchanged": ["API 8083", "AUTH001 Worker", "R3 protocol and NOT_READY", "database and collection", "old evidence and call-022", "project.config.json"]
+}
