@@ -73,6 +73,7 @@ from app.model.work_order import (
 from app.provider.factory import build_storage_provider
 from app.provider.storage import StorageProvider
 from app.repository.employee import EmployeeRepository
+from app.repository.ai import AiRepository
 from app.repository.identity import IdentityRepository
 from app.repository.resident import ResidentBindingRepository
 from app.repository.work_order import WorkOrderRepository
@@ -182,6 +183,7 @@ class WorkOrderService:
         employee_repository: EmployeeRepository | None = None,
         resident_repository: ResidentBindingRepository | None = None,
         audit_service: AuditService | None = None,
+        ai_repository: AiRepository | None = None,
         principal_loader: Callable[[int], Principal] | None = None,
         storage: StorageProvider | None = None,
         settings: Settings | None = None,
@@ -192,6 +194,7 @@ class WorkOrderService:
         self._employees = employee_repository or EmployeeRepository(session)
         self._residents = resident_repository or ResidentBindingRepository(session)
         self._audit_service = audit_service or AuditService(session)
+        self._analysis = ai_repository or AiRepository(session)
         self._principal_loader = principal_loader or AuthService(
             session,
             IdentityRepository(session),
@@ -652,6 +655,9 @@ class WorkOrderService:
         dict[str, object],
     ]:
         record = self.get_work_order(actor=actor, work_order_id=work_order_id)
+        analysis = self._analysis.get_current_analysis(record.id)
+        display_context = self._repository.get_display_context(record)
+        display_context["analysis_status"] = None if analysis is None else analysis.status
         return (
             record,
             self._repository.get_content(record.id),
@@ -661,7 +667,7 @@ class WorkOrderService:
             self._repository.list_receipts(record.id),
             self._repository.list_feedbacks(record.id),
             self._repository.list_logs(record.id),
-            self._repository.get_display_context(record),
+            display_context,
         )
 
     def list_supervisor_queue(

@@ -108,10 +108,20 @@ def work_order_display_data(
                     visit(item)
 
     visit(detail.model_dump(mode="json", exclude={"display"}))
+    needs_clarification = (
+        context.get("analysis_status") == "LOW_CONFIDENCE"
+        and detail.work_order.status == "PENDING_ANALYSIS"
+    )
     return WorkOrderDisplayData(
         property_timezone=timezone_name,
         assignee_names=context.get("assignee_names") or {},
         timestamp_labels=labels,
+        analysis_status=context.get("analysis_status"),
+        analysis_message=(
+            "现有信息不足，系统暂不派单；请补充可观察的现场情况后再次分析。"
+            if needs_clarification
+            else None
+        ),
     )
 
 

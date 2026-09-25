@@ -1,0 +1,68 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-R3POLICY",
+  "base_sha": "29f2302ba0bde3a6cc799409fcb58c6e308cb4cb",
+  "status": "NOT_READY",
+  "business_switch_allowed": false,
+  "business_switch_executed": false,
+  "model": "qwen3.5:4b",
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "prompt_candidate_changed": false,
+  "fixed_set": {
+    "planned_requests": 32,
+    "reused_exact_requests": 2,
+    "new_requests": 2,
+    "completed_fixed_set": false,
+    "images_executed": 0
+  },
+  "request_results": [
+    {
+      "number": 1,
+      "case": "GOLD-007",
+      "source": "exact candidate-02 response reuse",
+      "model_call_this_run": false,
+      "result": "contract-valid; pending whole-set quality decision"
+    },
+    {
+      "number": 2,
+      "case": "GOLD-011",
+      "source": "exact candidate-02 response reuse",
+      "model_call_this_run": false,
+      "result": "valid low-confidence clarification under the newly approved server policy; raw other/maintenance retained but ignored for dispatch"
+    },
+    {
+      "number": 3,
+      "case": "GOLD-012",
+      "model_call_this_run": true,
+      "result": "contract-valid response received; pending whole-set quality decision"
+    },
+    {
+      "number": 4,
+      "case": "GOLD-013",
+      "model_call_this_run": true,
+      "result": "critical provider contract failure: category noise is outside the frozen category enum"
+    }
+  ],
+  "stop": {
+    "reason": "RAW_OR_PROVIDER_CONTRACT_FAILURE",
+    "request_number": 4,
+    "why_policy_does_not_allow_it": "Low confidence can suppress otherwise legal routing fields, but an unknown enum remains invalid and cannot be accepted as clarification.",
+    "automatic_retry": false,
+    "further_candidate_created": false
+  },
+  "collector_history": {
+    "first_attempt": "failed before any new reservation because the inherited collector expected reserved_unix on exact-reuse records",
+    "resume_scope": "request-number and new-window accounting only; frozen prompt/model/cases unchanged",
+    "resume_result": "two new responses, then mandatory structural stop"
+  },
+  "evidence_sha256": {
+    "frozen_json": "fbc16048528ef40d59ea2f341cff0fa346647fad0d0cd77293fbdc8ff36ea3c3",
+    "reuse_json": "9b8be6a4eee76ee64c9c83fb63741b0760856361731e8e344bb2b213eaafd632",
+    "collector_resume_json": "798e4b1b7e3da2d31b2530a2cff2a43e9ff45e1dcb0743fa6715a6b8ad37a373",
+    "request_03_response": "ad11454b58fe29c11349c783b02c22bde0b07190a5b2d7dc706a676476b1265f",
+    "request_04_response": "1a69fe02b15a28a36c6332d5dd24decbd1e4f2d877f0cc5d21c99c80ec4d3c5d",
+    "request_04_supervision": "175b574f5643e08177140c53fd7f812a59bb84501739a5be469d73162968bbd5",
+    "stop_json": "eeea54226363d39ce738978d4c8537132e8100ec78ff3878872320fb58ee80b7"
+  },
+  "minimum_next_decision": "Do not switch AUTH001 to this candidate. Choose either a separately approved frozen normalization policy for an explicitly enumerated observable category, or a different already-permitted model candidate; do not silently coerce unknown enums or spend more calls under this run."
+}

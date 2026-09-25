@@ -234,6 +234,88 @@ def test_staff_detail_allows_current_participant_but_not_summary() -> None:
     service._llm.structured_completion.assert_not_called()
 
 
+def test_manager_resolves_and_reopens_without_mutating_member_work_orders() -> None:
+    manager = _manager()
+    service = _service(principal_loader=lambda _user_id: manager)
+    incident = _incident()
+    service._ai.get_incident_for_update.return_value = incident
+
+    resolved = service.update_status(
+        actor=manager,
+        incident_id=incident.id,
+        target_status="RESOLVED",
+        reason="现场公共线路已恢复，继续保留各工单回执",
+        expected_updated_at=NOW,
+        request_id="incident-resolve-501",
+    )
+
+    assert resolved.status == "RESOLVED"
+    service._audit.append.assert_called_once()
+    details = service._audit.append.call_args.kwargs["details"]
+    assert details["from_status"] == "OPEN"
+    assert details["to_status"] == "RESOLVED"
+    assert details["reason"] == "现场公共线路已恢复，继续保留各工单回执"
+    assert not any("work_order" in str(call).lower() for call in service._work_orders.mock_calls)
+
+    service._audit.reset_mock()
+    reopened = service.update_status(
+        actor=manager,
+        incident_id=incident.id,
+        target_status="OPEN",
+        reason="住户反馈公共故障再次出现",
+        expected_updated_at=NOW,
+        request_id="incident-reopen-501",
+    )
+    assert reopened.status == "OPEN"
+    assert service._audit.append.call_args.kwargs["details"]["from_status"] == "RESOLVED"
+
+
+def test_incident_status_update_rejects_staff_stale_and_illegal_transition() -> None:
+    staff = _staff()
+    service = _service(principal_loader=lambda _user_id: staff)
+    incident = _incident()
+    service._ai.get_incident_for_update.return_value = incident
+    with pytest.raises(AppError) as forbidden:
+        service.update_status(
+            actor=staff,
+            incident_id=incident.id,
+            target_status="RESOLVED",
+            reason="无权限尝试",
+            expected_updated_at=NOW,
+            request_id="incident-forbidden",
+        )
+    assert forbidden.value.code == IamErrorCode.FORBIDDEN
+    assert incident.status == "OPEN"
+
+    manager = _manager()
+    service = _service(principal_loader=lambda _user_id: manager)
+    incident = _incident()
+    service._ai.get_incident_for_update.return_value = incident
+    with pytest.raises(AppError) as stale:
+        service.update_status(
+            actor=manager,
+            incident_id=incident.id,
+            target_status="RESOLVED",
+            reason="基于旧页面提交",
+            expected_updated_at=NOW - timedelta(seconds=1),
+            request_id="incident-stale",
+        )
+    assert stale.value.code == IncidentErrorCode.CONFLICT
+    assert incident.status == "OPEN"
+
+    with pytest.raises(AppError) as illegal:
+        service.update_status(
+            actor=manager,
+            incident_id=incident.id,
+            target_status="OPEN",
+            reason="重复状态",
+            expected_updated_at=NOW,
+            request_id="incident-noop",
+        )
+    assert illegal.value.code == IncidentErrorCode.CONFLICT
+    service._audit.append.assert_not_called()
+
+
 def test_participant_repository_query_filters_current_assignment_before_limit() -> None:
     session = MagicMock()
     session.scalars.return_value.all.return_value = ()
@@ -350,13 +432,18 @@ def test_incident_page_wires_scoped_list_detail_summary_and_draft() -> None:
     assert 'scopeAllows(scope, "incident:manage", property)' in source
     assert "api.incident(id)" in source
     assert "api.summarizeIncident(incidentId)" in source
+    assert "updateIncidentStatus(selected.id" in source
+    assert "expected_updated_at: selected.updated_at" in source
     assert "createAnnouncement" in source
     assert "next_cursor" in source
     assert "小区 ID" not in template
     assert "生成 / 刷新 AI 运营摘要" in template
     assert "待人工审核的公告草稿" in template
     assert "不会自动改变事件状态或自动发布" in template
+    assert "处置或重开原因（必填）" in template
+    assert "不会批量关闭住户工单或覆盖回执" in template
     assert "/supervisor/incidents/${id}" in api
+    assert "/supervisor/incidents/${id}/status" in api
     assert "&tenant_id=${tenantId}" in api
     assert "事件管理" in home
     assert "我参与的事件" in home

@@ -1,0 +1,79 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-873\",\"object\":\"chat.completion\",\"created\":1790330804,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"water_supply\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"不出水\\\",\\n      \\\"subject\\\": \\\"水龙头\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"另一人说它完全不出水\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"滴渗水\\\",\\n      \\\"subject\\\": \\\"水龙头\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"一人说水正不断流出\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"medium\\\",\\n  \\\"priority\\\": \\\"p2\\\",\\n  \\\"summary\\\": \\\"同一厨房水龙头存在矛盾现象：有人报告水正不断流出，有人报告完全不出水，双方均称刚检查过但无法判断谁正确。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.85\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1625,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens\":204,\"total_tokens\":1829}}\n",
+  "raw_response_sha256": "b1e7aa1387588b6479fb9b964a13bca5a5387c782af41f6497a2fae49f8d900e",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-012",
+    "tags": [
+      "同刻事实冲突"
+    ],
+    "report": "关于此刻同一个厨房水龙头，一人说水正不断流出，另一人说它完全不出水；两人都说刚检查过，我无法判断谁说得对。",
+    "history": [],
+    "facts": [
+      "相反描述未核实"
+    ],
+    "forbidden": [
+      "任选一方确定",
+      "自行消除矛盾"
+    ],
+    "accept": [
+      [
+        "other",
+        "other",
+        [
+          "none",
+          "other"
+        ]
+      ]
+    ],
+    "manual": "LOW"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "water_supply",
+      "observations": [
+        {
+          "label": "不出水",
+          "subject": "水龙头",
+          "source": "report",
+          "quote": "另一人说它完全不出水"
+        },
+        {
+          "label": "滴渗水",
+          "subject": "水龙头",
+          "source": "report",
+          "quote": "一人说水正不断流出"
+        }
+      ],
+      "severity": "medium",
+      "priority": "p2",
+      "summary": "同一厨房水龙头存在矛盾现象：有人报告水正不断流出，有人报告完全不出水，双方均称刚检查过但无法判断谁正确。",
+      "risk": "none",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.85
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 10:06:39.388816+00:00",
+      "latency_ms": 4935,
+      "request_id": "supplement-GOLD-012",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1829
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "29f2302ba0bde3a6cc799409fcb58c6e308cb4cb"
+}

@@ -1059,6 +1059,10 @@ class AnalysisService:
         building_id: int | None,
     ) -> None:
         self._ai.delete_recommendations(analysis.id)
+        # Low confidence is a valid clarification decision, not a dispatch
+        # input. Preserve raw analysis/audit fields without selecting people.
+        if mapped.low_confidence:
+            return
         now = self._clock()
         property_record = self._work_orders.get_property(record.property_id)
         if property_record is None:
@@ -1267,8 +1271,20 @@ class AnalysisService:
                 "status": analysis.status,
                 "confidence": mapped.confidence,
                 "dispatch_contract_version": mapped.dispatch_contract_version,
+                "decision_code": (
+                    "CLARIFICATION_REQUIRED"
+                    if mapped.low_confidence
+                    else "DISPATCH_FIELDS_ACCEPTED"
+                ),
+                "dispatch_fields_applied": mapped.dispatch_fields_applied,
+                "raw_category": mapped.raw_category or mapped.category.value,
+                "effective_category": (
+                    None if mapped.low_confidence else mapped.category.value
+                ),
                 "raw_required_skill": mapped.raw_required_skill or mapped.required_skill,
-                "effective_required_skill": mapped.required_skill,
+                "effective_required_skill": (
+                    None if mapped.low_confidence else mapped.required_skill
+                ),
                 "skill_mapping_applied": mapped.skill_mapping_applied,
                 **({'event_evidence':mapped.event_trace} if mapped.event_trace is not None else {}),
             },

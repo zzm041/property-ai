@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-873\",\"object\":\"chat.completion\",\"created\":1790330804,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"water_supply\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"不出水\\\",\\n      \\\"subject\\\": \\\"水龙头\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"另一人说它完全不出水\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"滴渗水\\\",\\n      \\\"subject\\\": \\\"水龙头\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"一人说水正不断流出\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"medium\\\",\\n  \\\"priority\\\": \\\"p2\\\",\\n  \\\"summary\\\": \\\"同一厨房水龙头存在矛盾现象：有人报告水正不断流出，有人报告完全不出水，双方均称刚检查过但无法判断谁正确。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.85\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1625,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens\":204,\"total_tokens\":1829}}\n",
+  "raw_response_sha256": "b1e7aa1387588b6479fb9b964a13bca5a5387c782af41f6497a2fae49f8d900e",
+  "contract_errors": []
+}

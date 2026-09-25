@@ -108,6 +108,7 @@ Page({
     loading: false,
     error: "",
     notice: "",
+    dispositionReason: "",
   },
 
   onLoad(query) {
@@ -291,6 +292,41 @@ Page({
           notice: "运营摘要已更新；本地开发模型结果不代表真实 Qwen 验收。",
         });
       })
+    ).catch(() => {});
+  },
+
+  onDispositionReasonInput(event) {
+    this.setData({ dispositionReason: event.detail.value || "" });
+  },
+
+  updateIncidentStatus(event) {
+    if (!this.data.canManage || !this.data.selected || this.data.loading) {
+      return;
+    }
+    const reason = (this.data.dispositionReason || "").trim();
+    const status = event.currentTarget.dataset.status;
+    if (reason.length < 2) {
+      this.setData({ error: "请填写事件处置或重开原因" });
+      return;
+    }
+    const selected = this.data.selected;
+    withLoading(this, () =>
+      api
+        .updateIncidentStatus(selected.id, {
+          status,
+          reason,
+          expected_updated_at: selected.updated_at,
+        })
+        .then((incident) => {
+          const updated = decorate(incident);
+          this.setData({
+            selected: updated,
+            items: replaceItem(this.data.items, updated),
+            dispositionReason: "",
+            notice: status === "OPEN" ? "事件已重开并记录原因。" : "事件状态已更新并记录原因。",
+            error: "",
+          });
+        })
     ).catch(() => {});
   },
 

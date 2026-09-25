@@ -153,7 +153,7 @@ SlaPolicy 1 ── * WorkOrder
 5. `WorkOrder.property_id` 必须等于 `House` 所属小区。
 6. `WorkOrderAssignment.employee_id` 必须能通过有效 `EmployeeProperty` 服务该 `property_id`。
 7. `Incident` 与成员工单同 `property_id`。
-8. 账号合并：身份绑定迁到 target user；工单 reporter / 关系 user_id 一并迁移；源账户冻结并留合并审计。
+8. 账号合并：目标 user 保留；当前所有权仅按获批影响清单和冲突检查迁移，历史 actor 不改写；源账户冻结并永久保留合并、号码与审计历史。来源凭证/会话/恢复票据撤销，来源密码不复制。号码复用须经过 30 天隔离、独立新持有人证明和两名不同授权人审核；时间或新短信本身不授予旧身份。所需恢复/审核/合并账本属于待单独批准的新迁移，不借 JSON 绕过。
 9. `AuditLog.actor_user_id` 引用 `users.id`，因此 AuditLog Foundation 与 User 同在 Day 1 Task 3；Task 2 不创建 AuditLog。
 
 ## 4. 枚举（稳定值）

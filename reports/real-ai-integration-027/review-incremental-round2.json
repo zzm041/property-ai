@@ -1,0 +1,83 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-INCREMENTAL",
+  "base_sha": "29f2302ba0bde3a6cc799409fcb58c6e308cb4cb",
+  "reviewed_scope": {
+    "round": 2,
+    "mode": "INDEPENDENT_READ_ONLY",
+    "scope": "仅复核 027-INC-R1-01/02/03 的修复、直接回归测试源码及相关证据和跟踪修正。",
+    "excluded": "未重新审查 R3 模型质量、R2、完整项目或预存配置；未运行测试、模型、页面、业务请求、数据库、队列或进程操作。",
+    "source_hashes": {
+      "backend/app/domain/ai.py": "cdcc0ceb5d361346df6cfa64c6e598f276b630ebf5c70729c9c6877e760cce9a",
+      "backend/app/api/v1/work_orders.py": "af03430342118b45ac3ed94cb3db80819bbef2aa3ecc41b2c8a45ca0a1eab262",
+      "miniprogram/utils/work-order-display.js": "8d5fb40dbcacb95a7a7932de858d29ff2bc6cae342714456cff7a0e2293289ae",
+      "scripts/ops/auth001_backup_restore_027.py": "4e45d668c2af5746a316f1c24cb03ec971ce421646995f64b3c3db28b5927cd3"
+    }
+  },
+  "verdict": "PASS",
+  "verdict_boundary": "仅三个已记录问题及其直接源码修复通过窄复核；不是页面运行、R3、真实 AUTO、整体 027 或 Production PASS。",
+  "findings": [
+    {
+      "id": "027-INC-R1-01",
+      "status": "CLOSED",
+      "original_classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/backend/app/domain/ai.py::map_analysis_output",
+      "evidence": [
+        "非批准 category 现在直接抛出 ValueError，不再映射为 OTHER/LOW_CONFIDENCE。",
+        "AnalysisService._validate_payload 将该异常转换为 INVALID_OUTPUT。",
+        "新增测试使用 category=noise、confidence=0.6，断言明确拒绝；合法低置信、原始字段和风险保留测试仍在。"
+      ]
+    },
+    {
+      "id": "027-INC-R1-02",
+      "status": "CLOSED",
+      "original_classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/scripts/ops/auth001_backup_restore_027.py::run",
+      "evidence": [
+        "新执行在 dump 前保存 source-before.json；恢复核验读取已保存基线，不再用 source_after 替代。",
+        "旧执行缺少基线时明确记录 UNAVAILABLE_FOR_LEGACY_RESUME；存在基线且核验结果变化时拒绝成功结论。",
+        "实际原 manifest SHA-256 仍为 d5dffa864566f1f4a4f223a55308b724e06258a2b23c989def62171c95a1a7b8，与追加 clarification 的绑定一致。",
+        "恢复报告、closeout、handoff、matrix 已限定为 verification-time source/target 的计数和结构一致，并保留恢复前独立基线 UNAVAILABLE。",
+        "新增 Guard 测试检查缺失基线不得替换为核验时样本。"
+      ]
+    },
+    {
+      "id": "027-INC-R1-03",
+      "status": "CLOSED",
+      "original_classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/backend/app/api/v1/work_orders.py::work_order_display_data; D:/property-ai/miniprogram/utils/work-order-display.js::presentDetail",
+      "evidence": [
+        "API 和页面展示均要求 PENDING_ANALYSIS 且 LOW_CONFIDENCE 才显示澄清行动提示。",
+        "历史 analysis_status 保留；进入其他工单状态后不再输出或展示该行动文案。",
+        "展示测试覆盖待分析时显示，以及 ASSIGNED、PROCESSING、CANCELLED、CLOSED 时隐藏且清空提示。",
+        "Incident 跟踪文案同步为先 RESOLVED 再 CLOSED，与已审实现一致。"
+      ]
+    }
+  ],
+  "new_current_task_blockers": [],
+  "accepted_evidence": [
+    {
+      "path": "D:/property-ai/reports/real-ai-integration-027/review-incremental-round1.json",
+      "result": "实际读取并逐项对应原三个 finding。"
+    },
+    {
+      "path": "D:/property-ai/reports/real-ai-integration-027/tests-incremental-fix-round1.json",
+      "sha256": "392daaaac2c04cc02089ebfc999a1a1073a04cdae8932e26cd0f890e5a3dcddb",
+      "result": "记录实施方报告的业务/展示/Incident 61 passed、1 warning，以及完整 restore Guard 12 passed、1 warning；保留首次 Temp PermissionError 和后续仓库内 basetemp 重跑范围。",
+      "boundary": "raw_output_path=null，原始命令输出未保存。上述数字是实施方保存的结果记录，不是独立读取的原始测试日志，也不是审查者重跑结果。"
+    },
+    {
+      "path": "D:/property-ai/reports/real-ai-integration-027/restore-r6-clarification.json",
+      "sha256": "e856944b9dfd51422edb6de278a9e352b7cdaa3839b69a6243ec5a2a2d9bf164",
+      "result": "追加校正准确绑定未修改的原 manifest；没有用新记录覆盖旧证据。"
+    }
+  ],
+  "unverified": [
+    "本次修复未由审查者执行测试；既有 120/11/61/14 及新结果均不能表述为独立运行通过。",
+    "新增澄清提示和 Incident 处置的真实页面/API/数据库验收仍待完成。",
+    "修改后的备份基线保存逻辑未重新运行数据库恢复；本轮仅源码和 Guard 证据。",
+    "R6 的恢复前独立基线、逐行内容完整性、媒体恢复及生产灾备仍未验收。",
+    "R3 继续 NOT_READY；原始失败、停止记录及监督 UNKNOWN 不因本次修复而升级。",
+    "真实 AUTO、整体 027、账号合并/SLA 新结构及 Production 发布缺口继续保留。"
+  ],
+  "next_action": "保存本次原始审查结果并绑定准确源码，更新三个 finding 为 CLOSED；继续既有批准范围内尚缺的正常页面/API/DB 验证。不得将此 PASS 用作模型调用、4B 业务切换、新迁移或生产发布授权，也无需重跑旧诊断或数据库恢复。"
+}

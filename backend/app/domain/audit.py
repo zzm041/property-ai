@@ -554,7 +554,9 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             allowed_detail_keys=frozenset(
                 {"work_order_id", "analysis_id", "status", "confidence",
                  "dispatch_contract_version", "raw_required_skill",
-                 "effective_required_skill", "skill_mapping_applied", "event_evidence"}
+                 "effective_required_skill", "skill_mapping_applied", "event_evidence",
+                 "decision_code", "dispatch_fields_applied", "raw_category",
+                 "effective_category"}
             ),
             required_detail_keys=frozenset(
                 {"work_order_id", "analysis_id", "status"}
@@ -599,7 +601,14 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
         AuditAction.INCIDENT_UPDATED: AuditActionPolicy(
             resource_type=AuditResourceType.INCIDENT,
             allowed_detail_keys=frozenset(
-                {"incident_id", "category", "work_order_count"}
+                {
+                    "incident_id",
+                    "category",
+                    "work_order_count",
+                    "from_status",
+                    "to_status",
+                    "reason",
+                }
             ),
             required_detail_keys=frozenset(
                 {"incident_id", "category", "work_order_count"}

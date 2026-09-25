@@ -1,0 +1,13 @@
+{
+  "task_id": "PRODUCTION-V1-R6-RESTORE",
+  "run_id": "restore027-20260925r6",
+  "record_type": "append_only_evidence_clarification",
+  "original_manifest_sha256": "d5dffa864566f1f4a4f223a55308b724e06258a2b23c989def62171c95a1a7b8",
+  "original_pre_restore_source_snapshot": "UNAVAILABLE",
+  "reason": "The legacy resume_verification branch replaced source_before with a verification-time source sample before writing the original manifest.",
+  "supported_result": "At final verification time, the source and restored destination had the same approved revision, 58-table schema shape and per-table counts; the dump hash and retained destination are real.",
+  "unsupported_result": "The original manifest does not independently prove that the source stayed unchanged between dump creation and final verification.",
+  "rerun_performed": false,
+  "assets_rewritten": false,
+  "future_guard": "The restore helper now persists source-before.json before the dump and never substitutes a later sample when that baseline is absent."
+}

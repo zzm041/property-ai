@@ -181,6 +181,8 @@ class MappedAnalysis:
     skill_mapping_applied: bool = False
     dispatch_contract_version: str = DISPATCH_CONTRACT_VERSION
     event_trace: dict | None = None
+    raw_category: str | None = None
+    dispatch_fields_applied: bool = True
 
 
 def map_analysis_output(
@@ -191,9 +193,8 @@ def map_analysis_output(
     category = _CATEGORY_ALIASES.get(output.category) or _CATEGORY_ALIASES.get(
         output.category.casefold()
     )
-    recognized_category = category is not None
     if category is None:
-        category = WorkOrderCategory.OTHER
+        raise ValueError("category is not a supported value")
     priority = _PRIORITY_ALIASES.get(output.priority) or _PRIORITY_ALIASES.get(
         output.priority.casefold()
     )
@@ -220,7 +221,7 @@ def map_analysis_output(
         ORDINARY_MAINTENANCE_SKILLS | {"CLEANING", "SECURITY"}
     ):
         skill = _DUTY_FOR_CATEGORY[category]
-    low = output.confidence < threshold or not recognized_category or (
+    low = output.confidence < threshold or (
         category is WorkOrderCategory.OTHER and skill != "MAINTENANCE"
     )
     return MappedAnalysis(
@@ -237,6 +238,8 @@ def map_analysis_output(
         low_confidence=low,
         raw_required_skill=output.required_skill,
         skill_mapping_applied=skill != raw_skill,
+        raw_category=output.category,
+        dispatch_fields_applied=not low,
     )
 
 

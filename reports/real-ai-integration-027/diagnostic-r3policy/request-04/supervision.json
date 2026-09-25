@@ -1,0 +1,30 @@
+{
+  "latency_seconds": 2.8589999999967404,
+  "samples": [
+    {
+      "utc": "2026-09-25T10:06:44Z",
+      "ram_free_mib": 9358,
+      "gpu_used_mib": 5643,
+      "gpu_free_mib": 10353,
+      "gpu_utilization_percent": 77
+    },
+    {
+      "utc": "2026-09-25T10:06:45Z",
+      "ram_free_mib": 9256,
+      "gpu_used_mib": 5637,
+      "gpu_free_mib": 10359,
+      "gpu_utilization_percent": 10
+    },
+    {
+      "utc": "2026-09-25T10:06:46Z",
+      "ram_free_mib": 9278,
+      "gpu_used_mib": 5643,
+      "gpu_free_mib": 10353,
+      "gpu_utilization_percent": 84
+    }
+  ],
+  "exit_code": 0,
+  "stop_reason": "RAW_OR_PROVIDER_CONTRACT_FAILURE",
+  "child_pid": 12088,
+  "model_side_completion": "UNKNOWN"
+}

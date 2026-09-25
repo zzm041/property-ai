@@ -2323,10 +2323,10 @@
     "status": "R2_SCOPED_LOCAL_PASS_R3_NOT_READY_OVERALL_NOT_FULL_PASS",
     "evidence_index": "reports/real-ai-integration-027/closeout.md",
     "source_binding": "reports/real-ai-integration-027/review-source-manifest.json",
-    "review": "Same independent context retained call022 NEEDS_CHANGES then closed 027-CALL022-R1-01; incremental result review PASS_SCOPED_R2_CONTINUATION. R3 and whole027 remain NOT_FULL_PASS. Prior main round1 original UNAVAILABLE, not reconstructed",
+    "review": "Same independent context retained call022 NEEDS_CHANGES then closed 027-CALL022-R1-01; incremental result review PASS_SCOPED_R2_CONTINUATION. Current policy/R6/Incident round1 found three software/evidence issues; fixes await narrow round2. R3 and whole027 remain NOT_FULL_PASS. Prior main round1 original UNAVAILABLE, not reconstructed",
     "current_status_overlays": [
       {"id":"KNOWLEDGE-INGEST-UI","implementation_status":"Prior008 scopedPASS retained;027 normal pages created3documents/4versions, independent Worker activated real1024vectors; authorized page archive retained history; staff knowledge entry fixed","verification_status":"SCOPED_LOCAL_REAL_PROVIDER_PASS_NOT_PRODUCTION","evidence_version":"a6dcc39;027 pages/runtime-continuation-final/review-r2-continuation","remaining_gap":"Generalized quality, scale, target deployment, native device and production acceptance","next_action":"Preserve current objects and evidence; no repeated ingestion or inference without a new bounded approval"},
-      {"id":"SELFHOST-AI","implementation_status":"Exact isolated ASR/BGE CPU environments and compatibility proved; R2 real bge/reranker/Qwen RAG plus one exact synthetic-audio ASR succeeded; observed-eventv10 R3 stopped3/32","verification_status":"R2_SCOPED_LOCAL_PASS; R3_NOT_READY_FOR_AUTO","evidence_version":"a6dcc39;027 call030-046/asr-continuation/review-r2-continuation; original call022 failure retained","remaining_gap":"R3 false event labels, real image and AUTO unverified; resident/native voice, generalized quality, target runtime and production acceptance","next_action":"Require bounded R3 repair/diagnostic approval; real AUTO switch remains a separate later approval"},
+      {"id":"SELFHOST-AI","implementation_status":"Exact isolated ASR/BGE CPU environments and compatibility proved; R2 real bge/reranker/Qwen RAG plus one exact synthetic-audio ASR succeeded. Forward-only low-confidence server policy is wired, but unchanged r3fix2b stopped after2 reused+2 new results when GOLD013 emitted unknown category noise.","verification_status":"R2_SCOPED_LOCAL_PASS; R3_NOT_READY_FOR_AUTO","evidence_version":"a6dcc39 plus diagnostic-r3policy/result-summary.json and current software tests after29f2302; original failures retained","remaining_gap":"Complete fixed text/image quality set and real AUTO remain unverified; resident/native voice, generalized quality, target runtime and production acceptance also remain open","next_action":"Do not switch 4B or reuse the stopped window. A separately frozen enum/catalog strategy or different model route is required before another bounded quality run."},
       {"id":"V1-EMBEDDING-RAG","implementation_status":"Real bge-m3/reranker/Qwen with MySQL versions, independent Worker, new1024COSINE collection, actual page citations, STAFF_ONLY isolation and post-archive exclusion; old8d untouched","verification_status":"PASS_SCOPED_LOCAL_REAL_PROVIDER_NOT_PRODUCTION","evidence_version":"a6dcc39;027 runai027-b439223fda pages/asr-continuation/runtime-continuation-final/call030-046","remaining_gap":"Generalized answer quality, production latency/security/capacity/runtime, native device and release acceptance","next_action":"Continuation window spent; preserve ledger and request a new explicit bounded approval for any further inference"}
     ]
   },
@@ -2870,11 +2870,11 @@
       },
       {
         "requirement_id": "V1-INCIDENT-AGGREGATE",
-        "current_implementation": "current_schema_rule_aggregation_shared_auto_dispatch_transferable_capacity_and_scope_filtered_management_visibility_wired",
-        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE",
-        "evidence_version": "1046f1003847120ceddbbc1666a1aa920ae6ae0e / e58829a4d52cd94ff8bf62027e2081da7a8ca1bf / 9033caae493f120789f07f919d69666afc33625b / 77fd1f8009db4057b2d36bc4e4a5d518e23f5634",
-        "remaining_gap": "formal Incident status-disposition API and transition policy, real self-hosted model, production runtime and Production V1 acceptance",
-        "next_action": "retain scoped aggregation and UI evidence; implement disposition only after a frozen contract, then complete real-model and production acceptance"
+        "current_implementation": "current_schema_rule_aggregation_shared_auto_dispatch_transferable_capacity_scope_filtered_management_and_reasoned_audited_disposition_reopen_wired",
+        "verification_mode_status": "AGGREGATION_PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE;DISPOSITION_UNIT_UI_WIRING_PASS_RUNTIME_PENDING",
+        "evidence_version": "prior 005/009 retained; current 027 Incident selection 14 passed 1 warning on WIP after 29f2302",
+        "remaining_gap": "actual disposition page/API/DB evidence and independent review; real self-hosted model, production runtime and Production V1 acceptance",
+        "next_action": "run only the new disposition runtime path on the fixed candidate; do not replay aggregation or mutate member work orders"
       },
       {
         "requirement_id": "V1-ANN-TARGET",
@@ -2897,8 +2897,8 @@
         "current_implementation": "current_schema_scoped_policy_administration_effective_resolution_concurrency_audit_and_schedulers_wired",
         "verification_mode_status": "PARTIAL_SCOPED_LOCAL_DEVELOPMENT",
         "evidence_version": "2c2872fa0d7ccdeb8cc980802da14b212d31c8ea / 9ab106b29b9761504fa229cc1bd97227daa6e6c9 / 55fe0a90b81ff8935d50cb8a7fa93c381e8ba92b / 7814d45531a91efb6a63c63df261415fa446a1c4 / 39a58f3c9be053ddc5f90ec6f5613f1a32585a5f",
-        "remaining_gap": "separate accept/respond and editable warning/escalation policy fields, immutable applied-policy provenance, production RBAC/scheduler/provider operation and formal release",
-        "next_action": "preserve scoped policy-management evidence and request schema approval before richer SLA policy/versioning work"
+        "remaining_gap": "separate accept/respond and editable warning/escalation fields plus immutable policy versions/applied-version provenance require the documented post-0012 schema approval; production RBAC/scheduler/provider operation and formal release",
+        "next_action": "preserve current deadlines and clocks; separately approve exact SLA version DDL, never recompute historical clocks from edited policy values"
       },
       {
         "requirement_id": "V1-NTF-RETRY",
@@ -2926,11 +2926,11 @@
       },
       {
         "requirement_id": "V1-BACKUP-RESTORE",
-        "current_implementation": "ExactAUTH001 guarded hostbackup captured before0012, oldcounts/protectedfingerprints verified; backupsoutsidecontainer retained",
-        "verification_mode_status": "PARTIAL_BACKUP_CAPTURE_ONLY_RESTORE_UNVERIFIED",
-        "evidence_version": "026fresh-snapshot/migration-result/independenthash39bbabdf6e89907094dd74182917d83b2b3021150711f5d50d5e5967b1b1dfb6",
-        "remaining_gap": "实际隔离恢复、生产备份恢复及灾难恢复验收",
-        "next_action": "明确恢复目标另行批准前不恢复；不覆盖现有资产"
+        "current_implementation": "Fresh current0012 hostbackup restored only to new ungranted property_ai_auth001_restore_20260925; verification-time source and target revision,58table shape and all counts match; source,target,dump retained. Legacy resume did not preserve independent pre-restore source baseline.",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DATABASE_RESTORE_NOT_MEDIA_OR_PRODUCTION_DR",
+        "evidence_version": "027 restore027-20260925r6 dump sha256 49a4273a77f8298d2ced2c7fd4a4f1f868b82972950dffeaebc436ec2d826c0c schema shape d1032908f88d4041ca2226e92930d672ae97884275eea5ed9e6c93b482139111",
+        "remaining_gap": "pre-restore source baseline is unavailable for this run; media/object bytes, persistent MySQL storage and loopback binding, target-host scheduled/encrypted retention, production restore/rollback timing and shared-schema ownership",
+        "next_action": "preserve source,target and dump; request exact target/storage/shared-maintenance approval before production-equivalent recovery"
       },
       {
         "requirement_id": "V1-PERF-RELEASE",
@@ -2982,11 +2982,11 @@
       },
       {
         "requirement_id": "V1-AUTO-DISPATCH-FILTER",
-        "current_implementation": "024 unified MAINTENANCE/global idle/fairness/durable waiting preserved;025 analysis commit separated from dispatch, fresh-state ownership/Assignment/occupancy recheck after transient DB error, same-analysis retry avoids new model call.",
-        "verification_mode_status": "024_AND_025_PASS_SCOPED_LOCAL_DEVELOPMENT",
-        "evidence_version": "024ec9c1a716501c22ebb6e9f62b93722006e661a3e retained;0256a12ff140a555556103e6b389acb994fe98ae7fe/backendhash4d43d0643e07db25356d97418c090febfce0b33fecb33366d0c2504d96107953 equals reviewed/runtime;run db025-4efe90cf93;31/32/35oneAUTO each,duplicate no extra occupancy;contact/busy/recovery combined",
-        "remaining_gap": "RealQwenAUTO/RAG/device/production and broader reliability not accepted.24/25remainoriginalfailures;30fixturefailure/34exhaustionretained;no historicalreplay. Ordinarytrade skill exclusivity not restored.",
-        "next_action": "025independentround2PASS; only covered024-REL-01 transient recovery subset closed. Maintain normalWorkerwithouttestcontrols;do not repeat combinedregression;no0010/fees/newmodelcalls."
+        "current_implementation": "024/025 unified maintenance eligibility,fairness,waiting,recovery retained. New legal-low-confidence policy suppresses effective category/skill, recommendations,Assignment,occupancy andIncident while retaining raw fields/risk and resident clarification.",
+        "verification_mode_status": "024_025_PASS_RETAINED;LOW_CONFIDENCE_SOFTWARE_FOCUSED_PASS;REAL_R3_NOT_READY",
+        "evidence_version": "prior024/025 retained; current low-confidence 120 passed 3 warnings; diagnostic-r3policy stopped after2 reused+2 new at GOLD013 invalid enum noise",
+        "remaining_gap": "real Qwen text/image/voice AUTO remains unverified because fixed candidate emitted an unknown enum; production/device and broader reliability also remain open",
+        "next_action": "do not switch AUTH001 to4B. Decide one separately frozen enum/catalog normalization or different model route; no silent coercion or extra calls under the stopped run."
       },
       {
         "requirement_id": "V1-NTF-EVENTS",

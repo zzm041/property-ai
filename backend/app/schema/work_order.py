@@ -272,6 +272,8 @@ class WorkOrderDisplayData(BaseModel):
     # Current account display names, not immutable historical identity snapshots.
     assignee_names: dict[int, str] = Field(default_factory=dict)
     timestamp_labels: dict[str, str] = Field(default_factory=dict)
+    analysis_status: str | None = None
+    analysis_message: str | None = None
 
 
 class WorkOrderDetailData(BaseModel):

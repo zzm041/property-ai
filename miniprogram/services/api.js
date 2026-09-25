@@ -453,6 +453,12 @@ module.exports = {
       method: "POST",
       data: {},
     }),
+  updateIncidentStatus: (id, body) =>
+    request({
+      path: `/supervisor/incidents/${id}/status`,
+      method: "POST",
+      data: body,
+    }),
   createAnnouncement: (body) =>
     request({ path: "/admin/announcements", method: "POST", data: body }),
   adminAnnouncements: (propertyId, afterId) =>

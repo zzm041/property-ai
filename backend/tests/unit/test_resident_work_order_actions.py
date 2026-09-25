@@ -258,6 +258,7 @@ def test_changed_pending_content_creates_new_analysis_version(
         "app.service.analysis.begin_owned_transaction",
         lambda _session: nullcontext(),
     )
+    monkeypatch.setattr("app.service.analysis.require_execution_lease", lambda _session: None)
     service = AnalysisService.__new__(AnalysisService)
     service._session = MagicMock()
     service._settings = Settings(_env_file=None, app_env="test")
@@ -273,7 +274,7 @@ def test_changed_pending_content_creates_new_analysis_version(
     current = SimpleNamespace(
         id=71,
         analysis_version=1,
-        status=AnalysisStatus.PROCESSING.value,
+        status=AnalysisStatus.LOW_CONFIDENCE.value,
         input_hash="old-input",
         error_code=None,
     )
@@ -312,6 +313,7 @@ def test_analysis_apply_rejects_snapshot_from_before_append(
         "app.service.analysis.begin_owned_transaction",
         lambda _session: nullcontext(),
     )
+    monkeypatch.setattr("app.service.analysis.require_execution_lease", lambda _session: None)
     service = AnalysisService.__new__(AnalysisService)
     service._session = MagicMock()
     service._work_orders = MagicMock()

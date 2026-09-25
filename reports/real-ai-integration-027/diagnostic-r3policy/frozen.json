@@ -1,0 +1,124 @@
+{
+  "base_sha": "29f2302ba0bde3a6cc799409fcb58c6e308cb4cb",
+  "private_frozen_root": "D:\\property-ai\\tmp\\real-ai-integration-027\\diagnostic-r3policy\\frozen",
+  "files": [
+    {
+      "path": "backend/app/api/v1/work_orders.py",
+      "sha256": "c19b48d82a651a07245da6f24f8c184d13825ebd179211f10efabb7b9a483cae"
+    },
+    {
+      "path": "backend/app/domain/ai.py",
+      "sha256": "4e2fa83d934054eb09ef8ce78f33adadc858c6ed6c71c79cd4ff3f11fe241a92"
+    },
+    {
+      "path": "backend/app/domain/audit.py",
+      "sha256": "5a4b970d45beb700e93e350e90a158ec2861497a535480a8b1a6f922d75e8dad"
+    },
+    {
+      "path": "backend/app/domain/observed_event.py",
+      "sha256": "f8ca3dde741e1c5fc469a92c2cbdb0fdb308d1bbebff4f6b49f102b0c927bc3e"
+    },
+    {
+      "path": "backend/app/provider/http.py",
+      "sha256": "025a6f8cd20dda35190a61ceeca970dc49bc8be7573ddb5accfe4470ce00b574"
+    },
+    {
+      "path": "backend/app/provider/llm/__init__.py",
+      "sha256": "c1bf424bf2fab07849d905e85255a91b178002573078b3d742f17b81cb235430"
+    },
+    {
+      "path": "backend/app/provider/vision/__init__.py",
+      "sha256": "3c14aa554308e5259cb775490bc12814a44adcdb19db439db316be7058c34007"
+    },
+    {
+      "path": "backend/app/schema/work_order.py",
+      "sha256": "a83f5df70bb52746d2641e63cb752865b8e0caa4940c6baa0ee9bfb37d9e9cb7"
+    },
+    {
+      "path": "backend/app/service/analysis.py",
+      "sha256": "755dfe89d9c8f85232cdfa4229f645d51a867a685495daec51b87ea0f658b5d5"
+    },
+    {
+      "path": "backend/app/service/auto_dispatch.py",
+      "sha256": "33da3d71682f6f66ec5fe2467c79c085e87cb0261e5a0228711712b797c8f31e"
+    },
+    {
+      "path": "backend/app/service/work_order.py",
+      "sha256": "55895cf6db7196099ae30c8abe94442d852ea9002db161717f103e408a1d2d62"
+    },
+    {
+      "path": "docs/05-AI-DISPATCH-SPEC.md",
+      "sha256": "36bf7c3da6e2d5917618590f914b2da4b0e951d46249fd7ec6209e40bd7c47a9"
+    },
+    {
+      "path": "miniprogram/pages/work-orders/detail.js",
+      "sha256": "7d04444b7e08070795fe6d90bb6394021dcc184d1f61ab855b3f70de58742ec0"
+    },
+    {
+      "path": "miniprogram/pages/work-orders/detail.wxml",
+      "sha256": "edf3b115706b36766cd50923f57c4060f3ef68833479657f054b581dd8522979"
+    },
+    {
+      "path": "miniprogram/utils/work-order-display.js",
+      "sha256": "f4aa1f26ea0970c3500e61ec72fc6c674b78fa27e382de85a82422b6d9df37c8"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/gold-set-24.json",
+      "sha256": "c3c93b419b7d5dea12b529152cde661c16826cc708b1d80d5b26d39d70ddfc1f"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/repair-image-gold.json",
+      "sha256": "df10abfde5a0144c480e29041ddedcc146a0182a6452dacd2ed97498c88cfdbe"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/repair-images/ans-ball-valve.jpg",
+      "sha256": "965dc412677a19d32b2ad7092e7c0203e0abbda75d6b230c7dd087300939f1cd"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/repair-images/burned-socket.jpg",
+      "sha256": "1e3d71c542f7c8f9bfe20fc4915da7c61cb2bac875e0e383470bd201b7dd454a"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/repair-images/ceiling-peeling.jpg",
+      "sha256": "dabfd2227a33efa7b085d6f8519bec47f43b1542c7eaafed81047abb3d52eb8d"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/repair-images/normal-socket.jpg",
+      "sha256": "d6d75928f4a23d4ddde0bed730ca6d71624b7a9032afd2ca2ab5b74c61b03b87"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/run-approved-supplement.py",
+      "sha256": "0d3aa78b022e4e3506027afebf4fca76bf68a09a9428221cfa58af6fb312cb53"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/run-crossfield-diagnostic.py",
+      "sha256": "67fc0d701c6f2896433b36936983fb3f21ae11d58bec24a1f8298d11d19b859f"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/run-quality28.py",
+      "sha256": "5a9454c0f853f0571b3bc17a01c62d702aff74a4538eb3245ba375dab76aa435"
+    },
+    {
+      "path": "reports/real-ai-integration-027/diagnostic-r3policy.py",
+      "sha256": "c866e9610f3682df138daa556cef497db7d4daf54767d5c9fd927cf2814f1673"
+    }
+  ],
+  "model": "qwen3.5:4b",
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "prompt_candidate_changed": false,
+  "parameters": {
+    "context_length": 4096,
+    "temperature": 0,
+    "thinking": false,
+    "llm_max_tokens": 512,
+    "vlm_max_tokens": 256,
+    "per_request_seconds": 60
+  },
+  "fixed_set": "24 text + 4 image pairs = 32 model requests",
+  "new_budget": {
+    "maximum_requests": 32,
+    "maximum_seconds": 2400
+  },
+  "server_policy": "low confidence preserves raw fields but ignores category/skill for recommendations, assignment, occupancy and incident aggregation"
+}

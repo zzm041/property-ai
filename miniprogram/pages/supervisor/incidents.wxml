@@ -40,11 +40,16 @@
   <view wx:if="{{selected.ai_summary}}">AI 运营摘要：{{selected.ai_summary}}</view>
   <view wx:if="{{selected.affected_scope}}">影响范围：{{selected.affected_scope}}</view>
   <block wx:if="{{canManage}}">
+    <textarea class="input" maxlength="255" placeholder="处置或重开原因（必填）" value="{{dispositionReason}}" bindinput="onDispositionReasonInput"></textarea>
+    <button class="btn" wx:if="{{selected.status === 'OPEN'}}" data-status="MONITORING" bindtap="updateIncidentStatus" disabled="{{loading}}">转为监控中</button>
+    <button class="btn" wx:if="{{selected.status === 'OPEN' || selected.status === 'MONITORING'}}" data-status="RESOLVED" bindtap="updateIncidentStatus" disabled="{{loading}}">标记已解决</button>
+    <button class="btn" wx:if="{{selected.status === 'RESOLVED'}}" data-status="CLOSED" bindtap="updateIncidentStatus" disabled="{{loading}}">关闭事件</button>
+    <button class="btn" wx:if="{{selected.status === 'RESOLVED' || selected.status === 'CLOSED'}}" data-status="OPEN" bindtap="updateIncidentStatus" disabled="{{loading}}">重开事件</button>
     <button class="btn" bindtap="summarize" disabled="{{loading}}">生成 / 刷新 AI 运营摘要</button>
     <button class="btn" wx:if="{{canDraftAnnouncement}}" bindtap="createAnnouncementDraft" disabled="{{loading}}">生成待人工审核的公告草稿</button>
     <button class="btn" wx:if="{{lastDraftId}}" bindtap="openAnnouncements">前往公告审核</button>
   </block>
-  <view class="empty">AI 摘要和公告草稿都不会自动改变事件状态或自动发布。</view>
+  <view class="empty">事件处置不会批量关闭住户工单或覆盖回执；AI 摘要和公告草稿不会自动改变事件状态或自动发布。</view>
 </view>
 
 <button class="btn" bindtap="refresh" disabled="{{loading}}">刷新事件</button>

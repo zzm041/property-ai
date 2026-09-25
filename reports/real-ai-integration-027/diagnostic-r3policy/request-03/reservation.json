@@ -1,0 +1,23 @@
+{
+  "number": 3,
+  "reserved_unix": 1790330798.3650868,
+  "case": "GOLD-012",
+  "kind": "LLM",
+  "reserved_before_send": true,
+  "before": {
+    "utc": "2026-09-25T10:06:38Z",
+    "ram_free_mib": 10471,
+    "gpu_used_mib": 1680,
+    "gpu_free_mib": 14316,
+    "gpu_utilization_percent": 10
+  },
+  "collector_sha256": "c866e9610f3682df138daa556cef497db7d4daf54767d5c9fd927cf2814f1673",
+  "new_inference": true,
+  "authorized_new_request_limit": 32,
+  "wall_seconds": 2400,
+  "prompt_candidate": "unchanged-r3fix2b",
+  "candidate_number": 2,
+  "global_request_limit": 40,
+  "global_window_seconds": 3600,
+  "final_fixed_set": true
+}

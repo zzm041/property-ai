@@ -1,0 +1,70 @@
+[
+  {
+    "id": "PHOTO-001",
+    "original_sha256": "dabfd2227a33efa7b085d6f8519bec47f43b1542c7eaafed81047abb3d52eb8d",
+    "original_size": [
+      931,
+      678
+    ],
+    "copy": "D:\\property-ai\\tmp\\selfhost-ai-local\\crossfield-diagnostic-01\\images1024\\ceiling-peeling.png",
+    "copy_sha256": "ca4d552c5a8193276071759ab59cfaeb90d7847b14c14e6ee23fb702903836e1",
+    "copy_size": [
+      931,
+      678
+    ],
+    "mime": "image/png",
+    "pillow": "12.3.0",
+    "method": "aspect-preserving thumbnail LANCZOS; no upscale/crop/retouch"
+  },
+  {
+    "id": "PHOTO-002",
+    "original_sha256": "d6d75928f4a23d4ddde0bed730ca6d71624b7a9032afd2ca2ab5b74c61b03b87",
+    "original_size": [
+      681,
+      682
+    ],
+    "copy": "D:\\property-ai\\tmp\\selfhost-ai-local\\crossfield-diagnostic-01\\images1024\\normal-socket.png",
+    "copy_sha256": "1bde3aae828473b0d9a92d9e9ff48a124901f3bed81c2f49f60aef5ba3cdcda0",
+    "copy_size": [
+      681,
+      682
+    ],
+    "mime": "image/png",
+    "pillow": "12.3.0",
+    "method": "aspect-preserving thumbnail LANCZOS; no upscale/crop/retouch"
+  },
+  {
+    "id": "PHOTO-003",
+    "original_sha256": "1e3d71c542f7c8f9bfe20fc4915da7c61cb2bac875e0e383470bd201b7dd454a",
+    "original_size": [
+      1600,
+      1200
+    ],
+    "copy": "D:\\property-ai\\tmp\\selfhost-ai-local\\crossfield-diagnostic-01\\images1024\\burned-socket.png",
+    "copy_sha256": "10e207356672f29bd1cec11715800e91dbcf961ce35183e55928d64379d24102",
+    "copy_size": [
+      1024,
+      768
+    ],
+    "mime": "image/png",
+    "pillow": "12.3.0",
+    "method": "aspect-preserving thumbnail LANCZOS; no upscale/crop/retouch"
+  },
+  {
+    "id": "PHOTO-004",
+    "original_sha256": "965dc412677a19d32b2ad7092e7c0203e0abbda75d6b230c7dd087300939f1cd",
+    "original_size": [
+      2576,
+      1932
+    ],
+    "copy": "D:\\property-ai\\tmp\\selfhost-ai-local\\crossfield-diagnostic-01\\images1024\\ans-ball-valve.png",
+    "copy_sha256": "30013dfb12bb09d6da8d7523132d505a0db9a1cdef7ae321352d7e915e24a5f2",
+    "copy_size": [
+      1024,
+      768
+    ],
+    "mime": "image/png",
+    "pillow": "12.3.0",
+    "method": "aspect-preserving thumbnail LANCZOS; no upscale/crop/retouch"
+  }
+]

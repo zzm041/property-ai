@@ -1,0 +1,18 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-INCREMENTAL",
+  "observed_at": "2026-09-25T18:32:00+08:00",
+  "base_sha": "29f2302ba0bde3a6cc799409fcb58c6e308cb4cb",
+  "scope": [
+    "backend/tests/unit/test_analysis_crossfield_contract.py"
+  ],
+  "reason": "A direct AnalysisService._validate_payload assertion was added after the broader targeted run so the unknown-enum finding is covered at the service boundary as well as the domain mapper.",
+  "result": {
+    "passed": 17,
+    "failed": 0,
+    "warning_count": 1
+  },
+  "raw_output_path": null,
+  "raw_output_status": "NOT_PERSISTED; result captured from the main-session command output.",
+  "database_or_service_access": false,
+  "model_requests": 0
+}

@@ -1,0 +1,90 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-398\",\"object\":\"chat.completion\",\"created\":1790330807,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"noise\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"噪声\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"夜里听到嗡嗡声\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"现象待核实\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"可能是空调，也可能来自墙外设备\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"现象待核实\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"我没找到声音来源\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p4\\\",\\n  \\\"summary\\\": \\\"夜里听到嗡嗡声，可能来自空调或墙外设备，但未找到具体声音来源。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.6\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1615,\"prompt_tokens_details\":{\"cached_tokens\":1113},\"completion_tokens\":234,\"total_tokens\":1849}}\n",
+  "raw_response_sha256": "11b304cb2be70c4e24fc66e56133bb5b6da0da85be0d1964dc665ad2b2c3cc17",
+  "contract_errors": [
+    "INVALID_ENUM_category"
+  ],
+  "case": {
+    "id": "GOLD-013",
+    "tags": [
+      "来源未知",
+      "猜测"
+    ],
+    "report": "夜里听到嗡嗡声，可能是空调，也可能来自墙外设备，我没找到声音来源，没有别的现象。",
+    "history": [],
+    "facts": [
+      "嗡嗡声",
+      "来源未知"
+    ],
+    "forbidden": [
+      "确认压缩机故障",
+      "漏电",
+      "燃气泄漏"
+    ],
+    "accept": [
+      [
+        "other",
+        "other",
+        [
+          "none",
+          "other"
+        ]
+      ]
+    ],
+    "manual": "LOW"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "noise",
+      "observations": [
+        {
+          "label": "噪声",
+          "subject": "未确定",
+          "source": "report",
+          "quote": "夜里听到嗡嗡声"
+        },
+        {
+          "label": "现象待核实",
+          "subject": "未确定",
+          "source": "report",
+          "quote": "可能是空调，也可能来自墙外设备"
+        },
+        {
+          "label": "现象待核实",
+          "subject": "未确定",
+          "source": "report",
+          "quote": "我没找到声音来源"
+        }
+      ],
+      "severity": "low",
+      "priority": "p4",
+      "summary": "夜里听到嗡嗡声，可能来自空调或墙外设备，但未找到具体声音来源。",
+      "risk": "none",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.6
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 10:06:45.558961+00:00",
+      "latency_ms": 1722,
+      "request_id": "supplement-GOLD-013",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1849
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "29f2302ba0bde3a6cc799409fcb58c6e308cb4cb"
+}

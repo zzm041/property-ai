@@ -1,0 +1,18 @@
+{
+  "count": 2,
+  "new_model_calls": 0,
+  "not_cross_candidate_best_of": true,
+  "basis": "candidate-02 is the same final r3fix2b prompt/model candidate; only the newly approved server decision policy changed",
+  "items": [
+    {
+      "number": 1,
+      "case": "GOLD-007",
+      "response_sha256": "b6240d297049ffabe6fb7b25498dcf59bd311f0d6d330327312e4f86cacb80b5"
+    },
+    {
+      "number": 2,
+      "case": "GOLD-011",
+      "response_sha256": "3ea8c9db0b390c8114b46e7c11663539c442efa4b893918756df18365b3cf6a6"
+    }
+  ]
+}

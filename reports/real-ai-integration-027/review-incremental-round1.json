@@ -1,0 +1,102 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-INCREMENTAL",
+  "base_sha": "29f2302ba0bde3a6cc799409fcb58c6e308cb4cb",
+  "reviewed_scope": {
+    "round": 1,
+    "mode": "INDEPENDENT_READ_ONLY",
+    "included": [
+      "合法低置信处理、工单详情展示、补充版本及相关测试",
+      "diagnostic-r3policy 冻结、复用、原始请求响应、监督和停止证据",
+      "AUTH001 R6 隔离备份恢复脚本、Guard 测试、报告和私有 manifest",
+      "Incident 状态处置 API、Service、页面、权限、并发及审计",
+      "本轮正式规格、handoff、matrix、账号方案和模型方案增量"
+    ],
+    "excluded": [
+      "预存 backend/app/model/ai.py 和 miniprogram/project.config.json 修改",
+      "已接受的 R2 与其他历史切片",
+      "测试、模型、页面、业务、数据库、队列及进程操作"
+    ],
+    "note": "以下是本轮首次发现问题时的源码与证据结论；审查期间主会话新增的修复需另行窄复核。"
+  },
+  "verdict": "NEEDS_CHANGES",
+  "findings": [
+    {
+      "id": "027-INC-R1-01",
+      "severity": "P2",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/backend/app/domain/ai.py:194",
+      "trigger": "模型返回结构合法但 category 不在批准目录内的 JSON，例如本次 GOLD-013 的 category=noise、confidence=0.6。",
+      "impact": "map_analysis_output 将未知类别映射为 OTHER 并标记低置信；真实 AnalysisService 因而可能接受为 LOW_CONFIDENCE/CLARIFICATION_REQUIRED，而不是 INVALID_OUTPUT。诊断采集器拒绝该枚举不等于业务服务已拒绝。",
+      "evidence": [
+        "domain/ai.py 初审实现使用 recognized_category 和 OTHER 回退。",
+        "service/analysis.py::_validate_payload 未另行拒绝未知 category。",
+        "diagnostic-r3policy/request-04/response.json 的 provider_result 为 SUCCESS，原始 category=noise；INVALID_ENUM_category 来自采集器 contract_errors。",
+        "本轮正式规格明确未知枚举不得由低置信政策放行。"
+      ],
+      "recommendation": "在真实分析映射边界拒绝非批准类别，补与 GOLD-013 等价的纯测试；保留原始诊断结果，不追加推理。"
+    },
+    {
+      "id": "027-INC-R1-02",
+      "severity": "P2",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/scripts/ops/auth001_backup_restore_027.py::run",
+      "trigger": "以 resume_verification 完成恢复核验。",
+      "impact": "代码执行 source_before = source_after，随后 manifest、报告和 tracking 将这份核验时数据表述为独立的恢复前基线，不能支持恢复前后源数据未变化的结论。",
+      "evidence": [
+        "实际 manifest 的 resumed_after 表明本轮使用了 resume_verification。",
+        "该分支覆盖 source_before 后才生成 manifest。",
+        "restore-r6-result.md、closeout、handoff 和 matrix 声称 source-before/source-after/target 均一致。"
+      ],
+      "recommendation": "保留原 manifest、恢复资产和失败历史，以追加说明校正来源；无首次基线原始记录时标为 UNAVAILABLE，限定为核验时源/目标计数和结构一致。后续脚本持久保存首次基线，不用核验时值替代。无需重跑恢复。"
+    },
+    {
+      "id": "027-INC-R1-03",
+      "severity": "P2",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/miniprogram/utils/work-order-display.js:49",
+      "trigger": "历史分析仍为 LOW_CONFIDENCE，但工单已被合法接管、派发、处理或取消。",
+      "impact": "needsClarification 仅检查分析状态，详情仍显示‘系统暂不派单；请补充后再次分析’，与当前工单状态矛盾。",
+      "evidence": [
+        "presentDetail 未限制工单状态。",
+        "detail.wxml 无额外状态条件。",
+        "新增展示测试以 PROCESSING + LOW_CONFIDENCE 断言 needsClarification=true。",
+        "get_current_analysis 返回最近分析记录，不因后续工单状态变化自动清除历史低置信状态。"
+      ],
+      "recommendation": "仅在当前仍处于待分析澄清阶段时展示该行动提示；保留历史分析信息，补已派发、处理中及取消后的展示回归。"
+    }
+  ],
+  "accepted_evidence": [
+    {
+      "area": "低置信安全分支",
+      "result": "已读代码确认 _write_recommendations 在低置信时提前返回；_apply 不进入状态转换和 Incident 聚合；AUTO 在候选计算前返回 LOW_CONFIDENCE；风险仍保存。详情先完成工单授权再读取分析，改变补充内容会推进版本并建立新分析。"
+    },
+    {
+      "area": "R3 固定诊断",
+      "result": "实际读取 request-03/04 的输入、原始输出、响应、预约和监督记录。两份复用 response 与 candidate-02 原件 SHA-256 一致；25 个 private frozen 文件哈希均匹配。新增两次调用后 GOLD-013 因 noise 非法枚举停止，NOT_READY/no-AUTO 有依据；没有完整集合或图片质量通过的证据。",
+      "boundary": "request-04 监督记录仍标 model_side_completion=UNKNOWN，不将其改写为已证明完整回收。"
+    },
+    {
+      "area": "R6 恢复",
+      "result": "已读精确源 URL/环境 Guard、固定目标、拒绝既存目标、备份路径保护、无 drop/migrate/seed 的命令构造及 11 项 Guard 测试源码。实际备份文件 SHA-256 为 49a4273a77f8298d2ced2c7fd4a4f1f868b82972950dffeaebc436ec2d826c0c，与 manifest 一致；保存证据支持核验时源/目标的 58 表计数和结构一致。",
+      "boundary": "不支持独立恢复前基线、逐行内容完整性、媒体字节或 Production DR 验收。"
+    },
+    {
+      "area": "Incident 处置",
+      "result": "已读当前权限范围检查、FOR UPDATE、expected_updated_at 冲突检查、必填理由及审计。当前实现要求先 RESOLVED 才能 CLOSED，允许合法重开；未调用成员工单、Assignment、回执或反馈修改路径。",
+      "boundary": "handoff/closeout 的 active→closed 表述应同步为实际两步规则；本轮只确认源码和测试设计，实际页面/API/DB 证据仍待完成。"
+    },
+    {
+      "area": "测试与跟踪",
+      "result": "读取了相关测试源码及 software-results-20260925.md 中 120/11/61/14 的实施方结果摘要；未重跑，也未将摘要冒称独立执行结果。矩阵保留 Incident runtime pending、R3 NOT_READY 和生产缺口。"
+    }
+  ],
+  "unverified": [
+    "本轮测试摘要对应的完整原始执行输出尚未提供准确保存路径。",
+    "独立审查未执行任何测试、页面、业务请求或数据库核验。",
+    "新增 Incident 处置和澄清 UI 尚无本轮真实页面/API/DB 验收。",
+    "R3 未完成固定集、未运行维修图片、未达到业务切换或真实 AUTO 门槛。",
+    "恢复前源基线、逐行恢复内容、媒体恢复及生产灾备未验收。",
+    "账号恢复/合并、SLA 历史版本、真实 Provider、正式环境与 Production 发布仍保留各自审批和验收边界。"
+  ],
+  "next_action": "主会话只修复上述三个明确问题并校正文案，保存针对性离线回归输出；随后沿用同一只读审查上下文窄复核。保留 R3 原始失败和 NOT_READY，不追加推理、不重跑恢复或已通过历史业务。"
+}

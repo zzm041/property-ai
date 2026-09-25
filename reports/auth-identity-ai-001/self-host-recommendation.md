@@ -1,5 +1,13 @@
 # Self-hosted inference recommendation (AUTH-IDENTITY-AI-001-C)
 
+## Superseding current checkpoint — 2026-09-25
+
+- The owner-approved low-confidence server policy is implemented and focused-tested: legal low-confidence output becomes clarification required, with raw fields retained but no staff recommendation, Assignment, occupancy or Incident aggregation. Unknown enums remain invalid.
+- The unchanged r3fix2b candidate stopped the fixed diagnostic at GOLD-013 after 2 exact reused results and 2 new calls because `noise` is outside the frozen category enum. This is a real contract failure, not an AUTO misassignment and not a resource stop. R3 remains **NOT_READY**; no images, runtime switch or real AUTO occurred.
+- R6's fresh current-0012 backup and restore to the new ungranted `property_ai_auth001_restore_20260925` passed source/target revision, table-shape and count comparison. It does not cover media bytes, persistent storage or Production DR.
+- R4 policy is now decided, but its schema and real proof channel are not authorized: 30-day quarantine, independent new-holder proof, two different authorized reviewers, no SMS/time inheritance, source/history retained, source credentials revoked, target password explicitly set. The exact proposed post-0012 structural impact is recorded in the existing account-merge preapproval report; no migration file was created.
+- The only model decision now needed is whether to approve a separately frozen normalization/catalog change for observable `noise`, or use a different separately approved candidate. Do not coerce unknown enums or spend further inference under the stopped run.
+
 ## Current result and consolidated next approvals — 2026-09-25
 
 Fixed deadline **2026-09-27 14:00 Asia/Shanghai**; owner states the current remaining project execution budget is **15% total**, with no separate reserve, reset, upgrade or added spend. This section supersedes older pending/download/runtime statements below; old results and proposals remain historical, not approvals. No fees, cloud model, new weights outside the approved manifest,0010 or additional inference are implied.

@@ -101,6 +101,14 @@ class IncidentListData(BaseModel):
     next_cursor: int | None = None
 
 
+class UpdateIncidentStatusRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    status: str = Field(min_length=1, max_length=32)
+    reason: str = Field(min_length=2, max_length=255)
+    expected_updated_at: datetime
+
+
 class AnnouncementData(BaseModel):
     id: int
     tenant_id: int

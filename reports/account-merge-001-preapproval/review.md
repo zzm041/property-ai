@@ -194,6 +194,22 @@ The automatic-dispatch mainline does not depend on account merge. While the revi
 
 **0010尚未获批、未创建、未执行。**
 
+## 6. 2026-09-25 owner decision and exact migration impact
+
+The policy questions above are now decided: a phone has a 30-day quarantine before any new-holder route; current-holder proof must be independent of possession of a newly received SMS; two distinct authorized reviewers must approve; elapsed time or SMS alone never inherits an old account. A merge preserves source account, phone and merge history, revokes source sessions/password/reset authority, never copies the source password, and retains both existing phone unique constraints. A source without an ACTIVE phone uses the same trusted proof route. A target without a password must explicitly set one after recent target reauthentication. Until a trusted proof channel is approved and configured, cases stay pending/rejected rather than being simulated.
+
+This policy approval still does **not** authorize creating or applying a migration. The next migration must follow actual revision `20260925_0012_task_intents`; it must not use, rename or execute 0010/0013. The exact proposed structural delta for a separately reviewed new revision is:
+
+1. `identity_recovery_cases`: BIGINT identity PK; purpose `MERGE_SOURCE_PROOF|ACCOUNT_RECOVERY|PHONE_REUSE`; requester/source/target user FKs as applicable; normalized subject phone; state `PENDING_PROOF|PENDING_REVIEW|APPROVED|REJECTED|EXPIRED|COMPLETED|CANCELLED`; proof provider and opaque provider-reference hash; proof-result hash; quarantine start/end; proof/review/expiry/completion timestamps; redacted impact JSON plus SHA-256; attempt/version counters; created/updated timestamps. A generated active-subject key plus a unique `(purpose, active_subject_key)` prevents parallel active cases. No raw identity document, face image or biometric template is stored.
+2. `identity_recovery_reviews`: BIGINT identity PK; case FK; reviewer user FK; decision `APPROVE|REJECT`; reason; created timestamp; unique `(case_id, reviewer_user_id)`. Completion requires two APPROVE rows from different currently authorized reviewers, revalidated in the business transaction.
+3. `account_merges`: immutable completed/terminal ledger with source user FK, target user FK, recovery-case FK, operator user FK, status, redacted impact JSON/hash, source-phone-row reference, completed/cancelled timestamps and normal timestamps; check source != target; unique completed source guard. Active coordination lives in the recovery case, so expired/cancelled attempts do not permanently block a source.
+4. No delete or alteration of `uq_user_phones_active_e164` or `uq_user_phones_active_user`; no historical row rewrite/backfill. Generic SMS login/registration must query retained phone history and an active/approved reuse case before creating a user. Merge confirmation revokes source sessions and open reset tickets, ends the source ACTIVE phone, freezes source as MERGED and rotates target sessions inside the reviewed transaction/guard.
+5. Service impact remains the 24-user-reference disposition table in section 4. Historical actors stay on source; current ownership fields move only after collision checks. Sorted source/target user locks, active-case locks, proof/reviewer revalidation, impact-hash recheck, idempotent confirmation and cross-service merge-in-progress guards are mandatory.
+
+The same future migration proposal must also separately describe SLA provenance if bundled, but bundling is not recommended. SLA requires an independent version structure: immutable `sla_policy_versions` (policy FK, version, accept/respond/escalate/complete values, status, effective interval, actor/reason, unique policy+version) and a work-order/clock reference to the applied version. Existing `sla_clocks` deadline timestamps remain authoritative and are not recomputed or backfilled from newer policy values. Exact time fields must follow the already approved SLA semantics; no placeholder number may be invented.
+
+First execution, if later approved, remains AUTH001-only after a fresh host backup. It must verify empty/new tables, both phone unique constraints, forward and downgrade structure on a disposable restored copy, merge/reuse concurrency, two-reviewer separation, credential invalidation, historical actor preservation and rollback/fault injection. No real identity case is permitted in that rehearsal.
+
 ### Independent read-only review
 
 - Round 1: `NEEDS_CHANGES`; four audit-design findings were incorporated without changing product code.

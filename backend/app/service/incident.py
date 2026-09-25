@@ -298,6 +298,99 @@ class IncidentService:
                 )
         return incident
 
+    def update_status(
+        self,
+        *,
+        actor: Principal,
+        incident_id: int,
+        target_status: str,
+        reason: str,
+        expected_updated_at: datetime,
+        request_id: str,
+    ) -> Incident:
+        try:
+            target = IncidentStatus(target_status)
+        except ValueError as exc:
+            raise AppError(
+                code=IncidentErrorCode.INVALID_INPUT,
+                message="Incident status is invalid",
+                status_code=422,
+            ) from exc
+        clean_reason = reason.strip()
+        if len(clean_reason) < 2:
+            raise AppError(
+                code=IncidentErrorCode.INVALID_INPUT,
+                message="Incident status reason is required",
+                status_code=422,
+            )
+        transitions = {
+            IncidentStatus.OPEN: {
+                IncidentStatus.MONITORING,
+                IncidentStatus.RESOLVED,
+            },
+            IncidentStatus.MONITORING: {
+                IncidentStatus.OPEN,
+                IncidentStatus.RESOLVED,
+            },
+            IncidentStatus.RESOLVED: {
+                IncidentStatus.OPEN,
+                IncidentStatus.CLOSED,
+            },
+            IncidentStatus.CLOSED: {IncidentStatus.OPEN},
+        }
+        with begin_owned_transaction(self._session):
+            current_actor = self._reload_actor(actor)
+            incident = self._ai.get_incident_for_update(incident_id)
+            if incident is None:
+                raise AppError(
+                    code=IncidentErrorCode.NOT_FOUND,
+                    message="Incident was not found",
+                    status_code=404,
+                )
+            scope = OrganizationScope(
+                ScopeType.PROPERTY,
+                tenant_id=incident.tenant_id,
+                property_id=incident.property_id,
+            )
+            RbacService.require_permission(current_actor, INCIDENT_MANAGE, scope)
+            current = IncidentStatus(incident.status)
+            if incident.updated_at != expected_updated_at:
+                raise AppError(
+                    code=IncidentErrorCode.CONFLICT,
+                    message="Incident changed; refresh before updating its status",
+                    status_code=409,
+                    details={"retryable": True},
+                )
+            if target not in transitions[current]:
+                raise AppError(
+                    code=IncidentErrorCode.CONFLICT,
+                    message="Incident status transition is not allowed",
+                    status_code=409,
+                    details={"from_status": current.value, "to_status": target.value},
+                )
+            incident.status = target.value
+            self._audit.append(
+                action=AuditAction.INCIDENT_UPDATED,
+                resource_type=AuditResourceType.INCIDENT,
+                actor_user_id=current_actor.user_id,
+                resource_id=incident.id,
+                request_id=request_id,
+                scope_type=ScopeType.PROPERTY,
+                tenant_id=incident.tenant_id,
+                property_id=incident.property_id,
+                details={
+                    "incident_id": incident.id,
+                    "category": incident.category,
+                    "work_order_count": incident.work_order_count,
+                    "from_status": current.value,
+                    "to_status": target.value,
+                    "reason": clean_reason,
+                },
+            )
+            # Incident disposition deliberately does not mutate member work
+            # orders, receipts, assignments, or resident feedback history.
+            return incident
+
     def summarize(
         self,
         *,

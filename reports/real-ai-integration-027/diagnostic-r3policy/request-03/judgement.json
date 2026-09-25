@@ -1,0 +1,7 @@
+{
+  "continue": true,
+  "response_sha256": "ad11454b58fe29c11349c783b02c22bde0b07190a5b2d7dc706a676476b1265f",
+  "semantic_status": "PENDING_FINAL_FIXED_SET_ASSESSMENT",
+  "new_inference": true,
+  "note": "Collection continuation only; not an individual semantic PASS."
+}

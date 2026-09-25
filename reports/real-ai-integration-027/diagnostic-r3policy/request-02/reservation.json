@@ -1,0 +1,13 @@
+{
+  "number": 2,
+  "case": "GOLD-011",
+  "kind": "LLM",
+  "new_inference": false,
+  "reused_from": "reports\\real-ai-integration-027\\diagnostic-r3fix2\\candidate-02\\request-02",
+  "source_response_sha256": "3ea8c9db0b390c8114b46e7c11663539c442efa4b893918756df18365b3cf6a6",
+  "reason": "identical model, digest, prompt version, case input and parameters; server-policy-only reevaluation",
+  "candidate_number": 2,
+  "global_request_limit": 40,
+  "global_window_seconds": 3600,
+  "final_fixed_set": true
+}

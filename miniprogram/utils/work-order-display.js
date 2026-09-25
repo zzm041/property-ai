@@ -45,7 +45,12 @@ function presentDetail(item) {
     const name = Object.prototype.hasOwnProperty.call(names, id) ? names[id] : "";
     return name && name.trim() ? `${name}（员工 #${id}）` : `员工 #${id}（未提供展示名）`;
   };
+  const needsClarification =
+    item.work_order && item.work_order.status === "PENDING_ANALYSIS" &&
+    display.analysis_status === "LOW_CONFIDENCE";
   return {
+    needsClarification,
+    analysisMessage: needsClarification ? (display.analysis_message || "") : "",
     recoveryFailed: ["PENDING_ANALYSIS", "PENDING_ASSIGNMENT"].includes(item.work_order && item.work_order.status) &&
       (item.logs || []).filter(x => ["AI_TASK_ATTEMPT", "AI_TASK_FAILED"].includes(x.event_code)).sort((a, b) => b.id - a.id)[0]?.event_code === "AI_TASK_FAILED",
     timezoneLabel: display.property_timezone || "UTC",

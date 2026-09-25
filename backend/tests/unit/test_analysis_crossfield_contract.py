@@ -40,8 +40,8 @@ def test_special_restricted_skill_is_never_erased(category):
     assert m.required_skill=='HAZMAT_LICENSE' and not m.skill_mapping_applied
     assert hard_filter_candidate(candidate(m.required_duty,m.required_duty),required_duty=m.required_duty,required_skill=m.required_skill)==FilterReason.SKILL_MISMATCH
 
-@pytest.mark.parametrize('kw',[{'category':'unknown','required_skill':'maintenance'}, {'category':'other','required_skill':'other'}, {'confidence':.1}])
-def test_unknown_insufficient_or_low_confidence_not_promoted(kw):
+@pytest.mark.parametrize('kw',[{'category':'other','required_skill':'other'}, {'confidence':.1}])
+def test_insufficient_or_low_confidence_not_promoted(kw):
     assert map_analysis_output(output(**kw)).low_confidence
 
 @pytest.mark.parametrize('risk',['gas','safety'])
@@ -72,3 +72,43 @@ def test_audit_separates_original_derived_and_version():
     saved=repo.append.call_args.args[0].details_json
     assert saved['raw_required_skill']=='maintenance' and saved['effective_required_skill']=='CLEANING'
     assert saved['skill_mapping_applied'] is True and saved['dispatch_contract_version']=='category-duty-skill-v1'
+
+def test_low_confidence_keeps_raw_fields_but_has_no_effective_dispatch_fields():
+    from app.service.audit import AuditService
+    m=map_analysis_output(output(category='other',required_skill='maintenance',confidence=.3))
+    s=AnalysisService.__new__(AnalysisService);repo=MagicMock();s._audit=AuditService(MagicMock(),repository=repo)
+    s._append_success_audit(SimpleNamespace(id=2,tenant_id=3,property_id=4),SimpleNamespace(id=5,status='LOW_CONFIDENCE'),'offline',m)
+    saved=repo.append.call_args.args[0].details_json
+    assert saved['decision_code']=='CLARIFICATION_REQUIRED'
+    assert saved['dispatch_fields_applied'] is False
+    assert saved['raw_category']=='other' and saved['raw_required_skill']=='maintenance'
+    assert saved['effective_category'] is None and saved['effective_required_skill'] is None
+
+def test_low_confidence_never_selects_or_ranks_employee_recommendations():
+    m=map_analysis_output(output(category='other',required_skill='maintenance',confidence=.3))
+    s=AnalysisService.__new__(AnalysisService);s._ai=MagicMock();s._clock=MagicMock()
+    s._work_orders=MagicMock();s._settings=Settings(_env_file=None)
+    s._write_recommendations(SimpleNamespace(id=2),SimpleNamespace(id=5),m,None)
+    s._ai.delete_recommendations.assert_called_once_with(5)
+    s._ai.list_property_employees.assert_not_called()
+    s._work_orders.employee_global_occupancy.assert_not_called()
+
+def test_low_confidence_risk_is_preserved_while_dispatch_fields_are_ignored():
+    m=map_analysis_output(output(category='other',required_skill='maintenance',confidence=.3,risk='gas'))
+    assert m.low_confidence and m.risk==AiRisk.GAS and not m.dispatch_fields_applied
+    service=AutoDispatchService(None,settings=Settings(_env_file=None,ai_auto_assign=True))
+    assert service.maybe_assign(work_order=object(),mapped=m,request_id='offline')=='LOW_CONFIDENCE'
+
+def test_unknown_category_is_invalid_even_when_confidence_is_low():
+    raw = output(
+        category='noise',
+        required_skill='maintenance',
+        confidence=.6,
+        summary='夜里听到嗡嗡声，但来源未确定。',
+    )
+    with pytest.raises(ValueError, match="category is not a supported value"):
+        map_analysis_output(raw)
+    service = AnalysisService.__new__(AnalysisService)
+    service._settings = Settings(_env_file=None, llm_provider='development')
+    mapped, error = service._validate_payload(raw.model_dump())
+    assert mapped is None and error == 'AI.INVALID_OUTPUT'

@@ -1,0 +1,7 @@
+{
+  "reason": "The two explicitly reused reservations have no reserved_unix because they start no new window; inherited collector read that absent field before the approved override.",
+  "state_before_fix": "2 reused responses, 0 new reservations, 0 new inference",
+  "scope": "request numbering and new-window accounting only",
+  "frozen_candidate_changed": false,
+  "automatic_retry": false
+}

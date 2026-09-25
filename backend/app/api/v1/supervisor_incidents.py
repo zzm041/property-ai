@@ -9,7 +9,7 @@ from app.api.dependencies.auth import get_current_principal
 from app.api.dependencies.db import get_db_session
 from app.domain.iam import Principal
 from app.domain.incident import IncidentStatus
-from app.schema.ai import IncidentData, IncidentListData
+from app.schema.ai import IncidentData, IncidentListData, UpdateIncidentStatusRequest
 from app.schema.common import request_id_for, success_envelope
 from app.service.incident import IncidentService
 
@@ -91,6 +91,25 @@ def summarize_incident(
     record = service.summarize(
         actor=actor,
         incident_id=incident_id,
+        request_id=request_id_for(request),
+    )
+    return success_envelope(request, incident_data(record).model_dump(mode="json"))
+
+
+@router.post("/incidents/{incident_id}/status")
+def update_incident_status(
+    incident_id: int,
+    body: UpdateIncidentStatusRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[IncidentService, Depends(get_incident_service)],
+) -> dict[str, object]:
+    record = service.update_status(
+        actor=actor,
+        incident_id=incident_id,
+        target_status=body.status,
+        reason=body.reason,
+        expected_updated_at=body.expected_updated_at,
         request_id=request_id_for(request),
     )
     return success_envelope(request, incident_data(record).model_dump(mode="json"))

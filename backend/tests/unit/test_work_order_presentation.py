@@ -87,17 +87,20 @@ def test_missing_scoped_property_does_not_fetch_any_employee_name():
 def test_display_metadata_is_never_loaded_before_order_read_authorization():
     service = WorkOrderService.__new__(WorkOrderService)
     service._repository = MagicMock()
+    service._analysis = MagicMock()
     service.get_work_order = MagicMock(side_effect=AppError(code=WorkOrderErrorCode.NOT_FOUND, message='Not found', status_code=404))
     with pytest.raises(AppError):
         service.get_work_order_detail(actor=MagicMock(), work_order_id=31)
     assert not service._repository.mock_calls
+    service._analysis.get_current_analysis.assert_not_called()
     record = SimpleNamespace(id=31)
     service.get_work_order.side_effect = None
     service.get_work_order.return_value = record
     service._repository.get_display_context.return_value = {'property_timezone': 'UTC', 'assignee_names': {}}
+    service._analysis.get_current_analysis.return_value = SimpleNamespace(status='LOW_CONFIDENCE')
     result = service.get_work_order_detail(actor=MagicMock(), work_order_id=31)
     assert result[0] is record
-    assert result[-1] == {'property_timezone': 'UTC', 'assignee_names': {}}
+    assert result[-1] == {'property_timezone': 'UTC', 'assignee_names': {}, 'analysis_status': 'LOW_CONFIDENCE'}
     service._repository.get_display_context.assert_called_once_with(record)
 
 
@@ -107,7 +110,7 @@ const [root,scenario]=process.argv.slice(1),p=require(path.join(root,'miniprogra
 const statuses={PENDING_ANALYSIS:'待分析',PENDING_ASSIGNMENT:'待安排人员',ASSIGNED:'已派单',ACCEPTED:'已接单',PROCESSING:'处理中',WAIT_CONFIRM:'待住户确认',COMPLETED:'已完成',CANCELLED:'已撤销',CLOSED:'已归档'};
 if(scenario in statuses){assert.equal(p.statusLabel(scenario),statuses[scenario]);process.exit(0);}
 const raw={work_order:{id:31,status:'PROCESSING',process_reason:'EXTERNAL_COORDINATION',version:7,created_at:'2026-09-23T18:30:00Z'},
- display:{property_timezone:'Asia/Shanghai',assignee_names:{9:'合成员工'},timestamp_labels:{'2026-09-23T18:30:00Z':'2026-09-24 02:30:00 UTC+08:00'}},
+ display:{property_timezone:'Asia/Shanghai',assignee_names:{9:'合成员工'},timestamp_labels:{'2026-09-23T18:30:00Z':'2026-09-24 02:30:00 UTC+08:00'},analysis_status:'LOW_CONFIDENCE',analysis_message:'现有信息不足，请补充。'},
  assignments:[{id:8,employee_id:9}],processes:[{id:11,cycle_no:1,assignee_id:9,started_at:'2026-09-23T18:30:00Z'},{id:12,cycle_no:2,assignee_id:10}],
  receipts:[{id:21,process_id:11,problem_type:'ELECTRICAL'},{id:22,process_id:12,problem_type:'__proto__'}],
  feedbacks:[{id:40,process_id:11,unresolved_flag:true,created_at:'2026-09-23T18:30:00Z'}],
@@ -117,8 +120,15 @@ const saved=JSON.stringify(raw),view=p.presentDetail(raw);
 assert.equal(JSON.stringify(raw),saved,'projection must not mutate business data');
 if(scenario==='projection'){
  assert.equal(view.reasonLabel,'物业继续处理中');assert.equal(view.timezoneLabel,'Asia/Shanghai');assert.equal(view.createdAtLabel,'2026-09-24 02:30:00 UTC+08:00');
+ assert(!view.needsClarification);assert.equal(view.analysisMessage,'');
  assert.equal(view.processes[0].assigneeLabel,'合成员工（员工 #9）');assert.match(view.processes[1].assigneeLabel,/未提供展示名/);
  assert.equal(view.receipts[1].problemTypeLabel,'__proto__');assert.equal(view.logs[0].eventLabel,'提交报修');assert.equal(view.logs[0].actorLabel,'住户');assert.equal(view.media[0].phaseLabel,'报修附件');process.exit(0);
+}
+if(scenario==='clarification'){
+ raw.work_order.status='PENDING_ANALYSIS';raw.work_order.process_reason='NONE';
+ const pending=p.presentDetail(raw);assert(pending.needsClarification);assert.equal(pending.analysisMessage,'现有信息不足，请补充。');
+ for(const status of ['ASSIGNED','PROCESSING','CANCELLED','CLOSED']){raw.work_order.status=status;const final=p.presentDetail(raw);assert(!final.needsClarification);assert.equal(final.analysisMessage,'');}
+ process.exit(0);
 }
 if(scenario==='unknown'){
  assert.match(p.statusLabel('__proto__'),/未知状态/);assert.equal(p.utcLabel(null),'未记录');assert.equal(p.utcLabel('invalid'),'时间不可用');
@@ -142,7 +152,7 @@ vm.runInNewContext(fs.readFileSync(path.join(root,'miniprogram/pages/work-orders
 
 @pytest.mark.parametrize('scenario', [
     'PENDING_ANALYSIS', 'PENDING_ASSIGNMENT', 'ASSIGNED', 'ACCEPTED', 'PROCESSING',
-    'WAIT_CONFIRM', 'COMPLETED', 'CANCELLED', 'CLOSED', 'projection', 'unknown', 'page',
+    'WAIT_CONFIRM', 'COMPLETED', 'CANCELLED', 'CLOSED', 'projection', 'clarification', 'unknown', 'page',
 ])
 def test_readable_page_projection_preserves_business_state(scenario):
     result = subprocess.run(['node', '-e', SCRIPT, str(ROOT), scenario], capture_output=True, text=True, timeout=15)

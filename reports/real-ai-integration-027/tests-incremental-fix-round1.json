@@ -1,0 +1,29 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-INCREMENTAL",
+  "observed_at": "2026-09-25T18:27:57+08:00",
+  "base_sha": "29f2302ba0bde3a6cc799409fcb58c6e308cb4cb",
+  "scope": [
+    "backend/tests/unit/test_analysis_crossfield_contract.py",
+    "backend/tests/unit/test_work_order_presentation.py",
+    "backend/tests/unit/test_incident_management.py",
+    "backend/tests/unit/test_backup_restore_027_guard.py"
+  ],
+  "result": {
+    "business_and_presentation_assertions": {
+      "passed": 61,
+      "failed": 0,
+      "warning_count": 1
+    },
+    "restore_guard_assertions": {
+      "passed": 12,
+      "failed": 0,
+      "warning_count": 1,
+      "basetemp": "D:/property-ai/tmp/pytest-r3policy-final-20260925T1910"
+    }
+  },
+  "first_invocation_boundary": "The first combined invocation exited 1 because four restore-guard cases could not create pytest tmp_path under C:/Users/lmj/AppData/Local/Temp/pytest-of-lmj. The other 61 cases passed. The four affected cases were rerun through the same test file with a fresh workspace-local basetemp; the complete restore-guard file then reported 12 passed.",
+  "raw_output_path": null,
+  "raw_output_status": "NOT_PERSISTED; counts are captured from the main-session command results and must not be described as independently read raw logs.",
+  "database_or_service_access": false,
+  "model_requests": 0
+}

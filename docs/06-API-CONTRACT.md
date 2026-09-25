@@ -173,6 +173,7 @@
 | GET | `/supervisor/incidents` |
 | GET | `/supervisor/incidents/{id}` |
 | POST | `/supervisor/incidents/{id}/summary` | 触发 AI 摘要 |
+| POST | `/supervisor/incidents/{id}/status` | 具备目标范围 `incident:manage` 的人员提交 `status`、必填 `reason` 与 `expected_updated_at`；冲突 409；不批量改变成员工单 |
 | POST | `/admin/announcements` | 草稿，可带 ai_draft |
 | GET | `/admin/announcements` | 当前管理范围公告及定向、审核、审计历史 |
 | GET | `/admin/announcements/{id}` | 管理详情及历史 |
