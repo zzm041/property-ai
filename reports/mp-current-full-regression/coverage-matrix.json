@@ -1536,7 +1536,7 @@
         "implementation_status": "current_schema_rule_aggregation_shared_auto_dispatch_and_transferable_capacity_wired",
         "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE",
         "evidence_version": "1046f1003847120ceddbbc1666a1aa920ae6ae0e / e58829a4d52cd94ff8bf62027e2081da7a8ca1bf",
-        "remaining_gap": "scope-filtered management page is supplied by INCIDENT-MGMT-UI-009; formal Incident disposition policy, real self-hosted model, production runtime and Production V1 acceptance remain"
+        "remaining_gap": "scope-filtered management and reasoned audited disposition are supplied by the current closeout candidate; real self-hosted model, production runtime and Production V1 acceptance remain"
       }
     ]
   },
@@ -1666,28 +1666,28 @@
   },
   "incident_management_009": {
     "task_id": "INCIDENT-MGMT-UI-009",
-    "implementation_head": "9033caae493f120789f07f919d69666afc33625b",
-    "evidence_head": "77fd1f8009db4057b2d36bc4e4a5d518e23f5634",
-    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE",
+    "implementation_head": "fe90913a6f3918bca33b2f100137a786a67c4f86",
+    "evidence_head": "098da6cc6a295d40bf2c89327c061d88f0d281a3",
+    "status": "PASS_SCOPED_LOCAL_DEVELOPMENT_RUNTIME",
     "independent_review": {
       "result": "PASS",
-      "path": "reports/codex/INCIDENT-MGMT-UI-009-review.json",
-      "boundary": "Independent read-only review inspected the scoped product diff, redacted API/page/read-only-DB evidence and all six screenshots without rerunning tests, operating pages or sending requests."
+      "path": "reports/real-ai-integration-027/review-incremental-round4-binding.json",
+      "boundary": "The same independent read-only reviewer accepted the scoped Developer Tools/API/DB evidence, closed the preparation-runner finding and bound the final guard hash without rerunning business, page, model, database or queue operations."
     },
     "current_status_overlays": [
       {
         "id": "INCIDENT-UI",
-        "implementation_status": "scope_filtered_list_detail_status_filter_paging_development_summary_draft_and_staff_current_participant_view_wired",
-        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE",
-        "evidence_version": "9033caae493f120789f07f919d69666afc33625b / 77fd1f8009db4057b2d36bc4e4a5d518e23f5634",
-        "remaining_gap": "formal Incident status-disposition API and transition policy, real self-hosted model, production runtime and Production V1 acceptance"
+        "implementation_status": "scope_filtered_list_detail_status_filter_paging_development_summary_draft_staff_participant_view_and_reasoned_audited_disposition_wired",
+        "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_RUNTIME",
+        "evidence_version": "9033caae493f120789f07f919d69666afc33625b / 77fd1f8009db4057b2d36bc4e4a5d518e23f5634 / fe90913a6f3918bca33b2f100137a786a67c4f86 / incident-closeout-d020aa7150 / review-incremental-round4 plus final-hash binding",
+        "remaining_gap": "other disposition transitions and reanalysis-after-clarification lack new page runtime evidence; real self-hosted model, production runtime and Production V1 acceptance"
       },
       {
         "id": "V1-INCIDENT-AGGREGATE",
         "implementation_status": "current_schema_rule_aggregation_shared_auto_dispatch_transferable_capacity_and_scope_filtered_management_visibility_wired",
         "verification_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE",
         "evidence_version": "1046f1003847120ceddbbc1666a1aa920ae6ae0e / e58829a4d52cd94ff8bf62027e2081da7a8ca1bf / 9033caae493f120789f07f919d69666afc33625b / 77fd1f8009db4057b2d36bc4e4a5d518e23f5634",
-        "remaining_gap": "formal Incident status-disposition API and transition policy, real self-hosted model, production runtime and Production V1 acceptance"
+        "remaining_gap": "other disposition transitions lack new page runtime evidence; real self-hosted model, production runtime and Production V1 acceptance"
       }
     ]
   },
@@ -2323,7 +2323,7 @@
     "status": "R2_SCOPED_LOCAL_PASS_R3_NOT_READY_OVERALL_NOT_FULL_PASS",
     "evidence_index": "reports/real-ai-integration-027/closeout.md",
     "source_binding": "reports/real-ai-integration-027/review-source-manifest.json",
-    "review": "Same independent context retained call022 NEEDS_CHANGES then closed 027-CALL022-R1-01; incremental result review PASS_SCOPED_R2_CONTINUATION. Current policy/R6/Incident round1 found three software/evidence issues; fixes await narrow round2. R3 and whole027 remain NOT_FULL_PASS. Prior main round1 original UNAVAILABLE, not reconstructed",
+    "review": "Same independent context retained call022 NEEDS_CHANGES then closed 027-CALL022-R1-01; incremental result review PASS_SCOPED_R2_CONTINUATION. Policy/R6/Incident review rounds1-4 closed the scoped software/evidence findings; final hash binding keeps 027-INC-R3-01 CLOSED. R3 and whole027 remain NOT_FULL_PASS. Prior main round1 original UNAVAILABLE, not reconstructed",
     "current_status_overlays": [
       {"id":"KNOWLEDGE-INGEST-UI","implementation_status":"Prior008 scopedPASS retained;027 normal pages created3documents/4versions, independent Worker activated real1024vectors; authorized page archive retained history; staff knowledge entry fixed","verification_status":"SCOPED_LOCAL_REAL_PROVIDER_PASS_NOT_PRODUCTION","evidence_version":"a6dcc39;027 pages/runtime-continuation-final/review-r2-continuation","remaining_gap":"Generalized quality, scale, target deployment, native device and production acceptance","next_action":"Preserve current objects and evidence; no repeated ingestion or inference without a new bounded approval"},
       {"id":"SELFHOST-AI","implementation_status":"Exact isolated ASR/BGE CPU environments and compatibility proved; R2 real bge/reranker/Qwen RAG plus one exact synthetic-audio ASR succeeded. Forward-only low-confidence server policy is wired, but unchanged r3fix2b stopped after2 reused+2 new results when GOLD013 emitted unknown category noise.","verification_status":"R2_SCOPED_LOCAL_PASS; R3_NOT_READY_FOR_AUTO","evidence_version":"a6dcc39 plus diagnostic-r3policy/result-summary.json and current software tests after29f2302; original failures retained","remaining_gap":"Complete fixed text/image quality set and real AUTO remain unverified; resident/native voice, generalized quality, target runtime and production acceptance also remain open","next_action":"Do not switch 4B or reuse the stopped window. A separately frozen enum/catalog strategy or different model route is required before another bounded quality run."},
@@ -2542,11 +2542,11 @@
       },
       {
         "requirement_id": "WO-AUTO-DISPATCH",
-        "current_implementation": "Existing system-owned eligibility/ranking/AUTO/notification and scoped Development cross-process evidence retained. Real local2B order12 failed semantic quality; latest4B R3fix2 used2/2 candidates and stopped after an insufficient-evidence raw-field contract mismatch. The actual0.3-confidence result is blocked before AUTO by the existing0.70 guard. No real business dispatch occurred.",
+        "current_implementation": "Existing system-owned eligibility/ranking/AUTO/notification and scoped Development cross-process evidence retained. Real local2B order12 failed semantic quality. The forward-only low-confidence policy preserves legal raw fields but suppresses effective category/skill, recommendation, Assignment/occupancy and Incident; actual page/DB evidence confirms order12 remains pending clarification. The unchanged r3fix2b fixed set later stopped when GOLD013 emitted unknown category noise. No real business dispatch occurred.",
         "verification_mode_status": "PASS_SCOPED_DEVELOPMENT_REAL_AUTO_NOT_ACCEPTED",
-        "evidence_version": "Prior staff/019/022 evidence retained; e65b4d7 localqwen-b1090f3deaa3 failed2B order12;027 diagnostic-r3fix2 result-summary and raw candidate01/02 responses",
-        "remaining_gap": "Normal sufficient reports with eligible staff must actually create AUTO Assignment/notification without manager action. No complete32-request4B candidate; the final raw category/skill fields violate the frozen quality contract even though the actual low-confidence guard prevents AUTO. Realimage/business latency and production acceptance remain open.",
-        "next_action": "Keep protected orders unchanged. Stop at2/2 candidates; decide whether the frozen low-confidence raw-field contract remains other/other or define a documented deterministic normalization/clarification policy before any future bounded quality attempt or real AUTO switch."
+        "evidence_version": "Prior staff/019/022 evidence retained; e65b4d7 localqwen-b1090f3deaa3 failed2B order12;027 diagnostic-r3policy plus runtime-closeout and independent review round4 binding",
+        "remaining_gap": "Normal sufficient reports with eligible staff must actually create AUTO Assignment/notification without manager action. No complete fixed 4B candidate because the latest model output used an unknown enum. Real image/business latency and production acceptance remain open.",
+        "next_action": "Keep protected orders unchanged and do not switch AUTH001 to4B. A separately approved frozen enum/catalog strategy or different model route is required before another bounded quality attempt."
       },
       {
         "requirement_id": "WO-STAFF-PROCESS",
@@ -2710,11 +2710,11 @@
       },
       {
         "requirement_id": "SELFHOST-AI",
-        "current_implementation": "Exact isolated ASR/BGE environments and real compatibility completed; R2 continuation independently accepted real1024 RAG and one exact synthetic ASR result. R3fix2 preserved two candidates and3/40 real calls: subject evidence corrected, but the final candidate returned other/maintenance instead of the frozen other/other raw-field contract. Existing low-confidence protection blocks this actual result before AUTO.",
+        "current_implementation": "Exact isolated ASR/BGE environments and real compatibility completed; R2 continuation independently accepted real1024 RAG and one exact synthetic ASR result. The approved low-confidence policy was implemented without rewriting raw output. The unchanged r3fix2b fixed set then stopped after2 reused+2 new results because GOLD013 returned unknown category noise; no images or business switch followed.",
         "verification_mode_status": "R2_PASS_SCOPED_LOCAL_CONTINUATION;R3_NOT_READY_FOR_AUTO",
-        "evidence_version": "027 review-r2-continuation.json; diagnostic-r3fix2 candidate01/02 originals and result-summary; prior2B/28case/3of3/128call histories retained",
-        "remaining_gap": "No complete32-request R3 candidate, real repair-image fixed set or real AUTO business flow. Final raw-field contract failure is not a proved misassignment because the actual low-confidence guard stops AUTO; production quality/runtime/performance remain unaccepted.",
-        "next_action": "Stop model branch at2/2 candidates. Decide whether the frozen low-confidence raw-field contract remains strict other/other or define a documented deterministic normalization/clarification policy; no raw-output rewrite, third candidate, new weights or fees."
+        "evidence_version": "027 review-r2-continuation.json; diagnostic-r3policy originals/result-summary; runtime-closeout; prior2B/28case/3of3/128call histories retained",
+        "remaining_gap": "No complete fixed R3 candidate, real repair-image fixed set or real AUTO business flow. The latest unknown enum is not accepted by the low-confidence policy; production quality/runtime/performance remain unaccepted.",
+        "next_action": "Keep R3 NOT_READY and do not reuse the stopped window. Decide a separately frozen enum/catalog strategy or different model route; no silent coercion, extra calls, new weights or fees."
       },
       {
         "requirement_id": "REAL-SMS",
@@ -2766,11 +2766,11 @@
       },
       {
         "requirement_id": "INCIDENT-UI",
-        "current_implementation": "scope_filtered_list_detail_status_filter_paging_development_summary_draft_and_staff_current_participant_view_wired",
-        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE",
-        "evidence_version": "9033caae493f120789f07f919d69666afc33625b / 77fd1f8009db4057b2d36bc4e4a5d518e23f5634",
-        "remaining_gap": "formal Incident status-disposition API and transition policy, real self-hosted model, production runtime and Production V1 acceptance",
-        "next_action": "retain scoped evidence; define and approve the frozen disposition contract before implementation, then complete real-model and production acceptance"
+        "current_implementation": "scope_filtered_list_detail_status_filter_paging_development_summary_draft_staff_participant_view_and_reasoned_audited_disposition_wired",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_RUNTIME",
+        "evidence_version": "9033caae493f120789f07f919d69666afc33625b / 77fd1f8009db4057b2d36bc4e4a5d518e23f5634 / fe90913a6f3918bca33b2f100137a786a67c4f86 / incident-closeout-d020aa7150 / review-incremental-round4-binding",
+        "remaining_gap": "other disposition transitions lack new page runtime evidence; real self-hosted model, production runtime and Production V1 acceptance",
+        "next_action": "retain scoped disposition evidence; validate remaining transitions only when directly required, then complete real-model and production acceptance"
       },
       {
         "requirement_id": "STAFF-DAILY-PAGE",
@@ -2871,10 +2871,10 @@
       {
         "requirement_id": "V1-INCIDENT-AGGREGATE",
         "current_implementation": "current_schema_rule_aggregation_shared_auto_dispatch_transferable_capacity_scope_filtered_management_and_reasoned_audited_disposition_reopen_wired",
-        "verification_mode_status": "AGGREGATION_PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE;DISPOSITION_UNIT_UI_WIRING_PASS_RUNTIME_PENDING",
-        "evidence_version": "prior 005/009 retained; current 027 Incident selection 14 passed 1 warning on WIP after 29f2302",
-        "remaining_gap": "actual disposition page/API/DB evidence and independent review; real self-hosted model, production runtime and Production V1 acceptance",
-        "next_action": "run only the new disposition runtime path on the fixed candidate; do not replay aggregation or mutate member work orders"
+        "verification_mode_status": "AGGREGATION_PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE;DISPOSITION_PASS_SCOPED_LOCAL_DEVELOPMENT_RUNTIME",
+        "evidence_version": "prior 005/009 retained; fe90913; incident-closeout-d020aa7150; 027 review-incremental-round4 plus final-hash binding",
+        "remaining_gap": "other disposition transitions and real-model aggregation lack new runtime proof; production runtime and Production V1 acceptance",
+        "next_action": "preserve the scoped evidence; do not replay aggregation or mutate member work orders solely to expand screenshots"
       },
       {
         "requirement_id": "V1-ANN-TARGET",
@@ -2983,8 +2983,8 @@
       {
         "requirement_id": "V1-AUTO-DISPATCH-FILTER",
         "current_implementation": "024/025 unified maintenance eligibility,fairness,waiting,recovery retained. New legal-low-confidence policy suppresses effective category/skill, recommendations,Assignment,occupancy andIncident while retaining raw fields/risk and resident clarification.",
-        "verification_mode_status": "024_025_PASS_RETAINED;LOW_CONFIDENCE_SOFTWARE_FOCUSED_PASS;REAL_R3_NOT_READY",
-        "evidence_version": "prior024/025 retained; current low-confidence 120 passed 3 warnings; diagnostic-r3policy stopped after2 reused+2 new at GOLD013 invalid enum noise",
+        "verification_mode_status": "024_025_PASS_RETAINED;LOW_CONFIDENCE_PASS_SCOPED_LOCAL_DEVELOPMENT_RUNTIME;REAL_R3_NOT_READY",
+        "evidence_version": "prior024/025 retained; current low-confidence120 passed3 warnings plus workorder12 page/API/DB evidence and independent round4; diagnostic-r3policy stopped after2 reused+2 new at GOLD013 invalid enum noise",
         "remaining_gap": "real Qwen text/image/voice AUTO remains unverified because fixed candidate emitted an unknown enum; production/device and broader reliability also remain open",
         "next_action": "do not switch AUTH001 to4B. Decide one separately frozen enum/catalog normalization or different model route; no silent coercion or extra calls under the stopped run."
       },
