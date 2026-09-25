@@ -2,7 +2,7 @@
 
 ## Current checkpoint — REAL-AI-INTEGRATION-027 (2026-09-25)
 
-Main Codex sole writer; base `ad7d100`, current source/evidence WIP bound by `reports/real-ai-integration-027/review-source-manifest.json`. Read `closeout.md` in that directory for this step, not historical sections below by default. Deadline remains **2026-09-27 14:00 Asia/Shanghai**; last owner-provided quota baseline **31%**, actual current balance UNKNOWN. No paid resources or resets.
+Main Codex sole writer; saved product/evidence **28c08dfa3e00c9af412db852fde0287bcc36f980**, based on `ad7d100`, bound by `reports/real-ai-integration-027/review-source-manifest.json` plus `review-fix1-manifest.json`. Review originals and commit linkage are in `review-commit-binding.json`. Read `closeout.md` in that directory for this step, not historical sections below by default. Deadline remains **2026-09-27 14:00 Asia/Shanghai**; last owner-provided quota baseline **31%**, actual current balance UNKNOWN. No paid resources or resets.
 
 R1 exact isolated packages and three real model compatibility requests completed. R3 observed-event v10 diagnosis stopped on third request with false event labels: **NOT_READY**, zero pictures, no real AUTO, no further diagnosis authorized. Prior independent round-1 JSON was not saved before compaction and is **UNAVAILABLE**; do not reconstruct it as original. Same read-only reviewer now checking the exact WIP and R2 evidence; returned JSON must be saved immediately with source binding, later addenda separately.
 

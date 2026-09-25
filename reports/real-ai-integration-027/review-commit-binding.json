@@ -1,0 +1,17 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "product_evidence_commit": "28c08dfa3e00c9af412db852fde0287bcc36f980",
+  "base_sha": "ad7d100ba16fa8b11e61526cfd11978a5820a040",
+  "reviewer": "/root/review025_round1",
+  "review_round2_original_sha256": "e78eddd94cd7a89d5500937a2a9b6e717b13354f0fae917554fc4f23374954cf",
+  "review_round3_original_sha256": "c09c9c195c28835da422b007ca660c1f0400939227837e2c2d7ba488bc931141",
+  "review_source_manifest_sha256": "5a9a26a769e270b3f6d29a5da6f4ea576d6423e587085972cea1ad6b9956864f",
+  "review_fix1_manifest_sha256": "f1236498ea18d311e4d898fca23bad532d6e8fea656edb76f6d20aa41f28e061",
+  "round1_original": "UNAVAILABLE; not reconstructed",
+  "verdict": "PASS_SCOPED_SOFTWARE_FIX_ONLY; overall027 NOT_FULL_PASS",
+  "runtime": "Pinned backend b13ba9a284fffb97551fddb48f4d6237807eedb2203f59a25dba53c3a6b6a2e8 and model-adapter-fix1; latest process-job repair NOT loaded",
+  "model_calls_unchanged": {"R3":3,"R2_embedding":12,"R2_reranker":8,"R2_qwen":8,"R2_asr":1},
+  "original_failed_log_preserved": "tests-20260925T050604.txt retains its two original traceback trailing spaces; all other staged source/evidence whitespace checks passed",
+  "protected_config_sha256": "342ED0B61FE9C74E7A5CE82198C8F36BD9341D5CDA83DE2C408F33256867FE1F",
+  "tracking_only": "This binding does not rerun tests, reload runtime, invoke a model or change authorization."
+}
