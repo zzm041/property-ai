@@ -157,12 +157,14 @@ def test_versioned_prompt_keeps_context_as_json_evidence_and_usage_separate():
     payload, error, _ = s._run_llm(snapshot(context=context), asr_text=None, vision_text='images', request_id='req', attempt=1)
     assert error is None and dict(payload) == SUCCESS_ANALYSIS
     call = s._llm.structured_completion.call_args.kwargs
-    assert call['prompt_version'] == 'wo-analysis-v10-observed-event'
+    assert call['prompt_version'] == 'wo-analysis-v10-observed-event-r3fix1'
     assert 'summary 必须用简体中文' in call['prompt']
     assert '仅是过去记录' in call['prompt']
     assert '多项普通维修不必拆单或选唯一工种' in call['prompt']
     assert 'summary用中文分项完整列出所有当前问题' in call['prompt']
     assert '不推断未确认的内部原因、犯罪意图' in call['prompt']
+    assert '发黑、焦黑、熏黑用烧焦变色' in call['prompt']
+    assert '没有明确燃气字样不得标疑似燃气气味' in call['prompt']
     schema = json.loads(call['prompt'].split('OUTPUT_SCHEMA: ', 1)[1].split('\n证据规则：', 1)[0])
     assert 'observations' in schema['properties']
     assert 'subcategory' not in schema['properties']

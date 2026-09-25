@@ -1,0 +1,91 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-44\",\"object\":\"chat.completion\",\"created\":1790324128,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"electrical\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"火花烧损\\\",\\n      \\\"subject\\\": \\\"插座\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"插座正在连续冒火花\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"烧焦变色\\\",\\n      \\\"subject\\\": \\\"插座\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"塑料外壳已经发黑\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"焦煳气味\\\",\\n      \\\"subject\\\": \\\"插座\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"还有明显焦味\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"high\\\",\\n  \\\"priority\\\": \\\"p1\\\",\\n  \\\"summary\\\": \\\"测试房插座连续冒火花，塑料外壳发黑，伴有明显焦味。\\\",\\n  \\\"risk\\\": \\\"electric\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1444,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens\":232,\"total_tokens\":1676}}\n",
+  "raw_response_sha256": "46922c1b397715c8525a485d947f7177f1eee1c0d21cb6ecea0d2ab6be33b309",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-007",
+    "tags": [
+      "危险证据",
+      "火花"
+    ],
+    "report": "插座正在连续冒火花，塑料外壳已经发黑，还有明显焦味；我没有触碰它，请尽快处理。",
+    "history": [],
+    "facts": [
+      "正在连续火花",
+      "外壳发黑焦味",
+      "未触碰"
+    ],
+    "forbidden": [
+      "无危险",
+      "只是停电",
+      "已熄灭",
+      "确认墙内短路",
+      "有人受伤"
+    ],
+    "accept": [
+      [
+        "electrical",
+        "electrician",
+        [
+          "electric",
+          "safety"
+        ]
+      ]
+    ],
+    "manual": "RULES"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "electrical",
+      "observations": [
+        {
+          "label": "火花烧损",
+          "subject": "插座",
+          "source": "report",
+          "quote": "插座正在连续冒火花"
+        },
+        {
+          "label": "烧焦变色",
+          "subject": "插座",
+          "source": "report",
+          "quote": "塑料外壳已经发黑"
+        },
+        {
+          "label": "焦煳气味",
+          "subject": "插座",
+          "source": "report",
+          "quote": "还有明显焦味"
+        }
+      ],
+      "severity": "high",
+      "priority": "p1",
+      "summary": "测试房插座连续冒火花，塑料外壳发黑，伴有明显焦味。",
+      "risk": "electric",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.95
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 08:15:21.656220+00:00",
+      "latency_ms": 6373,
+      "request_id": "supplement-GOLD-007",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1676
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix1",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "88c973ef6f2ca602645074f84743d1b4c999cc54"
+}

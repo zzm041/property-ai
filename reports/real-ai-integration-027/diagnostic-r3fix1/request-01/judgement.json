@@ -1,0 +1,7 @@
+{
+  "continue": false,
+  "source": "main inspected original input/output; independent review pending",
+  "response_sha256": "817d420709906de06390fde617d08444bc668b6cf26b2263289044eb32b6bd24",
+  "note": "关键接线失败：标签已正确修复为烧焦变色/焦煳气味，但两条逐字证据仅包含塑料外壳/焦味，原始输出仍把subject标为插座；服务端同句对象校验拒绝，正常自动化不能继续。保留原始答案，不追加请求。",
+  "raw_vs_effective": null
+}

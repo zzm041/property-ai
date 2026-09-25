@@ -1,0 +1,40 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "branch": "R3_DIRECTED_FIX_DIAGNOSTIC",
+  "base_sha": "88c973ef6f2ca602645074f84743d1b4c999cc54",
+  "candidate_prompt_version": "wo-analysis-v10-observed-event-r3fix1",
+  "model": "qwen3.5:4b",
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "fixed_budget": {
+    "maximum_requests": 32,
+    "used_requests": 1,
+    "maximum_window_seconds": 1800,
+    "image_requests_used": 0,
+    "unused_requests_are_not_reusable_authorization": true
+  },
+  "offline_tests": {
+    "failed_construction_log_retained": "tests-20260925T081255.txt",
+    "passing_log": "tests-20260925T081313.txt",
+    "result": "76 passed, 1 warning"
+  },
+  "result": "NOT_READY",
+  "ready_for_bounded_auto": false,
+  "business_auto_started": false,
+  "request_process_cleanup": {
+    "supervised_child_exit_code": 0,
+    "model_side_completion": "response_received",
+    "later_os_process_recheck": "UNKNOWN: two read-only process-query attempts were not executed because the approval reviewer timed out; no inference or service action was retried"
+  },
+  "actual_improvement": "The raw model used 烧焦变色 and 焦煳气味 instead of the old false 表面剥落 and 疑似燃气气味 labels; category, risk and summary remained correct.",
+  "blocking_result": "The raw model assigned subject=插座 to two observations whose exact quoted clauses contain only 塑料外壳 and 焦味. The unchanged server same-clause subject evidence check rejects the analysis, so normal automatic processing cannot continue.",
+  "stop_rule_applied": "First critical evidence/contract failure stopped the branch; no second request, image request, prompt edit, restart or AUTO work order was made.",
+  "next_decision": "If another diagnostic is approved later, minimally clarify that a quote without an enumerated subject must use 未确定 (or approve one explicit observable device-shell subject) and keep the same server fail-closed evidence rule. A new fixed candidate and new bounded budget are required; this stopped window cannot be reset.",
+  "evidence_sha256": {
+    "frozen.json": "6f3568c7e7258acf9b67e72e368d946f2bf2446557ea0b323fa577b8d3f410b0",
+    "request-01/request.json": "0ba48f1a6b0136036131b31f5298567f4d62160ae597fff67b8a8494ee3a8619",
+    "request-01/response.json": "817d420709906de06390fde617d08444bc668b6cf26b2263289044eb32b6bd24",
+    "request-01/judgement.json": "3f0a2cdd003d54973953fc5e93d5459f35b1259624e16c3da5a98673875d4426",
+    "request-01/supervision.json": "068f3f7497450159639eacbccadc62ca20f4d08078ba2dcfb13531e9620eceee",
+    "stop.json": "96f4b6d58883b7deb873cc5338c35380ea3e5f2d5870dfe537725bcdf662580f"
+  }
+}

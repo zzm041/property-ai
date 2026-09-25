@@ -1,0 +1,64 @@
+................F....................................................... [ 94%]
+....                                                                     [100%]
+================================== FAILURES ===================================
+_ test_r3fix_request03_current_observations_map_without_rewriting_raw_failure _
+
+    def test_r3fix_request03_current_observations_map_without_rewriting_raw_failure():
+        import json
+        from pathlib import Path
+        text='插座正在连续冒火花，塑料外壳已经发黑，还有明显焦味；我没有触碰它，请尽快处理。'
+        old=json.loads((Path(__file__).resolve().parents[3]/'reports/real-ai-integration-027/diagnostic/request-03/response.json').read_text(encoding='utf-8'))['provider_result'][0]
+        with pytest.raises(ValueError,match='does not support'):
+            bind(old,{'report':text})
+        assert [x['label'] for x in old['observations']]==['火花烧损','表面剥落','疑似燃气气味']
+        fixed=payload('插座正在连续冒火花',label='火花烧损',subject='插座')
+        fixed['observations'] += [
+            dict(label='烧焦变色',subject='插座',source='report',quote='塑料外壳已经发黑'),
+            dict(label='焦煳气味',subject='未确定',source='report',quote='还有明显焦味'),
+        ]
+>       key,trace=bind(fixed,{'report':text})
+
+backend\tests\unit\test_observed_event_027.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\tests\unit\test_observed_event_027.py:16: in bind
+    def bind(value,source):return bind_observations(ObservedAnalysisOutput.model_validate(value),source)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+output = ObservedAnalysisOutput(category='water_supply', observations=[Observation(label='火花烧损', subject='插座', source='report',..., priority='p4', summary='插座正在连续冒火花', risk='none', required_role='STAFF', required_skill='maintenance', confidence=0.9)
+sources = {'report': '插座正在连续冒火花，塑料外壳已经发黑，还有明显焦味；我没有触碰它，请尽快处理。'}
+
+    def bind_observations(output: ObservedAnalysisOutput, sources: dict[str,str]) -> tuple[str,dict]:
+        normalized=[]
+        for item in output.observations:
+            source=sources.get(item.source,'') or ''
+            positions=[m.start() for m in re.finditer(re.escape(item.quote),source)]
+            if len(positions)!=1:raise ValueError('Observation needs one exact current-source span')
+            start=positions[0];clause,left=_clause(source,start,start+len(item.quote))
+            match=re.search(PATTERNS[item.label],item.quote)
+            if not match:raise ValueError('Quote does not support observable label')
+            # A token inside an explicitly denied/guessed/reported/historical clause
+            # is not proof. Unknown stays unconfirmed; no motive label exists.
+            if item.label!='现象待核实':
+                if _UNCERTAIN.search(clause) or _HISTORY.search(clause):raise ValueError('Observation is not confirmed current evidence')
+                prefix=source[left:start+match.start()]
+                if item.label!='外观无明显异常' and _NEGATIVE.search(prefix):raise ValueError('Negated observation')
+                suffix=source[start+match.end():left+len(clause)]
+                if item.label!='外观无明显异常' and _POST_NEGATIVE.search(suffix):raise ValueError('Postposed negated observation')
+            if item.subject!='未确定' and not re.search(SUBJECT_PATTERNS[item.subject],clause):
+>               raise ValueError('Subject not supported by the same observation clause')
+E               ValueError: Subject not supported by the same observation clause
+
+backend\app\domain\observed_event.py:85: ValueError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:40
+  D:\property-ai\.venv\Lib\site-packages\starlette\testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\unit\test_observed_event_027.py::test_r3fix_request03_current_observations_map_without_rewriting_raw_failure
+1 failed, 75 passed, 1 warning in 0.52s
+D:\property-ai\.venv\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))

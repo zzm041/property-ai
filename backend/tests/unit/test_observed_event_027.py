@@ -67,6 +67,42 @@ def test_review_027_r3_r1_02_postposed_negation_cannot_share_positive_key(text):
     positive=payload('插座出现火花',label='火花烧损',subject='插座')
     assert bind(positive,{'report':positive['summary']})[0]
 
+def test_r3fix_request03_current_observations_map_without_rewriting_raw_failure():
+    import json
+    from pathlib import Path
+    text='插座正在连续冒火花，塑料外壳已经发黑，还有明显焦味；我没有触碰它，请尽快处理。'
+    old=json.loads((Path(__file__).resolve().parents[3]/'reports/real-ai-integration-027/diagnostic/request-03/response.json').read_text(encoding='utf-8'))['provider_result'][0]
+    with pytest.raises(ValueError,match='does not support'):
+        bind(old,{'report':text})
+    assert [x['label'] for x in old['observations']]==['火花烧损','表面剥落','疑似燃气气味']
+    fixed=payload('插座正在连续冒火花',label='火花烧损',subject='插座')
+    fixed['observations'] += [
+        dict(label='烧焦变色',subject='未确定',source='report',quote='塑料外壳已经发黑'),
+        dict(label='焦煳气味',subject='未确定',source='report',quote='还有明显焦味'),
+    ]
+    key,trace=bind(fixed,{'report':text})
+    assert key.startswith('evt1:')
+    assert [x['label'] for x in trace['observations']]==['火花烧损','烧焦变色','焦煳气味']
+    assert trace['raw_model_output']==fixed
+
+@pytest.mark.parametrize('label,quote',[('表面剥落','塑料外壳已经发黑'),('疑似燃气气味','还有明显焦味')])
+def test_r3fix_old_request03_nearest_wrong_labels_remain_rejected(label,quote):
+    with pytest.raises(ValueError,match='does not support'):
+        bind(payload(quote,label=label,subject='插座' if label=='表面剥落' else '未确定'),{'report':quote})
+
+@pytest.mark.parametrize('label,text',[('烧焦变色','插座发黑'),('焦煳气味','插座有焦味')])
+@pytest.mark.parametrize('prefix',['没有','上次','我怀疑'])
+def test_r3fix_new_observations_do_not_accept_negated_historical_or_guessed_evidence(label,text,prefix):
+    with pytest.raises(ValueError):
+        bind(payload(text,label=label,subject='插座'),{'report':prefix+text})
+
+def test_r3fix_burning_smell_and_gas_smell_are_distinct_observations():
+    burning=payload('插座有烧焦味',label='焦煳气味',subject='插座')
+    gas=payload('厨房有明显燃气气味',label='疑似燃气气味',subject='未确定')
+    assert bind(burning,{'report':burning['summary']})[0]
+    assert bind(gas,{'report':gas['summary']})[0]
+    with pytest.raises(ValueError):bind(payload('插座有烧焦味',label='疑似燃气气味',subject='插座'),{'report':'插座有烧焦味'})
+
 def test_real_provider_requires_evidence_and_existing_analysis_has_effective_key():
     s=AnalysisService.__new__(AnalysisService);s._settings=Settings(_env_file=None,llm_provider='production')
     v=payload();mapped,error=s._validate_payload(v,sources={'report':v['summary']})
