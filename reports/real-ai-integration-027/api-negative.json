@@ -1,0 +1,67 @@
+{
+  "run_id": "ai027-b439223fda",
+  "cases": [
+    {
+      "case": "N01",
+      "path": "/admin/knowledge-documents/3",
+      "method": "GET",
+      "status": 403,
+      "response": {
+        "request_id": "ai027-b439223fda-N01",
+        "error": {
+          "code": "IAM.FORBIDDEN",
+          "message": "Permission denied",
+          "details": {}
+        }
+      }
+    },
+    {
+      "case": "N02",
+      "path": "/admin/knowledge-documents",
+      "method": "POST",
+      "status": 403,
+      "response": {
+        "request_id": "ai027-b439223fda-N02",
+        "error": {
+          "code": "IAM.FORBIDDEN",
+          "message": "Permission denied",
+          "details": {}
+        }
+      }
+    },
+    {
+      "case": "N03",
+      "path": "/assistant/query",
+      "method": "POST",
+      "status": 403,
+      "response": {
+        "request_id": "ai027-b439223fda-N03",
+        "error": {
+          "code": "IAM.FORBIDDEN",
+          "message": "Permission denied",
+          "details": {}
+        }
+      }
+    },
+    {
+      "case": "N04",
+      "path": "/assistant/query",
+      "method": "POST",
+      "status": 422,
+      "response": {
+        "request_id": "ai027-b439223fda-N04",
+        "error": {
+          "code": "KB.SCOPE_MISMATCH",
+          "message": "Property does not match claimed tenant",
+          "details": {}
+        }
+      }
+    }
+  ],
+  "inference_delta": 0,
+  "source": "actual authenticated API; not UI",
+  "foreign_property": {
+    "id": 1,
+    "tenant_id": 1
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "base_sha": "ad7d100ba16fa8b11e61526cfd11978a5820a040",
+  "prior_manifest": "review-source-manifest.json",
+  "prior_manifest_sha256": "5a9a26a769e270b3f6d29a5da6f4ea576d6423e587085972cea1ad6b9956864f",
+  "original_review": "review-round2.json",
+  "original_review_sha256": "e78eddd94cd7a89d5500937a2a9b6e717b13354f0fae917554fc4f23374954cf",
+  "scope": "027-R2-R2-01 only; not loaded into expired runtime; other prior manifest files unchanged",
+  "files": [
+    {"path":"scripts/ops/local_ai_http.py","sha256":"e413eeccb1fa4008b6bd38225c769c326b2fd531d1626a5c481545ebd2255183"},
+    {"path":"scripts/ops/local_ai_process.py","sha256":"657c7a4c560ca007f4915c5569a2e6f618c498cca64b8bfe571c63aa0468b680"},
+    {"path":"backend/tests/unit/test_local_ai_http_027.py","sha256":"c5cd66632fbb6da1f9dd016aebec6a06d7122f9ffc2055af9a972a8ca8dedfbd"},
+    {"path":"backend/tests/unit/test_local_ai_process_027.py","sha256":"024ea85f4b67acb6c09845b27c339d2e8c48e328e0b51b12c5a36ea410772d21"},
+    {"path":"reports/real-ai-integration-027/runtime.py","sha256":"31bcdb76fed20c8e04abbf73afbcf6f93fcbcd93cf8d0329962608ab14a4593b"}
+  ],
+  "tests": ["tests-20260925T053236.txt","tests-20260925T053646.txt"],
+  "tests_scope": "Three new dummy-process tests; seven new/directly impacted mock lifecycle and budget tests. No inference, business, old suite or page rerun."
+}

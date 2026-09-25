@@ -63,7 +63,7 @@ ANNOUNCEMENT_READ = "announcement:read"
 ANNOUNCEMENT_DRAFT = "announcement:draft"
 ANNOUNCEMENT_PUBLISH = "announcement:publish"
 
-WORK_ORDER_ANALYSIS_PROMPT_VERSION = "wo-analysis-v9-duty-contract"
+WORK_ORDER_ANALYSIS_PROMPT_VERSION = "wo-analysis-v10-observed-event"
 DISPATCH_CONTRACT_VERSION = "category-duty-skill-v1"
 INCIDENT_SUMMARY_PROMPT_VERSION = "incident-summary-v1"
 ANNOUNCEMENT_DRAFT_PROMPT_VERSION = "announcement-draft-v1"
@@ -180,6 +180,7 @@ class MappedAnalysis:
     raw_required_skill: str | None = None
     skill_mapping_applied: bool = False
     dispatch_contract_version: str = DISPATCH_CONTRACT_VERSION
+    event_trace: dict | None = None
 
 
 def map_analysis_output(

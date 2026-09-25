@@ -1,0 +1,99 @@
+{
+  "status": "SUCCESS",
+  "reason": null,
+  "exit_code": 0,
+  "model": "qwen3.5:4b",
+  "revision": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "events": [
+    {
+      "utc": "2026-09-25T04:52:46.654280+00:00",
+      "phase": "load"
+    },
+    {
+      "utc": "2026-09-25T04:52:46.654280+00:00",
+      "phase": "inference",
+      "load_seconds": null
+    },
+    {
+      "utc": "2026-09-25T04:52:49.905565+00:00",
+      "result": {
+        "id": "chatcmpl-760",
+        "object": "chat.completion",
+        "created": 1790311969,
+        "model": "qwen3.5:4b",
+        "system_fingerprint": "fp_ollama",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "{\n  \"status\": \"insufficient_knowledge\",\n  \"answer\": \"\",\n  \"citation_chunk_ids\": []\n}"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 266,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "completion_tokens": 29,
+          "total_tokens": 295
+        }
+      },
+      "inference_seconds": 3.25
+    }
+  ],
+  "samples": [
+    {
+      "ram_free_mib": 8522,
+      "gpu_free_mib": 14568
+    },
+    {
+      "ram_free_mib": 8438,
+      "gpu_free_mib": 14568
+    },
+    {
+      "ram_free_mib": 8393,
+      "gpu_free_mib": 14557
+    },
+    {
+      "ram_free_mib": 8246,
+      "gpu_free_mib": 14375
+    },
+    {
+      "ram_free_mib": 8246,
+      "gpu_free_mib": 14374
+    },
+    {
+      "ram_free_mib": 8129,
+      "gpu_free_mib": 11861
+    },
+    {
+      "ram_free_mib": 7689,
+      "gpu_free_mib": 11862
+    },
+    {
+      "ram_free_mib": 7627,
+      "gpu_free_mib": 11608
+    },
+    {
+      "ram_free_mib": 7520,
+      "gpu_free_mib": 10849
+    },
+    {
+      "ram_free_mib": 7538,
+      "gpu_free_mib": 10621
+    },
+    {
+      "ram_free_mib": 7458,
+      "gpu_free_mib": 10611
+    },
+    {
+      "ram_free_mib": 7450,
+      "gpu_free_mib": 10606
+    }
+  ],
+  "total_seconds": 3.5780000000086147,
+  "child_pid": 46324
+}

@@ -1,7 +1,7 @@
 """Async AI analysis: snapshot, provider calls outside locks, then apply."""
 
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timedelta
 from decimal import Decimal
 from hashlib import sha256
@@ -45,6 +45,7 @@ from app.domain.ai import (
     rank_candidates,
 )
 from app.domain.audit import AuditAction, AuditResourceType
+from app.domain.observed_event import ObservedAnalysisOutput, bind_observations
 from app.domain.employee import AttendanceOnDuty, EmployeeStatus
 from app.domain.iam import OrganizationScope, Principal, ScopeType
 from app.domain.work_order import (
@@ -696,14 +697,19 @@ class AnalysisService:
         # from being concatenated as trusted control instructions.
         prompt = (
             "你是物业报修记录员，不是现场诊断员。输出符合以下schema的九字段JSON。\nOUTPUT_SCHEMA: "
-            + json.dumps(WorkOrderAnalysisOutput.model_json_schema(), ensure_ascii=False)
+            + json.dumps(ObservedAnalysisOutput.model_json_schema(), ensure_ascii=False)
             + "\n证据规则：\n"
             "1. 中文报修的 summary 必须用简体中文。准确保留关键否定、位置更正和时间变化，"
             "不要把不能改成能、未检查改成正常、未观察到改成不存在。"
             "context.recent_house_orders 仅是过去记录，不能变成本次事实或与本次事实的冲突。\n"
-            "2. summary和subcategory只用中文描述实际现象，subcategory也不得推断未确认的内部原因、犯罪意图。"
+            "2. summary只用中文描述实际现象，不推断未确认的内部原因、犯罪意图。"
             "用户猜测与图像猜测均不能升级为事实。图像无可见损伤不等于功能完好或安全；"
             "不能添加用户未说过的确认、检测、安装、受伤、完好或已修复事实。\n"
+            "事件协议：不输出自由subcategory。observations列出所有当前报修现象；label和subject只选schema枚举。"
+            "source=report/asr/vision分别表示report_text/asr_text/image_understanding，quote逐字引用该来源当前现象的完整短句，"
+            "保留同句对象和否定/猜测/时态，不截掉否定词；不能引用历史。"
+            "按铃拍门只表示敲门按铃，不代表进入企图。现象未证实用现象待核实，不能拿同词命中当证实；"
+            "物体认不清用未确定。图像观察是vision来源，不冒充用户确认。服务端据合法现象和对象生成事件子类。\n"
             "3. 普通维修由实际MAINTENANCE维修组统筹，required_skill填maintenance。"
             "水、电、空调、墙面和一般设施按可观察现象保留category；"
             "多项普通维修不必拆单或选唯一工种，summary用中文分项完整列出所有当前问题，"
@@ -867,7 +873,8 @@ class AnalysisService:
                     or record.version != snapshot.work_order_version
                     or analysis.input_hash != snapshot.input_hash
                 )
-                mapped, mapped_error = self._validate_payload(bundle.llm_payload)
+                mapped, mapped_error = self._validate_payload(bundle.llm_payload, sources={
+                    'report':snapshot.text,'asr':bundle.asr_text or '', 'vision':bundle.vision_text or ''})
                 if stale:
                     analysis.status = AnalysisStatus.STALE.value
                     analysis.error_code = AiErrorCode.STALE_RESULT
@@ -973,16 +980,26 @@ class AnalysisService:
     def _validate_payload(
         self,
         payload: Mapping[str, object] | None,
+        *, sources: dict[str,str] | None = None,
     ) -> tuple[MappedAnalysis | None, str | None]:
         if payload is None:
             return None, None
         try:
-            output = WorkOrderAnalysisOutput.model_validate(payload)
+            trace=None
+            if 'observations' in payload:
+                observed=ObservedAnalysisOutput.model_validate(payload)
+                key,trace=bind_observations(observed,sources or {})
+                trace['raw_model_output']=dict(payload)
+                output=WorkOrderAnalysisOutput.model_validate({**observed.model_dump(exclude={'observations'}),'subcategory':key})
+            else:
+                if self._settings.llm_provider!='development':raise ValueError('V10 observable evidence required')
+                output = WorkOrderAnalysisOutput.model_validate(payload)
             mapped = map_analysis_output(
                 output,
                 threshold=self._settings.ai_confidence_threshold
                 or DEFAULT_CONFIDENCE_THRESHOLD,
             )
+            if trace is not None:mapped=replace(mapped,event_trace=trace)
         except (ValidationError, ValueError):
             return None, AiErrorCode.INVALID_OUTPUT
         return mapped, None
@@ -1246,6 +1263,7 @@ class AnalysisService:
                 "raw_required_skill": mapped.raw_required_skill or mapped.required_skill,
                 "effective_required_skill": mapped.required_skill,
                 "skill_mapping_applied": mapped.skill_mapping_applied,
+                **({'event_evidence':mapped.event_trace} if mapped.event_trace is not None else {}),
             },
         )
 

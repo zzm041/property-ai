@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 KNOWLEDGE_READ = "knowledge:read"
 KNOWLEDGE_MANAGE = "knowledge:manage"
-RAG_ANSWER_PROMPT_VERSION = "rag-answer-v1"
+RAG_ANSWER_PROMPT_VERSION = "rag-answer-v2"
 DEFAULT_CHUNK_CHARS = 400
 DEFAULT_CHUNK_OVERLAP = 40
 DEFAULT_RETRIEVAL_TOP_K = 8

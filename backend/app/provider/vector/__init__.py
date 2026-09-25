@@ -2,6 +2,7 @@
 
 from collections.abc import Sequence
 from typing import Any
+import json
 
 from pymilvus import Collection, CollectionSchema, DataType, FieldSchema, connections, utility
 
@@ -39,9 +40,11 @@ class MilvusKnowledgeStore:
         self.connect()
         if utility.has_collection(self.collection_name, using=self._alias):
             collection = Collection(self.collection_name, using=self._alias)
+            self._validate_collection(collection, dimensions)
             collection.load()
             return collection
         schema = CollectionSchema(
+            description=self._model_metadata(),
             fields=[
                 FieldSchema(name="chunk_id", dtype=DataType.INT64, is_primary=True, auto_id=False),
                 FieldSchema(name="tenant_id", dtype=DataType.INT64),
@@ -65,12 +68,29 @@ class MilvusKnowledgeStore:
             field_name="vector",
             index_params={
                 "index_type": "FLAT",
-                "metric_type": "IP",
+                "metric_type": self._settings.milvus_metric_type,
                 "params": {},
             },
         )
         collection.load()
         return collection
+
+    def _model_metadata(self) -> str:
+        if not self._settings.embedding_revision:
+            return ''  # Legacy collections retain their existing schema/metadata.
+        return json.dumps({'contract':'embedding-v1','model':self._settings.embedding_model,
+            'revision':self._settings.embedding_revision,'normalization':self._settings.embedding_normalization},sort_keys=True)
+
+    def _validate_collection(self, collection: Collection, dimensions: int) -> None:
+        vectors=[f for f in collection.schema.fields if f.name=='vector']
+        if len(vectors)!=1 or vectors[0].params.get('dim')!=dimensions:
+            raise ProviderUnavailableError('Milvus vector dimension mismatch; no mutation performed')
+        indexes=[i.params for i in collection.indexes if i.field_name=='vector']
+        if len(indexes)!=1 or indexes[0].get('metric_type')!=self._settings.milvus_metric_type:
+            raise ProviderUnavailableError('Milvus metric mismatch; no mutation performed')
+        metadata=self._model_metadata()
+        if metadata and collection.schema.description!=metadata:
+            raise ProviderUnavailableError('Milvus model metadata mismatch; no mutation performed')
 
     def upsert(
         self,
@@ -114,7 +134,7 @@ class MilvusKnowledgeStore:
             results = collection.search(
                 data=[list(vector)],
                 anns_field="vector",
-                param={"metric_type": "IP", "params": {}},
+                param={"metric_type": self._settings.milvus_metric_type, "params": {}},
                 limit=top_k,
                 expr=expr,
                 output_fields=[

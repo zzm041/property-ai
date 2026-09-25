@@ -1,0 +1,7 @@
+{
+  "continue": false,
+  "source": "main inspected original input/output; independent review pending",
+  "response_sha256": "cf50fec975e478480cde4ebe4839cb031e42dda5283fc5d3a48c5cf0c032e8cc",
+  "note": "核心证据/事件错误：塑料外壳发黑被标为表面剥落，明显焦味被标为疑似燃气气味；原文未给出这两个现象，0.95高置信且会污染事件键。摘要和electric风险正确不能抵消错误事件。服务端证据校验会拒绝而非改答案，普通自动化未达门槛。本次诊断3/32后停止，剩余29次不继续；不修改冻结提示词或样本重试。",
+  "raw_vs_effective": null
+}

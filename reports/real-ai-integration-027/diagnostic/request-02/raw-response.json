@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-238\",\"object\":\"chat.completion\",\"created\":1790310294,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"cleaning\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"杂物清扫\\\",\\n      \\\"subject\\\": \\\"楼道地面\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"楼道角落散落了几张纸和空纸盒，需要清扫\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"外观无明显异常\\\",\\n      \\\"subject\\\": \\\"楼道地面\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"通道可以正常通行，没有液体、碎玻璃或其他异常\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p4\\\",\\n  \\\"summary\\\": \\\"楼道角落散落纸张和空纸盒需清扫；通道通行正常无其他异常。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1377,\"prompt_tokens_details\":{\"cached_tokens\":866},\"completion_tokens\":205,\"total_tokens\":1582}}\n",
+  "raw_response_sha256": "1d09e277e03a0fc465f6622d9bc3858a19f372cc52d2f6b78c5883ab03b7714f",
+  "contract_errors": []
+}

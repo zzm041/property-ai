@@ -1,0 +1,123 @@
+{
+  "status": "SUCCESS",
+  "reason": null,
+  "exit_code": 0,
+  "model": "bge-reranker-v2-m3",
+  "revision": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e",
+  "events": [
+    {
+      "utc": "2026-09-25T05:15:28.913046+00:00",
+      "phase": "load"
+    },
+    {
+      "utc": "2026-09-25T05:15:34.161049+00:00",
+      "phase": "inference",
+      "load_seconds": 5.25
+    },
+    {
+      "utc": "2026-09-25T05:15:35.494757+00:00",
+      "result": {
+        "scores": [
+          0.9848339557647705,
+          3.563626160030253e-05
+        ],
+        "model": "bge-reranker-v2-m3"
+      },
+      "inference_seconds": 1.327999999979511
+    }
+  ],
+  "samples": [
+    {
+      "ram_free_mib": 9545
+    },
+    {
+      "ram_free_mib": 9543
+    },
+    {
+      "ram_free_mib": 9543
+    },
+    {
+      "ram_free_mib": 9542
+    },
+    {
+      "ram_free_mib": 9543
+    },
+    {
+      "ram_free_mib": 9542
+    },
+    {
+      "ram_free_mib": 9530
+    },
+    {
+      "ram_free_mib": 9486
+    },
+    {
+      "ram_free_mib": 9467
+    },
+    {
+      "ram_free_mib": 9453
+    },
+    {
+      "ram_free_mib": 9431
+    },
+    {
+      "ram_free_mib": 9430
+    },
+    {
+      "ram_free_mib": 9407
+    },
+    {
+      "ram_free_mib": 9379
+    },
+    {
+      "ram_free_mib": 9349
+    },
+    {
+      "ram_free_mib": 9326
+    },
+    {
+      "ram_free_mib": 9368
+    },
+    {
+      "ram_free_mib": 9343
+    },
+    {
+      "ram_free_mib": 9289
+    },
+    {
+      "ram_free_mib": 9146
+    },
+    {
+      "ram_free_mib": 9027
+    },
+    {
+      "ram_free_mib": 8882
+    },
+    {
+      "ram_free_mib": 8674
+    },
+    {
+      "ram_free_mib": 8407
+    },
+    {
+      "ram_free_mib": 8192
+    },
+    {
+      "ram_free_mib": 7993
+    },
+    {
+      "ram_free_mib": 9033
+    },
+    {
+      "ram_free_mib": 9238
+    },
+    {
+      "ram_free_mib": 9347
+    },
+    {
+      "ram_free_mib": 9609
+    }
+  ],
+  "total_seconds": 7.51500000001397,
+  "child_pid": 48804
+}

@@ -1,0 +1,321 @@
+{
+  "utc": "2026-09-25T04:53:37.233038+00:00",
+  "run_id": "ai027-b439223fda",
+  "documents": [
+    {
+      "id": 2,
+      "tenant_id": 1,
+      "property_id": 3,
+      "title": "ai027-b439223fda 合成便民工具借用规则",
+      "visibility": "RESIDENT",
+      "status": "ACTIVE",
+      "current_version": 1
+    },
+    {
+      "id": 3,
+      "tenant_id": 1,
+      "property_id": 3,
+      "title": "ai027-b439223fda 合成人员内部钥匙交接",
+      "visibility": "STAFF_ONLY",
+      "status": "ACTIVE",
+      "current_version": 1
+    },
+    {
+      "id": 4,
+      "tenant_id": 1,
+      "property_id": 3,
+      "title": "ai027-b439223fda 合成植物认领活动",
+      "visibility": "RESIDENT",
+      "status": "ACTIVE",
+      "current_version": 1
+    }
+  ],
+  "versions": [
+    {
+      "id": 2,
+      "document_id": 2,
+      "version": 1,
+      "status": "ACTIVE",
+      "content_hash": "3e7338fbbcef76b665c0f61ba8ac0379d71b4ac4b4f025cda3503bf9603f907b",
+      "source_text": "本规则仅供合成测试。便民工具在东侧服务台领取。借用时间为每天九点至十七点。可借物品为手电筒和雨伞，不提供电钻。每次最多借用一件，登记借用人称呼即可，不需要提交身份证照片。借用物品应在当天十七点前归还到东侧服务台。工具遗失时请向服务台说明情况；本资料没有规定赔偿金额。"
+    },
+    {
+      "id": 3,
+      "document_id": 3,
+      "version": 1,
+      "status": "ACTIVE",
+      "content_hash": "acee0351596fb7ec82aabf2813c30dc0b19dbe6e0e0e0e55ae14ba65aeb38c78",
+      "source_text": "本资料仅供合成测试工作人员查看。合成测试钥匙存放在编号S-27的柜子中。交班时两名工作人员共同核对钥匙数量，并在交接记录签署测试代号。不得将柜子编号或内部交接办法告知住户。本资料不包含真实钥匙、口令或安防配置。"
+    },
+    {
+      "id": 4,
+      "document_id": 4,
+      "version": 1,
+      "status": "ACTIVE",
+      "content_hash": "947042f56796794d3c67619f9bb79f11530dac1623a75bec0abfa102cb12414b",
+      "source_text": "本活动仅供合成测试。植物认领活动在西侧大厅进行，只发放绿萝。活动开放时间为周六上午十点至十一点，每户限领一盆。不需要缴费，也不提供送货服务。"
+    }
+  ],
+  "jobs": [
+    {
+      "id": 2,
+      "document_id": 2,
+      "version": 1,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "error_code": null,
+      "started_at": "2026-09-25 04:50:20.880796",
+      "finished_at": "2026-09-25 04:50:33.545837"
+    },
+    {
+      "id": 3,
+      "document_id": 3,
+      "version": 1,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "error_code": null,
+      "started_at": "2026-09-25 04:50:36.987800",
+      "finished_at": "2026-09-25 04:50:46.363530"
+    },
+    {
+      "id": 4,
+      "document_id": 4,
+      "version": 1,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "error_code": null,
+      "started_at": "2026-09-25 04:50:51.063555",
+      "finished_at": "2026-09-25 04:51:00.451830"
+    }
+  ],
+  "chunks": [
+    {
+      "id": 2,
+      "tenant_id": 1,
+      "property_id": 3,
+      "document_id": 2,
+      "version": 1,
+      "visibility": "RESIDENT",
+      "source_locator": "ai027-b439223fda 合成便民工具借用规则#chunk-1",
+      "excerpt": "本规则仅供合成测试。便民工具在东侧服务台领取。借用时间为每天九点至十七点。可借物品为手电筒和雨伞，不提供电钻。每次最多借用一件，登记借用人称呼即可，不需要提交身份证照片。借用物品应在当天十七点前归还到东侧服务台。工具遗失时请向服务台说明情况；本资料没有规定赔偿金额。",
+      "vector_id": 2
+    },
+    {
+      "id": 3,
+      "tenant_id": 1,
+      "property_id": 3,
+      "document_id": 3,
+      "version": 1,
+      "visibility": "STAFF_ONLY",
+      "source_locator": "ai027-b439223fda 合成人员内部钥匙交接#chunk-1",
+      "excerpt": "本资料仅供合成测试工作人员查看。合成测试钥匙存放在编号S-27的柜子中。交班时两名工作人员共同核对钥匙数量，并在交接记录签署测试代号。不得将柜子编号或内部交接办法告知住户。本资料不包含真实钥匙、口令或安防配置。",
+      "vector_id": 3
+    },
+    {
+      "id": 4,
+      "tenant_id": 1,
+      "property_id": 3,
+      "document_id": 4,
+      "version": 1,
+      "visibility": "RESIDENT",
+      "source_locator": "ai027-b439223fda 合成植物认领活动#chunk-1",
+      "excerpt": "本活动仅供合成测试。植物认领活动在西侧大厅进行，只发放绿萝。活动开放时间为周六上午十点至十一点，每户限领一盆。不需要缴费，也不提供送货服务。",
+      "vector_id": 4
+    }
+  ],
+  "intents": [
+    {
+      "id": 38,
+      "operation": "INGEST_KNOWLEDGE",
+      "resource_id": 2,
+      "status": "SUCCEEDED",
+      "execution_attempt": 1,
+      "publish_attempt": 1,
+      "task_id": "abd7b03a-3537-4fa6-b13f-9de6cc4d1ce2",
+      "last_error_code": null
+    },
+    {
+      "id": 39,
+      "operation": "INGEST_KNOWLEDGE",
+      "resource_id": 3,
+      "status": "SUCCEEDED",
+      "execution_attempt": 1,
+      "publish_attempt": 1,
+      "task_id": "da2720b7-01fe-439b-be6f-03f03a69aa2f",
+      "last_error_code": null
+    },
+    {
+      "id": 40,
+      "operation": "INGEST_KNOWLEDGE",
+      "resource_id": 4,
+      "status": "SUCCEEDED",
+      "execution_attempt": 1,
+      "publish_attempt": 1,
+      "task_id": "5fcc8df8-660a-4d49-9ba3-2bc5b08c5ef5",
+      "last_error_code": null
+    }
+  ],
+  "milvus": [
+    {
+      "visibility": "RESIDENT",
+      "chunk_id": 2,
+      "tenant_id": 1,
+      "property_id": 3,
+      "document_id": 2,
+      "document_version": 1,
+      "dimensions": 1024,
+      "l2_norm": 1.0000000601001635,
+      "vector_sha256": "d97bdcc3a4c54a0088218015c773afe7400f734d44f335528c0e8a558af53c2d"
+    },
+    {
+      "visibility": "STAFF_ONLY",
+      "chunk_id": 3,
+      "tenant_id": 1,
+      "property_id": 3,
+      "document_id": 3,
+      "document_version": 1,
+      "dimensions": 1024,
+      "l2_norm": 0.9999999111551101,
+      "vector_sha256": "14dd579773c6d4e9808398a33ca025b4c36b5b269bedd43544d4b2ab9c2964e0"
+    },
+    {
+      "visibility": "RESIDENT",
+      "chunk_id": 4,
+      "tenant_id": 1,
+      "property_id": 3,
+      "document_id": 4,
+      "document_version": 1,
+      "dimensions": 1024,
+      "l2_norm": 0.9999999730731552,
+      "vector_sha256": "e0da1632d363b7b3a4b87a6ba8f24c685ab1771ce4b943c665e03070ab82c1d3"
+    }
+  ],
+  "model_calls": [
+    {
+      "number": "call-001",
+      "kind": "embedding",
+      "unix": 1790311821.1910708,
+      "utc": "2026-09-25T04:50:21.191610+00:00",
+      "model": "bge-m3",
+      "max_calls": 24,
+      "input_hash": "7832b3f5b31446cad88f5f93fd858493e9f654ddd5c7876c35bdcf53cb0adea3",
+      "status": "SUCCESS",
+      "total_seconds": 9.78100000001723,
+      "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+      "load_seconds": 8.469000000011874,
+      "inference_seconds": 0.4529999999795109
+    },
+    {
+      "number": "call-002",
+      "kind": "embedding",
+      "unix": 1790311837.2938466,
+      "utc": "2026-09-25T04:50:37.294959+00:00",
+      "model": "bge-m3",
+      "max_calls": 24,
+      "input_hash": "76afdb282597d72524c21a29df352db899e1b7e37aab72a7afb3c5ecc825d3de",
+      "status": "SUCCESS",
+      "total_seconds": 6.01600000000326,
+      "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+      "load_seconds": 4.844000000011874,
+      "inference_seconds": 0.32800000000861473
+    },
+    {
+      "number": "call-003",
+      "kind": "embedding",
+      "unix": 1790311851.364127,
+      "utc": "2026-09-25T04:50:51.364127+00:00",
+      "model": "bge-m3",
+      "max_calls": 24,
+      "input_hash": "ef517dd320b0bd1f2e012f0ce82c3cddb9ada0f43f2c2e7a9e458da08f8b7fe1",
+      "status": "SUCCESS",
+      "total_seconds": 6.51600000000326,
+      "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+      "load_seconds": 5.327999999979511,
+      "inference_seconds": 0.34400000001187436
+    },
+    {
+      "number": "call-004",
+      "kind": "embedding",
+      "unix": 1790311904.4091358,
+      "utc": "2026-09-25T04:51:44.410248+00:00",
+      "model": "bge-m3",
+      "max_calls": 24,
+      "input_hash": "ab4525c7fc040b4eee362a4d6f9352ed0757548562a4dd0b66da25909922edc6",
+      "status": "SUCCESS",
+      "total_seconds": 7.280999999988126,
+      "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+      "load_seconds": 6.046999999991385,
+      "inference_seconds": 0.21799999999348074
+    },
+    {
+      "number": "call-005",
+      "kind": "reranker",
+      "unix": 1790311912.0971587,
+      "utc": "2026-09-25T04:51:52.098245+00:00",
+      "model": "bge-reranker-v2-m3",
+      "max_calls": 18,
+      "input_hash": "eb6e6dfba8f580ccf4b5be34f3871874c8b4971be7d7fd975ddceded395cc71f",
+      "status": "SUCCESS",
+      "total_seconds": 6.280999999988126,
+      "revision": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e",
+      "load_seconds": 4.85899999999674,
+      "inference_seconds": 0.5310000000172295
+    },
+    {
+      "number": "call-006",
+      "kind": "qwen",
+      "unix": 1790311918.7935205,
+      "utc": "2026-09-25T04:51:58.793520+00:00",
+      "model": "qwen3.5:4b",
+      "max_calls": 18,
+      "input_hash": "1d52e3895f3c552816d4c2badbe60ea293bd29a9f0b196884c081abdc79ea159",
+      "status": "SUCCESS",
+      "total_seconds": 4.875,
+      "revision": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+      "load_seconds": null,
+      "inference_seconds": 4.7189999999827705
+    },
+    {
+      "number": "call-007",
+      "kind": "embedding",
+      "unix": 1790311954.5334005,
+      "utc": "2026-09-25T04:52:34.534410+00:00",
+      "model": "bge-m3",
+      "max_calls": 24,
+      "input_hash": "0e99f0b05eb8686ee4b150258b459377f4be14b98d72ab09499d464c9da4b706",
+      "status": "SUCCESS",
+      "total_seconds": 6.030999999988126,
+      "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+      "load_seconds": 5.032000000006519,
+      "inference_seconds": 0.1870000000053551
+    },
+    {
+      "number": "call-008",
+      "kind": "reranker",
+      "unix": 1790311960.8778634,
+      "utc": "2026-09-25T04:52:40.877863+00:00",
+      "model": "bge-reranker-v2-m3",
+      "max_calls": 18,
+      "input_hash": "758dcb41b290b295ff2b7053bfa173fefb1203b5814c78dcd990f43408a2355e",
+      "status": "SUCCESS",
+      "total_seconds": 5.282000000006519,
+      "revision": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e",
+      "load_seconds": 3.812999999994645,
+      "inference_seconds": 0.639999999984866
+    },
+    {
+      "number": "call-009",
+      "kind": "qwen",
+      "unix": 1790311966.5627482,
+      "utc": "2026-09-25T04:52:46.563811+00:00",
+      "model": "qwen3.5:4b",
+      "max_calls": 18,
+      "input_hash": "fcf23c6879fb9e7fbbb92f6f51e08097e1a234fe8531f89a97fca087eda52998",
+      "status": "SUCCESS",
+      "total_seconds": 3.5780000000086147,
+      "revision": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+      "load_seconds": null,
+      "inference_seconds": 3.25
+    }
+  ]
+}

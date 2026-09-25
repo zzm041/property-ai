@@ -1,0 +1,55 @@
+{
+  "scope": "026 NORMAL_RUNTIME_INTEGRATION plus source-pinning addendum",
+  "checked_at_utc": "2026-09-25T05:04:00Z",
+  "method": "Existing records only; no business, test, model or reviewer invocation. Main-session metadata filtered to the completed batch time window. No authentication files or unrelated conversations read.",
+  "window_utc": ["2026-09-24T21:49:23Z", "2026-09-24T22:34:33Z"],
+  "session_id": "01a0b7e8-a676-7bc3-b5ad-6357cb53980f",
+  "main": {
+    "sessions": 1,
+    "unique_response_ids": 71,
+    "input_tokens": 10387882,
+    "cached_input_tokens_subset": 10025728,
+    "output_tokens": 65161,
+    "reasoning_output_tokens_subset": 14177,
+    "compaction_events": 1,
+    "usage_attribution": "Time-window totals include concurrent non-026 work; exclusive 026 usage UNKNOWN",
+    "calculation": "Deduplicated token_usage_record by session_id/response_id; sum of per-response usage cross-checked against last minus preceding thread_token_usage. Never sum cumulative token_count events or add cached input again.",
+    "source_lines": [36227, 36235, 36809],
+    "compaction_line": 36520
+  },
+  "review": {
+    "named_contexts": 1,
+    "reviewer": "/root/review025_round1",
+    "followup_calls": 4,
+    "message_calls": 2,
+    "request_count": "UNKNOWN",
+    "input_tokens": "UNKNOWN",
+    "cached_input_tokens": "UNKNOWN",
+    "output_tokens": "UNKNOWN",
+    "compactions": "UNKNOWN; saved review explicitly reports reconstruction after context compaction",
+    "source_lines": [36294, 36451, 36478, 36546, 36664, 36727],
+    "note": "Followups/messages are not equivalent to distinct reviews or model requests. No reviewer-specific usage ledger located within this bounded check. Encrypted communication bodies not decrypted."
+  },
+  "retries": {
+    "explicit_error_retry_events_in_window": 0,
+    "actual_transport_retry_count": "UNKNOWN",
+    "usage": "UNKNOWN",
+    "note": "Do not classify ordinary addendum/reconstruction/followup as infrastructure retry without evidence."
+  },
+  "findings": [
+    {
+      "source": "scripts/ops/codex_exec_readonly.py:36-40; reports/codex/context-preamble.txt:28-34",
+      "fact": "Legacy wrapper prepends the full fixed preamble on every call, including stale ACCOUNT-MERGE task/history. It does not itself concatenate AGENTS, handoff, historical reports or logs. No evidence that this batch used that wrapper."
+    },
+    {
+      "source": "main session line36539, call_hQPEIdntYI9NxojC1g40T7RW; compaction line36520",
+      "fact": "After compaction, a single command reread handoff first140 lines, model recommendation last150 lines and normal-integration script first190 lines with 14500 output-token allowance. This is a broad rehydration, not proof that every review rereads full history. Other handoff references were selective lookup/diff/staging, not repeated full reads."
+    },
+    {
+      "source": "reports/reliable-task-delivery-026/normal-integration/review.json:5; review-source-pinning.json:8-10",
+      "fact": "Original structured review was unavailable after compaction and the same reviewer reconstructed it. This is evidenced review-context recovery work; its separate token cost is UNKNOWN."
+    }
+  ],
+  "next_input_policy": "Current task, effective authorization, safety boundaries, exact checkpoint and evidence index by default; historical bodies/logs on demand. Preserve all history and requirements.",
+  "billing_attribution": "UNKNOWN; local token metadata is not a subscription billing or remaining-quota statement."
+}

@@ -1,0 +1,40 @@
+{
+  "status": "PASSED",
+  "reason": null,
+  "exit_code": 0,
+  "command": [
+    "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe",
+    "-I",
+    "-X",
+    "utf8",
+    "D:\\property-ai\\reports\\real-ai-integration-027\\compatibility.py",
+    "reranker",
+    "--child"
+  ],
+  "events": [
+    {
+      "utc": "2026-09-25T04:13:17.997992+00:00",
+      "phase": "load"
+    },
+    {
+      "utc": "2026-09-25T04:13:24.113150+00:00",
+      "phase": "inference",
+      "load_seconds": 3.1719999999913853
+    },
+    {
+      "utc": "2026-09-25T04:13:25.644048+00:00",
+      "result": {
+        "scores": [
+          0.9854937791824341,
+          1.6138010323629715e-05
+        ],
+        "model": "bge-reranker-v2-m3"
+      },
+      "inference_seconds": 1.5310000000172295
+    }
+  ],
+  "minimum_ram_mib": 11795,
+  "stderr": "",
+  "native_only": false,
+  "model_requests_reserved": 1
+}

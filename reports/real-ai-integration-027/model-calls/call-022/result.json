@@ -1,0 +1,131 @@
+{
+  "status": "FAILED",
+  "reason": "RESOURCE_FLOOR",
+  "exit_code": 1,
+  "model": "Qwen3-ASR-0.6B",
+  "revision": "5eb144179a02acc5e5ba31e748d22b0cf3e303b0",
+  "events": [
+    {
+      "utc": "2026-09-25T05:12:51.617093+00:00",
+      "phase": "load"
+    }
+  ],
+  "samples": [
+    {
+      "ram_free_mib": 9164
+    },
+    {
+      "ram_free_mib": 9127
+    },
+    {
+      "ram_free_mib": 9141
+    },
+    {
+      "ram_free_mib": 9120
+    },
+    {
+      "ram_free_mib": 9101
+    },
+    {
+      "ram_free_mib": 9085
+    },
+    {
+      "ram_free_mib": 9075
+    },
+    {
+      "ram_free_mib": 9053
+    },
+    {
+      "ram_free_mib": 9099
+    },
+    {
+      "ram_free_mib": 9098
+    },
+    {
+      "ram_free_mib": 9092
+    },
+    {
+      "ram_free_mib": 9088
+    },
+    {
+      "ram_free_mib": 9056
+    },
+    {
+      "ram_free_mib": 9068
+    },
+    {
+      "ram_free_mib": 9049
+    },
+    {
+      "ram_free_mib": 9021
+    },
+    {
+      "ram_free_mib": 9002
+    },
+    {
+      "ram_free_mib": 8991
+    },
+    {
+      "ram_free_mib": 9004
+    },
+    {
+      "ram_free_mib": 8978
+    },
+    {
+      "ram_free_mib": 8965
+    },
+    {
+      "ram_free_mib": 8957
+    },
+    {
+      "ram_free_mib": 8943
+    },
+    {
+      "ram_free_mib": 8918
+    },
+    {
+      "ram_free_mib": 8915
+    },
+    {
+      "ram_free_mib": 8884
+    },
+    {
+      "ram_free_mib": 8789
+    },
+    {
+      "ram_free_mib": 8732
+    },
+    {
+      "ram_free_mib": 8653
+    },
+    {
+      "ram_free_mib": 8656
+    },
+    {
+      "ram_free_mib": 8655
+    },
+    {
+      "ram_free_mib": 8662
+    },
+    {
+      "ram_free_mib": 8689
+    },
+    {
+      "ram_free_mib": 8043
+    },
+    {
+      "ram_free_mib": 7008
+    },
+    {
+      "ram_free_mib": 5841
+    },
+    {
+      "ram_free_mib": 4906
+    },
+    {
+      "ram_free_mib": 3962
+    }
+  ],
+  "total_seconds": 9.530999999988126,
+  "child_pid": 41248
+}

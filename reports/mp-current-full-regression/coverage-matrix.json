@@ -2318,12 +2318,25 @@
       {"id":"V1-BACKUP-RESTORE","implementation_status":"ExactAUTH001 guarded hostbackup captured before0012, olddatafingerprints verified","verification_status":"PARTIAL_BACKUP_CAPTURE_ONLY_RESTORE_UNVERIFIED","evidence_version":"026fresh-snapshot/migration-result/independentbackuphash","remaining_gap":"Actual isolatedrestore/production backup recovery acceptance","next_action":"Request precise restoretarget authorization before anyrestore; keep bothhostbackups"}
     ]
   },
+  "real_ai_integration_027": {
+    "task_id": "REAL-AI-INTEGRATION-027",
+    "status": "WIP_PARTIAL_REAL_RAG_R3_NOT_READY_ASR_FAILED_WINDOW_EXHAUSTED",
+    "evidence_index": "reports/real-ai-integration-027/closeout.md",
+    "source_binding": "reports/real-ai-integration-027/review-source-manifest.json",
+    "review": "Same independent context round2 NEEDS_CHANGES original saved; round3 PASS_SCOPED_SOFTWARE_FIX original saved, 027-R2-R2-01 closed; whole027 NOT_FULL_PASS. Prior round1 original UNAVAILABLE, not reconstructed",
+    "current_status_overlays": [
+      {"id":"KNOWLEDGE-INGEST-UI","implementation_status":"Prior008 scopedPASS retained;027 normal pages created3documents/4versions, independent Worker activated real1024vectors; staff knowledge entry fixed","verification_status":"PARTIAL_REAL_LOCAL_REVIEWED_NOT_FULL_PASS","evidence_version":"027 pages/runtime-final/candidate/source manifest","remaining_gap":"027 archive/visibility negatives not run; no full realRAG/production acceptance","next_action":"Save current independent review original immediately; no repeated ingestion"},
+      {"id":"SELFHOST-AI","implementation_status":"Exact isolated ASR/BGE CPU environments installed and compatibility proved; observed-eventv10 R3 stopped3/32; R2 real models connected","verification_status":"NOT_READY_FOR_AUTO; R2_PARTIAL_ASR_RESOURCE_FAILURE","evidence_version":"027 compatibility/diagnostic/stop/model-calls/call-022","remaining_gap":"R3 false event labels; real image/AUTO unverified; R2 ASR load hit3962MiB and failed; no further model budget","next_action":"Offline focused closure; additional inference only after explicit bounded approval, retain all prior failures"},
+      {"id":"V1-EMBEDDING-RAG","implementation_status":"Real bge-m3/reranker/Qwen with MySQL versions, independent Worker, new1024COSINE collection and actual page citations; old8d untouched","verification_status":"PARTIAL_REAL_LOCAL_REVIEWED_NOT_FULL_PASS","evidence_version":"027 runai027-b439223fda pages/api-negative/runtime-final/model-calls","remaining_gap":"Q02–05 resource refusals need later authorized check; N05/N06 unexecuted; production latency/security/runtime not accepted","next_action":"Preserve 12embedding/8reranker/8Qwen/1ASR ledger; 30min expired, no automatic extension"}
+    ]
+  },
   "current_effective_view": {
     "generated_at": "2026-09-25",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
     "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs), then notification_events_inbox_013.current_status_overlays (2 IDs)",
     "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs), then manager_wo_cancel_017 (1 composite ID, remains PARTIAL), then house_csv_roundtrip_018 (1 existing ID), then ai_analysis_input_019 (3 existing IDs; real-model statuses remain BLOCKED), then resident_wo_presentation_020 (1 existing ID; release gaps retained), then notification_presentation_021 (1 existing ID; explicitUTC not Property-local/outbound acceptance), then ai_fallback_runtime_022 (1 existing ID; Development injected failure only)",
     "latest_additional_overlay_source": "resident_house_select_023, evaluation_calibration_20260924, maintenance_contact_dispatch_024, db_task_recovery_025, reliable_task_delivery_026 includingnormalintegration (4 existing IDs, boundedDevelopment only), preservedselfhost_supplement_024_rubric_01 then crossfield_diagnostic_01 (SELFHOST-AI remainsNOT_READY; no percentage/extra_v1 double count)",
+    "final_overlay_source": "real_ai_integration_027.current_status_overlays; partial runtime facts, not PASS promotion; rows and historical IDs retained",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced. Old AUTH001 objects were lost on the 2026-09-23 tmpfs stop; historical evidence remains version-bound, not current-object proof.",
     "row_count": 83,
     "rows": [
@@ -2673,11 +2686,11 @@
       },
       {
         "requirement_id": "KNOWLEDGE-INGEST-UI",
-        "current_implementation": "scoped_create_version_failure_preservation_worker_activation_archive_history_and_page_status_verified_on_0009",
-        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT",
-        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / aef4fbe2d39655d0ac3dc259ef112e0f1bdcddcd",
-        "remaining_gap": "production runtime acceptance",
-        "next_action": "preserve scoped page/API/Worker evidence; revalidate after related knowledge-management changes"
+        "current_implementation": "008 scopedDevelopment retained;027 pages created3documents/4versions and independentWorker activated real1024vectors; staff knowledge entry corrected",
+        "verification_mode_status": "008_PASS_RETAINED;027_PARTIAL_REAL_LOCAL_REVIEWED_NOT_FULL_PASS",
+        "evidence_version": "Prior008 versions unchanged;027 pages/runtime-final/review-source-manifest",
+        "remaining_gap": "027 visibility/archive negatives and production acceptance",
+        "next_action": "Save original focused review; no repeated ingestion or expired-window model calls"
       },
       {
         "requirement_id": "HOUSE-IMPORT-EXPORT",
@@ -2697,11 +2710,11 @@
       },
       {
         "requirement_id": "SELFHOST-AI",
-        "current_implementation": "Approved free local2B/4B weights and real Ollama inference exist;4B Q4_K_M fixed24text+4photos baseline plus3repairs saved128calls. No general Qwen/4B disqualification; tested combination remains NOT_READY.",
-        "verification_mode_status": "REAL_LOCAL_DIAGNOSTICS_NOT_READY_FOR_BUSINESS_SWITCH",
-        "evidence_version": "e65b4d7 real2B failure;95654578605adb745c27aa29a3d0111611f4c0bd quality28-round0..3, immutable gold/photos and independent NEEDS_CHANGES; current interpretation in calibration v1",
-        "remaining_gap": "Newv9crossfield source/tests accepted, diagnostic2calls stops onGOLD006unsupported incidentintent; other22texts/4photos unverified. Pillow and26fixedASR/BGE filesprepared butruntime/RAG/realAUTO/device/production stillopen. OldB/28/3of3/PHOTO004 preserved, notdisqualificationofallQwen/4B.",
-        "next_action": "Read crossfield-diagnostic-01/review.json NOT_READY; no thirdcall/businessswitch. ExactCPU117wheel/new1024collection/protocol approval package inself-host-recommendation; original histories notretrospectivePASS."
+        "current_implementation": "Exact isolatedASR/BGE environments and real compatibility completed;027v10 protocolR3 stopped3/32; realRAG connected. All prior2B/28case/3of3/128call histories retained, not generalQwen disqualification",
+        "verification_mode_status": "R3_NOT_READY_FOR_AUTO;R2_PARTIAL_ASR_RESOURCE_FAILURE",
+        "evidence_version": "027 compatibility/diagnostic/stop/model-calls/call-022; prior versions retained",
+        "remaining_gap": "False observed-event labels; realimage/AUTO notverified; ASRHTTPload failed RAM3962MiB; controllerdescendant cleanup underreview; production notaccepted",
+        "next_action": "Offline focusedsoftware closure; no further inference without explicit boundedapproval, no newweights/fees"
       },
       {
         "requirement_id": "REAL-SMS",
@@ -2953,11 +2966,11 @@
       },
       {
         "requirement_id": "V1-EMBEDDING-RAG",
-        "current_implementation": "development_embedding_llm_worker_and_named_auth001_collection_verified_with_grounded_citations",
-        "verification_mode_status": "PASS_SCOPED_DEVELOPMENT_WIRING_REAL_MODEL_BLOCKED",
-        "evidence_version": "bfbf436615b7875ca1ee24527ee335bfe21522e3 / 966142bfeac72c6e4ed6a34d440b9464bf859fd2 / aef4fbe2d39655d0ac3dc259ef112e0f1bdcddcd",
-        "remaining_gap": "real bge-m3/Qwen deployment and business-quality acceptance, production collection/runtime/security and formal release",
-        "next_action": "keep real-model deployment behind its separate resource approval; preserve the scoped Development wiring evidence"
+        "current_implementation": "Realbge-m3/reranker/Qwen with MySQLversions/independentWorker/new1024COSINE collection and actualpagecitations; old8dunchanged",
+        "verification_mode_status": "008_DEVELOPMENT_PASS_RETAINED;027_PARTIAL_REAL_LOCAL_REVIEWED_NOT_FULL_PASS",
+        "evidence_version": "027 ai027-b439223fda pages/api-negative/runtime-final/model-calls/source manifest",
+        "remaining_gap": "Q02–05 initialresource refusals;N05/N06unexecuted; production latency/security/runtime acceptance",
+        "next_action": "Preserve ledger12embedding/8reranker/8Qwen/1ASR;30min expired,no automaticextension; current focusedreview"
       },
       {
         "requirement_id": "V1-AI-FAIL-CREATE",

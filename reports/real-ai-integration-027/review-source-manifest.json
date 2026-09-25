@@ -1,0 +1,80 @@
+{
+  "base_sha": "ad7d100ba16fa8b11e61526cfd11978a5820a040",
+  "files": [
+    {
+      "path": "backend/app/core/config.py",
+      "sha256": "66a1ed768cf9c26d81b63b12b316e3352821698b3401e43ceb021454bd7f60d8"
+    },
+    {
+      "path": "backend/app/domain/ai.py",
+      "sha256": "97416715fb4d07f34a536f66c5b4064826856f26cbaffa2e9f318b1bb45170dc"
+    },
+    {
+      "path": "backend/app/domain/audit.py",
+      "sha256": "a6b2587416aa392229067aa3c23c08e94f3726d43fba64561ef1fb9b9c59eb94"
+    },
+    {
+      "path": "backend/app/domain/knowledge.py",
+      "sha256": "600453dc5cd4b1a65a7a8e2fc8bcf5703e81df84701bb000e2e6718ed68ca9f2"
+    },
+    {
+      "path": "backend/app/domain/observed_event.py",
+      "sha256": "4d8c673bc85beb716ecd330f29608d82d73a66538167d93f5104972cfc6ca2a4"
+    },
+    {
+      "path": "backend/app/provider/llm/__init__.py",
+      "sha256": "c1bf424bf2fab07849d905e85255a91b178002573078b3d742f17b81cb235430"
+    },
+    {
+      "path": "backend/app/provider/vector/__init__.py",
+      "sha256": "2b4e80fc5d5b72cfca05670d5cc11ecda7c5132792135b09c709331e58967681"
+    },
+    {
+      "path": "backend/app/service/analysis.py",
+      "sha256": "9104911a2921fd847516044d1c6e497484c3c8625cdcb05bfef532af869a67e8"
+    },
+    {
+      "path": "backend/app/service/auto_dispatch.py",
+      "sha256": "33da3d71682f6f66ec5fe2467c79c085e87cb0261e5a0228711712b797c8f31e"
+    },
+    {
+      "path": "backend/app/service/retrieval.py",
+      "sha256": "0f3af06b271680cd31ea6342c98f89f6f04d437c8cf080be062479e653404e23"
+    },
+    {
+      "path": "backend/tests/unit/test_ai_analysis_input.py",
+      "sha256": "c9daa4b43c5f7671cdd9d9559974f1e030c6f540046bf6da1ff8487f8bdab7a9"
+    },
+    {
+      "path": "backend/tests/unit/test_observed_event_027.py",
+      "sha256": "27ed79d4df4fb3d95f1d88b8c51c9cb996dc94ba6dbfcfcd8d47d738fd68a035"
+    },
+    {
+      "path": "backend/tests/unit/test_local_ai_http_027.py",
+      "sha256": "c4f8e63be7bd2369062e615577505f9c8588169122abf5323166f4fa9c0fc071"
+    },
+    {
+      "path": "scripts/ops/local_ai_http.py",
+      "sha256": "a7661c1cc46c369af917d72098220d8f8ab65cd1d1b46c0c79c91d428d261fa3"
+    },
+    {
+      "path": "scripts/ops/local_ai_models.py",
+      "sha256": "e4fd619397bb82efabe65f74cb2a02928a3639d87cd6a246d77f59eacc5ace57"
+    },
+    {
+      "path": "docs/05-AI-DISPATCH-SPEC.md",
+      "sha256": "7691c9b531168a402a924c46e251a3a23b86d0e11a83a65d987686850c4630fe"
+    },
+    {
+      "path": "miniprogram/pages/home/home.js",
+      "sha256": "a6c09fea0465f3ad59b2bbf94fff2a0bd9df5308db9660a5b045eaa0bf4fc466"
+    },
+    {
+      "path": "miniprogram/pages/home/home.wxml",
+      "sha256": "96b0fdc6c3de129f02d7fc7100237250b463a2b79e1bdd7966d3d419f9786ff0"
+    }
+  ],
+  "runtime_backend_sha256": "b13ba9a284fffb97551fddb48f4d6237807eedb2203f59a25dba53c3a6b6a2e8",
+  "model_adapter_receipt": "model-adapter-fix1.json",
+  "protected_project_config_sha256": "342ed0b61fe9c74e7a5ce82198c8f36bd9341d5cda83de2c408f33256867fe1f"
+}

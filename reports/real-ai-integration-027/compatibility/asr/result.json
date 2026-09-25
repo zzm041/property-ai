@@ -1,0 +1,38 @@
+{
+  "status": "PASSED",
+  "reason": null,
+  "exit_code": 0,
+  "command": [
+    "D:\\property-ai\\tmp\\selfhost-ai-runtime\\asr-006-cpu\\.venv\\Scripts\\python.exe",
+    "-I",
+    "-X",
+    "utf8",
+    "D:\\property-ai\\reports\\real-ai-integration-027\\compatibility.py",
+    "asr",
+    "--child"
+  ],
+  "events": [
+    {
+      "utc": "2026-09-25T04:08:33.334110+00:00",
+      "phase": "load"
+    },
+    {
+      "utc": "2026-09-25T04:08:56.364648+00:00",
+      "phase": "inference",
+      "load_seconds": 17.046999999991385
+    },
+    {
+      "utc": "2026-09-25T04:08:57.915680+00:00",
+      "result": {
+        "text": "厨房水龙头关紧后还在滴水，没有积水，请维修人员检查。",
+        "language": "Chinese",
+        "model": "Qwen3-ASR-0.6B"
+      },
+      "inference_seconds": 1.547000000020489
+    }
+  ],
+  "minimum_ram_mib": 7939,
+  "stderr": "The following generation flags are not valid and may be ignored: ['temperature']. Set `TRANSFORMERS_VERBOSITY=info` for more details.\nSetting `pad_token_id` to `eos_token_id`:151645 for open-end generation.\n",
+  "native_only": false,
+  "model_requests_reserved": 1
+}

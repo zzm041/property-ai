@@ -1,0 +1,5 @@
+{
+  "reference": "audio-reference.json",
+  "input_sha256": "616e7102d84dc70bf39e54080f3774b1d583ceacc25903b4410d833b1804d814",
+  "reason": "Existing synthetic PCM retained privately; no duplicated base64 audio"
+}

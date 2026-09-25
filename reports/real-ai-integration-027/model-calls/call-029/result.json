@@ -1,0 +1,59 @@
+{
+  "status": "SUCCESS",
+  "reason": null,
+  "exit_code": 0,
+  "model": "qwen3.5:4b",
+  "revision": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "events": [
+    {
+      "utc": "2026-09-25T05:16:02.559330+00:00",
+      "phase": "load"
+    },
+    {
+      "utc": "2026-09-25T05:16:02.559330+00:00",
+      "phase": "inference",
+      "load_seconds": null
+    },
+    {
+      "utc": "2026-09-25T05:16:02.983900+00:00",
+      "result": {
+        "id": "chatcmpl-586",
+        "object": "chat.completion",
+        "created": 1790313362,
+        "model": "qwen3.5:4b",
+        "system_fingerprint": "fp_ollama",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "{\n  \"status\": \"answered\",\n  \"answer\": \"不需要提交身份证照片。\",\n  \"citation_chunk_ids\": [\n    5\n  ]\n}"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 279,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "completion_tokens": 39,
+          "total_tokens": 318
+        }
+      },
+      "inference_seconds": 0.42199999999138527
+    }
+  ],
+  "samples": [
+    {
+      "ram_free_mib": 8557,
+      "gpu_free_mib": 10518
+    },
+    {
+      "ram_free_mib": 8575,
+      "gpu_free_mib": 10518
+    }
+  ],
+  "total_seconds": 0.5939999999827705,
+  "child_pid": 46708
+}

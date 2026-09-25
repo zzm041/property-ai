@@ -146,7 +146,6 @@ class QwenLLMProvider:
         prompt: str,
         prompt_version: str,
     ) -> Mapping[str, object]:
-        del prompt_version
         if not self.base_url or not self._api_key:
             raise ProviderUnavailableError("LLM is unavailable")
         payload = request_json(
@@ -156,6 +155,7 @@ class QwenLLMProvider:
             headers={
                 "Authorization": f"Bearer {self._api_key}",
                 "Content-Type": "application/json",
+                "X-Prompt-Version": prompt_version,
             },
             json_body={
                 "model": self.model,
@@ -170,6 +170,8 @@ class QwenLLMProvider:
             operation="structured_completion",
         )
         try:
+            if payload['choices'][0].get('finish_reason') not in (None, 'stop'):
+                raise ProviderInvalidOutputError('LLM response was not complete')
             content = payload["choices"][0]["message"]["content"]
         except (KeyError, IndexError, TypeError) as exc:
             raise ProviderInvalidOutputError("LLM returned invalid JSON") from exc

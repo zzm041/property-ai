@@ -1,0 +1,113 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "scope": "本切片软件 round-2：模型 HTTP/CPU 适配器、RAG 接线与权限、已保存运行和页面证据、后置否定修复；不重新审查全仓。",
+  "review_type": "INDEPENDENT_READ_ONLY",
+  "base_sha": "ad7d100ba16fa8b11e61526cfd11978a5820a040",
+  "source_manifest": {
+    "path": "D:/property-ai/reports/real-ai-integration-027/review-source-manifest.json",
+    "sha256": "5a9a26a769e270b3f6d29a5da6f4ea576d6423e587085972cea1ad6b9956864f",
+    "verification": "18 个列明文件当前 SHA-256 全部匹配。",
+    "runtime_backend_sha256": "b13ba9a284fffb97551fddb48f4d6237807eedb2203f59a25dba53c3a6b6a2e8",
+    "binding_limit": "运行证据绑定已记录的固定 candidate；不是将当前整个工作区视为运行版本。"
+  },
+  "verdict": "NEEDS_CHANGES",
+  "model_verdict": "R3_NOT_READY",
+  "findings": [
+    {
+      "id": "027-R2-R2-01",
+      "level": "CURRENT_TASK_BLOCKER",
+      "priority": "P1",
+      "location": [
+        "D:/property-ai/scripts/ops/local_ai_http.py:171",
+        "D:/property-ai/scripts/ops/local_ai_http.py:178",
+        "D:/property-ai/scripts/ops/local_ai_http.py:187",
+        "D:/property-ai/scripts/ops/local_ai_http.py:194",
+        "D:/property-ai/scripts/ops/local_ai_http.py:134",
+        "D:/property-ai/scripts/ops/local_ai_http.py:230"
+      ],
+      "trigger": "Windows venv launcher 启动实际解释器后，请求遇到资源保护、阶段超时或总窗口耗尽。",
+      "impact": "当前只 terminate/wait Popen 对象，没有约束及确认本请求实际解释器后代退出；随后写入普通 FAILED 并释放串行锁。reserve 仅以缺失 result.json 判断完成未知，因此不同输入仍可能获准启动。实际模型进程的资源回收、严格串行及时间预算没有得到完整保证。",
+      "evidence": [
+        "源码中受控对象只有 p.pid，未见请求专属进程树所有权、后代退出确认或完成未知的持久阻断。",
+        "call-022 记录 launcher PID 41248；加载阶段 RAM 降至 3962 MiB，触发 RESOURCE_FLOOR，约 9.531 秒后记录 FAILED。",
+        "call-022 没有实际解释器后代即时退出证据；稍后 PID 和直接子进程不存在只能证明稍后的状态。",
+        "现有专项测试未覆盖 venv launcher 与真实子进程分离时的终止和 UNKNOWN 阻断。"
+      ],
+      "certainty_boundary": "确认的是控制机制缺口，不声称已经观察到残留推理或发生并行模型调用。",
+      "required_change": "将请求所属实际解释器及其后代纳入可验证的生命周期控制；资源/超时终止后确认全部退出。无法证明完成时持久记录 UNKNOWN，并阻断后续请求。远端 Ollama 不能仅由 HTTP 子进程退出推断推理停止，应保守处理未知完成，不停止共享 Ollama。只补无模型的专属哑进程及模拟测试，不追加已到期的模型调用。"
+    }
+  ],
+  "closed_findings": [
+    {
+      "id": "027-R3-R1-02",
+      "status": "CLOSED_FOR_REPORTED_COUNTEREXAMPLES",
+      "evidence": [
+        "observed_event.py:57、80 增加后置否定检查。",
+        "test_observed_event_027.py:63 覆盖“插座火花没有出现”“插座火花并没有出现”“插座火花从未出现”，并保留肯定句对照。",
+        "已读取本轮 66 passed、1 warning 的保存结果，未自行运行。"
+      ],
+      "boundary": "仅关闭已指出的源码反例；不等同于模型质量通过，也不重构未保存的 round-1 原始 JSON。"
+    }
+  ],
+  "accepted_evidence": {
+    "rag": [
+      "真实 bge-m3、reranker 与 Qwen 调用具有原始输入、输出和版本记录；已读取八次 Qwen 实际输入和原始结果。",
+      "文档 2/3/4、任务 2/3/4/5 与对应版本关联成立；文档 2 的 v1 为 SUPERSEDED、v2 为 ACTIVE。",
+      "保存的 Milvus 证据包含四条 1024 维归一化向量、对应 chunk/版本及固定模型元信息；未将旧 8 维 Development 集合称为真实向量。",
+      "Q01、Q07–Q12 为七个有实际引用的回答；Q06 返回资料不足，没有编造赔偿条款。",
+      "Q11 引用文档 2 的 v2，回答已更新内容；员工首页知识入口及 Q07/Q08 员工资料问答有页面证据。",
+      "RAG 在召回时使用组织与可见性过滤，并对 MySQL 当前有效版本和引用 chunk 再校验；未发现本切片放宽这些边界。"
+    ],
+    "permissions": [
+      "N01/N02/N03 为 403，N04 为作用域不匹配 422，记录中无新增推理。",
+      "N03 是同租户下其他小区验证，不能扩大解释为完整跨租户或混合角色验收。"
+    ],
+    "pages": [
+      "实际查看八张 PNG，而非仅检查文件名。",
+      "Q01/Q07/Q09/Q11 截图可见回答及相应来源，Q11 可见 v2 引用。",
+      "四张入库截图顶部仍显示 PENDING 提交提示，不能单凭这些截图证明激活；激活对应关系由页面状态、Worker 任务、数据库记录及后续引用共同支持。"
+    ],
+    "budgets": {
+      "embedding": 12,
+      "reranker": 8,
+      "qwen": 8,
+      "asr": 1,
+      "window": "原 30 分钟窗口已到期；本复审没有新增调用或重置预算。"
+    },
+    "saved_tests": [
+      "R2：45 passed，1 warning。",
+      "R3：66 passed，1 warning。",
+      "等待资源保护修正：18 passed，1 warning。",
+      "以上为读取实施方保存输出，不是审查者独立重跑，也不合并为全项目通过数。"
+    ]
+  },
+  "actually_read": [
+    "AGENTS.md、项目规则，以及本切片 closeout.md 和 review-source-manifest.json。",
+    "manifest 列明的相关源码及必要 diff；重点完整读取 local_ai_http.py、local_ai_models.py、observed_event.py、retrieval.py 及相关专项测试。",
+    "diagnostic 的冻结输入、request-01..03 实际原始结果及 stop.json。",
+    "preflight.json、candidate.json 的版本绑定、replacement.json、collection.json、model-service.json、model-adapter-fix1.json。",
+    "runtime-final.json 中文档、版本、任务、chunk、TaskIntent 和 Milvus 对应记录。",
+    "pages.js、pages.json 页面步骤与请求证据、rag-cases.json、api-negative.json。",
+    "model-calls 中八次 Qwen 输入/原始结果，以及 call-022 的 reservation、stdout、stderr、result；audio-reference.json。",
+    "tests-20260925T043105.txt、tests-20260925T043107.txt、tests-20260925T050629.txt。",
+    "doc-A-active.png、doc-B-active.png、doc-C-active.png、doc-A-v2.png、Q01-answer.png、Q07-answer.png、Q09-answer.png、Q11-answer.png。"
+  ],
+  "unverified": [
+    "本审查未运行测试、页面、业务请求、数据库、队列或模型，也未修改文件。",
+    "R3 第三例将发黑解释为表面剥落、焦味解释为疑似燃气气味；正确摘要不能抵消错误结构化观察。仍为 NOT_READY，3/32 后停止，图片和 AUTO 均未验证。",
+    "R2 ASR 只有加载失败，没有转写结果；早期兼容性结果不替代本轮业务 ASR。",
+    "Q02–Q05 被资源保护拒绝且未重跑，不能记为问答通过。",
+    "N05 住户检索员工内部资料、N06 归档后检索未执行；不能继承旧阶段结果成为本轮真实模型验收。",
+    "约 15–41 秒的成功问答延迟是本机测量，不构成生产性能通过。",
+    "未验证模型异常后远端 Ollama 请求的即时终止。",
+    "未保存的 round-1 原始审查 JSON 保持 UNAVAILABLE。",
+    "完整真实 AUTO、真实图片质量、完整生产 RAG、安全与可靠运行发布验收仍未关闭；0010 及其他未批准事项保持原边界。"
+  ],
+  "next_action": [
+    "立即原样保存本 JSON，并单独保存后续版本绑定，不补造 round-1 原始输出。",
+    "主会话只修复 027-R2-R2-01，增加无真实模型的进程树回收、UNKNOWN 持久阻断及超时预算专项证据。",
+    "沿用同一独立只读上下文窄复核修复和新增回归，不重跑既有业务、页面或已接受的模型结果。",
+    "本轮过期窗口及 ASR 配额不得复用或重置；新增真实模型验证须先取得明确的有界授权。",
+    "保留已证明的局部 RAG 能力，不将本次局部证据升级为完整 REAL-AI-INTEGRATION-027 或 Production PASS。"
+  ]
+}

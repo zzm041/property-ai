@@ -12,6 +12,8 @@
   <button class="btn" data-url="/pages/work-orders/create" bindtap="go">报修</button>
   <button class="btn" data-url="/pages/work-orders/list" bindtap="go">我的工单</button>
   <button class="btn" data-url="/pages/announcements/list" bindtap="go">公告</button>
+</view>
+<view class="card" wx:if="{{canReadKnowledge}}">
   <button class="btn" data-url="/pages/assistant/assistant" bindtap="go">知识助手</button>
 </view>
 <view class="card" wx:if="{{canStaff}}">

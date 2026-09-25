@@ -1,0 +1,676 @@
+{
+  "base_sha": "ad7d100ba16fa8b11e61526cfd11978a5820a040",
+  "source_root": "D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\candidate",
+  "source_sha256": "b13ba9a284fffb97551fddb48f4d6237807eedb2203f59a25dba53c3a6b6a2e8",
+  "files": [
+    {
+      "path": "backend/app/main.py",
+      "sha256": "88e485dd063a55fe1a83f61f44ceac94db9e10c487dff107bc0c8da129ac0013"
+    },
+    {
+      "path": "backend/app/__init__.py",
+      "sha256": "58eb37c4ba3b7433f6edca5561ded09b8e047d7dc2acb99917f43b7202a6f20c"
+    },
+    {
+      "path": "backend/app/api/__init__.py",
+      "sha256": "9bb1df408052c9e15bed01c210d9f67aef5f0766896ca9066df2a3937c2f59e1"
+    },
+    {
+      "path": "backend/app/cli/day1_smoke.py",
+      "sha256": "37afbd7c3c68103c6a23fc40a176f67a0c034a4eb639864c56f9eb9b587f6bb4"
+    },
+    {
+      "path": "backend/app/cli/dev_ai_fixture.py",
+      "sha256": "c3b24a96b944b810d33b87d09c916c13803324961b624233ae82d83abcdf1e34"
+    },
+    {
+      "path": "backend/app/cli/dev_ai_smoke.py",
+      "sha256": "0dcfaeb25fc427e7730958df9f6a07792bfbd597b540fc9dfe0b7af0ff58334a"
+    },
+    {
+      "path": "backend/app/cli/dev_employee_fixture.py",
+      "sha256": "780480f32137f982e347428c61468ae9d4a1f712d99ae79764c871dec2e6230f"
+    },
+    {
+      "path": "backend/app/cli/dev_employee_smoke.py",
+      "sha256": "53be07100426a0c635537827d18d57ec86d848058ed70b881aa769a260fc7c1c"
+    },
+    {
+      "path": "backend/app/cli/dev_house_fixture.py",
+      "sha256": "4675f4ae04bbecb23b7ab556fc913a561ab0594a6025b815113b82b4e174ef8c"
+    },
+    {
+      "path": "backend/app/cli/dev_seed.py",
+      "sha256": "15b7b703b4daccf9dc24935b3e9bc7f9987751b72a5af7a6f954f60939ade3a4"
+    },
+    {
+      "path": "backend/app/cli/dev_work_order_fixture.py",
+      "sha256": "c7cca7aca7fb752b34b08901cd74fc103f3d7a4ddf95f137c2e4300731dfc93e"
+    },
+    {
+      "path": "backend/app/cli/dev_work_order_smoke.py",
+      "sha256": "6511e6e6d3035be4a5d0fdbc0d0ec065c0598cdafd54d0e0c484b7aec30e33be"
+    },
+    {
+      "path": "backend/app/cli/rebuild_knowledge_index.py",
+      "sha256": "7d344626869aac93a6a2b7559a71dff50b4c924ec26cb058efb51cd672623466"
+    },
+    {
+      "path": "backend/app/cli/replay_failed_task.py",
+      "sha256": "586b6e63e0a8b3101ac2804b30a3ae87bd80f92e4b8c753c909db8f2eb491e65"
+    },
+    {
+      "path": "backend/app/cli/__init__.py",
+      "sha256": "fa108be25a39f584752aaa2b6d066a90ed9df8d6bd707ab5b927abf8b5e4ea5c"
+    },
+    {
+      "path": "backend/app/core/config.py",
+      "sha256": "66a1ed768cf9c26d81b63b12b316e3352821698b3401e43ceb021454bd7f60d8"
+    },
+    {
+      "path": "backend/app/core/database.py",
+      "sha256": "efa9a50969170ea11a4acb045f5db81bf94532b78c7cff15e8c2c2b2db2d0f91"
+    },
+    {
+      "path": "backend/app/core/errors.py",
+      "sha256": "fae76aab589fc8f07f57b035e7a493edd9ae3a4e040f5a1256f7891835fc1527"
+    },
+    {
+      "path": "backend/app/core/exception_handlers.py",
+      "sha256": "2b81682d6ff488093d1b84483ead1e362d0b3229ef127dda8356ede591a1bd66"
+    },
+    {
+      "path": "backend/app/core/logging.py",
+      "sha256": "0df3c17efe91ad01146ef14e62e650dbf6cd8d2cb1515899ec07506cf90c16d3"
+    },
+    {
+      "path": "backend/app/core/passwords.py",
+      "sha256": "44741ef44d28a06215a04b79ed85536c4b5acf6b2e5fa704ca5b56d8f6cbbb65"
+    },
+    {
+      "path": "backend/app/core/rate_limit.py",
+      "sha256": "ba4f0c06ec489dac9a0d0573a0c06e111eb16fd2940080e066ea77528dbcdda0"
+    },
+    {
+      "path": "backend/app/core/readiness.py",
+      "sha256": "10fbf71caeb54ef98b12aa03b47e1c70a79f8df88aa0b3f9409a0762fd92f860"
+    },
+    {
+      "path": "backend/app/core/request_context.py",
+      "sha256": "018d8905e56564716b74b7d04382266b2db381e8d3946bc38eac1b4d6dda8e2b"
+    },
+    {
+      "path": "backend/app/core/security.py",
+      "sha256": "5c079388512fd4b0a91ada96fb66b103e2248fc29110e548f87f499f2ad8bd44"
+    },
+    {
+      "path": "backend/app/core/time.py",
+      "sha256": "caf18f46c0d44ce1d59a85a3e4309a40ade5e8240b36f10c6b33dc27f3b59b17"
+    },
+    {
+      "path": "backend/app/core/token_hash.py",
+      "sha256": "2db8d87c1018571b7528011d4f3d91d72f70da25e2b6106071109c7ff48a6c5f"
+    },
+    {
+      "path": "backend/app/core/__init__.py",
+      "sha256": "aac69efccb86a62ce90700d4a330adca813be80f2da469682249adabcb7a129e"
+    },
+    {
+      "path": "backend/app/domain/ai.py",
+      "sha256": "97416715fb4d07f34a536f66c5b4064826856f26cbaffa2e9f318b1bb45170dc"
+    },
+    {
+      "path": "backend/app/domain/announcement.py",
+      "sha256": "e9450a5fc1164ce24c06f210607cfaeb88788b0568c485f5d72f73d6c33bbe95"
+    },
+    {
+      "path": "backend/app/domain/audit.py",
+      "sha256": "a6b2587416aa392229067aa3c23c08e94f3726d43fba64561ef1fb9b9c59eb94"
+    },
+    {
+      "path": "backend/app/domain/dev_seed.py",
+      "sha256": "df54363e069d7bdaf6d2b98abf40ab6358042c94269c51727a19de2e8f8da323"
+    },
+    {
+      "path": "backend/app/domain/employee.py",
+      "sha256": "c16a31c7dc234634e68c57a112bc71ec425e1a6b141faaa3e7ba5360f0e3badd"
+    },
+    {
+      "path": "backend/app/domain/iam.py",
+      "sha256": "987da304f99fb032d49564db29d50c71ef0bf133e9312ab108099c34a5e2d418"
+    },
+    {
+      "path": "backend/app/domain/incident.py",
+      "sha256": "1b8dde59484ac7cd008eb25a82b904599d323a28c902513591a2cbf624828490"
+    },
+    {
+      "path": "backend/app/domain/knowledge.py",
+      "sha256": "600453dc5cd4b1a65a7a8e2fc8bcf5703e81df84701bb000e2e6718ed68ca9f2"
+    },
+    {
+      "path": "backend/app/domain/observed_event.py",
+      "sha256": "4d8c673bc85beb716ecd330f29608d82d73a66538167d93f5104972cfc6ca2a4"
+    },
+    {
+      "path": "backend/app/domain/operations.py",
+      "sha256": "3ff097709cccb8d7445c111fdffa3d5040cea59a2459c98ceeeb0537d12ad3c2"
+    },
+    {
+      "path": "backend/app/domain/phone.py",
+      "sha256": "61ef33c539bf069412b5891d9b315a04cfaf2b775ef14da5c7fee3b987953ea7"
+    },
+    {
+      "path": "backend/app/domain/property.py",
+      "sha256": "d7a3531a7b020886bf241d9919f9201fd50b6f3587e463a41b0443a71f2e4307"
+    },
+    {
+      "path": "backend/app/domain/resident.py",
+      "sha256": "5540863dab2c99317c0f464e352010dfcb6197a1f36a9c9e0cad40ed617ecfcf"
+    },
+    {
+      "path": "backend/app/domain/work_order.py",
+      "sha256": "2e9368be0f5fff69e339f901dc28783e5d19ac717c3f4ba96bf1ab88b17956ec"
+    },
+    {
+      "path": "backend/app/domain/__init__.py",
+      "sha256": "63f9c98d543b672adca7dfe33cf8402b9118ce6fc87a3c31a51cbbfe78449fc7"
+    },
+    {
+      "path": "backend/app/model/ai.py",
+      "sha256": "ffc6419c0c1fbfb71c19e5542e71c07bce23c3e67d61264144cb1c81ae3e0f8e"
+    },
+    {
+      "path": "backend/app/model/base.py",
+      "sha256": "0e953ad4e9a585d6eec4109944a1625b3a21f1e290d40a9897a5972dfe37943e"
+    },
+    {
+      "path": "backend/app/model/employee.py",
+      "sha256": "2b46023e54282823e822ea3d3de48f39f952db6f8a0ceebcd6b67fb7f065b678"
+    },
+    {
+      "path": "backend/app/model/identity.py",
+      "sha256": "57664844430ed8e3d0a7fe010f57a329d25e85a8c53183a4172bb8bc6ea77a84"
+    },
+    {
+      "path": "backend/app/model/knowledge.py",
+      "sha256": "c5e3784e81663b94240dc39baa978416105eebb419ff3ff16b986007818b6e8e"
+    },
+    {
+      "path": "backend/app/model/property.py",
+      "sha256": "be6f4c5e7fe48a39aa1f359569201b0ed6720ab1c753662b340acc9fd5cba86b"
+    },
+    {
+      "path": "backend/app/model/resident.py",
+      "sha256": "31cb21b7ad91a3f257566ca333144f1208a290bd75f96ff5735f73c43752d619"
+    },
+    {
+      "path": "backend/app/model/task_intent.py",
+      "sha256": "ed19aed7fefb9265986d1e0f10c68ccb8a9d24f0c128709b836d9a73301f0730"
+    },
+    {
+      "path": "backend/app/model/work_order.py",
+      "sha256": "c019758b672a532f2ec852c1b937ae6b650faab195d078bd8c36f5631c19f361"
+    },
+    {
+      "path": "backend/app/model/__init__.py",
+      "sha256": "974e4908aac71ddf550c07a0cd1f1b55d7831be3fa3a5b585b6f83f4b38f347f"
+    },
+    {
+      "path": "backend/app/provider/errors.py",
+      "sha256": "569c2fed77095cf4b865572474db35a1f9a8d80a9a44a0d45b44adbbf0c850c7"
+    },
+    {
+      "path": "backend/app/provider/factory.py",
+      "sha256": "5fa7a7a39acaef2792a7ca7492faf67c27df49dac0bbc4ec6ba75fae55dc6e1a"
+    },
+    {
+      "path": "backend/app/provider/http.py",
+      "sha256": "025a6f8cd20dda35190a61ceeca970dc49bc8be7573ddb5accfe4470ce00b574"
+    },
+    {
+      "path": "backend/app/provider/knowledge_parser.py",
+      "sha256": "caf1934237566c12006e33f443b43c4ae6e87f6c41364e247c8e56c6737706db"
+    },
+    {
+      "path": "backend/app/provider/usage.py",
+      "sha256": "e8d063a28e9e1e1633f1f3db8e9acba259e9bdb58897fcc84458e44138f173ab"
+    },
+    {
+      "path": "backend/app/provider/__init__.py",
+      "sha256": "8be7c0c41fbcbd66f22c8dbe8108c03bd45546a480116489133886d7b441e247"
+    },
+    {
+      "path": "backend/app/repository/ai.py",
+      "sha256": "63005a27e6e3db4903f5d8b0e92c979e7f5d848b9a97541a38993ee4239e5ea5"
+    },
+    {
+      "path": "backend/app/repository/audit.py",
+      "sha256": "a833a1312c702739da8a242060bc93955d3ebdbd161450acc68da054cfb49ed0"
+    },
+    {
+      "path": "backend/app/repository/credential.py",
+      "sha256": "cad2f29b31721da65009fb59de6754ddd67707272a3ecdb65cd846bc3cec31d4"
+    },
+    {
+      "path": "backend/app/repository/dev_seed.py",
+      "sha256": "0901b00b38eff99ca07d8c0def6703ceda9d66ddf3298b2d82c908d3d8ae5a14"
+    },
+    {
+      "path": "backend/app/repository/employee.py",
+      "sha256": "56e1beadd72d9c469e12039b322059d9b91768020dffa0bc9ba0061b7e60f2cb"
+    },
+    {
+      "path": "backend/app/repository/identity.py",
+      "sha256": "55a54639b86730ca516ae30cf0a1db5244bcc57aa2f413e7947619a16ed650e4"
+    },
+    {
+      "path": "backend/app/repository/knowledge.py",
+      "sha256": "1e0ad0f70894ccafc2c29c85869539899cbf360268a4877c3a1362d3d8ae3055"
+    },
+    {
+      "path": "backend/app/repository/operations.py",
+      "sha256": "4548ce1e2bd89b079679092dc948097e0b02ca702ecc12d4af1eb34e69968d8b"
+    },
+    {
+      "path": "backend/app/repository/property.py",
+      "sha256": "dea71282759220ebd8d37387a9582645a2fe12515b3476e53a9f91e695aa3ea8"
+    },
+    {
+      "path": "backend/app/repository/rbac_mutation.py",
+      "sha256": "8ad6a9571453862eabe0675b96a67c15c553a29ccfd01e4b62a4b691f418b8c8"
+    },
+    {
+      "path": "backend/app/repository/resident.py",
+      "sha256": "4aee9ded47fb851b009e6511345973d78a5651c2377264d0febe018fefcc33ce"
+    },
+    {
+      "path": "backend/app/repository/task_intent.py",
+      "sha256": "108e06324dc9088af554e6dbc259b6da57ce3765853be038373b78c180afa798"
+    },
+    {
+      "path": "backend/app/repository/work_order.py",
+      "sha256": "2ddf6353fde6188abb1a652a375fb8682c8e657b578245cc537c9f65a4167f94"
+    },
+    {
+      "path": "backend/app/repository/__init__.py",
+      "sha256": "af7fff184de08be85a5824a1dbb71bf3ab7739688b55695014498845754e7f85"
+    },
+    {
+      "path": "backend/app/schema/ai.py",
+      "sha256": "1aa35c4c7f6c7d83e275ca480af022ba951ffd4549c407b85e15d24b88d75fbb"
+    },
+    {
+      "path": "backend/app/schema/auth.py",
+      "sha256": "87260605fa7fbd79afeece1844bdba4a32a629bdcc31298d34c167b8a9a91a96"
+    },
+    {
+      "path": "backend/app/schema/common.py",
+      "sha256": "982a2b42e823a83596f2716a9874fdf17a2335a3a6006d3ae34a2f6f35a1a6e9"
+    },
+    {
+      "path": "backend/app/schema/employee.py",
+      "sha256": "3310cb7036559c28773b9c6436e0e806ec149b5d4bd08f2c6956374426c104f8"
+    },
+    {
+      "path": "backend/app/schema/identity.py",
+      "sha256": "746c1814de6c6de0695559ec7e09b06fbe4d4054856b84428c3a1992ffc7bbd5"
+    },
+    {
+      "path": "backend/app/schema/knowledge.py",
+      "sha256": "0299ac50016f27f8adfaf6c0834a79b0f2026c2abee7d11a4a55ed305b27d7f0"
+    },
+    {
+      "path": "backend/app/schema/operations.py",
+      "sha256": "8097daf07ff2f20c14a2a952bad52a4e39a72cb0c4d3486c008887a28c259ee8"
+    },
+    {
+      "path": "backend/app/schema/property.py",
+      "sha256": "ff60c61aed23c83f8a1c8e04adb91ebf25fc6952f7ceb505df3a08aad2be8cb7"
+    },
+    {
+      "path": "backend/app/schema/resident.py",
+      "sha256": "c4882bc88beab61aa80e2b88d6c56c2c7fb4c8c55583762134fc3ad661d6f65c"
+    },
+    {
+      "path": "backend/app/schema/sla.py",
+      "sha256": "d9a91b6b5c8cba8c3f38d28f01d52d2271ff65d876a3625e22a4eae8d872747d"
+    },
+    {
+      "path": "backend/app/schema/work_order.py",
+      "sha256": "9d9445a1e1379e62c5cca19dfe7a2dee95162067efe5d55e8fed829ab486f26e"
+    },
+    {
+      "path": "backend/app/schema/__init__.py",
+      "sha256": "2447f7f26daa451143a57efd34aba284d3af062d63511a96024f4ae7651b1059"
+    },
+    {
+      "path": "backend/app/service/analysis.py",
+      "sha256": "9104911a2921fd847516044d1c6e497484c3c8625cdcb05bfef532af869a67e8"
+    },
+    {
+      "path": "backend/app/service/analysis_attempt.py",
+      "sha256": "2bbb9a1ddd58bb64f3a07a15788b25f1afe6915e1f5d28b8939ae957b738bae3"
+    },
+    {
+      "path": "backend/app/service/announcement.py",
+      "sha256": "8c6602ffc49d50ffef5c5d628488eefe67a5a7d944ee771a49221068c5f9cef7"
+    },
+    {
+      "path": "backend/app/service/audit.py",
+      "sha256": "0ae55d0f7371103790b8ec8489c911a8dc657f30a01a61a623a0e84bd822df59"
+    },
+    {
+      "path": "backend/app/service/auth.py",
+      "sha256": "7ab69898501c35105b893b3bb7cca6535f2cd2e34622ad19f3bc7e55d00ed445"
+    },
+    {
+      "path": "backend/app/service/auto_dispatch.py",
+      "sha256": "33da3d71682f6f66ec5fe2467c79c085e87cb0261e5a0228711712b797c8f31e"
+    },
+    {
+      "path": "backend/app/service/credential_auth.py",
+      "sha256": "62680cc01f434bf93e30d465dcedefb0a1c916eb4507407451ebf2acfbdf52a1"
+    },
+    {
+      "path": "backend/app/service/dev_ai_fixture.py",
+      "sha256": "b69fc5062568090c61e65926e1d9e8ba35cbe142b58b8a200afb4686133d4342"
+    },
+    {
+      "path": "backend/app/service/dev_employee_fixture.py",
+      "sha256": "83fc80edf8ddea684d2ce65e4a453ab23c63a95f970c80f88835e2f8fb09c218"
+    },
+    {
+      "path": "backend/app/service/dev_house_fixture.py",
+      "sha256": "8a0b3096d793ca03126dbb8d1eae973b4a59ed8b63424e01424a07f1b79b8c90"
+    },
+    {
+      "path": "backend/app/service/dev_seed.py",
+      "sha256": "29e39ff4caddcbb529624649fe4b6a60c03475d226fe563edf8c357e15c61860"
+    },
+    {
+      "path": "backend/app/service/dev_work_order_fixture.py",
+      "sha256": "60242389c62c4542d6c3bcfee286023caba788b51e3b5c3d207098950221841d"
+    },
+    {
+      "path": "backend/app/service/employee.py",
+      "sha256": "acb86b88c745074722da04d9b1592d83d295aed0c90b21a9d446a52dd8268587"
+    },
+    {
+      "path": "backend/app/service/employee_identity.py",
+      "sha256": "f3c22dd3f3e77da49dcd196eabcba9a6a090d0f17fc9230091d446597f601b8f"
+    },
+    {
+      "path": "backend/app/service/incident.py",
+      "sha256": "9eb142ae31b3ce5b6108edaf86d4b25cd09be0803155951180b41b677259e689"
+    },
+    {
+      "path": "backend/app/service/knowledge.py",
+      "sha256": "1bf4189a73aa3f16a5f07570a350d2a952a40b92e6427cb42b928e5752454df1"
+    },
+    {
+      "path": "backend/app/service/notification.py",
+      "sha256": "3b2750e0c079f41864ded8ef22d0d9eed8c5ca6c105d2496ad63b9a52e448a87"
+    },
+    {
+      "path": "backend/app/service/operations.py",
+      "sha256": "89b1be6119e9ca9b910afd43c045c2ce8cfc293ea24adf2340e837862b749c6a"
+    },
+    {
+      "path": "backend/app/service/property.py",
+      "sha256": "cb0e4ef51fcde05369f33524118c9cd991a1653dad152713565f1391b87fc20f"
+    },
+    {
+      "path": "backend/app/service/property_admin.py",
+      "sha256": "edf8103319f489f7da254e929fee01ac92930538b3300caea575a45738b0da57"
+    },
+    {
+      "path": "backend/app/service/property_catalog.py",
+      "sha256": "64f269bb338da0f967c90fc0acb7667bd70e04ac2974a4fa9693a04da72b6677"
+    },
+    {
+      "path": "backend/app/service/rbac.py",
+      "sha256": "d083af5dcc08e78dda85e80a99948ce9005ed6201938b336a0a83a08a238ce35"
+    },
+    {
+      "path": "backend/app/service/rbac_mutation.py",
+      "sha256": "17219c91056941ca4ee79f49c8ace8ebbe38b915886bce04e2393e82a9d6516f"
+    },
+    {
+      "path": "backend/app/service/resident.py",
+      "sha256": "6b1203e696e084ffc423945223857b075e8a6291285f84077082bf5b0f9138a3"
+    },
+    {
+      "path": "backend/app/service/retrieval.py",
+      "sha256": "0f3af06b271680cd31ea6342c98f89f6f04d437c8cf080be062479e653404e23"
+    },
+    {
+      "path": "backend/app/service/sla.py",
+      "sha256": "fc8e104beab62dbc0b51f57bc133fd11c2de36e595c35675f38bb1f2256e4f34"
+    },
+    {
+      "path": "backend/app/service/sla_policy.py",
+      "sha256": "ec27c33fccb14be4d0e86573b5ca8f9b8e00287cbd345dfd0fbe3db884baa0c9"
+    },
+    {
+      "path": "backend/app/service/task_intent.py",
+      "sha256": "ea9e76867c807649f308fcca96c7d5a7247803cf0e748b7f58a932154a0a02a7"
+    },
+    {
+      "path": "backend/app/service/wechat_auth.py",
+      "sha256": "a6471c53baea8f7a9eb6824a75a72cf4205c1847ccea9d6484758914985ee9aa"
+    },
+    {
+      "path": "backend/app/service/work_order.py",
+      "sha256": "a285a892cad8e272bdde94815d686ab27ab72579fecc6f6437b9690d1d7c797b"
+    },
+    {
+      "path": "backend/app/service/__init__.py",
+      "sha256": "017db41d8782cc25716e1f14b0a04ca481f23fdbd157efaf2f977d5ce940fa66"
+    },
+    {
+      "path": "backend/app/worker/celery_app.py",
+      "sha256": "6eef975e3d64e0d1caddf3709397ed39eb115d005b5700b41a55a5e77b796e2c"
+    },
+    {
+      "path": "backend/app/worker/enqueue.py",
+      "sha256": "ed4b6aabb33d238587d9b8723238c00efa53f8dd38a1c68a2055c40713397bf1"
+    },
+    {
+      "path": "backend/app/worker/failed_tasks.py",
+      "sha256": "31f8af67a994a21f3dcf298ae543c4b8d38f214428a8765c8e4ada49b87ec4e9"
+    },
+    {
+      "path": "backend/app/worker/tasks.py",
+      "sha256": "c69c237c45bb08955221b5f73642f63828143e71382be724287f70b1db9934e0"
+    },
+    {
+      "path": "backend/app/worker/task_intents.py",
+      "sha256": "7c59c41dcb2e5fe201c7699007da6382fa29feb1ca959e6af40d1fea9b61f9d9"
+    },
+    {
+      "path": "backend/app/worker/__init__.py",
+      "sha256": "1b588bf0aba02d8ee128bfaab23d335e66cd7c8a5034ebc1a42992e0392635f3"
+    },
+    {
+      "path": "backend/app/api/dependencies/auth.py",
+      "sha256": "9bf05951d1f95973cb30f195df3a5aa42b994a033b25ad06e699bb79a35ab48e"
+    },
+    {
+      "path": "backend/app/api/dependencies/db.py",
+      "sha256": "58468d1d3dbbea889f031cc297d2b6afe6977d7e18922c72ea1dc7dc3aa5c755"
+    },
+    {
+      "path": "backend/app/api/dependencies/__init__.py",
+      "sha256": "a6fa8a647d346f8fee615acafad5e31f47056276c41309b1d14be10f8cac0e73"
+    },
+    {
+      "path": "backend/app/api/v1/admin_announcements.py",
+      "sha256": "b43e096220942625dca914f332bfc0099412b174cc074be68bde12a20a885b9b"
+    },
+    {
+      "path": "backend/app/api/v1/admin_employee.py",
+      "sha256": "11046b2e42d5537557ef4abbbdb88e6f9b21c4dd11ae2118af9ede7ed54f2c75"
+    },
+    {
+      "path": "backend/app/api/v1/admin_knowledge.py",
+      "sha256": "a292316d6d10df97e8c09d2cc8559b50f3a93b0e77640ed2e8d80db477a5d3db"
+    },
+    {
+      "path": "backend/app/api/v1/admin_operations.py",
+      "sha256": "72c002cfea0b9d2f5e0b495f3bbf0a535537cf96e3f883d739d4a22c5902ecf9"
+    },
+    {
+      "path": "backend/app/api/v1/admin_property.py",
+      "sha256": "c33c06666e163f231f82092a805334055288e238e98d758c8f0ce691d49d575b"
+    },
+    {
+      "path": "backend/app/api/v1/admin_resident.py",
+      "sha256": "e971bd31e352052a2eea6cb655a7bdd2543a17fe94407725688ca039638b067b"
+    },
+    {
+      "path": "backend/app/api/v1/admin_sla.py",
+      "sha256": "da0a98c23c7c0557dc8808d042c21efaa3d76b685254cc7f5e1db05245c77531"
+    },
+    {
+      "path": "backend/app/api/v1/announcements.py",
+      "sha256": "42fb3ffd5d64745c12f58529b15c59cba05e3432a69d39ba73d01440f5fb7124"
+    },
+    {
+      "path": "backend/app/api/v1/assistant.py",
+      "sha256": "c8d2f75248106292a3dfe25f4a854a2a426fe4040b12f056e5f52c408d21f0be"
+    },
+    {
+      "path": "backend/app/api/v1/auth.py",
+      "sha256": "48b8d2bf50a6c14f05d5d40f77c756a0b0fc79f9264e96d6ecad7fd612e06fe6"
+    },
+    {
+      "path": "backend/app/api/v1/credential_auth.py",
+      "sha256": "08c5b3319cfac513991855164c939c6d2d8412396e65f5005ebcd8133e6f76a8"
+    },
+    {
+      "path": "backend/app/api/v1/employee_claim.py",
+      "sha256": "412747b8d6c028a196ebb088005a6d26bd1691078cf2b985559de208d1f0becd"
+    },
+    {
+      "path": "backend/app/api/v1/files.py",
+      "sha256": "fd33796e458826f0f296b1ffb3fb4100c03f821ec1ff68b1963806d985589413"
+    },
+    {
+      "path": "backend/app/api/v1/health.py",
+      "sha256": "60881c85ecfe26ecb7e9bea7d74d874e0a70f6f9bb1492250633ea6250e5a471"
+    },
+    {
+      "path": "backend/app/api/v1/me.py",
+      "sha256": "fe2ffeb12313734b71ba0c9f363c0ea18470175f717fb543d29240832c4f1277"
+    },
+    {
+      "path": "backend/app/api/v1/notifications.py",
+      "sha256": "714e238f4f2606727b4de3b8dd93a35abf5222bf72749e57c3fa76504d649676"
+    },
+    {
+      "path": "backend/app/api/v1/property_catalog.py",
+      "sha256": "c6653b57bdfc304e44af640b4266081a989d52f4ff93d251d387e09e518d6804"
+    },
+    {
+      "path": "backend/app/api/v1/resident.py",
+      "sha256": "73104941c2c0cf21f1372bab077d85fef578e6d37f24b7d8db5233a58f8f590c"
+    },
+    {
+      "path": "backend/app/api/v1/router.py",
+      "sha256": "64d3884a8c091cdbf7e8935afcef5cbba8deb5f5202d203321a326e2e490c1b2"
+    },
+    {
+      "path": "backend/app/api/v1/staff_attendance.py",
+      "sha256": "f85dba043c298c066478e33aea742668231e0530961a38725f40428f6493c035"
+    },
+    {
+      "path": "backend/app/api/v1/staff_work_orders.py",
+      "sha256": "86e4ae46ac0c10d982ace3b90ce911cb9a0cb727c344537f31f4074107382516"
+    },
+    {
+      "path": "backend/app/api/v1/supervisor_ai.py",
+      "sha256": "34d2e2f76207edfd6314af47362931cb5210dd3724b93bda4e04b5196a8732c8"
+    },
+    {
+      "path": "backend/app/api/v1/supervisor_incidents.py",
+      "sha256": "5eb54c2dbe5626b7323faa1635c28740f46739819ace7c427331a353182517a3"
+    },
+    {
+      "path": "backend/app/api/v1/supervisor_staff.py",
+      "sha256": "38251f4794da04ab5ddedc09ad46a744dbe21d5052a8782e4e905d4d2fa42b6c"
+    },
+    {
+      "path": "backend/app/api/v1/supervisor_work_orders.py",
+      "sha256": "627e123f8f57ff10ec7a65bb2cd623840a7ee9b633679557e58c1aa3f36f1f21"
+    },
+    {
+      "path": "backend/app/api/v1/task_intents.py",
+      "sha256": "54dee58248c6a6403e6bd4f8cfecacd3a528d35d2b0e064405401b52c0257a4b"
+    },
+    {
+      "path": "backend/app/api/v1/wechat_auth.py",
+      "sha256": "fdf120134c027925a3e194935b105a261b3297994c2f3168d49b39538072fce9"
+    },
+    {
+      "path": "backend/app/api/v1/work_orders.py",
+      "sha256": "69f85c926bb3128a5226a0ae5838236ccd908a48e8d37ba46fcb80452f6c385b"
+    },
+    {
+      "path": "backend/app/api/v1/__init__.py",
+      "sha256": "7d18ab8b5ec2ef514a8e387d10d2dac7cef701c8c4ce8d393ef900aa05432d1a"
+    },
+    {
+      "path": "backend/app/provider/asr/__init__.py",
+      "sha256": "227b5c491174ffcbd00e849f84e50795575fb88da1a2058625c91b42f82a6b8a"
+    },
+    {
+      "path": "backend/app/provider/embedding/__init__.py",
+      "sha256": "2dfabc8ba828bddf9e7c8c2ebf1d627c8b2d8cf732b18723ed57dd994d9fc93b"
+    },
+    {
+      "path": "backend/app/provider/llm/__init__.py",
+      "sha256": "c1bf424bf2fab07849d905e85255a91b178002573078b3d742f17b81cb235430"
+    },
+    {
+      "path": "backend/app/provider/notification/__init__.py",
+      "sha256": "59b9788d9455462227959eea25e13f59f1d743478332dcaa2d7342556effae89"
+    },
+    {
+      "path": "backend/app/provider/realname/__init__.py",
+      "sha256": "10cf26a7dfe361fab247059d3420dbe10513982043f009ce78724200022935cd"
+    },
+    {
+      "path": "backend/app/provider/reranker/__init__.py",
+      "sha256": "c8f2f84a2c9e571db5ec955782e9a1be191146729f9c91b96a486960e05f0683"
+    },
+    {
+      "path": "backend/app/provider/sms/__init__.py",
+      "sha256": "a2b25f7d4502393f5480eca2b175e6f6fe2ef12bb613a0e945a7f21844e77ea8"
+    },
+    {
+      "path": "backend/app/provider/storage/__init__.py",
+      "sha256": "333746d4b6e5d7e6608e924bba1eee4168ef5158adf8e4db36bbbc4315f3d962"
+    },
+    {
+      "path": "backend/app/provider/vector/__init__.py",
+      "sha256": "2b4e80fc5d5b72cfca05670d5cc11ecda7c5132792135b09c709331e58967681"
+    },
+    {
+      "path": "backend/app/provider/vision/__init__.py",
+      "sha256": "3c14aa554308e5259cb775490bc12814a44adcdb19db439db316be7058c34007"
+    },
+    {
+      "path": "backend/app/provider/wechat/__init__.py",
+      "sha256": "2409429fcace99a6614bd33c9758c92968f909a455aa73a6838d199a9b3b1d4a"
+    },
+    {
+      "path": "scripts/ops/local_ai_http.py",
+      "sha256": "59275c8a0c12d91860a643cb5e2bedb152412aba8f26e0eb0ec0b45057a6487f"
+    },
+    {
+      "path": "scripts/ops/local_ai_models.py",
+      "sha256": "e4fd619397bb82efabe65f74cb2a02928a3639d87cd6a246d77f59eacc5ace57"
+    }
+  ],
+  "scope": "R2_ONLY; R3 diagnostic NOT_READY, no work-order inference authorized"
+}

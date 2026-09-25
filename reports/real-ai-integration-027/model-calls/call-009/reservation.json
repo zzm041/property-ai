@@ -1,0 +1,8 @@
+{
+  "kind": "qwen",
+  "unix": 1790311966.5627482,
+  "utc": "2026-09-25T04:52:46.563811+00:00",
+  "model": "qwen3.5:4b",
+  "max_calls": 18,
+  "input_hash": "fcf23c6879fb9e7fbbb92f6f51e08097e1a234fe8531f89a97fca087eda52998"
+}

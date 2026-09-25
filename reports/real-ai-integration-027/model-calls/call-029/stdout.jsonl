@@ -1,0 +1,3 @@
+{"utc": "2026-09-25T05:16:02.559330+00:00", "phase": "load"}
+{"utc": "2026-09-25T05:16:02.559330+00:00", "phase": "inference", "load_seconds": null}
+{"utc": "2026-09-25T05:16:02.983900+00:00", "result": {"id": "chatcmpl-586", "object": "chat.completion", "created": 1790313362, "model": "qwen3.5:4b", "system_fingerprint": "fp_ollama", "choices": [{"index": 0, "message": {"role": "assistant", "content": "{\n  \"status\": \"answered\",\n  \"answer\": \"不需要提交身份证照片。\",\n  \"citation_chunk_ids\": [\n    5\n  ]\n}"}, "finish_reason": "stop"}], "usage": {"prompt_tokens": 279, "prompt_tokens_details": {"cached_tokens": 0}, "completion_tokens": 39, "total_tokens": 318}}, "inference_seconds": 0.42199999999138527}

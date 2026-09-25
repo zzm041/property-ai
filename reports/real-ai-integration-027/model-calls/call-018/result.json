@@ -1,0 +1,99 @@
+{
+  "status": "SUCCESS",
+  "reason": null,
+  "exit_code": 0,
+  "model": "qwen3.5:4b",
+  "revision": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "events": [
+    {
+      "utc": "2026-09-25T05:10:34.221040+00:00",
+      "phase": "load"
+    },
+    {
+      "utc": "2026-09-25T05:10:34.221040+00:00",
+      "phase": "inference",
+      "load_seconds": null
+    },
+    {
+      "utc": "2026-09-25T05:10:37.585545+00:00",
+      "result": {
+        "id": "chatcmpl-835",
+        "object": "chat.completion",
+        "created": 1790313037,
+        "model": "qwen3.5:4b",
+        "system_fingerprint": "fp_ollama",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "{\n  \"status\": \"answered\",\n  \"answer\": \"植物认领活动在西侧大厅进行，只发放绿萝。\",\n  \"citation_chunk_ids\": [\n    4\n  ]\n}"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 233,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "completion_tokens": 47,
+          "total_tokens": 280
+        }
+      },
+      "inference_seconds": 3.35999999998603
+    }
+  ],
+  "samples": [
+    {
+      "ram_free_mib": 9175,
+      "gpu_free_mib": 14554
+    },
+    {
+      "ram_free_mib": 9059,
+      "gpu_free_mib": 14551
+    },
+    {
+      "ram_free_mib": 8982,
+      "gpu_free_mib": 14532
+    },
+    {
+      "ram_free_mib": 8845,
+      "gpu_free_mib": 14354
+    },
+    {
+      "ram_free_mib": 8854,
+      "gpu_free_mib": 14355
+    },
+    {
+      "ram_free_mib": 8452,
+      "gpu_free_mib": 11842
+    },
+    {
+      "ram_free_mib": 8221,
+      "gpu_free_mib": 11842
+    },
+    {
+      "ram_free_mib": 8231,
+      "gpu_free_mib": 11588
+    },
+    {
+      "ram_free_mib": 8162,
+      "gpu_free_mib": 10824
+    },
+    {
+      "ram_free_mib": 8183,
+      "gpu_free_mib": 10595
+    },
+    {
+      "ram_free_mib": 8102,
+      "gpu_free_mib": 10585
+    },
+    {
+      "ram_free_mib": 8106,
+      "gpu_free_mib": 10585
+    }
+  ],
+  "total_seconds": 3.562999999994645,
+  "child_pid": 43584
+}

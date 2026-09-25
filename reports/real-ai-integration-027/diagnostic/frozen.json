@@ -1,0 +1,90 @@
+{
+  "base_sha": "ad7d100ba16fa8b11e61526cfd11978a5820a040",
+  "private_frozen_root": "D:\\property-ai\\tmp\\real-ai-integration-027\\diagnostic\\frozen",
+  "files": [
+    {
+      "path": "backend/app/domain/ai.py",
+      "sha256": "97416715fb4d07f34a536f66c5b4064826856f26cbaffa2e9f318b1bb45170dc"
+    },
+    {
+      "path": "backend/app/domain/audit.py",
+      "sha256": "a6b2587416aa392229067aa3c23c08e94f3726d43fba64561ef1fb9b9c59eb94"
+    },
+    {
+      "path": "backend/app/domain/observed_event.py",
+      "sha256": "b934fc58aff9cc81cda99d1f33f8c8e3365ea8328af4e7c76233efc2bc81a265"
+    },
+    {
+      "path": "backend/app/provider/http.py",
+      "sha256": "025a6f8cd20dda35190a61ceeca970dc49bc8be7573ddb5accfe4470ce00b574"
+    },
+    {
+      "path": "backend/app/provider/llm/__init__.py",
+      "sha256": "4901bc99b45c73d99a57da1406b93bcf08df32741c1bd74b9a3bfbdff023380e"
+    },
+    {
+      "path": "backend/app/provider/vision/__init__.py",
+      "sha256": "3c14aa554308e5259cb775490bc12814a44adcdb19db439db316be7058c34007"
+    },
+    {
+      "path": "backend/app/service/analysis.py",
+      "sha256": "9104911a2921fd847516044d1c6e497484c3c8625cdcb05bfef532af869a67e8"
+    },
+    {
+      "path": "backend/app/service/auto_dispatch.py",
+      "sha256": "33da3d71682f6f66ec5fe2467c79c085e87cb0261e5a0228711712b797c8f31e"
+    },
+    {
+      "path": "docs/05-AI-DISPATCH-SPEC.md",
+      "sha256": "7691c9b531168a402a924c46e251a3a23b86d0e11a83a65d987686850c4630fe"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/gold-set-24.json",
+      "sha256": "c3c93b419b7d5dea12b529152cde661c16826cc708b1d80d5b26d39d70ddfc1f"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/repair-image-gold.json",
+      "sha256": "df10abfde5a0144c480e29041ddedcc146a0182a6452dacd2ed97498c88cfdbe"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/repair-images/ans-ball-valve.jpg",
+      "sha256": "965dc412677a19d32b2ad7092e7c0203e0abbda75d6b230c7dd087300939f1cd"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/repair-images/burned-socket.jpg",
+      "sha256": "1e3d71c542f7c8f9bfe20fc4915da7c61cb2bac875e0e383470bd201b7dd454a"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/repair-images/ceiling-peeling.jpg",
+      "sha256": "dabfd2227a33efa7b085d6f8519bec47f43b1542c7eaafed81047abb3d52eb8d"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/repair-images/normal-socket.jpg",
+      "sha256": "d6d75928f4a23d4ddde0bed730ca6d71624b7a9032afd2ca2ab5b74c61b03b87"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/run-approved-supplement.py",
+      "sha256": "0d3aa78b022e4e3506027afebf4fca76bf68a09a9428221cfa58af6fb312cb53"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/run-crossfield-diagnostic.py",
+      "sha256": "67fc0d701c6f2896433b36936983fb3f21ae11d58bec24a1f8298d11d19b859f"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/run-quality28.py",
+      "sha256": "5a9454c0f853f0571b3bc17a01c62d702aff74a4538eb3245ba375dab76aa435"
+    },
+    {
+      "path": "reports/real-ai-integration-027/diagnostic.py",
+      "sha256": "795ffa821a95149148740fac170612e8eaf8e714fcd43300031c6b33962bcd93"
+    }
+  ],
+  "protocol": "observed-event-v1",
+  "budget": {
+    "requests": 32,
+    "seconds": 1800,
+    "per_request_seconds": 60
+  },
+  "rubric": "Original facts/risk/Chinese/complete issues/images remain; current observed evidence instead of free motive subcategory; ordinary maintenance unified; raw outputs immutable",
+  "prior_rounds": "Historical 3/3 untouched; this is one newly authorized R3 run"
+}

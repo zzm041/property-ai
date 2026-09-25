@@ -1,0 +1,84 @@
+.........FF.......                                                       [100%]
+================================== FAILURES ===================================
+____________ test_cpu_guard_waits_without_call_and_keeps_threshold ____________
+
+tmp_path = WindowsPath('D:/property-ai/tmp/real-ai-integration-027/unit-050602/test_cpu_guard_waits_without_c0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000013D86239F40>
+
+    def test_cpu_guard_waits_without_call_and_keeps_threshold(tmp_path,monkeypatch):
+        r=runner(tmp_path);samples=iter([7600,8191,8192]);sleeps=[]
+        monkeypatch.setattr(m,'ram',lambda:next(samples))
+        monkeypatch.setattr(m.time,'sleep',lambda seconds:sleeps.append(seconds))
+        def reserved(kind,input_hash):raise RuntimeError('REACHED_RESERVATION')
+        monkeypatch.setattr(r,'reserve',reserved)
+        with pytest.raises(RuntimeError,match='REACHED_RESERVATION'):
+>           r.run('embedding',{'model':'bge-m3','input':['测试']})
+
+backend\tests\unit\test_local_ai_http_027.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\ops\local_ai_http.py:148: in run
+    validate(kind,value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+kind = 'embedding', value = {'input': ['测试'], 'model': 'bge-m3'}
+
+    def validate(kind,value):
+        if kind=='asr':
+            if not isinstance(value,bytes) or len(value)>1_000_000:raise ValueError('AUDIO_SIZE')
+            try:
+                with wave.open(io.BytesIO(value),'rb') as w:
+                    if w.getnchannels()!=1 or w.getsampwidth()!=2 or w.getframerate()!=16000 or not 0<w.getnframes()<=480000 or w.getcomptype()!='NONE':raise ValueError('PCM_REQUIRED')
+                    if len(w.readframes(w.getnframes()))!=w.getnframes()*2:raise ValueError('TRUNCATED_AUDIO')
+            except (wave.Error,EOFError) as exc:raise ValueError('PCM_REQUIRED') from exc
+        elif kind=='embedding':
+>           if not isinstance(value,list) or not 1<=len(value)<=16 or any(not isinstance(v,str) or not 0<len(v)<=4000 for v in value):raise ValueError('EMBEDDING_INPUT')
+E           ValueError: EMBEDDING_INPUT
+
+scripts\ops\local_ai_http.py:74: ValueError
+____________ test_cpu_guard_times_out_without_reserving_or_loading ____________
+
+tmp_path = WindowsPath('D:/property-ai/tmp/real-ai-integration-027/unit-050602/test_cpu_guard_times_out_witho0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000013D86238710>
+
+    def test_cpu_guard_times_out_without_reserving_or_loading(tmp_path,monkeypatch):
+        r=runner(tmp_path);clock=iter([0,36])
+        monkeypatch.setattr(m,'ram',lambda:8191)
+        monkeypatch.setattr(m.time,'monotonic',lambda:next(clock))
+        with pytest.raises(RuntimeError,match='CPU_START_RAM_GUARD'):
+>           r.run('embedding',{'model':'bge-m3','input':['测试']})
+
+backend\tests\unit\test_local_ai_http_027.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\ops\local_ai_http.py:148: in run
+    validate(kind,value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+kind = 'embedding', value = {'input': ['测试'], 'model': 'bge-m3'}
+
+    def validate(kind,value):
+        if kind=='asr':
+            if not isinstance(value,bytes) or len(value)>1_000_000:raise ValueError('AUDIO_SIZE')
+            try:
+                with wave.open(io.BytesIO(value),'rb') as w:
+                    if w.getnchannels()!=1 or w.getsampwidth()!=2 or w.getframerate()!=16000 or not 0<w.getnframes()<=480000 or w.getcomptype()!='NONE':raise ValueError('PCM_REQUIRED')
+                    if len(w.readframes(w.getnframes()))!=w.getnframes()*2:raise ValueError('TRUNCATED_AUDIO')
+            except (wave.Error,EOFError) as exc:raise ValueError('PCM_REQUIRED') from exc
+        elif kind=='embedding':
+>           if not isinstance(value,list) or not 1<=len(value)<=16 or any(not isinstance(v,str) or not 0<len(v)<=4000 for v in value):raise ValueError('EMBEDDING_INPUT')
+E           ValueError: EMBEDDING_INPUT
+
+scripts\ops\local_ai_http.py:74: ValueError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:40
+  D:\property-ai\.venv\Lib\site-packages\starlette\testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\unit\test_local_ai_http_027.py::test_cpu_guard_waits_without_call_and_keeps_threshold
+FAILED backend\tests\unit\test_local_ai_http_027.py::test_cpu_guard_times_out_without_reserving_or_loading
+2 failed, 16 passed, 1 warning in 0.36s
+D:\property-ai\.venv\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))

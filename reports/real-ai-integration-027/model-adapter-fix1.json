@@ -1,0 +1,19 @@
+{
+  "old_process": {
+    "ProcessId": 35476,
+    "ExecutablePath": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe",
+    "CommandLine": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe -I -X utf8 D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\candidate\\scripts\\ops\\local_ai_http.py serve --config D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\model-config.json",
+    "created": "2026-09-25T12:37:24.7007790+08:00"
+  },
+  "new_process": {
+    "ProcessId": 38104,
+    "ExecutablePath": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe",
+    "CommandLine": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe -I -X utf8 D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\model-adapter-fix1\\local_ai_http.py serve --config D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\model-config.json",
+    "created": "2026-09-25T13:08:39.4634410+08:00"
+  },
+  "reason": "Wait for own idle Qwen release while retaining8192MiB CPU start guard; no probe/retry",
+  "source_sha256": "a7661c1cc46c369af917d72098220d8f8ab65cd1d1b46c0c79c91d428d261fa3",
+  "budget_directory": "D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\model-calls",
+  "budget_reset": false,
+  "business_source_unchanged": "b13ba9a284fffb97551fddb48f4d6237807eedb2203f59a25dba53c3a6b6a2e8"
+}

@@ -1,0 +1,25 @@
+{
+  "old": {
+    "api": {
+      "ProcessId": 30836,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -I -X utf8 D:\\property-ai\\reports\\reliable-task-delivery-026\\normal-integration.py api",
+      "created": "2026-09-25T05:50:41.1114130+08:00"
+    },
+    "worker": {
+      "ProcessId": 40816,
+      "ExecutablePath": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "CommandLine": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -I -X utf8 D:\\property-ai\\reports\\reliable-task-delivery-026\\normal-integration.py worker",
+      "created": "2026-09-25T05:50:41.8061460+08:00"
+    }
+  },
+  "idle": {
+    "active": 0,
+    "reserved": 0,
+    "scheduled": 0
+  },
+  "queues": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nproperty_ai.auth001.dlq\t7\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1\n",
+  "method": "targeted graceful Worker shutdown; own API stop flag",
+  "scope": "R2 only",
+  "utc": "2026-09-25T04:38:00.949358+00:00"
+}

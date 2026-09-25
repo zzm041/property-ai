@@ -108,6 +108,7 @@ class Settings(BaseSettings):
     incident_threshold: int = Field(default=5, ge=2, le=100)
     milvus_uri: str = "http://127.0.0.1:19530"
     milvus_collection: str = "knowledge_chunks_v1"
+    milvus_metric_type: Literal['IP', 'COSINE'] = 'IP'
     milvus_timeout_seconds: float = Field(default=3.0, ge=0.1, le=30.0)
     llm_provider: Literal["development", "production"] = "development"
     llm_base_url: str = ""
@@ -135,6 +136,8 @@ class Settings(BaseSettings):
     embedding_endpoint: str = ""
     embedding_api_key: SecretStr = SecretStr("")
     embedding_model: str = "bge-m3"
+    embedding_revision: str = ''
+    embedding_normalization: Literal['unspecified', 'l2'] = 'unspecified'
     embedding_dimensions: int = Field(default=8, ge=2, le=1024)
     embedding_timeout_seconds: float = Field(default=8.0, ge=0.1, le=60.0)
     reranker_provider: Literal["development", "production"] = "development"

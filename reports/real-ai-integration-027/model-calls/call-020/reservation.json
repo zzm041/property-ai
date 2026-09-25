@@ -1,0 +1,8 @@
+{
+  "kind": "reranker",
+  "unix": 1790313075.0422878,
+  "utc": "2026-09-25T05:11:15.042812+00:00",
+  "model": "bge-reranker-v2-m3",
+  "max_calls": 18,
+  "input_hash": "86b3e4a3b036939a508890cf10744ac8fb71b1d40c740b01a2bc66069e46af6e"
+}

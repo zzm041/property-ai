@@ -1,0 +1,17 @@
+{
+  "utc": "2026-09-25T04:35:47.369590+00:00",
+  "head": "ad7d100ba16fa8b11e61526cfd11978a5820a040",
+  "run_id": "ai027-b439223fda",
+  "database": "127.0.0.1:3307/property_ai_auth001_test@20260925_0012_task_intents",
+  "vhost": "property_ai_auth001",
+  "queue": "property_ai.auth001",
+  "worker_counts": {
+    "active": 0,
+    "reserved": 0,
+    "scheduled": 0
+  },
+  "queue_metadata": "Timeout: 60.0 seconds ...\nListing queues for vhost property_ai_auth001 ...\nname\tmessages_ready\tmessages_unacknowledged\tconsumers\nproperty_ai.auth001\t0\t0\t1\nproperty_ai.auth001.dlq\t7\t0\t0\nauth001@DESKTOP-8NHSE12.celery.pidbox\t0\t0\t1\n",
+  "protected_config_sha256": "342ed0b61fe9c74e7a5ce82198c8f36bd9341d5cda83de2c408f33256867fe1f",
+  "no_business_writes": true,
+  "model_requests": 0
+}

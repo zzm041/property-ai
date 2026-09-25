@@ -1,0 +1,3 @@
+{"utc": "2026-09-25T04:51:58.887134+00:00", "phase": "load"}
+{"utc": "2026-09-25T04:51:58.887134+00:00", "phase": "inference", "load_seconds": null}
+{"utc": "2026-09-25T04:52:03.610021+00:00", "result": {"id": "chatcmpl-782", "object": "chat.completion", "created": 1790311923, "model": "qwen3.5:4b", "system_fingerprint": "fp_ollama", "choices": [{"index": 0, "message": {"role": "assistant", "content": "{\n  \"status\": \"answered\",\n  \"answer\": \"在东侧服务台领取。\",\n  \"citation_chunk_ids\": [\n    2\n  ]\n}"}, "finish_reason": "stop"}], "usage": {"prompt_tokens": 267, "prompt_tokens_details": {"cached_tokens": 0}, "completion_tokens": 40, "total_tokens": 307}}, "inference_seconds": 4.7189999999827705}

@@ -1,0 +1,28 @@
+{
+  "process": {
+    "ProcessId": 35476,
+    "ExecutablePath": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe",
+    "CommandLine": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe -I -X utf8 D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\candidate\\scripts\\ops\\local_ai_http.py serve --config D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\model-config.json",
+    "created": "2026-09-25T12:37:24.7007790+08:00"
+  },
+  "health": {
+    "status": "ready",
+    "inference": false,
+    "scope": "R2_ONLY",
+    "models": {
+      "asr": "Qwen3-ASR-0.6B",
+      "embedding": "bge-m3",
+      "reranker": "bge-reranker-v2-m3",
+      "qwen": "qwen3.5:4b"
+    }
+  },
+  "config": {
+    "host": "127.0.0.1",
+    "port": 11436,
+    "private": "D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\model-calls",
+    "model_root": "D:\\property-ai\\tmp\\selfhost-ai-local\\models-hf",
+    "asr_python": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\asr-006-cpu\\.venv\\Scripts\\python.exe",
+    "bge_python": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe"
+  },
+  "calls": 0
+}

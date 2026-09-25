@@ -1,0 +1,106 @@
+{
+  "status": "SUCCESS",
+  "reason": null,
+  "exit_code": 0,
+  "model": "bge-reranker-v2-m3",
+  "revision": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e",
+  "events": [
+    {
+      "utc": "2026-09-25T05:09:09.219457+00:00",
+      "phase": "load"
+    },
+    {
+      "utc": "2026-09-25T05:09:13.366114+00:00",
+      "phase": "inference",
+      "load_seconds": 4.140999999974156
+    },
+    {
+      "utc": "2026-09-25T05:09:14.314569+00:00",
+      "result": {
+        "scores": [
+          0.999284565448761,
+          0.0069641778245568275,
+          0.018297456204891205
+        ],
+        "model": "bge-reranker-v2-m3"
+      },
+      "inference_seconds": 0.9530000000086147
+    }
+  ],
+  "samples": [
+    {
+      "ram_free_mib": 9081
+    },
+    {
+      "ram_free_mib": 9037
+    },
+    {
+      "ram_free_mib": 8998
+    },
+    {
+      "ram_free_mib": 8980
+    },
+    {
+      "ram_free_mib": 8953
+    },
+    {
+      "ram_free_mib": 8956
+    },
+    {
+      "ram_free_mib": 8920
+    },
+    {
+      "ram_free_mib": 8916
+    },
+    {
+      "ram_free_mib": 8877
+    },
+    {
+      "ram_free_mib": 8806
+    },
+    {
+      "ram_free_mib": 8756
+    },
+    {
+      "ram_free_mib": 8789
+    },
+    {
+      "ram_free_mib": 8763
+    },
+    {
+      "ram_free_mib": 8737
+    },
+    {
+      "ram_free_mib": 8590
+    },
+    {
+      "ram_free_mib": 8498
+    },
+    {
+      "ram_free_mib": 8463
+    },
+    {
+      "ram_free_mib": 8103
+    },
+    {
+      "ram_free_mib": 7803
+    },
+    {
+      "ram_free_mib": 7500
+    },
+    {
+      "ram_free_mib": 7752
+    },
+    {
+      "ram_free_mib": 8666
+    },
+    {
+      "ram_free_mib": 8671
+    },
+    {
+      "ram_free_mib": 9024
+    }
+  ],
+  "total_seconds": 6.015999999974156,
+  "child_pid": 3896
+}

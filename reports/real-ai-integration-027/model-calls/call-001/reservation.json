@@ -1,0 +1,8 @@
+{
+  "kind": "embedding",
+  "unix": 1790311821.1910708,
+  "utc": "2026-09-25T04:50:21.191610+00:00",
+  "model": "bge-m3",
+  "max_calls": 24,
+  "input_hash": "7832b3f5b31446cad88f5f93fd858493e9f654ddd5c7876c35bdcf53cb0adea3"
+}

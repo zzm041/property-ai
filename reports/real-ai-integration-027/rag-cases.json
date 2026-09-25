@@ -1,0 +1,33 @@
+{
+  "version":"027-rag-v1-frozen-before-inference",
+  "scope":"Synthetic only. A/B/C refer to new run documents, never historical IDs.",
+  "documents":[
+    {"key":"A","visibility":"RESIDENT","title":"合成便民工具借用规则","text":"本规则仅供合成测试。便民工具在东侧服务台领取。借用时间为每天九点至十七点。可借物品为手电筒和雨伞，不提供电钻。每次最多借用一件，登记借用人称呼即可，不需要提交身份证照片。借用物品应在当天十七点前归还到东侧服务台。工具遗失时请向服务台说明情况；本资料没有规定赔偿金额。","v2":"本规则仅供合成测试，替代旧版借用时间。便民工具在东侧服务台领取。借用时间改为每天下午十五点至十七点。可借物品为手电筒和雨伞，不提供电钻。每次最多借用一件，登记借用人称呼即可，不需要提交身份证照片。借用物品应在当天十七点前归还到东侧服务台。工具遗失时请向服务台说明情况；本资料没有规定赔偿金额。"},
+    {"key":"B","visibility":"STAFF_ONLY","title":"合成人员内部钥匙交接","text":"本资料仅供合成测试工作人员查看。合成测试钥匙存放在编号S-27的柜子中。交班时两名工作人员共同核对钥匙数量，并在交接记录签署测试代号。不得将柜子编号或内部交接办法告知住户。本资料不包含真实钥匙、口令或安防配置。"},
+    {"key":"C","visibility":"RESIDENT","title":"合成植物认领活动","text":"本活动仅供合成测试。植物认领活动在西侧大厅进行，只发放绿萝。活动开放时间为周六上午十点至十一点，每户限领一盆。不需要缴费，也不提供送货服务。"}
+  ],
+  "normal_questions":[
+    {"id":"Q01","actor":"resident","doc":"A","version":1,"question":"借用便民工具到哪里领取？","expect":["东侧服务台"]},
+    {"id":"Q02","actor":"resident","doc":"A","version":1,"question":"借工具需要提交身份证照片吗？","expect":["不需要","称呼"]},
+    {"id":"Q03","actor":"resident","doc":"A","version":1,"question":"能借电钻吗？有哪些物品可借？","expect":["不","电钻","手电筒","雨伞"]},
+    {"id":"Q04","actor":"resident","doc":"A","version":1,"question":"每次最多可以借几件工具？","expect":["一件"]},
+    {"id":"Q05","actor":"resident","doc":"A","version":1,"question":"借来的工具应什么时候归还，归还到哪里？","expect":["十七","东侧服务台"]},
+    {"id":"Q06","actor":"resident","doc":"A","version":1,"question":"工具遗失赔偿多少钱？","expect":["没有规定金额或明确资料不足"],"forbid":["虚构具体赔偿数额"]},
+    {"id":"Q07","actor":"staff","doc":"B","version":1,"question":"合成测试钥匙放在几号柜子？","expect":["S-27"]},
+    {"id":"Q08","actor":"staff","doc":"B","version":1,"question":"工作人员交班时如何交接钥匙？","expect":["两","核对","测试代号"]},
+    {"id":"Q09","actor":"resident","doc":"C","version":1,"question":"植物认领在哪里进行，能领哪种植物？","expect":["西侧大厅","绿萝"]},
+    {"id":"Q10","actor":"resident","doc":"C","version":1,"question":"植物认领需要缴费吗？提供送货吗？","expect":["不","缴费","送货"]},
+    {"id":"Q11","actor":"resident","doc":"A","version":2,"question":"最新规则中，便民工具从每天几点开始借？","expect":["十五"],"forbid":["九点开始"]},
+    {"id":"Q12","actor":"resident","doc":"A","version":2,"question":"新版便民工具借用规则是否还需要身份证照片？","expect":["不需要"]}
+  ],
+  "negative_cases":[
+    "N01 resident cannot manage staff-only document",
+    "N02 resident cannot create knowledge document",
+    "N03 resident cannot query actual other property",
+    "N04 wrong tenant claim is rejected before inference",
+    "N05 resident cannot receive STAFF_ONLY content or citations",
+    "N06 archived C no longer retrieved; history retained"
+  ],
+  "unchanged_reused_boundaries":"008/026 version failure, concurrent version numbering/idempotent jobs; existing mixed-grant scope tests. No new failure objects.",
+  "budgets":{"docs":3,"versions":4,"normal_qa":12,"negative":6,"asr":1,"embedding":24,"reranker":18,"qwen_answers":18,"seconds":1800}
+}

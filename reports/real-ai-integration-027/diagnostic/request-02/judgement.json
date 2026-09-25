@@ -1,0 +1,75 @@
+{
+  "continue": true,
+  "source": "main inspected original input/output; independent review pending",
+  "response_sha256": "4f28257bbb88488039033080f1ad342778ca180cc28a5954d8a3a4e8a8af5c67",
+  "note": "纸张纸盒需清扫、通行正常且无危险均来自当前原文，中文摘要未混入危险或历史。raw skill maintenance保留；已有负责人批准跨字段契约按cleaning派生CLEANING，不会送维修组。两条来源与事件映射均验证。",
+  "raw_vs_effective": {
+    "trace": {
+      "contract": "observed-event-v1",
+      "observations": [
+        {
+          "label": "杂物清扫",
+          "subject": "楼道地面",
+          "source": "report",
+          "quote": "楼道角落散落了几张纸和空纸盒，需要清扫",
+          "span": [
+            0,
+            19
+          ]
+        },
+        {
+          "label": "外观无明显异常",
+          "subject": "楼道地面",
+          "source": "report",
+          "quote": "通道可以正常通行，没有液体、碎玻璃或其他异常",
+          "span": [
+            20,
+            42
+          ]
+        }
+      ],
+      "effective_key": "evt1:414156df89a37bda61860a684e235a29",
+      "raw_model_output": {
+        "category": "cleaning",
+        "observations": [
+          {
+            "label": "杂物清扫",
+            "subject": "楼道地面",
+            "source": "report",
+            "quote": "楼道角落散落了几张纸和空纸盒，需要清扫"
+          },
+          {
+            "label": "外观无明显异常",
+            "subject": "楼道地面",
+            "source": "report",
+            "quote": "通道可以正常通行，没有液体、碎玻璃或其他异常"
+          }
+        ],
+        "severity": "low",
+        "priority": "p4",
+        "summary": "楼道角落散落纸张和空纸盒需清扫；通道通行正常无其他异常。",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "maintenance",
+        "confidence": 0.95
+      }
+    },
+    "mapped": {
+      "category": "CLEANING",
+      "subcategory": "evt1:414156df89a37bda61860a684e235a29",
+      "severity": "LOW",
+      "priority": "LOW",
+      "summary": "楼道角落散落纸张和空纸盒需清扫；通道通行正常无其他异常。",
+      "risk": "none",
+      "required_role": "STAFF",
+      "required_skill": "CLEANING",
+      "required_duty": "CLEANING",
+      "confidence": 0.95,
+      "low_confidence": false,
+      "raw_required_skill": "maintenance",
+      "skill_mapping_applied": true,
+      "dispatch_contract_version": "category-duty-skill-v1",
+      "event_trace": null
+    }
+  }
+}

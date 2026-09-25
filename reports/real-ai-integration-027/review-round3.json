@@ -1,0 +1,82 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "scope": "软件 round-3，仅复核 027-R2-R2-01 的进程所有权、回收与未知完成阻断修复。",
+  "review_type": "INDEPENDENT_READ_ONLY",
+  "base_sha": "ad7d100ba16fa8b11e61526cfd11978a5820a040",
+  "source_manifest": {
+    "path": "D:/property-ai/reports/real-ai-integration-027/review-fix1-manifest.json",
+    "sha256": "f1236498ea18d311e4d898fca23bad532d6e8fea656edb76f6d20aa41f28e061",
+    "verification": "5 个修复清单文件全部匹配 SHA-256；前轮清单中其余 16 个文件未变化。",
+    "original_round2_sha256": "e78eddd94cd7a89d5500937a2a9b6e717b13354f0fae917554fc4f23374954cf",
+    "original_round2_preserved": true
+  },
+  "verdict": "PASS_SCOPED_SOFTWARE_FIX",
+  "overall_task_verdict": "NOT_FULL_PASS",
+  "findings": [],
+  "closed_findings": [
+    {
+      "id": "027-R2-R2-01",
+      "status": "CLOSED_SCOPED_SOFTWARE",
+      "evidence": [
+        {
+          "location": "D:/property-ai/scripts/ops/local_ai_http.py:113",
+          "result": "实际解释器在模型加载和推理之前加入本请求随机命名 Job；不是仅记录 Windows venv launcher PID。"
+        },
+        {
+          "location": "D:/property-ai/scripts/ops/local_ai_process.py:53",
+          "result": "缺失 Job 拒绝执行；Job 不允许 breakaway，设置 KILL_ON_JOB_CLOSE，后代继承约束。"
+        },
+        {
+          "location": "D:/property-ai/scripts/ops/local_ai_http.py:201",
+          "result": "正常或异常退出均执行请求专属 Job 回收，确认 ActiveProcesses 为 0，再等待 launcher；无法确认时不记录普通已完成失败。"
+        },
+        {
+          "location": "D:/property-ai/scripts/ops/local_ai_http.py:214",
+          "result": "回收不确定写 UNKNOWN；Qwen 请求失败即使本地进程已退出，也保持远端完成 UNKNOWN，不推断 Ollama 已停止。"
+        },
+        {
+          "location": "D:/property-ai/scripts/ops/local_ai_http.py:142",
+          "result": "UNKNOWN、缺结果及旧版无退出证明的 FAILED 均阻断后续所有输入；不修改旧记录，不只限制相同输入。"
+        },
+        {
+          "location": "D:/property-ai/reports/real-ai-integration-027/runtime.py:121",
+          "result": "未来固定源码打包及适配器复制包含新增 local_ai_process.py；没有以工作区 helper 隐式替代运行快照。"
+        }
+      ]
+    }
+  ],
+  "tests_evidence": [
+    {
+      "path": "D:/property-ai/reports/real-ai-integration-027/tests-20260925T053236.txt",
+      "sha256": "b60de4a885c3bc1ee06bcaf52b2e58258ad52b33bf90176679a15f1336106563",
+      "reported_result": "3 passed，1 warning",
+      "verified_scope": "测试源码实际使用 Windows venv launcher 和无模型哑进程，断言真实解释器 PID 不同于 launcher、Job 包含后代；覆盖主动终止、关闭 owner 句柄及缺 Job 拒绝。"
+    },
+    {
+      "path": "D:/property-ai/reports/real-ai-integration-027/tests-20260925T053646.txt",
+      "sha256": "d8e4e4fae445c3376195406c577b425c93d1ce331c6aab8e3c550bbe013b554e",
+      "reported_result": "7 passed，16 deselected，1 warning",
+      "verified_scope": "模拟资源触底后的确认退出、回收失败 UNKNOWN、Qwen 远端 UNKNOWN；验证未知及旧失败阻断、调用预算和总窗口不重置。"
+    }
+  ],
+  "actually_read": [
+    "AGENTS.md 和项目规则。",
+    "review-fix1-manifest.json 及其列明的 5 个文件全文。",
+    "上述两份新测试输出。",
+    "前轮清单、已保存 round-2 JSON 的哈希，以及 local_ai_models.py 模块顶层导入边界。"
+  ],
+  "unverified": [
+    "审查者未执行测试、模型、页面、业务请求、数据库或队列操作，未修改文件。",
+    "本次通过只针对源码修复及保存的无模型测试证据；修复尚未加载当前运行进程。",
+    "未重新执行实际 ASR RESOURCE_FLOOR；原 call-022 没有转写结果，也没有即时后代退出证据，历史记录保持不变。",
+    "未实际验证远端 Ollama 取消；当前实现以 UNKNOWN 阻断处理，不声称已取消。",
+    "R3 request-03 的语义失败、NOT_READY、已用调用和返修历史均保持。",
+    "R2 的 Q02–Q05、N05/N06、业务 ASR、完整真实 AUTO、图片质量及 Production 验收缺口不因本次软件修复关闭。"
+  ],
+  "next_action": [
+    "原样保存本审查 JSON，保留 round-2 原始结论及修复历史。",
+    "可保存本次准确范围的软件修复与证据；不要将整体 027 标为 PASS。",
+    "原模型窗口和 ASR 配额已结束，不追加推理、不重置预算、不自行切换业务配置。",
+    "后续真实运行验证须按新的明确有界授权执行，并绑定包含 helper 的固定源码版本。"
+  ]
+}

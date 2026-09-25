@@ -1,0 +1,111 @@
+{
+  "status": "SUCCESS",
+  "reason": null,
+  "exit_code": 0,
+  "model": "qwen3.5:4b",
+  "revision": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "events": [
+    {
+      "utc": "2026-09-25T05:09:15.642882+00:00",
+      "phase": "load"
+    },
+    {
+      "utc": "2026-09-25T05:09:15.642882+00:00",
+      "phase": "inference",
+      "load_seconds": null
+    },
+    {
+      "utc": "2026-09-25T05:09:20.061755+00:00",
+      "result": {
+        "id": "chatcmpl-516",
+        "object": "chat.completion",
+        "created": 1790312960,
+        "model": "qwen3.5:4b",
+        "system_fingerprint": "fp_ollama",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "{\n  \"status\": \"answered\",\n  \"answer\": \"合成测试钥匙存放在编号S-27的柜子中。\",\n  \"citation_chunk_ids\": [\n    3\n  ]\n}"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 249,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "completion_tokens": 47,
+          "total_tokens": 296
+        }
+      },
+      "inference_seconds": 4.421999999991385
+    }
+  ],
+  "samples": [
+    {
+      "ram_free_mib": 8829,
+      "gpu_free_mib": 14552
+    },
+    {
+      "ram_free_mib": 8907,
+      "gpu_free_mib": 14552
+    },
+    {
+      "ram_free_mib": 8870,
+      "gpu_free_mib": 14546
+    },
+    {
+      "ram_free_mib": 8677,
+      "gpu_free_mib": 14361
+    },
+    {
+      "ram_free_mib": 8628,
+      "gpu_free_mib": 14307
+    },
+    {
+      "ram_free_mib": 8615,
+      "gpu_free_mib": 14359
+    },
+    {
+      "ram_free_mib": 8031,
+      "gpu_free_mib": 11845
+    },
+    {
+      "ram_free_mib": 7993,
+      "gpu_free_mib": 11850
+    },
+    {
+      "ram_free_mib": 7891,
+      "gpu_free_mib": 11850
+    },
+    {
+      "ram_free_mib": 7955,
+      "gpu_free_mib": 11600
+    },
+    {
+      "ram_free_mib": 7958,
+      "gpu_free_mib": 10832
+    },
+    {
+      "ram_free_mib": 7974,
+      "gpu_free_mib": 10838
+    },
+    {
+      "ram_free_mib": 7968,
+      "gpu_free_mib": 10838
+    },
+    {
+      "ram_free_mib": 7903,
+      "gpu_free_mib": 10600
+    },
+    {
+      "ram_free_mib": 7968,
+      "gpu_free_mib": 10594
+    }
+  ],
+  "total_seconds": 4.562999999994645,
+  "child_pid": 6428
+}

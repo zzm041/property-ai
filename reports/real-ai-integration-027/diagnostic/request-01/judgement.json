@@ -1,0 +1,75 @@
+{
+  "continue": true,
+  "source": "main inspected original input/output; independent review pending",
+  "response_sha256": "b18e6c21b056c703b98c4ab392894e703dc9873422aad700a32d3eb89ae83d86",
+  "note": "原文确认按铃拍门、已离开、未入室及未见器械；摘要完整中文，无入侵动机推断。安保职责/无当前伤害风险合理；待核实项保持未确认，不计为第二种确认故障。来源跨度通过服务端验证。",
+  "raw_vs_effective": {
+    "trace": {
+      "contract": "observed-event-v1",
+      "observations": [
+        {
+          "label": "敲门按铃",
+          "subject": "房门",
+          "source": "report",
+          "quote": "刚才有陌生人在楼道反复按门铃并拍门",
+          "span": [
+            0,
+            17
+          ]
+        },
+        {
+          "label": "现象待核实",
+          "subject": "未确定",
+          "source": "report",
+          "quote": "现在已经离开，未进入屋内，也未见器械，请安保核实",
+          "span": [
+            18,
+            42
+          ]
+        }
+      ],
+      "effective_key": "evt1:3d32de751458c4da25ab1f8f1fd47ea7",
+      "raw_model_output": {
+        "category": "security",
+        "observations": [
+          {
+            "label": "敲门按铃",
+            "subject": "房门",
+            "source": "report",
+            "quote": "刚才有陌生人在楼道反复按门铃并拍门"
+          },
+          {
+            "label": "现象待核实",
+            "subject": "未确定",
+            "source": "report",
+            "quote": "现在已经离开，未进入屋内，也未见器械，请安保核实"
+          }
+        ],
+        "severity": "low",
+        "priority": "p3",
+        "summary": "有陌生人在楼道反复按门铃并拍门，现已离开，未进入屋内且未见器械，需安保核实。",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "security",
+        "confidence": 0.95
+      }
+    },
+    "mapped": {
+      "category": "SECURITY",
+      "subcategory": "evt1:3d32de751458c4da25ab1f8f1fd47ea7",
+      "severity": "LOW",
+      "priority": "MEDIUM",
+      "summary": "有陌生人在楼道反复按门铃并拍门，现已离开，未进入屋内且未见器械，需安保核实。",
+      "risk": "none",
+      "required_role": "STAFF",
+      "required_skill": "SECURITY",
+      "required_duty": "SECURITY",
+      "confidence": 0.95,
+      "low_confidence": false,
+      "raw_required_skill": "security",
+      "skill_mapping_applied": false,
+      "dispatch_contract_version": "category-duty-skill-v1",
+      "event_trace": null
+    }
+  }
+}

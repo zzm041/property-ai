@@ -1,0 +1,3 @@
+{"utc": "2026-09-25T05:15:36.916786+00:00", "phase": "load"}
+{"utc": "2026-09-25T05:15:36.917787+00:00", "phase": "inference", "load_seconds": null}
+{"utc": "2026-09-25T05:15:41.281898+00:00", "result": {"id": "chatcmpl-154", "object": "chat.completion", "created": 1790313341, "model": "qwen3.5:4b", "system_fingerprint": "fp_ollama", "choices": [{"index": 0, "message": {"role": "assistant", "content": "{\n  \"status\": \"answered\",\n  \"answer\": \"每天下午十五点\",\n  \"citation_chunk_ids\": [\n    5\n  ]\n}"}, "finish_reason": "stop"}], "usage": {"prompt_tokens": 281, "prompt_tokens_details": {"cached_tokens": 0}, "completion_tokens": 38, "total_tokens": 319}}, "inference_seconds": 4.375}

@@ -1,0 +1,3 @@
+{"utc": "2026-09-25T04:52:46.654280+00:00", "phase": "load"}
+{"utc": "2026-09-25T04:52:46.654280+00:00", "phase": "inference", "load_seconds": null}
+{"utc": "2026-09-25T04:52:49.905565+00:00", "result": {"id": "chatcmpl-760", "object": "chat.completion", "created": 1790311969, "model": "qwen3.5:4b", "system_fingerprint": "fp_ollama", "choices": [{"index": 0, "message": {"role": "assistant", "content": "{\n  \"status\": \"insufficient_knowledge\",\n  \"answer\": \"\",\n  \"citation_chunk_ids\": []\n}"}, "finish_reason": "stop"}], "usage": {"prompt_tokens": 266, "prompt_tokens_details": {"cached_tokens": 0}, "completion_tokens": 29, "total_tokens": 295}}, "inference_seconds": 3.25}

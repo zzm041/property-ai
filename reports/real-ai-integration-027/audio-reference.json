@@ -1,0 +1,10 @@
+{
+  "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\compat-027\\repair-reference.wav",
+  "sha256": "616E7102D84DC70BF39E54080F3774B1D583CEACC25903B4410D833B1804D814",
+  "reference": "厨房水龙头关紧后还在滴水，没有积水，请维修人员检查。",
+  "source": "Existing local Windows Microsoft Huihui Desktop; no network, no resident voice",
+  "sample_rate": 16000,
+  "channels": 1,
+  "bits": 16,
+  "preparation_note": "Initial file launch failed UTF-8 parsing before execution; sandbox denied voice activation. Generated once via explicit UTF-8 host invocation; no model calls."
+}

@@ -462,6 +462,7 @@ class AutoDispatchService:
             "raw_required_skill": mapped.raw_required_skill or mapped.required_skill,
             "dispatch_contract_version": mapped.dispatch_contract_version,
             "skill_mapping_applied": mapped.skill_mapping_applied,
+            "event_contract": "observed-event-v1" if mapped.subcategory.startswith('evt1:') else "legacy",
             "required_duty": mapped.required_duty,
             "dispatch_policy": "maintenance-group-v1",
             "ordinary_maintenance": ordinary_maintenance(mapped.required_duty, mapped.required_skill),

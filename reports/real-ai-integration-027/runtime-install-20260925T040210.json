@@ -1,0 +1,1255 @@
+{
+  "started_utc": "2026-09-25T03:59:05.212001+00:00",
+  "manifest_sha256": "2181679185350e734276d54d7f81b6e2d889bdb864e15bd9c1cd113a9d489e01",
+  "files": [
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\accelerate-1.12.0-py3-none-any.whl",
+      "bytes": 380935,
+      "sha256": "3e2091cd341423207e2f084a6654b1efcd250dc326f2a37d6dde446e07cabb11",
+      "verification_mode": "sha256",
+      "upstream_digest": "3e2091cd341423207e2f084a6654b1efcd250dc326f2a37d6dde446e07cabb11",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\annotated_doc-0.0.5-py3-none-any.whl",
+      "bytes": 5302,
+      "sha256": "117bac03a25ede5df5440e855b32d556049ca169ead221505badf432fed4b101",
+      "verification_mode": "sha256",
+      "upstream_digest": "117bac03a25ede5df5440e855b32d556049ca169ead221505badf432fed4b101",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\annotated_types-0.8.0-py3-none-any.whl",
+      "bytes": 13427,
+      "sha256": "f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0",
+      "verification_mode": "sha256",
+      "upstream_digest": "f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\anyio-4.15.1-py3-none-any.whl",
+      "bytes": 132079,
+      "sha256": "6152fdbbf9a77fdec97731721bebf7c4c44f7c29b424b0065826173efc7ed101",
+      "verification_mode": "sha256",
+      "upstream_digest": "6152fdbbf9a77fdec97731721bebf7c4c44f7c29b424b0065826173efc7ed101",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\av-18.1.0-cp311-abi3-win_amd64.whl",
+      "bytes": 27595679,
+      "sha256": "ea1480b7a8d5405cb5f382b344731bf125fd2c1c6fae3964f6c48595628387ff",
+      "verification_mode": "sha256",
+      "upstream_digest": "ea1480b7a8d5405cb5f382b344731bf125fd2c1c6fae3964f6c48595628387ff",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\blinker-1.9.0-py3-none-any.whl",
+      "bytes": 8458,
+      "sha256": "ba0efaa9080b619ff2f3459d1d500c57bddea4a6b424b60a91141db6fd2f08bc",
+      "verification_mode": "sha256",
+      "upstream_digest": "ba0efaa9080b619ff2f3459d1d500c57bddea4a6b424b60a91141db6fd2f08bc",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\brotli-1.2.0-cp312-cp312-win_amd64.whl",
+      "bytes": 369115,
+      "sha256": "b35c13ce241abdd44cb8ca70683f20c0c079728a36a996297adb5334adfc1c44",
+      "verification_mode": "sha256",
+      "upstream_digest": "b35c13ce241abdd44cb8ca70683f20c0c079728a36a996297adb5334adfc1c44",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\certifi-2026.7.22-py3-none-any.whl",
+      "bytes": 136983,
+      "sha256": "62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775",
+      "verification_mode": "sha256",
+      "upstream_digest": "62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\cffi-2.1.1-cp312-cp312-win_amd64.whl",
+      "bytes": 185919,
+      "sha256": "f53e442b08449d42821fa4a4fba000095af9f62742a500f978a9f557ec44339a",
+      "verification_mode": "sha256",
+      "upstream_digest": "f53e442b08449d42821fa4a4fba000095af9f62742a500f978a9f557ec44339a",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\charset_normalizer-3.5.1-cp312-cp312-win_amd64.whl",
+      "bytes": 200551,
+      "sha256": "3617ac3cfd8b9888f145ad89dd6e692285834b0201c6074a5eeaad3fd4d668c2",
+      "verification_mode": "sha256",
+      "upstream_digest": "3617ac3cfd8b9888f145ad89dd6e692285834b0201c6074a5eeaad3fd4d668c2",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\click-8.5.0-py3-none-any.whl",
+      "bytes": 125251,
+      "sha256": "255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360",
+      "verification_mode": "sha256",
+      "upstream_digest": "255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\cloudpickle-3.1.2-py3-none-any.whl",
+      "bytes": 22228,
+      "sha256": "9acb47f6afd73f60dc1df93bb801b472f05ff42fa6c84167d25cb206be1fbf4a",
+      "verification_mode": "sha256",
+      "upstream_digest": "9acb47f6afd73f60dc1df93bb801b472f05ff42fa6c84167d25cb206be1fbf4a",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\colorama-0.4.6-py2.py3-none-any.whl",
+      "bytes": 25335,
+      "sha256": "4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6",
+      "verification_mode": "sha256",
+      "upstream_digest": "4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\cython-3.3.0-cp312-cp312-win_amd64.whl",
+      "bytes": 2872123,
+      "sha256": "333449cc0350baedee5a6af27929eac8a71eac4ec59333c45ff476b33c6c660d",
+      "verification_mode": "sha256",
+      "upstream_digest": "333449cc0350baedee5a6af27929eac8a71eac4ec59333c45ff476b33c6c660d",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\decorator-5.3.1-py3-none-any.whl",
+      "bytes": 10365,
+      "sha256": "f47fe6fdbd2edd623ecfe36875d37aba411624e2670dd395dddae1358689bb3c",
+      "verification_mode": "sha256",
+      "upstream_digest": "f47fe6fdbd2edd623ecfe36875d37aba411624e2670dd395dddae1358689bb3c",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\dynet38-2.2-cp312-cp312-win_amd64.whl",
+      "bytes": 1299414,
+      "sha256": "fd9967ed3ec071cc4c0c084d758ab44dac34cb37beb625ea9fcf2221c2085975",
+      "verification_mode": "sha256",
+      "upstream_digest": "fd9967ed3ec071cc4c0c084d758ab44dac34cb37beb625ea9fcf2221c2085975",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\fastapi-0.115.12-py3-none-any.whl",
+      "bytes": 95164,
+      "sha256": "e94613d6c05e27be7ffebdd6ea5f388112e5e430c8f7d6494a9d1d88d43e814d",
+      "verification_mode": "sha256",
+      "upstream_digest": "e94613d6c05e27be7ffebdd6ea5f388112e5e430c8f7d6494a9d1d88d43e814d",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\filelock-4.0.3-py3-none-any.whl",
+      "bytes": 108444,
+      "sha256": "30cd166e2aee2c7534ce2c33c6367c4cd051b8368e20e2c4eb0c34f699bacfab",
+      "verification_mode": "sha256",
+      "upstream_digest": "30cd166e2aee2c7534ce2c33c6367c4cd051b8368e20e2c4eb0c34f699bacfab",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\flask-3.1.3-py3-none-any.whl",
+      "bytes": 103424,
+      "sha256": "f4bcbefc124291925f1a26446da31a5178f9483862233b23c0c96a20701f670c",
+      "verification_mode": "sha256",
+      "upstream_digest": "f4bcbefc124291925f1a26446da31a5178f9483862233b23c0c96a20701f670c",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\fsspec-2026.9.0-py3-none-any.whl",
+      "bytes": 221738,
+      "sha256": "8dd6e646e99ea382bd85f97a45e6b526a442d79423a7dc673f1e2756d05fcb5f",
+      "verification_mode": "sha256",
+      "upstream_digest": "8dd6e646e99ea382bd85f97a45e6b526a442d79423a7dc673f1e2756d05fcb5f",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\gradio-6.15.1-py3-none-any.whl",
+      "bytes": 20093799,
+      "sha256": "f4f50488f8da1137b8e0d65fe656348b11bac3cd2f5ccab60636eb45e5a6f39f",
+      "verification_mode": "sha256",
+      "upstream_digest": "f4f50488f8da1137b8e0d65fe656348b11bac3cd2f5ccab60636eb45e5a6f39f",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\gradio_client-2.5.0-py3-none-any.whl",
+      "bytes": 59952,
+      "sha256": "d43e2179c29076292a76485ad7ed2e6eaa19d14ac58283bd7f5beabfe4ca958c",
+      "verification_mode": "sha256",
+      "upstream_digest": "d43e2179c29076292a76485ad7ed2e6eaa19d14ac58283bd7f5beabfe4ca958c",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\groovy-0.1.2-py3-none-any.whl",
+      "bytes": 14090,
+      "sha256": "7f7975bab18c729a257a8b1ae9dcd70b7cafb1720481beae47719af57c35fa64",
+      "verification_mode": "sha256",
+      "upstream_digest": "7f7975bab18c729a257a8b1ae9dcd70b7cafb1720481beae47719af57c35fa64",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\h11-0.16.0-py3-none-any.whl",
+      "bytes": 37515,
+      "sha256": "63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86",
+      "verification_mode": "sha256",
+      "upstream_digest": "63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\hf_gradio-0.4.1-py3-none-any.whl",
+      "bytes": 4482,
+      "sha256": "76b8cb8be6abe62d74c1ad2d35b42f0629db89aa9e1a8d033cecfe7c856eeab3",
+      "verification_mode": "sha256",
+      "upstream_digest": "76b8cb8be6abe62d74c1ad2d35b42f0629db89aa9e1a8d033cecfe7c856eeab3",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\hf_xet-1.6.0-cp38-abi3-win_amd64.whl",
+      "bytes": 4033128,
+      "sha256": "fb4fadde1b2b70bf4c0c14a6dccbe7194b1c28947fefd5bbe3fed9d940676c3b",
+      "verification_mode": "sha256",
+      "upstream_digest": "fb4fadde1b2b70bf4c0c14a6dccbe7194b1c28947fefd5bbe3fed9d940676c3b",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\httpcore-1.0.9-py3-none-any.whl",
+      "bytes": 78784,
+      "sha256": "2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55",
+      "verification_mode": "sha256",
+      "upstream_digest": "2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\httpx-0.28.1-py3-none-any.whl",
+      "bytes": 73517,
+      "sha256": "d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad",
+      "verification_mode": "sha256",
+      "upstream_digest": "d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\huggingface_hub-0.36.2-py3-none-any.whl",
+      "bytes": 566395,
+      "sha256": "48f0c8eac16145dfce371e9d2d7772854a4f591bcb56c9cf548accf531d54270",
+      "verification_mode": "sha256",
+      "upstream_digest": "48f0c8eac16145dfce371e9d2d7772854a4f591bcb56c9cf548accf531d54270",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\idna-3.20-py3-none-any.whl",
+      "bytes": 69583,
+      "sha256": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+      "verification_mode": "sha256",
+      "upstream_digest": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\itsdangerous-2.2.0-py3-none-any.whl",
+      "bytes": 16234,
+      "sha256": "c6242fc49e35958c8b15141343aa660db5fc54d4f13a1db01a3f5891b98700ef",
+      "verification_mode": "sha256",
+      "upstream_digest": "c6242fc49e35958c8b15141343aa660db5fc54d4f13a1db01a3f5891b98700ef",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\jinja2-3.1.6-py3-none-any.whl",
+      "bytes": 134899,
+      "sha256": "85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67",
+      "verification_mode": "sha256",
+      "upstream_digest": "85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\joblib-1.6.0-py3-none-any.whl",
+      "bytes": 306115,
+      "sha256": "3dbbf9f6e4b592a2357b854608e980fe6390d131d7a82f011a377ef2ebef7aba",
+      "verification_mode": "sha256",
+      "upstream_digest": "3dbbf9f6e4b592a2357b854608e980fe6390d131d7a82f011a377ef2ebef7aba",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\lazy_loader-0.6-py3-none-any.whl",
+      "bytes": 8791,
+      "sha256": "77253be3391b06124a0e16105bd663b6c54470af1a9ca8e1cf026f38d58ed056",
+      "verification_mode": "sha256",
+      "upstream_digest": "77253be3391b06124a0e16105bd663b6c54470af1a9ca8e1cf026f38d58ed056",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\librosa-1.0.0-py3-none-any.whl",
+      "bytes": 294628,
+      "sha256": "5910a6c0e1b2e494b92758c1615a7acbd0515a2315e138927ba2982f2af88857",
+      "verification_mode": "sha256",
+      "upstream_digest": "5910a6c0e1b2e494b92758c1615a7acbd0515a2315e138927ba2982f2af88857",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\llvmlite-0.49.0-cp312-cp312-win_amd64.whl",
+      "bytes": 41865543,
+      "sha256": "3a9c9e3af4e214acfefa4f73ebe7bc3fb35854a62b654edb3953f5ae33c08ba3",
+      "verification_mode": "sha256",
+      "upstream_digest": "3a9c9e3af4e214acfefa4f73ebe7bc3fb35854a62b654edb3953f5ae33c08ba3",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\markdown_it_py-4.2.0-py3-none-any.whl",
+      "bytes": 91687,
+      "sha256": "9f7ebbcd14fe59494226453aed97c1070d83f8d24b6fc3a3bcf9a38092641c4a",
+      "verification_mode": "sha256",
+      "upstream_digest": "9f7ebbcd14fe59494226453aed97c1070d83f8d24b6fc3a3bcf9a38092641c4a",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\markupsafe-3.0.3-cp312-cp312-win_amd64.whl",
+      "bytes": 15105,
+      "sha256": "26a5784ded40c9e318cfc2bdb30fe164bdb8665ded9cd64d500a34fb42067b1c",
+      "verification_mode": "sha256",
+      "upstream_digest": "26a5784ded40c9e318cfc2bdb30fe164bdb8665ded9cd64d500a34fb42067b1c",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\mdurl-0.1.2-py3-none-any.whl",
+      "bytes": 9979,
+      "sha256": "84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8",
+      "verification_mode": "sha256",
+      "upstream_digest": "84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\mpmath-1.3.0-py3-none-any.whl",
+      "bytes": 536198,
+      "sha256": "a0b2b9fe80bbcd81a6647ff13108738cfb482d481d826cc0e02f5b35e5c88d2c",
+      "verification_mode": "sha256",
+      "upstream_digest": "a0b2b9fe80bbcd81a6647ff13108738cfb482d481d826cc0e02f5b35e5c88d2c",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\msgpack-1.2.2-cp312-cp312-win_amd64.whl",
+      "bytes": 72275,
+      "sha256": "b68614fba0570349833b7dd999ff0aed4e5cc8d9eb6e3a7d4527be33c65e33d3",
+      "verification_mode": "sha256",
+      "upstream_digest": "b68614fba0570349833b7dd999ff0aed4e5cc8d9eb6e3a7d4527be33c65e33d3",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\nagisa-0.2.11-cp312-cp312-win_amd64.whl",
+      "bytes": 21352973,
+      "sha256": "6d68ee11ee6e82a37e54ad10885c120ac5e69446fe635d65327c4931b281d996",
+      "verification_mode": "sha256",
+      "upstream_digest": "6d68ee11ee6e82a37e54ad10885c120ac5e69446fe635d65327c4931b281d996",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\narwhals-2.26.0-py3-none-any.whl",
+      "bytes": 474034,
+      "sha256": "29326d74f107c347fd1009bd58e38d9f7c7c5b51e6de97bc93dbc325d9038b54",
+      "verification_mode": "sha256",
+      "upstream_digest": "29326d74f107c347fd1009bd58e38d9f7c7c5b51e6de97bc93dbc325d9038b54",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\networkx-3.7-py3-none-any.whl",
+      "bytes": 2142205,
+      "sha256": "e3fd2c13a7814cee3746340d8d7f8598a67f16a58bf47fb7f8793fab6efca1b0",
+      "verification_mode": "sha256",
+      "upstream_digest": "e3fd2c13a7814cee3746340d8d7f8598a67f16a58bf47fb7f8793fab6efca1b0",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\numba-0.67.0-cp312-cp312-win_amd64.whl",
+      "bytes": 2815645,
+      "sha256": "50e2b72406c18cda5dd7431b0082cb85ea94e06c64c33607248fc8bef92cfb81",
+      "verification_mode": "sha256",
+      "upstream_digest": "50e2b72406c18cda5dd7431b0082cb85ea94e06c64c33607248fc8bef92cfb81",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\numpy-2.5.3-cp312-cp312-win_amd64.whl",
+      "bytes": 12567828,
+      "sha256": "0a59a421a32580a009e8a1751345bf829631b990dc1794b80514ab722b435def",
+      "verification_mode": "sha256",
+      "upstream_digest": "0a59a421a32580a009e8a1751345bf829631b990dc1794b80514ab722b435def",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\orjson-3.12.0-cp312-cp312-win_amd64.whl",
+      "bytes": 122106,
+      "sha256": "010811c1b69773450a01cef97727a67b223242f350b77d4ca000e59a9ef2155a",
+      "verification_mode": "sha256",
+      "upstream_digest": "010811c1b69773450a01cef97727a67b223242f350b77d4ca000e59a9ef2155a",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\packaging-26.3-py3-none-any.whl",
+      "bytes": 129956,
+      "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+      "verification_mode": "sha256",
+      "upstream_digest": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\pandas-3.0.6-cp312-cp312-win_amd64.whl",
+      "bytes": 9661439,
+      "sha256": "3ef908d28590b3f42d7070e7ad8f9b34b442b260b7f3c1afb57e0040c58cdb1b",
+      "verification_mode": "sha256",
+      "upstream_digest": "3ef908d28590b3f42d7070e7ad8f9b34b442b260b7f3c1afb57e0040c58cdb1b",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\pillow-12.3.0-cp312-cp312-win_amd64.whl",
+      "bytes": 7227137,
+      "sha256": "a2b55dd6b2a4c4b7d87ffa56bdb33fdc5fdb9a462173861a7bc097f17d91cb09",
+      "verification_mode": "sha256",
+      "upstream_digest": "a2b55dd6b2a4c4b7d87ffa56bdb33fdc5fdb9a462173861a7bc097f17d91cb09",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\platformdirs-4.11.12-py3-none-any.whl",
+      "bytes": 24976,
+      "sha256": "b1ba966ac76153d9985a0787ffab951e7c18416189873d4e4ddb2c8a04a0a254",
+      "verification_mode": "sha256",
+      "upstream_digest": "b1ba966ac76153d9985a0787ffab951e7c18416189873d4e4ddb2c8a04a0a254",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\pooch-1.9.0-py3-none-any.whl",
+      "bytes": 67175,
+      "sha256": "f265597baa9f760d25ceb29d0beb8186c243d6607b0f60b83ecf14078dbc703b",
+      "verification_mode": "sha256",
+      "upstream_digest": "f265597baa9f760d25ceb29d0beb8186c243d6607b0f60b83ecf14078dbc703b",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\psutil-7.2.2-cp37-abi3-win_amd64.whl",
+      "bytes": 137737,
+      "sha256": "eb7e81434c8d223ec4a219b5fc1c47d0417b12be7ea866e24fb5ad6e84b3d988",
+      "verification_mode": "sha256",
+      "upstream_digest": "eb7e81434c8d223ec4a219b5fc1c47d0417b12be7ea866e24fb5ad6e84b3d988",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\pycparser-3.0-py3-none-any.whl",
+      "bytes": 48172,
+      "sha256": "b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992",
+      "verification_mode": "sha256",
+      "upstream_digest": "b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\pydantic-2.13.5-py3-none-any.whl",
+      "bytes": 472589,
+      "sha256": "346a034f080da3755d8e9cb5e00e8b07de1d39e4f6e2c87d8ab7cafa0b269a73",
+      "verification_mode": "sha256",
+      "upstream_digest": "346a034f080da3755d8e9cb5e00e8b07de1d39e4f6e2c87d8ab7cafa0b269a73",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\pydantic_core-2.46.5-cp312-cp312-win_amd64.whl",
+      "bytes": 2043140,
+      "sha256": "5e81740c09e310f5aa5cbd3e434a01c154d4bef93241c7877b39f211d2b78ba8",
+      "verification_mode": "sha256",
+      "upstream_digest": "5e81740c09e310f5aa5cbd3e434a01c154d4bef93241c7877b39f211d2b78ba8",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\pydub-0.25.1-py2.py3-none-any.whl",
+      "bytes": 32327,
+      "sha256": "65617e33033874b59d87db603aa1ed450633288aefead953b30bded59cb599a6",
+      "verification_mode": "sha256",
+      "upstream_digest": "65617e33033874b59d87db603aa1ed450633288aefead953b30bded59cb599a6",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\pygments-2.21.0-py3-none-any.whl",
+      "bytes": 1250147,
+      "sha256": "2363c69b61c4a97c838da3b130dcd6468f4848992b21a82f2a63ec34377137d9",
+      "verification_mode": "sha256",
+      "upstream_digest": "2363c69b61c4a97c838da3b130dcd6468f4848992b21a82f2a63ec34377137d9",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\python_dateutil-2.9.0.post0-py2.py3-none-any.whl",
+      "bytes": 229892,
+      "sha256": "a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427",
+      "verification_mode": "sha256",
+      "upstream_digest": "a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\python_multipart-0.0.20-py3-none-any.whl",
+      "bytes": 24546,
+      "sha256": "8a62d3a8335e06589fe01f2a3e178cdcc632f3fbe0d492ad9ee0ec35aab1f104",
+      "verification_mode": "sha256",
+      "upstream_digest": "8a62d3a8335e06589fe01f2a3e178cdcc632f3fbe0d492ad9ee0ec35aab1f104",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\pytz-2026.4-py2.py3-none-any.whl",
+      "bytes": 506747,
+      "sha256": "9d514388fbc89ca0833203464272ac485b8828568ab73532f5020f17e892a0ff",
+      "verification_mode": "sha256",
+      "upstream_digest": "9d514388fbc89ca0833203464272ac485b8828568ab73532f5020f17e892a0ff",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\pyyaml-6.0.3-cp312-cp312-win_amd64.whl",
+      "bytes": 154003,
+      "sha256": "5fcd34e47f6e0b794d17de1b4ff496c00986e1c83f7ab2fb8fcfe9616ff7477b",
+      "verification_mode": "sha256",
+      "upstream_digest": "5fcd34e47f6e0b794d17de1b4ff496c00986e1c83f7ab2fb8fcfe9616ff7477b",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\qwen_asr-0.0.6-py3-none-any.whl",
+      "bytes": 141603,
+      "sha256": "b9c55a38413298f3a990a4475467399daec6e8f4172363053fc42e2166c2dfd3",
+      "verification_mode": "sha256",
+      "upstream_digest": "b9c55a38413298f3a990a4475467399daec6e8f4172363053fc42e2166c2dfd3",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\qwen_omni_utils-0.0.9-py3-none-any.whl",
+      "bytes": 9657,
+      "sha256": "f111db07af669c83333411c5177131e18e831fe666d6a55a1af263952ada8939",
+      "verification_mode": "sha256",
+      "upstream_digest": "f111db07af669c83333411c5177131e18e831fe666d6a55a1af263952ada8939",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\regex-2026.9.10-cp312-cp312-win_amd64.whl",
+      "bytes": 277933,
+      "sha256": "4db7d00c4afbfbb55b8e17b1e371da11418ea9389b030acec63c1fa4c7ad4b86",
+      "verification_mode": "sha256",
+      "upstream_digest": "4db7d00c4afbfbb55b8e17b1e371da11418ea9389b030acec63c1fa4c7ad4b86",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\requests-2.34.2-py3-none-any.whl",
+      "bytes": 73075,
+      "sha256": "2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0",
+      "verification_mode": "sha256",
+      "upstream_digest": "2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\rich-15.0.0-py3-none-any.whl",
+      "bytes": 310654,
+      "sha256": "33bd4ef74232fb73fe9279a257718407f169c09b78a87ad3d296f548e27de0bb",
+      "verification_mode": "sha256",
+      "upstream_digest": "33bd4ef74232fb73fe9279a257718407f169c09b78a87ad3d296f548e27de0bb",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\safehttpx-0.1.7-py3-none-any.whl",
+      "bytes": 8959,
+      "sha256": "c4f4a162db6993464d7ca3d7cc4af0ffc6515a606dfd220b9f82c6945d869cde",
+      "verification_mode": "sha256",
+      "upstream_digest": "c4f4a162db6993464d7ca3d7cc4af0ffc6515a606dfd220b9f82c6945d869cde",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\safetensors-0.8.0-cp310-abi3-win_amd64.whl",
+      "bytes": 355540,
+      "sha256": "096ec1a98435df7beb08853bb5aa9081a84f23d0adc67ed1a0a10550f608373f",
+      "verification_mode": "sha256",
+      "upstream_digest": "096ec1a98435df7beb08853bb5aa9081a84f23d0adc67ed1a0a10550f608373f",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\scikit_learn-1.9.1-cp312-cp312-win_amd64.whl",
+      "bytes": 8262238,
+      "sha256": "4b59abb30618121cc46b45972d6bf53a7128b4df4cd346c6ca6f4d5f9031e49c",
+      "verification_mode": "sha256",
+      "upstream_digest": "4b59abb30618121cc46b45972d6bf53a7128b4df4cd346c6ca6f4d5f9031e49c",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\scipy-1.18.1-cp312-cp312-win_amd64.whl",
+      "bytes": 36658278,
+      "sha256": "5e4d44984abc0020154ea81b247adeddcc3ac5527b975ff798bd1ba0adc513c2",
+      "verification_mode": "sha256",
+      "upstream_digest": "5e4d44984abc0020154ea81b247adeddcc3ac5527b975ff798bd1ba0adc513c2",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\semantic_version-2.10.0-py2.py3-none-any.whl",
+      "bytes": 15552,
+      "sha256": "de78a3b8e0feda74cabc54aab2da702113e33ac9d9eb9d2389bcf1f58b7d9177",
+      "verification_mode": "sha256",
+      "upstream_digest": "de78a3b8e0feda74cabc54aab2da702113e33ac9d9eb9d2389bcf1f58b7d9177",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\setuptools-84.0.0-py3-none-any.whl",
+      "bytes": 818216,
+      "sha256": "51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670",
+      "verification_mode": "sha256",
+      "upstream_digest": "51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\shellingham-1.5.4-py2.py3-none-any.whl",
+      "bytes": 9755,
+      "sha256": "7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686",
+      "verification_mode": "sha256",
+      "upstream_digest": "7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\six-1.17.0-py2.py3-none-any.whl",
+      "bytes": 11050,
+      "sha256": "4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274",
+      "verification_mode": "sha256",
+      "upstream_digest": "4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\soundfile-0.14.0-py2.py3-none-win_amd64.whl",
+      "bytes": 1021480,
+      "sha256": "299491d3499460fb1b74bb4bd78b57ffc2d243a5fafa7b6ec1b264875c78453e",
+      "verification_mode": "sha256",
+      "upstream_digest": "299491d3499460fb1b74bb4bd78b57ffc2d243a5fafa7b6ec1b264875c78453e",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\sox-1.4.1-py2.py3-none-any.whl",
+      "bytes": 39686,
+      "sha256": "2458c8e71e229e7fb1a088874ad07906e0aedfb2874a6c4f0430efd6e7587129",
+      "verification_mode": "sha256",
+      "upstream_digest": "2458c8e71e229e7fb1a088874ad07906e0aedfb2874a6c4f0430efd6e7587129",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\soxr-1.1.0-cp312-abi3-win_amd64.whl",
+      "bytes": 174357,
+      "sha256": "6ae2a174bffea94e8ead857dad85999d3f49f091774dbad5b046c0417d7092f4",
+      "verification_mode": "sha256",
+      "upstream_digest": "6ae2a174bffea94e8ead857dad85999d3f49f091774dbad5b046c0417d7092f4",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\soynlp-0.0.493-py3-none-any.whl",
+      "bytes": 416753,
+      "sha256": "2aed0ced1f0f74f7bdd0bdc24a979c5cb9ee4a28393642db52a83d174ed65b7a",
+      "verification_mode": "sha256",
+      "upstream_digest": "2aed0ced1f0f74f7bdd0bdc24a979c5cb9ee4a28393642db52a83d174ed65b7a",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\starlette-0.46.2-py3-none-any.whl",
+      "bytes": 72037,
+      "sha256": "595633ce89f8ffa71a015caed34a5b2dc1c0cdb3f0f1fbd1e69339cf2abeec35",
+      "verification_mode": "sha256",
+      "upstream_digest": "595633ce89f8ffa71a015caed34a5b2dc1c0cdb3f0f1fbd1e69339cf2abeec35",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\sympy-1.14.0-py3-none-any.whl",
+      "bytes": 6299353,
+      "sha256": "e091cc3e99d2141a0ba2847328f5479b05d94a6635cb96148ccb3f34671bd8f5",
+      "verification_mode": "sha256",
+      "upstream_digest": "e091cc3e99d2141a0ba2847328f5479b05d94a6635cb96148ccb3f34671bd8f5",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\threadpoolctl-3.7.0-py3-none-any.whl",
+      "bytes": 26362,
+      "sha256": "cd8b60b5641b45c67bbf73c64c843235fc2d8a480c87389f52f5dbee893b86be",
+      "verification_mode": "sha256",
+      "upstream_digest": "cd8b60b5641b45c67bbf73c64c843235fc2d8a480c87389f52f5dbee893b86be",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\tokenizers-0.22.2-cp39-abi3-win_amd64.whl",
+      "bytes": 2747786,
+      "sha256": "c9ea31edff2968b44a88f97d784c2f16dc0729b8b143ed004699ebca91f05c48",
+      "verification_mode": "sha256",
+      "upstream_digest": "c9ea31edff2968b44a88f97d784c2f16dc0729b8b143ed004699ebca91f05c48",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\tomlkit-0.14.0-py3-none-any.whl",
+      "bytes": 39310,
+      "sha256": "592064ed85b40fa213469f81ac584f67a4f2992509a7c3ea2d632208623a3680",
+      "verification_mode": "sha256",
+      "upstream_digest": "592064ed85b40fa213469f81ac584f67a4f2992509a7c3ea2d632208623a3680",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\torch-2.9.1+cpu-cp312-cp312-win_amd64.whl",
+      "bytes": 110856378,
+      "sha256": "a4e06b4f441675d26b462123c8a83e77c55f1ec8ebc081203be2db1ea8054add",
+      "verification_mode": "sha256",
+      "upstream_digest": "a4e06b4f441675d26b462123c8a83e77c55f1ec8ebc081203be2db1ea8054add",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\tqdm-4.70.1-py3-none-any.whl",
+      "bytes": 80199,
+      "sha256": "c293e525e6fef9c20e8728fd4612df02a0aa31bb5fe91ecd93e123b1b7bffa73",
+      "verification_mode": "sha256",
+      "upstream_digest": "c293e525e6fef9c20e8728fd4612df02a0aa31bb5fe91ecd93e123b1b7bffa73",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\transformers-4.57.6-py3-none-any.whl",
+      "bytes": 11993498,
+      "sha256": "4c9e9de11333ddfe5114bc872c9f370509198acf0b87a832a0ab9458e2bd0550",
+      "verification_mode": "sha256",
+      "upstream_digest": "4c9e9de11333ddfe5114bc872c9f370509198acf0b87a832a0ab9458e2bd0550",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\typer-0.27.2-py3-none-any.whl",
+      "bytes": 123130,
+      "sha256": "b3a5fc4342d5fc8fda8fc3010b1cf117e9249aab7fae800c2eff62fd3842d97d",
+      "verification_mode": "sha256",
+      "upstream_digest": "b3a5fc4342d5fc8fda8fc3010b1cf117e9249aab7fae800c2eff62fd3842d97d",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\typing_extensions-4.16.0-py3-none-any.whl",
+      "bytes": 45571,
+      "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+      "verification_mode": "sha256",
+      "upstream_digest": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\typing_inspection-0.4.4-py3-none-any.whl",
+      "bytes": 14750,
+      "sha256": "65b8397ba37ccbce054456aaccddfc91e6e3083c92824df348d96ca832f3f147",
+      "verification_mode": "sha256",
+      "upstream_digest": "65b8397ba37ccbce054456aaccddfc91e6e3083c92824df348d96ca832f3f147",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\tzdata-2026.4-py2.py3-none-any.whl",
+      "bytes": 347494,
+      "sha256": "c2169a8b0a7a5e9674da5a135ccdfb2b3e671b333ed9fed17b41f73c34476e81",
+      "verification_mode": "sha256",
+      "upstream_digest": "c2169a8b0a7a5e9674da5a135ccdfb2b3e671b333ed9fed17b41f73c34476e81",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\urllib3-2.8.0-py3-none-any.whl",
+      "bytes": 135717,
+      "sha256": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3",
+      "verification_mode": "sha256",
+      "upstream_digest": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\uvicorn-0.32.1-py3-none-any.whl",
+      "bytes": 63828,
+      "sha256": "82ad92fd58da0d12af7482ecdb5f2470a04c9c9a53ced65b9bbb4a205377602e",
+      "verification_mode": "sha256",
+      "upstream_digest": "82ad92fd58da0d12af7482ecdb5f2470a04c9c9a53ced65b9bbb4a205377602e",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\werkzeug-3.1.8-py3-none-any.whl",
+      "bytes": 226459,
+      "sha256": "63a77fb8892bf28ebc3178683445222aa500e48ebad5ec77b0ad80f8726b1f50",
+      "verification_mode": "sha256",
+      "upstream_digest": "63a77fb8892bf28ebc3178683445222aa500e48ebad5ec77b0ad80f8726b1f50",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\accelerate-1.15.0-py3-none-any.whl",
+      "bytes": 394295,
+      "sha256": "97eacca0b73e45cb867dbf8c5d5d4dc32219544300e0c8992c7334dc2ef33cec",
+      "verification_mode": "sha256",
+      "upstream_digest": "97eacca0b73e45cb867dbf8c5d5d4dc32219544300e0c8992c7334dc2ef33cec",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\aiohappyeyeballs-2.7.1-py3-none-any.whl",
+      "bytes": 15038,
+      "sha256": "9243213661e29250eb41368e5daa826fc017156c3b8a11440826b2e3ed376472",
+      "verification_mode": "sha256",
+      "upstream_digest": "9243213661e29250eb41368e5daa826fc017156c3b8a11440826b2e3ed376472",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\aiohttp-3.14.3-cp312-cp312-win_amd64.whl",
+      "bytes": 476845,
+      "sha256": "33a2d7c28d33797a2e99923dffa63f83d908a19b6bf26cfe80fa790aa5e1a75a",
+      "verification_mode": "sha256",
+      "upstream_digest": "33a2d7c28d33797a2e99923dffa63f83d908a19b6bf26cfe80fa790aa5e1a75a",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\aiosignal-1.4.0-py3-none-any.whl",
+      "bytes": 7490,
+      "sha256": "053243f8b92b990551949e63930a839ff0cf0b0ebbe0597b0f3fb19e1a0fe82e",
+      "verification_mode": "sha256",
+      "upstream_digest": "053243f8b92b990551949e63930a839ff0cf0b0ebbe0597b0f3fb19e1a0fe82e",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\attrs-26.1.0-py3-none-any.whl",
+      "bytes": 67548,
+      "sha256": "c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309",
+      "verification_mode": "sha256",
+      "upstream_digest": "c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\datasets-5.0.1-py3-none-any.whl",
+      "bytes": 559079,
+      "sha256": "9fbf73688f8c18f7529b4fe592abd04015f81d1e58001e4bac73ffb2b39d7cc4",
+      "verification_mode": "sha256",
+      "upstream_digest": "9fbf73688f8c18f7529b4fe592abd04015f81d1e58001e4bac73ffb2b39d7cc4",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\dill-0.4.1-py3-none-any.whl",
+      "bytes": 120019,
+      "sha256": "1e1ce33e978ae97fcfcff5638477032b801c46c7c65cf717f95fbc2248f79a9d",
+      "verification_mode": "sha256",
+      "upstream_digest": "1e1ce33e978ae97fcfcff5638477032b801c46c7c65cf717f95fbc2248f79a9d",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\flagembedding-1.4.2-py3-none-any.whl",
+      "bytes": 250528,
+      "sha256": "35e33a08e8ed5e299eabbe3bc23518eb66a424dd29ee08fb3802bf9aef9e9bf2",
+      "verification_mode": "sha256",
+      "upstream_digest": "35e33a08e8ed5e299eabbe3bc23518eb66a424dd29ee08fb3802bf9aef9e9bf2",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\frozenlist-1.8.0-cp312-cp312-win_amd64.whl",
+      "bytes": 44591,
+      "sha256": "34187385b08f866104f0c0617404c8eb08165ab1272e884abc89c112e9c00746",
+      "verification_mode": "sha256",
+      "upstream_digest": "34187385b08f866104f0c0617404c8eb08165ab1272e884abc89c112e9c00746",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\fsspec-2026.6.0-py3-none-any.whl",
+      "bytes": 203949,
+      "sha256": "02e0b71817df9b2169dc30a16832045764def1191b43dcff5bb85bdee212d2a1",
+      "verification_mode": "sha256",
+      "upstream_digest": "02e0b71817df9b2169dc30a16832045764def1191b43dcff5bb85bdee212d2a1",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\ir_datasets-0.6.3-py3-none-any.whl",
+      "bytes": 947801,
+      "sha256": "8188ad99408dc042b3be7493fa8a9d76cf04681ca1ea010e97a5f93a0aaf1dbd",
+      "verification_mode": "sha256",
+      "upstream_digest": "8188ad99408dc042b3be7493fa8a9d76cf04681ca1ea010e97a5f93a0aaf1dbd",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\lxml-6.1.3-cp312-cp312-win_amd64.whl",
+      "bytes": 4005999,
+      "sha256": "3e9a00d1c2c30936f7add097c41afc5da6556c580909104aafd382cac92a855c",
+      "verification_mode": "sha256",
+      "upstream_digest": "3e9a00d1c2c30936f7add097c41afc5da6556c580909104aafd382cac92a855c",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\lz4-4.4.5-cp312-cp312-win_amd64.whl",
+      "bytes": 99497,
+      "sha256": "713a777de88a73425cf08eb11f742cd2c98628e79a8673d6a52e3c5f0c116f33",
+      "verification_mode": "sha256",
+      "upstream_digest": "713a777de88a73425cf08eb11f742cd2c98628e79a8673d6a52e3c5f0c116f33",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\multidict-6.9.1-cp312-cp312-win_amd64.whl",
+      "bytes": 59622,
+      "sha256": "a16a1dc8529f9e734a41c3b856f3eae7ebacdc061dde3f8a844e0c7889c97203",
+      "verification_mode": "sha256",
+      "upstream_digest": "a16a1dc8529f9e734a41c3b856f3eae7ebacdc061dde3f8a844e0c7889c97203",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\multiprocess-0.70.19-py312-none-any.whl",
+      "bytes": 150281,
+      "sha256": "3a56c0e85dd5025161bac5ce138dcac1e49174c7d8e74596537e729fd5c53c28",
+      "verification_mode": "sha256",
+      "upstream_digest": "3a56c0e85dd5025161bac5ce138dcac1e49174c7d8e74596537e729fd5c53c28",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\peft-0.21.0-py3-none-any.whl",
+      "bytes": 832883,
+      "sha256": "b64eb75fd9dece7401c70e675b8d9de024993b70483691b41c62876f0c7809b7",
+      "verification_mode": "sha256",
+      "upstream_digest": "b64eb75fd9dece7401c70e675b8d9de024993b70483691b41c62876f0c7809b7",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\propcache-0.5.4-cp312-cp312-win_amd64.whl",
+      "bytes": 46190,
+      "sha256": "98914de2c4d7f0f9f4a8c6ea4bf05841f4175796941e3ef7d47eb718f22311fb",
+      "verification_mode": "sha256",
+      "upstream_digest": "98914de2c4d7f0f9f4a8c6ea4bf05841f4175796941e3ef7d47eb718f22311fb",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\protobuf-7.36.2-cp310-abi3-win_amd64.whl",
+      "bytes": 456514,
+      "sha256": "a300819d441e078a5608c0d3c709796bb548136058fda017ae51d425b44fd353",
+      "verification_mode": "sha256",
+      "upstream_digest": "a300819d441e078a5608c0d3c709796bb548136058fda017ae51d425b44fd353",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\pyarrow-25.0.1-cp312-cp312-win_amd64.whl",
+      "bytes": 27953934,
+      "sha256": "8858d7bfc22e3f51529aeaa4077225029724623e4595dc9eff8c793935c34140",
+      "verification_mode": "sha256",
+      "upstream_digest": "8858d7bfc22e3f51529aeaa4077225029724623e4595dc9eff8c793935c34140",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\sentence_transformers-5.1.2-py3-none-any.whl",
+      "bytes": 488009,
+      "sha256": "724ce0ea62200f413f1a5059712aff66495bc4e815a1493f7f9bca242414c333",
+      "verification_mode": "sha256",
+      "upstream_digest": "724ce0ea62200f413f1a5059712aff66495bc4e815a1493f7f9bca242414c333",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\sentencepiece-0.2.2-cp312-cp312-win_amd64.whl",
+      "bytes": 1248030,
+      "sha256": "7c6e7bf684dc12145bfa685d3060beaea55139134ba848289bee514ed42e7383",
+      "verification_mode": "sha256",
+      "upstream_digest": "7c6e7bf684dc12145bfa685d3060beaea55139134ba848289bee514ed42e7383",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\xxhash-4.0.1-cp312-cp312-win_amd64.whl",
+      "bytes": 37073,
+      "sha256": "5c2d525a3afabcd8e3549d85fc7e111fde6bc302d06a1893fe73adb79823415e",
+      "verification_mode": "sha256",
+      "upstream_digest": "5c2d525a3afabcd8e3549d85fc7e111fde6bc302d06a1893fe73adb79823415e",
+      "reused": false
+    },
+    {
+      "path": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\yarl-1.25.1-cp312-cp312-win_amd64.whl",
+      "bytes": 102593,
+      "sha256": "7d575b54cb3863ef9bc290ea4b009999d55dc237326131e4853cf33e888fee03",
+      "verification_mode": "sha256",
+      "upstream_digest": "7d575b54cb3863ef9bc290ea4b009999d55dc237326131e4853cf33e888fee03",
+      "reused": false
+    }
+  ],
+  "environments": [
+    {
+      "manifest_sha256": "2181679185350e734276d54d7f81b6e2d889bdb864e15bd9c1cd113a9d489e01",
+      "target": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\asr-006-cpu\\.venv",
+      "commands": [
+        {
+          "command": [
+            "C:\\Users\\lmj\\.local\\bin\\uv.EXE",
+            "--no-config",
+            "--offline",
+            "venv",
+            "--no-project",
+            "--no-python-downloads",
+            "--python",
+            "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+            "--cache-dir",
+            "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\uv-cache",
+            "D:\\property-ai\\tmp\\selfhost-ai-runtime\\asr-006-cpu\\.venv"
+          ],
+          "exit_code": 0,
+          "output": "Using CPython 3.12.10 interpreter at: tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\nCreating virtual environment at: tmp\\selfhost-ai-runtime\\asr-006-cpu\\.venv\nActivate with: tmp\\selfhost-ai-runtime\\asr-006-cpu\\.venv\\Scripts\\activate\n"
+        },
+        {
+          "command": [
+            "C:\\Users\\lmj\\.local\\bin\\uv.EXE",
+            "--no-config",
+            "--offline",
+            "pip",
+            "install",
+            "--python",
+            "D:\\property-ai\\tmp\\selfhost-ai-runtime\\asr-006-cpu\\.venv\\Scripts\\python.exe",
+            "--no-index",
+            "--no-deps",
+            "--require-hashes",
+            "--only-binary",
+            ":all:",
+            "--no-python-downloads",
+            "--link-mode",
+            "copy",
+            "--cache-dir",
+            "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\uv-cache",
+            "--strict",
+            "--requirements",
+            "-"
+          ],
+          "exit_code": 0,
+          "output": "Using Python 3.12.10 environment at: tmp\\selfhost-ai-runtime\\asr-006-cpu\\.venv\nResolved 94 packages in 45ms\nPrepared 94 packages in 8.42s\nInstalled 94 packages in 26.40s\n + accelerate==1.12.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/accelerate-1.12.0-py3-none-any.whl)\n + annotated-doc==0.0.5 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/annotated_doc-0.0.5-py3-none-any.whl)\n + annotated-types==0.8.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/annotated_types-0.8.0-py3-none-any.whl)\n + anyio==4.15.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/anyio-4.15.1-py3-none-any.whl)\n + av==18.1.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/av-18.1.0-cp311-abi3-win_amd64.whl)\n + blinker==1.9.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/blinker-1.9.0-py3-none-any.whl)\n + brotli==1.2.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/brotli-1.2.0-cp312-cp312-win_amd64.whl)\n + certifi==2026.7.22 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/certifi-2026.7.22-py3-none-any.whl)\n + cffi==2.1.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/cffi-2.1.1-cp312-cp312-win_amd64.whl)\n + charset-normalizer==3.5.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/charset_normalizer-3.5.1-cp312-cp312-win_amd64.whl)\n + click==8.5.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/click-8.5.0-py3-none-any.whl)\n + cloudpickle==3.1.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/cloudpickle-3.1.2-py3-none-any.whl)\n + colorama==0.4.6 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/colorama-0.4.6-py2.py3-none-any.whl)\n + cython==3.3.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/cython-3.3.0-cp312-cp312-win_amd64.whl)\n + decorator==5.3.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/decorator-5.3.1-py3-none-any.whl)\n + dynet38==2.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/dynet38-2.2-cp312-cp312-win_amd64.whl)\n + fastapi==0.115.12 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/fastapi-0.115.12-py3-none-any.whl)\n + filelock==4.0.3 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/filelock-4.0.3-py3-none-any.whl)\n + flask==3.1.3 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/flask-3.1.3-py3-none-any.whl)\n + fsspec==2026.9.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/fsspec-2026.9.0-py3-none-any.whl)\n + gradio==6.15.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/gradio-6.15.1-py3-none-any.whl)\n + gradio-client==2.5.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/gradio_client-2.5.0-py3-none-any.whl)\n + groovy==0.1.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/groovy-0.1.2-py3-none-any.whl)\n + h11==0.16.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/h11-0.16.0-py3-none-any.whl)\n + hf-gradio==0.4.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/hf_gradio-0.4.1-py3-none-any.whl)\n + hf-xet==1.6.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/hf_xet-1.6.0-cp38-abi3-win_amd64.whl)\n + httpcore==1.0.9 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/httpcore-1.0.9-py3-none-any.whl)\n + httpx==0.28.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/httpx-0.28.1-py3-none-any.whl)\n + huggingface-hub==0.36.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/huggingface_hub-0.36.2-py3-none-any.whl)\n + idna==3.20 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/idna-3.20-py3-none-any.whl)\n + itsdangerous==2.2.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/itsdangerous-2.2.0-py3-none-any.whl)\n + jinja2==3.1.6 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/jinja2-3.1.6-py3-none-any.whl)\n + joblib==1.6.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/joblib-1.6.0-py3-none-any.whl)\n + lazy-loader==0.6 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/lazy_loader-0.6-py3-none-any.whl)\n + librosa==1.0.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/librosa-1.0.0-py3-none-any.whl)\n + llvmlite==0.49.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/llvmlite-0.49.0-cp312-cp312-win_amd64.whl)\n + markdown-it-py==4.2.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/markdown_it_py-4.2.0-py3-none-any.whl)\n + markupsafe==3.0.3 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/markupsafe-3.0.3-cp312-cp312-win_amd64.whl)\n + mdurl==0.1.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/mdurl-0.1.2-py3-none-any.whl)\n + mpmath==1.3.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/mpmath-1.3.0-py3-none-any.whl)\n + msgpack==1.2.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/msgpack-1.2.2-cp312-cp312-win_amd64.whl)\n + nagisa==0.2.11 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/nagisa-0.2.11-cp312-cp312-win_amd64.whl)\n + narwhals==2.26.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/narwhals-2.26.0-py3-none-any.whl)\n + networkx==3.7 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/networkx-3.7-py3-none-any.whl)\n + numba==0.67.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/numba-0.67.0-cp312-cp312-win_amd64.whl)\n + numpy==2.5.3 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/numpy-2.5.3-cp312-cp312-win_amd64.whl)\n + orjson==3.12.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/orjson-3.12.0-cp312-cp312-win_amd64.whl)\n + packaging==26.3 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/packaging-26.3-py3-none-any.whl)\n + pandas==3.0.6 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/pandas-3.0.6-cp312-cp312-win_amd64.whl)\n + pillow==12.3.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/pillow-12.3.0-cp312-cp312-win_amd64.whl)\n + platformdirs==4.11.12 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/platformdirs-4.11.12-py3-none-any.whl)\n + pooch==1.9.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/pooch-1.9.0-py3-none-any.whl)\n + psutil==7.2.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/psutil-7.2.2-cp37-abi3-win_amd64.whl)\n + pycparser==3.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/pycparser-3.0-py3-none-any.whl)\n + pydantic==2.13.5 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/pydantic-2.13.5-py3-none-any.whl)\n + pydantic-core==2.46.5 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/pydantic_core-2.46.5-cp312-cp312-win_amd64.whl)\n + pydub==0.25.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/pydub-0.25.1-py2.py3-none-any.whl)\n + pygments==2.21.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/pygments-2.21.0-py3-none-any.whl)\n + python-dateutil==2.9.0.post0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/python_dateutil-2.9.0.post0-py2.py3-none-any.whl)\n + python-multipart==0.0.20 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/python_multipart-0.0.20-py3-none-any.whl)\n + pytz==2026.4 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/pytz-2026.4-py2.py3-none-any.whl)\n + pyyaml==6.0.3 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/pyyaml-6.0.3-cp312-cp312-win_amd64.whl)\n + qwen-asr==0.0.6 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/qwen_asr-0.0.6-py3-none-any.whl)\n + qwen-omni-utils==0.0.9 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/qwen_omni_utils-0.0.9-py3-none-any.whl)\n + regex==2026.9.10 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/regex-2026.9.10-cp312-cp312-win_amd64.whl)\n + requests==2.34.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/requests-2.34.2-py3-none-any.whl)\n + rich==15.0.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/rich-15.0.0-py3-none-any.whl)\n + safehttpx==0.1.7 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/safehttpx-0.1.7-py3-none-any.whl)\n + safetensors==0.8.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/safetensors-0.8.0-cp310-abi3-win_amd64.whl)\n + scikit-learn==1.9.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/scikit_learn-1.9.1-cp312-cp312-win_amd64.whl)\n + scipy==1.18.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/scipy-1.18.1-cp312-cp312-win_amd64.whl)\n + semantic-version==2.10.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/semantic_version-2.10.0-py2.py3-none-any.whl)\n + setuptools==84.0.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/setuptools-84.0.0-py3-none-any.whl)\n + shellingham==1.5.4 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/shellingham-1.5.4-py2.py3-none-any.whl)\n + six==1.17.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/six-1.17.0-py2.py3-none-any.whl)\n + soundfile==0.14.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/soundfile-0.14.0-py2.py3-none-win_amd64.whl)\n + sox==1.4.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/sox-1.4.1-py2.py3-none-any.whl)\n + soxr==1.1.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/soxr-1.1.0-cp312-abi3-win_amd64.whl)\n + soynlp==0.0.493 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/soynlp-0.0.493-py3-none-any.whl)\n + starlette==0.46.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/starlette-0.46.2-py3-none-any.whl)\n + sympy==1.14.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/sympy-1.14.0-py3-none-any.whl)\n + threadpoolctl==3.7.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/threadpoolctl-3.7.0-py3-none-any.whl)\n + tokenizers==0.22.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/tokenizers-0.22.2-cp39-abi3-win_amd64.whl)\n + tomlkit==0.14.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/tomlkit-0.14.0-py3-none-any.whl)\n + torch==2.9.1+cpu (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/torch-2.9.1+cpu-cp312-cp312-win_amd64.whl)\n + tqdm==4.70.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/tqdm-4.70.1-py3-none-any.whl)\n + transformers==4.57.6 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/transformers-4.57.6-py3-none-any.whl)\n + typer==0.27.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/typer-0.27.2-py3-none-any.whl)\n + typing-extensions==4.16.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/typing_extensions-4.16.0-py3-none-any.whl)\n + typing-inspection==0.4.4 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/typing_inspection-0.4.4-py3-none-any.whl)\n + tzdata==2026.4 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/tzdata-2026.4-py2.py3-none-any.whl)\n + urllib3==2.8.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/urllib3-2.8.0-py3-none-any.whl)\n + uvicorn==0.32.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/uvicorn-0.32.1-py3-none-any.whl)\n + werkzeug==3.1.8 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/werkzeug-3.1.8-py3-none-any.whl)\n"
+        },
+        {
+          "command": [
+            "C:\\Users\\lmj\\.local\\bin\\uv.EXE",
+            "--no-config",
+            "--offline",
+            "pip",
+            "check",
+            "--python",
+            "D:\\property-ai\\tmp\\selfhost-ai-runtime\\asr-006-cpu\\.venv\\Scripts\\python.exe"
+          ],
+          "exit_code": 0,
+          "output": "Using Python 3.12.10 environment at: tmp\\selfhost-ai-runtime\\asr-006-cpu\\.venv\nChecked 94 packages in 183ms\nAll installed packages are compatible\n"
+        }
+      ],
+      "status": "INSTALLED_NOT_MODEL_VERIFIED",
+      "actual": {
+        "executable": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\asr-006-cpu\\.venv\\Scripts\\python.exe",
+        "version": "3.12.10 (main, May 30 2025, 05:39:07) [MSC v.1943 64 bit (AMD64)]",
+        "prefix": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\asr-006-cpu\\.venv",
+        "bits": 64,
+        "packages": {
+          "accelerate": "1.12.0",
+          "annotated-doc": "0.0.5",
+          "annotated-types": "0.8.0",
+          "anyio": "4.15.1",
+          "av": "18.1.0",
+          "blinker": "1.9.0",
+          "brotli": "1.2.0",
+          "certifi": "2026.7.22",
+          "cffi": "2.1.1",
+          "charset-normalizer": "3.5.1",
+          "click": "8.5.0",
+          "cloudpickle": "3.1.2",
+          "colorama": "0.4.6",
+          "cython": "3.3.0",
+          "decorator": "5.3.1",
+          "dynet38": "2.2",
+          "fastapi": "0.115.12",
+          "filelock": "4.0.3",
+          "flask": "3.1.3",
+          "fsspec": "2026.9.0",
+          "gradio": "6.15.1",
+          "gradio-client": "2.5.0",
+          "groovy": "0.1.2",
+          "h11": "0.16.0",
+          "hf-gradio": "0.4.1",
+          "hf-xet": "1.6.0",
+          "httpcore": "1.0.9",
+          "httpx": "0.28.1",
+          "huggingface-hub": "0.36.2",
+          "idna": "3.20",
+          "itsdangerous": "2.2.0",
+          "jinja2": "3.1.6",
+          "joblib": "1.6.0",
+          "lazy-loader": "0.6",
+          "librosa": "1.0.0",
+          "llvmlite": "0.49.0",
+          "markdown-it-py": "4.2.0",
+          "markupsafe": "3.0.3",
+          "mdurl": "0.1.2",
+          "mpmath": "1.3.0",
+          "msgpack": "1.2.2",
+          "nagisa": "0.2.11",
+          "narwhals": "2.26.0",
+          "networkx": "3.7",
+          "numba": "0.67.0",
+          "numpy": "2.5.3",
+          "orjson": "3.12.0",
+          "packaging": "26.3",
+          "pandas": "3.0.6",
+          "pillow": "12.3.0",
+          "platformdirs": "4.11.12",
+          "pooch": "1.9.0",
+          "psutil": "7.2.2",
+          "pycparser": "3.0",
+          "pydantic": "2.13.5",
+          "pydantic-core": "2.46.5",
+          "pydub": "0.25.1",
+          "pygments": "2.21.0",
+          "python-dateutil": "2.9.0.post0",
+          "python-multipart": "0.0.20",
+          "pytz": "2026.4",
+          "pyyaml": "6.0.3",
+          "qwen-asr": "0.0.6",
+          "qwen-omni-utils": "0.0.9",
+          "regex": "2026.9.10",
+          "requests": "2.34.2",
+          "rich": "15.0.0",
+          "safehttpx": "0.1.7",
+          "safetensors": "0.8.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "semantic-version": "2.10.0",
+          "setuptools": "84.0.0",
+          "shellingham": "1.5.4",
+          "six": "1.17.0",
+          "soundfile": "0.14.0",
+          "sox": "1.4.1",
+          "soxr": "1.1.0",
+          "soynlp": "0.0.493",
+          "starlette": "0.46.2",
+          "sympy": "1.14.0",
+          "threadpoolctl": "3.7.0",
+          "tokenizers": "0.22.2",
+          "tomlkit": "0.14.0",
+          "torch": "2.9.1+cpu",
+          "tqdm": "4.70.1",
+          "transformers": "4.57.6",
+          "typer": "0.27.2",
+          "typing-extensions": "4.16.0",
+          "typing-inspection": "0.4.4",
+          "tzdata": "2026.4",
+          "urllib3": "2.8.0",
+          "uvicorn": "0.32.1",
+          "werkzeug": "3.1.8"
+        }
+      }
+    },
+    {
+      "manifest_sha256": "2181679185350e734276d54d7f81b6e2d889bdb864e15bd9c1cd113a9d489e01",
+      "target": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv",
+      "commands": [
+        {
+          "command": [
+            "C:\\Users\\lmj\\.local\\bin\\uv.EXE",
+            "--no-config",
+            "--offline",
+            "venv",
+            "--no-project",
+            "--no-python-downloads",
+            "--python",
+            "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+            "--cache-dir",
+            "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\uv-cache",
+            "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv"
+          ],
+          "exit_code": 0,
+          "output": "Using CPython 3.12.10 interpreter at: tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe\nCreating virtual environment at: tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\nActivate with: tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\activate\n"
+        },
+        {
+          "command": [
+            "C:\\Users\\lmj\\.local\\bin\\uv.EXE",
+            "--no-config",
+            "--offline",
+            "pip",
+            "install",
+            "--python",
+            "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe",
+            "--no-index",
+            "--no-deps",
+            "--require-hashes",
+            "--only-binary",
+            ":all:",
+            "--no-python-downloads",
+            "--link-mode",
+            "copy",
+            "--cache-dir",
+            "D:\\property-ai\\tmp\\selfhost-ai-runtime\\wheelhouse-cpu-20260925\\uv-cache",
+            "--strict",
+            "--requirements",
+            "-"
+          ],
+          "exit_code": 0,
+          "output": "Using Python 3.12.10 environment at: tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\nResolved 72 packages in 42ms\nPrepared 23 packages in 1.37s\nInstalled 72 packages in 24.93s\n + accelerate==1.15.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/accelerate-1.15.0-py3-none-any.whl)\n + aiohappyeyeballs==2.7.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/aiohappyeyeballs-2.7.1-py3-none-any.whl)\n + aiohttp==3.14.3 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/aiohttp-3.14.3-cp312-cp312-win_amd64.whl)\n + aiosignal==1.4.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/aiosignal-1.4.0-py3-none-any.whl)\n + annotated-types==0.8.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/annotated_types-0.8.0-py3-none-any.whl)\n + anyio==4.15.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/anyio-4.15.1-py3-none-any.whl)\n + attrs==26.1.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/attrs-26.1.0-py3-none-any.whl)\n + certifi==2026.7.22 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/certifi-2026.7.22-py3-none-any.whl)\n + charset-normalizer==3.5.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/charset_normalizer-3.5.1-cp312-cp312-win_amd64.whl)\n + click==8.5.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/click-8.5.0-py3-none-any.whl)\n + cloudpickle==3.1.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/cloudpickle-3.1.2-py3-none-any.whl)\n + colorama==0.4.6 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/colorama-0.4.6-py2.py3-none-any.whl)\n + datasets==5.0.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/datasets-5.0.1-py3-none-any.whl)\n + dill==0.4.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/dill-0.4.1-py3-none-any.whl)\n + fastapi==0.115.12 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/fastapi-0.115.12-py3-none-any.whl)\n + filelock==4.0.3 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/filelock-4.0.3-py3-none-any.whl)\n + flagembedding==1.4.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/flagembedding-1.4.2-py3-none-any.whl)\n + frozenlist==1.8.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/frozenlist-1.8.0-cp312-cp312-win_amd64.whl)\n + fsspec==2026.6.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/fsspec-2026.6.0-py3-none-any.whl)\n + h11==0.16.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/h11-0.16.0-py3-none-any.whl)\n + hf-xet==1.6.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/hf_xet-1.6.0-cp38-abi3-win_amd64.whl)\n + httpcore==1.0.9 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/httpcore-1.0.9-py3-none-any.whl)\n + httpx==0.28.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/httpx-0.28.1-py3-none-any.whl)\n + huggingface-hub==0.36.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/huggingface_hub-0.36.2-py3-none-any.whl)\n + idna==3.20 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/idna-3.20-py3-none-any.whl)\n + ir-datasets==0.6.3 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/ir_datasets-0.6.3-py3-none-any.whl)\n + jinja2==3.1.6 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/jinja2-3.1.6-py3-none-any.whl)\n + joblib==1.6.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/joblib-1.6.0-py3-none-any.whl)\n + lxml==6.1.3 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/lxml-6.1.3-cp312-cp312-win_amd64.whl)\n + lz4==4.4.5 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/lz4-4.4.5-cp312-cp312-win_amd64.whl)\n + markupsafe==3.0.3 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/markupsafe-3.0.3-cp312-cp312-win_amd64.whl)\n + mpmath==1.3.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/mpmath-1.3.0-py3-none-any.whl)\n + multidict==6.9.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/multidict-6.9.1-cp312-cp312-win_amd64.whl)\n + multiprocess==0.70.19 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/multiprocess-0.70.19-py312-none-any.whl)\n + narwhals==2.26.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/narwhals-2.26.0-py3-none-any.whl)\n + networkx==3.7 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/networkx-3.7-py3-none-any.whl)\n + numpy==2.5.3 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/numpy-2.5.3-cp312-cp312-win_amd64.whl)\n + packaging==26.3 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/packaging-26.3-py3-none-any.whl)\n + pandas==3.0.6 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/pandas-3.0.6-cp312-cp312-win_amd64.whl)\n + peft==0.21.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/peft-0.21.0-py3-none-any.whl)\n + pillow==12.3.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/pillow-12.3.0-cp312-cp312-win_amd64.whl)\n + propcache==0.5.4 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/propcache-0.5.4-cp312-cp312-win_amd64.whl)\n + protobuf==7.36.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/protobuf-7.36.2-cp310-abi3-win_amd64.whl)\n + psutil==7.2.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/psutil-7.2.2-cp37-abi3-win_amd64.whl)\n + pyarrow==25.0.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/pyarrow-25.0.1-cp312-cp312-win_amd64.whl)\n + pydantic==2.13.5 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/pydantic-2.13.5-py3-none-any.whl)\n + pydantic-core==2.46.5 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/pydantic_core-2.46.5-cp312-cp312-win_amd64.whl)\n + python-dateutil==2.9.0.post0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/python_dateutil-2.9.0.post0-py2.py3-none-any.whl)\n + pyyaml==6.0.3 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/pyyaml-6.0.3-cp312-cp312-win_amd64.whl)\n + regex==2026.9.10 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/regex-2026.9.10-cp312-cp312-win_amd64.whl)\n + requests==2.34.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/requests-2.34.2-py3-none-any.whl)\n + safetensors==0.8.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/safetensors-0.8.0-cp310-abi3-win_amd64.whl)\n + scikit-learn==1.9.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/scikit_learn-1.9.1-cp312-cp312-win_amd64.whl)\n + scipy==1.18.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/scipy-1.18.1-cp312-cp312-win_amd64.whl)\n + sentence-transformers==5.1.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/sentence_transformers-5.1.2-py3-none-any.whl)\n + sentencepiece==0.2.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/sentencepiece-0.2.2-cp312-cp312-win_amd64.whl)\n + setuptools==84.0.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/setuptools-84.0.0-py3-none-any.whl)\n + six==1.17.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/six-1.17.0-py2.py3-none-any.whl)\n + starlette==0.46.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/starlette-0.46.2-py3-none-any.whl)\n + sympy==1.14.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/sympy-1.14.0-py3-none-any.whl)\n + threadpoolctl==3.7.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/threadpoolctl-3.7.0-py3-none-any.whl)\n + tokenizers==0.22.2 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/tokenizers-0.22.2-cp39-abi3-win_amd64.whl)\n + torch==2.9.1+cpu (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/torch-2.9.1+cpu-cp312-cp312-win_amd64.whl)\n + tqdm==4.70.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/tqdm-4.70.1-py3-none-any.whl)\n + transformers==4.57.6 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/transformers-4.57.6-py3-none-any.whl)\n + typing-extensions==4.16.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/typing_extensions-4.16.0-py3-none-any.whl)\n + typing-inspection==0.4.4 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/typing_inspection-0.4.4-py3-none-any.whl)\n + tzdata==2026.4 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/tzdata-2026.4-py2.py3-none-any.whl)\n + urllib3==2.8.0 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/urllib3-2.8.0-py3-none-any.whl)\n + uvicorn==0.32.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/uvicorn-0.32.1-py3-none-any.whl)\n + xxhash==4.0.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/xxhash-4.0.1-cp312-cp312-win_amd64.whl)\n + yarl==1.25.1 (from file:///D:/property-ai/tmp/selfhost-ai-runtime/wheelhouse-cpu-20260925/yarl-1.25.1-cp312-cp312-win_amd64.whl)\n"
+        },
+        {
+          "command": [
+            "C:\\Users\\lmj\\.local\\bin\\uv.EXE",
+            "--no-config",
+            "--offline",
+            "pip",
+            "check",
+            "--python",
+            "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe"
+          ],
+          "exit_code": 0,
+          "output": "Using Python 3.12.10 environment at: tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\nChecked 72 packages in 177ms\nAll installed packages are compatible\n"
+        }
+      ],
+      "status": "INSTALLED_NOT_MODEL_VERIFIED",
+      "actual": {
+        "executable": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe",
+        "version": "3.12.10 (main, May 30 2025, 05:39:07) [MSC v.1943 64 bit (AMD64)]",
+        "prefix": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv",
+        "bits": 64,
+        "packages": {
+          "accelerate": "1.15.0",
+          "aiohappyeyeballs": "2.7.1",
+          "aiohttp": "3.14.3",
+          "aiosignal": "1.4.0",
+          "annotated-types": "0.8.0",
+          "anyio": "4.15.1",
+          "attrs": "26.1.0",
+          "certifi": "2026.7.22",
+          "charset-normalizer": "3.5.1",
+          "click": "8.5.0",
+          "cloudpickle": "3.1.2",
+          "colorama": "0.4.6",
+          "datasets": "5.0.1",
+          "dill": "0.4.1",
+          "fastapi": "0.115.12",
+          "filelock": "4.0.3",
+          "flagembedding": "1.4.2",
+          "frozenlist": "1.8.0",
+          "fsspec": "2026.6.0",
+          "h11": "0.16.0",
+          "hf-xet": "1.6.0",
+          "httpcore": "1.0.9",
+          "httpx": "0.28.1",
+          "huggingface-hub": "0.36.2",
+          "idna": "3.20",
+          "ir-datasets": "0.6.3",
+          "jinja2": "3.1.6",
+          "joblib": "1.6.0",
+          "lxml": "6.1.3",
+          "lz4": "4.4.5",
+          "markupsafe": "3.0.3",
+          "mpmath": "1.3.0",
+          "multidict": "6.9.1",
+          "multiprocess": "0.70.19",
+          "narwhals": "2.26.0",
+          "networkx": "3.7",
+          "numpy": "2.5.3",
+          "packaging": "26.3",
+          "pandas": "3.0.6",
+          "peft": "0.21.0",
+          "pillow": "12.3.0",
+          "propcache": "0.5.4",
+          "protobuf": "7.36.2",
+          "psutil": "7.2.2",
+          "pyarrow": "25.0.1",
+          "pydantic": "2.13.5",
+          "pydantic-core": "2.46.5",
+          "python-dateutil": "2.9.0.post0",
+          "pyyaml": "6.0.3",
+          "regex": "2026.9.10",
+          "requests": "2.34.2",
+          "safetensors": "0.8.0",
+          "scikit-learn": "1.9.1",
+          "scipy": "1.18.1",
+          "sentencepiece": "0.2.2",
+          "sentence-transformers": "5.1.2",
+          "setuptools": "84.0.0",
+          "six": "1.17.0",
+          "starlette": "0.46.2",
+          "sympy": "1.14.0",
+          "threadpoolctl": "3.7.0",
+          "tokenizers": "0.22.2",
+          "torch": "2.9.1+cpu",
+          "tqdm": "4.70.1",
+          "transformers": "4.57.6",
+          "typing-extensions": "4.16.0",
+          "typing-inspection": "0.4.4",
+          "tzdata": "2026.4",
+          "urllib3": "2.8.0",
+          "uvicorn": "0.32.1",
+          "xxhash": "4.0.1",
+          "yarl": "1.25.1"
+        }
+      }
+    }
+  ],
+  "inference_requests": 0,
+  "status": "EXACT_ENVIRONMENTS_INSTALLED_NO_INFERENCE",
+  "finished_utc": "2026-09-25T04:02:10.142045+00:00"
+}

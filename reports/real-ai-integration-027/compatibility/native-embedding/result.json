@@ -1,0 +1,25 @@
+{
+  "status": "BLOCKED",
+  "reason": null,
+  "exit_code": 1,
+  "command": [
+    "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe",
+    "-I",
+    "-X",
+    "utf8",
+    "D:\\property-ai\\reports\\real-ai-integration-027\\compatibility.py",
+    "embedding",
+    "--child",
+    "--native"
+  ],
+  "events": [
+    {
+      "utc": "2026-09-25T04:06:24.926791+00:00",
+      "phase": "native"
+    }
+  ],
+  "minimum_ram_mib": 13276,
+  "stderr": "Traceback (most recent call last):\n  File \"D:\\property-ai\\reports\\real-ai-integration-027\\compatibility.py\", line 97, in <module>\n    if a.child:child(a.kind,a.native)\n               ^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\property-ai\\reports\\real-ai-integration-027\\compatibility.py\", line 36, in child\n    import torch, transformers, numpy, scipy, soundfile, tokenizers\nModuleNotFoundError: No module named 'soundfile'\n",
+  "native_only": true,
+  "model_requests_reserved": 0
+}

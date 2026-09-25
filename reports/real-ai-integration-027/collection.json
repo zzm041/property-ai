@@ -1,0 +1,113 @@
+{
+  "utc": "2026-09-25T04:37:27.202846+00:00",
+  "name": "knowledge_chunks_auth001_bgem3_1024",
+  "existed_before": false,
+  "schema": {
+    "auto_id": false,
+    "description": "{\"contract\": \"embedding-v1\", \"model\": \"bge-m3\", \"normalization\": \"l2\", \"revision\": \"5617a9f61b028005a4858fdac845db406aefb181\"}",
+    "fields": [
+      {
+        "name": "chunk_id",
+        "description": "",
+        "type": 5,
+        "is_primary": true,
+        "auto_id": false
+      },
+      {
+        "name": "tenant_id",
+        "description": "",
+        "type": 5
+      },
+      {
+        "name": "property_id",
+        "description": "",
+        "type": 5
+      },
+      {
+        "name": "visibility",
+        "description": "",
+        "type": 21,
+        "params": {
+          "max_length": 32
+        }
+      },
+      {
+        "name": "document_id",
+        "description": "",
+        "type": 5
+      },
+      {
+        "name": "document_version",
+        "description": "",
+        "type": 5
+      },
+      {
+        "name": "vector",
+        "description": "",
+        "type": 101,
+        "params": {
+          "dim": 1024
+        }
+      }
+    ],
+    "enable_dynamic_field": false
+  },
+  "indexes": [
+    {
+      "index_type": "FLAT",
+      "metric_type": "COSINE"
+    }
+  ],
+  "legacy_schema": {
+    "auto_id": false,
+    "description": "",
+    "fields": [
+      {
+        "name": "chunk_id",
+        "description": "",
+        "type": 5,
+        "is_primary": true,
+        "auto_id": false
+      },
+      {
+        "name": "tenant_id",
+        "description": "",
+        "type": 5
+      },
+      {
+        "name": "property_id",
+        "description": "",
+        "type": 5
+      },
+      {
+        "name": "visibility",
+        "description": "",
+        "type": 21,
+        "params": {
+          "max_length": 32
+        }
+      },
+      {
+        "name": "document_id",
+        "description": "",
+        "type": 5
+      },
+      {
+        "name": "document_version",
+        "description": "",
+        "type": 5
+      },
+      {
+        "name": "vector",
+        "description": "",
+        "type": 101,
+        "params": {
+          "dim": 8
+        }
+      }
+    ],
+    "enable_dynamic_field": false
+  },
+  "legacy_modified": false,
+  "model_calls": 0
+}
