@@ -1,0 +1,17 @@
+{
+  "schema": "real-ai-r2-continuation-review-binding-v1",
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "run_id": "ai027-b439223fda",
+  "product_evidence_commit": "a6dcc39cdbf7c8c675ffaadaa56445ff9aec985c",
+  "review_manifest_path": "reports/real-ai-integration-027/r2-continuation-review-manifest.json",
+  "review_manifest_sha256": "76bddaca0ddcd5f32c4f31deef4fc02db60ed3701622ddea9d36e6fca26fa69d",
+  "review_path": "reports/real-ai-integration-027/review-r2-continuation.json",
+  "review_sha256": "23584d4177df8ae20237fed5d9055706819a29d00c51d73ed54d93aa31b74f3a",
+  "verdict": "PASS_SCOPED_R2_CONTINUATION",
+  "overall_task_verdict": "NOT_FULL_PASS",
+  "boundaries": [
+    "Q02-Q05, N05/N06 and one synthetic-audio real ASR only",
+    "R3 remains NOT_READY and real AUTO is not executed",
+    "Not native-device, generalized model-quality, production-performance or release acceptance"
+  ]
+}
