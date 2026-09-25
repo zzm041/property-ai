@@ -1,0 +1,64 @@
+{
+  "schema": "real-ai-request-resolution-v1",
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "run_id": "ai027-b439223fda",
+  "record": "call-022",
+  "authorization": "Owner explicitly approved an immutable follow-up resolution record on 2026-09-25; original files, failure and count remain unchanged.",
+  "original": {
+    "kind": "asr",
+    "status": "FAILED",
+    "reason": "RESOURCE_FLOOR",
+    "reserved_at_utc": "2026-09-25T05:12:51.521524+00:00",
+    "historical_launcher_pid": 41248,
+    "input_sha256": "616e7102d84dc70bf39e54080f3774b1d583ceacc25903b4410d833b1804d814",
+    "reservation_sha256": "4ab121765d5829ab5e7deac2268564ec22061fda19069a8d4d294e5db8d88053",
+    "result_sha256": "d0dc9f769f676d7cb54c5c5bc65e19c6710b246cb811638004283814b25ddb7c",
+    "stdout_sha256": "22cd031b43b83262ebaaf03bc3d0344dd2460f0f330891ec77cda6582e3979df",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "private_input_file_sha256": "6dbd1ef9491409d53372ca420851b9f8d96f3caf3f9a4dd03e77717ace701576",
+    "historical_immediate_exit_confirmed": "UNKNOWN",
+    "asr_outcome": "FAILED_NO_TRANSCRIPTION",
+    "original_files_modified": false
+  },
+  "current_execution": {
+    "checked_at_utc": "2026-09-25T06:31:24.0300996Z",
+    "call_or_model_request_executors_matching_project_paths": 0,
+    "old_adapter_launcher_and_listener_process_count": 0,
+    "currently_executing": false,
+    "evidence_limit": "Confirms current absence only; does not rewrite historical immediate-exit UNKNOWN."
+  },
+  "adapter_replacement": {
+    "receipt": "model-adapter-request-job.json",
+    "receipt_sha256": "182371f85856762a614265f0211ee3936bfb223be69d6ded540713ef7a72894f",
+    "old_launcher_pid": 38104,
+    "old_listener_pid": 30672,
+    "new_launcher_pid": 14420,
+    "new_listener_pid": 35644,
+    "new_listener": "127.0.0.1:11436",
+    "new_actual_server_created": "2026-09-25T14:29:37.540736+08:00",
+    "new_source": "tmp/real-ai-integration-027/runtime/model-adapter-request-job",
+    "health_inference": false,
+    "new_model_calls": 0
+  },
+  "auxiliary_serial_records": [
+    {"record":"call-023","reservation_sha256":"2515745791121c88fa4eb7b78ee297289c6c23f76e3f3696acad4582947b3d25","result_sha256":"50f6f766b8cc1544c98b68bbffd3aca267854f9b516e89e1b979071444875cbc","status":"SUCCESS"},
+    {"record":"call-024","reservation_sha256":"b04dd882d4c3c1d421fbe9dbb33d35de2c3d247541c734efc0c434731e492373","result_sha256":"996c509ebc04515c1200c1fc2ae5b453c8db9729b6b4d893386442c6d6db8849","status":"SUCCESS"},
+    {"record":"call-025","reservation_sha256":"4add8b044430d3fce57dfeed1619782dca112a94cb31e6cdb251a4a0add51e4d","result_sha256":"1d0b3089ba4f940e08b99f7e4fd58ad2497238e1f5da808794b65736445129bf","status":"SUCCESS"},
+    {"record":"call-026","reservation_sha256":"fae6034253407cefe86a01731a301d526ecec8f6aa219de5ab5ba99cc52adb5d","result_sha256":"d0f415a6d16e17b3cbf648ddd45724d0d4595a00c51de5a0d7b2bc66552207fa","status":"SUCCESS"},
+    {"record":"call-027","reservation_sha256":"590ae0bab6bd35283af0945f0b2abaaffa7f67270787db7e885daba3d8188d8b","result_sha256":"61f3425520be064fcffeb268872bde4d56cd809d717fbe966163be55d998b0e8","status":"SUCCESS"},
+    {"record":"call-028","reservation_sha256":"2ce579e5e59b1f2a2b5af5d11f699f88f8123040867281e43d26c4229a6d69b2","result_sha256":"b700e72031f2be21d3d14018e8405f6e4492e90258f8ddfa165a57d7bbde7965","status":"SUCCESS"},
+    {"record":"call-029","reservation_sha256":"b5dee4df6f0c915c98f00f0cbcf2cd18af36f7b6f44b9b6d9d5ade4406d15483","result_sha256":"d1b8e150a74a0db95e9da4f0ab3ae10ea222131b96bc8ca528ad9930b3984ef9","status":"SUCCESS"}
+  ],
+  "auxiliary_limit": "Later successful serial records are corroboration only, not sole proof of call-022 exit.",
+  "explicit_same_input_replay": {
+    "authorized": true,
+    "maximum": 1,
+    "scope": "The already approved R2 continuation may retry the same synthetic PCM once; this is not automatic retry and consumes the new ASR limit."
+  },
+  "review": {
+    "required_reviewer": "/root/review025_round1",
+    "expected_original_path": "call-022-resolution-review.json",
+    "status": "PENDING_SEPARATE_IMMUTABLE_BINDING"
+  },
+  "gate_effect": "NONE until a separately hashed independent PASS binding is configured. Does not consume a call number or start the continuation window."
+}

@@ -30,6 +30,7 @@ from local_ai_process import RequestJob,join_request_job
 
 MODELS={'asr':'Qwen3-ASR-0.6B','embedding':'bge-m3','reranker':'bge-reranker-v2-m3','qwen':'qwen3.5:4b'}
 LIMITS={'asr':1,'embedding':24,'reranker':18,'qwen':18}
+CONTINUATION_MAX={'asr':1,'embedding':6,'reranker':6,'qwen':6}
 MAX_BODY=1_100_000
 DIGEST='2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd'
 
@@ -133,24 +134,78 @@ class Runner:
         # The launcher records and verifies pinned source/weights; runtime config
         # cannot widen invocation caps or choose arbitrary upstream endpoints.
         if self.config['host']!='127.0.0.1' or self.config['port']!=11436:raise ValueError('LOOPBACK_ONLY')
+        self.continuation=self.config.get('continuation')
+        if self.continuation:
+            c=self.continuation
+            if c.get('task_id')!='REAL-AI-INTEGRATION-027' or c.get('run_id')!='ai027-b439223fda':raise ValueError('CONTINUATION_SCOPE')
+            if c.get('base_count')!=29 or not 0<c.get('duration_seconds',0)<=900:raise ValueError('CONTINUATION_LIMIT')
+            if set(c.get('limits',{}))!=set(CONTINUATION_MAX) or any(not 0<c['limits'][k]<=CONTINUATION_MAX[k] for k in CONTINUATION_MAX):raise ValueError('CONTINUATION_LIMIT')
+            if c.get('asr_start_ram_mib')!=11264:raise ValueError('ASR_ADMISSION_LIMIT')
+    @staticmethod
+    def _sha(path):
+        return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    def _resolution(self,path,result):
+        if not self.continuation:return None
+        for spec in self.continuation.get('resolutions',[]):
+            if spec.get('record')!=path.parent.name:continue
+            report=Path(spec['resolution_path']).resolve();review=Path(spec['review_path']).resolve()
+            allowed=Path(self.config['evidence_root']).resolve()
+            if not report.is_relative_to(allowed) or not review.is_relative_to(allowed):raise RuntimeError('RESOLUTION_PATH_SCOPE')
+            if self._sha(path)!=spec['reservation_sha256'] or self._sha(path.parent/'result.json')!=spec['result_sha256']:raise RuntimeError('RESOLUTION_ORIGINAL_DRIFT')
+            if self._sha(report)!=spec['resolution_sha256'] or self._sha(review)!=spec['review_sha256']:raise RuntimeError('RESOLUTION_REVIEW_DRIFT')
+            data=json.loads(report.read_text(encoding='utf-8'));verdict=json.loads(review.read_text(encoding='utf-8'))
+            if result.get('status')!='FAILED' or data.get('original',{}).get('status')!='FAILED':raise RuntimeError('RESOLUTION_SEMANTICS')
+            if data.get('record')!=path.parent.name or data.get('original',{}).get('historical_immediate_exit_confirmed')!='UNKNOWN':raise RuntimeError('RESOLUTION_SEMANTICS')
+            if data.get('current_execution',{}).get('currently_executing') is not False:raise RuntimeError('RESOLUTION_SEMANTICS')
+            if verdict.get('verdict')!='PASS_SCOPED_CALL_RESOLUTION' or verdict.get('resolution_sha256')!=spec['resolution_sha256']:raise RuntimeError('RESOLUTION_REVIEW_REQUIRED')
+            return data
+        return None
+    def gate(self):
+        prior=sorted(self.private.glob('call-*/reservation.json'))
+        if any(not (p.parent/'result.json').exists() for p in prior):return 'BLOCKED_PREVIOUS_REQUEST_COMPLETION_UNKNOWN_NO_REPLAY'
+        try:
+            for p in prior:
+                result=json.loads((p.parent/'result.json').read_text(encoding='utf-8'))
+                resolution=self._resolution(p,result)
+                if resolution:continue
+                if result.get('status')=='SUCCESS':continue
+                if result.get('status')=='UNKNOWN':return 'BLOCKED_PREVIOUS_REQUEST_COMPLETION_UNKNOWN_NO_REPLAY'
+                if result.get('owned_exit_confirmed') is True:continue
+                return 'BLOCKED_PREVIOUS_REQUEST_COMPLETION_UNKNOWN_NO_REPLAY'
+        except (OSError,ValueError,KeyError,json.JSONDecodeError,RuntimeError):
+            return 'BLOCKED_RESOLUTION_INVALID'
+        return 'READY'
     def reserve(self,kind,input_hash=None):
         prior=sorted(self.private.glob('call-*/reservation.json'))
         records=[json.loads(p.read_text()) for p in prior]
-        if any(not (p.parent/'result.json').exists() for p in prior):
+        if self.gate()!='READY':
             raise RuntimeError('PREVIOUS_REQUEST_COMPLETION_UNKNOWN_NO_REPLAY')
-        results=[json.loads(p.parent.joinpath('result.json').read_text(encoding='utf-8')) for p in prior]
-        if any(r.get('status')=='UNKNOWN' or (r.get('status')!='SUCCESS' and r.get('owned_exit_confirmed') is not True) for r in results):
-            raise RuntimeError('PREVIOUS_REQUEST_COMPLETION_UNKNOWN_NO_REPLAY')
-        if input_hash and any(r.get('input_hash')==input_hash and r['kind']==kind and
-            json.loads(p.parent.joinpath('result.json').read_text())['status']!='SUCCESS'
-            for p,r in zip(prior,records)):
-            raise RuntimeError('FAILED_INPUT_NO_AUTOMATIC_MODEL_RETRY')
+        replay_of=None
+        if input_hash:
+            failed=[]
+            for p,r in zip(prior,records):
+                result=json.loads((p.parent/'result.json').read_text(encoding='utf-8'))
+                if r.get('input_hash')==input_hash and r['kind']==kind and result.get('status')!='SUCCESS':failed.append((p,result))
+            for p,result in failed:
+                resolution=self._resolution(p,result)
+                used=any(r.get('replay_of')==p.parent.name for r in records)
+                if not resolution or not resolution.get('explicit_same_input_replay',{}).get('authorized') or used:
+                    raise RuntimeError('FAILED_INPUT_NO_AUTOMATIC_MODEL_RETRY')
+                replay_of=p.parent.name
         now=time.time()
-        if records and now-records[0]['unix']>=1800:raise RuntimeError('R2_WINDOW_EXHAUSTED')
-        if sum(r['kind']==kind for r in records)>=LIMITS[kind]:raise RuntimeError('R2_CALL_LIMIT')
-        deadline=(records[0]['unix'] if records else now)+1800
+        if self.continuation:
+            base=self.continuation['base_count'];new=records[base:]
+            if len(records)<base:raise RuntimeError('CONTINUATION_BASE_MISSING')
+            start=(new[0]['window_start_unix'] if new else now);deadline=start+self.continuation['duration_seconds']
+            if now>=deadline:raise RuntimeError('R2_WINDOW_EXHAUSTED')
+            if sum(r['kind']==kind for r in new)>=self.continuation['limits'][kind]:raise RuntimeError('R2_CALL_LIMIT')
+            metadata={'window':'r2-continuation-01','window_start_unix':start,'incremental_max_calls':self.continuation['limits'][kind],'replay_of':replay_of}
+        else:
+            if records and now-records[0]['unix']>=1800:raise RuntimeError('R2_WINDOW_EXHAUSTED')
+            if sum(r['kind']==kind for r in records)>=LIMITS[kind]:raise RuntimeError('R2_CALL_LIMIT')
+            deadline=(records[0]['unix'] if records else now)+1800;metadata={}
         folder=self.private/f'call-{len(records)+1:03d}';folder.mkdir()
-        save(folder/'reservation.json',{'kind':kind,'unix':now,'utc':stamp(),'model':MODELS[kind],'max_calls':LIMITS[kind],'input_hash':input_hash})
+        save(folder/'reservation.json',{'kind':kind,'unix':now,'utc':stamp(),'model':MODELS[kind],'max_calls':LIMITS[kind],'input_hash':input_hash,**metadata})
         return folder,deadline
     def run(self,kind,value):
         validate(kind,value)
@@ -159,9 +214,10 @@ class Runner:
             # Existing Qwen runtime unloads its own idle model after30s. Wait
             # serially, without a probe inference/retry or lowering the floor.
             started=time.monotonic();samples=[]
+            minimum=self.continuation['asr_start_ram_mib'] if kind=='asr' and self.continuation else 8192
             while True:
                 available=ram();samples.append(available)
-                if available>=8192:break
+                if available>=minimum:break
                 if time.monotonic()-started>=35:
                     raise RuntimeError('CPU_START_RAM_GUARD')
                 time.sleep(.25)
@@ -236,7 +292,7 @@ def serve(config_path):
         def do_GET(self):
             if not self.authorized():return self.reply(401,{'error':'AUTH_REQUIRED'})
             if self.path!='/healthz':return self.reply(404,{'error':'NOT_FOUND'})
-            return self.reply(200,{'status':'ready','inference':False,'scope':'R2_ONLY','models':MODELS})
+            return self.reply(200,{'status':'ready','inference':False,'scope':'R2_ONLY','models':MODELS,'reservation_gate':runner.gate()})
         def do_POST(self):
             if not self.authorized():return self.reply(401,{'error':'AUTH_REQUIRED'})
             if self.headers.get('Transfer-Encoding') or len(self.headers.get_all('Content-Length',[]))!=1:return self.reply(400,{'error':'CONTENT_LENGTH_REQUIRED'})

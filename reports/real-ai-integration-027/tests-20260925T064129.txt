@@ -1,0 +1,59 @@
+F.F                                                                      [100%]
+================================== FAILURES ===================================
+_ test_reviewed_resolution_starts_one_continuation_window_without_new_ledger __
+
+tmp_path = WindowsPath('D:/property-ai/tmp/real-ai-integration-027/unit-064126/test_reviewed_resolution_start0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001A6AA929190>
+
+    def test_reviewed_resolution_starts_one_continuation_window_without_new_ledger(tmp_path,monkeypatch):
+        r,input_hash=continuation_runner(tmp_path);monkeypatch.setattr(m.time,'time',lambda:1000.)
+>       assert r.gate()=='READY'
+E       AssertionError: assert 'BLOCKED_RESOLUTION_INVALID' == 'READY'
+E         
+E         - READY
+E         + BLOCKED_RESOLUTION_INVALID
+
+backend\tests\unit\test_local_ai_http_027.py:77: AssertionError
+_________ test_reviewed_resolution_blocks_original_result_hash_drift __________
+
+tmp_path = WindowsPath('D:/property-ai/tmp/real-ai-integration-027/unit-064126/test_reviewed_resolution_block0')
+
+    def test_reviewed_resolution_blocks_original_result_hash_drift(tmp_path):
+        r,_=continuation_runner(tmp_path)
+>       m.save(r.private/'call-022/result.json',{'status':'SUCCESS'})
+
+backend\tests\unit\test_local_ai_http_027.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\ops\local_ai_http.py:39: in save
+    with Path(path).open('x',encoding='utf-8') as f:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('D:/property-ai/tmp/real-ai-integration-027/unit-064126/test_reviewed_resolution_block0/run/call-022/result.json')
+mode = 'x', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+E       FileExistsError: [Errno 17] File exists: 'D:\\property-ai\\tmp\\real-ai-integration-027\\unit-064126\\test_reviewed_resolution_block0\\run\\call-022\\result.json'
+
+tmp\uv-python\cpython-3.12.10-windows-x86_64-none\Lib\pathlib.py:1013: FileExistsError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:40
+  D:\property-ai\.venv\Lib\site-packages\starlette\testclient.py:40: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\unit\test_local_ai_http_027.py::test_reviewed_resolution_starts_one_continuation_window_without_new_ledger
+FAILED backend\tests\unit\test_local_ai_http_027.py::test_reviewed_resolution_blocks_original_result_hash_drift
+2 failed, 1 passed, 23 deselected, 1 warning in 0.56s
+D:\property-ai\.venv\Lib\site-packages\pytest_asyncio\plugin.py:207: PytestDeprecationWarning: The configuration option "asyncio_default_fixture_loop_scope" is unset.
+The event loop scope for asynchronous fixtures will default to the fixture caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to function scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: "function", "class", "module", "package", "session"
+
+  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))

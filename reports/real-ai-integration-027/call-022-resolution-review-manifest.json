@@ -1,0 +1,38 @@
+{
+  "schema": "real-ai-call-resolution-review-manifest-v1",
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "run_id": "ai027-b439223fda",
+  "scope": "Focused read-only confirmation of current process absence, immutable call-022 follow-up resolution, generic reservation gate, one bounded continuation window and exact loader. No inference, page, database or queue operation.",
+  "head_before_review": "ba99e84231197852aed71686040fa9758f2956ef",
+  "inputs": [
+    {"path": "reports/real-ai-integration-027/call-022-resolution.json", "sha256": "4dd73ceceeea18e5cacd36005cdf8a2d590cd74db0a0ffd74de15d61eaeb0097"},
+    {"path": "reports/real-ai-integration-027/model-adapter-request-job.json", "sha256": "182371f85856762a614265f0211ee3936bfb223be69d6ded540713ef7a72894f"},
+    {"path": "reports/real-ai-integration-027/tests-20260925T063807.txt", "sha256": "20d677334583a23a10cfea191e7235839e067ff4bc2e3f54d3fa5a6eaa224f1b"},
+    {"path": "scripts/ops/local_ai_http.py", "sha256": "5c52632f4a55cccae60dc7ed7a1715123428f43bc9862bb4be69c9a259d0cd92"},
+    {"path": "backend/tests/unit/test_local_ai_http_027.py", "sha256": "044b4128b7b0cddb66678eeecacdc9b1ff11ba20e9c94bc41ad1cfd2734161b5"},
+    {"path": "reports/real-ai-integration-027/run-tests.py", "sha256": "60b6824b6f8911d034c0f761de8fb54f84c54ae88b8b2c96120ae2eeea3b765e"},
+    {"path": "reports/real-ai-integration-027/runtime.py", "sha256": "0423cf572e6ea177467489eb1415cf8b0534e48279809ddeb37269e3cdd18e8b"}
+  ],
+  "original_call_022": {
+    "reservation_sha256": "4ab121765d5829ab5e7deac2268564ec22061fda19069a8d4d294e5db8d88053",
+    "result_sha256": "d0dc9f769f676d7cb54c5c5bc65e19c6710b246cb811638004283814b25ddb7c",
+    "historical_immediate_exit_confirmed": "UNKNOWN",
+    "original_outcome": "FAILED_NO_TRANSCRIPTION"
+  },
+  "expected_invariants": {
+    "original_29_records_unchanged": true,
+    "review_required_before_gate_ready": true,
+    "same_input_replay_maximum": 1,
+    "continuation_duration_seconds": 900,
+    "continuation_limits": {"embedding": 6, "reranker": 6, "qwen": 6, "asr": 1},
+    "continuation_starts_on_first_new_reservation": true,
+    "asr_start_ram_mib": 11264,
+    "runtime_floor_mib": 4500,
+    "expected_first_new_record": "call-030",
+    "same_ledger": true,
+    "api_worker_unchanged": true
+  },
+  "test_result": "2 passed, 23 deselected, 1 warning; no model, page, database or queue operation",
+  "requested_verdict": "PASS_SCOPED_CALL_RESOLUTION or NEEDS_CHANGES",
+  "required_pass_binding": "A PASS must include resolution_sha256=4dd73ceceeea18e5cacd36005cdf8a2d590cd74db0a0ffd74de15d61eaeb0097."
+}

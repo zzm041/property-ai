@@ -230,6 +230,72 @@ Stop-Process -Id $server[0].ProcessId -ErrorAction Stop
         'budget_directory':str(PRIVATE/'model-calls'),'budget_reset':False,'api_worker_unchanged':True})
     print('Reviewed request-job adapter loaded; reservation gate remains blocked; zero inference')
 
+def model_continuation():
+    """Load the reviewed call-022 resolution and the one approved R2 window."""
+    c=ctx();old=c['processes']['models'];actual=identity(old['ProcessId'])
+    assert actual and actual['created']==old['created'] and actual['CommandLine']==old['CommandLine']
+    assert 'model-adapter-request-job\\local_ai_http.py' in actual['CommandLine'] or 'model-adapter-request-job/local_ai_http.py' in actual['CommandLine']
+    reservations=sorted((PRIVATE/'model-calls').glob('call-*/reservation.json'))
+    assert len(reservations)==29 and all((p.parent/'result.json').exists() for p in reservations)
+    resolution=OUT/'call-022-resolution.json';review=OUT/'call-022-resolution-review.json'
+    resolution_data=read(resolution);review_data=read(review)
+    resolution_hash=sha(resolution);review_hash=sha(review)
+    assert resolution_data['record']=='call-022'
+    assert resolution_data['original']['historical_immediate_exit_confirmed']=='UNKNOWN'
+    assert resolution_data['current_execution']['currently_executing'] is False
+    assert review_data['verdict']=='PASS_SCOPED_CALL_RESOLUTION'
+    assert review_data['resolution_sha256']==resolution_hash
+    original=PRIVATE/'model-calls/call-022'
+    assert sha(original/'reservation.json')==resolution_data['original']['reservation_sha256']
+    assert sha(original/'result.json')==resolution_data['original']['result_sha256']
+    folder=PRIVATE/'model-adapter-continuation';assert not folder.exists();folder.mkdir()
+    source={}
+    for name in ('local_ai_http.py','local_ai_models.py','local_ai_process.py'):
+        shutil.copy2(ROOT/'scripts/ops'/name,folder/name);source[name]=sha(folder/name)
+    base=read(PRIVATE/'model-config.json')
+    config={**base,'evidence_root':str(OUT),'continuation':{
+        'task_id':'REAL-AI-INTEGRATION-027','run_id':c['run_id'],'base_count':29,'duration_seconds':900,
+        'limits':{'embedding':6,'reranker':6,'qwen':6,'asr':1},'asr_start_ram_mib':11264,
+        'resolutions':[{'record':'call-022','reservation_path':str(original/'reservation.json'),
+            'reservation_sha256':sha(original/'reservation.json'),'result_sha256':sha(original/'result.json'),
+            'resolution_path':str(resolution),'resolution_sha256':resolution_hash,
+            'review_path':str(review),'review_sha256':review_hash}]}}
+    config_path=PRIVATE/'model-config-continuation.json';config_path.write_text(json.dumps(config,indent=2),encoding='utf-8')
+    # Stop only this run's reviewed, idle adapter. The launcher and actual
+    # listener are checked independently, and a request child forbids replacement.
+    command=f"""$ErrorActionPreference='Stop'
+$launcher=Get-CimInstance Win32_Process -Filter 'ProcessId={old['ProcessId']}'
+if($launcher.CreationDate.ToString('o') -ne '{old['created']}'){{throw 'Identity changed'}}
+$children=@(Get-CimInstance Win32_Process -Filter 'ParentProcessId={old['ProcessId']}')
+$server=@($children | Where-Object {{$_.ExecutablePath -eq 'D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe'}})
+if($server.Count -ne 1){{throw 'Unexpected server child'}}
+$expected='-I -X utf8 D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\model-adapter-request-job\\local_ai_http.py serve --config D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\model-config.json'
+if(-not $server[0].CommandLine.EndsWith($expected)){{throw 'Unexpected child command'}}
+if(@($children | Where-Object {{$_.ProcessId -ne $server[0].ProcessId -and $_.ExecutablePath -ne 'C:\\WINDOWS\\system32\\conhost.exe'}}).Count){{throw 'Unknown child'}}
+if(Get-CimInstance Win32_Process -Filter ('ParentProcessId='+$server[0].ProcessId)){{throw 'Inference child still running'}}
+$listener=@(Get-NetTCPConnection -LocalPort 11436 -State Listen)
+if($listener.Count -ne 1 -or $listener[0].LocalAddress -ne '127.0.0.1' -or $listener[0].OwningProcess -ne $server[0].ProcessId){{throw 'Listener ownership changed'}}
+Stop-Process -Id $server[0].ProcessId -ErrorAction Stop
+"""
+    subprocess.run(['powershell','-NoProfile','-Command',command],check=True)
+    wait(lambda:identity(old['ProcessId']) is None,5)
+    env=dict(os.environ);env['LOCAL_AI_INTERNAL_TOKEN']=c['internal_key']
+    with (PRIVATE/'models-continuation.stdout.log').open('xb') as out,(PRIVATE/'models-continuation.stderr.log').open('xb') as err:
+        p=subprocess.Popen([config['bge_python'],'-I','-X','utf8',str(folder/'local_ai_http.py'),'serve','--config',str(config_path)],stdout=out,stderr=err,cwd=ROOT,env=env,creationflags=subprocess.CREATE_NO_WINDOW)
+    new=wait(lambda:identity(p.pid),5);c['processes']['models']=new;save_ctx(c)
+    import httpx
+    def health():
+        try:return httpx.get('http://127.0.0.1:11436/healthz',headers={'Authorization':'Bearer '+c['internal_key']},trust_env=False,timeout=1).json()
+        except (httpx.HTTPError,ValueError):return None
+    result=wait(health,10)
+    assert result['inference'] is False and result['reservation_gate']=='READY'
+    write('model-adapter-continuation.json',{'old_process':old,'new_process':new,'health':result,
+        'source_sha256':source,'resolution_sha256':resolution_hash,'review_sha256':review_hash,
+        'old_reservations':29,'continuation_window_started':False,'new_model_calls':0,
+        'limits':config['continuation']['limits'],'duration_seconds':900,'budget_directory':str(PRIVATE/'model-calls'),
+        'budget_reset':False,'api_worker_unchanged':True})
+    print('Reviewed call-022 resolution loaded; gate ready; continuation window not started; zero inference')
+
 def collection():
     s=settings();guard(s)
     from app.provider.vector import MilvusKnowledgeStore
@@ -291,6 +357,6 @@ def serve(part):
         celery_app.worker_main(['worker','-Q','property_ai.auth001','--pool=solo','--loglevel=warning','--hostname=auth001@%h','--without-mingle','--without-gossip'])
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('mode',choices=['prepare','pin','model-start','model-fix','model-request-job','collection','replace','api','worker','publisher']);a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('mode',choices=['prepare','pin','model-start','model-fix','model-request-job','model-continuation','collection','replace','api','worker','publisher']);a=p.parse_args()
     if a.mode in ('api','worker','publisher'):serve(a.mode)
-    else:{'prepare':prepare,'pin':pin,'model-start':model_start,'model-fix':model_fix,'model-request-job':model_request_job,'collection':collection,'replace':replace}[a.mode]()
+    else:{'prepare':prepare,'pin':pin,'model-start':model_start,'model-fix':model_fix,'model-request-job':model_request_job,'model-continuation':model_continuation,'collection':collection,'replace':replace}[a.mode]()

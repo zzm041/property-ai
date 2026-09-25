@@ -14,6 +14,7 @@ if '--child' in sys.argv:
     if '--process-only' in sys.argv:files=['test_local_ai_process_027.py']
     selection=['-k','unknown_or_legacy or resource_stop or append_only_budget or total_window'] if '--lifecycle-only' in sys.argv else []
     if '--lifecycle-only' in sys.argv:files=['test_local_ai_http_027.py']
+    if '--resolution-only' in sys.argv:files=['test_local_ai_http_027.py'];selection=['-k','reviewed_resolution or resolution_without']
     raise SystemExit(pytest.main(['-q','-p','no:cacheprovider','--basetemp',str(ROOT/'tmp/real-ai-integration-027'/datetime.now(UTC).strftime('unit-%H%M%S')),
         *['backend/tests/unit/'+name for name in files],*selection]))
 result=subprocess.run([sys.executable,'-I','-X','utf8',__file__,'--child',*sys.argv[1:]],cwd=ROOT,capture_output=True,text=True,encoding='utf-8')

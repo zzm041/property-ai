@@ -1,0 +1,45 @@
+{
+  "schema": "real-ai-r2-continuation-process-v1",
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "run_id": "ai027-b439223fda",
+  "checked_at_utc": "2026-09-25T06:53:44.0065123Z",
+  "adapter": {
+    "launcher_pid": 12560,
+    "launcher_created": "2026-09-25T14:45:50.9146520+08:00",
+    "launcher_command": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe -I -X utf8 D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\model-adapter-continuation\\local_ai_http.py serve --config D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\model-config-continuation.json",
+    "server_pid": 6876,
+    "server_created": "2026-09-25T14:45:50.9353320+08:00",
+    "server_command": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe -I -X utf8 D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\model-adapter-continuation\\local_ai_http.py serve --config D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\model-config-continuation.json",
+    "request_descendant_count_after_run": 0,
+    "listener": "127.0.0.1:11436",
+    "listener_owner_pid": 6876
+  },
+  "continuation_records": {
+    "first": "call-030",
+    "last": "call-046",
+    "count": 17,
+    "statuses": {"SUCCESS": 17, "FAILED": 0, "UNKNOWN": 0},
+    "owned_exit_confirmed_true": 17,
+    "cleanup_error_non_null": 0
+  },
+  "window": {
+    "window_start_unix": 1790318871.8651223,
+    "last_reservation_unix": 1790319116.307091,
+    "reservation_span_seconds": 244.442,
+    "maximum_seconds": 900,
+    "reset": false
+  },
+  "incremental_counts": {"embedding": 6, "reranker": 6, "qwen": 4, "asr": 1},
+  "incremental_limits": {"embedding": 6, "reranker": 6, "qwen": 6, "asr": 1},
+  "original_call_022": {
+    "reservation_sha256": "4ab121765d5829ab5e7deac2268564ec22061fda19069a8d4d294e5db8d88053",
+    "result_sha256": "d0dc9f769f676d7cb54c5c5bc65e19c6710b246cb811638004283814b25ddb7c",
+    "stdout_sha256": "22cd031b43b83262ebaaf03bc3d0344dd2460f0f330891ec77cda6582e3979df",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "input_sha256": "6dbd1ef9491409d53372ca420851b9f8d96f3caf3f9a4dd03e77717ace701576",
+    "historical_immediate_exit_confirmed": "UNKNOWN",
+    "outcome": "FAILED_NO_TRANSCRIPTION",
+    "modified": false
+  },
+  "method": "Exact process identity and listener ownership were read after the final request. Per-request result records were inspected without replay."
+}

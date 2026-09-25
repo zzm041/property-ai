@@ -1,0 +1,24 @@
+{
+  "run_id": "ai027-b439223fda",
+  "status": "SUCCESS",
+  "file_id": 4,
+  "storage_key": "dev-object:1:3:496c5275-a60d-4d50-8c61-b5693a086b6b",
+  "sha256": "616E7102D84DC70BF39E54080F3774B1D583CEACC25903B4410D833B1804D814",
+  "reference": "厨房水龙头关紧后还在滴水，没有积水，请维修人员检查。",
+  "actual": {
+    "text": "厨房水龙头关紧后还在滴水，没有积水，请维修人员检查。",
+    "confidence": 0.0,
+    "model_version": "Qwen3-ASR-0.6B",
+    "token_usage": null
+  },
+  "seconds": 15.546999999991385,
+  "available_ram_mib_at_admission": 13099,
+  "upload_and_authorized_download_equal": true,
+  "mode": "existing normal API media object + real HTTP ASR continuation; not native recording",
+  "model_calls_before": 45,
+  "model_calls_after": 46,
+  "record": "call-046",
+  "original_call_022_unchanged": true,
+  "work_order_id": null,
+  "work_order_association": "BLOCKED_BY_R3_NOT_READY; no new orders created"
+}

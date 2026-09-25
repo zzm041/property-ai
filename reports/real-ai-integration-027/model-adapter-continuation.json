@@ -1,0 +1,46 @@
+{
+  "old_process": {
+    "ProcessId": 14420,
+    "ExecutablePath": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe",
+    "CommandLine": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe -I -X utf8 D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\model-adapter-request-job\\local_ai_http.py serve --config D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\model-config.json",
+    "created": "2026-09-25T14:29:37.5184490+08:00"
+  },
+  "new_process": {
+    "ProcessId": 12560,
+    "ExecutablePath": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe",
+    "CommandLine": "D:\\property-ai\\tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe -I -X utf8 D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\model-adapter-continuation\\local_ai_http.py serve --config D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\model-config-continuation.json",
+    "created": "2026-09-25T14:45:50.9146520+08:00"
+  },
+  "health": {
+    "status": "ready",
+    "inference": false,
+    "scope": "R2_ONLY",
+    "models": {
+      "asr": "Qwen3-ASR-0.6B",
+      "embedding": "bge-m3",
+      "reranker": "bge-reranker-v2-m3",
+      "qwen": "qwen3.5:4b"
+    },
+    "reservation_gate": "READY"
+  },
+  "source_sha256": {
+    "local_ai_http.py": "be79d98298fc7ffd6a25667089b0566f0a092d0962412bdbd501989e984f3158",
+    "local_ai_models.py": "e4fd619397bb82efabe65f74cb2a02928a3639d87cd6a246d77f59eacc5ace57",
+    "local_ai_process.py": "657c7a4c560ca007f4915c5569a2e6f618c498cca64b8bfe571c63aa0468b680"
+  },
+  "resolution_sha256": "4dd73ceceeea18e5cacd36005cdf8a2d590cd74db0a0ffd74de15d61eaeb0097",
+  "review_sha256": "e7fbe1842bf586ab15446f7187b421a0d1b473dee823b1a71645a1159089f194",
+  "old_reservations": 29,
+  "continuation_window_started": false,
+  "new_model_calls": 0,
+  "limits": {
+    "embedding": 6,
+    "reranker": 6,
+    "qwen": 6,
+    "asr": 1
+  },
+  "duration_seconds": 900,
+  "budget_directory": "D:\\property-ai\\tmp\\real-ai-integration-027\\runtime\\model-calls",
+  "budget_reset": false,
+  "api_worker_unchanged": true
+}

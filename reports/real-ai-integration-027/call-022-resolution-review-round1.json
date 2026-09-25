@@ -1,0 +1,61 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "scope": "call-022 定向解除阻断审查：原始证据保留、独立审查绑定、同账本有界续跑及 11436 适配器精准替换；不是整体 027 复审。",
+  "review_type": "INDEPENDENT_READ_ONLY",
+  "base_sha": "ba99e84231197852aed71686040fa9758f2956ef",
+  "source_manifest": {
+    "path": "D:/property-ai/reports/real-ai-integration-027/call-022-resolution-review-manifest.json",
+    "sha256": "f7bbd0f282012d08a5e7c469bd630652dae006392256a2921807f630b0adbc9d",
+    "verification": "列明的 7 个文件全部匹配 SHA-256；call-022 原 reservation/result 哈希与解决记录一致。原账本仍为 29 条，call-030 不存在；144 个可对应的原始文件与已保存副本一致，已跟踪原始证据无 Git diff。"
+  },
+  "verdict": "NEEDS_CHANGES",
+  "overall_task_verdict": "NOT_FULL_PASS",
+  "findings": [
+    {
+      "id": "027-CALL022-R1-01",
+      "level": "CURRENT_TASK_BLOCKER",
+      "priority": "P2",
+      "location": ["D:/property-ai/scripts/ops/local_ai_http.py:168", "D:/property-ai/scripts/ops/local_ai_http.py:170", "D:/property-ai/scripts/ops/local_ai_http.py:154"],
+      "trigger": "已配置解除记录的 call-022 原 result.json 发生漂移，例如状态变成 SUCCESS，或 FAILED 新增 owned_exit_confirmed=true。",
+      "impact": "gate() 在核对已绑定原始文件、解决记录和独立审查哈希之前直接 continue，因而该记录不再经过 _resolution()。这会使上述哈希漂移绕过解除条件，违反本次“哈希漂移继续阻断”的明确要求。",
+      "evidence": [
+        "gate() 第 168 行直接信任 SUCCESS，第 170 行直接信任 owned_exit_confirmed=true；只有未被这两个分支跳过的记录才进入 _resolution()。",
+        "原 reservation/result 哈希及 review PASS 检查全部位于 _resolution() 内。",
+        "现有两项新测试覆盖正常解除与 NEEDS_CHANGES 拒绝，没有覆盖已绑定原记录状态漂移的上述分支。"
+      ],
+      "certainty_boundary": "这是静态可证的保护分支缺口；本次实际核对未发现原始文件已被修改，不声称发生过篡改或额外推理。",
+      "required_change": "对于配置中列明的解除记录，在信任其 status/owned_exit_confirmed 前，无条件核对原 reservation/result、resolution 和独立 review 的绑定。漂移或未 PASS 必须阻断。补充两个状态漂移的无模型测试，不修改真实历史记录。"
+    }
+  ],
+  "closed_findings": [],
+  "accepted_checks": [
+    "解决记录明确保留历史即时退出 UNKNOWN、FAILED_NO_TRANSCRIPTION，没有将稍后的无进程状态追认为历史即时回收成功。",
+    "正常解除路径要求独立 PASS_SCOPED_CALL_RESOLUTION 与 resolution_sha256 匹配，并核对解决记录及 review 文件哈希。",
+    "同输入重试以显式授权及 replay_of 限制一次；新增 UNKNOWN 和缺失结果继续阻断。",
+    "续跑继续使用原账本，从 call-030 开始；窗口从首次新预约写入 window_start_unix 起算 900 秒，后续读取该起点。",
+    "增量上限为 embedding/reranker/Qwen 各 6、ASR 1；ASR admission 为 11264 MiB，运行底线仍为 4500 MiB。",
+    "model_continuation 在审查 PASS 校验之后，核对旧 launcher 身份、实际 listener、loopback 端口与无请求子进程，再精准替换 11436 适配器；该分支没有启动或停止 API/Worker。",
+    "以上是源码条件核对，不代表后续调用、窗口耗尽或适配器替换已经实际通过。"
+  ],
+  "tests_evidence": [{"path":"D:/property-ai/reports/real-ai-integration-027/tests-20260925T063807.txt","sha256":"20d677334583a23a10cfea191e7235839e067ff4bc2e3f54d3fa5a6eaa224f1b","reported_result":"2 passed，23 deselected，1 warning","scope":"已读取对应测试源码：正常解除从 call-030 开始、记录一次 replay、拒绝再次同输入，以及独立结论非 PASS 时拒绝。","reviewer_execution":"未自行运行测试。"}],
+  "actually_read": [
+    "call-022-resolution-review-manifest.json、model-adapter-request-job.json、call-022-resolution.json。",
+    "local_ai_http.py 的解除门、预约预算、资源保护及请求生命周期上下文。",
+    "test_local_ai_http_027.py 本次增量和对应保存输出。",
+    "run-tests.py 的定向选择，以及 runtime.py 的 model_continuation 分支与必要 diff。",
+    "原账本与已提交证据副本的文件数量、哈希及 Git 差异。"
+  ],
+  "unverified": [
+    "尝试的只读 Get-CimInstance 查询被拒绝访问；该调用随后产生的空数组和零计数无效，不能作为当前无执行进程证据。",
+    "已保存的 2026-09-25T06:31:24Z 无执行记录只表示该次采集时点，不证明 call-022 历史即时退出，也不证明此刻进程状态。",
+    "未启动模型、页面、业务、测试或子审查者；未操作数据库、队列或进程，未修改文件。",
+    "后续 R2 调用尚未运行；R3 NOT_READY、ASR 原失败、其余模型与发布缺口保持。",
+    "本次不重新打开已关闭的请求专属 Job 修复，也不重审已接受 RAG 证据。"
+  ],
+  "next_action": [
+    "原样保存本 JSON；当前不得配置解除门为可运行。",
+    "仅修复 027-CALL022-R1-01，增加无模型哈希漂移负测，保留真实 29 条记录和原解决记录。",
+    "交由同一只读上下文窄复核；通过后才保存具备准确 resolution_sha256 的放行结论。",
+    "此后按已批准的单个有界窗口执行，不重置账本、次数或窗口，不把放行审查写成后续运行或整体 027 PASS。"
+  ]
+}

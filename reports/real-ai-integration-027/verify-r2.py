@@ -86,6 +86,46 @@ def asr():
         'work_order_id':None,'work_order_association':'BLOCKED_BY_R3_NOT_READY; no new orders created'})
     h.close();print(json.dumps({'ASR':asdict(result),'file_id':media['id']},ensure_ascii=False))
 
+def asr_continuation():
+    c=r.ctx();output=r.OUT/'asr-continuation.json'
+    assert not output.exists(),'Do not repeat the approved continuation ASR'
+    assert c.get('asr_http_started'),'Original call-022 marker is required and remains unchanged'
+    assert not c.get('asr_continuation_started'),'Continuation ASR completion unknown: inspect without replay'
+    resolution=r.read(r.OUT/'call-022-resolution.json');review=r.read(r.OUT/'call-022-resolution-review.json')
+    assert resolution['record']=='call-022' and resolution['original']['asr_outcome']=='FAILED_NO_TRANSCRIPTION'
+    assert review['verdict']=='PASS_SCOPED_CALL_RESOLUTION' and review['resolution_sha256']==r.sha(r.OUT/'call-022-resolution.json')
+    calls=sorted((r.PRIVATE/'model-calls').glob('call-*/reservation.json'))
+    assert len(calls)>=29 and not any(r.read(p)['kind']=='asr' for p in calls[29:]),'Approved continuation ASR already reserved'
+    s=r.settings();r.guard(s);reference=r.read(r.OUT/'audio-reference.json');audio=Path(reference['path']).read_bytes()
+    assert hashlib.sha256(audio).hexdigest().upper()==reference['sha256']
+    media=c['audio_file'];h=client();stored=h.get(f"/files/{media['id']}/content")
+    assert stored.status_code==200 and stored.content==audio,'Reuse the exact authorized synthetic audio; do not upload another file'
+    from local_ai_http import ram
+    available=ram()
+    if available<11264:
+        r.write('asr-continuation-admission.json',{'utc':r.stamp(),'run_id':c['run_id'],'status':'NOT_SENT_RESOURCE_ADMISSION',
+            'available_ram_mib':available,'required_ram_mib':11264,'model_calls_before':len(calls),'model_calls_after':len(calls)})
+        h.close();raise RuntimeError('ASR_ADMISSION_RAM_BELOW_11264_NO_REQUEST')
+    c['asr_continuation_started']=r.stamp();r.save_ctx(c);start=time.monotonic()
+    try:
+        from app.provider.factory import build_asr_provider
+        result=build_asr_provider(s).transcribe(storage_key=media['storage_key'],mime_type='audio/wav')
+    except Exception as exc:
+        latest=sorted((r.PRIVATE/'model-calls').glob('call-*/reservation.json'))
+        r.write('asr-continuation.json',{'run_id':c['run_id'],'status':'FAILED','error_type':type(exc).__name__,
+            'file_id':media['id'],'sha256':reference['sha256'],'reference':reference['reference'],'available_ram_mib_at_admission':available,
+            'seconds':time.monotonic()-start,'model_calls_before':len(calls),'model_calls_after':len(latest),
+            'latest_record':latest[-1].parent.name if latest else None,'original_call_022_unchanged':True})
+        h.close();raise
+    latest=sorted((r.PRIVATE/'model-calls').glob('call-*/reservation.json'))
+    r.write('asr-continuation.json',{'run_id':c['run_id'],'status':'SUCCESS','file_id':media['id'],'storage_key':media['storage_key'],
+        'sha256':reference['sha256'],'reference':reference['reference'],'actual':asdict(result),'seconds':time.monotonic()-start,
+        'available_ram_mib_at_admission':available,'upload_and_authorized_download_equal':True,
+        'mode':'existing normal API media object + real HTTP ASR continuation; not native recording','model_calls_before':len(calls),
+        'model_calls_after':len(latest),'record':latest[-1].parent.name,'original_call_022_unchanged':True,
+        'work_order_id':None,'work_order_association':'BLOCKED_BY_R3_NOT_READY; no new orders created'})
+    h.close();print(json.dumps({'ASR':asdict(result),'file_id':media['id'],'record':latest[-1].parent.name},ensure_ascii=False))
+
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('mode',choices=['snapshot','negative','asr']);p.add_argument('--name',default='runtime-final');a=p.parse_args()
-    {'snapshot':lambda:snapshot(a.name),'negative':negative,'asr':asr}[a.mode]()
+    p=argparse.ArgumentParser();p.add_argument('mode',choices=['snapshot','negative','asr','asr-continuation']);p.add_argument('--name',default='runtime-final');a=p.parse_args()
+    {'snapshot':lambda:snapshot(a.name),'negative':negative,'asr':asr,'asr-continuation':asr_continuation}[a.mode]()

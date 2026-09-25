@@ -1,0 +1,48 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "scope": "call-022 round-2 窄复核：仅检查 027-CALL022-R1-01 修复及直接回归。",
+  "review_type": "INDEPENDENT_READ_ONLY",
+  "base_sha": "ba99e84231197852aed71686040fa9758f2956ef",
+  "source_manifest": {
+    "path": "D:/property-ai/reports/real-ai-integration-027/call-022-resolution-review-round2-manifest.json",
+    "sha256": "578ede4ebb5f0c5fcbf47614575270a3e2341e85c248363162f5b15055e7a622",
+    "verification": "前轮审查、原 resolution、两个修改文件、测试输出及未变 loader 的 6 项文件哈希全部匹配。账本仍为 29 条，call-030 不存在；已跟踪原始调用证据无 Git diff。"
+  },
+  "verdict": "PASS_SCOPED_CALL_RESOLUTION",
+  "resolution_sha256": "4dd73ceceeea18e5cacd36005cdf8a2d590cd74db0a0ffd74de15d61eaeb0097",
+  "overall_task_verdict": "NOT_FULL_PASS",
+  "findings": [],
+  "closed_findings": [
+    {
+      "id": "027-CALL022-R1-01",
+      "status": "CLOSED",
+      "evidence": [
+        {"location":"D:/property-ai/scripts/ops/local_ai_http.py:169","result":"gate() 现在先调用 _resolution()，再信任 SUCCESS 或 owned_exit_confirmed，不再绕过已配置解除记录的绑定核验。"},
+        {"location":"D:/property-ai/scripts/ops/local_ai_http.py:154","result":"无条件先核对已绑定原 reservation/result 及 resolution/review 哈希；随后核对原失败语义和独立 PASS。"},
+        {"location":"D:/property-ai/backend/tests/unit/test_local_ai_http_027.py:93","result":"两种原结果漂移均断言 BLOCKED_RESOLUTION_INVALID，且不同输入也不能预约。测试只改临时夹具，不改真实历史记录。"}
+      ]
+    }
+  ],
+  "tests_evidence": [{"path":"D:/property-ai/reports/real-ai-integration-027/tests-20260925T064251.txt","sha256":"c7cbb0ec94d42db16a8e4a119867f54d733de6b8c466af8d1d39a595034bb8d2","reported_result":"4 passed，23 deselected，1 warning","scope":"正常解除、非 PASS 阻断，以及 SUCCESS 漂移和 FAILED+owned_exit_confirmed 漂移两项负测。","reviewer_execution":"只读取源码和保存输出，未执行测试。"}],
+  "actually_read": [
+    "call-022-resolution-review-round2-manifest.json。",
+    "call-022-resolution-review-round1.json 原结论及 finding。",
+    "local_ai_http.py 的 _resolution、gate、reserve 和直接预算上下文。",
+    "test_local_ai_http_027.py 的解除夹具、原两项测试及两种新增漂移测试。",
+    "tests-20260925T064251.txt。",
+    "原 resolution、未变 loader 的哈希，以及账本数量、call-030 存在性和原证据 Git 差异。"
+  ],
+  "unverified": [
+    "本次未操作进程、模型、页面、业务、数据库或队列，未修改文件、运行测试或创建审查者。",
+    "未独立重新采集当前进程状态；前轮权限拒绝产生的空数组仍不是无进程证据。实际替换前必须继续执行 loader 的即时身份、空闲与 listener 核验。",
+    "本结论允许按已批准范围解除 call-022 阻断，不代表适配器已加载或后续 R2 运行通过。",
+    "原 call-022 的历史即时退出 UNKNOWN 和 FAILED_NO_TRANSCRIPTION 不变。",
+    "R3 NOT_READY、其余未执行验收、真实 AUTO 和 Production 发布缺口保持。"
+  ],
+  "next_action": [
+    "原样保存本 JSON，保留 round-1 NEEDS_CHANGES 和同一 finding 的关闭历史。",
+    "将本结论及其哈希绑定到未变 resolution；在即时保护检查通过后，才执行已批准的精准适配器替换。",
+    "后续仅沿用原账本，从 call-030 开始执行已批准的单个 900 秒窗口和增量上限；不重置预算。",
+    "新 UNKNOWN、文件漂移或保护失败继续阻断；运行结果另行取证，不将本放行结论写成整体 027 PASS。"
+  ]
+}

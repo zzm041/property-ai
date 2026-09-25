@@ -1,0 +1,49 @@
+{
+  "schema": "real-ai-call-resolution-review-followup-v1",
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "run_id": "ai027-b439223fda",
+  "review_round": 2,
+  "scope": "Only finding 027-CALL022-R1-01 and direct regression; no inference or runtime operation.",
+  "base_sha": "ba99e84231197852aed71686040fa9758f2956ef",
+  "prior_review": {
+    "path": "reports/real-ai-integration-027/call-022-resolution-review-round1.json",
+    "sha256": "8d4e6ee74cc749d0e6d85631e1b3adb9964a62d1d398b32e8ccf949744969cc7",
+    "verdict": "NEEDS_CHANGES",
+    "finding": "027-CALL022-R1-01"
+  },
+  "resolution": {
+    "path": "reports/real-ai-integration-027/call-022-resolution.json",
+    "sha256": "4dd73ceceeea18e5cacd36005cdf8a2d590cd74db0a0ffd74de15d61eaeb0097"
+  },
+  "changed_inputs": [
+    {
+      "path": "scripts/ops/local_ai_http.py",
+      "sha256": "be79d98298fc7ffd6a25667089b0566f0a092d0962412bdbd501989e984f3158",
+      "change": "Every configured resolution is validated before status or owned_exit_confirmed can be trusted."
+    },
+    {
+      "path": "backend/tests/unit/test_local_ai_http_027.py",
+      "sha256": "b7ed541cf6071e2620de1c5bfe76ac1ce9cce0ed0a5e85b1f780ceffcc4a3d7b",
+      "change": "Adds both SUCCESS drift and FAILED plus owned_exit_confirmed=true drift cases."
+    },
+    {
+      "path": "reports/real-ai-integration-027/tests-20260925T064251.txt",
+      "sha256": "c7cbb0ec94d42db16a8e4a119867f54d733de6b8c466af8d1d39a595034bb8d2",
+      "result": "4 passed, 23 deselected, 1 warning"
+    }
+  ],
+  "unchanged_loader": {
+    "path": "reports/real-ai-integration-027/runtime.py",
+    "sha256": "0423cf572e6ea177467489eb1415cf8b0534e48279809ddeb37269e3cdd18e8b"
+  },
+  "invariants": {
+    "original_29_records_modified": false,
+    "call_030_exists": false,
+    "model_calls_in_followup": 0,
+    "continuation_window_started": false
+  },
+  "required_pass": {
+    "verdict": "PASS_SCOPED_CALL_RESOLUTION",
+    "resolution_sha256": "4dd73ceceeea18e5cacd36005cdf8a2d590cd74db0a0ffd74de15d61eaeb0097"
+  }
+}

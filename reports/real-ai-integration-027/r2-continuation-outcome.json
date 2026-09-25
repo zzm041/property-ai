@@ -1,0 +1,59 @@
+{
+  "schema": "real-ai-r2-continuation-outcome-v1",
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "run_id": "ai027-b439223fda",
+  "mode": "scoped local real providers; normal mini-program page for RAG cases; existing synthetic audio for ASR",
+  "rag_cases": [
+    {"id":"Q02","page_step":"Q02-fix1","status":"answered","answer":"不需要提交身份证照片，只需登记借用人称呼即可。","document_id":2,"actual_citation_version":2,"verdict":"PASS"},
+    {"id":"Q03","page_step":"Q03-fix1","status":"answered","answer":"不能借电钻。可借物品为手电筒和雨伞。","document_id":2,"actual_citation_version":2,"verdict":"PASS"},
+    {"id":"Q04","page_step":"Q04-fix1","status":"answered","answer":"每次最多借用一件工具。","document_id":2,"actual_citation_version":2,"verdict":"PASS"},
+    {"id":"Q05","page_step":"Q05-fix1","status":"answered","answer":"借来的工具应在当天十七点前归还到东侧服务台。","document_id":2,"actual_citation_version":2,"verdict":"PASS"},
+    {"id":"N05","status":"insufficient_knowledge","answer":"当前知识库未能生成答案","citations":[],"protected_document_id":3,"protected_visibility":"STAFF_ONLY","verdict":"PASS"},
+    {"id":"N06","status":"insufficient_knowledge","answer":"当前知识库未能生成答案","citations":[],"archived_document_id":4,"verdict":"PASS"}
+  ],
+  "version_note": "Q02-Q05 reuse the frozen questions. Their original metadata says version 1, but document 2 had already advanced to active version 2; the relevant clauses are unchanged and every actual citation correctly names version 2. The saved page record is not rewritten.",
+  "archive": {
+    "document_id": 4,
+    "performed_by": "normally authenticated manager through the knowledge management page",
+    "database_status": "ARCHIVED",
+    "history_visible": true,
+    "direct_database_write": false
+  },
+  "asr": {
+    "record": "call-046",
+    "status": "SUCCESS",
+    "model": "Qwen3-ASR-0.6B",
+    "admission_ram_mib": 13099,
+    "required_admission_ram_mib": 11264,
+    "audio_sha256": "616E7102D84DC70BF39E54080F3774B1D583CEACC25903B4410D833B1804D814",
+    "reference": "厨房水龙头关紧后还在滴水，没有积水，请维修人员检查。",
+    "actual": "厨房水龙头关紧后还在滴水，没有积水，请维修人员检查。",
+    "difference": "NONE",
+    "seconds": 15.547,
+    "existing_file_id": 4,
+    "new_media_created": false,
+    "new_work_order_created": false
+  },
+  "screenshots_inspected": [
+    {"path":"reports/real-ai-integration-027/N05-answer.png","sha256":"ed3e77a94349b2de0baae595390fc8209341510269dd0d16b0a623e6e4342b9e"},
+    {"path":"reports/real-ai-integration-027/doc-C-archived.png","sha256":"f84cf927e7e3146a46f2a1af49d8a8acd6f00cdda5715c6db7f3b2968b0089c6"},
+    {"path":"reports/real-ai-integration-027/N06-answer.png","sha256":"6fc7ffaba3576ed6e3ff1f2323a37f024391ef6d58a3165d68c641e275199115"}
+  ],
+  "evidence": [
+    {"path":"reports/real-ai-integration-027/pages.json","sha256":"636de213275813a0ba0f7e216547c31a5be896eb4ea2955bf0f98cefa4fe44fd"},
+    {"path":"reports/real-ai-integration-027/asr-continuation.json","sha256":"4fcb3149f628d3b2f4d39a6a46341091df47fbd5b8efc4942237808e57301cf7"},
+    {"path":"reports/real-ai-integration-027/runtime-continuation-final.json","sha256":"ae14409f32dbdb5488b5f4a8f2d191cb956b10b6b3b4d2c6e8a4b0d6b9ed5ea7"},
+    {"path":"reports/real-ai-integration-027/model-adapter-continuation.json","sha256":"572e59e9c3865b9b3cfac19fee473ec2526ae7025e62732f296da3e0b49d9410"},
+    {"path":"reports/real-ai-integration-027/call-022-resolution-review.json","sha256":"e7fbe1842bf586ab15446f7187b421a0d1b473dee823b1a71645a1159089f194"}
+  ],
+  "boundaries": {
+    "r2_rag": "READY_SCOPED_LOCAL_REAL_PROVIDER",
+    "r2_asr": "PASS_SCOPED_LOCAL_SYNTHETIC_AUDIO",
+    "r3": "NOT_READY",
+    "real_auto": "NOT_EXECUTED",
+    "production": "NOT_PASSED",
+    "api_worker_replaced": false,
+    "new_model_or_collection": false,
+    "external_cost": 0
+  }
+}

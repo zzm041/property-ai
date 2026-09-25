@@ -491,6 +491,166 @@
       "expected_document": 2,
       "expected_version": 2,
       "semantic_verdict": "PENDING_MAIN_AND_INDEPENDENT_REVIEW"
+    },
+    "Q02-fix1": {
+      "question": "借工具需要提交身份证照片吗？",
+      "actor": "resident",
+      "path": "pages/assistant/assistant",
+      "status": "answered",
+      "answer": "不需要提交身份证照片，只需登记借用人称呼即可。",
+      "citations": [
+        {
+          "document_id": 2,
+          "title": "ai027-b439223fda 合成便民工具借用规则",
+          "version": 2,
+          "source_locator": "ai027-b439223fda 合成便民工具借用规则#chunk-1",
+          "excerpt": "本规则仅供合成测试，替代旧版借用时间。便民工具在东侧服务台领取。借用时间改为每天下午十五点至十七点。可借物品为手电筒和雨伞，不提供电钻。每次最多借用一件，登记借用人称呼即可，不需要提交身份证照片。借用物品应在当天十七点前归还到东侧服务台。工具遗失时请向服务台说明情况；本资料没有规定赔偿金额。"
+        }
+      ],
+      "seconds": 21.825,
+      "expected": [
+        "不需要",
+        "称呼"
+      ],
+      "expected_document": 2,
+      "expected_version": 1,
+      "semantic_verdict": "PENDING_MAIN_AND_INDEPENDENT_REVIEW"
+    },
+    "Q03-fix1": {
+      "question": "能借电钻吗？有哪些物品可借？",
+      "actor": "resident",
+      "path": "pages/assistant/assistant",
+      "status": "answered",
+      "answer": "不能借电钻。可借物品为手电筒和雨伞。",
+      "citations": [
+        {
+          "document_id": 2,
+          "title": "ai027-b439223fda 合成便民工具借用规则",
+          "version": 2,
+          "source_locator": "ai027-b439223fda 合成便民工具借用规则#chunk-1",
+          "excerpt": "本规则仅供合成测试，替代旧版借用时间。便民工具在东侧服务台领取。借用时间改为每天下午十五点至十七点。可借物品为手电筒和雨伞，不提供电钻。每次最多借用一件，登记借用人称呼即可，不需要提交身份证照片。借用物品应在当天十七点前归还到东侧服务台。工具遗失时请向服务台说明情况；本资料没有规定赔偿金额。"
+        }
+      ],
+      "seconds": 17.018,
+      "expected": [
+        "不",
+        "电钻",
+        "手电筒",
+        "雨伞"
+      ],
+      "expected_document": 2,
+      "expected_version": 1,
+      "semantic_verdict": "PENDING_MAIN_AND_INDEPENDENT_REVIEW"
+    },
+    "Q04-fix1": {
+      "question": "每次最多可以借几件工具？",
+      "actor": "resident",
+      "path": "pages/assistant/assistant",
+      "status": "answered",
+      "answer": "每次最多借用一件工具。",
+      "citations": [
+        {
+          "document_id": 2,
+          "title": "ai027-b439223fda 合成便民工具借用规则",
+          "version": 2,
+          "source_locator": "ai027-b439223fda 合成便民工具借用规则#chunk-1",
+          "excerpt": "本规则仅供合成测试，替代旧版借用时间。便民工具在东侧服务台领取。借用时间改为每天下午十五点至十七点。可借物品为手电筒和雨伞，不提供电钻。每次最多借用一件，登记借用人称呼即可，不需要提交身份证照片。借用物品应在当天十七点前归还到东侧服务台。工具遗失时请向服务台说明情况；本资料没有规定赔偿金额。"
+        }
+      ],
+      "seconds": 15.515,
+      "expected": [
+        "一件"
+      ],
+      "expected_document": 2,
+      "expected_version": 1,
+      "semantic_verdict": "PENDING_MAIN_AND_INDEPENDENT_REVIEW"
+    },
+    "Q05-fix1": {
+      "question": "借来的工具应什么时候归还，归还到哪里？",
+      "actor": "resident",
+      "path": "pages/assistant/assistant",
+      "status": "answered",
+      "answer": "借来的工具应在当天十七点前归还到东侧服务台。",
+      "citations": [
+        {
+          "document_id": 2,
+          "title": "ai027-b439223fda 合成便民工具借用规则",
+          "version": 2,
+          "source_locator": "ai027-b439223fda 合成便民工具借用规则#chunk-1",
+          "excerpt": "本规则仅供合成测试，替代旧版借用时间。便民工具在东侧服务台领取。借用时间改为每天下午十五点至十七点。可借物品为手电筒和雨伞，不提供电钻。每次最多借用一件，登记借用人称呼即可，不需要提交身份证照片。借用物品应在当天十七点前归还到东侧服务台。工具遗失时请向服务台说明情况；本资料没有规定赔偿金额。"
+        }
+      ],
+      "seconds": 15.935,
+      "expected": [
+        "十七",
+        "东侧服务台"
+      ],
+      "expected_document": 2,
+      "expected_version": 1,
+      "semantic_verdict": "PENDING_MAIN_AND_INDEPENDENT_REVIEW"
+    },
+    "N05": {
+      "question": "合成测试钥匙存放在几号柜子？",
+      "actor": "resident",
+      "path": "pages/assistant/assistant",
+      "status": "insufficient_knowledge",
+      "answer": "当前知识库未能生成答案",
+      "citations": [],
+      "seconds": 16.357,
+      "expected": [
+        "S-27",
+        "STAFF_ONLY引用"
+      ],
+      "semantic_verdict": "PENDING_MAIN_AND_INDEPENDENT_REVIEW"
+    },
+    "archive": {
+      "document": 4,
+      "notice": "文档 #4 已归档"
+    },
+    "archived_history": {
+      "id": 4,
+      "tenant_id": 1,
+      "property_id": 3,
+      "title": "ai027-b439223fda 合成植物认领活动",
+      "document_type": "FAQ",
+      "visibility": "RESIDENT",
+      "status": "ARCHIVED",
+      "current_version": 1,
+      "created_at": "2026-09-25T04:50:49.823781Z",
+      "versions": [
+        {
+          "version": 1,
+          "status": "ACTIVE",
+          "content_hash": "947042f56796794d3c67619f9bb79f11530dac1623a75bec0abfa102cb12414b",
+          "created_at": "2026-09-25T04:50:49.825351Z"
+        }
+      ],
+      "ingestion_jobs": [
+        {
+          "version": 1,
+          "status": "SUCCEEDED",
+          "error_code": null,
+          "attempt": 1,
+          "started_at": "2026-09-25T04:50:51.063555Z",
+          "finished_at": "2026-09-25T04:51:00.451830Z"
+        }
+      ],
+      "targetText": "当前小区",
+      "jobText": "v1 SUCCEEDED"
+    },
+    "N06": {
+      "question": "植物认领活动在什么地方？",
+      "actor": "resident",
+      "path": "pages/assistant/assistant",
+      "status": "insufficient_knowledge",
+      "answer": "当前知识库未能生成答案",
+      "citations": [],
+      "seconds": 14.848,
+      "expected": [
+        "引用已归档C",
+        "无据编造地点"
+      ],
+      "semantic_verdict": "PENDING_MAIN_AND_INDEPENDENT_REVIEW"
     }
   },
   "requests": [
@@ -7646,6 +7806,621 @@
       },
       "source": "actual origin wx.request",
       "utc": "2026-09-25T05:16:03.080Z"
+    },
+    {
+      "path": "/assistant/query",
+      "method": "POST",
+      "status": 200,
+      "request_id": "3e24486a22184c2a8e80559e44cc47db",
+      "data": {
+        "status": "answered",
+        "answer": "不需要提交身份证照片，只需登记借用人称呼即可。",
+        "citations": [
+          {
+            "document_id": 2,
+            "title": "ai027-b439223fda 合成便民工具借用规则",
+            "version": 2,
+            "source_locator": "ai027-b439223fda 合成便民工具借用规则#chunk-1",
+            "excerpt": "本规则仅供合成测试，替代旧版借用时间。便民工具在东侧服务台领取。借用时间改为每天下午十五点至十七点。可借物品为手电筒和雨伞，不提供电钻。每次最多借用一件，登记借用人称呼即可，不需要提交身份证照片。借用物品应在当天十七点前归还到东侧服务台。工具遗失时请向服务台说明情况；本资料没有规定赔偿金额。"
+          }
+        ]
+      },
+      "source": "actual origin wx.request",
+      "utc": "2026-09-25T06:48:13.042Z"
+    },
+    {
+      "path": "/assistant/query",
+      "method": "POST",
+      "status": 200,
+      "request_id": "d9f95e4d82174a3d9137e4b86f85b89a",
+      "data": {
+        "status": "answered",
+        "answer": "不能借电钻。可借物品为手电筒和雨伞。",
+        "citations": [
+          {
+            "document_id": 2,
+            "title": "ai027-b439223fda 合成便民工具借用规则",
+            "version": 2,
+            "source_locator": "ai027-b439223fda 合成便民工具借用规则#chunk-1",
+            "excerpt": "本规则仅供合成测试，替代旧版借用时间。便民工具在东侧服务台领取。借用时间改为每天下午十五点至十七点。可借物品为手电筒和雨伞，不提供电钻。每次最多借用一件，登记借用人称呼即可，不需要提交身份证照片。借用物品应在当天十七点前归还到东侧服务台。工具遗失时请向服务台说明情况；本资料没有规定赔偿金额。"
+          }
+        ]
+      },
+      "source": "actual origin wx.request",
+      "utc": "2026-09-25T06:48:35.835Z"
+    },
+    {
+      "path": "/assistant/query",
+      "method": "POST",
+      "status": 200,
+      "request_id": "aa19f1979dd54cbd9e0f9ab7d3fd8cbb",
+      "data": {
+        "status": "answered",
+        "answer": "每次最多借用一件工具。",
+        "citations": [
+          {
+            "document_id": 2,
+            "title": "ai027-b439223fda 合成便民工具借用规则",
+            "version": 2,
+            "source_locator": "ai027-b439223fda 合成便民工具借用规则#chunk-1",
+            "excerpt": "本规则仅供合成测试，替代旧版借用时间。便民工具在东侧服务台领取。借用时间改为每天下午十五点至十七点。可借物品为手电筒和雨伞，不提供电钻。每次最多借用一件，登记借用人称呼即可，不需要提交身份证照片。借用物品应在当天十七点前归还到东侧服务台。工具遗失时请向服务台说明情况；本资料没有规定赔偿金额。"
+          }
+        ]
+      },
+      "source": "actual origin wx.request",
+      "utc": "2026-09-25T06:48:57.041Z"
+    },
+    {
+      "path": "/assistant/query",
+      "method": "POST",
+      "status": 200,
+      "request_id": "3fad53a13c274edc8310240007b4850a",
+      "data": {
+        "status": "answered",
+        "answer": "借来的工具应在当天十七点前归还到东侧服务台。",
+        "citations": [
+          {
+            "document_id": 2,
+            "title": "ai027-b439223fda 合成便民工具借用规则",
+            "version": 2,
+            "source_locator": "ai027-b439223fda 合成便民工具借用规则#chunk-1",
+            "excerpt": "本规则仅供合成测试，替代旧版借用时间。便民工具在东侧服务台领取。借用时间改为每天下午十五点至十七点。可借物品为手电筒和雨伞，不提供电钻。每次最多借用一件，登记借用人称呼即可，不需要提交身份证照片。借用物品应在当天十七点前归还到东侧服务台。工具遗失时请向服务台说明情况；本资料没有规定赔偿金额。"
+          }
+        ]
+      },
+      "source": "actual origin wx.request",
+      "utc": "2026-09-25T06:49:18.637Z"
+    },
+    {
+      "path": "/assistant/query",
+      "method": "POST",
+      "status": 200,
+      "request_id": "b1d9731d592f4766bea785b3f5c8548c",
+      "data": {
+        "status": "insufficient_knowledge",
+        "answer": "",
+        "citations": []
+      },
+      "source": "actual origin wx.request",
+      "utc": "2026-09-25T06:50:06.037Z"
+    },
+    {
+      "path": "/admin/knowledge-documents?property_id=1&limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "55580f44b6094fb1bc67eea06e017c1c",
+      "data": {
+        "items": [],
+        "next_cursor": null
+      },
+      "source": "actual origin wx.request",
+      "utc": "2026-09-25T06:50:32.934Z"
+    },
+    {
+      "path": "/admin/knowledge-documents?property_id=3&limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "28816e07cdcc48ccaa937d6c3fd9e5e5",
+      "data": {
+        "items": [
+          {
+            "id": 1,
+            "tenant_id": 1,
+            "property_id": 3,
+            "title": "rt026-91880f6aeb恢复说明",
+            "document_type": "GUIDE",
+            "visibility": "RESIDENT",
+            "status": "ACTIVE",
+            "current_version": 1,
+            "created_at": "2026-09-24T20:58:12.638302Z",
+            "versions": [
+              {
+                "version": 1,
+                "status": "ACTIVE",
+                "content_hash": "b400d2b7274680653ada9d01614b9f063ad6576a558f7f6dc9dca64206d39a83",
+                "created_at": "2026-09-24T20:58:12.640801Z"
+              }
+            ],
+            "ingestion_jobs": [
+              {
+                "version": 1,
+                "status": "SUCCEEDED",
+                "error_code": null,
+                "attempt": 1,
+                "started_at": "2026-09-24T20:58:14.437597Z",
+                "finished_at": "2026-09-24T20:58:17.123424Z"
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "tenant_id": 1,
+            "property_id": 3,
+            "title": "ai027-b439223fda 合成便民工具借用规则",
+            "document_type": "FAQ",
+            "visibility": "RESIDENT",
+            "status": "ACTIVE",
+            "current_version": 2,
+            "created_at": "2026-09-25T04:50:19.137682Z",
+            "versions": [
+              {
+                "version": 2,
+                "status": "ACTIVE",
+                "content_hash": "ee1de6d88a9bc8e012e78369d0ddd32622f2e39b1b25e347ec496dcaaf94a1c2",
+                "created_at": "2026-09-25T05:14:49.635239Z"
+              },
+              {
+                "version": 1,
+                "status": "SUPERSEDED",
+                "content_hash": "3e7338fbbcef76b665c0f61ba8ac0379d71b4ac4b4f025cda3503bf9603f907b",
+                "created_at": "2026-09-25T04:50:19.141106Z"
+              }
+            ],
+            "ingestion_jobs": [
+              {
+                "version": 2,
+                "status": "SUCCEEDED",
+                "error_code": null,
+                "attempt": 1,
+                "started_at": "2026-09-25T05:14:49.986256Z",
+                "finished_at": "2026-09-25T05:15:02.140345Z"
+              },
+              {
+                "version": 1,
+                "status": "SUCCEEDED",
+                "error_code": null,
+                "attempt": 1,
+                "started_at": "2026-09-25T04:50:20.880796Z",
+                "finished_at": "2026-09-25T04:50:33.545837Z"
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "tenant_id": 1,
+            "property_id": 3,
+            "title": "ai027-b439223fda 合成人员内部钥匙交接",
+            "document_type": "FAQ",
+            "visibility": "STAFF_ONLY",
+            "status": "ACTIVE",
+            "current_version": 1,
+            "created_at": "2026-09-25T04:50:36.551132Z",
+            "versions": [
+              {
+                "version": 1,
+                "status": "ACTIVE",
+                "content_hash": "acee0351596fb7ec82aabf2813c30dc0b19dbe6e0e0e0e55ae14ba65aeb38c78",
+                "created_at": "2026-09-25T04:50:36.552816Z"
+              }
+            ],
+            "ingestion_jobs": [
+              {
+                "version": 1,
+                "status": "SUCCEEDED",
+                "error_code": null,
+                "attempt": 1,
+                "started_at": "2026-09-25T04:50:36.987800Z",
+                "finished_at": "2026-09-25T04:50:46.363530Z"
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "tenant_id": 1,
+            "property_id": 3,
+            "title": "ai027-b439223fda 合成植物认领活动",
+            "document_type": "FAQ",
+            "visibility": "RESIDENT",
+            "status": "ACTIVE",
+            "current_version": 1,
+            "created_at": "2026-09-25T04:50:49.823781Z",
+            "versions": [
+              {
+                "version": 1,
+                "status": "ACTIVE",
+                "content_hash": "947042f56796794d3c67619f9bb79f11530dac1623a75bec0abfa102cb12414b",
+                "created_at": "2026-09-25T04:50:49.825351Z"
+              }
+            ],
+            "ingestion_jobs": [
+              {
+                "version": 1,
+                "status": "SUCCEEDED",
+                "error_code": null,
+                "attempt": 1,
+                "started_at": "2026-09-25T04:50:51.063555Z",
+                "finished_at": "2026-09-25T04:51:00.451830Z"
+              }
+            ]
+          }
+        ],
+        "next_cursor": null
+      },
+      "source": "actual origin wx.request",
+      "utc": "2026-09-25T06:50:33.029Z"
+    },
+    {
+      "path": "/admin/knowledge-documents/4",
+      "method": "GET",
+      "status": 200,
+      "request_id": "3ec1cbf2d6bf4627bde12f1894546ce0",
+      "data": {
+        "id": 4,
+        "tenant_id": 1,
+        "property_id": 3,
+        "title": "ai027-b439223fda 合成植物认领活动",
+        "document_type": "FAQ",
+        "visibility": "RESIDENT",
+        "status": "ACTIVE",
+        "current_version": 1,
+        "created_at": "2026-09-25T04:50:49.823781Z",
+        "versions": [
+          {
+            "version": 1,
+            "status": "ACTIVE",
+            "content_hash": "947042f56796794d3c67619f9bb79f11530dac1623a75bec0abfa102cb12414b",
+            "created_at": "2026-09-25T04:50:49.825351Z"
+          }
+        ],
+        "ingestion_jobs": [
+          {
+            "version": 1,
+            "status": "SUCCEEDED",
+            "error_code": null,
+            "attempt": 1,
+            "started_at": "2026-09-25T04:50:51.063555Z",
+            "finished_at": "2026-09-25T04:51:00.451830Z"
+          }
+        ]
+      },
+      "source": "actual origin wx.request",
+      "utc": "2026-09-25T06:50:33.273Z"
+    },
+    {
+      "path": "/admin/knowledge-documents/4/archive",
+      "method": "POST",
+      "status": 200,
+      "request_id": "fd87cfe5038b42fe916a952ccabe1f92",
+      "data": {
+        "id": 4,
+        "tenant_id": 1,
+        "property_id": 3,
+        "title": "ai027-b439223fda 合成植物认领活动",
+        "document_type": "FAQ",
+        "visibility": "RESIDENT",
+        "status": "ARCHIVED",
+        "current_version": 1,
+        "created_at": "2026-09-25T04:50:49.823781Z"
+      },
+      "source": "actual origin wx.request",
+      "utc": "2026-09-25T06:50:33.544Z"
+    },
+    {
+      "path": "/admin/knowledge-documents?property_id=3&limit=100",
+      "method": "GET",
+      "status": 200,
+      "request_id": "39e20608ec7143ff807ff40cbaca2c2c",
+      "data": {
+        "items": [
+          {
+            "id": 1,
+            "tenant_id": 1,
+            "property_id": 3,
+            "title": "rt026-91880f6aeb恢复说明",
+            "document_type": "GUIDE",
+            "visibility": "RESIDENT",
+            "status": "ACTIVE",
+            "current_version": 1,
+            "created_at": "2026-09-24T20:58:12.638302Z",
+            "versions": [
+              {
+                "version": 1,
+                "status": "ACTIVE",
+                "content_hash": "b400d2b7274680653ada9d01614b9f063ad6576a558f7f6dc9dca64206d39a83",
+                "created_at": "2026-09-24T20:58:12.640801Z"
+              }
+            ],
+            "ingestion_jobs": [
+              {
+                "version": 1,
+                "status": "SUCCEEDED",
+                "error_code": null,
+                "attempt": 1,
+                "started_at": "2026-09-24T20:58:14.437597Z",
+                "finished_at": "2026-09-24T20:58:17.123424Z"
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "tenant_id": 1,
+            "property_id": 3,
+            "title": "ai027-b439223fda 合成便民工具借用规则",
+            "document_type": "FAQ",
+            "visibility": "RESIDENT",
+            "status": "ACTIVE",
+            "current_version": 2,
+            "created_at": "2026-09-25T04:50:19.137682Z",
+            "versions": [
+              {
+                "version": 2,
+                "status": "ACTIVE",
+                "content_hash": "ee1de6d88a9bc8e012e78369d0ddd32622f2e39b1b25e347ec496dcaaf94a1c2",
+                "created_at": "2026-09-25T05:14:49.635239Z"
+              },
+              {
+                "version": 1,
+                "status": "SUPERSEDED",
+                "content_hash": "3e7338fbbcef76b665c0f61ba8ac0379d71b4ac4b4f025cda3503bf9603f907b",
+                "created_at": "2026-09-25T04:50:19.141106Z"
+              }
+            ],
+            "ingestion_jobs": [
+              {
+                "version": 2,
+                "status": "SUCCEEDED",
+                "error_code": null,
+                "attempt": 1,
+                "started_at": "2026-09-25T05:14:49.986256Z",
+                "finished_at": "2026-09-25T05:15:02.140345Z"
+              },
+              {
+                "version": 1,
+                "status": "SUCCEEDED",
+                "error_code": null,
+                "attempt": 1,
+                "started_at": "2026-09-25T04:50:20.880796Z",
+                "finished_at": "2026-09-25T04:50:33.545837Z"
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "tenant_id": 1,
+            "property_id": 3,
+            "title": "ai027-b439223fda 合成人员内部钥匙交接",
+            "document_type": "FAQ",
+            "visibility": "STAFF_ONLY",
+            "status": "ACTIVE",
+            "current_version": 1,
+            "created_at": "2026-09-25T04:50:36.551132Z",
+            "versions": [
+              {
+                "version": 1,
+                "status": "ACTIVE",
+                "content_hash": "acee0351596fb7ec82aabf2813c30dc0b19dbe6e0e0e0e55ae14ba65aeb38c78",
+                "created_at": "2026-09-25T04:50:36.552816Z"
+              }
+            ],
+            "ingestion_jobs": [
+              {
+                "version": 1,
+                "status": "SUCCEEDED",
+                "error_code": null,
+                "attempt": 1,
+                "started_at": "2026-09-25T04:50:36.987800Z",
+                "finished_at": "2026-09-25T04:50:46.363530Z"
+              }
+            ]
+          }
+        ],
+        "next_cursor": null
+      },
+      "source": "actual origin wx.request",
+      "utc": "2026-09-25T06:50:33.579Z"
+    },
+    {
+      "path": "/admin/knowledge-documents?property_id=3&limit=100&include_archived=true",
+      "method": "GET",
+      "status": 200,
+      "request_id": "657e62ef1a894685a37080ae58f6c934",
+      "data": {
+        "items": [
+          {
+            "id": 1,
+            "tenant_id": 1,
+            "property_id": 3,
+            "title": "rt026-91880f6aeb恢复说明",
+            "document_type": "GUIDE",
+            "visibility": "RESIDENT",
+            "status": "ACTIVE",
+            "current_version": 1,
+            "created_at": "2026-09-24T20:58:12.638302Z",
+            "versions": [
+              {
+                "version": 1,
+                "status": "ACTIVE",
+                "content_hash": "b400d2b7274680653ada9d01614b9f063ad6576a558f7f6dc9dca64206d39a83",
+                "created_at": "2026-09-24T20:58:12.640801Z"
+              }
+            ],
+            "ingestion_jobs": [
+              {
+                "version": 1,
+                "status": "SUCCEEDED",
+                "error_code": null,
+                "attempt": 1,
+                "started_at": "2026-09-24T20:58:14.437597Z",
+                "finished_at": "2026-09-24T20:58:17.123424Z"
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "tenant_id": 1,
+            "property_id": 3,
+            "title": "ai027-b439223fda 合成便民工具借用规则",
+            "document_type": "FAQ",
+            "visibility": "RESIDENT",
+            "status": "ACTIVE",
+            "current_version": 2,
+            "created_at": "2026-09-25T04:50:19.137682Z",
+            "versions": [
+              {
+                "version": 2,
+                "status": "ACTIVE",
+                "content_hash": "ee1de6d88a9bc8e012e78369d0ddd32622f2e39b1b25e347ec496dcaaf94a1c2",
+                "created_at": "2026-09-25T05:14:49.635239Z"
+              },
+              {
+                "version": 1,
+                "status": "SUPERSEDED",
+                "content_hash": "3e7338fbbcef76b665c0f61ba8ac0379d71b4ac4b4f025cda3503bf9603f907b",
+                "created_at": "2026-09-25T04:50:19.141106Z"
+              }
+            ],
+            "ingestion_jobs": [
+              {
+                "version": 2,
+                "status": "SUCCEEDED",
+                "error_code": null,
+                "attempt": 1,
+                "started_at": "2026-09-25T05:14:49.986256Z",
+                "finished_at": "2026-09-25T05:15:02.140345Z"
+              },
+              {
+                "version": 1,
+                "status": "SUCCEEDED",
+                "error_code": null,
+                "attempt": 1,
+                "started_at": "2026-09-25T04:50:20.880796Z",
+                "finished_at": "2026-09-25T04:50:33.545837Z"
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "tenant_id": 1,
+            "property_id": 3,
+            "title": "ai027-b439223fda 合成人员内部钥匙交接",
+            "document_type": "FAQ",
+            "visibility": "STAFF_ONLY",
+            "status": "ACTIVE",
+            "current_version": 1,
+            "created_at": "2026-09-25T04:50:36.551132Z",
+            "versions": [
+              {
+                "version": 1,
+                "status": "ACTIVE",
+                "content_hash": "acee0351596fb7ec82aabf2813c30dc0b19dbe6e0e0e0e55ae14ba65aeb38c78",
+                "created_at": "2026-09-25T04:50:36.552816Z"
+              }
+            ],
+            "ingestion_jobs": [
+              {
+                "version": 1,
+                "status": "SUCCEEDED",
+                "error_code": null,
+                "attempt": 1,
+                "started_at": "2026-09-25T04:50:36.987800Z",
+                "finished_at": "2026-09-25T04:50:46.363530Z"
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "tenant_id": 1,
+            "property_id": 3,
+            "title": "ai027-b439223fda 合成植物认领活动",
+            "document_type": "FAQ",
+            "visibility": "RESIDENT",
+            "status": "ARCHIVED",
+            "current_version": 1,
+            "created_at": "2026-09-25T04:50:49.823781Z",
+            "versions": [
+              {
+                "version": 1,
+                "status": "ACTIVE",
+                "content_hash": "947042f56796794d3c67619f9bb79f11530dac1623a75bec0abfa102cb12414b",
+                "created_at": "2026-09-25T04:50:49.825351Z"
+              }
+            ],
+            "ingestion_jobs": [
+              {
+                "version": 1,
+                "status": "SUCCEEDED",
+                "error_code": null,
+                "attempt": 1,
+                "started_at": "2026-09-25T04:50:51.063555Z",
+                "finished_at": "2026-09-25T04:51:00.451830Z"
+              }
+            ]
+          }
+        ],
+        "next_cursor": null
+      },
+      "source": "actual origin wx.request",
+      "utc": "2026-09-25T06:50:33.812Z"
+    },
+    {
+      "path": "/admin/knowledge-documents/4",
+      "method": "GET",
+      "status": 200,
+      "request_id": "e7721824464f461caf332be321b13f56",
+      "data": {
+        "id": 4,
+        "tenant_id": 1,
+        "property_id": 3,
+        "title": "ai027-b439223fda 合成植物认领活动",
+        "document_type": "FAQ",
+        "visibility": "RESIDENT",
+        "status": "ARCHIVED",
+        "current_version": 1,
+        "created_at": "2026-09-25T04:50:49.823781Z",
+        "versions": [
+          {
+            "version": 1,
+            "status": "ACTIVE",
+            "content_hash": "947042f56796794d3c67619f9bb79f11530dac1623a75bec0abfa102cb12414b",
+            "created_at": "2026-09-25T04:50:49.825351Z"
+          }
+        ],
+        "ingestion_jobs": [
+          {
+            "version": 1,
+            "status": "SUCCEEDED",
+            "error_code": null,
+            "attempt": 1,
+            "started_at": "2026-09-25T04:50:51.063555Z",
+            "finished_at": "2026-09-25T04:51:00.451830Z"
+          }
+        ]
+      },
+      "source": "actual origin wx.request",
+      "utc": "2026-09-25T06:50:34.063Z"
+    },
+    {
+      "path": "/assistant/query",
+      "method": "POST",
+      "status": 200,
+      "request_id": "ccfa84105b5e42268aade5f28bbb006f",
+      "data": {
+        "status": "insufficient_knowledge",
+        "answer": "",
+        "citations": []
+      },
+      "source": "actual origin wx.request",
+      "utc": "2026-09-25T06:51:16.657Z"
     }
   ],
   "screenshots": [
@@ -7656,7 +8431,10 @@
     "Q07-answer.png",
     "Q09-answer.png",
     "doc-A-v2.png",
-    "Q11-answer.png"
+    "Q11-answer.png",
+    "N05-answer.png",
+    "doc-C-archived.png",
+    "N06-answer.png"
   ],
   "errors": [
     {

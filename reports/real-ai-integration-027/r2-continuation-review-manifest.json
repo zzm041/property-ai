@@ -1,0 +1,44 @@
+{
+  "schema": "real-ai-r2-continuation-review-manifest-v1",
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "run_id": "ai027-b439223fda",
+  "base_sha": "ba99e84231197852aed71686040fa9758f2956ef",
+  "scope": "One incremental independent read-only review of the approved R2 continuation only. No review-time inference, page, test, DB, queue or process action.",
+  "implementation": [
+    {"path":"scripts/ops/local_ai_http.py","sha256":"be79d98298fc7ffd6a25667089b0566f0a092d0962412bdbd501989e984f3158"},
+    {"path":"backend/tests/unit/test_local_ai_http_027.py","sha256":"b7ed541cf6071e2620de1c5bfe76ac1ce9cce0ed0a5e85b1f780ceffcc4a3d7b"},
+    {"path":"reports/real-ai-integration-027/run-tests.py","sha256":"60b6824b6f8911d034c0f761de8fb54f84c54ae88b8b2c96120ae2eeea3b765e"},
+    {"path":"reports/real-ai-integration-027/runtime.py","sha256":"0423cf572e6ea177467489eb1415cf8b0534e48279809ddeb37269e3cdd18e8b"},
+    {"path":"reports/real-ai-integration-027/verify-r2.py","sha256":"a41b3dd616f38f3f4458376e7d224b816c2dc1af541bb584a457a30f0b233bf9"}
+  ],
+  "resolution_chain": [
+    {"path":"reports/real-ai-integration-027/call-022-resolution.json","sha256":"4dd73ceceeea18e5cacd36005cdf8a2d590cd74db0a0ffd74de15d61eaeb0097"},
+    {"path":"reports/real-ai-integration-027/call-022-resolution-review-round1.json","sha256":"8d4e6ee74cc749d0e6d85631e1b3adb9964a62d1d398b32e8ccf949744969cc7"},
+    {"path":"reports/real-ai-integration-027/call-022-resolution-review.json","sha256":"e7fbe1842bf586ab15446f7187b421a0d1b473dee823b1a71645a1159089f194"},
+    {"path":"reports/real-ai-integration-027/call-022-resolution-review-binding.json","sha256":"16e60e1d4da63a63b70d48e813f313fe1a301d68837562fc77c2d1072de14be0"},
+    {"path":"reports/real-ai-integration-027/model-adapter-continuation.json","sha256":"572e59e9c3865b9b3cfac19fee473ec2526ae7025e62732f296da3e0b49d9410"}
+  ],
+  "tests": [{"path":"reports/real-ai-integration-027/tests-20260925T064251.txt","sha256":"c7cbb0ec94d42db16a8e4a119867f54d733de6b8c466af8d1d39a595034bb8d2","result":"4 passed, 23 deselected, 1 warning; no model or service operation"}],
+  "runtime_evidence": [
+    {"path":"reports/real-ai-integration-027/pages.json","sha256":"636de213275813a0ba0f7e216547c31a5be896eb4ea2955bf0f98cefa4fe44fd"},
+    {"path":"reports/real-ai-integration-027/asr-continuation.json","sha256":"4fcb3149f628d3b2f4d39a6a46341091df47fbd5b8efc4942237808e57301cf7"},
+    {"path":"reports/real-ai-integration-027/runtime-continuation-final.json","sha256":"ae14409f32dbdb5488b5f4a8f2d191cb956b10b6b3b4d2c6e8a4b0d6b9ed5ea7"},
+    {"path":"reports/real-ai-integration-027/r2-continuation-process.json","sha256":"9fa43b640a237bda6e7dce69c702c4447ce38b2796d6698ddc6bf32438ac5a82"},
+    {"path":"reports/real-ai-integration-027/r2-continuation-outcome.json","sha256":"2de60fbb4febcf013d1d26ff1cad521b097c8f491f85fc9ef2bd13189dd22534"}
+  ],
+  "screenshots": [
+    {"path":"reports/real-ai-integration-027/N05-answer.png","sha256":"ed3e77a94349b2de0baae595390fc8209341510269dd0d16b0a623e6e4342b9e"},
+    {"path":"reports/real-ai-integration-027/doc-C-archived.png","sha256":"f84cf927e7e3146a46f2a1af49d8a8acd6f00cdda5715c6db7f3b2968b0089c6"},
+    {"path":"reports/real-ai-integration-027/N06-answer.png","sha256":"6fc7ffaba3576ed6e3ff1f2323a37f024391ef6d58a3165d68c641e275199115"}
+  ],
+  "required_checks": [
+    "Q02-Q05 answers and actual version-2 citations are supported by the active synthetic document; original failed attempts are retained.",
+    "N05 exposes neither STAFF_ONLY answer nor citation; N06 follows a normal authorized archive and exposes neither archived answer nor citation; archive history remains.",
+    "ASR reuses the exact synthetic PCM and existing normal media object, starts above 11264 MiB, produces a real transcript, and does not become a work order.",
+    "The same ledger advances from call-030 through call-046 within one 900-second window, using 6 embedding, 6 reranker, 4 Qwen and 1 ASR; all requests have confirmed owned cleanup.",
+    "Original call-022 remains FAILED_NO_TRANSCRIPTION with historical immediate exit UNKNOWN and unchanged hashes.",
+    "No R3/AUTO inference, API/Worker replacement, new document/version/work-order/model/collection, migration or external cost occurred."
+  ],
+  "allowed_verdicts": ["PASS_SCOPED_R2_CONTINUATION", "NEEDS_CHANGES"],
+  "overall_027_and_production_must_remain": "NOT_FULL_PASS"
+}

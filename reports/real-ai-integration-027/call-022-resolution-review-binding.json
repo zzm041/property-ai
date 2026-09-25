@@ -1,0 +1,18 @@
+{
+  "schema": "real-ai-call-resolution-review-binding-v1",
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "run_id": "ai027-b439223fda",
+  "record": "call-022",
+  "resolution_path": "reports/real-ai-integration-027/call-022-resolution.json",
+  "resolution_sha256": "4dd73ceceeea18e5cacd36005cdf8a2d590cd74db0a0ffd74de15d61eaeb0097",
+  "review_path": "reports/real-ai-integration-027/call-022-resolution-review.json",
+  "review_sha256": "e7fbe1842bf586ab15446f7187b421a0d1b473dee823b1a71645a1159089f194",
+  "review_manifest_path": "reports/real-ai-integration-027/call-022-resolution-review-round2-manifest.json",
+  "review_manifest_sha256": "578ede4ebb5f0c5fcbf47614575270a3e2341e85c248363162f5b15055e7a622",
+  "verdict": "PASS_SCOPED_CALL_RESOLUTION",
+  "source_sha256": "be79d98298fc7ffd6a25667089b0566f0a092d0962412bdbd501989e984f3158",
+  "loader_sha256": "0423cf572e6ea177467489eb1415cf8b0534e48279809ddeb37269e3cdd18e8b",
+  "effect": "Allows the exact reviewed resolution to satisfy the current call-022 reservation gate. It does not alter the original failure, consume a call number, start the continuation window, or pass R2/027.",
+  "historical_immediate_exit_confirmed": "UNKNOWN",
+  "original_asr_outcome": "FAILED_NO_TRANSCRIPTION"
+}
