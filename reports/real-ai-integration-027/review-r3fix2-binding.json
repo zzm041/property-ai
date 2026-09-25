@@ -1,0 +1,14 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "binding_type": "post_commit_review_binding",
+  "product_and_evidence_commit": "2650d86a3013638a109408cc0f50af6e09cac14b",
+  "review_decision": "PASS_SCOPED_FAILURE_CLOSEOUT",
+  "review_sha256": "ad9b461ee7ccf3bd6c72c5913761b947aaa96887941d4f11ed581905d38b2732",
+  "review_input_manifest_sha256": "cd758631ce8cd398b6fc7aa3914f72bd2801ce2efc8a05908f902790d7b9a28d",
+  "source_sha256": {
+    "backend/app/domain/ai.py": "57941394153eff347e15be68f4033848dd84e1b1ba8664a4788e8e4cd249b827",
+    "backend/app/domain/observed_event.py": "f8ca3dde741e1c5fc469a92c2cbdb0fdb308d1bbebff4f6b49f102b0c927bc3e",
+    "backend/app/service/analysis.py": "9338a214df8ed87bb8aa45b8d23636da9b8cfd8dc70cd3d812f0705fb43fc63f"
+  },
+  "boundary": "This binds the independently reviewed failure closeout to the committed bytes. It is not R3 model-quality PASS, READY_FOR_BOUNDED_AUTO, overall 027 PASS, or Production V1 acceptance."
+}
