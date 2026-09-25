@@ -157,7 +157,7 @@ def test_versioned_prompt_keeps_context_as_json_evidence_and_usage_separate():
     payload, error, _ = s._run_llm(snapshot(context=context), asr_text=None, vision_text='images', request_id='req', attempt=1)
     assert error is None and dict(payload) == SUCCESS_ANALYSIS
     call = s._llm.structured_completion.call_args.kwargs
-    assert call['prompt_version'] == 'wo-analysis-v10-observed-event-r3fix1'
+    assert call['prompt_version'] == 'wo-analysis-v10-observed-event-r3fix2b'
     assert 'summary 必须用简体中文' in call['prompt']
     assert '仅是过去记录' in call['prompt']
     assert '多项普通维修不必拆单或选唯一工种' in call['prompt']
@@ -165,9 +165,16 @@ def test_versioned_prompt_keeps_context_as_json_evidence_and_usage_separate():
     assert '不推断未确认的内部原因、犯罪意图' in call['prompt']
     assert '发黑、焦黑、熏黑用烧焦变色' in call['prompt']
     assert '没有明确燃气字样不得标疑似燃气气味' in call['prompt']
+    assert '每项subject必须由该项quote本身明确支持' in call['prompt']
+    assert '不能借相邻句补成插座等确定设备' in call['prompt']
+    assert '不能一律填未确定' in call['prompt']
+    assert 'quote="外壳已经发黑"或quote="有明显焦味"时subject=未确定' in call['prompt']
     schema = json.loads(call['prompt'].split('OUTPUT_SCHEMA: ', 1)[1].split('\n证据规则：', 1)[0])
     assert 'observations' in schema['properties']
     assert 'subcategory' not in schema['properties']
+    observation_schema=schema['$defs']['Observation']['properties']
+    assert '不得借相邻句补全' in observation_schema['subject']['description']
+    assert '保留本项对象、否定、猜测和时态' in observation_schema['quote']['description']
     assert 'risk独立于专业和置信度' in call['prompt']
     assert '不能添加用户未说过的确认' in call['prompt']
     assert call['prompt'].index('OUTPUT_SCHEMA:') < call['prompt'].index('证据规则：') < call['prompt'].index('INPUT_DATA:')

@@ -1,0 +1,106 @@
+{
+  "base_sha": "0dd550ab6524bcd468b3a9ecd1046e6f7d3443ab",
+  "private_frozen_root": "D:\\property-ai\\tmp\\real-ai-integration-027\\diagnostic-r3fix2\\frozen-candidate-02",
+  "files": [
+    {
+      "path": "backend/app/domain/ai.py",
+      "sha256": "57941394153eff347e15be68f4033848dd84e1b1ba8664a4788e8e4cd249b827"
+    },
+    {
+      "path": "backend/app/domain/audit.py",
+      "sha256": "a6b2587416aa392229067aa3c23c08e94f3726d43fba64561ef1fb9b9c59eb94"
+    },
+    {
+      "path": "backend/app/domain/observed_event.py",
+      "sha256": "f8ca3dde741e1c5fc469a92c2cbdb0fdb308d1bbebff4f6b49f102b0c927bc3e"
+    },
+    {
+      "path": "backend/app/provider/http.py",
+      "sha256": "025a6f8cd20dda35190a61ceeca970dc49bc8be7573ddb5accfe4470ce00b574"
+    },
+    {
+      "path": "backend/app/provider/llm/__init__.py",
+      "sha256": "c1bf424bf2fab07849d905e85255a91b178002573078b3d742f17b81cb235430"
+    },
+    {
+      "path": "backend/app/provider/vision/__init__.py",
+      "sha256": "3c14aa554308e5259cb775490bc12814a44adcdb19db439db316be7058c34007"
+    },
+    {
+      "path": "backend/app/service/analysis.py",
+      "sha256": "9338a214df8ed87bb8aa45b8d23636da9b8cfd8dc70cd3d812f0705fb43fc63f"
+    },
+    {
+      "path": "backend/app/service/auto_dispatch.py",
+      "sha256": "33da3d71682f6f66ec5fe2467c79c085e87cb0261e5a0228711712b797c8f31e"
+    },
+    {
+      "path": "docs/05-AI-DISPATCH-SPEC.md",
+      "sha256": "6e6f1bdf71b97f359f56128037c826241751c9f3642e3b7348b0aafb4e2d8870"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/gold-set-24.json",
+      "sha256": "c3c93b419b7d5dea12b529152cde661c16826cc708b1d80d5b26d39d70ddfc1f"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/repair-image-gold.json",
+      "sha256": "df10abfde5a0144c480e29041ddedcc146a0182a6452dacd2ed97498c88cfdbe"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/repair-images/ans-ball-valve.jpg",
+      "sha256": "965dc412677a19d32b2ad7092e7c0203e0abbda75d6b230c7dd087300939f1cd"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/repair-images/burned-socket.jpg",
+      "sha256": "1e3d71c542f7c8f9bfe20fc4915da7c61cb2bac875e0e383470bd201b7dd454a"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/repair-images/ceiling-peeling.jpg",
+      "sha256": "dabfd2227a33efa7b085d6f8519bec47f43b1542c7eaafed81047abb3d52eb8d"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/repair-images/normal-socket.jpg",
+      "sha256": "d6d75928f4a23d4ddde0bed730ca6d71624b7a9032afd2ca2ab5b74c61b03b87"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/run-approved-supplement.py",
+      "sha256": "0d3aa78b022e4e3506027afebf4fca76bf68a09a9428221cfa58af6fb312cb53"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/run-crossfield-diagnostic.py",
+      "sha256": "67fc0d701c6f2896433b36936983fb3f21ae11d58bec24a1f8298d11d19b859f"
+    },
+    {
+      "path": "reports/auth-identity-ai-001/local-qwen/run-quality28.py",
+      "sha256": "5a9454c0f853f0571b3bc17a01c62d702aff74a4538eb3245ba375dab76aa435"
+    },
+    {
+      "path": "reports/real-ai-integration-027/diagnostic-r3fix2-candidate2.py",
+      "sha256": "622f09d85de1f5db871ae721294f368f9960378383883c07057788c4be370d81"
+    }
+  ],
+  "candidate_number": 2,
+  "maximum_candidates": 2,
+  "candidate_01_stop_sha256": "c52ee9289aa23648903e752925682e0dea96a5c3028d3d6aeaed8a710b49c31a",
+  "candidate_01_requests_used": 1,
+  "candidate_01_results_not_reused": true,
+  "protocol": "observed-event-v1",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "model": "qwen3.5:4b",
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "parameters": {
+    "context_length": 4096,
+    "temperature": 0,
+    "thinking": false,
+    "llm_max_tokens": 512,
+    "vlm_max_tokens": 256,
+    "per_request_seconds": 60
+  },
+  "global_budget": {
+    "requests": 40,
+    "seconds": 3600,
+    "starts_at_unix": 1790326698.9186547
+  },
+  "candidate_fixed_set_requests": 32,
+  "only_correction": "Adds the same quote-local subject requirement to the schema field description and generic examples. No enum, category, risk, sample, model or runtime parameter changed."
+}

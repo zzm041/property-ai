@@ -1,0 +1,7 @@
+{
+  "maximum_requests": 40,
+  "maximum_seconds": 3600,
+  "maximum_candidates": 2,
+  "window_starts_on_first_reservation": true,
+  "historical_allowances_not_inherited": true
+}

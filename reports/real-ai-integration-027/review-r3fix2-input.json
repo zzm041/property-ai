@@ -1,0 +1,42 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "review_scope": "R3fix2 subject-evidence delta, two-candidate global-budget evidence, stop decision, and targeted current-view reconciliation only",
+  "base_sha": "0dd550ab6524bcd468b3a9ecd1046e6f7d3443ab",
+  "required_decision": "Confirm whether NOT_READY/no-AUTO is supported and whether the offline source changes introduce a direct correctness, safety or aggregation regression. Do not promote to READY_FOR_BOUNDED_AUTO.",
+  "bound_files": [
+    {"path":"backend/app/domain/ai.py","sha256":"57941394153eff347e15be68f4033848dd84e1b1ba8664a4788e8e4cd249b827"},
+    {"path":"backend/app/domain/observed_event.py","sha256":"f8ca3dde741e1c5fc469a92c2cbdb0fdb308d1bbebff4f6b49f102b0c927bc3e"},
+    {"path":"backend/app/service/analysis.py","sha256":"9338a214df8ed87bb8aa45b8d23636da9b8cfd8dc70cd3d812f0705fb43fc63f"},
+    {"path":"backend/tests/unit/test_ai_analysis_input.py","sha256":"b15063919d90eb1318096011a330df23487e674d0c506c1da83ef928d0e4add3"},
+    {"path":"backend/tests/unit/test_observed_event_027.py","sha256":"698d0cb1647a7a363e79d95a9a2a0e948caaf00be792e1ffdd37e76801acfb1b"},
+    {"path":"docs/05-AI-DISPATCH-SPEC.md","sha256":"6e6f1bdf71b97f359f56128037c826241751c9f3642e3b7348b0aafb4e2d8870"},
+    {"path":"reports/real-ai-integration-027/diagnostic-r3fix2/result-summary.json","sha256":"1f48ac1b9fa4a96ff08e73a2a95a32f6f57eada37406a57dd2e58e6177eab68c"},
+    {"path":"reports/real-ai-integration-027/diagnostic-r3fix2/candidate-02/interpretation-addendum.json","sha256":"3d7da64fbead6f729ce2777ffff9ca66e82aae4125d29a0e8d67ea1397d632c7"},
+    {"path":"reports/real-ai-integration-027/closeout.md","sha256":"2a704e83f4b30e8d565c09fef916940a53432468f11d9d9ea36be8784a1ffb4d"},
+    {"path":"reports/project-handoff.md","sha256":"e949e64cb7cedec35566c3362aa12d994f8acb15550e3d766cf85344b29fd2f4"},
+    {"path":"reports/mp-current-full-regression/coverage-matrix.json","sha256":"b8fa534ac0a22a1ec071d4810da4b38aae3b2ce51175b10f7feb44f4ae60f8ed"},
+    {"path":"reports/auth-identity-ai-001/self-host-recommendation.md","sha256":"0bd4392957642c30d6d0c898ae10d521195b860b13a0805f8129824e8569fc46"},
+    {"path":"reports/real-ai-integration-027/review-r3fix2-round1.json","sha256":"ebbdd8c6ee71f0e4d2424f6b25ca34bd62b80aa51b1a31f450c9800bc5424636"}
+  ],
+  "evidence_index": [
+    "reports/real-ai-integration-027/diagnostic-r3fix2/budget.json",
+    "reports/real-ai-integration-027/diagnostic-r3fix2/candidate-01/frozen.json",
+    "reports/real-ai-integration-027/diagnostic-r3fix2/candidate-01/request-01/",
+    "reports/real-ai-integration-027/diagnostic-r3fix2/candidate-01/stop.json",
+    "reports/real-ai-integration-027/diagnostic-r3fix2/candidate-02/frozen.json",
+    "reports/real-ai-integration-027/diagnostic-r3fix2/candidate-02/request-01/",
+    "reports/real-ai-integration-027/diagnostic-r3fix2/candidate-02/request-02/",
+    "reports/real-ai-integration-027/diagnostic-r3fix2/candidate-02/stop.json",
+    "reports/real-ai-integration-027/diagnostic-r3fix2/candidate-02/interpretation-addendum.json",
+    "reports/real-ai-integration-027/tests-20260925T085529.txt",
+    "reports/real-ai-integration-027/tests-20260925T090140.txt"
+  ],
+  "review_boundaries": {
+    "write_workspace": false,
+    "run_tests_or_model": false,
+    "business_requests": false,
+    "database_or_queue": false,
+    "recursive_reviewer": false,
+    "r2_re_review": false
+  }
+}

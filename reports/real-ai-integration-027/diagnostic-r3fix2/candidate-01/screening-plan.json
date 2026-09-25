@@ -1,0 +1,47 @@
+{
+  "fixed_before_inference": true,
+  "maximum_requests": 8,
+  "ordered_requests": [
+    {
+      "number": 1,
+      "case": "GOLD-007",
+      "kind": "LLM"
+    },
+    {
+      "number": 2,
+      "case": "GOLD-011",
+      "kind": "LLM"
+    },
+    {
+      "number": 3,
+      "case": "GOLD-012",
+      "kind": "LLM"
+    },
+    {
+      "number": 4,
+      "case": "GOLD-013",
+      "kind": "LLM"
+    },
+    {
+      "number": 5,
+      "case": "GOLD-014",
+      "kind": "LLM"
+    },
+    {
+      "number": 6,
+      "case": "GOLD-006",
+      "kind": "LLM"
+    },
+    {
+      "number": 7,
+      "case": "PHOTO-003",
+      "kind": "VLM"
+    },
+    {
+      "number": 8,
+      "case": "PHOTO-003",
+      "kind": "LLM"
+    }
+  ],
+  "purpose": "prior subject failure, insufficient/conflicting/unknown evidence, multi-subject, security, and image-text subject binding"
+}

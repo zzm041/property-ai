@@ -1,0 +1,47 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "base_sha": "0dd550ab6524bcd468b3a9ecd1046e6f7d3443ab",
+  "global_budget": {
+    "maximum_requests": 40,
+    "used_requests": 3,
+    "maximum_seconds": 3600,
+    "maximum_candidates": 2,
+    "used_candidates": 2,
+    "unused_requests_are_not_reusable_authorization": true
+  },
+  "offline_tests": {
+    "candidate_01": "tests-20260925T085529.txt: 83 passed, 1 warning",
+    "candidate_02": "tests-20260925T090140.txt: 83 passed, 1 warning"
+  },
+  "candidate_01": {
+    "prompt_version": "wo-analysis-v10-observed-event-r3fix2",
+    "requests": 1,
+    "result": "NOT_READY",
+    "failure": "GOLD-007 still assigned subject=插座 to quote 塑料外壳已经发黑; the unchanged same-clause evidence guard rejects it.",
+    "stop_sha256": "c52ee9289aa23648903e752925682e0dea96a5c3028d3d6aeaed8a710b49c31a",
+    "response_sha256": "9d913fffc110083494fc7fed822792cd177d2a5adb8c2b1eaea4ee03ce61b3c2"
+  },
+  "candidate_02": {
+    "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+    "requests": 2,
+    "result": "NOT_READY",
+    "passed_before_stop": "GOLD-007 correctly used explicit 插座 plus 未确定 for unsupported shell/smell subjects, with complete facts and electric risk.",
+    "failure": "GOLD-011 correctly represented insufficient evidence as 现象待核实/未确定 but output other/maintenance instead of the frozen other/other model-output contract. Its confidence was 0.3, so the existing 0.70 low-confidence guard would stop this exact result before AUTO candidate selection; this request does not prove a maintenance misassignment.",
+    "interpretation_addendum": "candidate-02/interpretation-addendum.json",
+    "stop_sha256": "853f646a6b9dc37de313b436fb05f5d435f1939ef7881112da8dab4bb34e5c42",
+    "response_01_sha256": "b6240d297049ffabe6fb7b25498dcf59bd311f0d6d330327312e4f86cacb80b5",
+    "response_02_sha256": "3ea8c9db0b390c8114b46e7c11663539c442efa4b893918756df18365b3cf6a6"
+  },
+  "request_processes": {
+    "all_three_supervised_child_exit_codes": [0, 0, 0],
+    "all_three_model_side_completion": "response_received",
+    "prior_later_os_recheck_unknown_preserved": true
+  },
+  "final_result": "NOT_READY",
+  "ready_for_bounded_auto": false,
+  "independent_ready_review_started": false,
+  "business_runtime_replaced": false,
+  "business_auto_started": false,
+  "next_model_decision": "No third candidate is authorized. The existing low-confidence guard already prevents this exact result from AUTO dispatch. The minimum future product/quality decision is whether the frozen model contract must continue to require other/other even when that guard applies, or whether a documented deterministic server normalization/clarification policy should define the accepted raw-field boundary. Do not silently reinterpret the raw output as PASS.",
+  "retained_boundaries": "R2 scoped results remain valid. No model, dependency, collection, migration, API/Worker/publisher, business object, queue or historical evidence was changed by this diagnostic."
+}

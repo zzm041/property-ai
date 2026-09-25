@@ -1,0 +1,19 @@
+{
+  "number": 1,
+  "reserved_unix": 1790327075.8030522,
+  "case": "GOLD-007",
+  "kind": "LLM",
+  "reserved_before_send": true,
+  "before": {
+    "utc": "2026-09-25T09:04:35Z",
+    "ram_free_mib": 9726,
+    "gpu_used_mib": 1617,
+    "gpu_free_mib": 14379,
+    "gpu_utilization_percent": 11
+  },
+  "collector_sha256": "622f09d85de1f5db871ae721294f368f9960378383883c07057788c4be370d81",
+  "candidate_number": 2,
+  "global_request_limit": 40,
+  "global_window_seconds": 3600,
+  "final_fixed_set": true
+}

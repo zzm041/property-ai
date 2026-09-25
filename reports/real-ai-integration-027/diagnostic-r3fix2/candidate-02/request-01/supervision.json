@@ -1,0 +1,58 @@
+{
+  "latency_seconds": 6.6560000000172295,
+  "samples": [
+    {
+      "utc": "2026-09-25T09:04:35Z",
+      "ram_free_mib": 9726,
+      "gpu_used_mib": 1617,
+      "gpu_free_mib": 14379,
+      "gpu_utilization_percent": 11
+    },
+    {
+      "utc": "2026-09-25T09:04:36Z",
+      "ram_free_mib": 9582,
+      "gpu_used_mib": 1616,
+      "gpu_free_mib": 14380,
+      "gpu_utilization_percent": 11
+    },
+    {
+      "utc": "2026-09-25T09:04:37Z",
+      "ram_free_mib": 9316,
+      "gpu_used_mib": 2538,
+      "gpu_free_mib": 13458,
+      "gpu_utilization_percent": 11
+    },
+    {
+      "utc": "2026-09-25T09:04:39Z",
+      "ram_free_mib": 8744,
+      "gpu_used_mib": 4311,
+      "gpu_free_mib": 11685,
+      "gpu_utilization_percent": 10
+    },
+    {
+      "utc": "2026-09-25T09:04:40Z",
+      "ram_free_mib": 8703,
+      "gpu_used_mib": 5329,
+      "gpu_free_mib": 10667,
+      "gpu_utilization_percent": 13
+    },
+    {
+      "utc": "2026-09-25T09:04:41Z",
+      "ram_free_mib": 8547,
+      "gpu_used_mib": 5597,
+      "gpu_free_mib": 10399,
+      "gpu_utilization_percent": 88
+    },
+    {
+      "utc": "2026-09-25T09:04:42Z",
+      "ram_free_mib": 8560,
+      "gpu_used_mib": 5597,
+      "gpu_free_mib": 10399,
+      "gpu_utilization_percent": 85
+    }
+  ],
+  "exit_code": 0,
+  "stop_reason": null,
+  "child_pid": 7556,
+  "model_side_completion": "response_received"
+}

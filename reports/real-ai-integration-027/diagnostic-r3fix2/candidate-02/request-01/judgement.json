@@ -1,0 +1,91 @@
+{
+  "continue": true,
+  "source": "main inspected original input/output; independent review pending",
+  "response_sha256": "b6240d297049ffabe6fb7b25498dcf59bd311f0d6d330327312e4f86cacb80b5",
+  "note": "GOLD-007通过：三项当前事实完整；火花主体明确，外壳变色和焦味按逐字证据使用未确定；中文摘要和electric高风险正确，无改写。",
+  "raw_vs_effective": {
+    "trace": {
+      "contract": "observed-event-v1",
+      "observations": [
+        {
+          "label": "火花烧损",
+          "subject": "插座",
+          "source": "report",
+          "quote": "插座正在连续冒火花",
+          "span": [
+            0,
+            9
+          ]
+        },
+        {
+          "label": "烧焦变色",
+          "subject": "未确定",
+          "source": "report",
+          "quote": "塑料外壳已经发黑",
+          "span": [
+            10,
+            18
+          ]
+        },
+        {
+          "label": "焦煳气味",
+          "subject": "未确定",
+          "source": "report",
+          "quote": "还有明显焦味",
+          "span": [
+            19,
+            25
+          ]
+        }
+      ],
+      "effective_key": "evt1:767fe336b71f0b2f5a31a2dea6243c19",
+      "raw_model_output": {
+        "category": "electrical",
+        "observations": [
+          {
+            "label": "火花烧损",
+            "subject": "插座",
+            "source": "report",
+            "quote": "插座正在连续冒火花"
+          },
+          {
+            "label": "烧焦变色",
+            "subject": "未确定",
+            "source": "report",
+            "quote": "塑料外壳已经发黑"
+          },
+          {
+            "label": "焦煳气味",
+            "subject": "未确定",
+            "source": "report",
+            "quote": "还有明显焦味"
+          }
+        ],
+        "severity": "high",
+        "priority": "p1",
+        "summary": "插座正在连续冒火花，塑料外壳已经发黑，还有明显焦味。",
+        "risk": "electric",
+        "required_role": "STAFF",
+        "required_skill": "maintenance",
+        "confidence": 0.95
+      }
+    },
+    "mapped": {
+      "category": "ELECTRICAL",
+      "subcategory": "evt1:767fe336b71f0b2f5a31a2dea6243c19",
+      "severity": "HIGH",
+      "priority": "URGENT",
+      "summary": "插座正在连续冒火花，塑料外壳已经发黑，还有明显焦味。",
+      "risk": "electric",
+      "required_role": "STAFF",
+      "required_skill": "MAINTENANCE",
+      "required_duty": "MAINTENANCE",
+      "confidence": 0.95,
+      "low_confidence": false,
+      "raw_required_skill": "maintenance",
+      "skill_mapping_applied": false,
+      "dispatch_contract_version": "category-duty-skill-v1",
+      "event_trace": null
+    }
+  }
+}

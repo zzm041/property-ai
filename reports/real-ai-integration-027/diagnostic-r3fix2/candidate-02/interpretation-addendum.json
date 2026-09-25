@@ -1,0 +1,24 @@
+{
+  "record_type": "append_only_interpretation_addendum",
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "candidate": "candidate-02",
+  "request": "request-02",
+  "case_id": "GOLD-011",
+  "original_response_sha256": "3ea8c9db0b390c8114b46e7c11663539c442efa4b893918756df18365b3cf6a6",
+  "original_stop_sha256": "853f646a6b9dc37de313b436fb05f5d435f1939ef7881112da8dab4bb34e5c42",
+  "original_records_immutable": true,
+  "clarification": {
+    "model_contract_result": "The raw other/maintenance routing fields violate the frozen GOLD-011 other/other contract and therefore remain a fixed-set quality failure.",
+    "actual_confidence": 0.3,
+    "configured_default_confidence_threshold": 0.7,
+    "mapped_low_confidence": true,
+    "runtime_effect": "For this exact output, AutoDispatchService.maybe_assign returns LOW_CONFIDENCE before schema validation and candidate selection, so this case does not demonstrate an AUTO assignment or a maintenance misassignment.",
+    "counterfactual_boundary": "A wrong required_skill could affect routing only if the confidence/guard conditions differed; that was not proved by this request.",
+    "final_quality_decision": "NOT_READY remains because the second and final authorized candidate failed the frozen routing-field contract; no third candidate, full fixed-set continuation or real AUTO was authorized after this stop."
+  },
+  "source_evidence": [
+    "backend/app/core/config.py: ai_confidence_threshold default 0.70",
+    "backend/app/domain/ai.py: map_analysis_output derives mapped.low_confidence",
+    "backend/app/service/auto_dispatch.py: maybe_assign returns LOW_CONFIDENCE before schema/candidate selection"
+  ]
+}

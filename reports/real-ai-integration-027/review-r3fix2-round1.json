@@ -1,0 +1,97 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "reviewed_base": "0dd550ab6524bcd468b3a9ecd1046e6f7d3443ab",
+  "decision": "NEEDS_CHANGES",
+  "scope": "R3fix2 源码增量、两候选诊断及失败收尾；不重审 R2 或完整 027。",
+  "findings": [
+    {
+      "id": "027-R3FIX2-R1-01",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "path": "D:/property-ai/reports/real-ai-integration-027/diagnostic-r3fix2/candidate-02/request-02/judgement.json:5",
+      "trigger": "将 GOLD-011 的 other/maintenance 输出解释为“会错误进入普通维修自动派单”。",
+      "impact": "收尾说明夸大了本例已证明的业务影响，可能将现有低置信保护误记为失效，并影响后续方案决策。",
+      "evidence": [
+        "原始响应 confidence=0.3，summary 和 observation 均明确表示信息不足，没有借用历史水龙头故障。",
+        "backend/app/domain/ai.py:223 将 confidence<threshold 判为 low_confidence；默认阈值为 0.70，诊断 Settings 未覆盖它。",
+        "backend/app/service/auto_dispatch.py:124 在 low_confidence 时直接返回 LOW_CONFIDENCE，尚未进入候选选择或 Assignment。",
+        "同一过强结论出现在 candidate-02/stop.json、result-summary.json、closeout.md:66 和 coverage-matrix.json:2716。"
+      ],
+      "required_change": "保留原始响应、判定和 stop 文件，追加校准说明，并修正当前摘要/交接/矩阵的有效表述：这是不符合冻结 other/other 要求的模型路由字段契约失败；本例会被既有低置信保护阻断，不是已证明的错误 AUTO。NOT_READY、未完成固定集和 no-AUTO 结论可继续保留，不重跑推理。"
+    },
+    {
+      "id": "027-R3FIX2-R1-02",
+      "classification": "NON_BLOCKING",
+      "path": "D:/property-ai/reports/real-ai-integration-027/review-r3fix2-input.json",
+      "trigger": "审查期间 handoff 发生变化。",
+      "impact": "当前输入清单不能准确绑定最终交接版本；不能声称全部交付文件均通过原清单哈希核对。",
+      "evidence": [
+        "清单中 handoff 预期 SHA-256 为 850ab2aaecebea7a7958e0828b9888d5441bbac62c29abab1acaf040ee493b5c。",
+        "实际读取时为 d014d804d9340a3aac535f70da09ff0cce558f4398d1b43ef4c6e8cf1c4f5280。",
+        "其余 9 项绑定文件均匹配；两个候选各 19 项冻结文件全部匹配。"
+      ],
+      "required_change": "收尾说明稳定后，追加准确版本绑定；不修改原冻结候选和诊断证据。"
+    }
+  ],
+  "checked": {
+    "source_manifest": {
+      "path": "D:/property-ai/reports/real-ai-integration-027/review-r3fix2-input.json",
+      "sha256": "ffc53b8361cdc8c7499158d5a7a33ebba91c871b476365c1d6f10283c38c5437",
+      "binding": "9/10 当前交付文件匹配；handoff 漂移如 finding 所述。候选冻结文件 38/38 匹配。"
+    },
+    "source_delta": [
+      "实际读取 domain/ai.py、observed_event.py、analysis.py、两份专项测试及正式规格的 diff。",
+      "未知主体的事件键新增逐字 quote，避免把不同未知对象仅按 label+未确定 合并；已知主体保留原规范化集合。",
+      "新增测试覆盖左右不同对象、完整多现象集合、风险保留、明确主体、否定/历史/猜测不得因未确定而绕过。",
+      "本轮没有改变真实员工资格、统一维修组规则、风险规则或自动派单事务；未发现该增量引入需要修改产品代码的直接正确性、安全或聚合回归。"
+    ],
+    "test_evidence": [
+      "tests-20260925T085529.txt：83 passed，1 warning。",
+      "tests-20260925T090140.txt：83 passed，1 warning。",
+      "已读取保存输出和相关测试源码；没有自行执行，也不将两轮数字相加制造覆盖量。"
+    ],
+    "candidate_01": {
+      "requests": 1,
+      "case": "GOLD-007",
+      "actual_result": "火花、发黑和焦味标签正确，但把只有塑料外壳字样的证据赋予 subject=插座；现有同分句主体校验会拒绝。",
+      "conclusion": "保留该原始失败及 NOT_READY 有依据。"
+    },
+    "candidate_02": {
+      "requests": 2,
+      "GOLD_007": "原始输出完整保留三项现象；明确插座主体与未确定外壳/气味主体分开，风险 electric，已保存映射与原输出对应。",
+      "GOLD_011": "正确保留信息不足、未知主体、低置信且没有历史污染；required_skill=maintenance 不符合冻结的 other/other 要求，但不能据此认定本例会穿透低置信保护。",
+      "conclusion": "未完成固定集且存在当前协议不符，继续 NOT_READY/no-AUTO 合理；需纠正失败影响描述。"
+    },
+    "budget_and_history": {
+      "requests_used": 3,
+      "request_limit": 40,
+      "candidates_used": 2,
+      "candidate_limit": 2,
+      "elapsed_seconds": 400.864,
+      "window_seconds": 3600,
+      "actual_calls": "三次均为 LLM；没有图片推理。",
+      "verification": "实际读取两份 frozen、三份 reservation/request/raw-response/response/judgement/supervision、两份 stop、预声明筛选计划及总预算实现。",
+      "completion": "三次均收到真实响应，监督子进程 exit_code=0；不将此替代语义验收或扩大为历史即时回收证明。",
+      "authorization": "不支持第三候选、复用未花完次数或进入真实 AUTO。"
+    },
+    "tracking": {
+      "original_items": 83,
+      "original_items_unchanged": true,
+      "extra_v1_unchanged": true,
+      "status": "没有将 R3、真实 AUTO 或整体 027 升级 PASS；R2 只沿用既有独立 scoped 结论。本轮未重审 R2。",
+      "needed_correction": "当前矩阵中对 GOLD-011 可直接错误派单的表述需按 finding 校准。"
+    }
+  },
+  "unverified": [
+    "本审查没有修改文件、执行测试/模型/页面/业务请求、操作数据库/队列或创建审查者。",
+    "没有完成任一候选的 32 请求固定集，没有本轮维修图片质量证据。",
+    "没有真实 AUTO、业务运行切换或完整生产性能证据。",
+    "当前结论不证明通用 Qwen 或所有 4B 模型不适用，也不把本例改判为模型契约 PASS。",
+    "真实 AUTO、整体 027 和 Production 继续 NOT_FULL_PASS。"
+  ],
+  "next_action": [
+    "立即原样保存本 JSON。",
+    "仅追加失败影响校准说明并更新当前摘要、handoff 和 matrix；保留原诊断文件、失败和 2/2 候选历史。",
+    "提供稳定后的准确绑定，沿用同一只读上下文只复核上述文案及证据绑定，不重跑测试或推理。",
+    "未取得新的明确批准前，不创建第三候选、不追加调用、不切换业务运行。"
+  ]
+}

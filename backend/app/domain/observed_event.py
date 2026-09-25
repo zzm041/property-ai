@@ -21,9 +21,9 @@ Subject = Literal['水龙头','排水接头','天花墙面','插座','照明','�
 class Observation(BaseModel):
     model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
     label: Label
-    subject: Subject
+    subject: Subject = Field(description='必须由本项quote内的字面证据支持；quote未出现现有枚举主体时只能填未确定，不得借相邻句补全')
     source: Literal['report','asr','vision']
-    quote: str = Field(min_length=2,max_length=160)
+    quote: str = Field(min_length=2,max_length=160,description='当前来源中的唯一逐字证据；保留本项对象、否定、猜测和时态')
 
 class ObservedAnalysisOutput(BaseModel):
     model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
@@ -86,9 +86,11 @@ def bind_observations(output: ObservedAnalysisOutput, sources: dict[str,str]) ->
         normalized.append({'label':item.label,'subject':item.subject,'source':item.source,
                            'quote':item.quote,'span':[start,start+len(item.quote)]})
     # Distinct phenomenon+object sets do not collapse to a broad trade/OTHER key.
-    # Unconfirmed observations keep their actual wording rather than coalescing
-    # all unknown reports; ordinary known paraphrases share the canonical set.
-    identity=sorted({(r['label'],r['subject'],r['quote'] if r['label']=='现象待核实' else '') for r in normalized})
+    # Unconfirmed phenomena and confirmed phenomena with an unknown subject
+    # retain the exact evidence.  Thus 未确定 is not a wildcard that merges
+    # observations about two unidentifiable objects.  Known subjects keep the
+    # canonical phenomenon+object identity so ordinary paraphrases still merge.
+    identity=sorted({(r['label'],r['subject'],r['quote'] if r['label']=='现象待核实' or r['subject']=='未确定' else '') for r in normalized})
     key='evt1:'+sha256(json.dumps(identity,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()[:32]
     return key,{'contract':EVENT_CONTRACT,'observations':normalized,'effective_key':key,
                 'raw_model_output':output.model_dump(mode='json')}

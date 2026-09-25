@@ -2542,11 +2542,11 @@
       },
       {
         "requirement_id": "WO-AUTO-DISPATCH",
-        "current_implementation": "Existing system-owned eligibility/ranking/AUTO/notification and scoped Development cross-process evidence retained. Real local2B order12 failed semantic quality;4B diagnosis is read-only, not business dispatch.",
+        "current_implementation": "Existing system-owned eligibility/ranking/AUTO/notification and scoped Development cross-process evidence retained. Real local2B order12 failed semantic quality; latest4B R3fix2 used2/2 candidates and stopped after an insufficient-evidence raw-field contract mismatch. The actual0.3-confidence result is blocked before AUTO by the existing0.70 guard. No real business dispatch occurred.",
         "verification_mode_status": "PASS_SCOPED_DEVELOPMENT_REAL_AUTO_NOT_ACCEPTED",
-        "evidence_version": "Prior staff/019/022 evidence retained; e65b4d7 localqwen-b1090f3deaa3 failed2B order12;95654578605adb745c27aa29a3d0111611f4c0bd fixed28 saved diagnostics/reviews",
-        "remaining_gap": "Normal sufficient reports with eligible staff must actually create AUTO Assignment/notification without manager per-order action. Real4B quality/protocol, unnecessary manual diversion, end-to-end latency and production acceptance remain open.",
-        "next_action": "Keep order12 unchanged and023/proxy PASS; resolve only documented capability/risk ambiguities, no further inference under exhausted3/3. Extra32calls and later4B business switch each require explicit approval. Continue independent current-schema gaps."
+        "evidence_version": "Prior staff/019/022 evidence retained; e65b4d7 localqwen-b1090f3deaa3 failed2B order12;027 diagnostic-r3fix2 result-summary and raw candidate01/02 responses",
+        "remaining_gap": "Normal sufficient reports with eligible staff must actually create AUTO Assignment/notification without manager action. No complete32-request4B candidate; the final raw category/skill fields violate the frozen quality contract even though the actual low-confidence guard prevents AUTO. Realimage/business latency and production acceptance remain open.",
+        "next_action": "Keep protected orders unchanged. Stop at2/2 candidates; decide whether the frozen low-confidence raw-field contract remains other/other or define a documented deterministic normalization/clarification policy before any future bounded quality attempt or real AUTO switch."
       },
       {
         "requirement_id": "WO-STAFF-PROCESS",
@@ -2710,11 +2710,11 @@
       },
       {
         "requirement_id": "SELFHOST-AI",
-        "current_implementation": "Exact isolatedASR/BGE environments and real compatibility completed;027v10 protocolR3 stopped3/32; realRAG connected. All prior2B/28case/3of3/128call histories retained, not generalQwen disqualification",
-        "verification_mode_status": "R3_NOT_READY_FOR_AUTO;R2_PARTIAL_ASR_RESOURCE_FAILURE",
-        "evidence_version": "027 compatibility/diagnostic/stop/model-calls/call-022; prior versions retained",
-        "remaining_gap": "False observed-event labels; realimage/AUTO notverified; ASRHTTPload failed RAM3962MiB; controllerdescendant cleanup underreview; production notaccepted",
-        "next_action": "Offline focusedsoftware closure; no further inference without explicit boundedapproval, no newweights/fees"
+        "current_implementation": "Exact isolated ASR/BGE environments and real compatibility completed; R2 continuation independently accepted real1024 RAG and one exact synthetic ASR result. R3fix2 preserved two candidates and3/40 real calls: subject evidence corrected, but the final candidate returned other/maintenance instead of the frozen other/other raw-field contract. Existing low-confidence protection blocks this actual result before AUTO.",
+        "verification_mode_status": "R2_PASS_SCOPED_LOCAL_CONTINUATION;R3_NOT_READY_FOR_AUTO",
+        "evidence_version": "027 review-r2-continuation.json; diagnostic-r3fix2 candidate01/02 originals and result-summary; prior2B/28case/3of3/128call histories retained",
+        "remaining_gap": "No complete32-request R3 candidate, real repair-image fixed set or real AUTO business flow. Final raw-field contract failure is not a proved misassignment because the actual low-confidence guard stops AUTO; production quality/runtime/performance remain unaccepted.",
+        "next_action": "Stop model branch at2/2 candidates. Decide whether the frozen low-confidence raw-field contract remains strict other/other or define a documented deterministic normalization/clarification policy; no raw-output rewrite, third candidate, new weights or fees."
       },
       {
         "requirement_id": "REAL-SMS",
@@ -2950,11 +2950,11 @@
       },
       {
         "requirement_id": "V1-REAL-ASR-VLM",
-        "current_implementation": "019 multi-image provenance/Development wiring retained; actual4B repair-photo diagnostics now exist, distinct from blue/red calibration. Three final vision responses complete, PHOTO004 truncated; no business or comprehensive visual-quality PASS.",
-        "verification_mode_status": "REAL_VLM_READ_ONLY_DIAGNOSTICS_INCOMPLETE_REAL_ASR_UNVERIFIED",
-        "evidence_version": "Prior019 version-bound evidence;95654578605adb745c27aa29a3d0111611f4c0bd fixed28 round0..3 originals/photos/review; calibration v1 separates main visible content from nonessential subtype",
-        "remaining_gap": "Complete image protocol, fact-faithful safe routing and real ASR/business usage; native picker/device, production media/security/runtime/release. No internal-fault or exact-part-identification perfection requirement.",
-        "next_action": "Preserve original photos/answers and PHOTO004 context failure; do not infer all4B unsuitable or text fallback equals image PASS. No new inference/preprocessing/model change without bounded approval; real RAG/new1024d remains separate."
+        "current_implementation": "019 multi-image provenance/Development wiring retained; prior actual4B repair-photo diagnostics remain incomplete. R2 continuation produced one exact real local synthetic-audio ASR transcript with guarded cleanup, but it was not associated with a work order.",
+        "verification_mode_status": "REAL_ASR_SINGLE_SYNTHETIC_SCOPED_PASS;REAL_VLM_FIXED_SET_AND_BUSINESS_UNVERIFIED",
+        "evidence_version": "027 call046/review-r2-continuation; prior019 and fixed28 image originals retained; latest R3fix2 stopped before images",
+        "remaining_gap": "Complete fact-faithful repair-image protocol and real text/image/voice work-order association; native picker/microphone/device, production media/security/runtime/release. No internal-fault perfection requirement.",
+        "next_action": "Preserve ASR and image histories. R3fix2 stopped at2/2 candidates, so no image fallback or business association may be inferred; future model work needs a new explicit decision."
       },
       {
         "requirement_id": "V1-AUTH-LOCKOUT",
@@ -2966,11 +2966,11 @@
       },
       {
         "requirement_id": "V1-EMBEDDING-RAG",
-        "current_implementation": "Realbge-m3/reranker/Qwen with MySQLversions/independentWorker/new1024COSINE collection and actualpagecitations; old8dunchanged",
-        "verification_mode_status": "008_DEVELOPMENT_PASS_RETAINED;027_PARTIAL_REAL_LOCAL_REVIEWED_NOT_FULL_PASS",
-        "evidence_version": "027 ai027-b439223fda pages/api-negative/runtime-final/model-calls/source manifest",
-        "remaining_gap": "Q02–05 initialresource refusals;N05/N06unexecuted; production latency/security/runtime acceptance",
-        "next_action": "Preserve ledger12embedding/8reranker/8Qwen/1ASR;30min expired,no automaticextension; current focusedreview"
+        "current_implementation": "Real bge-m3/reranker/Qwen with MySQL versions, independent Worker, new1024 COSINE collection and actual page citations; old8d unchanged. Approved continuation completed Q02-Q05 plus N05/N06 archive/visibility negatives.",
+        "verification_mode_status": "008_DEVELOPMENT_PASS_RETAINED;027_R2_PASS_SCOPED_LOCAL_CONTINUATION_NOT_PRODUCTION",
+        "evidence_version": "027 ai027-b439223fda, call030-046, pages/api-negative/runtime-final and review-r2-continuation.json",
+        "remaining_gap": "Production latency, security, target-runtime durability and release acceptance; local CPU/GPU timings are not capacity acceptance.",
+        "next_action": "Preserve spent continuation ledger and scoped independent PASS; do not rerun R2 or alter the8d/1024d collections without a direct dependency change and approval."
       },
       {
         "requirement_id": "V1-AI-FAIL-CREATE",
@@ -2998,11 +2998,11 @@
       },
       {
         "requirement_id": "V1-GOVERNANCE-OPS",
-        "current_implementation": "不属于小程序页面、应单独后端验证",
-        "verification_mode_status": "API:NOT_IMPLEMENTED",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "健康检查、结构化日志、request_id、上传校验、幂等、并发接单",
-        "next_action": "按依赖顺序实施，保留本ID在分母中"
+        "current_implementation": "Existing backend has liveness/readiness checks, structured redacted logging and request-id middleware, persistent upload size/extension/magic/hash validation, work-order idempotency and locked/versioned lifecycle transitions. This reconciles a stale aggregate row; it is not a new runtime PASS.",
+        "verification_mode_status": "PARTIAL_EXISTING_SCOPED_EVIDENCE_RECONCILED_NOT_RELEASE_ACCEPTED",
+        "evidence_version": "backend health/request_context/work_order current source; retained Day3/Day4, persistent-media, auto-dispatch and lifecycle scoped tests/evidence",
+        "remaining_gap": "Complete cross-module security/IDOR, production dependency readiness, malware scanning/provider operation, load/concurrency and formal release acceptance.",
+        "next_action": "Do not reimplement existing controls. Include their unchanged assertions in the final candidate regression, then run production-equivalent security/load/provider acceptance after target authorization."
       }
     ]
   }

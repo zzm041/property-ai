@@ -1,0 +1,7 @@
+{
+  "continue": false,
+  "source": "main inspected original input/output; independent review pending",
+  "response_sha256": "3ea8c9db0b390c8114b46e7c11663539c442efa4b893918756df18365b3cf6a6",
+  "note": "最终候选关键路由失败：GOLD-011正确识别信息不足、现象待核实和未确定主体，却输出other/maintenance而非冻结规则要求的other/other；这会把位置和现象均未知的工单错误送入普通维修自动派单。停止候选2，不生成第三候选、不进入真实AUTO。",
+  "raw_vs_effective": null
+}

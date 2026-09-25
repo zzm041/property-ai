@@ -85,6 +85,48 @@ def test_r3fix_request03_current_observations_map_without_rewriting_raw_failure(
     assert [x['label'] for x in trace['observations']]==['火花烧损','烧焦变色','焦煳气味']
     assert trace['raw_model_output']==fixed
 
+def test_r3fix1_real_answer_stays_raw_and_is_rejected_for_cross_clause_subject_inference():
+    import json
+    from pathlib import Path
+    record=json.loads((Path(__file__).resolve().parents[3]/'reports/real-ai-integration-027/diagnostic-r3fix1/request-01/response.json').read_text(encoding='utf-8'))
+    original=record['provider_result'][0]
+    with pytest.raises(ValueError,match='Subject not supported'):
+        bind(original,{'report':record['case']['report']})
+    assert original['observations'][1]['subject']=='插座'
+    assert original['observations'][1]['quote']=='塑料外壳已经发黑'
+
+def test_unknown_subject_expresses_confirmed_risk_without_becoming_an_event_wildcard():
+    black=payload('塑料外壳已经发黑',label='烧焦变色',subject='未确定')
+    smell=payload('还有明显焦味',label='焦煳气味',subject='未确定')
+    black['risk']='electric';black['severity']='high';black['priority']='p1'
+    first_key,first_trace=bind(black,{'report':black['summary']})
+    second_key,_=bind(smell,{'report':smell['summary']})
+    assert first_key!=second_key
+    assert first_trace['observations'][0]['subject']=='未确定'
+    s=AnalysisService.__new__(AnalysisService);s._settings=Settings(_env_file=None,llm_provider='production')
+    mapped,error=s._validate_payload(black,sources={'report':black['summary']})
+    assert error is None and mapped.required_duty=='MAINTENANCE'
+    assert mapped.risk.value=='electric'
+
+def test_unknown_subject_evidence_text_prevents_cross_object_coalescing():
+    a=payload('左侧外壳已经发黑',label='烧焦变色',subject='未确定')
+    b=payload('右侧外壳已经发黑',label='烧焦变色',subject='未确定')
+    assert bind(a,{'report':a['summary']})[0]!=bind(b,{'report':b['summary']})[0]
+
+def test_explicit_multiple_subjects_bind_only_to_their_own_clauses():
+    value=payload('水龙头持续滴水',label='滴渗水',subject='水龙头')
+    value['observations']+=payload('插座正在冒火花',label='火花烧损',subject='插座')['observations']
+    text='水龙头持续滴水，插座正在冒火花'
+    assert bind(value,{'report':text})[0]
+    value['observations'][0]['subject']='插座'
+    with pytest.raises(ValueError,match='Subject not supported'):
+        bind(value,{'report':text})
+
+@pytest.mark.parametrize('text',['没有发现外壳发黑','上次外壳发黑','我怀疑外壳发黑'])
+def test_unknown_subject_does_not_bypass_negation_history_or_uncertainty(text):
+    with pytest.raises(ValueError):
+        bind(payload('外壳发黑',label='烧焦变色',subject='未确定'),{'report':text})
+
 @pytest.mark.parametrize('label,quote',[('表面剥落','塑料外壳已经发黑'),('疑似燃气气味','还有明显焦味')])
 def test_r3fix_old_request03_nearest_wrong_labels_remain_rejected(label,quote):
     with pytest.raises(ValueError,match='does not support'):

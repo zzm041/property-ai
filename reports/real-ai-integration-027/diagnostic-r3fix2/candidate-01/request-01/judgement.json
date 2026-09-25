@@ -1,0 +1,7 @@
+{
+  "continue": false,
+  "source": "main inspected original input/output; independent review pending",
+  "response_sha256": "9d913fffc110083494fc7fed822792cd177d2a5adb8c2b1eaea4ee03ce61b3c2",
+  "note": "候选1初筛关键失败：烧焦变色的逐字quote仅为塑料外壳已经发黑，原始输出仍借相邻句标subject=插座；服务端同句证据校验拒绝。焦煳气味已正确使用未确定。保留原始输出，进入唯一一次离线修正；候选1结果不复用于候选2。",
+  "raw_vs_effective": null
+}
