@@ -11,7 +11,7 @@ This document records its intended boundary; it is not permission to run it.
 
 ## Exact structural delta
 
-The proposal creates seven tables and no columns on existing business tables:
+The proposal creates six tables and no columns on existing business tables:
 
 1. `identity_recovery_cases`: purpose, requester/source/target user references,
    subject phone, opaque proof hashes, 30-day quarantine dates, review/expiry/
@@ -32,8 +32,10 @@ The proposal creates seven tables and no columns on existing business tables:
 6. `work_order_sla_applications`: one immutable policy/version snapshot per
    work order. New orders use it for accept, response, warning and escalation;
    later policy changes cannot rewrite the snapshot.
-7. Existing RBAC tables receive only the new `identity:review` permission and a
-   SYSTEM_ADMIN grant when absent.
+
+Separately, existing RBAC tables receive only the new `identity:review`
+permission and a SYSTEM_ADMIN grant when absent. This RBAC data delta is the
+previously described seventh migration item; it is not a seventh table.
 
 Both existing phone uniqueness constraints are mandatory preconditions and are
 neither dropped nor changed:
@@ -82,8 +84,8 @@ practice; the live restore database and other schemas remain untouched.
 ## Functionality boundary before execution
 
 When these tables are absent, identity recovery remains explicitly disabled and
-legacy SLA behavior remains compatible. Even after the DDL is applied, a trusted
-identity-proof provider and the account-ownership merge transaction are still
-required before account merge/reuse is operational. The current code stores no
-raw ID document, face image or biometric template and does not treat SMS as
-identity proof.
+legacy SLA behavior remains compatible. The account-ownership completion
+transaction is now implemented and unit-verified, but it still requires this
+schema and a trusted identity-proof provider before it is operational. The
+current code stores no raw ID document, face image or biometric template and
+does not treat SMS as identity proof.

@@ -1,0 +1,130 @@
+{
+  "task_id": "PENDING0014-IMPLEMENTATION",
+  "round": 1,
+  "review_phase": "NARROW_FIX_VERIFICATION",
+  "base_sha": "0a9c9824bbd69e6a1f12bb99fca60ed0cbdc9834",
+  "mode": "INDEPENDENT_READ_ONLY",
+  "verdict": "PASS_SCOPED",
+  "verdict_scope": "仅通过P14-R1-01至05的源码修复及离线测试设计复核；不是数据库、API、页面或生产验收通过。",
+  "findings": [],
+  "closed_findings": [
+    {
+      "id": "P14-R1-01",
+      "status": "CLOSED",
+      "location": "backend/app/service/identity_recovery.py::_reauthenticate_target",
+      "resolution": "无密码目标必须提供绑定TARGET_REAUTH:case_id及目标当前ACTIVE手机号的证明，验证通过后才设置新密码。已有密码仍验证当前密码，不复制来源密码。",
+      "evidence": "实际读取API/Schema接线、证明校验分支，以及缺失证明拒绝和正确绑定证明成功的测试。测试Provider同时校验签名、purpose、phone和有效期。"
+    },
+    {
+      "id": "P14-R1-02",
+      "status": "CLOSED",
+      "location": "backend/app/service/identity_recovery.py::_build_impact、_complete_account_transfer",
+      "resolution": "ACCOUNT_RECOVERY允许来源只有历史ENDED手机号；普通MERGE_SOURCE_PROOF仍要求对应当前号码。恢复记录引用历史号码，不重新激活或伪造来源号码。",
+      "evidence": "实际读取历史归属复核、两种目的分支及ENDED-only来源完成测试；来源手机保持ENDED，合并记录保留source_phone_id。"
+    },
+    {
+      "id": "P14-R1-03",
+      "status": "CLOSED",
+      "location": "miniprogram/pages/identity-recovery/identity-recovery.js、identity-recovery.wxml；miniprogram/services/api.js",
+      "resolution": "完成响应后直接清理密码、目标证明及本地会话并引导重登，不再用已撤销会话查询。PROOF_REJECTED单独显示为业务认证失败，不刷新或重放；真正token失效仍走原认证处理。PHONE_REUSE新增明确勾选确认。",
+      "evidence": "实际读取成功分支、错误码分流及其重试参数传递、替换号码勾选和对应静态接线测试。",
+      "boundary": "实际微信页面及网络交互未运行。"
+    },
+    {
+      "id": "P14-R1-04",
+      "status": "CLOSED",
+      "location": "backend/app/service/identity_write_guard.py及本次直接写入入口；identity_recovery/credential/resident仓储",
+      "resolution": [
+        "共享身份写锁在锁后强制刷新User并拒绝非ACTIVE；合并行锁查询同样使用populate_existing。",
+        "新建报修在身份、幂等和关系读取前加锁；员工认领先做无锁存在性检查，再按User→Employee→Invite顺序加锁。",
+        "已核对文件、通知、住户申请/批准、员工创建/认领、微信绑定/换绑、RBAC及相关凭据入口的接线。",
+        "凭据分支改为先定位用户、锁用户，再重新检查手机号或票据。",
+        "本轮新增peek造成的三个缓存风险已修复：PasswordResetTicket、EmployeeInvite和ResidentBindRequest锁后均强制刷新。"
+      ],
+      "evidence": [
+        "实际读取共享guard、准确入口位置和锁顺序。",
+        "读取FOR UPDATE及populate_existing断言、MERGED拒绝和入口顺序测试。",
+        "读取旧peek后票据已消费时拒绝重置且不改密码/不撤session的负测。",
+        "读取绑定申请锁后REJECTED返回ALREADY_PROCESSED的负测，以及邀请锁后重新校验实现。"
+      ],
+      "boundary": "这是源码与离线回归边界；未证明真实MySQL交错执行、死锁处理或故障回滚矩阵。"
+    },
+    {
+      "id": "P14-R1-05",
+      "status": "CLOSED",
+      "location": "backend/app/service/identity_recovery.py::_build_impact",
+      "resolution": "影响摘要已包含来源及目标角色的role/scope/tenant/property、关系关键值、员工租户、微信绑定哈希、目标当前号码哈希和相关生命周期状态，不再只绑定ID集合。",
+      "evidence": "实际读取规范化影响结构、完成前哈希及内容双重比较；同ID角色property变更会拒绝完成且不创建合并记录。敏感凭据原文未进入摘要。"
+    }
+  ],
+  "reviewed_files": [
+    "backend/app/service/identity_recovery.py",
+    "backend/app/repository/identity_recovery.py",
+    "backend/app/service/identity_write_guard.py",
+    "backend/app/provider/identity_proof/__init__.py",
+    "backend/app/schema/identity_recovery.py",
+    "backend/app/api/v1/identity_recovery.py",
+    "backend/app/service/work_order.py",
+    "backend/app/service/credential_auth.py",
+    "backend/app/repository/credential.py",
+    "backend/app/service/employee.py",
+    "backend/app/service/employee_identity.py",
+    "backend/app/service/notification.py",
+    "backend/app/service/resident.py",
+    "backend/app/repository/resident.py",
+    "backend/app/service/wechat_auth.py",
+    "backend/app/service/rbac_mutation.py",
+    "backend/app/repository/rbac_mutation.py",
+    "backend/tests/unit/test_identity_recovery_pending_0014.py",
+    "backend/tests/unit/test_password_change.py",
+    "backend/tests/unit/test_official_auth_security.py",
+    "miniprogram/pages/identity-recovery/identity-recovery.js",
+    "miniprogram/pages/identity-recovery/identity-recovery.wxml",
+    "miniprogram/services/api.js"
+  ],
+  "reviewed_hashes_sha256": {
+    "backend/app/service/identity_recovery.py": "39d5085af65bf275a4e290ae9c6c6dc81055b2d21182df28ad07be473bc18075",
+    "backend/app/repository/identity_recovery.py": "d7e9679ec2e4f819db2724162cda6c417a2c9eb29ad65993e095d954cb620ee4",
+    "backend/app/service/identity_write_guard.py": "c187d2b952114ed4a001967116394ea12bbc6a83a5c847ede8fe2451a06384bf",
+    "backend/app/repository/credential.py": "84d16d9149b3025f89817d9afb3592138e0b58af522d1859f363d69360bd5b4f",
+    "backend/app/repository/resident.py": "bc95316970eeac84bb2cc17628b8cecb3ada6cf74856664605fd11297c12e483",
+    "backend/app/service/employee_identity.py": "6ce5bb1728d4faf191c760deeee8170a0da49323117da06b2e4af880701c0257",
+    "backend/app/service/work_order.py": "bd24892da206b3c39f0a5c4ff21479f034c8e1bd071a3ca4fd87addef00acbec",
+    "miniprogram/pages/identity-recovery/identity-recovery.js": "b2e8365a81507af7d97da71b29710ef98111997bf49f1dd3fa449fb8847ccc9d",
+    "miniprogram/services/api.js": "5c188fa889152532522e953a60fc6d7ea6883debaa3a01e38be3392614142658"
+  },
+  "evidence_checked": {
+    "source": "实际读取当前修复差异、上述必要调用上下文及直接测试源码；未扩大到全仓审查。",
+    "tests_reported": {
+      "final_combined": "192 passed，3 warnings",
+      "intermediate": [
+        "173 passed，3 warnings",
+        "identity + official：47 passed，3 warnings",
+        "work_order相关：52 passed，3 warnings",
+        "锁后刷新相关：64 passed，3 warnings"
+      ],
+      "provenance": "以上是主实施会话实际执行报告，原始输出仅在主工具记录。本审查未读取对应新增完整日志文件，也未独立运行；不累加为总通过数。"
+    },
+    "history": "保留round-1原始NEEDS_CHANGES及五项历史。本次仅关闭已核对修复，不改写初审。",
+    "vlm": "沿用本轮初审对严格Schema离线修复的限定结论；没有新模型调用，不将request-31原失败追认为通过。"
+  },
+  "verified_conditions": [
+    "审核批准与实际身份变更仍严格分离。",
+    "双人独立审核、当前权限复核、30天隔离及影响重验未被修复放宽。",
+    "来源凭据/session/ticket失效、当前所有权处置与历史actor保留逻辑仍在同一Service事务中。",
+    "PHONE_REUSE仍不继承原持有人的资产或合并目标资料。",
+    "测试Proof仍限精确AUTH001/test/显式开关，不等于真实核验渠道。",
+    "本次五项finding在已读源码范围内无剩余当前阻塞。"
+  ],
+  "unverified": [
+    "0014未执行；数据库、API、页面及SLA运行状态保持BLOCKED_ENV。",
+    "没有启动、重建或操作已停止的tmpfs MySQL容器。",
+    "未运行模型、业务、数据库、队列或页面操作，未修改工作区。",
+    "真实MySQL并发、故障注入零部分提交、完整24项引用迁移与实际会话失效仍待具名隔离环境验收。",
+    "页面修复目前为源码/离线测试边界，不是正常页面验收PASS。",
+    "真实身份Proof Provider、真实R3/AUTO和Production仍未验收；R3保持NOT_READY。",
+    "预存project.config.json、model/ai.py及无关旧review WIP不属于本次审查改动。"
+  ],
+  "conclusion_basis": "五项原问题及修复直接引入的锁后缓存回归均已定位并修正；最终源码与直接测试断言一致。通过范围限定为源码增量和离线回归复核，环境未运行的事实不被测试数量或审查结论覆盖。",
+  "next_action": "保存本JSON并绑定最终代码/测试版本；更新交接为源码专项已复审、运行BLOCKED_ENV。环境恢复及0014执行仍按准确范围单独获批，之后仅做本切片必要的数据库/API/页面与并发验收；不要为收尾启动模型或重复无关历史测试。"
+}
