@@ -5,6 +5,7 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import re
 import runpy
 import site
@@ -14,6 +15,10 @@ import threading
 import time
 
 ROOT=Path(r'D:\property-ai');OUT=Path(__file__).parent
+SCREEN_IDS=('GOLD-005','GOLD-006','GOLD-008','GOLD-012','GOLD-018','GOLD-021','PHOTO-002','PHOTO-004')
+NINE_B_DEADLINE_UTC=datetime.fromisoformat('2026-09-29T14:36:10+00:00')
+NINE_B_TOTAL_CALL_LIMIT=64
+NINE_B_TOTAL_MODEL_SECONDS=7200
 site.addsitedir(str(ROOT/'.venv/Lib/site-packages'));sys.path.insert(0,str(ROOT/'backend'))
 import httpx
 from app.core.config import Settings
@@ -45,8 +50,15 @@ def main():
         sys.argv.remove('--supplement')
         runpy.run_path(str(OUT/'run-approved-supplement.py'), run_name='__main__')
         return
-    parser=argparse.ArgumentParser();parser.add_argument('--round',type=int,choices=range(4),required=True);args=parser.parse_args()
-    target=OUT/f'quality28-round{args.round}.json'
+    parser=argparse.ArgumentParser();parser.add_argument('--round',type=int,choices=range(4));parser.add_argument('--model',choices=('qwen3.5:4b','qwen3.5:9b'),default='qwen3.5:4b');parser.add_argument('--phase',choices=('screen','fixed'));parser.add_argument('--candidate',type=int,choices=(1,2));args=parser.parse_args()
+    if args.model=='qwen3.5:4b':
+        assert args.round is not None and args.phase is None and args.candidate is None,'Historical 4B mode requires --round only'
+        target=OUT/f'quality28-round{args.round}.json';run_out=OUT;max_requests=32
+    else:
+        assert args.round is None and args.phase is not None and args.candidate is not None,'9B mode requires --phase and --candidate'
+        assert args.candidate==1 or args.phase=='fixed','Candidate 2 is the one allowed concentrated repair and must run the complete fixed set'
+        budget_root=ROOT/'reports/real-ai-integration-027/diagnostic-r3-9b';run_out=budget_root/f'candidate-{args.candidate:02d}';run_out.mkdir(parents=True,exist_ok=True)
+        target=run_out/f'{args.phase}.json';max_requests=10 if args.phase=='screen' else 22 if args.candidate==1 else 32
     assert not target.exists(),'Recorded round is immutable: inspect or explicit new repair round; no replay'
     helpers=runpy.run_path(str(OUT/'probe-model.py'));api=helpers['api'];sample=helpers['resource_sample']
     textpath=OUT/'gold-set-24.json';photopath=OUT/'repair-image-gold.json'
@@ -54,36 +66,69 @@ def main():
     assert sha(photopath)=='df10abfde5a0144c480e29041ddedcc146a0182a6452dacd2ed97498c88cfdbe'
     gold=json.loads(textpath.read_text(encoding='utf-8'));photos=json.loads(photopath.read_text(encoding='utf-8'))
     assert len(gold['cases'])==24 and len(photos['cases'])==4
+    all_items=gold['cases']+photos['cases']
+    if args.model=='qwen3.5:9b' and args.phase=='screen':
+        selected_items=[item for item in all_items if item['id'] in SCREEN_IDS]
+        assert tuple(item['id'] for item in selected_items)==SCREEN_IDS
+    else:selected_items=all_items
     downloads=json.loads((OUT/'repair-image-downloads.json').read_text(encoding='utf-8'))
     images={}
     for p in photos['cases']:
         path=OUT/'repair-images'/p['file'];row=next(r for r in downloads if Path(r['file']).name==p['file'])
         assert sha(path)==row['sha256'] and p['gps_metadata_present'] is False
         images[p['file']]=path.read_bytes()
-    digest=json.loads((OUT/'download-4b-result.json').read_text(encoding='utf-8'))['manifest_sha256']
-    assert api('/api/version')['version']=='0.34.2'
-    assert next(r for r in api('/api/tags')['models'] if r['name']=='qwen3.5:4b')['digest']==digest
+    digest=(json.loads((OUT/'download-4b-result.json').read_text(encoding='utf-8'))['manifest_sha256']
+            if args.model=='qwen3.5:4b' else '6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7')
+    expected_version='0.34.2' if args.model=='qwen3.5:4b' else '0.34.3'
+    assert api('/api/version')['version']==expected_version
+    assert next(r for r in api('/api/tags')['models'] if r['name']==args.model)['digest']==digest
     def resident():
         rows=api('/api/ps')['models']
-        assert len(rows)<=1 and all(r['name']=='qwen3.5:4b' and r['digest']==digest and r['context_length']==4096 for r in rows),'Resident model/context mismatch'
+        assert len(rows)<=1 and all(r['name']==args.model and r['digest']==digest and r['context_length']==4096 for r in rows),'Resident model/context mismatch'
         return rows
-    runtime=json.loads((OUT/'diagnostic-runtime28.json').read_text(encoding='utf-8-sig'))
+    runtime=(json.loads((OUT/'diagnostic-runtime28.json').read_text(encoding='utf-8-sig')) if args.model=='qwen3.5:4b' else
+             json.loads((ROOT/'reports/real-ai-integration-027/qwen35-9b-runtime.json').read_text(encoding='utf-8-sig')))
     assert runtime['no_cloud'] and runtime['context_length']==4096 and runtime['concurrency']==1
-    e={'task_id':'SELFHOST-AI-LOCAL-001','round':args.round,'repair_rounds_used':args.round,'base_sha':'13786627b05120613ba4649da14be606cd58c10e',
+    budget_path=(budget_root/'qwen-budget.jsonl') if args.model=='qwen3.5:9b' else run_out/'qwen-budget.jsonl'
+    def budget_events():
+        if not budget_path.exists():return []
+        return [json.loads(line) for line in budget_path.read_text(encoding='utf-8').splitlines() if line.strip()]
+    def budget_state():
+        events=budget_events();reserved=[row for row in events if row['event']=='RESERVED'];completed={row['request_id']:row for row in events if row['event']=='COMPLETED'}
+        unknown=[row['request_id'] for row in reserved if row['request_id'] not in completed]
+        return {'attempted':len(reserved),'model_seconds':sum(float(row['model_seconds']) for row in completed.values()),'unknown':unknown}
+    def append_budget(row):
+        payload=(json.dumps({'at_utc':datetime.now(UTC).isoformat(),**row},ensure_ascii=False,separators=(',',':'))+'\n').encode()
+        fd=os.open(budget_path,os.O_APPEND|os.O_CREAT|os.O_WRONLY,0o600)
+        try:os.write(fd,payload);os.fsync(fd)
+        finally:os.close(fd)
+    if args.model=='qwen3.5:9b':
+        state=budget_state();assert not state['unknown'],f'Prior request completion UNKNOWN: {state["unknown"]}'
+        assert state['attempted']<NINE_B_TOTAL_CALL_LIMIT and state['model_seconds']<NINE_B_TOTAL_MODEL_SECONDS
+        assert datetime.now(UTC)<NINE_B_DEADLINE_UTC,'48-hour delivery window expired'
+    e={'task_id':'REAL-AI-INTEGRATION-027' if args.model.endswith(':9b') else 'SELFHOST-AI-LOCAL-001','round':args.round,'phase':args.phase,'candidate':args.candidate,'repair_rounds_used':args.round,'base_sha':'f5c8154',
        'source_sha':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'at_utc':datetime.now(UTC).isoformat(),
-       'model':'qwen3.5:4b','model_digest':digest,'quantization':'Q4_K_M','prompt_version':WORK_ORDER_ANALYSIS_PROMPT_VERSION,
+       'model':args.model,'model_digest':digest,'quantization':'Q4_K_M','prompt_version':WORK_ORDER_ANALYSIS_PROMPT_VERSION,
        'vision_prompt_version':getattr(QwenVLMProvider,'prompt_version','unversioned-original'),
        'source_hashes':{p:sha(ROOT/p) for p in ['backend/app/service/analysis.py','backend/app/domain/ai.py','backend/app/provider/llm/__init__.py','backend/app/provider/vision/__init__.py','backend/app/provider/http.py','reports/auth-identity-ai-001/local-qwen/run-quality28.py']},
        'gold_hashes':{textpath.name:sha(textpath),photopath.name:sha(photopath)},'runtime':runtime,
-       'controls':{'context':4096,'temperature':0,'thinking':False,'llm_max_tokens':512,'vlm_max_tokens':256,'timeout_seconds':60,'parallel':1,'max_cases':28,'max_inference_requests':32},
-       'business_calls':False,'database_access':False,'queue_access':False,'business_runtime_changed':False,'attempted_requests':0,'results':[],'status':'RUNNING'}
+       'controls':{'context':4096,'temperature':0,'thinking':False,'llm_max_tokens':512,'vlm_max_tokens':256,'timeout_seconds':60,'parallel':1,'max_cases':8 if args.phase=='screen' else 28,'max_inference_requests':max_requests},
+       'cumulative_budget':{'path':str(budget_path),'call_limit':NINE_B_TOTAL_CALL_LIMIT,'model_seconds_limit':NINE_B_TOTAL_MODEL_SECONDS,'deadline_utc':NINE_B_DEADLINE_UTC.isoformat()} if args.model=='qwen3.5:9b' else None,
+       'business_calls':False,'database_access':False,'queue_access':False,'business_runtime_changed':False,'attempted_requests':0,'reused_requests':0,'results':[],'status':'RUNNING'}
     def save():target.write_text(json.dumps(e,ensure_ascii=False,indent=2,default=str)+'\n',encoding='utf-8')
     current={}
     def request_hook(request):
         assert str(request.url)=='http://127.0.0.1:11435/v1/chat/completions' and request.method=='POST'
-        body=json.loads(request.content);assert body['model']=='qwen3.5:4b' and body['temperature']==0 and body['reasoning_effort']=='none'
+        body=json.loads(request.content);assert body['model']==args.model and body['temperature']==0 and body['reasoning_effort']=='none'
         assert body['max_tokens']==(256 if current['kind']=='VLM' else 512)
-        assert e['attempted_requests']<32
+        assert e['attempted_requests']<max_requests
+        if args.model=='qwen3.5:9b':
+            state=budget_state();assert not state['unknown'],'Prior request completion UNKNOWN'
+            assert state['attempted']<NINE_B_TOTAL_CALL_LIMIT and state['model_seconds']<NINE_B_TOTAL_MODEL_SECONDS
+            assert datetime.now(UTC)<NINE_B_DEADLINE_UTC,'48-hour delivery window expired'
+            request_id=f'candidate-{args.candidate:02d}-{args.phase}-{e["attempted_requests"]+1:03d}'
+            append_budget({'event':'RESERVED','request_id':request_id,'candidate':args.candidate,'phase':args.phase,'kind':current['kind'],'body_sha256':hashlib.sha256(request.content).hexdigest()})
+            current['budget_request_id']=request_id
         e['attempted_requests']+=1;current['attempted']=True
         current['request']={'url':str(request.url),'method':request.method,'body':body,'body_sha256':hashlib.sha256(request.content).hexdigest()}
         save()
@@ -95,9 +140,9 @@ def main():
         except (ValueError,AttributeError):current['usage']=None
         save()
     client=httpx.Client(trust_env=False,timeout=60,event_hooks={'request':[request_hook],'response':[response_hook]})
-    settings=Settings(_env_file=None,app_env='test',llm_provider='production',llm_base_url='http://127.0.0.1:11435/v1',llm_model='qwen3.5:4b',llm_api_key='local-loopback-no-auth',llm_disable_thinking=True,llm_max_output_tokens=512,llm_timeout_seconds=60)
+    settings=Settings(_env_file=None,app_env='test',llm_provider='production',llm_base_url='http://127.0.0.1:11435/v1',llm_model=args.model,llm_api_key='local-loopback-no-auth',llm_disable_thinking=True,llm_max_output_tokens=512,llm_timeout_seconds=60)
     service=AnalysisService.__new__(AnalysisService);service._llm=build_llm_provider(settings);service._llm._client=client;service._clock=lambda:datetime.now(UTC)
-    service._vlm=QwenVLMProvider(base_url='http://127.0.0.1:11435/v1',model='qwen3.5:4b',api_key='local-loopback-no-auth',timeout_seconds=60,storage=PhotoStorage(images),client=client,disable_thinking=True,max_output_tokens=256)
+    service._vlm=QwenVLMProvider(base_url='http://127.0.0.1:11435/v1',model=args.model,api_key='local-loopback-no-auth',timeout_seconds=60,storage=PhotoStorage(images),client=client,disable_thinking=True,max_output_tokens=256)
     logs=[];service._write_call_log=lambda *a,**kw:logs.append(kw)
     def stage(kind,call,case):
         nonlocal current
@@ -122,11 +167,25 @@ def main():
             current['call_log']=list(logs);current['after']=sample();current['resident_after']=resident()
             measured=[before,current['after']]+[s for s in current['samples'] if 'ram_free_mib' in s]
             current['min_ram_free_mib']=min(s['ram_free_mib'] for s in measured);current['min_gpu_free_mib']=min(s['gpu_free_mib'] for s in measured)
+            if args.model=='qwen3.5:9b' and current.get('budget_request_id'):
+                append_budget({'event':'COMPLETED','request_id':current['budget_request_id'],'candidate':args.candidate,'phase':args.phase,'kind':kind,'status':current['status'],'model_seconds':current['latency_seconds'],'raw_response_sha256':current.get('raw_response_sha256')})
             if current['min_ram_free_mib']<2000 or current['min_gpu_free_mib']<2000:e['stop_reason']='RESOURCE_FLOOR_CROSSED'
             save()
     try:
         save()
-        for item in gold['cases']+photos['cases']:
+        reused={}
+        if args.model=='qwen3.5:9b' and args.phase=='fixed' and args.candidate==1:
+            screen_path=run_out/'screen.json';assert screen_path.exists(),'Complete identical screen phase is required before fixed phase'
+            screen=json.loads(screen_path.read_text(encoding='utf-8'))
+            assert screen['status']=='RECORDED_NEEDS_SEMANTIC_REVIEW' and screen['model']==args.model and screen['model_digest']==digest
+            assert screen['prompt_version']==e['prompt_version'] and screen['vision_prompt_version']==e['vision_prompt_version']
+            assert screen['source_hashes']==e['source_hashes'] and screen['gold_hashes']==e['gold_hashes']
+            reused={row['id']:row for row in screen['results']};assert tuple(reused)==SCREEN_IDS and screen['attempted_requests']==10
+        for item in selected_items:
+            if item['id'] in reused:
+                case=json.loads(json.dumps(reused[item['id']]))
+                case['reused_from']={'path':str(run_out/'screen.json'),'source_hashes_verified':True,'model_input_protocol_parameters_identical':True}
+                e['results'].append(case);e['reused_requests']+=2 if item['id'].startswith('PHOTO') else 1;save();continue
             is_photo=item['id'].startswith('PHOTO');report=item['paired_report'] if is_photo else item['report']
             case={'id':item['id'],'input':item,'stages':[],'semantic_review':'PENDING_INDIVIDUAL_REVIEW_NOT_AUTOMATIC_PASS'};e['results'].append(case)
             context={'house':{'property_name':'合成测试小区','building_name':'合成楼','unit_name':'合成单元','room_no':'测试房'},'reporter_relationships':['OWNER'],'recent_house_orders':[dict(zip(('category','status','summary'),r)) for r in item.get('history',[])]}
@@ -149,7 +208,9 @@ def main():
             except Exception as exc:case['mechanical_checks']={'schema_and_mapping':False,'error_type':type(exc).__name__}
             save();print(json.dumps({'case':item['id'],'requests':e['attempted_requests'],'payload':payload},ensure_ascii=False),flush=True)
             if e.get('stop_reason'):break
-        e['status']='RECORDED_NEEDS_SEMANTIC_REVIEW' if len(e['results'])==28 and e['attempted_requests']==32 and not e.get('stop_reason') else 'INCOMPLETE'
+        expected_cases=8 if args.model=='qwen3.5:9b' and args.phase=='screen' else 28
+        expected_calls=10 if args.model=='qwen3.5:9b' and args.phase=='screen' else 32
+        e['status']='RECORDED_NEEDS_SEMANTIC_REVIEW' if len(e['results'])==expected_cases and e['attempted_requests']+e['reused_requests']==expected_calls and not e.get('stop_reason') else 'INCOMPLETE'
     except Exception as exc:e['status']='INCOMPLETE';e.setdefault('stop_reason',type(exc).__name__);raise
     finally:
         client.close();e['finished_at_utc']=datetime.now(UTC).isoformat();save()

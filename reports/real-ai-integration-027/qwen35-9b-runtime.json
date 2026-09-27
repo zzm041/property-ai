@@ -1,0 +1,19 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "phase": "qwen35-9b-candidate",
+  "launched_at_utc": "2026-09-27T14:46:24.7490500Z",
+  "pid": 40700,
+  "executable": "C:\\Users\\lmj\\AppData\\Local\\Programs\\Ollama\\ollama.exe",
+  "host": "127.0.0.1:11435",
+  "models": "D:\\property-ai\\tmp\\selfhost-ai-local\\models",
+  "no_cloud": true,
+  "max_loaded_models": 1,
+  "concurrency": 1,
+  "context_length": 4096,
+  "keep_alive": "30s",
+  "gpu_reserved_bytes": 2147483648,
+  "api_worker_changed": false,
+  "global_settings_changed": false,
+  "log_directory": "D:\\property-ai\\tmp\\selfhost-ai-local\\qwen35-9b-20260927",
+  "status": "STARTED_NOT_YET_READY"
+}

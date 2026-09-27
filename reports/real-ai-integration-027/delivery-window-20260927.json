@@ -1,0 +1,10 @@
+{
+  "task_id": "PRODUCTION-V1-CLOSEOUT",
+  "timezone": "Asia/Shanghai",
+  "recorded_start": "2026-09-27T22:36:10+08:00",
+  "fixed_deadline": "2026-09-29T22:36:10+08:00",
+  "duration_hours": 48,
+  "reset_on_session_or_tool_interruption": false,
+  "prior_missed_deadline": "2026-09-27T14:00:00+08:00",
+  "prior_missed_deadline_preserved": true
+}

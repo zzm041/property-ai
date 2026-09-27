@@ -22,6 +22,25 @@ ROOT=Path(__file__).resolve().parents[3]
 spec=importlib.util.spec_from_file_location('local_ai_http_027',ROOT/'scripts/ops/local_ai_http.py')
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 
+
+def _load_adapter_candidate(monkeypatch, model):
+    monkeypatch.setenv('PROPERTY_AI_LOCAL_QWEN_MODEL',model)
+    candidate_spec=importlib.util.spec_from_file_location(
+        f'local_ai_http_{model.replace(":", "_")}',ROOT/'scripts/ops/local_ai_http.py'
+    )
+    candidate=importlib.util.module_from_spec(candidate_spec)
+    candidate_spec.loader.exec_module(candidate)
+    return candidate
+
+
+def test_only_explicit_reviewed_qwen_candidates_can_configure_adapter(monkeypatch):
+    candidate=_load_adapter_candidate(monkeypatch,'qwen3.5:9b')
+    assert candidate.MODELS['qwen']=='qwen3.5:9b'
+    assert candidate.DIGEST=='6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7'
+    assert candidate.QWEN_RUNTIME_VERSION=='0.34.3'
+    with pytest.raises(RuntimeError,match='UNAPPROVED_QWEN_CANDIDATE'):
+        _load_adapter_candidate(monkeypatch,'qwen3.5:latest')
+
 @pytest.mark.parametrize('path,obj',[
     ('/v1/embeddings',{'model':'other','input':['a']}),
     ('/v1/embeddings',{'model':'bge-m3','input':['a']*17}),

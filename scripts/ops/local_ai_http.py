@@ -30,11 +30,17 @@ from local_ai_models import MODEL_DIRS,offline,load,infer
 from local_ai_process import RequestJob,join_request_job
 from app.domain.vision import VISION_ANALYSIS_PROMPT_VERSION,vision_analysis_response_format
 
-MODELS={'asr':'Qwen3-ASR-0.6B','embedding':'bge-m3','reranker':'bge-reranker-v2-m3','qwen':'qwen3.5:4b'}
+QWEN_CANDIDATES={
+    'qwen3.5:4b':('2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd','0.34.2'),
+    'qwen3.5:9b':('6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7','0.34.3'),
+}
+QWEN_MODEL=os.environ.get('PROPERTY_AI_LOCAL_QWEN_MODEL','qwen3.5:4b')
+if QWEN_MODEL not in QWEN_CANDIDATES:raise RuntimeError('UNAPPROVED_QWEN_CANDIDATE')
+DIGEST,QWEN_RUNTIME_VERSION=QWEN_CANDIDATES[QWEN_MODEL]
+MODELS={'asr':'Qwen3-ASR-0.6B','embedding':'bge-m3','reranker':'bge-reranker-v2-m3','qwen':QWEN_MODEL}
 LIMITS={'asr':1,'embedding':24,'reranker':18,'qwen':18}
 CONTINUATION_MAX={'asr':1,'embedding':6,'reranker':6,'qwen':6}
 MAX_BODY=1_100_000
-DIGEST='2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd'
 WORK_ORDER_PROMPT_VERSION='wo-analysis-v10-observed-event-r3fix2b'
 WORK_ORDER_RESPONSE_FORMAT=json.loads((Path(__file__).resolve().parent/'work_order_response_format.json').read_text(encoding='utf-8'))
 VISION_RESPONSE_FORMAT=vision_analysis_response_format()
@@ -62,7 +68,7 @@ def direct(path,body=None,timeout=3):
     with urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect()).open(request,timeout=timeout) as r:
         return json.loads(r.read(1_100_000))
 def qwen_guard():
-    if direct('/api/version').get('version')!='0.34.2':raise RuntimeError('QWEN_VERSION_CHANGED')
+    if direct('/api/version').get('version')!=QWEN_RUNTIME_VERSION:raise RuntimeError('QWEN_VERSION_CHANGED')
     tags=direct('/api/tags')['models']
     if not any(x['name']==MODELS['qwen'] and x['digest']==DIGEST for x in tags):raise RuntimeError('QWEN_DIGEST_CHANGED')
     loaded=direct('/api/ps')['models']

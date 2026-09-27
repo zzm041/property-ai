@@ -1,0 +1,18 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "record_type": "append_only_runtime_resolution",
+  "prior_record": "reports/real-ai-integration-027/qwen35-9b-runtime.json",
+  "prior_status_preserved": "STARTED_NOT_YET_READY",
+  "observed_at_utc": "2026-09-27T14:53:15.1439001Z",
+  "pid": 40700,
+  "process_start_utc": "2026-09-27T14:46:24.6959939Z",
+  "executable": "C:\\Users\\lmj\\AppData\\Local\\Programs\\Ollama\\ollama.exe",
+  "executable_sha256_from_prelaunch_check": "F282BAB3CB8ECE9F1843811C08E54FEC449557EFADC49EE0F9AF07F1B93407FC",
+  "listener": "127.0.0.1:11435",
+  "health_version": "0.34.3",
+  "current_status": "READY_NO_INFERENCE_DOWNLOAD_IN_PROGRESS",
+  "duplicate_start_performed": false,
+  "api_worker_changed": false,
+  "business_provider_changed": false,
+  "note": "The first launcher used the historical 0.34.2 readiness expectation. The same owned process remained healthy at 0.34.3, so no second listener was started. This record does not overwrite the original observation and does not claim model download or inference completion."
+}

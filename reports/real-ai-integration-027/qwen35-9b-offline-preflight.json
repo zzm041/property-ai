@@ -1,0 +1,32 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "recorded_at_utc": "2026-09-27T14:55:41.9747003Z",
+  "scope": "9B candidate selection, loopback adapter contract, strict VLM schema and saved wrapper-failure behavior; no inference or business IO",
+  "command_scope": [
+    "backend/tests/unit/test_local_ai_http_027.py",
+    "backend/tests/unit/test_qwen_local_controls.py"
+  ],
+  "result": {
+    "passed": 44,
+    "warnings": 1,
+    "failed": 0,
+    "errors": 0,
+    "duration_seconds": 0.48
+  },
+  "environment_note": "The first invocation produced 31 passes and 13 fixture setup errors because the default user temp root denied access. The identical tests were rerun with a fresh project-local --basetemp and cacheprovider disabled; no assertions or product code were changed to obtain the passing result.",
+  "saved_wrapper_conclusion": {
+    "source": "reports/real-ai-integration-027/diagnostic-r3schema/request-31/raw-response.json",
+    "raw_model_content": "nested JSON wrapper with top-level JSON field",
+    "adapter_behavior": "rejected as AI.INVALID_OUTPUT",
+    "policy": "do not recursively decode or silently rewrite",
+    "current_request_contract": "repair-photo-v5-strict-schema"
+  },
+  "sha256": {
+    "scripts/ops/local_ai_http.py": "A5893F541CA478321B8948E7C03D66078BB7F7534722A7E9C1F562400E33EC3B",
+    "backend/tests/unit/test_local_ai_http_027.py": "7284675907145365DF90D031971DD97F47D90B04669443DE740935433E743D23",
+    "backend/tests/unit/test_qwen_local_controls.py": "24647ECDACF602303E98A3490F111C6C0DF843D60DBDE599FEFD899F2791E366",
+    "backend/app/provider/vision/__init__.py": "849FC87B388B6D0452A8EF723718B24CD0426DAB5FEA6AAA330F69B52E9BE484",
+    "backend/app/domain/vision.py": "E0B184ADEF632A15676BE9E055F43F7D5E958D2CE638366D5CFE727BA82E160E",
+    "reports/auth-identity-ai-001/local-qwen/run-quality28.py": "457D5E6CC5B5631B6E4600B051A929011475280162C6BED5391F266D7BFC933C"
+  }
+}
