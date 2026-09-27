@@ -399,6 +399,9 @@ class ResidentBindingService:
         claimed_tenant_id: int | None,
         claimed_property_id: int | None,
     ) -> ResidentBindRequest:
+        from app.service.identity_write_guard import lock_active_identity
+
+        lock_active_identity(self._session, actor.user_id)
         current = self._reload_actor(actor)
         house = self._require_registered_house(house_id)
         self._reject_claimed_scope_mismatch(
@@ -464,8 +467,24 @@ class ResidentBindingService:
         request_id: int,
         http_request_id: str,
     ) -> tuple[ResidentBindRequest, ResidentHouseRelation]:
+        from app.service.identity_write_guard import lock_active_identity
+
         current = self._reload_actor(actor)
+        peeked = self._repository.get_bind_request(request_id)
+        if peeked is None:
+            raise AppError(
+                code=ResidentErrorCode.BIND_REQUEST_NOT_FOUND,
+                message="Binding request was not found",
+                status_code=404,
+            )
+        lock_active_identity(self._session, peeked.user_id)
         request = self._lock_pending_request(request_id)
+        if request.user_id != peeked.user_id:
+            raise AppError(
+                code=ResidentErrorCode.CONFLICT,
+                message="Binding request changed",
+                status_code=409,
+            )
         house = self._require_house_in_request_scope(request)
         RbacService.require_permission(
             current,

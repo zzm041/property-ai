@@ -25,8 +25,10 @@ import urllib.request
 import wave
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
+sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'backend'))
 from local_ai_models import MODEL_DIRS,offline,load,infer
 from local_ai_process import RequestJob,join_request_job
+from app.domain.vision import VISION_ANALYSIS_PROMPT_VERSION,vision_analysis_response_format
 
 MODELS={'asr':'Qwen3-ASR-0.6B','embedding':'bge-m3','reranker':'bge-reranker-v2-m3','qwen':'qwen3.5:4b'}
 LIMITS={'asr':1,'embedding':24,'reranker':18,'qwen':18}
@@ -35,6 +37,7 @@ MAX_BODY=1_100_000
 DIGEST='2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd'
 WORK_ORDER_PROMPT_VERSION='wo-analysis-v10-observed-event-r3fix2b'
 WORK_ORDER_RESPONSE_FORMAT=json.loads((Path(__file__).resolve().parent/'work_order_response_format.json').read_text(encoding='utf-8'))
+VISION_RESPONSE_FORMAT=vision_analysis_response_format()
 
 def stamp():return datetime.now(UTC).isoformat()
 def save(path,value):
@@ -81,9 +84,20 @@ def validate(kind,value):
         validate('embedding',value['documents'])
     elif kind=='qwen':
         expected={'model','messages','response_format','temperature','reasoning_effort','max_tokens'}
-        if not isinstance(value,dict) or set(value)!=expected or value['model']!=MODELS['qwen'] or value['temperature']!=0 or value['reasoning_effort']!='none' or value['max_tokens']!=512:raise ValueError('QWEN_SETTINGS')
+        if not isinstance(value,dict) or set(value)!=expected or value['model']!=MODELS['qwen'] or value['temperature']!=0 or value['reasoning_effort']!='none':raise ValueError('QWEN_SETTINGS')
+        expected_tokens=256 if value['response_format']==VISION_RESPONSE_FORMAT else 512
+        if value['max_tokens']!=expected_tokens:raise ValueError('QWEN_SETTINGS')
         messages=value['messages']
-        if not isinstance(messages,list) or len(messages)!=1 or set(messages[0])!={'role','content'} or messages[0]['role']!='user' or not isinstance(messages[0]['content'],str) or not 0<len(messages[0]['content'])<=10000:raise ValueError('QWEN_INPUT')
+        if not isinstance(messages,list) or len(messages)!=1 or set(messages[0])!={'role','content'} or messages[0]['role']!='user':raise ValueError('QWEN_INPUT')
+        content=messages[0]['content']
+        if value['response_format']==VISION_RESPONSE_FORMAT:
+            if not isinstance(content,list) or len(content)!=2:raise ValueError('VLM_INPUT')
+            text_part,image_part=content
+            if set(text_part)!={'type','text'} or text_part['type']!='text' or not isinstance(text_part['text'],str) or not 0<len(text_part['text'])<=1000:raise ValueError('VLM_INPUT')
+            if set(image_part)!={'type','image_url'} or image_part['type']!='image_url' or set(image_part['image_url'])!={'url'}:raise ValueError('VLM_INPUT')
+            image_url=image_part['image_url']['url']
+            if not isinstance(image_url,str) or not image_url.startswith('data:image/') or ';base64,' not in image_url:raise ValueError('VLM_INPUT')
+        elif not isinstance(content,str) or not 0<len(content)<=10000:raise ValueError('QWEN_INPUT')
 
 def decode(path,content_type,body,prompt_version):
     if path=='/v1/audio/transcriptions':
@@ -107,6 +121,7 @@ def decode(path,content_type,body,prompt_version):
             expected_format=(
                 {'type':'json_object'} if prompt_version=='rag-answer-v2'
                 else WORK_ORDER_RESPONSE_FORMAT if prompt_version==WORK_ORDER_PROMPT_VERSION
+                else VISION_RESPONSE_FORMAT if prompt_version==VISION_ANALYSIS_PROMPT_VERSION
                 else None
             )
             if expected_format is None:raise ValueError('PROMPT_VERSION_NOT_ALLOWED')

@@ -18,6 +18,14 @@ class RbacMutationRepository:
     def get_user(self, user_id: int) -> User | None:
         return self._session.get(User, user_id)
 
+    def get_user_for_update(self, user_id: int) -> User | None:
+        return self._session.scalar(
+            select(User)
+            .where(User.id == user_id)
+            .execution_options(populate_existing=True)
+            .with_for_update()
+        )
+
     def get_role_by_code(self, role_code: str) -> Role | None:
         return self._session.scalar(
             select(Role).where(

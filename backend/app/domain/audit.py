@@ -83,6 +83,7 @@ class AuditAction(StrEnum):
     IDENTITY_RECOVERY_REQUESTED = "IDENTITY_RECOVERY_REQUESTED"
     IDENTITY_RECOVERY_REVIEWED = "IDENTITY_RECOVERY_REVIEWED"
     IDENTITY_RECOVERY_FINALIZED = "IDENTITY_RECOVERY_FINALIZED"
+    IDENTITY_RECOVERY_COMPLETED = "IDENTITY_RECOVERY_COMPLETED"
 
 
 class AuditResourceType(StrEnum):
@@ -709,6 +710,32 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             resource_type=AuditResourceType.IDENTITY_RECOVERY_CASE,
             allowed_detail_keys=frozenset({"purpose", "status", "reviewer_count"}),
             required_detail_keys=frozenset({"purpose", "status", "reviewer_count"}),
+            allowed_scope_types=frozenset({ScopeType.SYSTEM}),
+        ),
+        AuditAction.IDENTITY_RECOVERY_COMPLETED: AuditActionPolicy(
+            resource_type=AuditResourceType.IDENTITY_RECOVERY_CASE,
+            allowed_detail_keys=frozenset(
+                {
+                    "purpose",
+                    "status",
+                    "source_user_id",
+                    "target_user_id",
+                    "merge_id",
+                    "impact_hash",
+                    "moved_counts",
+                }
+            ),
+            required_detail_keys=frozenset(
+                {
+                    "purpose",
+                    "status",
+                    "source_user_id",
+                    "target_user_id",
+                    "merge_id",
+                    "impact_hash",
+                    "moved_counts",
+                }
+            ),
             allowed_scope_types=frozenset({ScopeType.SYSTEM}),
         ),
         AuditAction.TASK_INTENT_RETRIED: AuditActionPolicy(

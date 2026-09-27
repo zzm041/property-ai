@@ -239,8 +239,8 @@ class CredentialAuthService:
             otp_status["value"] = self._apply_otp(phone_e164, purpose="login", code=code)
             if otp_status["value"] != "ok":
                 return
-            phone_row = self._repository.get_active_phone_for_update(phone_e164)
-            if phone_row is None:
+            phone_peek = self._repository.get_active_phone(phone_e164)
+            if phone_peek is None:
                 self._require_phone_reuse_clear(phone_e164)
                 user = self._repository.add_user(
                     User(status="ACTIVE", display_name=mask_phone(phone_e164))
@@ -255,12 +255,13 @@ class CredentialAuthService:
                 )
                 user_id = user.id
             else:
-                user = self._identity.get_user(phone_row.user_id)
-                if user is None or user.status != "ACTIVE":
+                user = self._lock_active_user(phone_peek.user_id)
+                phone_row = self._repository.get_active_phone_for_update(phone_e164)
+                if phone_row is None or phone_row.user_id != user.id:
                     raise AppError(
-                        code=AuthErrorCode.USER_DISABLED,
-                        message="User is not active",
-                        status_code=401,
+                        code=AuthErrorCode.INVALID_PHONE,
+                        message="Phone identity changed; retry authentication",
+                        status_code=409,
                     )
                 user_id = user.id
             issued = self._issue_session(user_id=user_id, auth_method="sms")
@@ -336,9 +337,13 @@ class CredentialAuthService:
         issued_box: list[IssuedSession] = []
 
         def _persist() -> None:
-            phone_row = self._repository.get_active_phone_for_update(phone_e164)
+            phone_peek = self._repository.get_active_phone(phone_e164)
+            phone_row = None
             credential = None
-            if phone_row is not None:
+            if phone_peek is not None:
+                self._lock_active_user(phone_peek.user_id)
+                phone_row = self._repository.get_active_phone_for_update(phone_e164)
+            if phone_row is not None and phone_row.user_id == phone_peek.user_id:
                 credential = self._repository.get_password(phone_row.user_id)
             if (
                 phone_row is None
@@ -350,13 +355,7 @@ class CredentialAuthService:
                     message="Phone or password is incorrect",
                     status_code=401,
                 )
-            user = self._identity.get_user(phone_row.user_id)
-            if user is None or user.status != "ACTIVE":
-                raise AppError(
-                    code=AuthErrorCode.USER_DISABLED,
-                    message="User is not active",
-                    status_code=401,
-                )
+            user = self._lock_active_user(phone_row.user_id)
             issued = self._issue_session(user_id=user.id, auth_method="password")
             self._audit.append(
                 action=AuditAction.AUTH_PASSWORD_TOKEN_ISSUED,
@@ -472,6 +471,7 @@ class CredentialAuthService:
         self._raise_otp(otp_status["new"])
 
         def _persist() -> None:
+            user = self._lock_active_user(user_id)
             current = self._repository.get_active_phone_for_user_for_update(user_id)
             if current is None or current.phone_e164 != old_phone_e164:
                 raise AppError(
@@ -479,7 +479,6 @@ class CredentialAuthService:
                     message="Current phone does not match the signed-in account",
                     status_code=409,
                 )
-            user = self._lock_active_user(user_id)
             existing = self._repository.get_active_phone_for_update(new_phone_e164)
             if existing is not None:
                 raise AppError(
@@ -542,8 +541,13 @@ class CredentialAuthService:
             otp_status["value"] = self._apply_otp(phone_e164, purpose="reset", code=code)
             if otp_status["value"] != "ok":
                 return
-            phone_row = self._repository.get_active_phone(phone_e164)
-            if phone_row is None:
+            phone_peek = self._repository.get_active_phone(phone_e164)
+            if phone_peek is None:
+                otp_status["value"] = "invalid"
+                return
+            self._lock_active_user(phone_peek.user_id)
+            phone_row = self._repository.get_active_phone_for_update(phone_e164)
+            if phone_row is None or phone_row.user_id != phone_peek.user_id:
                 otp_status["value"] = "invalid"
                 return
             raw = generate_invite_token()
@@ -583,6 +587,11 @@ class CredentialAuthService:
         status = {"value": "ok"}
 
         def _persist() -> None:
+            peeked = self._repository.get_reset_ticket(token_hash)
+            if peeked is None:
+                status["value"] = "invalid"
+                return
+            self._lock_active_user(peeked.user_id)
             ticket = self._repository.get_reset_ticket_for_update(token_hash)
             now = self._clock()
             if (
@@ -593,7 +602,6 @@ class CredentialAuthService:
                 status["value"] = "invalid"
                 return
             ticket.consumed_at = now
-            self._lock_active_user(ticket.user_id)
             hashed = hash_password(new_password)
             credential = self._repository.get_password_for_update(ticket.user_id)
             if credential is None:
@@ -723,13 +731,7 @@ class CredentialAuthService:
         holder: list[User] = []
 
         def _persist() -> None:
-            user = self._identity.get_user(user_id)
-            if user is None or user.status != "ACTIVE":
-                raise AppError(
-                    code=AuthErrorCode.USER_DISABLED,
-                    message="User is not active",
-                    status_code=401,
-                )
+            user = self._lock_active_user(user_id)
             user.display_name = name
             self._audit.append(
                 action=AuditAction.AUTH_PROFILE_UPDATED,

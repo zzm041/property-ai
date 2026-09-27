@@ -27,7 +27,10 @@ class CredentialRepository:
 
     def get_user_for_update(self, user_id: int) -> User | None:
         return self._session.scalar(
-            select(User).where(User.id == user_id).with_for_update()
+            select(User)
+            .where(User.id == user_id)
+            .execution_options(populate_existing=True)
+            .with_for_update()
         )
 
     def get_active_phone(self, phone_e164: str) -> UserPhone | None:
@@ -135,7 +138,13 @@ class CredentialRepository:
         return self._session.scalar(
             select(PasswordResetTicket)
             .where(PasswordResetTicket.token_hash == token_hash)
+            .execution_options(populate_existing=True)
             .with_for_update()
+        )
+
+    def get_reset_ticket(self, token_hash: str) -> PasswordResetTicket | None:
+        return self._session.scalar(
+            select(PasswordResetTicket).where(PasswordResetTicket.token_hash == token_hash)
         )
 
     def add_session(self, record: AuthSession) -> AuthSession:

@@ -521,14 +521,17 @@ class EmployeeService:
         )
         resolved_user_id = None
         if user_id is not None:
-            user = IdentityRepository(self._session).get_user(user_id)
-            if user is None or user.status != "ACTIVE":
+            from app.service.identity_write_guard import lock_active_identity
+
+            try:
+                user = lock_active_identity(self._session, user_id)
+            except AppError as exc:
                 raise AppError(
                     code=EmployeeErrorCode.INVALID_INPUT,
                     message="Target user is not available",
                     status_code=422,
                     details={"field": "user_id"},
-                )
+                ) from exc
             resolved_user_id = user.id
         department = None
         if department_id is not None:

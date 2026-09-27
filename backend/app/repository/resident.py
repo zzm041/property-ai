@@ -44,6 +44,7 @@ class ResidentBindingRepository:
         return self._session.scalar(
             select(ResidentBindRequest)
             .where(ResidentBindRequest.id == request_id)
+            .execution_options(populate_existing=True)
             .with_for_update()
         )
 

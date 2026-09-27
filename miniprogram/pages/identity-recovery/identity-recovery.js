@@ -1,4 +1,5 @@
 const api = require("../../services/api");
+const auth = require("../../services/auth");
 const { withLoading } = require("../../utils/ui");
 
 Page({
@@ -15,10 +16,19 @@ Page({
     purposeIndex: 0,
     phone: "",
     proofAssertion: "",
+    cases: [],
+    currentPassword: "",
+    targetReauthAssertion: "",
+    newPassword: "",
+    confirmPassword: "",
+    confirmReplacePhone: false,
   },
   onShow() {
-    withLoading(this, () => api.identityRecoveryCapabilities().then((capabilities) => {
-      this.setData({ capabilities, error: "" });
+    withLoading(this, () => Promise.all([
+      api.identityRecoveryCapabilities(),
+      api.myIdentityRecoveryCases(),
+    ]).then(([capabilities, result]) => {
+      this.setData({ capabilities, cases: result.items || [], error: "" });
     })).catch(() => {});
   },
   onPurpose(event) {
@@ -48,5 +58,46 @@ Page({
         error: "",
       });
     })).catch(() => {});
+  },
+  complete(event) {
+    const id = Number(event.currentTarget.dataset.id);
+    const item = this.data.cases.find((entry) => entry.id === id);
+    if (!item || item.status !== "APPROVED") return;
+    const newPassword = String(this.data.newPassword || "");
+    const confirmPassword = String(this.data.confirmPassword || "");
+    if (newPassword !== confirmPassword) {
+      this.setData({ error: "新密码与确认密码不一致" });
+      return;
+    }
+    if (item.purpose === "PHONE_REUSE" && this.data.confirmReplacePhone !== true) {
+      this.setData({ error: "请明确确认本次号码将替换目标账号当前手机号" });
+      return;
+    }
+    withLoading(this, () => api.completeIdentityRecoveryCase(id, {
+      expected_version: item.version,
+      current_password: String(this.data.currentPassword || "") || undefined,
+      target_reauth_assertion: String(this.data.targetReauthAssertion || "").trim() || undefined,
+      new_password: newPassword || undefined,
+      confirm_password: confirmPassword || undefined,
+      confirm_replace_phone: item.purpose === "PHONE_REUSE" && this.data.confirmReplacePhone === true,
+    }).then((completed) => {
+      this.setData({
+        cases: this.data.cases.map((entry) => entry.id === completed.id ? completed : entry),
+        currentPassword: "",
+        targetReauthAssertion: "",
+        newPassword: "",
+        confirmPassword: "",
+        confirmReplacePhone: false,
+        notice: `申请 #${completed.id} 的身份事务已完成，请重新登录`,
+        error: "",
+      });
+      auth.clearSession();
+      wx.showToast({ title: "身份事务已完成，请重新登录", icon: "none" });
+      wx.reLaunch({ url: "/pages/login/login" });
+    })).catch(() => {});
+  },
+  onReplacePhoneConfirm(event) {
+    const values = Array.isArray(event.detail.value) ? event.detail.value : [];
+    this.setData({ confirmReplacePhone: values.includes("replace"), notice: "" });
   },
 });

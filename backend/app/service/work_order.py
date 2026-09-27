@@ -245,6 +245,9 @@ class WorkOrderService:
         stored_holder: dict[str, object] = {}
 
         def _persist() -> FileObject:
+            from app.service.identity_write_guard import lock_active_identity
+
+            lock_active_identity(self._session, actor.user_id)
             resolved_property_id = property_id
             resolved_tenant_id = tenant_id
             if resolved_property_id is not None:
@@ -1125,6 +1128,9 @@ class WorkOrderService:
         claimed_tenant_id: int | None,
         claimed_property_id: int | None,
     ) -> tuple[WorkOrder, bool]:
+        from app.service.identity_write_guard import lock_active_identity
+
+        lock_active_identity(self._session, actor.user_id)
         current = self._reload_actor(actor)
         cleaned_text = self._optional_text(text)
         if cleaned_text is None and not file_ids:

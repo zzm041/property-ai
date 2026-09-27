@@ -6,6 +6,7 @@ import base64
 
 import httpx
 
+from app.domain.vision import VISION_ANALYSIS_PROMPT_VERSION, vision_analysis_response_format
 from app.provider.errors import (
     ProviderInvalidOutputError,
     ProviderTimeoutError,
@@ -59,7 +60,7 @@ class QwenVLMProvider:
     """Qwen-VL compatible adapter. Reads only the authorized storage object."""
 
     model_version = "qwen-vl"
-    prompt_version = "repair-photo-v4"
+    prompt_version = VISION_ANALYSIS_PROMPT_VERSION
 
     def __init__(
         self,
@@ -96,6 +97,7 @@ class QwenVLMProvider:
             headers={
                 "Authorization": f"Bearer {self._api_key}",
                 "Content-Type": "application/json",
+                "X-Prompt-Version": self.prompt_version,
             },
             json_body={
                 "model": self.model,
@@ -106,8 +108,8 @@ class QwenVLMProvider:
                             {
                                 "type": "text",
                                 "text": (
-                                    "JSON:description(中文8字物体通称及明显破损，禁止完好/正常/细类),"
-                                    "labels:[],confidence"
+                                    "仅描述图像中可直接观察到的维修现象。description使用简洁中文；"
+                                    "labels只写可见对象或现象；confidence表示图像证据把握。"
                                 ),
                             },
                             {
@@ -117,7 +119,7 @@ class QwenVLMProvider:
                         ],
                     }
                 ],
-                "response_format": {"type": "json_object"},
+                "response_format": vision_analysis_response_format(),
                 "temperature": 0,
                 **({"reasoning_effort": "none"} if self._disable_thinking else {}),
                 **({"max_tokens": self._max_output_tokens} if self._max_output_tokens is not None else {}),
@@ -127,21 +129,30 @@ class QwenVLMProvider:
             operation="inspect_image",
         )
         try:
+            if payload["choices"][0].get("finish_reason") not in (None, "stop"):
+                raise ProviderInvalidOutputError("VLM response was not complete")
             raw = payload["choices"][0]["message"]["content"]
         except (KeyError, IndexError, TypeError) as exc:
             raise ProviderInvalidOutputError("VLM returned invalid JSON") from exc
         parsed = parse_json_object(str(raw))
+        if set(parsed) != {"description", "labels", "confidence"}:
+            raise ProviderInvalidOutputError("VLM returned invalid JSON")
         description = parsed.get("description")
-        if not isinstance(description, str) or not description.strip():
+        if not isinstance(description, str) or not description.strip() or len(description) > 200:
             raise ProviderInvalidOutputError("VLM returned an empty description")
-        labels = parsed.get("labels") or ()
-        if isinstance(labels, str):
-            labels = (labels,)
-        confidence = parsed.get("confidence", 0.0)
-        try:
-            confidence_value = float(confidence)
-        except (TypeError, ValueError) as exc:
-            raise ProviderInvalidOutputError("VLM returned invalid JSON") from exc
+        labels = parsed.get("labels")
+        if (
+            not isinstance(labels, list)
+            or len(labels) > 8
+            or any(not isinstance(item, str) or not item.strip() or len(item) > 64 for item in labels)
+        ):
+            raise ProviderInvalidOutputError("VLM returned invalid JSON")
+        confidence = parsed.get("confidence")
+        if isinstance(confidence, bool) or not isinstance(confidence, (int, float)):
+            raise ProviderInvalidOutputError("VLM returned invalid JSON")
+        confidence_value = float(confidence)
+        if not 0 <= confidence_value <= 1:
+            raise ProviderInvalidOutputError("VLM returned invalid JSON")
         return VisionInsight(
             description=description,
             labels=tuple(str(item) for item in labels),

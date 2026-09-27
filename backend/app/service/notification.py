@@ -56,6 +56,9 @@ class NotificationService:
         resource_type: str,
         resource_id: int,
     ) -> Notification:
+        from app.service.identity_write_guard import lock_active_identity
+
+        lock_active_identity(self._session, user_id)
         record = self._repository.add_notification(
             Notification(
                 tenant_id=tenant_id,

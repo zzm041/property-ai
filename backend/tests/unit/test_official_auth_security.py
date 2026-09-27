@@ -187,7 +187,7 @@ def test_employee_claim_locks_employee_row() -> None:
         "with_for_update()", claim_pos
     )
     invalid_invite = 'message="Invitation is invalid or expired"'
-    assert service.count(invalid_invite) == 3
+    assert service.count(invalid_invite) == 4
     for index in range(3):
         pos = -1
         for _ in range(index + 1):
@@ -235,7 +235,11 @@ def test_claim_unknown_or_consumed_invite_is_400_not_401(monkeypatch: pytest.Mon
     session.commit.assert_not_called()
     session.rollback.assert_not_called()
 
-    peeked = SimpleNamespace(employee_id=4)
+    peeked = SimpleNamespace(
+        employee_id=4,
+        status="CONSUMED",
+        expires_at=datetime(2099, 1, 1, tzinfo=UTC),
+    )
     consumed = SimpleNamespace(
         employee_id=4,
         status="CONSUMED",

@@ -30,6 +30,11 @@ from app.provider.wechat import (
     ProductionWeChatAuthProvider,
     WeChatAuthProvider,
 )
+from app.provider.identity_proof import (
+    IdentityProofProvider,
+    IsolatedTestIdentityProofProvider,
+    UnavailableIdentityProofProvider,
+)
 
 
 def build_storage_provider(settings: Settings) -> StorageProvider:
@@ -134,6 +139,14 @@ def build_wechat_auth_provider(settings: Settings) -> WeChatAuthProvider:
 
 def build_notification_provider(settings: Settings) -> NotificationProvider:
     return DevelopmentNotificationProvider(settings.notification_provider_behavior)
+
+
+def build_identity_proof_provider(settings: Settings) -> IdentityProofProvider:
+    if settings.identity_test_proof_enabled:
+        return IsolatedTestIdentityProofProvider(
+            secret=settings.identity_test_proof_secret.get_secret_value()
+        )
+    return UnavailableIdentityProofProvider()
 
 
 def build_milvus_store(settings: Settings) -> MilvusKnowledgeStore:

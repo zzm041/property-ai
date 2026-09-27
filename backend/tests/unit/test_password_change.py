@@ -183,6 +183,7 @@ def test_password_reset_serializes_user_then_password_after_ticket(
     )
     credential = _credential()
     service._repository.get_reset_ticket_for_update.return_value = ticket
+    service._repository.get_reset_ticket.return_value = ticket
     service._repository.get_password_for_update.return_value = credential
     service._repository.reset_mock()
 
@@ -196,9 +197,10 @@ def test_password_reset_serializes_user_then_password_after_ticket(
     assert ticket.consumed_at == datetime(2026, 9, 21, 3, 0, tzinfo=UTC)
     assert verify_password(credential.password_hash, "Reset9Pass")
     repository_calls = [item[0] for item in service._repository.method_calls]
-    assert repository_calls[:3] == [
-        "get_reset_ticket_for_update",
+    assert repository_calls[:4] == [
+        "get_reset_ticket",
         "get_user_for_update",
+        "get_reset_ticket_for_update",
         "get_password_for_update",
     ]
     service._revoke_sessions.assert_called_once_with(
@@ -206,6 +208,36 @@ def test_password_reset_serializes_user_then_password_after_ticket(
         reason="PASSWORD_RESET",
         request_id="password-reset-lock-order",
     )
+
+
+def test_password_reset_rejects_ticket_consumed_while_waiting_for_user_lock(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    service = _service(monkeypatch)
+    peeked = SimpleNamespace(
+        user_id=17,
+        consumed_at=None,
+        expires_at=datetime(2026, 9, 21, 3, 10, tzinfo=UTC),
+    )
+    refreshed = SimpleNamespace(
+        user_id=17,
+        consumed_at=datetime(2026, 9, 21, 3, 0, tzinfo=UTC),
+        expires_at=datetime(2026, 9, 21, 3, 10, tzinfo=UTC),
+    )
+    service._repository.get_reset_ticket.return_value = peeked
+    service._repository.get_reset_ticket_for_update.return_value = refreshed
+
+    with pytest.raises(AppError) as captured:
+        service.confirm_password_reset(
+            reset_token="valid-reset-token-value",
+            new_password="Reset9Pass",
+            confirm_password="Reset9Pass",
+            request_id="password-reset-stale-ticket",
+        )
+
+    assert captured.value.code == AuthErrorCode.RESET_TOKEN_INVALID
+    service._repository.get_password_for_update.assert_not_called()
+    service._revoke_sessions.assert_not_called()
 
 
 def test_profile_page_wires_password_policy_confirmation_and_session_replacement() -> None:

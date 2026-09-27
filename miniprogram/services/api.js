@@ -66,7 +66,7 @@ function refreshSessionOnce() {
   return refreshInFlight;
 }
 
-function request({ path, method, data, headers, retried }) {
+function request({ path, method, data, headers, retried, unauthorizedBusinessCodes }) {
   if (!BASE_URL) {
     return Promise.reject(new Error("未配置 API 地址"));
   }
@@ -92,13 +92,18 @@ function request({ path, method, data, headers, retried }) {
       success: (response) => {
         const payload = response.data || {};
         if (isUnauthorized(response.statusCode, payload)) {
+          const errorCode = payload && payload.error && payload.error.code;
+          if (Array.isArray(unauthorizedBusinessCodes) && unauthorizedBusinessCodes.includes(errorCode)) {
+            reject(new Error(messageFromError(payload, "认证失败")));
+            return;
+          }
           if (CREDENTIAL_AUTH_PATHS[path]) {
             reject(new Error(messageFromError(payload, "认证失败")));
             return;
           }
           const latestToken = auth.getToken();
           if (!retried && latestToken && latestToken !== token) {
-            request({ path, method, data, headers, retried: true })
+            request({ path, method, data, headers, retried: true, unauthorizedBusinessCodes })
               .then(resolve)
               .catch(reject);
             return;
@@ -106,7 +111,7 @@ function request({ path, method, data, headers, retried }) {
           if (!retried && auth.getRefreshToken()) {
             refreshSessionOnce()
               .then(() =>
-                request({ path, method, data, headers, retried: true })
+                request({ path, method, data, headers, retried: true, unauthorizedBusinessCodes })
               )
               .then(resolve)
               .catch(() => {
@@ -299,6 +304,15 @@ module.exports = {
   identityRecoveryCapabilities: () => request({ path: "/identity/recovery/capabilities" }),
   createIdentityRecoveryCase: (body) =>
     request({ path: "/identity/recovery/cases", method: "POST", data: body }),
+  myIdentityRecoveryCases: (afterId = 0) =>
+    request({ path: `/identity/recovery/cases/mine?after_id=${afterId}&limit=50` }),
+  completeIdentityRecoveryCase: (id, body) =>
+    request({
+      path: `/identity/recovery/cases/${id}/complete`,
+      method: "POST",
+      data: body,
+      unauthorizedBusinessCodes: ["IDENTITY_RECOVERY.PROOF_REJECTED"],
+    }),
   identityRecoveryCases: (afterId = 0, status = "") =>
     request({ path: `/admin/identity-recovery/cases?after_id=${afterId}&limit=50${status ? `&status=${status}` : ""}` }),
   reviewIdentityRecoveryCase: (id, body) =>

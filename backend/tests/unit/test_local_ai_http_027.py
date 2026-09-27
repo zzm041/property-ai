@@ -14,6 +14,7 @@ from app.provider.errors import ProviderInvalidOutputError,ProviderUnavailableEr
 from app.provider.llm import QwenLLMProvider
 from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
 from app.domain.observed_event import work_order_analysis_response_format
+from app.domain.vision import VISION_ANALYSIS_PROMPT_VERSION, vision_analysis_response_format
 from app.provider.vector import MilvusKnowledgeStore
 from app.service.retrieval import RetrievalService
 
@@ -57,6 +58,25 @@ def test_only_reviewed_rag_or_exact_work_order_schema_can_reach_qwen():
 def test_committed_adapter_schema_is_generated_from_domain_contract():
     path=ROOT/'scripts/ops/work_order_response_format.json'
     assert json.loads(path.read_text(encoding='utf-8'))==work_order_analysis_response_format()
+
+
+def test_exact_vision_schema_and_multimodal_shape_are_guarded_without_wrapper_rewrite():
+    value={
+        'model':'qwen3.5:4b',
+        'messages':[{'role':'user','content':[
+            {'type':'text','text':'仅描述合成维修图片中的可见现象'},
+            {'type':'image_url','image_url':{'url':'data:image/png;base64,cG5n'}},
+        ]}],
+        'temperature':0,
+        'reasoning_effort':'none',
+        'max_tokens':256,
+        'response_format':vision_analysis_response_format(),
+    }
+    raw=json.dumps(value,ensure_ascii=False).encode()
+    assert m.decode('/v1/chat/completions','application/json',raw,VISION_ANALYSIS_PROMPT_VERSION)[0]=='qwen'
+    value['response_format']={'type':'json_object'}
+    with pytest.raises(ValueError,match='QWEN_SCHEMA_MISMATCH'):
+        m.decode('/v1/chat/completions','application/json',json.dumps(value,ensure_ascii=False).encode(),VISION_ANALYSIS_PROMPT_VERSION)
 
 def runner(tmp_path):
     path=tmp_path/'config.json';path.write_text(json.dumps({'private':str(tmp_path/'run'),'host':'127.0.0.1','port':11436}))

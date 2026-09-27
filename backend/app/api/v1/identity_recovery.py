@@ -7,11 +7,13 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_principal
 from app.api.dependencies.db import get_db_session
+from app.core.config import Settings, get_settings
 from app.domain.iam import Principal
 from app.domain.phone import mask_phone
 from app.repository.identity import IdentityRepository
 from app.schema.common import request_id_for, success_envelope
 from app.schema.identity_recovery import (
+    CompleteIdentityRecoveryCaseRequest,
     CreateIdentityRecoveryCaseRequest,
     FinalizeIdentityRecoveryCaseRequest,
     IdentityRecoveryCapabilitiesData,
@@ -20,6 +22,7 @@ from app.schema.identity_recovery import (
 )
 from app.service.auth import AuthService
 from app.service.identity_recovery import IdentityRecoveryService
+from app.provider.factory import build_identity_proof_provider
 
 
 router = APIRouter(tags=["identity-recovery"])
@@ -27,9 +30,11 @@ router = APIRouter(tags=["identity-recovery"])
 
 def get_identity_recovery_service(
     session: Annotated[Session, Depends(get_db_session)],
+    settings: Annotated[Settings, Depends(get_settings)],
 ) -> IdentityRecoveryService:
     return IdentityRecoveryService(
         session,
+        provider=build_identity_proof_provider(settings),
         principal_loader=AuthService(session, IdentityRepository(session)).load_principal,
     )
 
@@ -82,6 +87,39 @@ def create_case(
         phone=body.phone,
         proof_assertion=body.proof_assertion,
         source_user_id=body.source_user_id,
+        request_id=request_id_for(request),
+    )
+    return success_envelope(request, _data(service, record))
+
+
+@router.get("/identity/recovery/cases/mine")
+def list_my_cases(
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[IdentityRecoveryService, Depends(get_identity_recovery_service)],
+    after_id: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=100)] = 50,
+) -> dict[str, object]:
+    records = service.list_my_cases(actor=actor, after_id=after_id, limit=limit)
+    return success_envelope(request, {"items": [_data(service, item) for item in records]})
+
+
+@router.post("/identity/recovery/cases/{case_id}/complete")
+def complete_case(
+    case_id: int,
+    body: CompleteIdentityRecoveryCaseRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[IdentityRecoveryService, Depends(get_identity_recovery_service)],
+) -> dict[str, object]:
+    record = service.complete_case(
+        actor=actor,
+        case_id=case_id,
+        expected_version=body.expected_version,
+        current_password=body.current_password,
+        target_reauth_assertion=body.target_reauth_assertion,
+        new_password=body.new_password,
+        confirm_replace_phone=body.confirm_replace_phone,
         request_id=request_id_for(request),
     )
     return success_envelope(request, _data(service, record))

@@ -1,6 +1,6 @@
 <view class="card">
   <view class="section-title">身份恢复审核</view>
-  <view class="empty">两名不同且当前仍有权限的审核人必须独立批准；隔离期结束后还需最终确认。</view>
+  <view class="empty">两名不同且当前仍有权限的审核人必须独立批准；隔离期结束后只能确认审核完成，身份变更仍需申请人再次认证并执行。</view>
 </view>
 <block wx:for="{{items}}" wx:key="id">
   <view class="card">
@@ -11,7 +11,7 @@
     <view class="action-row" wx:if="{{item.status === 'PENDING_REVIEW'}}">
       <button size="mini" data-id="{{item.id}}" data-decision="APPROVE" bindtap="review">批准</button>
       <button size="mini" data-id="{{item.id}}" data-decision="REJECT" bindtap="review">拒绝</button>
-      <button size="mini" data-id="{{item.id}}" bindtap="finalize">隔离期后确认</button>
+      <button size="mini" data-id="{{item.id}}" bindtap="finalize">确认审核完成</button>
     </view>
   </view>
 </block>

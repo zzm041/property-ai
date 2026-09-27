@@ -469,12 +469,19 @@ class RbacMutationService:
         return current_actor
 
     def _require_user(self, user_id: int) -> User:
-        user = self._repository.get_user(user_id)
-        if user is None:
+        peeked = self._repository.get_user(user_id)
+        if peeked is None:
             raise AppError(
                 code=IamErrorCode.USER_NOT_FOUND,
                 message="Target user was not found",
                 status_code=404,
+            )
+        user = self._repository.get_user_for_update(user_id)
+        if user is None or user.status != "ACTIVE":
+            raise AppError(
+                code=IamErrorCode.FORBIDDEN,
+                message="Target user is not active",
+                status_code=409,
             )
         return user
 

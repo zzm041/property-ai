@@ -10,6 +10,7 @@ from app.provider.factory import build_llm_provider, build_vlm_provider
 from app.provider.llm import QwenLLMProvider
 from app.provider.vision import QwenVLMProvider
 from app.provider.storage import DevelopmentStorageProvider
+from app.domain.vision import VISION_ANALYSIS_PROMPT_VERSION, vision_analysis_response_format
 
 
 @pytest.mark.parametrize("vision", [False, True])
@@ -17,7 +18,9 @@ from app.provider.storage import DevelopmentStorageProvider
 def test_request_controls_are_explicit_and_default_payload_unchanged(vision, bounded):
     def handler(request):
         body = json.loads(request.content)
-        assert body["response_format"] == {"type": "json_object"}
+        assert body["response_format"] == (
+            vision_analysis_response_format() if vision else {"type": "json_object"}
+        )
         assert body["temperature"] == 0
         if bounded:
             assert body["reasoning_effort"] == "none"
@@ -27,9 +30,9 @@ def test_request_controls_are_explicit_and_default_payload_unchanged(vision, bou
         if vision:
             content = body["messages"][0]["content"]
             assert content[1]["image_url"]["url"].startswith("data:image/png;base64,")
-            assert '中文8字' in content[0]['text']
-            assert '物体通称及明显破损，禁止完好/正常/细类' in content[0]['text']
-            assert QwenVLMProvider.prompt_version == 'repair-photo-v4'
+            assert '可直接观察到' in content[0]['text']
+            assert request.headers["X-Prompt-Version"] == VISION_ANALYSIS_PROMPT_VERSION
+            assert QwenVLMProvider.prompt_version == VISION_ANALYSIS_PROMPT_VERSION
         return httpx.Response(200, json={"choices": [{"message": {"content": json.dumps({"description": "synthetic", "labels": [], "confidence": 0.5})}}]})
 
     storage = DevelopmentStorageProvider()
@@ -71,3 +74,27 @@ def test_default_settings_do_not_switch_providers_or_controls():
     assert settings.llm_provider == settings.vlm_provider == "development"
     assert settings.llm_disable_thinking is settings.vlm_disable_thinking is False
     assert settings.llm_max_output_tokens is settings.vlm_max_output_tokens is None
+
+
+def test_vlm_rejects_saved_nested_json_wrapper_without_recursive_rewrite():
+    storage = DevelopmentStorageProvider()
+    item = storage.register_object(mime_type="image/png", size_bytes=3, tenant_id=51, property_id=61)
+    storage.put_object(item.storage_key, b"png", "image/png")
+
+    def handler(_request):
+        nested = {"JSON": json.dumps({"description": "蓝色闸阀", "labels": ["闸阀"], "confidence": 0.95})}
+        return httpx.Response(200, json={"choices": [{"message": {"content": json.dumps(nested)}, "finish_reason": "stop"}]})
+
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        provider = QwenVLMProvider(
+            base_url="http://127.0.0.1:11435/v1",
+            model="qwen3.5:4b",
+            api_key="synthetic-local-only",
+            timeout_seconds=2,
+            storage=storage,
+            client=client,
+        )
+        from app.provider.errors import ProviderInvalidOutputError
+
+        with pytest.raises(ProviderInvalidOutputError):
+            provider.inspect_image(storage_key=item.storage_key, mime_type="image/png")

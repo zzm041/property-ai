@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 RecoveryPurpose = Literal["MERGE_SOURCE_PROOF", "ACCOUNT_RECOVERY", "PHONE_REUSE"]
@@ -39,6 +39,23 @@ class FinalizeIdentityRecoveryCaseRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     expected_version: int = Field(strict=True, ge=1)
+
+
+class CompleteIdentityRecoveryCaseRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    expected_version: int = Field(strict=True, ge=1)
+    current_password: str | None = Field(default=None, max_length=128)
+    target_reauth_assertion: str | None = Field(default=None, min_length=8, max_length=2048)
+    new_password: str | None = Field(default=None, max_length=128)
+    confirm_password: str | None = Field(default=None, max_length=128)
+    confirm_replace_phone: bool = False
+
+    @model_validator(mode="after")
+    def validate_new_password_confirmation(self):
+        if self.new_password != self.confirm_password:
+            raise ValueError("New password and confirmation must match")
+        return self
 
 
 class IdentityRecoveryCaseData(BaseModel):

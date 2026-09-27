@@ -157,17 +157,19 @@ class WeChatAuthService:
                 message="WeChat auth is unavailable",
                 status_code=503,
             ) from exc
+        credential_service = CredentialAuthService(self._session, settings=settings)
         bound: UserWechat | None = None
 
         def _persist() -> None:
             nonlocal bound
-            user = self._identity.get_user(user_id)
-            if user is None or user.status != "ACTIVE":
+            try:
+                user = credential_service._lock_active_user(user_id)
+            except AppError as exc:
                 raise AppError(
                     code=AuthErrorCode.USER_DISABLED,
                     message="User is not active",
                     status_code=401,
-                )
+                ) from exc
             candidates = self._repository.list_user_wechat_rebind_candidates_for_update(
                 user_id=user.id,
                 appid=session.appid,
@@ -303,6 +305,7 @@ class WeChatAuthService:
         issued_box: list[IssuedSession] = []
 
         def _persist() -> None:
+            credential_service._lock_active_user(user_id)
             current_phone = (
                 credential_repository.get_active_phone_for_user_for_update(user_id)
             )
@@ -318,7 +321,6 @@ class WeChatAuthService:
                 openid=wechat_session.openid,
                 unionid=wechat_session.unionid,
             )
-            credential_service._lock_active_user(user_id)
             current_bindings = [
                 item
                 for item in candidates

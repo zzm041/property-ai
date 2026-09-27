@@ -196,10 +196,24 @@ class EmployeeIdentityService:
                     message="Invitation is invalid or expired",
                     status_code=400,
                 )
+            peeked_expires_at = getattr(peeked, "expires_at", None)
+            if (
+                getattr(peeked, "status", "ACTIVE") != "ACTIVE"
+                or (peeked_expires_at is not None and peeked_expires_at <= utc_now())
+            ):
+                raise AppError(
+                    code=EmployeeErrorCode.INVALID_INPUT,
+                    message="Invitation is invalid or expired",
+                    status_code=400,
+                )
+            from app.service.identity_write_guard import lock_active_identity
+
+            lock_active_identity(self._session, actor.user_id)
             employee = self._employees.get_employee_for_update(peeked.employee_id)
             invite = (
                 self._session.query(EmployeeInvite)
                 .filter(EmployeeInvite.token_hash == token_hash)
+                .populate_existing()
                 .with_for_update()
                 .one_or_none()
             )

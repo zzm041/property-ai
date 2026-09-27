@@ -15,6 +15,26 @@
     <view wx:else class="error">当前尚未配置获批准的可信身份核验渠道，系统不会伪造核验或允许短信接管。请联系系统负责人。</view>
   </block>
 </view>
+<view class="card" wx:if="{{cases.length}}">
+  <view class="section-title">我的申请</view>
+  <block wx:for="{{cases}}" wx:key="id">
+    <view class="case-row">
+      <view>#{{item.id}} · {{item.purpose}} · {{item.status}}</view>
+      <view>号码：{{item.masked_phone}} · 审核 {{item.approval_count}}/2</view>
+      <view wx:if="{{item.status === 'APPROVED'}}" class="completion-box">
+        <view class="empty">审核通过尚未改变账号。请再次验证目标账号；目标尚无密码时需设置新密码。</view>
+        <input data-field="currentPassword" value="{{currentPassword}}" bindinput="onField" password="true" placeholder="目标账号当前密码（如已有）" maxlength="128" />
+        <input data-field="targetReauthAssertion" value="{{targetReauthAssertion}}" bindinput="onField" password="true" placeholder="无密码账号的目标身份核验令牌" maxlength="2048" />
+        <input data-field="newPassword" value="{{newPassword}}" bindinput="onField" password="true" placeholder="新密码（目标尚无密码时）" maxlength="128" />
+        <input data-field="confirmPassword" value="{{confirmPassword}}" bindinput="onField" password="true" placeholder="确认新密码" maxlength="128" />
+        <checkbox-group wx:if="{{item.purpose === 'PHONE_REUSE'}}" bindchange="onReplacePhoneConfirm">
+          <label><checkbox value="replace" checked="{{confirmReplacePhone}}" />确认用本次号码替换目标账号当前手机号</label>
+        </checkbox-group>
+        <button class="btn" disabled="{{loading}}" data-id="{{item.id}}" bindtap="complete">确认并执行身份事务</button>
+      </view>
+    </view>
+  </block>
+</view>
 <view class="loading" wx:if="{{loading}}">加载中...</view>
 <view class="notice" wx:if="{{notice}}">{{notice}}</view>
 <view class="error" wx:if="{{error}}">{{error}}</view>

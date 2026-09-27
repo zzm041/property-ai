@@ -36,6 +36,8 @@ class Settings(BaseSettings):
     sms_send_limit_per_hour: int = Field(default=5, ge=1, le=20)
     sms_login_limit_per_hour: int = Field(default=10, ge=1, le=30)
     dev_seed_lock_timeout_seconds: int = Field(default=5, ge=0, le=30)
+    identity_test_proof_enabled: bool = False
+    identity_test_proof_secret: SecretStr = SecretStr("")
 
     api_host: str = "0.0.0.0"
     api_port: int = Field(default=8000, ge=1, le=65535)
@@ -213,6 +215,19 @@ class Settings(BaseSettings):
                 raise ValueError("Production WeChat login requires WECHAT_APP_SECRET")
         if self.app_env == "production":
             self._require_production_provider_credentials()
+        if self.identity_test_proof_enabled:
+            target = make_url(self.active_database_url)
+            if (
+                self.app_env != "test"
+                or target.drivername != "mysql+pymysql"
+                or target.host != "127.0.0.1"
+                or (target.port or 3306) != 3307
+                or target.database != "property_ai_auth001_test"
+                or not self.identity_test_proof_secret.get_secret_value()
+            ):
+                raise ValueError(
+                    "Identity test proof requires exact AUTH001 test isolation and a private signing secret"
+                )
         return self
 
     def _require_production_provider_credentials(self) -> None:

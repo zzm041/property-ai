@@ -80,11 +80,13 @@ def _build_service(
         audit_service=audit_service,
         principal_loader=principal_loader,
     )
-    repository.get_user.return_value = User(
+    target_user = User(
         id=20,
         status="ACTIVE",
         display_name="Target",
     )
+    repository.get_user.return_value = target_user
+    repository.get_user_for_update.return_value = target_user
     repository.get_role_by_code.return_value = Role(
         id=31,
         code="PROPERTY_ADMIN",
