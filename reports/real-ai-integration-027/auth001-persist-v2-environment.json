@@ -1,0 +1,66 @@
+{
+  "task_id": "PRODUCTION-V1-CLOSEOUT-PERSIST-V2",
+  "recorded_at_utc": "2026-09-27T15:03:07.189632+00:00",
+  "mysql": {
+    "container": "property-ai-auth001-persist-v2",
+    "container_id": "2f2625b367e84b82e0298838b2001acdf1eb036d3664c2601a640fe7f35214b0",
+    "image": "mysql@sha256:bf577825b52ab281d6281fb281eabbfdc73507eda8f2c2745790251533ef0306",
+    "volume": "property-ai-auth001-persist-v2-data",
+    "volume_mode": "named-persistent-volume",
+    "target": "127.0.0.1:3307/property_ai_auth001_test",
+    "server_uuid": "29ae447e-ba81-11f1-9554-36b749bec9d6",
+    "accepted_source_dump_sha256": "49A4273A77F8298D2CED2C7FD4A4F1F868B82972950DFFEAEBC436EC2D826C0C",
+    "restart_persistence_verified": true,
+    "baseline_revision": "20260925_0012_task_intents",
+    "baseline_table_count": 58,
+    "baseline_counts": {"users": 15, "work_orders": 40, "task_intents": 39, "work_order_assignments": 36, "audit_logs": 754},
+    "new_external_backup": {
+      "path": "D:/property-ai/tmp/auth001-persist-v2/backups/baseline-20260927v2/auth001-0012.sql",
+      "bytes": 749523,
+      "sha256": "C5BF89EEEFB272AC7313C59169DDC2E2807FFB854E9DB566CE02BFF5BF94322F"
+    }
+  },
+  "migration_0014": {
+    "status": "PARTIAL_DDL_REVISION_NOT_ADVANCED",
+    "revision": "20260925_0012_task_intents",
+    "cause": "alembic_version.version_num is VARCHAR(32), shorter than revision 20260926_0014_identity_merge_sla_versions",
+    "present_empty_new_tables": ["account_merges", "identity_recovery_cases", "identity_recovery_reviews", "phone_identity_tombstones", "sla_policy_versions", "work_order_sla_applications"],
+    "identity_review_permission_count": 0,
+    "system_admin_grant_count": 0,
+    "new_feature_writes_blocked": true,
+    "automatic_drop_downgrade_stamp_or_overwrite_performed": false
+  },
+  "dedicated_dependencies": {
+    "network": "property-ai-auth001-persist-v2-net",
+    "rabbitmq": {
+      "container": "property-ai-auth001-persist-v2-rabbitmq",
+      "container_id": "6f47c94df70ef507560e4fa6e78fd97b8c77a40b1a238e34e3250579a324db1b",
+      "image_digest": "sha256:606d8c0d6b3c18d1da9afc53bc7cdb2a8d5486df91b5a9830e9e07626c9ae281",
+      "port": 5675,
+      "management_port": 15675,
+      "vhost": "property_ai_auth001_persist_v2",
+      "planned_queue": "property_ai.auth001.persist.v2",
+      "volume": "property-ai-auth001-persist-v2-rabbitmq-data",
+      "queue_declared_or_consumed": false
+    },
+    "redis": {
+      "container": "property-ai-auth001-persist-v2-redis",
+      "container_id": "4ff42fc80979b504994ca99201e280cea277e816619c4d23edd8ab54f862a509",
+      "image_digest": "sha256:02419de7eddf55aa5bcf49efb74e88fa8d931b4d77c07eff8a6b2144472b6952",
+      "port": 6382,
+      "volume": "property-ai-auth001-persist-v2-redis-data"
+    },
+    "minio": {
+      "container": "property-ai-auth001-persist-v2-minio",
+      "container_id": "857e5e535e56e312ae5c55f7ce6a725567bd594544eed429bdb8016e117be0d5",
+      "image_digest": "sha256:1dce27c494a16bae114774f1cec295493f3613142713130c2d22dd5696be6ad3",
+      "port": 9002,
+      "console_port": 9003,
+      "planned_bucket": "property-ai-auth001-persist-v2",
+      "volume": "property-ai-auth001-persist-v2-minio-data",
+      "bucket_created": false
+    }
+  },
+  "secrets": "ignored host files only; values and hashes omitted from Git evidence",
+  "legacy_or_shared_services_connected_or_modified": false
+}
