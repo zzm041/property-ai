@@ -50,15 +50,15 @@ def main():
         sys.argv.remove('--supplement')
         runpy.run_path(str(OUT/'run-approved-supplement.py'), run_name='__main__')
         return
-    parser=argparse.ArgumentParser();parser.add_argument('--round',type=int,choices=range(4));parser.add_argument('--model',choices=('qwen3.5:4b','qwen3.5:9b'),default='qwen3.5:4b');parser.add_argument('--phase',choices=('screen','fixed'));parser.add_argument('--candidate',type=int,choices=(1,2));args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--round',type=int,choices=range(4));parser.add_argument('--model',choices=('qwen3.5:4b','qwen3.5:9b'),default='qwen3.5:4b');parser.add_argument('--phase',choices=('screen','fixed','novel'));parser.add_argument('--candidate',type=int,choices=(1,2));args=parser.parse_args()
     if args.model=='qwen3.5:4b':
         assert args.round is not None and args.phase is None and args.candidate is None,'Historical 4B mode requires --round only'
         target=OUT/f'quality28-round{args.round}.json';run_out=OUT;max_requests=32
     else:
         assert args.round is None and args.phase is not None and args.candidate is not None,'9B mode requires --phase and --candidate'
-        assert args.candidate==1 or args.phase=='fixed','Candidate 2 is the one allowed concentrated repair and must run the complete fixed set'
+        assert args.candidate==1 or args.phase in {'fixed','novel'},'Candidate 2 cannot add another screen after the one allowed concentrated repair'
         budget_root=ROOT/'reports/real-ai-integration-027/diagnostic-r3-9b';run_out=budget_root/f'candidate-{args.candidate:02d}';run_out.mkdir(parents=True,exist_ok=True)
-        target=run_out/f'{args.phase}.json';max_requests=10 if args.phase=='screen' else 22 if args.candidate==1 else 32
+        target=run_out/f'{args.phase}.json';max_requests=10 if args.phase=='screen' else 4 if args.phase=='novel' else 22 if args.candidate==1 else 32
     assert not target.exists(),'Recorded round is immutable: inspect or explicit new repair round; no replay'
     helpers=runpy.run_path(str(OUT/'probe-model.py'));api=helpers['api'];sample=helpers['resource_sample']
     textpath=OUT/'gold-set-24.json';photopath=OUT/'repair-image-gold.json'
@@ -68,12 +68,17 @@ def main():
     assert len(gold['cases'])==24 and len(photos['cases'])==4
     overlay_path=ROOT/'reports/real-ai-integration-027/qwen35-9b-evaluation-overlay.json'
     overlay=(json.loads(overlay_path.read_text(encoding='utf-8')) if args.model=='qwen3.5:9b' else None)
+    novel_path=ROOT/'reports/real-ai-integration-027/qwen35-9b-novel-set.json'
+    novel=(json.loads(novel_path.read_text(encoding='utf-8')) if args.model=='qwen3.5:9b' else None)
     if overlay is not None:
         assert overlay['base_gold_unchanged'] is True and set(overlay['cases'])=={item['id'] for item in gold['cases']}
     all_items=gold['cases']+photos['cases']
     if args.model=='qwen3.5:9b' and args.phase=='screen':
         selected_items=[item for item in all_items if item['id'] in SCREEN_IDS]
         assert tuple(item['id'] for item in selected_items)==SCREEN_IDS
+    elif args.model=='qwen3.5:9b' and args.phase=='novel':
+        assert novel['frozen_before_first_9b_inference'] is True and len(novel['cases'])==4
+        selected_items=novel['cases']
     else:selected_items=all_items
     downloads=json.loads((OUT/'repair-image-downloads.json').read_text(encoding='utf-8'))
     images={}
@@ -115,8 +120,8 @@ def main():
        'model':args.model,'model_digest':digest,'quantization':'Q4_K_M','prompt_version':WORK_ORDER_ANALYSIS_PROMPT_VERSION,
        'vision_prompt_version':getattr(QwenVLMProvider,'prompt_version','unversioned-original'),
        'source_hashes':{p:sha(ROOT/p) for p in ['backend/app/service/analysis.py','backend/app/domain/ai.py','backend/app/provider/llm/__init__.py','backend/app/provider/vision/__init__.py','backend/app/provider/http.py','reports/auth-identity-ai-001/local-qwen/run-quality28.py']},
-       'gold_hashes':{textpath.name:sha(textpath),photopath.name:sha(photopath),**({'qwen35-9b-evaluation-overlay.json':sha(overlay_path)} if overlay is not None else {})},'runtime':runtime,
-       'controls':{'context':4096,'temperature':0,'thinking':False,'llm_max_tokens':512,'vlm_max_tokens':256,'timeout_seconds':60,'parallel':1,'max_cases':8 if args.phase=='screen' else 28,'max_inference_requests':max_requests},
+       'gold_hashes':{textpath.name:sha(textpath),photopath.name:sha(photopath),**({'qwen35-9b-evaluation-overlay.json':sha(overlay_path),'qwen35-9b-novel-set.json':sha(novel_path)} if overlay is not None else {})},'runtime':runtime,
+       'controls':{'context':4096,'temperature':0,'thinking':False,'llm_max_tokens':512,'vlm_max_tokens':256,'timeout_seconds':60,'parallel':1,'max_cases':8 if args.phase=='screen' else 4 if args.phase=='novel' else 28,'max_inference_requests':max_requests},
        'cumulative_budget':{'path':str(budget_path),'call_limit':NINE_B_TOTAL_CALL_LIMIT,'model_seconds_limit':NINE_B_TOTAL_MODEL_SECONDS,'deadline_utc':NINE_B_DEADLINE_UTC.isoformat()} if args.model=='qwen3.5:9b' else None,
        'business_calls':False,'database_access':False,'queue_access':False,'business_runtime_changed':False,'attempted_requests':0,'reused_requests':0,'results':[],'status':'RUNNING'}
     def save():target.write_text(json.dumps(e,ensure_ascii=False,indent=2,default=str)+'\n',encoding='utf-8')
@@ -185,6 +190,9 @@ def main():
             assert screen['prompt_version']==e['prompt_version'] and screen['vision_prompt_version']==e['vision_prompt_version']
             assert screen['source_hashes']==e['source_hashes'] and screen['gold_hashes']==e['gold_hashes']
             reused={row['id']:row for row in screen['results']};assert tuple(reused)==SCREEN_IDS and screen['attempted_requests']==10
+        if args.model=='qwen3.5:9b' and args.phase=='novel':
+            fixed=json.loads((run_out/'fixed.json').read_text(encoding='utf-8'))
+            assert fixed['status']=='RECORDED_NEEDS_SEMANTIC_REVIEW' and fixed['source_hashes']==e['source_hashes'] and fixed['gold_hashes']==e['gold_hashes']
         for item in selected_items:
             if item['id'] in reused:
                 case=json.loads(json.dumps(reused[item['id']]))
@@ -205,7 +213,7 @@ def main():
             case.update(raw_payload=payload,provider_error=error,provider_status=status)
             try:
                 valid=WorkOrderAnalysisOutput.model_validate(payload);mapped=map_analysis_output(valid)
-                accepted=item['accept'] if overlay is None or is_photo else overlay['cases'][item['id']]['accept']
+                accepted=item['accept'] if overlay is None or is_photo or args.phase=='novel' else overlay['cases'][item['id']]['accept']
                 case['mechanical_checks']={'schema_and_mapping':True,'has_cjk_hint':bool(re.search('[\u4e00-\u9fff]',valid.summary)),
                     'summary':valid.summary,'severity':valid.severity,'priority':valid.priority,'risk':valid.risk,'required_role':valid.required_role,'required_skill':valid.required_skill,'confidence':valid.confidence,
                     'below_confidence_threshold':valid.confidence<gold['common_gold']['confidence_threshold'],'business_fallback':mapped.low_confidence,
@@ -214,8 +222,8 @@ def main():
             except Exception as exc:case['mechanical_checks']={'schema_and_mapping':False,'error_type':type(exc).__name__}
             save();print(json.dumps({'case':item['id'],'requests':e['attempted_requests'],'payload':payload},ensure_ascii=False),flush=True)
             if e.get('stop_reason'):break
-        expected_cases=8 if args.model=='qwen3.5:9b' and args.phase=='screen' else 28
-        expected_calls=10 if args.model=='qwen3.5:9b' and args.phase=='screen' else 32
+        expected_cases=8 if args.model=='qwen3.5:9b' and args.phase=='screen' else 4 if args.model=='qwen3.5:9b' and args.phase=='novel' else 28
+        expected_calls=10 if args.model=='qwen3.5:9b' and args.phase=='screen' else 4 if args.model=='qwen3.5:9b' and args.phase=='novel' else 32
         e['status']='RECORDED_NEEDS_SEMANTIC_REVIEW' if len(e['results'])==expected_cases and e['attempted_requests']+e['reused_requests']==expected_calls and not e.get('stop_reason') else 'INCOMPLETE'
     except Exception as exc:e['status']='INCOMPLETE';e.setdefault('stop_reason',type(exc).__name__);raise
     finally:

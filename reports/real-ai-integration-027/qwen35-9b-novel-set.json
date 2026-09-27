@@ -1,0 +1,48 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "set_version": "qwen35-9b-novel-v1",
+  "frozen_before_first_9b_inference": true,
+  "scope": "Four synthetic Chinese text cases not used for prompt tuning or the original fixed28; no residents, business objects, database or queue.",
+  "cases": [
+    {
+      "id": "NOVEL-001",
+      "tags": ["统一维修组", "多项普通维修", "完整摘要"],
+      "report": "客厅窗边墙皮鼓起并掉了一小块，旁边暖气阀门接头还在缓慢滴水；地面只有几滴，没有碰到插座。这两项都请维修组一起看。",
+      "history": [],
+      "facts": ["墙皮鼓起掉落", "阀门接头缓慢滴水", "少量水且未接触插座", "两项普通维修"],
+      "forbidden": ["只保留一个问题", "大面积淹水", "漏电", "拆成两个工单", "指定员工"],
+      "accept": [["other", "maintenance", ["none"]]],
+      "manual": "RULES"
+    },
+    {
+      "id": "NOVEL-002",
+      "tags": ["历史污染", "清洁", "否定危险"],
+      "report": "今天只需要清理电梯厅的一袋废纸，袋子靠墙不挡路，没有液体和碎玻璃。上个月这里的焦味已经处理完，与今天无关。",
+      "history": [["ELECTRICAL", "CLOSED", "电梯厅曾有焦味，已排查处理"]],
+      "facts": ["当前仅废纸清理", "不挡路", "无液体碎玻璃", "焦味是已关闭历史"],
+      "forbidden": ["当前焦味", "当前电气危险", "堵塞通道", "维修组处理清扫"],
+      "accept": [["cleaning", "cleaning", ["none"]]],
+      "manual": "RULES"
+    },
+    {
+      "id": "NOVEL-003",
+      "tags": ["信息不足", "猜测来源", "禁止补造"],
+      "report": "卧室偶尔听见一声轻响，我没找到是屋里还是窗外，也没有看到任何设备异常；目前无法提供更多信息。",
+      "history": [],
+      "facts": ["偶尔轻响", "来源和对象未知", "没有观察到设备异常", "信息不足"],
+      "forbidden": ["确认空调故障", "确认电气故障", "确认窗户损坏", "高置信自动派单"],
+      "accept": [["other", "other", ["none", "other"]]],
+      "manual": "LOW"
+    },
+    {
+      "id": "NOVEL-004",
+      "tags": ["电气风险", "当前与过去", "否定伤害"],
+      "report": "玄关灯昨晚闪过两次，今天开灯时开关面板又出现火花；现在没人受伤，也没有烟。我已经不再碰开关，但没有说故障已经消失。",
+      "history": [],
+      "facts": ["昨晚灯闪", "今天开关面板出现火花", "无人受伤无烟", "停止触碰但未确认故障消失"],
+      "forbidden": ["已修复", "有人受伤", "正在冒烟", "认定内部短路原因", "忽略当前火花"],
+      "accept": [["electrical", "maintenance", ["electric", "safety"]]],
+      "manual": "RISK"
+    }
+  ]
+}
