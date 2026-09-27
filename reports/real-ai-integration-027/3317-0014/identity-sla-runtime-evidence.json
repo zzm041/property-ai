@@ -1,0 +1,76 @@
+{
+  "task_id": "PRODUCTION-V1-3317-IDENTITY-SLA-RUNTIME",
+  "run_id": "id-sla3317-0f26435219",
+  "resumed_after_transactional_finalize_failure": true,
+  "started_utc": "2026-09-27T19:20:07.018604+00:00",
+  "finished_utc": "2026-09-27T19:20:08.384292+00:00",
+  "environment": {
+    "database": "127.0.0.1:3317/property_ai_auth001_test@0014",
+    "api": "127.0.0.1:8083",
+    "analysis": "Development",
+    "enqueue": false,
+    "rabbitmq": "blocked-not-connected"
+  },
+  "identity": {
+    "case_id": 1,
+    "source_user_id": 23,
+    "target_user_id": 24,
+    "reviewer_user_ids": [
+      25,
+      26
+    ],
+    "invalid_proof_status": 403,
+    "duplicate_review_status": 409,
+    "early_finalize_status": 409,
+    "future_clock": "2026-10-27T19:16:26.950070+00:00",
+    "final_status": "COMPLETED",
+    "source_status": "MERGED",
+    "target_status": "ACTIVE",
+    "source_active_sessions": 0,
+    "source_password_rows": 0,
+    "merge_rows": 1,
+    "audit_rows": 5,
+    "old_source_password_status": 401,
+    "old_target_session_status": 401,
+    "fresh_target_password_login": true,
+    "mine_contains_completed": true,
+    "proof_mode": "isolated synthetic server fixture; not real identity verification"
+  },
+  "sla": {
+    "policy_id": 1,
+    "version_numbers": [
+      1,
+      2
+    ],
+    "work_order_id": 42,
+    "application_policy_version_id": 1,
+    "snapshot": [
+      7,
+      17,
+      47,
+      5,
+      9
+    ],
+    "updated_policy_version": 2,
+    "legacy_work_order_1_application_count": 0,
+    "clock_state": "OPEN",
+    "clock_fields_present": true,
+    "bind_request_id": 121,
+    "bind_status": "APPROVED"
+  },
+  "synthetic_phone_hashes": {
+    "source": "c74f16accaf5f6b5",
+    "target": "1f2411fcc018e798",
+    "reviewer1": "2464fd5f6ddfb386",
+    "reviewer2": "e557c1f701904478",
+    "resident": "d1803a608b1e1ce3",
+    "admin": "8dce8bf856dd8ad3"
+  },
+  "request_id_count": 28,
+  "direct_business_sql_writes": 0,
+  "test_fixtures": [
+    "audited role grants",
+    "identity +31 day injected service clock"
+  ],
+  "model_requests": 0
+}

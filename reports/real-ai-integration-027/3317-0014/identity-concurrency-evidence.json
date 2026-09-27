@@ -1,0 +1,30 @@
+{
+  "task_id": "PRODUCTION-V1-3317-IDENTITY-CONCURRENCY",
+  "run_id": "id-sla3317-0f26435219",
+  "database": "127.0.0.1:3317/property_ai_auth001_test@0014",
+  "case_id": 1,
+  "contenders": [
+    {
+      "contender": 1,
+      "case_id": 1,
+      "status": "COMPLETED",
+      "version": 5
+    },
+    {
+      "contender": 2,
+      "case_id": 1,
+      "status": "COMPLETED",
+      "version": 5
+    }
+  ],
+  "final": {
+    "case_status": "COMPLETED",
+    "case_version": 5,
+    "source_status": "MERGED",
+    "target_status": "ACTIVE",
+    "account_merge_rows": 1,
+    "completion_audit_rows": 1
+  },
+  "new_business_objects": 0,
+  "model_requests": 0
+}

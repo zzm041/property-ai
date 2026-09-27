@@ -1,0 +1,68 @@
+{
+  "task_id": "PRODUCTION-V1-3317-0014-RUNTIME",
+  "round": 3,
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "base_sha": "4cc9fa0da8ceef128b742f923cc7a2d0a23a2382",
+  "decision": "PASS_SCOPED_RUNTIME",
+  "findings": [],
+  "prior_findings": [
+    {"id": "3317-R1-01", "status": "CLOSED"},
+    {"id": "3317-R1-02", "status": "CLOSED"},
+    {"id": "3317-R1-03", "status": "CLOSED"}
+  ],
+  "accepted_evidence": {
+    "environment_and_migration": [
+      "manifest及实际restart-verification.json记录同一3317命名卷实例：0012、58表、五项代表计数、server_uuid及两条手机号唯一约束在重启前后相同。",
+      "版本列凭据记录VARCHAR32→64，保留NOT NULL、主键属性、utf8mb4及原排序规则，revision未被stamp。",
+      "migration-0014.json记录目标revision正常推进、六张新表及RBAC增量；身份表与历史工单应用未被伪造填充。",
+      "恢复备份副本SHA256实际核对为c5bf89eeefb272ac7313c59169ddc2e2807ffb854e9db566ce02bff5bf94322f。",
+      "post0014宿主机备份SHA256实际核对为b67ee8a627cddefae4aee91b77fd27fcadc3bf8989d5269a821cc1476b7ee0fc。此项证明备份已保存，不证明该post0014备份已演练恢复。"
+    ],
+    "identity": [
+      "同一run id-sla3317-0f26435219、case1的原始API日志支持无效Proof403、重复审核409及隔离期内提前finalize409。",
+      "恢复脚本仅续接来源用户匹配、PENDING_REVIEW/version3的唯一案件。",
+      "带明确注入时钟的真实Service/MySQL事务完成后，保存证据显示case COMPLETED、source MERGED、目标ACTIVE、来源有效会话及密码行归零、单条merge。",
+      "原始API日志支持旧来源密码401、旧目标会话SESSION_REVOKED 401、新目标密码登录200及完成案件读取200。",
+      "两路已完成案件重入均返回COMPLETED/version5，数据库证据保留单条merge及单条完成审计。"
+    ],
+    "sla": [
+      "真实API创建策略v1、创建工单42、更新策略v2均有对应请求日志。",
+      "保存数据库结果支持工单42仍绑定v1快照7/17/47/5/9；v2为11/23/59/6/12，未覆盖v1。",
+      "旧工单1没有伪造的work_order_sla_applications记录。",
+      "本次迁移时sla_policies原有行数为0，不能据此宣称已验证非空历史策略的基线捕获。"
+    ],
+    "pages": [
+      "已通过图像工具实际查看01-target-completed-identity.png：case1 COMPLETED、审核2/2、号码掩码。",
+      "已实际查看02-reviewer-completed-identity.png：同一case1 COMPLETED、两人批准及隔离截止时间。",
+      "已实际查看03-sla-version2.png：正常SLA管理页面显示11/23/59等v2配置；结合page-evidence与API记录核对版本。",
+      "页面采集脚本使用正常输入、点击、导航和实际页面数据；本轮页面仅展示读取，没有把页面提交完成合并算作已验证。"
+    ],
+    "audit_fix": "APPROVED仅对IDENTITY_RECOVERY_FINALIZED增加允许分支，没有扩大全局状态白名单；正向及其他action拒绝测试已读取。",
+    "source_binding": {
+      "manifest": "D:/property-ai/reports/real-ai-integration-027/3317-0014/runtime-source-binding.json",
+      "manifest_sha256": "68AE93008189CA73C25EEF6BD172ECA9A87EEA6884692EDC3B8F77955CC22352",
+      "fixed_app_file_count": 172,
+      "independently_recomputed_tree_sha256": "3d13a2b2554c31360fb2728a0beceed748c56226bb4b31ffcc93099200c90681",
+      "audit_source_sha256": "4B30CC6059B3D00831AD160D660318A30818D759A828B850F715A78B5F9E20B4",
+      "boundary": "固定副本及四项绑定证据hash匹配；进程PID、创建时间与监听关系依据主会话保存的只读记录，本审查未查询实时进程。"
+    },
+    "privacy": "所读公开JSON、截图和日志未发现完整手机号、密码、Proof assertion或会话Token泄露；未读取私密上下文、secret文件或SQL备份内容。"
+  },
+  "evidence_limits": [
+    "恢复基线为15 users/754 audits；迁移前合成SYSTEM_ADMIN前置新增1 user及3 audit，post0014为16/757。protected_history_unchanged不等于没有前置新增记录。",
+    "首次准备失败的6个合成账号记录保留，不将其计作成功身份案件。",
+    "finalize/complete使用注入隔离期结束时钟的Service事务，不是实际等待30天，也不是正常页面完成提交。",
+    "并发结果仅证明已COMPLETED案件的幂等重入，不证明首次完成竞态、非空资产转移冲突或员工占用并发。",
+    "SLA本轮证明版本、快照及页面读取，不证明Worker超时升级调度。",
+    "验证脚本使用恢复基线的tenant/property/house 1/1/1，不代表动态资源发现已验证。",
+    "指定的restore-evidence.json、restart-evidence.json不存在；实际采用manifest.json及restart-verification.json，不补造原文件。",
+    "58 passed及81 passed加1项setup ERROR、随后精确单测1 passed为主实施会话报告；审查者读取了相关测试源码，未独立重跑或读取这些运行的原始输出，不合并称单次82 passed。"
+  ],
+  "remaining_blockers": [
+    {"classification": "RELEASE_BLOCKER", "item": "RabbitMQ Worker及投递器", "status": "未通过", "basis": "容器ID不符原因UNKNOWN；解决记录不存在；API enqueue=false，未启动本轮Worker或投递器。不能据身份/SLA成功解除该阻塞。"},
+    {"classification": "RELEASE_BLOCKER", "item": "可信真实身份Proof", "status": "未通过", "basis": "仅使用精确隔离环境的测试Proof及合成角色fixture。"},
+    {"classification": "RELEASE_BLOCKER", "item": "9B质量及真实AUTO", "status": "RESOURCE_FLOOR / NOT_READY", "basis": "本轮业务脚本未请求模型；4808MiB低于8200MiB为主会话资源观察，审查未重复测量。不得升级为真实模型或AUTO通过。"},
+    {"classification": "RELEASE_BLOCKER", "item": "Production V1", "status": "NOT_FULL_PASS", "basis": "生产部署、真实Provider、设备及完整运行验收未在本轮完成。"}
+  ],
+  "next_action": "保存本轮独立审查及绑定，按准确路径提交本任务源码和脱敏证据，更新handoff/matrix为上述受限local Development结果；保留失败记录、前置新增对象和全部发布阻塞。不要重跑已通过业务，不因本PASS自行解决Rabbit身份差异、启动Worker/投递器或追加9B调用。"
+}

@@ -1,0 +1,29 @@
+{
+  "task_id": "PRODUCTION-V1-3317-IDENTITY-SLA-RUNTIME",
+  "run_id": "id-sla3317-71cea62c99",
+  "status": "HARNESS_PREREQUISITE_FAILED",
+  "failure": {
+    "step": "grant_property_admin_fixture",
+    "reason": "The restored baseline does not contain the PROPERTY_ADMIN role definition.",
+    "classification": "fixture/reference-data mismatch; no product PASS or FAIL conclusion"
+  },
+  "created_synthetic_user_ids": [17, 18, 19, 20, 21, 22],
+  "completed_before_failure": [
+    "six normal Development SMS authentications",
+    "six profile updates",
+    "source and target password setup",
+    "two SYSTEM_ADMIN reviewer fixture grants"
+  ],
+  "not_started": [
+    "identity recovery case",
+    "identity reviews/finalize/complete",
+    "resident binding",
+    "SLA policy write",
+    "work order creation"
+  ],
+  "read_only_confirmation": {
+    "identity_recovery_case_count_for_run_users": 0,
+    "available_roles": ["RESIDENT", "STAFF", "SYSTEM_ADMIN", "TENANT_ADMIN"]
+  },
+  "handling": "Objects are retained as failed synthetic setup evidence; no deletion, direct status change, or historical rewrite was performed."
+}

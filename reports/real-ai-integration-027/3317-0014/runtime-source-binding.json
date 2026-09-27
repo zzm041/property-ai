@@ -1,0 +1,53 @@
+{
+  "task_id": "PRODUCTION-V1-3317-0014-RUNTIME-BINDING",
+  "recorded_utc": "2026-09-27T19:34:00Z",
+  "base_head": "4cc9fa0da8ceef128b742f923cc7a2d0a23a2382",
+  "fixed_backend": "D:\\property-ai\\tmp\\auth001-retry-3317\\fixed-source-4cc9fa0\\backend",
+  "source_construction": {
+    "base": "backend/app exported from base_head",
+    "reviewed_overlays": [
+      "app/core/config.py exact 3317 test-proof guard",
+      "app/service/audit.py identity-finalized APPROVED allowlist fix"
+    ],
+    "protected_workspace_ai_excluded": true,
+    "tree_digest_algorithm": "Root is fixed_backend/app. Exclude any path containing __pycache__. Sort POSIX paths relative to that app root with Python codepoint ordering (first path: __init__.py). For each file append relative_path, NUL, lowercase SHA-256 hex, newline; UTF-8 encode the concatenation and SHA-256 it.",
+    "file_count": 172,
+    "tree_sha256": "3d13a2b2554c31360fb2728a0beceed748c56226bb4b31ffcc93099200c90681"
+  },
+  "key_files": {
+    "app/core/config.py": "812864C187F07DB4877AF144F78015EE6B53380F8C5B5146890DB9FFE078CC63",
+    "app/service/audit.py": "4B30CC6059B3D00831AD160D660318A30818D759A828B850F715A78B5F9E20B4",
+    "app/model/ai.py": "866200E80E3046131F21892D2BDC8013E57D5BBB9FFD89457352425EAD2DDBD0",
+    "app/model/ai.py_git_blob": "f652a5120a91fd6b1817867566718cfc8f4a8bd3"
+  },
+  "api_process": {
+    "pid": 41044,
+    "created_utc": "2026-09-27T19:19:49.7687339Z",
+    "executable": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+    "command_line": "python.exe D:\\property-ai\\scripts\\ops\\serve_auth001_retry.py api",
+    "listener": "127.0.0.1:8083",
+    "listener_pid": 41044,
+    "database": "127.0.0.1:3317/property_ai_auth001_test@0014",
+    "enqueue": false,
+    "rabbitmq_connected": false
+  },
+  "runtime_evidence_sha256": {
+    "identity-sla-runtime-evidence.json": "1E33093A15F25668584396FC56A2FEB86712806172462429FA43C24AAD494E96",
+    "identity-concurrency-evidence.json": "790ED18D24773FC0F2445FE048B54102143EAB6E5AEECD9C8D28E3DC56B19E95",
+    "page-evidence.json": "56AE2E3FFDA0AFCCDF3D7AF59E66D7F132C9D1EEC2D2C29221841FF223ED35EB",
+    "initial_api_log_with_403_409_409": "BCB2C844A895DD656E6EF5540201931A5996EBF99CCB7F18FF5FD6C4583C349A"
+  },
+  "migration_count_boundary": {
+    "restored_baseline": {"users": 15, "audit_logs": 754},
+    "pre_migration_synthetic_prerequisite": "one explicitly marked SYSTEM_ADMIN plus three audited setup records",
+    "post_migration_backup": {"users": 16, "audit_logs": 757},
+    "protected_history_unchanged_meaning": "0014 did not rewrite the pre-existing users, phones, work orders, clocks, identity history or audit rows; it does not mean the approved synthetic prerequisite inserted no new rows."
+  },
+  "scope_limits": {
+    "hardcoded_catalog_ids": "The bounded verifier used the restored synthetic tenant/property/house IDs 1/1/1; it does not claim dynamic resource discovery.",
+    "concurrency": "Two contenders re-entered an already COMPLETED case. This proves idempotent duplicate completion only, not a first-completion race.",
+    "real_identity_provider": false,
+    "worker_or_publisher_loaded": false,
+    "production_claimed": false
+  }
+}

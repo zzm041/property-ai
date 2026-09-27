@@ -1,0 +1,86 @@
+{
+  "task_id": "PRODUCTION-V1-3317-IDENTITY-SLA-PAGES",
+  "run_id": "id-sla3317-0f26435219",
+  "environment": {
+    "api": "127.0.0.1:8083",
+    "database": "127.0.0.1:3317/property_ai_auth001_test@0014",
+    "automator": "ws://127.0.0.1:9440"
+  },
+  "identity": {
+    "case_id": 1,
+    "target_status": "COMPLETED",
+    "target_approval_count": 2,
+    "reviewer_status": "COMPLETED",
+    "reviewer_approval_count": 2
+  },
+  "sla": {
+    "policy_id": 1,
+    "version_no": 2,
+    "accept_minutes": 11,
+    "respond_minutes": 23,
+    "complete_minutes": 59,
+    "versioning_available": true
+  },
+  "checks": {
+    "target_password_login": true,
+    "profile_navigation": true,
+    "completed_case_visible_to_target": true,
+    "completed_case_visible_to_reviewer": true,
+    "tenant_admin_sla_scope": true,
+    "sla_version2_visible_after_picker_interaction": true,
+    "target_completed_identity_visual_recaptured": true
+  },
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/sla-policies",
+      "status": 200,
+      "request_id_hash": "aefd9fc9fdc1d2e8"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/password/login",
+      "status": 200,
+      "request_id_hash": "12af803a299cc252"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id_hash": "65d00e2c9a9762a8"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id_hash": "02ac2bf1ffd1c757"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/recovery/capabilities",
+      "status": 200,
+      "request_id_hash": "60b40d07bb7bf534"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/recovery/cases/mine",
+      "status": 200,
+      "request_id_hash": "14bfaf0007dbffd7"
+    }
+  ],
+  "screenshots": [
+    "01-target-completed-identity.png",
+    "02-reviewer-completed-identity.png",
+    "03-sla-version2.png"
+  ],
+  "boundaries": {
+    "development_sms_used": true,
+    "seed_login_used": false,
+    "dev_auth_used": false,
+    "page_state_faked": false,
+    "page_business_write": false,
+    "identity_screenshots_reused_from_same_collector_attempts": true,
+    "real_identity_proof_claimed": false,
+    "model_requests": 0
+  }
+}

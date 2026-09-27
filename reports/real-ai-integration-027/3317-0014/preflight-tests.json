@@ -1,0 +1,23 @@
+{
+  "task_id": "PRODUCTION-V1-3317-0014-PREFLIGHT",
+  "observed_utc": "2026-09-27T18:52:42.8586737Z",
+  "source_head": "4cc9fa0da8ceef128b742f923cc7a2d0a23a2382",
+  "scope": "guard and compatibility implementation only; no Docker or database mutation",
+  "result": {
+    "passed": 38,
+    "failed": 0,
+    "warnings": 1,
+    "warning": "pre-existing Starlette TestClient deprecation warning"
+  },
+  "files": {
+    "backend/alembic/versions/20260926_0014_identity_merge_sla_versions.py": "8DF73D9474E0BE7B0ACCFD5085BD635B55AF9C7CFA7362EA80844863DEBC8B55",
+    "backend/app/core/config.py": "812864C187F07DB4877AF144F78015EE6B53380F8C5B5146890DB9FFE078CC63",
+    "scripts/ops/migrate_auth001_0014.py": "0D950834F85F1AB4B72FECA59A0D08F3D9FAF9FADBD92597B6D4D5CFB90E5D95",
+    "scripts/ops/auth001_retry_3317.py": "BAA205926AF4B393C46FB97F7020AB9C509E841261CE198012FBA5BBA4D872A5",
+    "backend/tests/unit/test_auth001_retry_3317.py": "C6BC9E547F7D664F55ADD0A262A1248B9DE0B4580A99284E0AFC1976C8BCAE22",
+    "backend/tests/unit/test_pending_0014_contract.py": "074201EF932C65907CC54669B794A368E95D2EFFCEB09B8432F8A7C68B6F473E",
+    "backend/tests/unit/test_identity_recovery_pending_0014.py": "4BB8F94C2A00228A3B90D186FFD0FCE565FF853918D9933C7C3C563BDE867202"
+  },
+  "database_or_container_touched": false,
+  "model_requests": 0
+}
