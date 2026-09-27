@@ -28,6 +28,25 @@ from app.provider.vision import QwenVLMProvider
 from app.service.analysis import AnalysisService,AnalysisSnapshot,MediaRef
 
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+def budget_state_from_events(events):
+    """Treat a transport failure without a response as remotely UNKNOWN.
+
+    A local HTTP exception is not proof that Ollama stopped evaluating the
+    request.  The append-only ledger therefore blocks the next reservation
+    until every reservation has a terminal response-backed completion.
+    """
+    reserved=[row for row in events if row['event']=='RESERVED']
+    completed={row['request_id']:row for row in events if row['event']=='COMPLETED'}
+    unknown=[]
+    for row in reserved:
+        completion=completed.get(row['request_id'])
+        if completion is None or completion.get('remote_completion')!='RESPONSE_RECEIVED':
+            unknown.append(row['request_id'])
+    return {
+        'attempted':len(reserved),
+        'model_seconds':sum(float(row['model_seconds']) for row in completed.values()),
+        'unknown':unknown,
+    }
 def raw_json_checks(raw,kind):
     try:
         response=json.loads(raw);content=response['choices'][0]['message']['content'];value=json.loads(content)
@@ -103,9 +122,7 @@ def main():
         if not budget_path.exists():return []
         return [json.loads(line) for line in budget_path.read_text(encoding='utf-8').splitlines() if line.strip()]
     def budget_state():
-        events=budget_events();reserved=[row for row in events if row['event']=='RESERVED'];completed={row['request_id']:row for row in events if row['event']=='COMPLETED'}
-        unknown=[row['request_id'] for row in reserved if row['request_id'] not in completed]
-        return {'attempted':len(reserved),'model_seconds':sum(float(row['model_seconds']) for row in completed.values()),'unknown':unknown}
+        return budget_state_from_events(budget_events())
     def append_budget(row):
         payload=(json.dumps({'at_utc':datetime.now(UTC).isoformat(),**row},ensure_ascii=False,separators=(',',':'))+'\n').encode()
         fd=os.open(budget_path,os.O_APPEND|os.O_CREAT|os.O_WRONLY,0o600)
@@ -177,7 +194,7 @@ def main():
             measured=[before,current['after']]+[s for s in current['samples'] if 'ram_free_mib' in s]
             current['min_ram_free_mib']=min(s['ram_free_mib'] for s in measured);current['min_gpu_free_mib']=min(s['gpu_free_mib'] for s in measured)
             if args.model=='qwen3.5:9b' and current.get('budget_request_id'):
-                append_budget({'event':'COMPLETED','request_id':current['budget_request_id'],'candidate':args.candidate,'phase':args.phase,'kind':kind,'status':current['status'],'model_seconds':current['latency_seconds'],'raw_response_sha256':current.get('raw_response_sha256')})
+                append_budget({'event':'COMPLETED','request_id':current['budget_request_id'],'candidate':args.candidate,'phase':args.phase,'kind':kind,'status':current['status'],'model_seconds':current['latency_seconds'],'raw_response_sha256':current.get('raw_response_sha256'),'remote_completion':'RESPONSE_RECEIVED' if current.get('raw_response_sha256') else 'UNKNOWN'})
             if current['min_ram_free_mib']<2000 or current['min_gpu_free_mib']<2000:e['stop_reason']='RESOURCE_FLOOR_CROSSED'
             save()
     try:

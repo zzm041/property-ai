@@ -23,3 +23,19 @@ def test_low_confidence_and_rule_fallback_are_separate():
 def test_existing_media_reference_contract():
     media=helpers['MediaRef'](storage_key='normal-socket.jpg',mime_type='image/jpeg',kind='IMAGE')
     assert media.kind=='IMAGE'
+
+def test_budget_blocks_transport_failure_without_remote_response():
+    state=helpers['budget_state_from_events']([
+        {'event':'RESERVED','request_id':'request-1'},
+        {'event':'COMPLETED','request_id':'request-1','status':'EXCEPTION','model_seconds':60,
+         'remote_completion':'UNKNOWN'},
+    ])
+    assert state=={'attempted':1,'model_seconds':60.0,'unknown':['request-1']}
+
+def test_budget_accepts_response_backed_provider_rejection():
+    state=helpers['budget_state_from_events']([
+        {'event':'RESERVED','request_id':'request-1'},
+        {'event':'COMPLETED','request_id':'request-1','status':'EXCEPTION','model_seconds':3.5,
+         'remote_completion':'RESPONSE_RECEIVED'},
+    ])
+    assert state=={'attempted':1,'model_seconds':3.5,'unknown':[]}
