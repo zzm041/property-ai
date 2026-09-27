@@ -66,6 +66,10 @@ def main():
     assert sha(photopath)=='df10abfde5a0144c480e29041ddedcc146a0182a6452dacd2ed97498c88cfdbe'
     gold=json.loads(textpath.read_text(encoding='utf-8'));photos=json.loads(photopath.read_text(encoding='utf-8'))
     assert len(gold['cases'])==24 and len(photos['cases'])==4
+    overlay_path=ROOT/'reports/real-ai-integration-027/qwen35-9b-evaluation-overlay.json'
+    overlay=(json.loads(overlay_path.read_text(encoding='utf-8')) if args.model=='qwen3.5:9b' else None)
+    if overlay is not None:
+        assert overlay['base_gold_unchanged'] is True and set(overlay['cases'])=={item['id'] for item in gold['cases']}
     all_items=gold['cases']+photos['cases']
     if args.model=='qwen3.5:9b' and args.phase=='screen':
         selected_items=[item for item in all_items if item['id'] in SCREEN_IDS]
@@ -111,7 +115,7 @@ def main():
        'model':args.model,'model_digest':digest,'quantization':'Q4_K_M','prompt_version':WORK_ORDER_ANALYSIS_PROMPT_VERSION,
        'vision_prompt_version':getattr(QwenVLMProvider,'prompt_version','unversioned-original'),
        'source_hashes':{p:sha(ROOT/p) for p in ['backend/app/service/analysis.py','backend/app/domain/ai.py','backend/app/provider/llm/__init__.py','backend/app/provider/vision/__init__.py','backend/app/provider/http.py','reports/auth-identity-ai-001/local-qwen/run-quality28.py']},
-       'gold_hashes':{textpath.name:sha(textpath),photopath.name:sha(photopath)},'runtime':runtime,
+       'gold_hashes':{textpath.name:sha(textpath),photopath.name:sha(photopath),**({'qwen35-9b-evaluation-overlay.json':sha(overlay_path)} if overlay is not None else {})},'runtime':runtime,
        'controls':{'context':4096,'temperature':0,'thinking':False,'llm_max_tokens':512,'vlm_max_tokens':256,'timeout_seconds':60,'parallel':1,'max_cases':8 if args.phase=='screen' else 28,'max_inference_requests':max_requests},
        'cumulative_budget':{'path':str(budget_path),'call_limit':NINE_B_TOTAL_CALL_LIMIT,'model_seconds_limit':NINE_B_TOTAL_MODEL_SECONDS,'deadline_utc':NINE_B_DEADLINE_UTC.isoformat()} if args.model=='qwen3.5:9b' else None,
        'business_calls':False,'database_access':False,'queue_access':False,'business_runtime_changed':False,'attempted_requests':0,'reused_requests':0,'results':[],'status':'RUNNING'}
@@ -201,10 +205,12 @@ def main():
             case.update(raw_payload=payload,provider_error=error,provider_status=status)
             try:
                 valid=WorkOrderAnalysisOutput.model_validate(payload);mapped=map_analysis_output(valid)
+                accepted=item['accept'] if overlay is None or is_photo else overlay['cases'][item['id']]['accept']
                 case['mechanical_checks']={'schema_and_mapping':True,'has_cjk_hint':bool(re.search('[\u4e00-\u9fff]',valid.summary)),
                     'summary':valid.summary,'severity':valid.severity,'priority':valid.priority,'risk':valid.risk,'required_role':valid.required_role,'required_skill':valid.required_skill,'confidence':valid.confidence,
                     'below_confidence_threshold':valid.confidence<gold['common_gold']['confidence_threshold'],'business_fallback':mapped.low_confidence,
-                    'category_skill_risk':any(valid.category==c and valid.required_skill==s and valid.risk in risks for c,s,risks in item['accept']) if not is_photo else None}
+                    'category_skill_risk':any(valid.category==c and valid.required_skill==s and valid.risk in risks for c,s,risks in accepted) if not is_photo else None,
+                    'evaluation_policy':'original-fixed-gold' if overlay is None else overlay['version']}
             except Exception as exc:case['mechanical_checks']={'schema_and_mapping':False,'error_type':type(exc).__name__}
             save();print(json.dumps({'case':item['id'],'requests':e['attempted_requests'],'payload':payload},ensure_ascii=False),flush=True)
             if e.get('stop_reason'):break

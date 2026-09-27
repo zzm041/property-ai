@@ -1,0 +1,41 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "version": "unified-maintenance-group-20260924",
+  "base_gold": "reports/auth-identity-ai-001/local-qwen/gold-set-24.json",
+  "base_gold_unchanged": true,
+  "reason": "The fixed gold predates the approved unified maintenance-group policy. For normal repair routing, water/electrical/HVAC subtype labels remain observable categories but no longer require plumber/electrician/HVAC skill rows; the server selects a qualified MAINTENANCE group member. Cleaning, security, low-evidence abstention and independent risk guards remain strict.",
+  "cases": {
+    "GOLD-001": {"accept": [["electrical", "maintenance", ["none", "electric"]]]},
+    "GOLD-002": {"accept": [["electrical", "maintenance", ["none", "electric"]]]},
+    "GOLD-003": {"accept": [["water_supply", "maintenance", ["none"]]]},
+    "GOLD-004": {"accept": [["hvac", "maintenance", ["none"]]]},
+    "GOLD-005": {"accept": [["cleaning", "cleaning", ["none"]]]},
+    "GOLD-006": {"accept": [["security", "security", ["none", "safety"]]]},
+    "GOLD-007": {"accept": [["electrical", "maintenance", ["electric", "safety"]]]},
+    "GOLD-008": {"accept": [["water_supply", "maintenance", ["flooding"]]]},
+    "GOLD-009": {"accept": [["other", "other", ["gas"]]]},
+    "GOLD-010": {"accept": [["other", "maintenance", ["safety"]], ["other", "other", ["safety"]]]},
+    "GOLD-011": {"accept": [["other", "other", ["none", "other"]]]},
+    "GOLD-012": {"accept": [["other", "other", ["none", "other"]]]},
+    "GOLD-013": {"accept": [["other", "other", ["none", "other"]]]},
+    "GOLD-014": {"accept": [["other", "maintenance", ["none", "electric"]]]},
+    "GOLD-015": {"accept": [["electrical", "maintenance", ["none", "electric"]]]},
+    "GOLD-016": {"accept": [["water_supply", "maintenance", ["none", "flooding"]]]},
+    "GOLD-017": {"accept": [["electrical", "maintenance", ["none", "electric"]]]},
+    "GOLD-018": {"accept": [["hvac", "maintenance", ["none"]]]},
+    "GOLD-019": {"accept": [["cleaning", "cleaning", ["none"]]]},
+    "GOLD-020": {"accept": [["water_supply", "maintenance", ["none"]]]},
+    "GOLD-021": {"accept": [["electrical", "maintenance", ["none", "electric"]]]},
+    "GOLD-022": {"accept": [["water_supply", "maintenance", ["none", "flooding"]]]},
+    "GOLD-023": {"accept": [["electrical", "maintenance", ["none", "electric"]]]},
+    "GOLD-024": {"accept": [["water_supply", "maintenance", ["none"]]]}
+  },
+  "non_relaxed_gates": [
+    "current facts and historical facts remain distinct",
+    "negation, source and time remain strict",
+    "dangerous hallucination remains a critical failure",
+    "risk handling remains independent of maintenance-group routing",
+    "low evidence cannot create an AUTO assignment",
+    "model never names an employee"
+  ]
+}
