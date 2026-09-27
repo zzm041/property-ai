@@ -20,7 +20,28 @@
   "pre_download_free_bytes_on_d": 63552245760,
   "minimum_required_free_bytes": 12884901888,
   "download_command_count": 1,
-  "download_status": "IN_PROGRESS_NO_INFERENCE",
+  "download_status": "DOWNLOADED_VERIFIED_NO_INFERENCE_RESOURCE_HEADROOM_BLOCKED",
+  "download_completed_at_utc": "2026-09-27T15:17:50Z",
+  "installed_model": {
+    "name": "qwen3.5:9b",
+    "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+    "bytes": 6594474711,
+    "format": "gguf",
+    "family": "qwen35",
+    "parameter_size": "9.7B",
+    "quantization": "Q4_K_M",
+    "capabilities": ["completion", "vision", "tools", "thinking"]
+  },
+  "post_download_resource_gate": {
+    "observed_at_utc": "2026-09-27T15:18:26Z",
+    "available_ram_mib": 4216,
+    "minimum_start_ram_mib": 4500,
+    "gpu_free_mib": 6581,
+    "minimum_unloaded_gpu_free_mib": 6000,
+    "resident_models": 0,
+    "inference_calls": 0,
+    "decision": "BLOCKED_BEFORE_FIRST_REQUEST"
+  },
   "runtime": {
     "ollama_version": "0.34.3",
     "loopback": "127.0.0.1:11435",
