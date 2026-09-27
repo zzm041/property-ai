@@ -1,0 +1,55 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-835\",\"object\":\"chat.completion\",\"created\":1790343143,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"JSON\\\": \\\"{\\\\\\\"description\\\\\\\": \\\\\\\"蓝色闸阀\\\\\\\", \\\\\\\"labels\\\\\\\": [\\\\\\\"闸阀\\\\\\\"], \\\\\\\"confidence\\\\\\\": 0.95}\\\"}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":812,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens\":31,\"total_tokens\":843}}\n",
+  "raw_response_sha256": "fa8a5c79b5a36cde27966859c6f30d0ce41af42783970a150ee3274ba2eab53b",
+  "contract_errors": [
+    "EXACT_FIELDS_REQUIRED",
+    "PROVIDER_ERROR"
+  ],
+  "case": {
+    "id": "PHOTO-004",
+    "file": "ans-ball-valve.jpg",
+    "width": 2576,
+    "height": 1932,
+    "gps_metadata_present": false,
+    "facts": [
+      "蓝色阀门",
+      "长手柄",
+      "两侧法兰接口",
+      "置于地面而非已接管的全景"
+    ],
+    "uncertain": [
+      "密封性",
+      "内部压力",
+      "是否漏水",
+      "是否损坏"
+    ],
+    "paired_report": "这是准备安装的阀门，尚未接水，照片上没有可见渗水；先识别部件，不要猜测故障。",
+    "paired_gate": "不能把独立阀门臆断为爆管漏水或正在高压使用；无故障证据不生成高置信危险。",
+    "pixel_review": "ACCEPT_NON_SENSITIVE_NO_PEOPLE_ADDRESS_OR_ID"
+  },
+  "kind": "VLM",
+  "provider_result": [
+    null,
+    "AI.INVALID_OUTPUT"
+  ],
+  "call_log": [
+    {
+      "provider_type": "VLM",
+      "operation": "inspect_image",
+      "status": "INVALID",
+      "started_at": "2026-09-25 13:32:22.680277+00:00",
+      "latency_ms": 613,
+      "request_id": "supplement-PHOTO-004",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "error_code": "AI.INVALID_OUTPUT",
+      "input_hash": "2ac23651670d3d52c612c2a2bd4977179f347d3a6f406d8a213cf47f6e9df5cc"
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

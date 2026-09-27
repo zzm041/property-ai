@@ -1,0 +1,90 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-512\",\"object\":\"chat.completion\",\"created\":1790343130,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"electrical\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"不能供电\\\",\\n      \\\"subject\\\": \\\"插座\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"厨房靠窗的那一个插座不能用\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"外观无明显异常\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"没有焦味\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p3\\\",\\n  \\\"summary\\\": \\\"厨房靠窗插座无法供电，用户确认其他插座及照明正常且无焦味。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1673,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":190,\"total_tokens\":1863}}\n",
+  "raw_response_sha256": "20fd6ef0ddc68da8dcaf30ebf22f5b2ddcc252cee4528447694ac15991ad0966",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-023",
+    "tags": [
+      "位置更正",
+      "长句"
+    ],
+    "report": "刚才说错了，不是卧室，是厨房靠窗的那一个插座不能用；靠门的插座和两个房间的灯都正常，电水壶换到正常插座可以使用，没有焦味。",
+    "history": [
+      [
+        "ELECTRICAL",
+        "CLOSED",
+        "卧室照明开关故障"
+      ]
+    ],
+    "facts": [
+      "厨房靠窗插座故障",
+      "其他插座灯正常",
+      "水壶可用无焦味"
+    ],
+    "forbidden": [
+      "当前卧室故障",
+      "水壶坏",
+      "所有插座失效",
+      "确认内部原因"
+    ],
+    "accept": [
+      [
+        "electrical",
+        "electrician",
+        [
+          "none",
+          "electric"
+        ]
+      ]
+    ],
+    "manual": "RULES"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "electrical",
+      "observations": [
+        {
+          "label": "不能供电",
+          "subject": "插座",
+          "source": "report",
+          "quote": "厨房靠窗的那一个插座不能用"
+        },
+        {
+          "label": "外观无明显异常",
+          "subject": "未确定",
+          "source": "report",
+          "quote": "没有焦味"
+        }
+      ],
+      "severity": "low",
+      "priority": "p3",
+      "summary": "厨房靠窗插座无法供电，用户确认其他插座及照明正常且无焦味。",
+      "risk": "none",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.95
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:32:09.605674+00:00",
+      "latency_ms": 1282,
+      "request_id": "supplement-GOLD-023",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1863
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

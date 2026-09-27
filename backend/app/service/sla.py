@@ -56,7 +56,25 @@ class AssignmentSlaSweepResult:
         return asdict(self)
 
 
-def _response_window_minutes(repository: WorkOrderRepository, work_order) -> int:
+def _assignment_windows_minutes(
+    repository: WorkOrderRepository,
+    work_order,
+) -> tuple[int, int, int, object | None]:
+    getter = getattr(repository, "get_sla_application", None)
+    available = getattr(repository, "sla_versioning_available", None)
+    if callable(getter) and callable(available) and available() is True:
+        application = getter(work_order.id)
+        if (
+            isinstance(getattr(application, "accept_minutes", None), int)
+            and isinstance(getattr(application, "respond_minutes", None), int)
+            and isinstance(getattr(application, "escalation_minutes", None), int)
+        ):
+            return (
+                application.accept_minutes,
+                application.respond_minutes,
+                application.escalation_minutes,
+                application,
+            )
     priority = WorkOrderPriority(work_order.priority)
     respond_minutes, _ = sla_windows_for_priority(priority)
     policy = repository.find_sla_policy(
@@ -65,7 +83,8 @@ def _response_window_minutes(repository: WorkOrderRepository, work_order) -> int
         category=work_order.category,
         priority=priority.value,
     )
-    return respond_minutes if policy is None else int(policy.respond_minutes)
+    respond = respond_minutes if policy is None else int(policy.respond_minutes)
+    return respond, respond, 0, None
 
 
 def reset_assignment_sla_deadlines(
@@ -79,13 +98,13 @@ def reset_assignment_sla_deadlines(
     clock = repository.get_sla_clock_for_update(work_order.id)
     if clock is None:
         return
-    deadline = now + timedelta(
-        minutes=_response_window_minutes(repository, work_order)
+    accept_minutes, respond_minutes, _, _ = _assignment_windows_minutes(
+        repository, work_order
     )
-    clock.accept_due_at = deadline
+    clock.accept_due_at = now + timedelta(minutes=accept_minutes)
     # The response window is restarted from the actual accept event below. Keep
     # a valid interim value for the non-null 0009 column.
-    clock.respond_due_at = deadline
+    clock.respond_due_at = now + timedelta(minutes=respond_minutes)
 
 
 def reset_response_sla_deadline(
@@ -99,9 +118,8 @@ def reset_response_sla_deadline(
     clock = repository.get_sla_clock_for_update(work_order.id)
     if clock is None:
         return
-    clock.respond_due_at = now + timedelta(
-        minutes=_response_window_minutes(repository, work_order)
-    )
+    _, respond_minutes, _, _ = _assignment_windows_minutes(repository, work_order)
+    clock.respond_due_at = now + timedelta(minutes=respond_minutes)
 
 
 class SlaService:
@@ -443,6 +461,12 @@ class SlaService:
             or assignment.accept_at is None
         ):
             return None
+        _, _, escalation_minutes, application = _assignment_windows_minutes(
+            self._repository, record
+        )
+        escalation_due_at = clock.respond_due_at + timedelta(minutes=escalation_minutes)
+        if now < escalation_due_at:
+            return None
         request_id = f"sla-assignment:{assignment.id}:response-timeout"
         if self._repository.has_log_request_id(
             work_order_id=record.id,
@@ -467,6 +491,9 @@ class SlaService:
                     "assignment_id": assignment.id,
                     "employee_id": assignment.employee_id,
                     "respond_due_at": clock.respond_due_at.isoformat(),
+                    "escalation_due_at": escalation_due_at.isoformat(),
+                    "sla_application_id": None if application is None else application.id,
+                    "policy_version_id": None if application is None else application.policy_version_id,
                     "action": "SUPERVISOR_REVIEW",
                 },
             )

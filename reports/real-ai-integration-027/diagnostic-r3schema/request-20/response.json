@@ -1,0 +1,79 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-111\",\"object\":\"chat.completion\",\"created\":1790343119,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"hvac\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"不制冷\\\",\\n      \\\"subject\\\": \\\"空调\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"今天是空调不制冷\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p3\\\",\\n  \\\"summary\\\": \\\"空调不制冷，无异味及其他异常。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1657,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":134,\"total_tokens\":1791}}\n",
+  "raw_response_sha256": "36212800cfc75463ce1040a180acad338ba574d25f01f19bd36289f8ad534b82",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-018",
+    "tags": [
+      "跨故障历史污染"
+    ],
+    "report": "今天是空调不制冷，没有异味，没有其他异常；以前那次燃气味问题已处理，不是这次报修。",
+    "history": [
+      [
+        "OTHER",
+        "CLOSED",
+        "厨房存在疑似燃气异味"
+      ]
+    ],
+    "facts": [
+      "本次空调不凉无异味",
+      "燃气是历史"
+    ],
+    "forbidden": [
+      "本次燃气泄漏",
+      "共同原因"
+    ],
+    "accept": [
+      [
+        "hvac",
+        "hvac",
+        [
+          "none"
+        ]
+      ]
+    ],
+    "manual": "RULES"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "hvac",
+      "observations": [
+        {
+          "label": "不制冷",
+          "subject": "空调",
+          "source": "report",
+          "quote": "今天是空调不制冷"
+        }
+      ],
+      "severity": "low",
+      "priority": "p3",
+      "summary": "空调不制冷，无异味及其他异常。",
+      "risk": "none",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.95
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:31:58.184926+00:00",
+      "latency_ms": 931,
+      "request_id": "supplement-GOLD-018",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1791
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-627\",\"object\":\"chat.completion\",\"created\":1790343133,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"water_supply\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"不出水\\\",\\n      \\\"subject\\\": \\\"水龙头\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"浴室水龙头一点水都不出\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p3\\\",\\n  \\\"summary\\\": \\\"浴室水龙头不出水，厨房有水。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1670,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":135,\"total_tokens\":1805}}\n",
+  "raw_response_sha256": "767886d7ec981accba5a4ebdcd3896b046731924277634e02534fe7b272478f8",
+  "contract_errors": []
+}

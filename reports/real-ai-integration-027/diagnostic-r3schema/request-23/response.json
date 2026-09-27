@@ -1,0 +1,76 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-301\",\"object\":\"chat.completion\",\"created\":1790343125,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"electrical\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"不能供电\\\",\\n      \\\"subject\\\": \\\"插座\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"客厅插座没电\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p3\\\",\\n  \\\"summary\\\": \\\"用户明确否认冒烟，仅报告客厅插座无电但照明正常。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1648,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":141,\"total_tokens\":1789}}\n",
+  "raw_response_sha256": "f73049882fbc06df00c6939640fe0c67e25e4bfed9086159c63ed10ee9711252",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-021",
+    "tags": [
+      "引语否定",
+      "复杂中文"
+    ],
+    "report": "我说的是“没有冒烟”，不是“冒烟”；是客厅插座没电，灯还亮着。请不要把刚才电话里漏听的那个“没”字丢掉。",
+    "history": [],
+    "facts": [
+      "客厅插座无电",
+      "灯亮",
+      "没有冒烟"
+    ],
+    "forbidden": [
+      "正在冒烟",
+      "客厅全部断电"
+    ],
+    "accept": [
+      [
+        "electrical",
+        "electrician",
+        [
+          "none",
+          "electric"
+        ]
+      ]
+    ],
+    "manual": "RULES"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "electrical",
+      "observations": [
+        {
+          "label": "不能供电",
+          "subject": "插座",
+          "source": "report",
+          "quote": "客厅插座没电"
+        }
+      ],
+      "severity": "low",
+      "priority": "p3",
+      "summary": "用户明确否认冒烟，仅报告客厅插座无电但照明正常。",
+      "risk": "none",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.95
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:32:04.890200+00:00",
+      "latency_ms": 996,
+      "request_id": "supplement-GOLD-021",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1789
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

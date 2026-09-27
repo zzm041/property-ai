@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-449\",\"object\":\"chat.completion\",\"created\":1790343121,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"cleaning\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"杂物清扫\\\",\\n      \\\"subject\\\": \\\"楼道地面\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"楼道角落有落叶需要清扫\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p4\\\",\\n  \\\"summary\\\": \\\"楼道角落发现落叶需清扫，通行正常。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"cleaning\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1669,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":139,\"total_tokens\":1808}}\n",
+  "raw_response_sha256": "dd09fb408322cbc4951cacc2f7dbe8390fe76a7c721db2cb31b72d31d375d921",
+  "contract_errors": []
+}

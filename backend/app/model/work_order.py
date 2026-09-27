@@ -168,6 +168,46 @@ class SlaPolicy(BigIntPrimaryKeyMixin, TimestampMixin, Base):
     )
 
 
+class SlaPolicyVersion(BigIntPrimaryKeyMixin, Base):
+    __tablename__ = "sla_policy_versions"
+    __table_args__ = (
+        UniqueConstraint("policy_id", "version_no", name="uq_sla_policy_versions_policy_version"),
+        Index("ix_sla_policy_versions_policy", "policy_id", "version_no", "id"),
+        MYSQL_TABLE_OPTIONS,
+    )
+    policy_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("sla_policies.id", ondelete="RESTRICT", onupdate="RESTRICT"), nullable=False)
+    version_no: Mapped[int] = mapped_column(Integer, nullable=False)
+    accept_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+    respond_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+    complete_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+    warning_lead_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+    escalation_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+    status: Mapped[str] = mapped_column(String(16), nullable=False)
+    change_reason: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_by_user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id", ondelete="RESTRICT", onupdate="RESTRICT"), nullable=False)
+    effective_from: Mapped[datetime] = mapped_column(UTCDateTime(), nullable=False)
+    effective_to: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), nullable=False, default=utc_now, server_default=text("CURRENT_TIMESTAMP(6)"))
+
+
+class WorkOrderSlaApplication(BigIntPrimaryKeyMixin, Base):
+    __tablename__ = "work_order_sla_applications"
+    __table_args__ = (
+        UniqueConstraint("work_order_id", name="uq_work_order_sla_applications_work_order"),
+        Index("ix_work_order_sla_applications_version", "policy_version_id", "work_order_id"),
+        MYSQL_TABLE_OPTIONS,
+    )
+    work_order_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("work_orders.id", ondelete="RESTRICT", onupdate="RESTRICT"), nullable=False)
+    policy_version_id: Mapped[int | None] = mapped_column(BigInteger, ForeignKey("sla_policy_versions.id", ondelete="RESTRICT", onupdate="RESTRICT"), nullable=True)
+    source: Mapped[str] = mapped_column(String(16), nullable=False)
+    accept_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+    respond_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+    complete_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+    warning_lead_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+    escalation_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+    applied_at: Mapped[datetime] = mapped_column(UTCDateTime(), nullable=False, default=utc_now, server_default=text("CURRENT_TIMESTAMP(6)"))
+
+
 class WorkOrder(BigIntPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "work_orders"
     __table_args__ = (

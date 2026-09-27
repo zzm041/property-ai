@@ -42,7 +42,7 @@ def test_reject_enqueues_redispatch_only_after_business_transaction() -> None:
     record.status = "PENDING_ASSIGNMENT"
     service._validate_request_id = MagicMock()
     service._reject = MagicMock(return_value=record)
-    service._execute = MagicMock(side_effect=lambda operation: operation())
+    service._execute = MagicMock(side_effect=lambda operation, **_kwargs: operation())
     service._enqueue_analysis = MagicMock()
 
     result = service.reject(

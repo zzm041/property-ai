@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-209\",\"object\":\"chat.completion\",\"created\":1790343114,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"water_supply\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"水渍\\\",\\n      \\\"subject\\\": \\\"天花墙面\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"卫生间天花板有一片新水渍\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"滴渗水\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"还在缓慢滴水\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"medium\\\",\\n  \\\"priority\\\": \\\"p2\\\",\\n  \\\"summary\\\": \\\"卫生间天花板发现新水渍，并伴有缓慢滴水现象。\\\",\\n  \\\"risk\\\": \\\"flooding\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.85\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1635,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":186,\"total_tokens\":1821}}\n",
+  "raw_response_sha256": "040cafbdfab1a11c9716eed1987a052a348af181ae232d4b5547fa9ad9e59e2e",
+  "contract_errors": []
+}

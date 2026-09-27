@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-986\",\"object\":\"chat.completion\",\"created\":1790343075,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"other\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"现象待核实\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"家里好像有什么不对，具体是哪里、什么情况，我现在也说不清。\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p4\\\",\\n  \\\"summary\\\": \\\"用户报告家中出现异常状况，但无法明确具体位置和问题类型。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"other\\\",\\n  \\\"confidence\\\": 0.3\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1652,\"prompt_tokens_details\":{\"cached_tokens\":1122},\"completion_tokens\":152,\"total_tokens\":1804}}\n",
+  "raw_response_sha256": "bc7edcb51a6ee1dcba30f4a53318871ce3a4f0c252a083da2c762ea308b0191e",
+  "contract_errors": []
+}

@@ -3,13 +3,17 @@
 from app.model.base import Base
 from app.model.task_intent import TaskIntent
 from app.model.identity import (
+    AccountMerge,
     AuditLog,
+    IdentityRecoveryCase,
+    IdentityRecoveryReview,
     Permission,
     Role,
     RolePermission,
     User,
     UserRole,
     UserWechat,
+    PhoneIdentityTombstone,
 )
 from app.model.employee import (
     AttendanceRecord,
@@ -29,6 +33,7 @@ from app.model.work_order import (
     IdempotencyRecord,
     SlaClock,
     SlaPolicy,
+    SlaPolicyVersion,
     WorkOrder,
     WorkOrderAssignment,
     WorkOrderContent,
@@ -37,6 +42,7 @@ from app.model.work_order import (
     WorkOrderMedia,
     WorkOrderProcess,
     WorkOrderReceipt,
+    WorkOrderSlaApplication,
 )
 from app.model.ai import (
     AiCallLog,
@@ -59,6 +65,7 @@ from app.model.knowledge import (
 
 __all__ = [
     "AttendanceRecord",
+    "AccountMerge",
     "AuditLog",
     "Base",
     "Building",
@@ -71,8 +78,11 @@ __all__ = [
     "EmployeeSkill",
     "FileObject",
     "House",
+    "IdentityRecoveryRequest",
+    "IdentityRecoveryReview",
     "IdempotencyRecord",
     "Permission",
+    "PhoneIdentityTombstone",
     "Property",
     "ResidentBindRequest",
     "ResidentHouseRelation",
@@ -81,6 +91,7 @@ __all__ = [
     "Skill",
     "SlaClock",
     "SlaPolicy",
+    "SlaPolicyVersion",
     "Tenant",
     "Unit",
     "User",
@@ -94,6 +105,7 @@ __all__ = [
     "WorkOrderMedia",
     "WorkOrderProcess",
     "WorkOrderReceipt",
+    "WorkOrderSlaApplication",
     "AiCallLog",
     "Announcement",
     "AnnouncementReview",

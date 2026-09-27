@@ -33,6 +33,8 @@ LIMITS={'asr':1,'embedding':24,'reranker':18,'qwen':18}
 CONTINUATION_MAX={'asr':1,'embedding':6,'reranker':6,'qwen':6}
 MAX_BODY=1_100_000
 DIGEST='2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd'
+WORK_ORDER_PROMPT_VERSION='wo-analysis-v10-observed-event-r3fix2b'
+WORK_ORDER_RESPONSE_FORMAT=json.loads((Path(__file__).resolve().parent/'work_order_response_format.json').read_text(encoding='utf-8'))
 
 def stamp():return datetime.now(UTC).isoformat()
 def save(path,value):
@@ -79,7 +81,7 @@ def validate(kind,value):
         validate('embedding',value['documents'])
     elif kind=='qwen':
         expected={'model','messages','response_format','temperature','reasoning_effort','max_tokens'}
-        if not isinstance(value,dict) or set(value)!=expected or value['model']!=MODELS['qwen'] or value['temperature']!=0 or value['reasoning_effort']!='none' or value['max_tokens']!=512 or value['response_format']!={'type':'json_object'}:raise ValueError('QWEN_SETTINGS')
+        if not isinstance(value,dict) or set(value)!=expected or value['model']!=MODELS['qwen'] or value['temperature']!=0 or value['reasoning_effort']!='none' or value['max_tokens']!=512:raise ValueError('QWEN_SETTINGS')
         messages=value['messages']
         if not isinstance(messages,list) or len(messages)!=1 or set(messages[0])!={'role','content'} or messages[0]['role']!='user' or not isinstance(messages[0]['content'],str) or not 0<len(messages[0]['content'])<=10000:raise ValueError('QWEN_INPUT')
 
@@ -102,8 +104,13 @@ def decode(path,content_type,body,prompt_version):
             if set(obj)!={'model','query','documents'} or obj['model']!=MODELS['reranker']:raise ValueError('MODEL_OR_FIELDS')
             kind='reranker';value={k:obj[k] for k in ('query','documents')}
         elif path=='/v1/chat/completions':
-            # R3 did NOT pass. This server cannot authorize work-order inference.
-            if prompt_version!='rag-answer-v2':raise ValueError('RAG_ONLY_NO_AUTO_AUTHORIZATION')
+            expected_format=(
+                {'type':'json_object'} if prompt_version=='rag-answer-v2'
+                else WORK_ORDER_RESPONSE_FORMAT if prompt_version==WORK_ORDER_PROMPT_VERSION
+                else None
+            )
+            if expected_format is None:raise ValueError('PROMPT_VERSION_NOT_ALLOWED')
+            if obj.get('response_format')!=expected_format:raise ValueError('QWEN_SCHEMA_MISMATCH')
             kind='qwen';value=obj
         else:raise ValueError('ENDPOINT_NOT_ALLOWED')
     validate(kind,value);return kind,value

@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-512\",\"object\":\"chat.completion\",\"created\":1790343130,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"electrical\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"不能供电\\\",\\n      \\\"subject\\\": \\\"插座\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"厨房靠窗的那一个插座不能用\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"外观无明显异常\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"没有焦味\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p3\\\",\\n  \\\"summary\\\": \\\"厨房靠窗插座无法供电，用户确认其他插座及照明正常且无焦味。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1673,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":190,\"total_tokens\":1863}}\n",
+  "raw_response_sha256": "20fd6ef0ddc68da8dcaf30ebf22f5b2ddcc252cee4528447694ac15991ad0966",
+  "contract_errors": []
+}

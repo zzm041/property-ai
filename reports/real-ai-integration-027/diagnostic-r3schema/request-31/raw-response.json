@@ -1,0 +1,8 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-835\",\"object\":\"chat.completion\",\"created\":1790343143,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"JSON\\\": \\\"{\\\\\\\"description\\\\\\\": \\\\\\\"蓝色闸阀\\\\\\\", \\\\\\\"labels\\\\\\\": [\\\\\\\"闸阀\\\\\\\"], \\\\\\\"confidence\\\\\\\": 0.95}\\\"}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":812,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens\":31,\"total_tokens\":843}}\n",
+  "raw_response_sha256": "fa8a5c79b5a36cde27966859c6f30d0ce41af42783970a150ee3274ba2eab53b",
+  "contract_errors": [
+    "EXACT_FIELDS_REQUIRED"
+  ]
+}

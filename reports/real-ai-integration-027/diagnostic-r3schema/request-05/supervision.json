@@ -1,0 +1,30 @@
+{
+  "latency_seconds": 2.2809999999881256,
+  "samples": [
+    {
+      "utc": "2026-09-25T13:31:20Z",
+      "ram_free_mib": 11615,
+      "gpu_used_mib": 5368,
+      "gpu_free_mib": 10628,
+      "gpu_utilization_percent": 80
+    },
+    {
+      "utc": "2026-09-25T13:31:21Z",
+      "ram_free_mib": 11535,
+      "gpu_used_mib": 5367,
+      "gpu_free_mib": 10629,
+      "gpu_utilization_percent": 3
+    },
+    {
+      "utc": "2026-09-25T13:31:23Z",
+      "ram_free_mib": 11507,
+      "gpu_used_mib": 5367,
+      "gpu_free_mib": 10629,
+      "gpu_utilization_percent": 82
+    }
+  ],
+  "exit_code": 0,
+  "stop_reason": null,
+  "child_pid": 37048,
+  "model_side_completion": "response_received"
+}

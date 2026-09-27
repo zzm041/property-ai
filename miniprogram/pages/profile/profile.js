@@ -281,4 +281,7 @@ Page({
   goClaim() {
     wx.navigateTo({ url: "/pages/employee-claim/employee-claim" });
   },
+  goIdentityRecovery() {
+    wx.navigateTo({ url: "/pages/identity-recovery/identity-recovery" });
+  },
 });

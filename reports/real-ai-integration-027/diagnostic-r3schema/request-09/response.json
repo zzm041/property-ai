@@ -1,0 +1,79 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-821\",\"object\":\"chat.completion\",\"created\":1790343092,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"electrical\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"不能供电\\\",\\n      \\\"subject\\\": \\\"插座\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"厨房插座没有电\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"medium\\\",\\n  \\\"priority\\\": \\\"p2\\\",\\n  \\\"summary\\\": \\\"厨房插座无法供电，其他房间照明正常且无冒烟现象。\\\",\\n  \\\"risk\\\": \\\"electric\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1627,\"prompt_tokens_details\":{\"cached_tokens\":1140},\"completion_tokens\":140,\"total_tokens\":1767}}\n",
+  "raw_response_sha256": "f86f0eec9be707fe3709dd6921cb7b4b2572718d1707c4ee0245349ae0ac6166",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-001",
+    "tags": [
+      "中文摘要",
+      "电气基线",
+      "否定"
+    ],
+    "report": "厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+    "history": [],
+    "facts": [
+      "厨房插座无电",
+      "其他房间正常",
+      "没有冒烟"
+    ],
+    "forbidden": [
+      "火花",
+      "烧焦",
+      "全屋停电",
+      "已确定短路"
+    ],
+    "accept": [
+      [
+        "electrical",
+        "electrician",
+        [
+          "none",
+          "electric"
+        ]
+      ]
+    ],
+    "manual": "RULES"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "electrical",
+      "observations": [
+        {
+          "label": "不能供电",
+          "subject": "插座",
+          "source": "report",
+          "quote": "厨房插座没有电"
+        }
+      ],
+      "severity": "medium",
+      "priority": "p2",
+      "summary": "厨房插座无法供电，其他房间照明正常且无冒烟现象。",
+      "risk": "electric",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.95
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:31:31.394700+00:00",
+      "latency_ms": 1006,
+      "request_id": "supplement-GOLD-001",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1767
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

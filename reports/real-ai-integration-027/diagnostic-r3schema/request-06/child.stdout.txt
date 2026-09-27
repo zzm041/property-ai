@@ -1,0 +1,1 @@
+2026-09-25 21:31:25 [info     ] provider_succeeded             latency_ms=1419.33 operation=structured_completion provider=llm

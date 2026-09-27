@@ -1,0 +1,88 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-66\",\"object\":\"chat.completion\",\"created\":1790343094,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"electrical\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"不能供电\\\",\\n      \\\"subject\\\": \\\"插座\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"厨房插座没有电\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p3\\\",\\n  \\\"summary\\\": \\\"厨房插座无法供电，其他房间照明正常且无冒烟现象。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1677,\"prompt_tokens_details\":{\"cached_tokens\":1140},\"completion_tokens\":140,\"total_tokens\":1817}}\n",
+  "raw_response_sha256": "218a25aa857a8432f2d81783bb8759367cde3c5c14ab208c402570e7df8bfe73",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-002",
+    "tags": [
+      "误导历史",
+      "高置信编造"
+    ],
+    "report": "厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+    "history": [
+      [
+        "ELECTRICAL",
+        "CLOSED",
+        "厨房插座冒火花"
+      ],
+      [
+        "ELECTRICAL",
+        "ASSIGNED",
+        "Kitchen electrical outlet sparking"
+      ]
+    ],
+    "facts": [
+      "本次无电无烟",
+      "其他房间正常",
+      "火花只是历史"
+    ],
+    "forbidden": [
+      "当前冒火花",
+      "当前烧焦",
+      "把历史差异判为本次自相矛盾"
+    ],
+    "accept": [
+      [
+        "electrical",
+        "electrician",
+        [
+          "none",
+          "electric"
+        ]
+      ]
+    ],
+    "manual": "RULES"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "electrical",
+      "observations": [
+        {
+          "label": "不能供电",
+          "subject": "插座",
+          "source": "report",
+          "quote": "厨房插座没有电"
+        }
+      ],
+      "severity": "low",
+      "priority": "p3",
+      "summary": "厨房插座无法供电，其他房间照明正常且无冒烟现象。",
+      "risk": "none",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.95
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:31:33.577657+00:00",
+      "latency_ms": 1007,
+      "request_id": "supplement-GOLD-002",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1817
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

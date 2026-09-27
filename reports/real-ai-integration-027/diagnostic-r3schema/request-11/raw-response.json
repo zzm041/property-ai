@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-504\",\"object\":\"chat.completion\",\"created\":1790343097,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"water_supply\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"滴渗水\\\",\\n      \\\"subject\\\": \\\"排水接头\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"洗手盆排水接头缓慢渗水\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"水渍\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"地上只有几滴水\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p3\\\",\\n  \\\"summary\\\": \\\"洗手盆排水接头缓慢渗水，地面仅有少量积水，无电器设备。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1658,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":190,\"total_tokens\":1848}}\n",
+  "raw_response_sha256": "55d39a8eaa4f331048c2761a271a6518c344920acf84f18c3e6f4febf435e89d",
+  "contract_errors": []
+}

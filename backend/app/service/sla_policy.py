@@ -4,6 +4,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 
+from sqlalchemy import func, inspect, select
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -18,14 +19,16 @@ from app.domain.work_order import (
     SlaPolicyStatus,
     WorkOrderCategory,
     WorkOrderPriority,
+    sla_warning_lead_minutes,
 )
-from app.model.work_order import SlaPolicy
+from app.model.work_order import SlaPolicy, SlaPolicyVersion
 from app.repository.identity import IdentityRepository
 from app.repository.property import PropertyRepository
 from app.repository.work_order import WorkOrderRepository
 from app.service.audit import AuditService
 from app.service.auth import AuthService
 from app.service.rbac import RbacService
+from app.core.time import utc_now
 
 
 @dataclass(frozen=True, slots=True)
@@ -43,6 +46,7 @@ class SlaPolicyListing:
     property_id: int
     items: tuple[SlaPolicy, ...]
     effective: tuple[EffectiveSlaPolicy, ...]
+    versioning_available: bool = False
 
 
 class SlaPolicyService:
@@ -89,10 +93,15 @@ class SlaPolicyService:
             tenant_id=property_record.tenant_id,
             property_id=property_record.id,
         )
+        available = self._versioning_available()
+        if available:
+            for record in records:
+                record._latest_version = self._latest_version(record.id)
         return SlaPolicyListing(
             property_id=property_record.id,
             items=records,
             effective=self._effective(records, property_id=property_record.id),
+            versioning_available=available,
         )
 
     def put_policy(
@@ -105,6 +114,10 @@ class SlaPolicyService:
         priority: str,
         respond_minutes: int,
         complete_minutes: int,
+        accept_minutes: int | None = None,
+        warning_lead_minutes: int | None = None,
+        escalation_minutes: int | None = None,
+        change_reason: str | None = None,
         status: str,
         expected_updated_at: datetime | None,
         request_id: str,
@@ -129,6 +142,17 @@ class SlaPolicyService:
                     message="Tenant default SLA policy cannot be disabled",
                     status_code=422,
                 )
+            versioning_available = self._versioning_available()
+            accept = respond_minutes if accept_minutes is None else accept_minutes
+            warning = (
+                sla_warning_lead_minutes(complete_minutes)
+                if warning_lead_minutes is None
+                else warning_lead_minutes
+            )
+            escalation = 0 if escalation_minutes is None else escalation_minutes
+            if accept > respond_minutes:
+                raise AppError(code=SlaErrorCode.INVALID_INPUT, message="SLA acceptance must not exceed response", status_code=422)
+            cleaned_reason = None if change_reason is None else change_reason.strip()
             record = self._repository.get_sla_policy_for_update(
                 tenant_id=tenant_id,
                 property_id=property_id,
@@ -142,8 +166,23 @@ class SlaPolicyService:
             }
             if record is not None:
                 before = self._snapshot(record)
-                if all(before[key] == value for key, value in requested.items()):
+                latest = self._latest_version(record.id) if versioning_available else None
+                same_version_values = latest is not None and (
+                    latest.accept_minutes == accept
+                    and latest.respond_minutes == respond_minutes
+                    and latest.complete_minutes == complete_minutes
+                    and latest.warning_lead_minutes == warning
+                    and latest.escalation_minutes == escalation
+                    and latest.status == parsed_status.value
+                )
+                if all(before[key] == value for key, value in requested.items()) and (
+                    not versioning_available or same_version_values
+                ):
+                    record._latest_version = latest
+                    record._versioning_available = versioning_available
                     return record
+                if versioning_available and not cleaned_reason:
+                    raise AppError(code=SlaErrorCode.INVALID_INPUT, message="SLA policy change reason is required", status_code=422)
                 if expected_updated_at is None or record.updated_at != expected_updated_at:
                     raise AppError(
                         code=SlaErrorCode.CONFLICT,
@@ -157,6 +196,8 @@ class SlaPolicyService:
                 self._repository.flush_sla_policy(record)
             else:
                 before = None
+                if versioning_available and not cleaned_reason:
+                    raise AppError(code=SlaErrorCode.INVALID_INPUT, message="SLA policy change reason is required", status_code=422)
                 record = self._repository.add_sla_policy(
                     SlaPolicy(
                         tenant_id=tenant_id,
@@ -168,6 +209,36 @@ class SlaPolicyService:
                         status=parsed_status.value,
                     )
                 )
+            if versioning_available:
+                now = utc_now()
+                # The legacy row remains the concurrency token for both old and
+                # newly versioned clients. A change that only touches the new
+                # accept/warning/escalation fields must still advance it.
+                record.updated_at = now
+                previous = self._latest_version(record.id)
+                if previous is not None and previous.effective_to is None:
+                    previous.effective_to = now
+                version_no = int(self._session.scalar(select(func.max(SlaPolicyVersion.version_no)).where(SlaPolicyVersion.policy_id == record.id)) or 0) + 1
+                version = SlaPolicyVersion(
+                    policy_id=record.id,
+                    version_no=version_no,
+                    accept_minutes=accept,
+                    respond_minutes=respond_minutes,
+                    complete_minutes=complete_minutes,
+                    warning_lead_minutes=warning,
+                    escalation_minutes=escalation,
+                    status=parsed_status.value,
+                    change_reason=cleaned_reason,
+                    created_by_user_id=current.user_id,
+                    effective_from=now,
+                    effective_to=None,
+                )
+                self._session.add(version)
+                self._session.flush()
+                record._latest_version = version
+            else:
+                record._latest_version = None
+            record._versioning_available = versioning_available
             self._audit.append(
                 action=AuditAction.SLA_POLICY_CHANGED,
                 resource_type=AuditResourceType.SLA_POLICY,
@@ -292,6 +363,24 @@ class SlaPolicyService:
             "complete_minutes": int(record.complete_minutes),
             "status": str(record.status),
         }
+
+    def _versioning_available(self) -> bool:
+        try:
+            inspector = inspect(self._session.get_bind())
+            return (
+                inspector.has_table("sla_policy_versions") is True
+                and inspector.has_table("work_order_sla_applications") is True
+            )
+        except (AttributeError, SQLAlchemyError):
+            return False
+
+    def _latest_version(self, policy_id: int) -> SlaPolicyVersion | None:
+        return self._session.scalar(
+            select(SlaPolicyVersion)
+            .where(SlaPolicyVersion.policy_id == policy_id)
+            .order_by(SlaPolicyVersion.version_no.desc(), SlaPolicyVersion.id.desc())
+            .limit(1)
+        )
 
     @staticmethod
     def _effective(

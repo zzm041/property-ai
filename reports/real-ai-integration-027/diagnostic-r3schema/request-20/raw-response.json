@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-111\",\"object\":\"chat.completion\",\"created\":1790343119,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"hvac\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"不制冷\\\",\\n      \\\"subject\\\": \\\"空调\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"今天是空调不制冷\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p3\\\",\\n  \\\"summary\\\": \\\"空调不制冷，无异味及其他异常。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1657,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":134,\"total_tokens\":1791}}\n",
+  "raw_response_sha256": "36212800cfc75463ce1040a180acad338ba574d25f01f19bd36289f8ad534b82",
+  "contract_errors": []
+}

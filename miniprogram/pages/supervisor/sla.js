@@ -94,6 +94,11 @@ Page({
     statusIndex: 0,
     respondMinutes: "",
     completeMinutes: "",
+    acceptMinutes: "",
+    warningLeadMinutes: "",
+    escalationMinutes: "",
+    changeReason: "",
+    versioningAvailable: false,
     expectedUpdatedAt: "",
     editingId: "",
     items: [],
@@ -209,7 +214,7 @@ Page({
         key: `${item.category}-${item.priority}`,
         sourceText: sourceLabel(item.source),
       }));
-      this.setData({ items, effective, error: "" });
+      this.setData({ items, effective, versioningAvailable: !!payload.versioning_available, error: "" });
       this.syncEditor();
     });
   },
@@ -248,6 +253,10 @@ Page({
       expectedUpdatedAt: exact ? exact.updated_at : "",
       respondMinutes: source ? String(source.respond_minutes) : "",
       completeMinutes: source ? String(source.complete_minutes) : "",
+      acceptMinutes: exact && exact.accept_minutes != null ? String(exact.accept_minutes) : source ? String(source.respond_minutes) : "",
+      warningLeadMinutes: exact && exact.warning_lead_minutes != null ? String(exact.warning_lead_minutes) : "15",
+      escalationMinutes: exact && exact.escalation_minutes != null ? String(exact.escalation_minutes) : "0",
+      changeReason: "",
       statusIndex,
     });
   },
@@ -258,6 +267,9 @@ Page({
     }
     const respondMinutes = Number(this.data.respondMinutes);
     const completeMinutes = Number(this.data.completeMinutes);
+    const acceptMinutes = Number(this.data.acceptMinutes);
+    const warningLeadMinutes = Number(this.data.warningLeadMinutes);
+    const escalationMinutes = Number(this.data.escalationMinutes);
     if (
       !Number.isInteger(respondMinutes) ||
       !Number.isInteger(completeMinutes) ||
@@ -268,6 +280,18 @@ Page({
       completeMinutes > 2147483647
     ) {
       this.setData({ error: "时限必须是正整数分钟，且接单/响应不能晚于完成时限" });
+      return;
+    }
+    if (this.data.versioningAvailable && (
+      !Number.isInteger(acceptMinutes) || acceptMinutes < 1 || acceptMinutes > respondMinutes ||
+      !Number.isInteger(warningLeadMinutes) || warningLeadMinutes < 0 ||
+      !Number.isInteger(escalationMinutes) || escalationMinutes < 0
+    )) {
+      this.setData({ error: "接单、预警和升级配置无效" });
+      return;
+    }
+    if (this.data.versioningAvailable && this.data.changeReason.trim().length < 2) {
+      this.setData({ error: "请填写本次 SLA 策略变更原因" });
       return;
     }
     const scope = optionValue(this.data.scopeOptions, this.data.scopeIndex);
@@ -282,6 +306,10 @@ Page({
       priority: optionValue(PRIORITY_OPTIONS, this.data.priorityIndex),
       respond_minutes: respondMinutes,
       complete_minutes: completeMinutes,
+      accept_minutes: this.data.versioningAvailable ? acceptMinutes : null,
+      warning_lead_minutes: this.data.versioningAvailable ? warningLeadMinutes : null,
+      escalation_minutes: this.data.versioningAvailable ? escalationMinutes : null,
+      change_reason: this.data.versioningAvailable ? this.data.changeReason.trim() : null,
       status: optionValue(this.data.visibleStatusOptions, this.data.statusIndex),
       expected_updated_at: this.data.expectedUpdatedAt || null,
     };

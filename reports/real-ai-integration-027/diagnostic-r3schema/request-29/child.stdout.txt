@@ -1,0 +1,1 @@
+2026-09-25 21:32:18 [info     ] provider_succeeded             latency_ms=458.8 operation=inspect_image provider=vlm

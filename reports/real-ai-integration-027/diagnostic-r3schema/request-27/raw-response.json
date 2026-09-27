@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-366\",\"object\":\"chat.completion\",\"created\":1790343134,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"description\\\": \\\"墙面漆皮脱落\\\", \\\"labels\\\": [\\\"墙面\\\", \\\"损坏\\\"], \\\"confidence\\\": 0.95}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":653,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens\":28,\"total_tokens\":681}}\n",
+  "raw_response_sha256": "7ea6bfdbdac13933cfa9abbe948fe0b85fc4fcd04d817e537b27e5315115945d",
+  "contract_errors": []
+}

@@ -27,6 +27,7 @@ def get_sla_policy_service(
 
 
 def _policy_data(record) -> SlaPolicyData:
+    version = getattr(record, "_latest_version", None)
     return SlaPolicyData(
         id=record.id,
         tenant_id=record.tenant_id,
@@ -38,12 +39,20 @@ def _policy_data(record) -> SlaPolicyData:
         complete_minutes=record.complete_minutes,
         status=record.status,
         updated_at=record.updated_at,
+        version_no=None if version is None else version.version_no,
+        accept_minutes=None if version is None else version.accept_minutes,
+        warning_lead_minutes=None if version is None else version.warning_lead_minutes,
+        escalation_minutes=None if version is None else version.escalation_minutes,
+        change_reason=None if version is None else version.change_reason,
+        effective_from=None if version is None else version.effective_from,
+        effective_to=None if version is None else version.effective_to,
     )
 
 
 def _listing_data(listing: SlaPolicyListing) -> SlaPolicyListData:
     return SlaPolicyListData(
         property_id=listing.property_id,
+        versioning_available=listing.versioning_available,
         items=[_policy_data(record) for record in listing.items],
         effective=[
             EffectiveSlaPolicyData(
@@ -93,6 +102,10 @@ def put_sla_policy(
         priority=body.priority,
         respond_minutes=body.respond_minutes,
         complete_minutes=body.complete_minutes,
+        accept_minutes=body.accept_minutes,
+        warning_lead_minutes=body.warning_lead_minutes,
+        escalation_minutes=body.escalation_minutes,
+        change_reason=body.change_reason,
         status=body.status,
         expected_updated_at=body.expected_updated_at,
         request_id=request_id_for(request),

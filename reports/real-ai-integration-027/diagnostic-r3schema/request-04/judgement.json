@@ -1,0 +1,6 @@
+{
+  "continue": true,
+  "response_sha256": "456b9664ca4856dbe9557c51b678dff81b5ae47216d8eb7c973af5caa2d15eb2",
+  "semantic_status": "PENDING_FINAL_FIXED_SET_ASSESSMENT",
+  "note": "Collection only; this is not an individual semantic PASS."
+}

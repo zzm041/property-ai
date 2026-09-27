@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-192\",\"object\":\"chat.completion\",\"created\":1790343141,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"electrical\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"烧焦变色\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"vision\\\",\\n      \\\"quote\\\": \\\"照片外观没有发黑\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"火花烧损\\\",\\n      \\\"subject\\\": \\\"插座\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"插座刚才有一缕烟\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"medium\\\",\\n  \\\"priority\\\": \\\"p2\\\",\\n  \\\"summary\\\": \\\"插座曾冒烟现已消失，照片显示外观无发黑迹象。\\\",\\n  \\\"risk\\\": \\\"electric\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.85\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1654,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":187,\"total_tokens\":1841}}\n",
+  "raw_response_sha256": "22cf11049e41bcd209555d02ac9d3f4b4132c8c50fde34d0da62eb87ffb1c0a6",
+  "contract_errors": []
+}

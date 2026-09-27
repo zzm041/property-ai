@@ -12,6 +12,7 @@ Page({
     canViewIncidents: false,
     canManageIncidents: false,
     canViewProperty: false,
+    canReviewIdentity: false,
     propertyId: "",
     tenantId: "",
     loading: false,
@@ -47,6 +48,7 @@ Page({
             canViewIncidents: permissions.indexOf("incident:read") >= 0,
             canManageIncidents: permissions.indexOf("incident:manage") >= 0,
             canViewProperty: permissions.indexOf("property:read") >= 0,
+            canReviewIdentity: permissions.indexOf("identity:review") >= 0,
             propertyId,
             tenantId,
           });

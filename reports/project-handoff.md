@@ -1,5 +1,19 @@
 # Project handoff (latest facts only)
 
+## Current checkpoint — structured AI contract and post-0012 implementation (2026-09-27)
+
+Continue from source baseline `1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78`; the product/evidence commit for this batch is recorded below after final review. The fixed **2026-09-27 14:00 Asia/Shanghai** deadline has passed and is not silently extended. The last known owner quota baseline remains 13%; no reset, paid route or extra allowance was used.
+
+The work-order provider now sends a strict JSON Schema generated from the same formal category/risk/role/skill model used by server validation, and the loopback adapter accepts only that exact schema or the existing RAG contract. The unchanged local Qwen3.5-4B candidate used 31 Qwen requests and zero ASR requests. It eliminated the observed unknown-enum failure but still produced three critical semantic/source errors, and the last VLM response violated the exact wrapper contract. Request 32 was not sent; the fixed set is incomplete, status is **NOT_READY**, and no AUTH001 runtime replacement, new business work order or real AUTO occurred. Raw results remain under `reports/real-ai-integration-027/diagnostic-r3schema/`.
+
+Post-0012 recovery/SLA software is implemented but intentionally not live. Recovery cases accept only an approved proof-provider assertion, retain hashes rather than raw identity media, require a 30-day quarantine and two distinct authorized reviewers, and prevent generic SMS login from silently recreating an ended phone identity. Metadata inspection errors fail closed. The provider is currently unavailable, no trusted proof channel is configured, and the actual cross-account ownership-transfer/merge transaction remains unimplemented. The UI therefore reports the feature as unavailable rather than faking verification.
+
+SLA policy editing now has pending support for immutable versions and per-work-order application snapshots: post-0014 work orders use exact accept/respond/warning/escalation values, while pre-0014 work orders retain their authoritative existing clocks and legacy path. The initial policy version is explicitly a migration-time capture, not reconstructed history. Proposed migration `20260926_0014_identity_merge_sla_versions` (parent 0012, SHA-256 `D2CBF32AD9A865B65A67279D24006E4CEF141F21B77567C6247644E1F8FC020A`) creates seven tables and one permission/grant; it has **not** been applied. It preserves both phone uniqueness constraints, inserts no identity cases/merges, and does not fabricate historical work-order SLA applications.
+
+Final main-session verification: focused final subset **21 passed**, metadata fail-closed regression **8 passed**, complete pure unit suite **1075 passed, 1 existing warning**. Mini-program syntax/config parsing passed earlier in the same batch; no new Developer Tools/page or database runtime claim is made. AUTH001 API/Worker/model services remain offline and the last running product version remains `fe90913a6f3918bca33b2f100137a786a67c4f86`, not this WIP.
+
+External decisions still required: separately approve execution of reviewed 0014 on AUTH001 only; select and authorize a trusted identity-proof channel and its privacy/fee limits; provide target host/access, domain/TLS, ignored secret locations, real WeChat/SMS credentials, physical-device operator, deployment/shared-service authorization and final release approval. These missing inputs prevent Production V1 acceptance.
+
 ## Current checkpoint — 027 policy/R6/Incident closeout (2026-09-25)
 
 Continue from product HEAD `fe90913a6f3918bca33b2f100137a786a67c4f86` and evidence commit `098da6cc6a295d40bf2c89327c061d88f0d281a3`; do not revert to the older checkpoint below. Deadline remains **2026-09-27 14:00 Asia/Shanghai**. Owner-reported remaining execution baseline is **13%**, with no reset, upgrade or added spend.

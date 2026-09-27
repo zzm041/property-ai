@@ -43,7 +43,7 @@ def test_structured_output_maps_docs_aliases() -> None:
     assert mapped.low_confidence is False
 
 
-def test_unknown_category_is_other_and_low_confidence() -> None:
+def test_unknown_category_is_rejected_instead_of_silently_relabelled() -> None:
     output = WorkOrderAnalysisOutput(
         category="unknown_thing",
         subcategory="x",
@@ -55,9 +55,8 @@ def test_unknown_category_is_other_and_low_confidence() -> None:
         required_skill="other",
         confidence=0.99,
     )
-    mapped = map_analysis_output(output)
-    assert mapped.category is WorkOrderCategory.OTHER
-    assert mapped.low_confidence is True
+    with pytest.raises(ValueError, match="category is not a supported value"):
+        map_analysis_output(output)
 
 
 def test_control_characters_are_rejected() -> None:

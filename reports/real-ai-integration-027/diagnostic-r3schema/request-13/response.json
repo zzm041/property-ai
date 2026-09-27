@@ -1,0 +1,82 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-734\",\"object\":\"chat.completion\",\"created\":1790343102,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"cleaning\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"杂物清扫\\\",\\n      \\\"subject\\\": \\\"楼道地面\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"楼道角落散落了几张纸和空纸盒\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"外观无明显异常\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"没有液体、碎玻璃或其他异常\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p4\\\",\\n  \\\"summary\\\": \\\"楼道角落散落纸张和空纸盒需清扫，通道无其他异常。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"cleaning\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1637,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":196,\"total_tokens\":1833}}\n",
+  "raw_response_sha256": "bc6668816ebccf70f2e1061d1158e2f44957a3b533ec94b9eab4ca2067694a3e",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-005",
+    "tags": [
+      "清洁",
+      "危险否定"
+    ],
+    "report": "楼道角落散落了几张纸和空纸盒，需要清扫；通道可以正常通行，没有液体、碎玻璃或其他异常。",
+    "history": [],
+    "facts": [
+      "角落纸盒需清扫",
+      "通行正常"
+    ],
+    "forbidden": [
+      "堵塞消防通道",
+      "有人滑倒",
+      "玻璃割伤",
+      "污水"
+    ],
+    "accept": [
+      [
+        "cleaning",
+        "cleaning",
+        [
+          "none"
+        ]
+      ]
+    ],
+    "manual": "RULES"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "cleaning",
+      "observations": [
+        {
+          "label": "杂物清扫",
+          "subject": "楼道地面",
+          "source": "report",
+          "quote": "楼道角落散落了几张纸和空纸盒"
+        },
+        {
+          "label": "外观无明显异常",
+          "subject": "未确定",
+          "source": "report",
+          "quote": "没有液体、碎玻璃或其他异常"
+        }
+      ],
+      "severity": "low",
+      "priority": "p4",
+      "summary": "楼道角落散落纸张和空纸盒需清扫，通道无其他异常。",
+      "risk": "none",
+      "required_role": "STAFF",
+      "required_skill": "cleaning",
+      "confidence": 0.95
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:31:40.771435+00:00",
+      "latency_ms": 1327,
+      "request_id": "supplement-GOLD-005",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1833
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

@@ -17,6 +17,12 @@ Label = Literal['滴渗水','不出水','不能供电','火花烧损','不制冷
                 '外观无明显异常','现象待核实']
 Subject = Literal['水龙头','排水接头','天花墙面','插座','照明','空调','扶手',
                   '楼道地面','房门','阀门管道','未确定']
+Category = Literal['water_supply','electrical','hvac','cleaning','security','other']
+Severity = Literal['low','medium','high']
+Priority = Literal['p1','p2','p3','p4']
+Risk = Literal['none','safety','flooding','electric','gas','other']
+RequiredRole = Literal['STAFF']
+RequiredSkill = Literal['maintenance','cleaning','security','other']
 
 class Observation(BaseModel):
     model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
@@ -27,15 +33,27 @@ class Observation(BaseModel):
 
 class ObservedAnalysisOutput(BaseModel):
     model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
-    category: str = Field(min_length=1,max_length=32)
+    category: Category
     observations: list[Observation] = Field(min_length=1,max_length=6)
-    severity: str = Field(min_length=1,max_length=16)
-    priority: str = Field(min_length=1,max_length=16)
+    severity: Severity
+    priority: Priority
     summary: str = Field(min_length=1,max_length=255)
-    risk: str = Field(min_length=1,max_length=32)
-    required_role: str = Field(min_length=1,max_length=32)
-    required_skill: str = Field(min_length=1,max_length=32)
+    risk: Risk
+    required_role: RequiredRole
+    required_skill: RequiredSkill
     confidence: float = Field(ge=0,le=1)
+
+
+def work_order_analysis_response_format() -> dict[str, object]:
+    """One canonical strict-output contract for provider and local adapter."""
+    return {
+        'type': 'json_schema',
+        'json_schema': {
+            'name': 'work_order_analysis',
+            'strict': True,
+            'schema': ObservedAnalysisOutput.model_json_schema(),
+        },
+    }
 
 PATTERNS = {
     '滴渗水':r'滴|渗水|漏水|喷水|喷出', '不出水':r'不出水|水都不出|没有水|没水|停水',

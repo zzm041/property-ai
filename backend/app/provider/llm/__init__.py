@@ -9,6 +9,7 @@ import httpx
 
 from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
 from app.domain.knowledge import RAG_ANSWER_PROMPT_VERSION
+from app.domain.observed_event import work_order_analysis_response_format
 from app.provider.errors import (
     ProviderInvalidOutputError,
     ProviderTimeoutError,
@@ -160,7 +161,11 @@ class QwenLLMProvider:
             json_body={
                 "model": self.model,
                 "messages": [{"role": "user", "content": prompt}],
-                "response_format": {"type": "json_object"},
+                "response_format": (
+                    work_order_analysis_response_format()
+                    if prompt_version == WORK_ORDER_ANALYSIS_PROMPT_VERSION
+                    else {"type": "json_object"}
+                ),
                 "temperature": 0,
                 **({"reasoning_effort": "none"} if self._disable_thinking else {}),
                 **({"max_tokens": self._max_output_tokens} if self._max_output_tokens is not None else {}),

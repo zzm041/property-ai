@@ -1,0 +1,77 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-PENDING0014",
+  "round": 1,
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78",
+  "verdict": "PASS_SCOPED",
+  "current_task_blockers": 0,
+  "status_boundaries": {
+    "software_review": "本次源码增量及修复通过限定只读审查",
+    "migration_0014": "未执行；本结论不是执行批准",
+    "identity_completion": "未完成真实核验、恢复、号码复用或账号资产合并闭环",
+    "r3": "NOT_READY",
+    "real_auto": "未运行，不得切换业务",
+    "production": "NOT_FULL_PASS"
+  },
+  "reviewed_hashes_sha256": {
+    "backend/app/service/sla.py": "d0f555d6c6c8fc315b01284add86a8add8acbd73c28a6b05f9c81c390c40c0ad",
+    "backend/app/service/sla_policy.py": "19939406bbd1f9149454268c57c150d076a730d55f1ed106502064cabd0d4f6a",
+    "backend/app/repository/work_order.py": "8204dd0b3f88c9ec744f2fc61be6418dacc26be444000363e60cb056d44fcdf0",
+    "backend/app/service/credential_auth.py": "447778e68e7b75a3dbb86873e1153584a7a867ddd881616cb353ee096dfae6b6",
+    "backend/alembic/versions/20260926_0014_identity_merge_sla_versions.py": "d2cbf32ad9a865b65a67279d24006e4cef141f21b77567c6247644e1f8fc020a",
+    "backend/tests/unit/test_identity_recovery_pending_0014.py": "949f706088829a18cf216135f9feb132f5b41d6929731c0d132d0f499d14dee2"
+  },
+  "closed_findings": [
+    {
+      "id": "027-PENDING0014-R1-01",
+      "status": "CLOSED",
+      "resolution": "版本化配置发生实际变化时显式推进父记录updated_at；旧并发令牌不能覆盖新版本。"
+    },
+    {
+      "id": "027-PENDING0014-R1-02",
+      "status": "CLOSED",
+      "resolution": "派发与接单重置使用工单快照；响应升级按快照宽限计算并记录application/version。"
+    },
+    {
+      "id": "027-PENDING0014-R1-03",
+      "status": "CLOSED",
+      "resolution": "不伪造旧工单application；旧单保留原时钟和legacy路径，查询不漏扫；政策基线以迁移时刻生效。"
+    },
+    {
+      "id": "027-PENDING0014-R1-04",
+      "status": "CLOSED",
+      "resolution": "元数据查询异常不再被当作schema不存在；异常使登录事务失败关闭，不创建用户或跳过历史号码保护。"
+    }
+  ],
+  "release_blockers": [
+    {
+      "id": "027-R3SCHEMA-RELEASE-01",
+      "location": "diagnostic-r3schema request-03,14,30,31",
+      "impact": "固定集仍有关键事实、来源及Provider契约错误，不能授权真实AUTO。",
+      "recommendation": "保留原始结果、NOT_READY和no-AUTO；下一候选及调用另行授权。"
+    },
+    {
+      "id": "027-PENDING0014-RELEASE-01",
+      "location": "identity proof provider and recovery finalize",
+      "impact": "真实Proof Provider未配置；现有流程止于审核，不执行资产迁移、凭证撤销或号码重新认领。",
+      "recommendation": "0014须单独批准；真实渠道、完整事务及运行验收完成前不开放完成入口。"
+    }
+  ],
+  "accepted_evidence": {
+    "ai": "20个冻结文件哈希匹配；31份原始响应哈希匹配；实际读取03/14/30/31并查看两张冻结图片；31 Qwen、0 ASR、request32不存在。",
+    "software": "strict json_schema、身份schema/provider双门、Proof引用哈希、两人审核、0014隔离Guard、SLA新单快照与旧单legacy路径均已读。",
+    "tests_read": "已有原始日志58 passed/1 warning与86 passed/1 warning已读；后续125、21、1075和8项结果按主实施会话报告保留，未冒称独立运行。",
+    "report_calibration": "03与30措辞已校准，原始模型答案未改写，NOT_READY结论不变。"
+  },
+  "unverified": [
+    "审查者未运行测试、模型、页面、业务请求、数据库或队列操作。",
+    "0014未执行，身份与新增SLA页面无本轮运行闭环。",
+    "真实核验、完整账号合并事务及合法新持有人复用未验收。",
+    "固定集未完成，无真实AUTO证据；不构成R3、027或Production PASS。"
+  ],
+  "next_action": [
+    "保持0014未执行并单独申请精确隔离迁移批准。",
+    "保持R3 NOT_READY，不启动AUTO或追加模型调用。",
+    "后续只复核新实现或获批运行证据，不重开已关闭四项问题。"
+  ]
+}

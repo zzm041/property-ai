@@ -1,0 +1,23 @@
+{
+  "latency_seconds": 2.0309999999881256,
+  "samples": [
+    {
+      "utc": "2026-09-25T13:32:03Z",
+      "ram_free_mib": 11326,
+      "gpu_used_mib": 5439,
+      "gpu_free_mib": 10557,
+      "gpu_utilization_percent": 81
+    },
+    {
+      "utc": "2026-09-25T13:32:05Z",
+      "ram_free_mib": 11282,
+      "gpu_used_mib": 5440,
+      "gpu_free_mib": 10556,
+      "gpu_utilization_percent": 3
+    }
+  ],
+  "exit_code": 0,
+  "stop_reason": null,
+  "child_pid": 34620,
+  "model_side_completion": "response_received"
+}

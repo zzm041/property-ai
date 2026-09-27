@@ -83,7 +83,8 @@ def test_other_duties_and_explicit_restricted_skill_stay_hard_constraints(duty, 
 
 
 def test_unknown_is_not_relabelled_maintenance_and_low_confidence_is_preserved():
-    assert mapped('not-a-category').low_confidence
+    with pytest.raises(ValueError, match='category is not a supported value'):
+        mapped('not-a-category')
     assert mapped('other', 'other').low_confidence
     assert mapped('other', confidence=.4).low_confidence
 

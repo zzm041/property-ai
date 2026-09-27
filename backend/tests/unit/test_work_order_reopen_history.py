@@ -77,12 +77,12 @@ def test_reopen_enqueues_only_after_commit_for_pending_assignment(state, expecte
     events = []
     service._reopen = MagicMock(return_value=order)
 
-    def commit(operation):
+    def commit(operation, **_kwargs):
         result = operation()
         events.append("committed")
         return result
 
-    def enqueue(*args):
+    def enqueue(*args, **_kwargs):
         assert events == ["committed"]
         events.append("enqueued")
 

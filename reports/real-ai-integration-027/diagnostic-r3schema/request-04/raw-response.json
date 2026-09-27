@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-4\",\"object\":\"chat.completion\",\"created\":1790343080,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"hvac\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"噪声\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"夜里听到嗡嗡声\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"现象待核实\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"可能是空调，也可能来自墙外设备\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p4\\\",\\n  \\\"summary\\\": \\\"夜里听到嗡嗡声，来源不确定，可能是空调或墙外设备。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.5\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1633,\"prompt_tokens_details\":{\"cached_tokens\":1140},\"completion_tokens\":187,\"total_tokens\":1820}}\n",
+  "raw_response_sha256": "68e49da2cb281516fcaaefd6d35645cdb382548e6ad139c66d2dbd3381be037f",
+  "contract_errors": []
+}

@@ -99,18 +99,25 @@ def test_analysis_apply_uses_locking_content_read_before_aggregation() -> None:
     service._ai = MagicMock()
     service._append_failure_audit = MagicMock()
     service._validate_payload = MagicMock(return_value=(None, None))
-    record = SimpleNamespace(id=41, status="CANCELLED")
+    record = SimpleNamespace(id=41, status="CANCELLED", version=7)
     analysis = SimpleNamespace(
         id=51,
         status=AnalysisStatus.PROCESSING.value,
         error_code=None,
+        input_hash="analysis-input",
     )
     service._work_orders.get_work_order_for_update.return_value = record
     service._ai.get_current_analysis_for_update.return_value = analysis
 
     result = service._apply(
-        snapshot=SimpleNamespace(work_order_id=41, analysis_id=51),
-        bundle=SimpleNamespace(asr_text=None, llm_payload=None),
+        snapshot=SimpleNamespace(
+            work_order_id=41,
+            analysis_id=51,
+            work_order_version=7,
+            input_hash="analysis-input",
+            text="synthetic report",
+        ),
+        bundle=SimpleNamespace(asr_text=None, vision_text=None, llm_payload=None),
         request_id="analysis-current-read",
         attempt=1,
     )

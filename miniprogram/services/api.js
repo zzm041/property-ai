@@ -296,6 +296,15 @@ module.exports = {
     request({ path: "/auth/logout", method: "POST", data: { refresh_token: refreshToken || undefined } }),
   updateProfile: (displayName) =>
     request({ path: "/me/profile", method: "PATCH", data: { display_name: displayName } }),
+  identityRecoveryCapabilities: () => request({ path: "/identity/recovery/capabilities" }),
+  createIdentityRecoveryCase: (body) =>
+    request({ path: "/identity/recovery/cases", method: "POST", data: body }),
+  identityRecoveryCases: (afterId = 0, status = "") =>
+    request({ path: `/admin/identity-recovery/cases?after_id=${afterId}&limit=50${status ? `&status=${status}` : ""}` }),
+  reviewIdentityRecoveryCase: (id, body) =>
+    request({ path: `/admin/identity-recovery/cases/${id}/reviews`, method: "POST", data: body }),
+  finalizeIdentityRecoveryCase: (id, expectedVersion) =>
+    request({ path: `/admin/identity-recovery/cases/${id}/finalize`, method: "POST", data: { expected_version: expectedVersion } }),
   catalogProperties: (afterId, limit = 100) =>
     request({
       path: `/properties?limit=${limit}${afterId ? `&after_id=${afterId}` : ""}`,

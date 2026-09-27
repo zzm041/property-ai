@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-226\",\"object\":\"chat.completion\",\"created\":1790343123,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"water_supply\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"滴渗水\\\",\\n      \\\"subject\\\": \\\"水龙头\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"卫生间水龙头关紧后仍滴水\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"外观无明显异常\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"没有积水\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p3\\\",\\n  \\\"summary\\\": \\\"卫生间水龙头关紧后仍滴水，但下方无积水。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1652,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":184,\"total_tokens\":1836}}\n",
+  "raw_response_sha256": "c7676abe0ffb1564efac31374600e97ec45901e2ba19c77b0916d0440a43d2d2",
+  "contract_errors": []
+}

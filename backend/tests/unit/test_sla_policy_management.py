@@ -287,6 +287,115 @@ def test_same_value_replay_is_noop_without_concurrency_token() -> None:
     service._audit.append.assert_not_called()
 
 
+def test_versioned_update_closes_previous_version_and_records_reason() -> None:
+    actor = _property_admin()
+    service = _service(actor)
+    record = _policy()
+    previous = SimpleNamespace(
+        id=80,
+        version_no=2,
+        accept_minutes=20,
+        respond_minutes=30,
+        complete_minutes=120,
+        warning_lead_minutes=30,
+        escalation_minutes=0,
+        status="ACTIVE",
+        effective_to=None,
+    )
+    service._repository.get_sla_policy_for_update.return_value = record
+    service._repository.flush_sla_policy.side_effect = lambda item: item
+    service._versioning_available = MagicMock(return_value=True)
+    service._latest_version = MagicMock(return_value=previous)
+    service._session.scalar.return_value = 2
+
+    result = _put(
+        service,
+        actor,
+        accept_minutes=15,
+        warning_lead_minutes=20,
+        escalation_minutes=5,
+        change_reason="调整本小区响应窗口",
+    )
+
+    assert result is record
+    assert previous.effective_to is not None
+    created = service._session.add.call_args.args[0]
+    assert created.version_no == 3
+    assert created.change_reason == "调整本小区响应窗口"
+    assert created.effective_from == previous.effective_to
+    assert created.effective_to is None
+
+
+def test_versioned_change_requires_reason_but_exact_replay_does_not() -> None:
+    actor = _property_admin()
+    service = _service(actor)
+    record = _policy(respond_minutes=45, complete_minutes=180)
+    same = SimpleNamespace(
+        id=80,
+        version_no=2,
+        accept_minutes=45,
+        respond_minutes=45,
+        complete_minutes=180,
+        warning_lead_minutes=45,
+        escalation_minutes=0,
+        status="ACTIVE",
+        effective_to=None,
+    )
+    service._repository.get_sla_policy_for_update.return_value = record
+    service._versioning_available = MagicMock(return_value=True)
+    service._latest_version = MagicMock(return_value=same)
+
+    assert _put(service, actor, expected_updated_at=None) is record
+
+    same.respond_minutes = 30
+    with pytest.raises(AppError) as captured:
+        _put(service, actor, expected_updated_at=NOW)
+    assert captured.value.code == SlaErrorCode.INVALID_INPUT
+
+
+def test_version_only_change_advances_legacy_concurrency_token() -> None:
+    actor = _property_admin()
+    service = _service(actor)
+    record = _policy(respond_minutes=45, complete_minutes=180)
+    previous = SimpleNamespace(
+        id=80,
+        version_no=2,
+        accept_minutes=45,
+        respond_minutes=45,
+        complete_minutes=180,
+        warning_lead_minutes=45,
+        escalation_minutes=0,
+        status="ACTIVE",
+        effective_to=None,
+    )
+    service._repository.get_sla_policy_for_update.return_value = record
+    service._versioning_available = MagicMock(return_value=True)
+    service._latest_version = MagicMock(return_value=previous)
+    service._session.scalar.return_value = 2
+
+    original_token = record.updated_at
+    result = _put(
+        service,
+        actor,
+        expected_updated_at=original_token,
+        warning_lead_minutes=30,
+        change_reason="调整预警提前量",
+    )
+
+    assert result.updated_at > original_token
+    assert result._latest_version.warning_lead_minutes == 30
+
+    with pytest.raises(AppError) as captured:
+        _put(
+            service,
+            actor,
+            expected_updated_at=original_token,
+            warning_lead_minutes=20,
+            change_reason="再次调整预警提前量",
+        )
+    assert captured.value.code == SlaErrorCode.CONFLICT
+
+
 def test_stale_different_update_returns_stable_conflict_without_audit() -> None:
     actor = _property_admin()
     service = _service(actor)

@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-801\",\"object\":\"chat.completion\",\"created\":1790343128,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"water_supply\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"滴渗水\\\",\\n      \\\"subject\\\": \\\"水龙头\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"洗手盆下面又开始滴\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"现象待核实\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"量不大，目前还在滴\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p3\\\",\\n  \\\"summary\\\": \\\"昨晚关紧阀门后停止漏水。今天重开阀门，洗手盆下面又开始滴水，量不大且未漫到门外。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1649,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":200,\"total_tokens\":1849}}\n",
+  "raw_response_sha256": "067971f1233f9a41957b68fac493beed5e724275af917ab915b4759a815964cf",
+  "contract_errors": []
+}

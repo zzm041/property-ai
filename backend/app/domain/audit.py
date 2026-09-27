@@ -80,6 +80,9 @@ class AuditAction(StrEnum):
     KNOWLEDGE_DOCUMENT_ACTIVATED = "KNOWLEDGE_DOCUMENT_ACTIVATED"
     KNOWLEDGE_DOCUMENT_ARCHIVED = "KNOWLEDGE_DOCUMENT_ARCHIVED"
     SLA_POLICY_CHANGED = "SLA_POLICY_CHANGED"
+    IDENTITY_RECOVERY_REQUESTED = "IDENTITY_RECOVERY_REQUESTED"
+    IDENTITY_RECOVERY_REVIEWED = "IDENTITY_RECOVERY_REVIEWED"
+    IDENTITY_RECOVERY_FINALIZED = "IDENTITY_RECOVERY_FINALIZED"
 
 
 class AuditResourceType(StrEnum):
@@ -113,6 +116,7 @@ class AuditResourceType(StrEnum):
     AUTH_SESSION = "AUTH_SESSION"
     EMPLOYEE_INVITE = "EMPLOYEE_INVITE"
     TASK_INTENT = "TASK_INTENT"
+    IDENTITY_RECOVERY_CASE = "IDENTITY_RECOVERY_CASE"
 
 
 class AuditSource(StrEnum):
@@ -688,6 +692,24 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             allowed_detail_keys=_SLA_POLICY_CHANGED_DETAIL_KEYS,
             required_detail_keys=_SLA_POLICY_CHANGED_DETAIL_KEYS,
             allowed_scope_types=frozenset({ScopeType.TENANT, ScopeType.PROPERTY}),
+        ),
+        AuditAction.IDENTITY_RECOVERY_REQUESTED: AuditActionPolicy(
+            resource_type=AuditResourceType.IDENTITY_RECOVERY_CASE,
+            allowed_detail_keys=frozenset({"purpose", "status"}),
+            required_detail_keys=frozenset({"purpose", "status"}),
+            allowed_scope_types=frozenset({ScopeType.SYSTEM}),
+        ),
+        AuditAction.IDENTITY_RECOVERY_REVIEWED: AuditActionPolicy(
+            resource_type=AuditResourceType.IDENTITY_RECOVERY_CASE,
+            allowed_detail_keys=frozenset({"decision", "status"}),
+            required_detail_keys=frozenset({"decision", "status"}),
+            allowed_scope_types=frozenset({ScopeType.SYSTEM}),
+        ),
+        AuditAction.IDENTITY_RECOVERY_FINALIZED: AuditActionPolicy(
+            resource_type=AuditResourceType.IDENTITY_RECOVERY_CASE,
+            allowed_detail_keys=frozenset({"purpose", "status", "reviewer_count"}),
+            required_detail_keys=frozenset({"purpose", "status", "reviewer_count"}),
+            allowed_scope_types=frozenset({ScopeType.SYSTEM}),
         ),
         AuditAction.TASK_INTENT_RETRIED: AuditActionPolicy(
             resource_type=AuditResourceType.TASK_INTENT,

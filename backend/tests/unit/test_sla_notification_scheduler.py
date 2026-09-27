@@ -249,6 +249,8 @@ def test_response_timeout_escalates_once_without_reassignment(monkeypatch) -> No
         id=62,
         tenant_id=7,
         property_id=9,
+        category="PLUMBING",
+        priority="MEDIUM",
         status="ACCEPTED",
         process_reason="NONE",
     )
@@ -315,6 +317,28 @@ def test_due_assignment_query_filters_handled_cycles_before_limit() -> None:
     assert "LIMIT 100 FOR UPDATE SKIP LOCKED" in sql
 
 
+def test_versioned_due_query_waits_until_response_escalation_due() -> None:
+    session = MagicMock()
+    session.scalars.return_value.all.return_value = []
+    repository = WorkOrderRepository(session)
+    repository.sla_versioning_available = MagicMock(return_value=True)
+
+    assert repository.list_due_assignment_sla_work_orders_for_update(
+        now=datetime(2026, 9, 20, 8, 0, tzinfo=UTC),
+        limit=100,
+    ) == ()
+
+    statement = session.scalars.call_args.args[0]
+    sql = str(
+        statement.compile(
+            dialect=mysql.dialect(),
+            compile_kwargs={"literal_binds": True},
+        )
+    )
+    assert "LEFT OUTER JOIN work_order_sla_applications" in sql
+    assert "timestampadd(MINUTE, coalesce(work_order_sla_applications.escalation_minutes, 0), sla_clocks.respond_due_at)" in sql
+
+
 def test_assignment_and_accept_restart_phase_deadlines() -> None:
     assigned_at = datetime(2026, 9, 20, 8, 0, tzinfo=UTC)
     accepted_at = assigned_at + timedelta(minutes=2)
@@ -344,6 +368,88 @@ def test_assignment_and_accept_restart_phase_deadlines() -> None:
         now=accepted_at,
     )
     assert clock.respond_due_at == accepted_at + timedelta(minutes=5)
+
+
+def test_versioned_assignment_uses_snapshot_accept_respond_and_escalation() -> None:
+    assigned_at = datetime(2026, 9, 20, 8, 0, tzinfo=UTC)
+    accepted_at = assigned_at + timedelta(minutes=3)
+    clock = SimpleNamespace(accept_due_at=None, respond_due_at=None)
+    record = SimpleNamespace(
+        id=64,
+        tenant_id=7,
+        property_id=9,
+        category="PLUMBING",
+        priority="MEDIUM",
+    )
+    application = SimpleNamespace(
+        id=91,
+        policy_version_id=81,
+        accept_minutes=4,
+        respond_minutes=11,
+        escalation_minutes=7,
+    )
+    repository = MagicMock()
+    repository.sla_versioning_available.return_value = True
+    repository.get_sla_application.return_value = application
+    repository.get_sla_clock_for_update.return_value = clock
+
+    reset_assignment_sla_deadlines(repository, work_order=record, now=assigned_at)
+    assert clock.accept_due_at == assigned_at + timedelta(minutes=4)
+    assert clock.respond_due_at == assigned_at + timedelta(minutes=11)
+
+    reset_response_sla_deadline(repository, work_order=record, now=accepted_at)
+    assert clock.respond_due_at == accepted_at + timedelta(minutes=11)
+
+
+def test_response_escalation_waits_for_versioned_grace(monkeypatch) -> None:
+    now = datetime(2026, 9, 20, 8, 0, tzinfo=UTC)
+    clock = SimpleNamespace(id=53, work_order_id=63, respond_due_at=now)
+    record = SimpleNamespace(
+        id=63,
+        tenant_id=7,
+        property_id=9,
+        category="PLUMBING",
+        priority="MEDIUM",
+        status="ACCEPTED",
+        process_reason="NONE",
+        current_assignment_id=73,
+    )
+    assignment = SimpleNamespace(id=73, employee_id=83, accept_at=now - timedelta(minutes=10), timeout_at=None)
+    repository = MagicMock()
+    repository.get_active_assignment_for_update.return_value = assignment
+    repository.sla_versioning_available.return_value = True
+    repository.get_sla_application.return_value = SimpleNamespace(
+        id=92,
+        policy_version_id=82,
+        accept_minutes=4,
+        respond_minutes=10,
+        escalation_minutes=7,
+    )
+    repository.has_log_request_id.return_value = False
+    repository.list_sla_management_user_ids.return_value = (20,)
+    repository.get_active_assignee_user_id.return_value = None
+    _Notifier.calls = []
+    monkeypatch.setattr("app.service.sla.NotificationService", _Notifier)
+    service = SlaService(_session(), repository=repository)
+
+    assert service._escalate_response_timeout(
+        record=record,
+        clock=clock,
+        now=now + timedelta(minutes=6),
+        notifier=_Notifier(None),
+    ) is None
+    assert assignment.timeout_at is None
+
+    count = service._escalate_response_timeout(
+        record=record,
+        clock=clock,
+        now=now + timedelta(minutes=7),
+        notifier=_Notifier(None),
+    )
+    assert count == 1
+    log = repository.add_log.call_args.args[0]
+    assert log.payload_json["escalation_due_at"] == (now + timedelta(minutes=7)).isoformat()
+    assert log.payload_json["policy_version_id"] == 82
 
 
 class _DeliveryRepository:

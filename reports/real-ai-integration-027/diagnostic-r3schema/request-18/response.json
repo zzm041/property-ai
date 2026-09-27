@@ -1,0 +1,83 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-209\",\"object\":\"chat.completion\",\"created\":1790343114,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"water_supply\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"水渍\\\",\\n      \\\"subject\\\": \\\"天花墙面\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"卫生间天花板有一片新水渍\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"滴渗水\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"还在缓慢滴水\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"medium\\\",\\n  \\\"priority\\\": \\\"p2\\\",\\n  \\\"summary\\\": \\\"卫生间天花板发现新水渍，并伴有缓慢滴水现象。\\\",\\n  \\\"risk\\\": \\\"flooding\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.85\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1635,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":186,\"total_tokens\":1821}}\n",
+  "raw_response_sha256": "040cafbdfab1a11c9716eed1987a052a348af181ae232d4b5547fa9ad9e59e2e",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-016",
+    "tags": [
+      "渗水",
+      "未确认责任"
+    ],
+    "report": "卫生间天花板有一片新水渍，还在缓慢滴水。我怀疑楼上管道漏了，但没去楼上确认。",
+    "history": [],
+    "facts": [
+      "水渍滴水",
+      "楼上原因未确认"
+    ],
+    "forbidden": [
+      "确定楼上管破裂",
+      "确定责任",
+      "即将坍塌",
+      "已漏电"
+    ],
+    "accept": [
+      [
+        "water_supply",
+        "plumber",
+        [
+          "none",
+          "flooding"
+        ]
+      ]
+    ],
+    "manual": "RULES"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "water_supply",
+      "observations": [
+        {
+          "label": "水渍",
+          "subject": "天花墙面",
+          "source": "report",
+          "quote": "卫生间天花板有一片新水渍"
+        },
+        {
+          "label": "滴渗水",
+          "subject": "未确定",
+          "source": "report",
+          "quote": "还在缓慢滴水"
+        }
+      ],
+      "severity": "medium",
+      "priority": "p2",
+      "summary": "卫生间天花板发现新水渍，并伴有缓慢滴水现象。",
+      "risk": "flooding",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.85
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:31:53.170185+00:00",
+      "latency_ms": 1264,
+      "request_id": "supplement-GOLD-016",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1821
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

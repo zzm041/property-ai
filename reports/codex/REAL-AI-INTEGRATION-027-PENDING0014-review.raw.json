@@ -1,0 +1,141 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-PENDING0014",
+  "round": 1,
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78",
+  "reviewed_scope": [
+    "本轮未提交的 canonical JSON Schema、Provider/适配器协议及固定诊断证据",
+    "待审批0014 DDL、身份核验申请与双人审核、历史手机号保护、相关API/UI",
+    "SLA版本、创建时快照、阶段时钟重置、升级查询及直接回归",
+    "本轮四项finding的修复；未重审其他已完成切片"
+  ],
+  "verdict": "PASS_SCOPED",
+  "current_task_blockers": 0,
+  "status_boundaries": {
+    "software_review": "本次源码增量及修复通过限定只读审查",
+    "migration_0014": "未执行；本结论不是执行批准",
+    "identity_completion": "未完成真实核验、恢复、号码复用或账号资产合并闭环",
+    "r3": "NOT_READY",
+    "real_auto": "未运行，不得切换业务",
+    "production": "NOT_FULL_PASS"
+  },
+  "reviewed_hashes_sha256": {
+    "backend/app/service/sla.py": "d0f555d6c6c8fc315b01284add86a8add8acbd73c28a6b05f9c81c390c40c0ad",
+    "backend/app/service/sla_policy.py": "19939406bbd1f9149454268c57c150d076a730d55f1ed106502064cabd0d4f6a",
+    "backend/app/repository/work_order.py": "8204dd0b3f88c9ec744f2fc61be6418dacc26be444000363e60cb056d44fcdf0",
+    "backend/app/service/credential_auth.py": "447778e68e7b75a3dbb86873e1153584a7a867ddd881616cb353ee096dfae6b6",
+    "backend/alembic/versions/20260926_0014_identity_merge_sla_versions.py": "d2cbf32ad9a865b65a67279d24006e4cef141f21b77567c6247644e1f8fc020a",
+    "backend/tests/unit/test_identity_recovery_pending_0014.py": "949f706088829a18cf216135f9feb132f5b41d6929731c0d132d0f499d14dee2"
+  },
+  "closed_findings": [
+    {
+      "id": "027-PENDING0014-R1-01",
+      "status": "CLOSED",
+      "location": "backend/app/service/sla_policy.py::put_policy",
+      "resolution": "版本化配置发生实际变化时显式推进父记录updated_at，包括仅修改accept/warning/escalation的情况；旧并发令牌不能继续覆盖新版本。",
+      "evidence": "已读取test_version_only_change_advances_legacy_concurrency_token及对应实现。"
+    },
+    {
+      "id": "027-PENDING0014-R1-02",
+      "status": "CLOSED",
+      "location": "backend/app/service/sla.py；backend/app/repository/work_order.py",
+      "resolution": "派发与接单重置优先读取本工单快照；响应升级按快照宽限计算。查询使用TIMESTAMPADD，事件记录包含application/version标识；旧schema保持原路径。",
+      "evidence": "已读取快照时钟、宽限到点升级和MySQL查询编译断言；没有声称已在0014数据库运行。"
+    },
+    {
+      "id": "027-PENDING0014-R1-03",
+      "status": "CLOSED",
+      "location": "backend/alembic/versions/20260926_0014_identity_merge_sla_versions.py；backend/app/repository/work_order.py",
+      "resolution": "取消以建单至当前截止时间的总历时伪造旧工单窗口。旧工单不回填application，保留原时钟及legacy重置；升级查询改为LEFT OUTER JOIN和零宽限回退，避免漏扫旧单。政策基线改为迁移时刻生效，明确技术基线责任人不等于历史编辑者。",
+      "evidence": "已读取修正DDL、禁止旧application回填的测试断言及LEFT OUTER JOIN/coalesce查询断言。"
+    },
+    {
+      "id": "027-PENDING0014-R1-04",
+      "status": "CLOSED",
+      "location": "backend/app/service/credential_auth.py::_identity_recovery_available",
+      "resolution": "元数据查询异常不再转成schema不存在；异常向上传播，由短信登录事务回滚并返回稳定错误，不创建用户或跳过历史号码保护。",
+      "evidence": "最终负测直接令inspect返回的inspector.has_table抛SQLAlchemyError，实际调用真实检查分支；断言无后续历史查询和用户创建。已读取修正测试及login_sms异常处理上下文。"
+    }
+  ],
+  "findings": [
+    {
+      "id": "027-R3SCHEMA-RELEASE-01",
+      "severity": "P1",
+      "classification": "RELEASE_BLOCKER",
+      "location": "reports/real-ai-integration-027/diagnostic-r3schema/request-03、request-14、request-30、request-31",
+      "trigger": "本候选处理矛盾传闻、观察标签与否定来源，或第四张图片输出。",
+      "impact": "尚不能满足固定集事件事实和Provider契约要求，不能授权真实AUTO。",
+      "evidence": [
+        "#03摘要确实保留双方说法矛盾，但以0.85置信度输出未核实的确定现象；不能表述为摘要抹除了矛盾。",
+        "#14把软管裂开标为不出水；摘要及flooding风险正确不抵消事件观察错误。",
+        "#30将report_text中的“照片外观没有发黑”标成vision来源的肯定烧焦观察；真正image_understanding只描述螺丝松动。摘要保留否定，错误位于结构化观察及来源。",
+        "#31返回JSON字段包裹的JSON字符串，Provider拒绝为AI.INVALID_OUTPUT；request-32不存在。"
+      ],
+      "recommendation": "保留原始结果、NOT_READY和no-AUTO。不得把Provider结构合法或本次审查通过升级为模型质量通过；下一候选及额外调用另按授权处理。"
+    },
+    {
+      "id": "027-PENDING0014-RELEASE-01",
+      "severity": "P1",
+      "classification": "RELEASE_BLOCKER",
+      "location": "backend/app/provider/identity_proof/__init__.py；backend/app/service/identity_recovery.py::finalize_case",
+      "trigger": "试图将当前准备代码作为可用账号恢复、号码复用或账号合并交付。",
+      "impact": "真实Proof Provider未配置；finalize目前只产生APPROVED审核结果，不执行账号资产迁移、冲突处理及凭证/session/ticket失效事务，也不完成号码重新认领。",
+      "evidence": "默认UnavailableIdentityProofProvider使能力关闭；现有Service止于审核状态，account_merges和tombstone的实际完成流程未实现。",
+      "recommendation": "继续明确区分申请审核准备与身份变更完成。0014须单独批准；真实核验渠道、完整合并事务及运行验收完成前不开放完成入口、不标V1完成。"
+    },
+    {
+      "id": "027-PENDING0014-NB-01",
+      "severity": "P3",
+      "classification": "NON_BLOCKING",
+      "location": "reports/account-merge-001-preapproval/0014-final-ddl.md；reports/real-ai-integration-027/batch-results-20260927.md",
+      "trigger": "直接使用当前报告头部作为最终审批绑定。",
+      "impact": "最后读取时DDL文档仍列旧哈希0B0231…，汇总仍列1074；与已修源码和主会话后续1075报告不一致。",
+      "evidence": "本次实际计算DDL哈希为d2cbf32ad9a865b65a67279d24006e4cef141f21b77567c6247644e1f8fc020a。",
+      "recommendation": "最终保存时更新准确哈希、测试版本和审查边界；本项不要求重跑模型或业务。"
+    }
+  ],
+  "accepted_evidence": {
+    "ai_binding": [
+      "frozen.json列出的20个冻结文件均实际重新计算哈希并匹配。",
+      "31份raw-response中的原始响应字符串均重新计算SHA-256，与记录匹配。",
+      "实际读取请求、原始回答、Provider结果及监督记录；重点逐项核对03/14/30/31。",
+      "实际通过图像工具查看冻结normal-socket.jpg和ans-ball-valve.jpg，不仅检查文件路径。",
+      "保存记录显示31次Qwen、0次ASR；第31次契约失败停止，固定32请求集未完成。"
+    ],
+    "software": [
+      "工单LLM采用由服务端模型生成的canonical strict json_schema；RAG协议仍单独校验。",
+      "身份入口保留schema/provider双门；API依赖正常认证，管理复核要求SYSTEM identity:review及当前授权重查。",
+      "Proof只持久化不透明引用哈希；响应手机号脱敏；重复审核受唯一约束，状态更新有版本检查。",
+      "新增住户表单仅在capabilities.enabled时可用，不上传证件、人脸或短信，不由页面指定来源账号。",
+      "0014限定127.0.0.1:3307/property_ai_auth001_test、APP_ENV=test、实际0012及显式批准变量，保留两条手机号唯一约束。",
+      "SLA新工单快照与旧工单legacy路径明确分离；没有改写旧时钟或杜撰旧应用版本。"
+    ],
+    "tests_actually_read": [
+      "reports/real-ai-integration-027/tests-20260925T130103.txt：58 passed，1 warning。",
+      "reports/real-ai-integration-027/tests-20260925T130118.txt：86 passed，1 warning。",
+      "本轮identity、pending0014、SLA、Provider及适配器专项测试源码和新增回归断言。"
+    ],
+    "tests_reported_by_implementer_not_independently_rerun": [
+      "125 passed，1 warning；中间SLA直接回归51 passed，1 warning。",
+      "修复后专项21 passed，1 warning；完整纯单元1075 passed，1 warning。",
+      "最终加强元数据故障注入后的目标文件8 passed，1 warning。",
+      "JS/app.json语法检查通过。以上后续数字未在本次审查中取得对应原始完整日志，按主实施会话报告保留，不冒称独立运行。"
+    ],
+    "report_calibration": "#03/#30的result-summary措辞修正已实际读取，原始模型答案未被改写，NOT_READY结论合理。"
+  },
+  "unverified": [
+    "未执行测试、模型、页面、业务请求、数据库或队列操作。",
+    "未执行0014；未验证真实MySQL升级、约束行为、回滚恢复或迁移后并发。",
+    "身份及新增SLA页面只有源码/语法与单元边界，没有本轮正常页面/API/数据库闭环。",
+    "真实核验渠道、账号合并资产事务、恢复完成及合法新持有人号码复用未验收。",
+    "未独立核对当前运行进程；保存证据不等于已把本轮WIP加载到API/Worker。",
+    "固定集未完成；本轮没有真实AUTO业务证据，也不构成R3、整体027或Production PASS。",
+    "预存project.config.json、model/ai.py差异及无关历史证据不属于本次产品审查范围。"
+  ],
+  "next_action": [
+    "保存本JSON，校准最终报告哈希与测试版本，只提交准确范围内的源码和证据。",
+    "保持0014未执行，提交其精确DDL及隔离验证申请；批准前不因源码审查通过而迁移。",
+    "保留身份完成流程和真实AI为发布缺口；R3保持NOT_READY，不启动AUTO或追加模型调用。",
+    "后续复核仅针对新实现、获批运行证据或明确回归，不重审已关闭的四项问题。"
+  ]
+}

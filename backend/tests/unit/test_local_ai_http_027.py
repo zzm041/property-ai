@@ -12,6 +12,8 @@ import pytest
 from app.core.config import Settings
 from app.provider.errors import ProviderInvalidOutputError,ProviderUnavailableError
 from app.provider.llm import QwenLLMProvider
+from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
+from app.domain.observed_event import work_order_analysis_response_format
 from app.provider.vector import MilvusKnowledgeStore
 from app.service.retrieval import RetrievalService
 
@@ -38,12 +40,23 @@ def test_audio_is_bytes_and_bounded_pcm_not_url():
     m.validate('asr',b.getvalue())
     with pytest.raises(ValueError):m.validate('asr','D:/private.wav')
 
-def test_only_rag_prompt_can_reach_qwen_in_current_package():
+def test_only_reviewed_rag_or_exact_work_order_schema_can_reach_qwen():
     value={'model':'qwen3.5:4b','messages':[{'role':'user','content':'依据资料回答'}],
         'temperature':0,'reasoning_effort':'none','max_tokens':512,'response_format':{'type':'json_object'}}
     raw=json.dumps(value).encode()
-    with pytest.raises(ValueError):m.decode('/v1/chat/completions','application/json',raw,'wo-analysis-v10-observed-event')
+    with pytest.raises(ValueError):m.decode('/v1/chat/completions','application/json',raw,'unknown-prompt')
     assert m.decode('/v1/chat/completions','application/json',raw,'rag-answer-v2')[0]=='qwen'
+    value['response_format']=work_order_analysis_response_format()
+    raw=json.dumps(value,ensure_ascii=False).encode()
+    assert m.decode('/v1/chat/completions','application/json',raw,WORK_ORDER_ANALYSIS_PROMPT_VERSION)[0]=='qwen'
+    value['response_format']['json_schema']['schema']['properties']['category']['enum'].append('noise')
+    with pytest.raises(ValueError,match='QWEN_SCHEMA_MISMATCH'):
+        m.decode('/v1/chat/completions','application/json',json.dumps(value,ensure_ascii=False).encode(),WORK_ORDER_ANALYSIS_PROMPT_VERSION)
+
+
+def test_committed_adapter_schema_is_generated_from_domain_contract():
+    path=ROOT/'scripts/ops/work_order_response_format.json'
+    assert json.loads(path.read_text(encoding='utf-8'))==work_order_analysis_response_format()
 
 def runner(tmp_path):
     path=tmp_path/'config.json';path.write_text(json.dumps({'private':str(tmp_path/'run'),'host':'127.0.0.1','port':11436}))

@@ -7,6 +7,7 @@ from hashlib import sha256
 from pathlib import Path
 from typing import TypeVar
 
+from sqlalchemy import inspect, select
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -61,6 +62,7 @@ from app.model.work_order import (
     FileObject,
     IdempotencyRecord,
     SlaClock,
+    SlaPolicyVersion,
     WorkOrder,
     WorkOrderAssignment,
     WorkOrderContent,
@@ -69,6 +71,7 @@ from app.model.work_order import (
     WorkOrderMedia,
     WorkOrderProcess,
     WorkOrderReceipt,
+    WorkOrderSlaApplication,
 )
 from app.provider.factory import build_storage_provider
 from app.provider.storage import StorageProvider
@@ -1219,6 +1222,24 @@ class WorkOrderService:
         if policy is not None:
             respond_minutes = policy.respond_minutes
             complete_minutes = policy.complete_minutes
+        versioning_available = self._sla_versioning_available()
+        sla_version = None
+        accept_minutes = respond_minutes
+        warning_delta = sla_warning_lead_minutes(complete_minutes)
+        escalation_minutes = 0
+        if versioning_available and policy is not None:
+            sla_version = self._session.scalar(
+                select(SlaPolicyVersion)
+                .where(SlaPolicyVersion.policy_id == policy.id)
+                .order_by(SlaPolicyVersion.version_no.desc(), SlaPolicyVersion.id.desc())
+                .limit(1)
+            )
+            if sla_version is not None:
+                accept_minutes = sla_version.accept_minutes
+                respond_minutes = sla_version.respond_minutes
+                complete_minutes = sla_version.complete_minutes
+                warning_delta = sla_version.warning_lead_minutes
+                escalation_minutes = sla_version.escalation_minutes
         due_at = compute_sla_due_at(
             created_at=now,
             priority=priority_value,
@@ -1255,13 +1276,30 @@ class WorkOrderService:
             file_ids=file_ids,
             taken_phase=MediaTakenPhase.REPORT,
         )
-        warning_delta = sla_warning_lead_minutes(complete_minutes)
+        if versioning_available:
+            self._session.add(
+                WorkOrderSlaApplication(
+                    work_order_id=record.id,
+                    policy_version_id=None if sla_version is None else sla_version.id,
+                    source=(
+                        "CODE_DEFAULT"
+                        if policy is None
+                        else "TENANT" if policy.property_id is None else "PROPERTY"
+                    ),
+                    accept_minutes=accept_minutes,
+                    respond_minutes=respond_minutes,
+                    complete_minutes=complete_minutes,
+                    warning_lead_minutes=warning_delta,
+                    escalation_minutes=escalation_minutes,
+                    applied_at=now,
+                )
+            )
         self._repository.add_sla_clock(
             SlaClock(
                 tenant_id=record.tenant_id,
                 property_id=record.property_id,
                 work_order_id=record.id,
-                accept_due_at=now + timedelta(minutes=respond_minutes),
+                accept_due_at=now + timedelta(minutes=accept_minutes),
                 respond_due_at=now + timedelta(minutes=respond_minutes),
                 complete_due_at=due_at,
                 warning_at=due_at - timedelta(minutes=warning_delta),
@@ -3098,6 +3136,17 @@ class WorkOrderService:
                 message="Work order audit could not be written",
                 status_code=500,
             ) from exc
+
+    def _sla_versioning_available(self) -> bool:
+        try:
+            bind = self._session.get_bind()
+            inspector = inspect(bind)
+            return (
+                inspector.has_table("work_order_sla_applications") is True
+                and inspector.has_table("sla_policy_versions") is True
+            )
+        except (AttributeError, SQLAlchemyError):
+            return False
 
     @staticmethod
     def _assert_version(record: WorkOrder, version: int | None) -> None:

@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-295\",\"object\":\"chat.completion\",\"created\":1790343107,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"other\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"疑似燃气气味\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"厨房闻到很明显的类似燃气的气味\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"medium\\\",\\n  \\\"priority\\\": \\\"p2\\\",\\n  \\\"summary\\\": \\\"厨房出现疑似燃气气味，来源不明且未见明火或烟雾。\\\",\\n  \\\"risk\\\": \\\"gas\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.85\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1632,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":143,\"total_tokens\":1775}}\n",
+  "raw_response_sha256": "efc93b814851f933c7bb54ba222557ae2d69d8f4e4f01f9e269d63108189e0d8",
+  "contract_errors": []
+}

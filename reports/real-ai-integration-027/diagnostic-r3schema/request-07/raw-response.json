@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-782\",\"object\":\"chat.completion\",\"created\":1790343087,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"description\\\": \\\"插座烧焦破损\\\",\\n  \\\"labels\\\": [\\n    \\\"插座\\\",\\n    \\\"烧焦\\\",\\n    \\\"破损\\\"\\n  ],\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":812,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens\":50,\"total_tokens\":862}}\n",
+  "raw_response_sha256": "872005b4c8ef6394cb90c664e7c346ba9815733fc53b08ebb96501c7a708d9d1",
+  "contract_errors": []
+}

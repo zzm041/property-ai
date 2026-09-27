@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-726\",\"object\":\"chat.completion\",\"created\":1790343099,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"hvac\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"不制冷\\\",\\n      \\\"subject\\\": \\\"空调\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"出风但不凉\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"外观无明显异常\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"没有漏水，也没有异味\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"medium\\\",\\n  \\\"priority\\\": \\\"p3\\\",\\n  \\\"summary\\\": \\\"空调可以开机出风但不制冷，无漏水及异味。用户猜测可能缺制冷剂。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.85\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1630,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":189,\"total_tokens\":1819}}\n",
+  "raw_response_sha256": "12139e24071ad2929ff57ad4e68c71137ba0e53df7d7aea3fc43b6616f4fc9c5",
+  "contract_errors": []
+}

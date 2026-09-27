@@ -56,6 +56,15 @@ class CredentialRepository:
             .with_for_update()
         )
 
+    def get_latest_phone_for_update(self, phone_e164: str) -> UserPhone | None:
+        return self._session.scalar(
+            select(UserPhone)
+            .where(UserPhone.phone_e164 == phone_e164)
+            .order_by(UserPhone.id.desc())
+            .limit(1)
+            .with_for_update()
+        )
+
     def get_active_phone_for_user_for_update(self, user_id: int) -> UserPhone | None:
         return self._session.scalar(
             select(UserPhone)

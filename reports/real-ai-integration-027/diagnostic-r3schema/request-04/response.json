@@ -1,0 +1,82 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-4\",\"object\":\"chat.completion\",\"created\":1790343080,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"hvac\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"噪声\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"夜里听到嗡嗡声\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"现象待核实\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"可能是空调，也可能来自墙外设备\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p4\\\",\\n  \\\"summary\\\": \\\"夜里听到嗡嗡声，来源不确定，可能是空调或墙外设备。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.5\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1633,\"prompt_tokens_details\":{\"cached_tokens\":1140},\"completion_tokens\":187,\"total_tokens\":1820}}\n",
+  "raw_response_sha256": "68e49da2cb281516fcaaefd6d35645cdb382548e6ad139c66d2dbd3381be037f",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-013",
+    "tags": [
+      "来源未知",
+      "猜测"
+    ],
+    "report": "夜里听到嗡嗡声，可能是空调，也可能来自墙外设备，我没找到声音来源，没有别的现象。",
+    "history": [],
+    "facts": [
+      "嗡嗡声",
+      "来源未知"
+    ],
+    "forbidden": [
+      "确认压缩机故障",
+      "漏电",
+      "燃气泄漏"
+    ],
+    "accept": [
+      [
+        "other",
+        "other",
+        [
+          "none",
+          "other"
+        ]
+      ]
+    ],
+    "manual": "LOW"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "hvac",
+      "observations": [
+        {
+          "label": "噪声",
+          "subject": "未确定",
+          "source": "report",
+          "quote": "夜里听到嗡嗡声"
+        },
+        {
+          "label": "现象待核实",
+          "subject": "未确定",
+          "source": "report",
+          "quote": "可能是空调，也可能来自墙外设备"
+        }
+      ],
+      "severity": "low",
+      "priority": "p4",
+      "summary": "夜里听到嗡嗡声，来源不确定，可能是空调或墙外设备。",
+      "risk": "none",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.5
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:31:19.401652+00:00",
+      "latency_ms": 1265,
+      "request_id": "supplement-GOLD-013",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1820
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

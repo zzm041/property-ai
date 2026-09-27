@@ -4,6 +4,8 @@
     "pages/password-reset/password-reset",
     "pages/home/home",
     "pages/profile/profile",
+    "pages/identity-recovery/identity-recovery",
+    "pages/supervisor/identity-recovery",
     "pages/work-orders/create",
     "pages/work-orders/list",
     "pages/work-orders/detail",

@@ -1,0 +1,89 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-716\",\"object\":\"chat.completion\",\"created\":1790343104,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"water_supply\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"不出水\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"厨房进水软管裂开\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"滴渗水\\\",\\n      \\\"subject\\\": \\\"阀门管道\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"水一直喷出\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"水渍\\\",\\n      \\\"subject\\\": \\\"楼道地面\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"厨房地面已经积水并流向客厅\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"high\\\",\\n  \\\"priority\\\": \\\"p1\\\",\\n  \\\"summary\\\": \\\"厨房进水软管裂开导致水持续喷出，厨房地面已积水并流向客厅，用户尚未关闭水源。\\\",\\n  \\\"risk\\\": \\\"flooding\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1635,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":242,\"total_tokens\":1877}}\n",
+  "raw_response_sha256": "17e1cd73d8d7a983a55cf4141aafbcd57e870fd56fe6ca93397ac4023e37b6d4",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-008",
+    "tags": [
+      "淹水",
+      "持续状态"
+    ],
+    "report": "厨房进水软管裂开，水一直喷出，厨房地面已经积水并流向客厅，我还没有关住水。",
+    "history": [],
+    "facts": [
+      "软管裂开持续喷水",
+      "积水流向客厅",
+      "尚未止水"
+    ],
+    "forbidden": [
+      "已关阀",
+      "整栋被淹",
+      "已经漏电",
+      "仅几滴水"
+    ],
+    "accept": [
+      [
+        "water_supply",
+        "plumber",
+        [
+          "flooding"
+        ]
+      ]
+    ],
+    "manual": "RULES"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "water_supply",
+      "observations": [
+        {
+          "label": "不出水",
+          "subject": "未确定",
+          "source": "report",
+          "quote": "厨房进水软管裂开"
+        },
+        {
+          "label": "滴渗水",
+          "subject": "阀门管道",
+          "source": "report",
+          "quote": "水一直喷出"
+        },
+        {
+          "label": "水渍",
+          "subject": "楼道地面",
+          "source": "report",
+          "quote": "厨房地面已经积水并流向客厅"
+        }
+      ],
+      "severity": "high",
+      "priority": "p1",
+      "summary": "厨房进水软管裂开导致水持续喷出，厨房地面已积水并流向客厅，用户尚未关闭水源。",
+      "risk": "flooding",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.95
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:31:43.283316+00:00",
+      "latency_ms": 1615,
+      "request_id": "supplement-GOLD-008",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1877
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

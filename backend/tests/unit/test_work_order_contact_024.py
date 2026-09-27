@@ -35,7 +35,7 @@ def service_for(principal, phone=PHONE):
     service = WorkOrderService(MagicMock(), repository=repository, employee_repository=employees,
                                audit_service=audit, principal_loader=lambda _: principal,
                                settings=Settings(_env_file=None))
-    service._execute = lambda operation: operation()
+    service._execute = lambda operation, **_kwargs: operation()
     return service, order, repository, employees, audit
 
 

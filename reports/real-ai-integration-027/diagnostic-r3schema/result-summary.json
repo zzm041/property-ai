@@ -1,0 +1,77 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "candidate": "r3schema-final-fixed-set",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78",
+  "model": "qwen3.5:4b",
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "protocol": "canonical OpenAI-compatible strict json_schema for work-order LLM; existing json_object for VLM",
+  "window": {
+    "first_reserved_utc": "2026-09-25T13:31:07Z",
+    "last_reserved_utc": "2026-09-25T13:32:21Z",
+    "qwen_requests_used": 31,
+    "qwen_batch_limit": 48,
+    "asr_requests_used": 0,
+    "asr_batch_limit": 1,
+    "request_32_sent": false
+  },
+  "collection": {
+    "planned_requests": 32,
+    "completed_http_responses": 31,
+    "provider_successes": 30,
+    "provider_invalid_outputs": 1,
+    "fixed_set_complete": false
+  },
+  "positive_evidence": [
+    "All 24 text cases and the first three VLM/LLM image pairs reached HTTP 200.",
+    "The strict work-order JSON Schema prevented unknown category/skill enum values; GOLD-013 returned only allowed enums.",
+    "Requests 1 through 30 satisfied the structural work-order contract before semantic assessment."
+  ],
+  "blocking_findings": [
+    {
+      "id": "R3SCHEMA-SEM-01",
+      "request": 3,
+      "case": "GOLD-012",
+      "severity": "CRITICAL_FOR_AUTO",
+      "evidence_sha256": "b17d55f46d5a97e208ed1c7cf19b542cdaa6e6d738a5abeac8db3dc587441b13",
+      "finding": "The summary retained the hearsay conflict, but the model still returned the unverified water phenomena as high-confidence confirmed event observations instead of an information-insufficient result."
+    },
+    {
+      "id": "R3SCHEMA-SEM-02",
+      "request": 14,
+      "case": "GOLD-008",
+      "severity": "CRITICAL_FOR_EVENT_ACCURACY",
+      "evidence_sha256": "17e1cd73d8d7a983a55cf4141aafbcd57e870fd56fe6ca93397ac4023e37b6d4",
+      "finding": "The model asserted the observable label not-water from a quote that only says a supply hose is split; the same result otherwise correctly retained flooding risk."
+    },
+    {
+      "id": "R3SCHEMA-SEM-03",
+      "request": 30,
+      "case": "PHOTO-002",
+      "severity": "CRITICAL_FOR_EVENT_ACCURACY",
+      "evidence_sha256": "22cf11049e41bcd209555d02ac9d3f4b4132c8c50fde34d0da62eb87ffb1c0a6",
+      "finding": "The report text said there was no blackening while image_understanding only identified a loose outlet screw, yet the model emitted affirmative scorch discoloration with an incorrect vision source."
+    },
+    {
+      "id": "R3SCHEMA-CONTRACT-01",
+      "request": 31,
+      "case": "PHOTO-004",
+      "severity": "BLOCKING_PROVIDER_CONTRACT",
+      "evidence_sha256": "fa8a5c79b5a36cde27966859c6f30d0ce41af42783970a150ee3274ba2eab53b",
+      "finding": "The VLM returned a nested JSON string under a JSON field instead of the exact description/labels/confidence object. The provider correctly rejected it as AI.INVALID_OUTPUT; child exit was 0 and the raw HTTP response was preserved."
+    }
+  ],
+  "stop": {
+    "request": 31,
+    "reason": "RAW_OR_PROVIDER_CONTRACT_FAILURE",
+    "resource_guard_breached": false,
+    "process_exit_code": 0,
+    "request_32_omitted_to_preserve_stop_rule": true
+  },
+  "decision": "NOT_READY",
+  "ready_for_bounded_auto": false,
+  "auto_business_validation_started": false,
+  "reason": "The fixed set is incomplete and contains critical semantic evidence errors. Changing the VLM parser or candidate now would require a complete same-candidate rerun, which cannot be completed within the remaining cumulative request budget while preserving the reserved business allowance.",
+  "minimum_next_decision": "Choose one future bounded candidate that adds semantic contradiction/negation enforcement and an exact VLM structured-output contract, then approve enough budget for one complete, internally consistent 32-request fixed set. Do not combine these results with a modified candidate.",
+  "independent_review": "PENDING"
+}

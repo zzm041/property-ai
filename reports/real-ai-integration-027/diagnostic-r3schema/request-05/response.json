@@ -1,0 +1,83 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-325\",\"object\":\"chat.completion\",\"created\":1790343083,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"other\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"滴渗水\\\",\\n      \\\"subject\\\": \\\"水龙头\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"卫生间水龙头持续滴水\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"不能供电\\\",\\n      \\\"subject\\\": \\\"插座\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"卧室插座不能供电\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"medium\\\",\\n  \\\"priority\\\": \\\"p2\\\",\\n  \\\"summary\\\": \\\"卫生间水龙头持续滴水，同时卧室插座不能供电。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1637,\"prompt_tokens_details\":{\"cached_tokens\":1140},\"completion_tokens\":178,\"total_tokens\":1815}}\n",
+  "raw_response_sha256": "fccc2d44fbb8584cdfe7ac1a9b711dfedb30cc828a42059a8fae6c4ff5623a36",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-014",
+    "tags": [
+      "多故障无主次"
+    ],
+    "report": "卫生间水龙头持续滴水，同时卧室插座不能供电，这是两个独立问题，我没有指定先处理哪一个，没有烟火或积水。",
+    "history": [],
+    "facts": [
+      "两个独立问题",
+      "滴水和插座无电",
+      "未指定主次"
+    ],
+    "forbidden": [
+      "隐去另一个故障",
+      "同一原因",
+      "拼接skill",
+      "已拆单派人"
+    ],
+    "accept": [
+      [
+        "other",
+        "other",
+        [
+          "none",
+          "electric"
+        ]
+      ]
+    ],
+    "manual": "DIAGNOSTIC_ABSTAIN"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "other",
+      "observations": [
+        {
+          "label": "滴渗水",
+          "subject": "水龙头",
+          "source": "report",
+          "quote": "卫生间水龙头持续滴水"
+        },
+        {
+          "label": "不能供电",
+          "subject": "插座",
+          "source": "report",
+          "quote": "卧室插座不能供电"
+        }
+      ],
+      "severity": "medium",
+      "priority": "p2",
+      "summary": "卫生间水龙头持续滴水，同时卧室插座不能供电。",
+      "risk": "none",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.95
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:31:21.846653+00:00",
+      "latency_ms": 1245,
+      "request_id": "supplement-GOLD-014",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1815
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

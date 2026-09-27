@@ -32,6 +32,8 @@ from app.provider.wechat import (
     ProductionWeChatAuthProvider,
 )
 from app.provider.asr import DevelopmentASRProvider
+from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
+from app.domain.observed_event import work_order_analysis_response_format
 
 
 def _settings(**overrides: object) -> Settings:
@@ -77,6 +79,28 @@ def test_qwen_llm_parses_structured_json_and_strips_fences() -> None:
     result = provider.structured_completion(prompt="outlet", prompt_version="wo-v1")
     assert result["category"] == "electrical"
     assert "sk-live" not in str(result)
+
+
+def test_work_order_qwen_uses_canonical_json_schema() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content)
+        assert payload["response_format"] == work_order_analysis_response_format()
+        schema = payload["response_format"]["json_schema"]["schema"]
+        assert schema["properties"]["category"]["enum"] == [
+            "water_supply", "electrical", "hvac", "cleaning", "security", "other"
+        ]
+        return httpx.Response(200, json={"choices": [{"finish_reason": "stop", "message": {"content": '{"category":"other"}'}}]})
+
+    provider = QwenLLMProvider(
+        base_url="http://127.0.0.1:11436/v1",
+        model="qwen3.5:4b",
+        api_key="unit",
+        timeout_seconds=1,
+        client=httpx.Client(transport=httpx.MockTransport(handler)),
+        disable_thinking=True,
+        max_output_tokens=512,
+    )
+    provider.structured_completion(prompt="synthetic", prompt_version=WORK_ORDER_ANALYSIS_PROMPT_VERSION)
 
 
 def test_qwen_llm_maps_timeout_and_invalid_payload() -> None:

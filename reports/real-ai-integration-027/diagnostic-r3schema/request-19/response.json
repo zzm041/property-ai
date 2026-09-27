@@ -1,0 +1,85 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-332\",\"object\":\"chat.completion\",\"created\":1790343116,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"electrical\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"不能供电\\\",\\n      \\\"subject\\\": \\\"插座\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"书房的两个插座都没有电\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"现象待核实\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"我猜可能跳闸了\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"medium\\\",\\n  \\\"priority\\\": \\\"p3\\\",\\n  \\\"summary\\\": \\\"书房两个插座无电，用户猜测可能跳闸但未检查配电箱且未闻到焦味。\\\",\\n  \\\"risk\\\": \\\"electric\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.85\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1637,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":193,\"total_tokens\":1830}}\n",
+  "raw_response_sha256": "5134b607ac92820813b1c8fd0d5fed6a70c560be00fc0f6760da2e6dcde7a419",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-017",
+    "tags": [
+      "归因猜测",
+      "局部停电"
+    ],
+    "report": "书房的两个插座都没有电，其他房间正常。我猜可能跳闸了，但没有检查配电箱，没闻到焦味。",
+    "history": [],
+    "facts": [
+      "书房两插座无电",
+      "其他正常",
+      "跳闸未确认",
+      "无焦味"
+    ],
+    "forbidden": [
+      "确定跳闸",
+      "全屋停电",
+      "线路烧毁",
+      "已检查配电箱"
+    ],
+    "accept": [
+      [
+        "electrical",
+        "electrician",
+        [
+          "none",
+          "electric"
+        ]
+      ]
+    ],
+    "manual": "RULES"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "electrical",
+      "observations": [
+        {
+          "label": "不能供电",
+          "subject": "插座",
+          "source": "report",
+          "quote": "书房的两个插座都没有电"
+        },
+        {
+          "label": "现象待核实",
+          "subject": "未确定",
+          "source": "report",
+          "quote": "我猜可能跳闸了"
+        }
+      ],
+      "severity": "medium",
+      "priority": "p3",
+      "summary": "书房两个插座无电，用户猜测可能跳闸但未检查配电箱且未闻到焦味。",
+      "risk": "electric",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.85
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:31:55.612583+00:00",
+      "latency_ms": 1314,
+      "request_id": "supplement-GOLD-017",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1830
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

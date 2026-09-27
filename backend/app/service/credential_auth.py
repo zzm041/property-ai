@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from datetime import timedelta
 import secrets
 
+from sqlalchemy import inspect
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -240,6 +241,7 @@ class CredentialAuthService:
                 return
             phone_row = self._repository.get_active_phone_for_update(phone_e164)
             if phone_row is None:
+                self._require_phone_reuse_clear(phone_e164)
                 user = self._repository.add_user(
                     User(status="ACTIVE", display_name=mask_phone(phone_e164))
                 )
@@ -302,6 +304,29 @@ class CredentialAuthService:
             user_id=user_id_holder["user_id"],
             session_id=user_id_holder["session_id"],
         )
+
+    def _require_phone_reuse_clear(self, phone_e164: str) -> None:
+        """Do not let a fresh SMS silently inherit or recreate an ended identity.
+
+        This guard is enabled only with the separately approved recovery schema.
+        The approved recovery flow must create/bind the new identity explicitly;
+        generic SMS login never acts as its completion step.
+        """
+        if not self._identity_recovery_available():
+            return
+        historical = self._repository.get_latest_phone_for_update(phone_e164)
+        if historical is not None:
+            raise AppError(
+                code=AuthErrorCode.IDENTITY_RECOVERY_REQUIRED,
+                message="This phone requires approved identity recovery",
+                status_code=409,
+            )
+
+    def _identity_recovery_available(self) -> bool:
+        # Only a definitive absence preserves the pre-0014 compatibility path.
+        # Inspection failures must propagate into login_sms's stable 500 rather
+        # than silently disabling the ended-phone reuse guard.
+        return inspect(self._session.get_bind()).has_table("identity_recovery_cases") is True
 
     def login_password(
         self, *, phone: str, password: str, request_id: str

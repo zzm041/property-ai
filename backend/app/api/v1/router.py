@@ -28,6 +28,7 @@ from app.api.v1.supervisor_incidents import router as supervisor_incidents_route
 from app.api.v1.supervisor_staff import router as supervisor_staff_router
 from app.api.v1.supervisor_work_orders import router as supervisor_work_orders_router
 from app.api.v1.wechat_auth import router as wechat_auth_router
+from app.api.v1.identity_recovery import router as identity_recovery_router
 from app.api.v1.work_orders import router as work_orders_router
 from app.core.config import Settings
 
@@ -60,6 +61,7 @@ def build_api_router(settings: Settings) -> APIRouter:
     router.include_router(assistant_router)
     router.include_router(notifications_router)
     router.include_router(wechat_auth_router)
+    router.include_router(identity_recovery_router)
     if settings.dev_auth_enabled:
         router.include_router(development_auth_router)
     return router

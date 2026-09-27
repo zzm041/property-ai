@@ -1,0 +1,49 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-366\",\"object\":\"chat.completion\",\"created\":1790343134,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"description\\\": \\\"墙面漆皮脱落\\\", \\\"labels\\\": [\\\"墙面\\\", \\\"损坏\\\"], \\\"confidence\\\": 0.95}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":653,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens\":28,\"total_tokens\":681}}\n",
+  "raw_response_sha256": "7ea6bfdbdac13933cfa9abbe948fe0b85fc4fcd04d817e537b27e5315115945d",
+  "contract_errors": [],
+  "case": {
+    "id": "PHOTO-001",
+    "file": "ceiling-peeling.jpg",
+    "width": 931,
+    "height": 678,
+    "gps_metadata_present": false,
+    "facts": [
+      "浅色天花板大片涂层起皮剥落",
+      "不规则棕黄斑块"
+    ],
+    "uncertain": [
+      "是否正在滴水",
+      "水源",
+      "是否一定管道破裂"
+    ],
+    "paired_report": "天花板有图中的斑块和起皮，没有看到现在滴水，原因不清楚，请检查。",
+    "paired_gate": "保留无当前滴水与原因未知，不能直接确认楼上管道破裂或大面积淹水。",
+    "pixel_review": "ACCEPT_NON_SENSITIVE_NO_PEOPLE_ADDRESS_OR_ID"
+  },
+  "kind": "VLM",
+  "provider_result": [
+    "[{\"image_index\": 1, \"description\": \"墙面漆皮脱落\", \"error_code\": null}]",
+    null
+  ],
+  "call_log": [
+    {
+      "provider_type": "VLM",
+      "operation": "inspect_image",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:32:14.283878+00:00",
+      "latency_ms": 543,
+      "request_id": "supplement-PHOTO-001",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 681,
+      "input_hash": "8039e50898e3e0f0d7320a34c9d01926abd76d843bb94deb7fb7fb9db63c89c0"
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

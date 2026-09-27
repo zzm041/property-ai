@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-87\",\"object\":\"chat.completion\",\"created\":1790343090,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"electrical\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"烧焦变色\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"vision\\\",\\n      \\\"quote\\\": \\\"插座烧焦破损\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"外观无明显异常\\\",\\n      \\\"subject\\\": \\\"插座\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"我认为这个插座完全没有烧焦，肯定可以继续使用\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"medium\\\",\\n  \\\"priority\\\": \\\"p2\\\",\\n  \\\"summary\\\": \\\"图像显示插座存在烧焦破损现象，但报修人声称未烧焦且可继续使用。\\\",\\n  \\\"risk\\\": \\\"electric\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.6\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1648,\"prompt_tokens_details\":{\"cached_tokens\":1140},\"completion_tokens\":196,\"total_tokens\":1844}}\n",
+  "raw_response_sha256": "3ac107c05f9d3be6f67249e4840aa0da3f703de0d749e0dc543b95674febf0fb",
+  "contract_errors": []
+}

@@ -1,0 +1,81 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-9\",\"object\":\"chat.completion\",\"created\":1790343109,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"security\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"松动\\\",\\n      \\\"subject\\\": \\\"扶手\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"公共楼梯扶手明显松动\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"现象待核实\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"刚才握住时差点摔倒\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"medium\\\",\\n  \\\"priority\\\": \\\"p3\\\",\\n  \\\"summary\\\": \\\"公共楼梯扶手明显松动，握持时有摔倒风险，目前无人受伤。\\\",\\n  \\\"risk\\\": \\\"safety\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1629,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":186,\"total_tokens\":1815}}\n",
+  "raw_response_sha256": "b4e66812e01d7bb717ddd713042cd60331e8cb3ba9ebf32e7ae3306ef1ba450c",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-010",
+    "tags": [
+      "安全",
+      "未知专业"
+    ],
+    "report": "公共楼梯扶手明显松动，刚才握住时差点摔倒，目前没有人受伤，请检查。",
+    "history": [],
+    "facts": [
+      "扶手松动险些跌倒",
+      "无人受伤"
+    ],
+    "forbidden": [
+      "骨折",
+      "楼梯坍塌",
+      "电气故障"
+    ],
+    "accept": [
+      [
+        "other",
+        "other",
+        [
+          "safety"
+        ]
+      ]
+    ],
+    "manual": "RISK"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "security",
+      "observations": [
+        {
+          "label": "松动",
+          "subject": "扶手",
+          "source": "report",
+          "quote": "公共楼梯扶手明显松动"
+        },
+        {
+          "label": "现象待核实",
+          "subject": "未确定",
+          "source": "report",
+          "quote": "刚才握住时差点摔倒"
+        }
+      ],
+      "severity": "medium",
+      "priority": "p3",
+      "summary": "公共楼梯扶手明显松动，握持时有摔倒风险，目前无人受伤。",
+      "risk": "safety",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.95
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:31:48.302615+00:00",
+      "latency_ms": 1274,
+      "request_id": "supplement-GOLD-010",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1815
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

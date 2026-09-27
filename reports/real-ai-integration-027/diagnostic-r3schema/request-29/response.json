@@ -1,0 +1,49 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-910\",\"object\":\"chat.completion\",\"created\":1790343138,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\\"description\\\": \\\"插座面板有螺丝松动\\\", \\\"labels\\\": [\\\"插座\\\"], \\\"confidence\\\": 0.95}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":485,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens\":26,\"total_tokens\":511}}\n",
+  "raw_response_sha256": "e9cfc6284cfd137ec46a1f51eb783b9eab606cc98d3e9c62868e80f926c5a820",
+  "contract_errors": [],
+  "case": {
+    "id": "PHOTO-002",
+    "file": "normal-socket.jpg",
+    "width": 681,
+    "height": 682,
+    "gps_metadata_present": false,
+    "facts": [
+      "白色多孔插座与打开的盖板",
+      "没有可见烧焦或烟火"
+    ],
+    "uncertain": [
+      "是否带电",
+      "内部接线是否安全",
+      "拍摄时刻是否对应文本时刻"
+    ],
+    "paired_report": "插座刚才有一缕烟，现在没有了；照片外观没有发黑。请检查，我不知道原因。",
+    "paired_gate": "图中无烟不能否定住户过去时报告，区分来源与时间，不能称现在正冒烟或内部确定短路。",
+    "pixel_review": "ACCEPT_NON_SENSITIVE_NO_PEOPLE_ADDRESS_OR_ID"
+  },
+  "kind": "VLM",
+  "provider_result": [
+    "[{\"image_index\": 1, \"description\": \"插座面板有螺丝松动\", \"error_code\": null}]",
+    null
+  ],
+  "call_log": [
+    {
+      "provider_type": "VLM",
+      "operation": "inspect_image",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:32:18.520270+00:00",
+      "latency_ms": 460,
+      "request_id": "supplement-PHOTO-002",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 511,
+      "input_hash": "e452dca0bdabd3d38d405bc2b68110f8b384488fe858b3dcfc0176231099c722"
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

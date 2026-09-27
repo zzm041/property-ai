@@ -11,6 +11,7 @@ from sqlalchemy import (
     case,
     func,
     inspect as sa_inspect,
+    literal_column,
     or_,
     select,
     update,
@@ -26,6 +27,7 @@ from app.model.work_order import (
     IdempotencyRecord,
     SlaClock,
     SlaPolicy,
+    WorkOrderSlaApplication,
     WorkOrder,
     WorkOrderAssignment,
     WorkOrderContent,
@@ -549,6 +551,23 @@ class WorkOrderRepository:
             .with_for_update()
         )
 
+    def sla_versioning_available(self) -> bool:
+        try:
+            inspector = sa_inspect(self._session.get_bind())
+            return (
+                inspector.has_table("sla_policy_versions") is True
+                and inspector.has_table("work_order_sla_applications") is True
+            )
+        except (AttributeError, SQLAlchemyError):
+            return False
+
+    def get_sla_application(self, work_order_id: int) -> WorkOrderSlaApplication | None:
+        return self._session.scalar(
+            select(WorkOrderSlaApplication).where(
+                WorkOrderSlaApplication.work_order_id == work_order_id
+            )
+        )
+
     def list_due_assignment_sla_work_orders_for_update(
         self,
         *,
@@ -576,6 +595,14 @@ class WorkOrderRepository:
             WorkOrderAssignment.ended_at.is_(None),
             WorkOrderAssignment.timeout_at.is_(None),
         )
+        versioned = self.sla_versioning_available()
+        response_escalation_due = SlaClock.respond_due_at
+        if versioned:
+            response_escalation_due = func.timestampadd(
+                literal_column("MINUTE"),
+                func.coalesce(WorkOrderSlaApplication.escalation_minutes, 0),
+                SlaClock.respond_due_at,
+            )
         filters = [
             or_(
                 and_(
@@ -587,32 +614,38 @@ class WorkOrderRepository:
                     WorkOrder.status == "ACCEPTED",
                     WorkOrderAssignment.accept_at.is_not(None),
                     ~handled_response_timeout,
-                    SlaClock.respond_due_at <= now,
+                    response_escalation_due <= now,
                 ),
             )
         ]
         if work_order_id is not None:
             filters.append(WorkOrder.id == work_order_id)
-        return tuple(
-            self._session.scalars(
+        query = (
                 select(WorkOrder)
                 .join(SlaClock, SlaClock.work_order_id == WorkOrder.id)
                 .join(WorkOrderAssignment, active_assignment)
-                .where(*filters)
+        )
+        if versioned:
+            query = query.outerjoin(
+                WorkOrderSlaApplication,
+                WorkOrderSlaApplication.work_order_id == WorkOrder.id,
+            )
+        query = (
+                query.where(*filters)
                 .order_by(
                     case(
                         (
                             WorkOrder.status == "ASSIGNED",
                             SlaClock.accept_due_at,
                         ),
-                        else_=SlaClock.respond_due_at,
+                        else_=response_escalation_due,
                     ),
                     WorkOrder.id,
                 )
                 .limit(limit)
                 .with_for_update(skip_locked=True)
-            ).all()
         )
+        return tuple(self._session.scalars(query).all())
 
     def has_log_request_id(self, *, work_order_id: int, request_id: str) -> bool:
         return self._session.scalar(

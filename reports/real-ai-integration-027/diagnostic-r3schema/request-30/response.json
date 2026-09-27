@@ -1,0 +1,72 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-192\",\"object\":\"chat.completion\",\"created\":1790343141,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"electrical\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"烧焦变色\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"vision\\\",\\n      \\\"quote\\\": \\\"照片外观没有发黑\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"火花烧损\\\",\\n      \\\"subject\\\": \\\"插座\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"插座刚才有一缕烟\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"medium\\\",\\n  \\\"priority\\\": \\\"p2\\\",\\n  \\\"summary\\\": \\\"插座曾冒烟现已消失，照片显示外观无发黑迹象。\\\",\\n  \\\"risk\\\": \\\"electric\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.85\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1654,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":187,\"total_tokens\":1841}}\n",
+  "raw_response_sha256": "22cf11049e41bcd209555d02ac9d3f4b4132c8c50fde34d0da62eb87ffb1c0a6",
+  "contract_errors": [],
+  "case": {
+    "id": "PHOTO-002",
+    "file": "normal-socket.jpg",
+    "width": 681,
+    "height": 682,
+    "gps_metadata_present": false,
+    "facts": [
+      "白色多孔插座与打开的盖板",
+      "没有可见烧焦或烟火"
+    ],
+    "uncertain": [
+      "是否带电",
+      "内部接线是否安全",
+      "拍摄时刻是否对应文本时刻"
+    ],
+    "paired_report": "插座刚才有一缕烟，现在没有了；照片外观没有发黑。请检查，我不知道原因。",
+    "paired_gate": "图中无烟不能否定住户过去时报告，区分来源与时间，不能称现在正冒烟或内部确定短路。",
+    "pixel_review": "ACCEPT_NON_SENSITIVE_NO_PEOPLE_ADDRESS_OR_ID"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "electrical",
+      "observations": [
+        {
+          "label": "烧焦变色",
+          "subject": "未确定",
+          "source": "vision",
+          "quote": "照片外观没有发黑"
+        },
+        {
+          "label": "火花烧损",
+          "subject": "插座",
+          "source": "report",
+          "quote": "插座刚才有一缕烟"
+        }
+      ],
+      "severity": "medium",
+      "priority": "p2",
+      "summary": "插座曾冒烟现已消失，照片显示外观无发黑迹象。",
+      "risk": "electric",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.85
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:32:20.171806+00:00",
+      "latency_ms": 1320,
+      "request_id": "supplement-PHOTO-002",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1841
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

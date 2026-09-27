@@ -1,0 +1,84 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-801\",\"object\":\"chat.completion\",\"created\":1790343128,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"water_supply\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"滴渗水\\\",\\n      \\\"subject\\\": \\\"水龙头\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"洗手盆下面又开始滴\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"现象待核实\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"量不大，目前还在滴\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p3\\\",\\n  \\\"summary\\\": \\\"昨晚关紧阀门后停止漏水。今天重开阀门，洗手盆下面又开始滴水，量不大且未漫到门外。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1649,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":200,\"total_tokens\":1849}}\n",
+  "raw_response_sha256": "067971f1233f9a41957b68fac493beed5e724275af917ab915b4759a815964cf",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-022",
+    "tags": [
+      "复杂中文",
+      "时间顺序"
+    ],
+    "report": "昨晚不是没漏过，是漏过；关紧阀门后停了。今天重开阀门，洗手盆下面又开始滴，量不大，目前还在滴，没有漫到门外。",
+    "history": [],
+    "facts": [
+      "昨晚曾止漏",
+      "今日再次少量滴水",
+      "未漫出门"
+    ],
+    "forbidden": [
+      "目前止漏",
+      "从未漏水",
+      "整夜大量喷水",
+      "漫出门"
+    ],
+    "accept": [
+      [
+        "water_supply",
+        "plumber",
+        [
+          "none",
+          "flooding"
+        ]
+      ]
+    ],
+    "manual": "RULES"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "water_supply",
+      "observations": [
+        {
+          "label": "滴渗水",
+          "subject": "水龙头",
+          "source": "report",
+          "quote": "洗手盆下面又开始滴"
+        },
+        {
+          "label": "现象待核实",
+          "subject": "未确定",
+          "source": "report",
+          "quote": "量不大，目前还在滴"
+        }
+      ],
+      "severity": "low",
+      "priority": "p3",
+      "summary": "昨晚关紧阀门后停止漏水。今天重开阀门，洗手盆下面又开始滴水，量不大且未漫到门外。",
+      "risk": "none",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.95
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:32:07.048812+00:00",
+      "latency_ms": 1360,
+      "request_id": "supplement-GOLD-022",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1849
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

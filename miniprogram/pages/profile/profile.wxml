@@ -49,6 +49,10 @@
 <view class="card">
   <button class="btn" data-url="/pages/employee-claim/employee-claim" bindtap="goClaim">员工邀请认领</button>
 </view>
+<view class="card">
+  <button class="btn btn-secondary" bindtap="goIdentityRecovery">账号合并 / 高风险恢复</button>
+  <view class="empty">新短信不能继承旧账号；需独立身份核验、30 天隔离及两名不同授权人审核。</view>
+</view>
 <button class="btn" bindtap="back">返回</button>
 <view class="loading" wx:if="{{loading}}">处理中...</view>
 <view class="error" wx:if="{{error}}">{{error}}</view>

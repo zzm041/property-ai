@@ -1,0 +1,91 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-504\",\"object\":\"chat.completion\",\"created\":1790343097,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"water_supply\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"滴渗水\\\",\\n      \\\"subject\\\": \\\"排水接头\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"洗手盆排水接头缓慢渗水\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"水渍\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"地上只有几滴水\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p3\\\",\\n  \\\"summary\\\": \\\"洗手盆排水接头缓慢渗水，地面仅有少量积水，无电器设备。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1658,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":190,\"total_tokens\":1848}}\n",
+  "raw_response_sha256": "55d39a8eaa4f331048c2761a271a6518c344920acf84f18c3e6f4febf435e89d",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-003",
+    "tags": [
+      "漏水",
+      "技能单值",
+      "无据风险"
+    ],
+    "report": "洗手盆排水接头缓慢渗水，地上只有几滴水，附近没有电器，请检查接头。",
+    "history": [
+      [
+        "ELECTRICAL",
+        "CLOSED",
+        "厨房电线过热，维修完成"
+      ]
+    ],
+    "facts": [
+      "接头慢渗",
+      "少量水滴",
+      "无电器"
+    ],
+    "forbidden": [
+      "漏电",
+      "燃气泄漏",
+      "大面积淹水",
+      "plumber/electrician",
+      "水管爆裂"
+    ],
+    "accept": [
+      [
+        "water_supply",
+        "plumber",
+        [
+          "none"
+        ]
+      ]
+    ],
+    "manual": "RULES"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "water_supply",
+      "observations": [
+        {
+          "label": "滴渗水",
+          "subject": "排水接头",
+          "source": "report",
+          "quote": "洗手盆排水接头缓慢渗水"
+        },
+        {
+          "label": "水渍",
+          "subject": "未确定",
+          "source": "report",
+          "quote": "地上只有几滴水"
+        }
+      ],
+      "severity": "low",
+      "priority": "p3",
+      "summary": "洗手盆排水接头缓慢渗水，地面仅有少量积水，无电器设备。",
+      "risk": "none",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.95
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:31:35.822338+00:00",
+      "latency_ms": 1293,
+      "request_id": "supplement-GOLD-003",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1848
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

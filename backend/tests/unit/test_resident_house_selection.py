@@ -20,6 +20,7 @@ const defer=()=>{let resolve,reject;const promise=new Promise((r,j)=>{resolve=r;
 const row=n=>({relation_id:n,house_id:n+100,property_name:'花园',property_address:'合成街1号',building_name:'3幢',unit_name:'2单元',room_no:String(n)});
 let page,calls=[],posts=[],navigation=[],saved={},rows=[row(1),row(2)];
 const api={houses:(after,limit)=>{calls.push({after,limit});return Promise.resolve({items:rows,next_cursor:null});},
+ contactDefault:()=>Promise.resolve({phone:'+8613800000123'}),
  createWorkOrder:(body,key)=>{posts.push({body,key});return Promise.resolve({id:601});}};
 const auth={getSelectedHouseId:()=>101,setSelectedHouseId:id=>saved.house=id,setLastWorkOrderId:id=>saved.order=id};
 vm.runInNewContext(fs.readFileSync(path.join(root,'miniprogram/pages/work-orders/create.js'),'utf8'),{
@@ -34,7 +35,7 @@ async function main(){
   const pending=defer();api.houses=()=>pending.promise;const work=page.onShow();await tick();page.onUnload();pending.resolve({items:rows});await work;
   assert.equal(page.data.houses.length,0);assert.equal(page.data.houseId,'');return;
  }
- await page.onShow();assert.deepEqual(calls,[{after:0,limit:20}]);
+ await page.onShow();await tick();page.setData({contactPhone:'+8613800000123',contactConfirmed:true});assert.deepEqual(calls,[{after:0,limit:20}]);
  if(scenario==='foreign-query'){
   assert.equal(page.data.houseId,'');choose(999);await page.submit();assert.equal(posts.length,0);assert.match(page.data.error,/本人已绑定/);return;
  }

@@ -1,0 +1,72 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-5\",\"object\":\"chat.completion\",\"created\":1790343137,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"other\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"表面剥落\\\",\\n      \\\"subject\\\": \\\"天花墙面\\\",\\n      \\\"source\\\": \\\"vision\\\",\\n      \\\"quote\\\": \\\"墙面漆皮脱落\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"现象待核实\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"没有看到现在滴水\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p4\\\",\\n  \\\"summary\\\": \\\"天花墙面存在漆皮脱落现象，天花板未见当前滴水。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.85\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1651,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":183,\"total_tokens\":1834}}\n",
+  "raw_response_sha256": "5858fc4674eb1a3799a031f6715418a0c95254a46abd30137692ab9e2903f8d3",
+  "contract_errors": [],
+  "case": {
+    "id": "PHOTO-001",
+    "file": "ceiling-peeling.jpg",
+    "width": 931,
+    "height": 678,
+    "gps_metadata_present": false,
+    "facts": [
+      "浅色天花板大片涂层起皮剥落",
+      "不规则棕黄斑块"
+    ],
+    "uncertain": [
+      "是否正在滴水",
+      "水源",
+      "是否一定管道破裂"
+    ],
+    "paired_report": "天花板有图中的斑块和起皮，没有看到现在滴水，原因不清楚，请检查。",
+    "paired_gate": "保留无当前滴水与原因未知，不能直接确认楼上管道破裂或大面积淹水。",
+    "pixel_review": "ACCEPT_NON_SENSITIVE_NO_PEOPLE_ADDRESS_OR_ID"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "other",
+      "observations": [
+        {
+          "label": "表面剥落",
+          "subject": "天花墙面",
+          "source": "vision",
+          "quote": "墙面漆皮脱落"
+        },
+        {
+          "label": "现象待核实",
+          "subject": "未确定",
+          "source": "report",
+          "quote": "没有看到现在滴水"
+        }
+      ],
+      "severity": "low",
+      "priority": "p4",
+      "summary": "天花墙面存在漆皮脱落现象，天花板未见当前滴水。",
+      "risk": "none",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.85
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:32:15.997074+00:00",
+      "latency_ms": 1312,
+      "request_id": "supplement-PHOTO-001",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1834
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}

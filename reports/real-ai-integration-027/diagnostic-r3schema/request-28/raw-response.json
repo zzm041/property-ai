@@ -1,0 +1,6 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-5\",\"object\":\"chat.completion\",\"created\":1790343137,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"other\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"表面剥落\\\",\\n      \\\"subject\\\": \\\"天花墙面\\\",\\n      \\\"source\\\": \\\"vision\\\",\\n      \\\"quote\\\": \\\"墙面漆皮脱落\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"现象待核实\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"没有看到现在滴水\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p4\\\",\\n  \\\"summary\\\": \\\"天花墙面存在漆皮脱落现象，天花板未见当前滴水。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"maintenance\\\",\\n  \\\"confidence\\\": 0.85\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1651,\"prompt_tokens_details\":{\"cached_tokens\":1165},\"completion_tokens\":183,\"total_tokens\":1834}}\n",
+  "raw_response_sha256": "5858fc4674eb1a3799a031f6715418a0c95254a46abd30137692ab9e2903f8d3",
+  "contract_errors": []
+}

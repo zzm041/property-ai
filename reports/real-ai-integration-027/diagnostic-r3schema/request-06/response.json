@@ -1,0 +1,84 @@
+{
+  "http_status": 200,
+  "raw_response_body": "{\"id\":\"chatcmpl-480\",\"object\":\"chat.completion\",\"created\":1790343085,\"model\":\"qwen3.5:4b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"category\\\": \\\"security\\\",\\n  \\\"observations\\\": [\\n    {\\n      \\\"label\\\": \\\"敲门按铃\\\",\\n      \\\"subject\\\": \\\"房门\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"刚才有陌生人在楼道反复按门铃并拍门\\\"\\n    },\\n    {\\n      \\\"label\\\": \\\"现象待核实\\\",\\n      \\\"subject\\\": \\\"未确定\\\",\\n      \\\"source\\\": \\\"report\\\",\\n      \\\"quote\\\": \\\"现在已经离开，未进入屋内，也未见器械，请安保核实\\\"\\n    }\\n  ],\\n  \\\"severity\\\": \\\"low\\\",\\n  \\\"priority\\\": \\\"p3\\\",\\n  \\\"summary\\\": \\\"有陌生人在楼道反复按门铃并拍门，现已离开，未进入屋内且未见器械，需安保核实。\\\",\\n  \\\"risk\\\": \\\"none\\\",\\n  \\\"required_role\\\": \\\"STAFF\\\",\\n  \\\"required_skill\\\": \\\"security\\\",\\n  \\\"confidence\\\": 0.95\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1638,\"prompt_tokens_details\":{\"cached_tokens\":1140},\"completion_tokens\":213,\"total_tokens\":1851}}\n",
+  "raw_response_sha256": "d248c437c4cc6f7d36501cffdd079c96a9445b8b43c39110378b3c50025c7ea9",
+  "contract_errors": [],
+  "case": {
+    "id": "GOLD-006",
+    "tags": [
+      "安保",
+      "时态"
+    ],
+    "report": "刚才有陌生人在楼道反复按门铃并拍门，现在已经离开，未进入屋内，也未见器械，请安保核实。",
+    "history": [],
+    "facts": [
+      "曾按铃拍门",
+      "已离开",
+      "未入室"
+    ],
+    "forbidden": [
+      "持刀",
+      "正在入室",
+      "已发生盗窃",
+      "认定犯罪身份"
+    ],
+    "accept": [
+      [
+        "security",
+        "security",
+        [
+          "none",
+          "safety"
+        ]
+      ]
+    ],
+    "manual": "RULES"
+  },
+  "kind": "LLM",
+  "provider_result": [
+    {
+      "category": "security",
+      "observations": [
+        {
+          "label": "敲门按铃",
+          "subject": "房门",
+          "source": "report",
+          "quote": "刚才有陌生人在楼道反复按门铃并拍门"
+        },
+        {
+          "label": "现象待核实",
+          "subject": "未确定",
+          "source": "report",
+          "quote": "现在已经离开，未进入屋内，也未见器械，请安保核实"
+        }
+      ],
+      "severity": "low",
+      "priority": "p3",
+      "summary": "有陌生人在楼道反复按门铃并拍门，现已离开，未进入屋内且未见器械，需安保核实。",
+      "risk": "none",
+      "required_role": "STAFF",
+      "required_skill": "security",
+      "confidence": 0.95
+    },
+    null,
+    "SUCCESS"
+  ],
+  "call_log": [
+    {
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "started_at": "2026-09-25 13:31:24.260482+00:00",
+      "latency_ms": 1419,
+      "request_id": "supplement-GOLD-006",
+      "attempt": 1,
+      "model_version": "qwen3.5:4b",
+      "token_usage": 1851
+    }
+  ],
+  "model_digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+  "prompt_version": "wo-analysis-v10-observed-event-r3fix2b",
+  "vision_prompt_version": "repair-photo-v4",
+  "semantic_verdict": "PENDING_MAIN_REVIEW",
+  "frozen_base_sha": "1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78"
+}
