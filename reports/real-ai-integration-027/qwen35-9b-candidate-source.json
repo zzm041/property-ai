@@ -20,7 +20,7 @@
   "pre_download_free_bytes_on_d": 63552245760,
   "minimum_required_free_bytes": 12884901888,
   "download_command_count": 1,
-  "download_status": "DOWNLOADED_VERIFIED_NO_INFERENCE_RESOURCE_HEADROOM_BLOCKED",
+  "download_status": "DOWNLOADED_VERIFIED_DIAGNOSTIC_STOPPED_RESOURCE_FLOOR",
   "download_completed_at_utc": "2026-09-27T15:17:50Z",
   "installed_model": {
     "name": "qwen3.5:9b",
@@ -41,6 +41,17 @@
     "resident_models": 0,
     "inference_calls": 0,
     "decision": "BLOCKED_BEFORE_FIRST_REQUEST"
+  },
+  "first_request_outcome": {
+    "at_utc": "2026-09-27T15:21:09Z",
+    "attempted_requests": 1,
+    "model_seconds": 7.962,
+    "remote_completion": "RESPONSE_RECEIVED",
+    "minimum_ram_free_mib": 4737,
+    "minimum_gpu_free_mib": 405,
+    "runtime_gpu_floor_mib": 2000,
+    "decision": "STOPPED_NO_FURTHER_INFERENCE",
+    "resident_models_after_keep_alive": 0
   },
   "runtime": {
     "ollama_version": "0.34.3",

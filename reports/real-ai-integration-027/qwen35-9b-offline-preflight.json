@@ -1,14 +1,14 @@
 {
   "task_id": "REAL-AI-INTEGRATION-027",
   "recorded_at_utc": "2026-09-27T14:55:41.9747003Z",
-  "updated_at_utc": "2026-09-27T15:10:00Z",
+  "updated_at_utc": "2026-09-27T15:22:38Z",
   "scope": "9B candidate selection, loopback adapter contract, strict VLM schema, saved wrapper-failure behavior, and response-backed completion guard; no inference or business IO",
   "command_scope": [
     "backend/tests/unit/test_local_ai_http_027.py",
     "backend/tests/unit/test_qwen_local_controls.py"
   ],
   "result": {
-    "passed": 51,
+    "passed": 52,
     "warnings": 1,
     "failed": 0,
     "errors": 0,
@@ -33,7 +33,7 @@
     "backend/tests/unit/test_qwen_local_controls.py": "24647ECDACF602303E98A3490F111C6C0DF843D60DBDE599FEFD899F2791E366",
     "backend/app/provider/vision/__init__.py": "849FC87B388B6D0452A8EF723718B24CD0426DAB5FEA6AAA330F69B52E9BE484",
     "backend/app/domain/vision.py": "E0B184ADEF632A15676BE9E055F43F7D5E958D2CE638366D5CFE727BA82E160E",
-    "reports/auth-identity-ai-001/local-qwen/run-quality28.py": "09339E14F01EC2ED3F23D084EA47C139375E86D5044EF2918B9F95C02AF55C46",
-    "reports/auth-identity-ai-001/local-qwen/test_quality28_collector.py": "DBDBEC56AAB42BDBD77A04F763290A74CDB952C29933989DAA2F8928F1A2B2CA"
+    "reports/auth-identity-ai-001/local-qwen/run-quality28.py": "F73F41A955B21410EC7F4F7816540E40A77C4ABF219635FB770248274EDE82A2",
+    "reports/auth-identity-ai-001/local-qwen/test_quality28_collector.py": "B9392F0F455860ACA9933B36EB15F31B3263FFA287591104EA8CBF51374E7571"
   }
 }

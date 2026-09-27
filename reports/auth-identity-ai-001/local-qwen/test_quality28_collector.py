@@ -39,3 +39,20 @@ def test_budget_accepts_response_backed_provider_rejection():
          'remote_completion':'RESPONSE_RECEIVED'},
     ])
     assert state=={'attempted':1,'model_seconds':3.5,'unknown':[]}
+
+def test_mechanical_check_uses_observed_event_contract_not_legacy_subcategory():
+    payload={'category':'cleaning','observations':[{'label':'杂物清扫','subject':'楼道地面',
+        'source':'report','quote':'楼道角落散落纸盒，需要清扫'}],'severity':'low','priority':'p3',
+        'summary':'楼道角落纸盒需要清扫。','risk':'none','required_role':'STAFF',
+        'required_skill':'cleaning','confidence':1.0}
+    service=helpers['AnalysisService'].__new__(helpers['AnalysisService'])
+    service._settings=helpers['Settings'](_env_file=None,app_env='test',llm_provider='production')
+    result=helpers['diagnostic_mechanical_checks'](
+        service,payload,{'report':'楼道角落散落纸盒，需要清扫。','asr':'','vision':''},
+        [['cleaning','cleaning',['none']]],is_photo=False,
+        evaluation_policy='test',threshold=0.70,
+    )
+    assert result['schema_and_mapping'] is True
+    assert result['event_contract']=='observed-event-v1'
+    assert result['effective_event_key'].startswith('evt1:')
+    assert result['category_skill_risk'] is True

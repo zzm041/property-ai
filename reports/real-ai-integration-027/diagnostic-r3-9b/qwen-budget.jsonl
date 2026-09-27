@@ -1,0 +1,2 @@
+{"at_utc":"2026-09-27T15:21:01.074287+00:00","event":"RESERVED","request_id":"candidate-01-screen-001","candidate":1,"phase":"screen","kind":"LLM","body_sha256":"a699d4ea813bc5195af93412a321fc8e4faa594d8a1d0d2fca8917e1ef3cc4d5"}
+{"at_utc":"2026-09-27T15:21:09.077397+00:00","event":"COMPLETED","request_id":"candidate-01-screen-001","candidate":1,"phase":"screen","kind":"LLM","status":"RECORDED","model_seconds":7.962,"raw_response_sha256":"e3d53dae4e93578d464dcfdef329dc0b1638e4acc9275c6fe79fe4dc96fac631","remote_completion":"RESPONSE_RECEIVED"}

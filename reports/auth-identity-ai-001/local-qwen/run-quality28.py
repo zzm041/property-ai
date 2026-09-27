@@ -47,6 +47,27 @@ def budget_state_from_events(events):
         'model_seconds':sum(float(row['model_seconds']) for row in completed.values()),
         'unknown':unknown,
     }
+def diagnostic_mechanical_checks(service,payload,sources,accepted,*,is_photo,evaluation_policy,threshold):
+    """Evaluate the canonical observed-event contract through production code."""
+    mapped,error=service._validate_payload(payload,sources=sources)
+    if mapped is None:
+        return {'schema_and_mapping':False,'error_code':error}
+    return {
+        'schema_and_mapping':True,
+        'has_cjk_hint':bool(re.search('[\u4e00-\u9fff]',str(payload['summary']))),
+        'summary':payload['summary'],'severity':payload['severity'],'priority':payload['priority'],
+        'risk':payload['risk'],'required_role':payload['required_role'],
+        'required_skill':payload['required_skill'],'confidence':payload['confidence'],
+        'below_confidence_threshold':float(payload['confidence'])<threshold,
+        'business_fallback':mapped.low_confidence,
+        'category_skill_risk':(None if is_photo else any(
+            payload['category']==category and payload['required_skill']==skill and payload['risk'] in risks
+            for category,skill,risks in accepted
+        )),
+        'event_contract':mapped.event_trace['contract'] if mapped.event_trace else None,
+        'effective_event_key':mapped.subcategory,
+        'evaluation_policy':evaluation_policy,
+    }
 def raw_json_checks(raw,kind):
     try:
         response=json.loads(raw);content=response['choices'][0]['message']['content'];value=json.loads(content)
@@ -167,7 +188,7 @@ def main():
         save()
     client=httpx.Client(trust_env=False,timeout=60,event_hooks={'request':[request_hook],'response':[response_hook]})
     settings=Settings(_env_file=None,app_env='test',llm_provider='production',llm_base_url='http://127.0.0.1:11435/v1',llm_model=args.model,llm_api_key='local-loopback-no-auth',llm_disable_thinking=True,llm_max_output_tokens=512,llm_timeout_seconds=60)
-    service=AnalysisService.__new__(AnalysisService);service._llm=build_llm_provider(settings);service._llm._client=client;service._clock=lambda:datetime.now(UTC)
+    service=AnalysisService.__new__(AnalysisService);service._settings=settings;service._llm=build_llm_provider(settings);service._llm._client=client;service._clock=lambda:datetime.now(UTC)
     service._vlm=QwenVLMProvider(base_url='http://127.0.0.1:11435/v1',model=args.model,api_key='local-loopback-no-auth',timeout_seconds=60,storage=PhotoStorage(images),client=client,disable_thinking=True,max_output_tokens=256)
     logs=[];service._write_call_log=lambda *a,**kw:logs.append(kw)
     def stage(kind,call,case):
@@ -228,15 +249,12 @@ def main():
                 if e.get('stop_reason'):break
             payload,error,status=stage('LLM',lambda:service._run_llm(snapshot,asr_text=None,vision_text=vision,request_id='quality28-'+item['id'],attempt=1),case)
             case.update(raw_payload=payload,provider_error=error,provider_status=status)
-            try:
-                valid=WorkOrderAnalysisOutput.model_validate(payload);mapped=map_analysis_output(valid)
-                accepted=item['accept'] if overlay is None or is_photo or args.phase=='novel' else overlay['cases'][item['id']]['accept']
-                case['mechanical_checks']={'schema_and_mapping':True,'has_cjk_hint':bool(re.search('[\u4e00-\u9fff]',valid.summary)),
-                    'summary':valid.summary,'severity':valid.severity,'priority':valid.priority,'risk':valid.risk,'required_role':valid.required_role,'required_skill':valid.required_skill,'confidence':valid.confidence,
-                    'below_confidence_threshold':valid.confidence<gold['common_gold']['confidence_threshold'],'business_fallback':mapped.low_confidence,
-                    'category_skill_risk':any(valid.category==c and valid.required_skill==s and valid.risk in risks for c,s,risks in accepted) if not is_photo else None,
-                    'evaluation_policy':'original-fixed-gold' if overlay is None else overlay['version']}
-            except Exception as exc:case['mechanical_checks']={'schema_and_mapping':False,'error_type':type(exc).__name__}
+            accepted=item['accept'] if overlay is None or is_photo or args.phase=='novel' else overlay['cases'][item['id']]['accept']
+            case['mechanical_checks']=diagnostic_mechanical_checks(
+                service,payload,{'report':report,'asr':'','vision':vision or ''},accepted,
+                is_photo=is_photo,evaluation_policy='original-fixed-gold' if overlay is None else overlay['version'],
+                threshold=gold['common_gold']['confidence_threshold'],
+            )
             save();print(json.dumps({'case':item['id'],'requests':e['attempted_requests'],'payload':payload},ensure_ascii=False),flush=True)
             if e.get('stop_reason'):break
         expected_cases=8 if args.model=='qwen3.5:9b' and args.phase=='screen' else 4 if args.model=='qwen3.5:9b' and args.phase=='novel' else 28

@@ -1,0 +1,50 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "candidate": "qwen3.5:9b",
+  "model_digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+  "quantization": "Q4_K_M",
+  "source_sha_at_request": "2317b1a77c0b0fb3d692f348e19ebec75804a7fa",
+  "status": "NOT_READY_RESOURCE_FLOOR",
+  "fixed_set_complete": false,
+  "business_switch_allowed": false,
+  "actual_usage": {
+    "qwen_requests": 1,
+    "model_seconds": 7.962,
+    "asr_requests": 0,
+    "embedding_requests": 0,
+    "reranker_requests": 0
+  },
+  "stop": {
+    "reason": "RESOURCE_FLOOR_CROSSED",
+    "minimum_ram_free_mib": 4737,
+    "minimum_gpu_free_mib": 405,
+    "required_runtime_gpu_floor_mib": 2000,
+    "request_response_received": true,
+    "request_completion_unknown": false,
+    "model_unloaded_after_keep_alive": true
+  },
+  "recorded_case": {
+    "id": "GOLD-005",
+    "raw_response_preserved": true,
+    "semantic_observation": "The response described only the present paper/cardboard cleanup, retained the negative hazard facts, selected cleaning/cleaning, and introduced no forbidden event.",
+    "offline_canonical_validation": "PASS",
+    "offline_mapping": {
+      "category": "CLEANING",
+      "required_skill": "CLEANING",
+      "risk": "none",
+      "low_confidence": false,
+      "event_contract": "observed-event-v1"
+    },
+    "boundary": "One correct case is not a model-quality pass and cannot replace the incomplete fixed set."
+  },
+  "diagnostic_correction": {
+    "issue": "The saved collector initially applied the legacy subcategory model directly to the canonical observed-event payload and reported a false mechanical ValidationError.",
+    "resolution": "Future evidence now uses AnalysisService._validate_payload with the exact report/asr/vision source strings. The immutable raw screen record was not edited and no model answer was rewritten.",
+    "focused_tests": "52 passed, 1 warning"
+  },
+  "evidence_sha256": {
+    "candidate-01/screen.json": "BDD30152C76056902C21908E9764D6134D31DF9938B097E74734EBAE8830373B",
+    "qwen-budget.jsonl": "5239B80BA9C3AA3716B534A61D7EADDAD62683376FDBCE7C9B5F4B31D5637E0C"
+  },
+  "next_decision": "The approved local 9B branch cannot continue under the fixed 2 GiB GPU floor while current non-model GPU use leaves only about 6.6 GiB free before loading. Do not lower the floor, rerun, change model, or start real AUTO without a new resource decision."
+}
