@@ -332,6 +332,9 @@ class AuditService:
                         AuditAction.PROPERTY_HOUSE_CREATED,
                         AuditAction.PROPERTY_HOUSE_UPDATED,
                     }
+                ) and not (
+                    value == "APPROVED"
+                    and action == AuditAction.IDENTITY_RECOVERY_FINALIZED
                 ):
                     cls._raise_invalid_details("status is invalid")
             elif key in {"code", "name", "room_no"}:

@@ -222,6 +222,39 @@ def test_allowlisted_detail_values_are_constrained() -> None:
     repository.append.assert_not_called()
 
 
+def test_identity_finalized_audit_allows_approved_status_only_for_that_action() -> None:
+    service, _, repository = _service()
+
+    result = service.append(
+        action=AuditAction.IDENTITY_RECOVERY_FINALIZED,
+        resource_type=AuditResourceType.IDENTITY_RECOVERY_CASE,
+        actor_user_id=11,
+        resource_id=31,
+        request_id="identity-finalized-approved",
+        scope_type=ScopeType.SYSTEM,
+        details={
+            "purpose": "MERGE_SOURCE_PROOF",
+            "status": "APPROVED",
+            "reviewer_count": 2,
+        },
+    )
+
+    assert result.details_json["status"] == "APPROVED"
+    repository.append.assert_called_once_with(result)
+
+    with pytest.raises(AppError) as captured:
+        service.append(
+            action=AuditAction.IDENTITY_RECOVERY_REQUESTED,
+            resource_type=AuditResourceType.IDENTITY_RECOVERY_CASE,
+            actor_user_id=11,
+            resource_id=32,
+            request_id="identity-requested-approved",
+            scope_type=ScopeType.SYSTEM,
+            details={"purpose": "MERGE_SOURCE_PROOF", "status": "APPROVED"},
+        )
+    assert captured.value.code == AuditErrorCode.INVALID_DETAILS
+
+
 def test_action_resource_and_scope_policy_are_enforced() -> None:
     service, _, repository = _service()
 

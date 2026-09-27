@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 BACKEND = ROOT / "backend"
 site.addsitedir(str(ROOT / ".venv" / "Lib" / "site-packages"))
 sys.path.insert(0, str(BACKEND))
+sys.path.insert(0, str(ROOT / "scripts" / "ops"))
 os.chdir(BACKEND)
 
 from alembic import command
@@ -33,7 +34,6 @@ from app.service.rbac_mutation import RbacMutationService
 DATABASE = "property_ai_auth001_test"
 BEFORE = "20260925_0012_task_intents"
 AFTER = "20260926_0014_identity_merge_sla_versions"
-OUTPUT = ROOT / "tmp" / "auth001-persist-v2" / "migration-0014.json"
 ALLOWED_COUNT_CHANGES = {"permissions", "role_permissions"}
 NEW_TABLES = {
     "identity_recovery_cases",
@@ -46,18 +46,42 @@ NEW_TABLES = {
 SYNTHETIC_ADMIN_MARKER = "__PERSIST_V2_SYSTEM_ADMIN_20260927__"
 
 
-def _settings_and_url() -> tuple[Settings, str]:
+def _verify_retry_3317_preconditions() -> None:
+    import auth001_retry_3317 as retry
+
+    retry._require_recorded_runtime()
+    retry._verify_dump(retry.COPY_DUMP)
+    metadata = retry._metadata()
+    retry._assert_clean_0012(metadata)
+    if metadata["alembic_version_column"]["length"] != 64:
+        raise RuntimeError("0014 retry requires the reviewed VARCHAR(64) compatibility step")
+    if not retry.COMPATIBILITY_EVIDENCE.is_file():
+        raise RuntimeError("0014 retry compatibility evidence is missing")
+    evidence = json.loads(retry.COMPATIBILITY_EVIDENCE.read_text(encoding="utf-8"))
+    if (
+        evidence.get("target") != f"{retry.HOST}:{retry.PORT}/{retry.DATABASE}"
+        or evidence.get("revision_unchanged") != retry.REVISION
+        or evidence.get("before", {}).get("length") != 32
+        or evidence.get("after") != metadata["alembic_version_column"]
+        or evidence.get("baseline_metadata_unchanged") is not True
+    ):
+        raise RuntimeError("0014 retry compatibility evidence does not match the live baseline")
+
+
+def _settings_and_url(port: int) -> tuple[Settings, str]:
+    if port not in {3307, 3317}:
+        raise RuntimeError("0014 runner rejected unapproved port")
     env_file = next((p for p in (BACKEND / ".env", ROOT / ".env") if p.exists()), None)
     settings = Settings(
         _env_file=str(env_file) if env_file else None,
         app_env="test",
         allow_destructive_test_database=True,
     )
-    parsed = make_url(settings.test_database_url).set(database=DATABASE)
+    parsed = make_url(settings.test_database_url).set(database=DATABASE, port=port)
     if (
         parsed.drivername != "mysql+pymysql"
         or parsed.host != "127.0.0.1"
-        or parsed.port != 3307
+        or parsed.port != port
         or parsed.database != DATABASE
         or not parsed.username
         or not parsed.password
@@ -199,15 +223,20 @@ def _inspect_partial_state(engine) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--port", type=int, choices=(3307, 3317), required=True)
     parser.add_argument("--prepare-synthetic-prerequisite", action="store_true")
     parser.add_argument("--inspect-only", action="store_true")
     args = parser.parse_args()
-    settings, database_url = _settings_and_url()
+    if args.port == 3317:
+        _verify_retry_3317_preconditions()
+    settings, database_url = _settings_and_url(args.port)
+    state = ROOT / "tmp" / ("auth001-retry-3317" if args.port == 3317 else "auth001-persist-v2")
+    output = state / "migration-0014.json"
     engine = create_engine(database_url, pool_pre_ping=True)
     if args.inspect_only:
         evidence = _inspect_partial_state(engine)
         engine.dispose()
-        path = ROOT / "tmp" / "auth001-persist-v2" / "migration-0014-failure.json"
+        path = state / "migration-0014-failure.json"
         path.write_text(json.dumps(evidence, ensure_ascii=False, indent=2), encoding="utf-8")
         print(json.dumps(evidence, ensure_ascii=False))
         return 0
@@ -234,6 +263,7 @@ def main() -> int:
 
     os.environ["APP_ENV"] = "test"
     os.environ["PROPERTY_AI_APPROVE_0014_DATABASE"] = DATABASE
+    os.environ["PROPERTY_AI_APPROVE_0014_TARGET"] = f"127.0.0.1:{args.port}/{DATABASE}"
     config = Config(str(BACKEND / "alembic.ini"))
     config.attributes["database_url"] = database_url
     command.upgrade(config, AFTER)
@@ -275,7 +305,7 @@ def main() -> int:
     evidence = {
         "task_id": "PENDING0014-RUNTIME",
         "observed_utc": datetime.now(UTC).isoformat(),
-        "target": "127.0.0.1:3307/property_ai_auth001_test",
+        "target": f"127.0.0.1:{args.port}/property_ai_auth001_test",
         "synthetic_prerequisite_seeded": seeded,
         "synthetic_prerequisite_marker_present": prerequisite_marker == 1 or seeded,
         "before_revision": BEFORE,
@@ -292,7 +322,7 @@ def main() -> int:
             json.dumps(before["counts"], sort_keys=True, separators=(",", ":")).encode()
         ).hexdigest(),
     }
-    OUTPUT.write_text(json.dumps(evidence, ensure_ascii=False, indent=2), encoding="utf-8")
+    output.write_text(json.dumps(evidence, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(evidence, ensure_ascii=False))
     return 0
 

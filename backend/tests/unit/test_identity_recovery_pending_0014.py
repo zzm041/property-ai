@@ -341,6 +341,7 @@ def test_test_proof_switch_requires_exact_auth001_target() -> None:
         test_database_url="mysql+pymysql://u:p@127.0.0.1:3307/property_ai_auth001_test",
         identity_test_proof_enabled=True,
         identity_test_proof_secret="private-test-secret",
+        identity_test_proof_target="127.0.0.1:3307/property_ai_auth001_test",
     )
     assert settings.identity_test_proof_enabled is True
     with pytest.raises(ValidationError):
@@ -350,6 +351,30 @@ def test_test_proof_switch_requires_exact_auth001_target() -> None:
             test_database_url="mysql+pymysql://u:p@127.0.0.1:3307/property_ai_test",
             identity_test_proof_enabled=True,
             identity_test_proof_secret="private-test-secret",
+            identity_test_proof_target="127.0.0.1:3307/property_ai_test",
+        )
+
+
+def test_test_proof_switch_accepts_only_explicit_retry_3317_target() -> None:
+    settings = Settings(
+        _env_file=None,
+        app_env="test",
+        database_url="mysql+pymysql://u:p@127.0.0.1:3306/property_ai",
+        test_database_url="mysql+pymysql://u:p@127.0.0.1:3317/property_ai_auth001_test",
+        identity_test_proof_enabled=True,
+        identity_test_proof_secret="private-test-secret",
+        identity_test_proof_target="127.0.0.1:3317/property_ai_auth001_test",
+    )
+    assert settings.identity_test_proof_enabled is True
+    with pytest.raises(ValueError, match="exact AUTH001"):
+        Settings(
+            _env_file=None,
+            app_env="test",
+            database_url="mysql+pymysql://u:p@127.0.0.1:3306/property_ai",
+            test_database_url="mysql+pymysql://u:p@127.0.0.1:3317/property_ai_auth001_test",
+            identity_test_proof_enabled=True,
+            identity_test_proof_secret="private-test-secret",
+            identity_test_proof_target="127.0.0.1:3307/property_ai_auth001_test",
         )
 
 

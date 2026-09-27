@@ -3,7 +3,15 @@
 Status: **PENDING EXECUTION APPROVAL — NOT APPLIED**
 Proposed revision: `20260926_0014_identity_merge_sla_versions`
 Parent: `20260925_0012_task_intents`
-Migration SHA-256: `D2CBF32AD9A865B65A67279D24006E4CEF141F21B77567C6247644E1F8FC020A`
+Original reviewed migration SHA-256 (3307-only guard):
+`D2CBF32AD9A865B65A67279D24006E4CEF141F21B77567C6247644E1F8FC020A`
+
+The owner subsequently approved a guard-only adaptation for the clean retry
+target at `127.0.0.1:3317/property_ai_auth001_test`. The business DDL,
+revision and parent are unchanged. The adapted file has a different byte hash;
+its preflight SHA-256 is
+`8DF73D9474E0BE7B0ACCFD5085BD635B55AF9C7CFA7362EA80844863DEBC8B55`.
+It is not represented as byte-identical to the original.
 
 The executable DDL is the migration file at
 `backend/alembic/versions/20260926_0014_identity_merge_sla_versions.py`.
@@ -67,9 +75,12 @@ alter 3307 bindings, or touch any other database.
 ## Execution guard and proposed first verification
 
 The migration refuses unless all of these are true: `APP_ENV=test`, PyMySQL,
-host `127.0.0.1`, port `3307`, database and explicit approval variable both
-equal `property_ai_auth001_test`, actual Alembic head equals 0012, both phone
-unique constraints exist, and at least one SYSTEM_ADMIN exists.
+host `127.0.0.1`, port in the explicitly reviewed set (`3307` or the clean
+retry `3317`), database equals `property_ai_auth001_test`, a separate approval
+variable equals the complete actual host/port/database target, actual Alembic
+head equals 0012, both phone unique constraints exist, and at least one
+SYSTEM_ADMIN exists. The execution runner supplies the exact target variable;
+`APP_ENV=test` by itself is insufficient.
 
 If execution is separately approved, the first run should be AUTH001-only after
 a fresh container-external backup. Verify: revision/head and all constraints;

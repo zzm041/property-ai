@@ -23,13 +23,16 @@ def _execution_guard() -> None:
     bind = op.get_bind()
     url = bind.engine.url
     approved_database = os.environ.get("PROPERTY_AI_APPROVE_0014_DATABASE")
+    approved_target = os.environ.get("PROPERTY_AI_APPROVE_0014_TARGET")
+    actual_target = f"{url.host}:{url.port}/{url.database}"
     if (
         os.environ.get("APP_ENV") != "test"
         or approved_database != "property_ai_auth001_test"
+        or approved_target != actual_target
         or url.drivername != "mysql+pymysql"
         or url.database != approved_database
         or url.host != "127.0.0.1"
-        or url.port != 3307
+        or url.port not in {3307, 3317}
     ):
         raise RuntimeError("0014 requires an explicit exact local target approval")
     current = bind.execute(sa.text("SELECT version_num FROM alembic_version")).scalar_one()
