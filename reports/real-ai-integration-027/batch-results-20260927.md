@@ -1,6 +1,7 @@
 # 027 structured contract / pending 0014 batch evidence
 
 - Baseline HEAD: `1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78`.
+- Saved product/evidence commit: `d32bf3d06e8624497a9806802b292814ba581cbd`.
 - Work-order LLM requests now carry the strict JSON Schema generated from the
   same `ObservedAnalysisOutput` used by server validation. Unknown enum values
   are rejected rather than silently mapped to OTHER.

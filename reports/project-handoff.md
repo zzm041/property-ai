@@ -2,7 +2,7 @@
 
 ## Current checkpoint — structured AI contract and post-0012 implementation (2026-09-27)
 
-Continue from source baseline `1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78`; the product/evidence commit for this batch is recorded below after final review. The fixed **2026-09-27 14:00 Asia/Shanghai** deadline has passed and is not silently extended. The last known owner quota baseline remains 13%; no reset, paid route or extra allowance was used.
+Product/evidence commit: `d32bf3d06e8624497a9806802b292814ba581cbd` (source baseline `1847dae9b3d3c7323ae80ab9fa8ca33382f4ee78`). The fixed **2026-09-27 14:00 Asia/Shanghai** deadline has passed and is not silently extended. The last known owner quota baseline remains 13%; no reset, paid route or extra allowance was used.
 
 The work-order provider now sends a strict JSON Schema generated from the same formal category/risk/role/skill model used by server validation, and the loopback adapter accepts only that exact schema or the existing RAG contract. The unchanged local Qwen3.5-4B candidate used 31 Qwen requests and zero ASR requests. It eliminated the observed unknown-enum failure but still produced three critical semantic/source errors, and the last VLM response violated the exact wrapper contract. Request 32 was not sent; the fixed set is incomplete, status is **NOT_READY**, and no AUTH001 runtime replacement, new business work order or real AUTO occurred. Raw results remain under `reports/real-ai-integration-027/diagnostic-r3schema/`.
 
