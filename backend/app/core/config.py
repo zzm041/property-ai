@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 from typing import Literal
+from urllib.parse import urlsplit
 
 from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -120,6 +121,17 @@ class Settings(BaseSettings):
     llm_timeout_seconds: float = Field(default=8.0, ge=0.1, le=60.0)
     llm_disable_thinking: bool = False
     llm_max_output_tokens: int | None = Field(default=None, ge=1, le=8192)
+    # Knowledge answers may use a separately approved self-hosted model while
+    # work-order analysis remains on its independently gated provider.  The
+    # default preserves the historical single-provider configuration.
+    rag_llm_provider: Literal["inherit", "development", "production"] = "inherit"
+    rag_llm_base_url: str = ""
+    rag_llm_model: str = ""
+    rag_llm_api_key: SecretStr = SecretStr("")
+    rag_llm_timeout_seconds: float = Field(default=8.0, ge=0.1, le=60.0)
+    rag_llm_disable_thinking: bool = False
+    rag_llm_max_output_tokens: int | None = Field(default=None, ge=1, le=8192)
+    local_ai_internal_token: SecretStr = SecretStr("")
     vlm_provider: Literal["development", "production"] = "development"
     vlm_base_url: str = ""
     vlm_model: str = "qwen-vl-plus"
@@ -237,6 +249,14 @@ class Settings(BaseSettings):
         if self.llm_provider == "production":
             if not self.llm_base_url or not self.llm_api_key.get_secret_value():
                 raise ValueError("Production LLM requires LLM_BASE_URL and LLM_API_KEY")
+        if self.rag_llm_provider == "production":
+            if not self.rag_llm_base_url or not self.resolve_local_ai_key(
+                self.rag_llm_api_key,
+                self.rag_llm_base_url,
+            ):
+                raise ValueError(
+                    "Production RAG LLM requires RAG_LLM_BASE_URL and RAG_LLM_API_KEY"
+                )
         if self.vlm_provider == "production":
             if not self.vlm_base_url or not self.vlm_api_key.get_secret_value():
                 raise ValueError("Production VLM requires VLM_BASE_URL and VLM_API_KEY")
@@ -263,6 +283,24 @@ class Settings(BaseSettings):
                 raise ValueError("Production WeChat provider requires WECHAT_APP_ID")
             if not self.wechat_app_secret.get_secret_value():
                 raise ValueError("Production WeChat provider requires WECHAT_APP_SECRET")
+
+    def resolve_local_ai_key(self, explicit: SecretStr, endpoint: str) -> str:
+        """Use the shared token only for this host's explicitly local adapter."""
+
+        value = explicit.get_secret_value()
+        if value:
+            return value
+        local = self.local_ai_internal_token.get_secret_value()
+        if not local:
+            return ""
+        parsed = urlsplit(endpoint)
+        if parsed.scheme not in {"http", "https"} or parsed.hostname not in {
+            "127.0.0.1",
+            "localhost",
+            "host.docker.internal",
+        }:
+            return ""
+        return local
 
     @property
     def active_database_url(self) -> str:

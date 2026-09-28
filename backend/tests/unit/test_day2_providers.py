@@ -18,6 +18,7 @@ from app.provider.factory import (
     build_asr_provider,
     build_embedding_provider,
     build_llm_provider,
+    build_rag_llm_provider,
     build_reranker_provider,
     build_storage_provider,
     build_vlm_provider,
@@ -45,6 +46,7 @@ def _settings(**overrides: object) -> Settings:
 def test_factory_keeps_development_fakes_by_default() -> None:
     settings = _settings()
     assert isinstance(build_llm_provider(settings), DevelopmentLLMProvider)
+    assert isinstance(build_rag_llm_provider(settings), DevelopmentLLMProvider)
     assert isinstance(build_vlm_provider(settings), DevelopmentVLMProvider)
     assert isinstance(build_asr_provider(settings), DevelopmentASRProvider)
     assert isinstance(build_wechat_auth_provider(settings), DevelopmentWeChatAuthProvider)
@@ -377,12 +379,72 @@ def test_factory_production_branches() -> None:
         wechat_app_secret="secret",
     )
     assert isinstance(build_llm_provider(settings), QwenLLMProvider)
+    assert isinstance(build_rag_llm_provider(settings), QwenLLMProvider)
     assert isinstance(build_vlm_provider(settings), QwenVLMProvider)
     assert isinstance(build_asr_provider(settings), HttpASRProvider)
     assert isinstance(build_embedding_provider(settings), HttpEmbeddingProvider)
     assert isinstance(build_reranker_provider(settings), HttpRerankerProvider)
     assert isinstance(build_storage_provider(settings), ProductionStorageProvider)
     assert isinstance(build_wechat_auth_provider(settings), ProductionWeChatAuthProvider)
+
+
+def test_rag_llm_can_be_production_while_work_order_llm_stays_development() -> None:
+    settings = _settings(
+        llm_provider="development",
+        rag_llm_provider="production",
+        rag_llm_base_url="http://127.0.0.1:11436/v1",
+        rag_llm_model="qwen3.5:4b",
+        rag_llm_api_key="local-test-token",
+        rag_llm_disable_thinking=True,
+        rag_llm_max_output_tokens=512,
+    )
+
+    assert isinstance(build_llm_provider(settings), DevelopmentLLMProvider)
+    rag = build_rag_llm_provider(settings)
+    assert isinstance(rag, QwenLLMProvider)
+    assert rag.model_version == "qwen3.5:4b"
+
+
+def test_local_ai_token_fallback_is_limited_to_local_endpoints() -> None:
+    local = _settings(
+        local_ai_internal_token="local-only-token",
+        rag_llm_provider="production",
+        rag_llm_base_url="http://host.docker.internal:11436/v1",
+        embedding_provider="production",
+        embedding_endpoint="http://host.docker.internal:11436/v1/embeddings",
+        reranker_provider="production",
+        reranker_endpoint="http://host.docker.internal:11436/v1/rerank",
+    )
+    assert build_rag_llm_provider(local)._api_key == "local-only-token"
+    assert build_embedding_provider(local)._api_key == "local-only-token"
+    assert build_reranker_provider(local)._api_key == "local-only-token"
+
+    external = _settings(
+        local_ai_internal_token="must-not-leak",
+        rag_llm_provider="production",
+        rag_llm_base_url="https://models.example/v1",
+        rag_llm_api_key="independent-rag-key",
+        embedding_provider="production",
+        embedding_endpoint="https://models.example/v1/embeddings",
+        embedding_api_key="independent-embedding-key",
+        reranker_provider="production",
+        reranker_endpoint="https://models.example/v1/rerank",
+        reranker_api_key="independent-reranker-key",
+    )
+    assert build_rag_llm_provider(external)._api_key == "independent-rag-key"
+    assert build_embedding_provider(external)._api_key == "independent-embedding-key"
+    assert build_reranker_provider(external)._api_key == "independent-reranker-key"
+
+
+def test_production_rag_llm_requires_its_own_endpoint_and_secret() -> None:
+    with pytest.raises(ValueError, match="Production RAG LLM"):
+        Settings(
+            _env_file=None,
+            app_env="production",
+            app_secret_key="production-secret-that-is-long-enough",
+            wechat_login_enabled=False,
+            rag_llm_provider="production",
+        )
 
 
 def test_development_storage_persists_across_instances(tmp_path) -> None:

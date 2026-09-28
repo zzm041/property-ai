@@ -101,6 +101,95 @@ def runner(tmp_path):
     return m.Runner(path)
 
 
+def test_rag_only_scope_rejects_work_order_protocol_but_allows_rag():
+    work_order = {
+        'model': 'qwen3.5:4b',
+        'messages': [{'role': 'user', 'content': '合成报修'}],
+        'response_format': m.WORK_ORDER_RESPONSE_FORMAT,
+        'temperature': 0,
+        'reasoning_effort': 'none',
+        'max_tokens': 512,
+    }
+    raw = json.dumps(work_order, ensure_ascii=False).encode()
+    with pytest.raises(ValueError, match='RAG_ONLY_NO_AUTO_AUTHORIZATION'):
+        m.decode('/v1/chat/completions', 'application/json', raw, m.WORK_ORDER_PROMPT_VERSION, 'rag_only')
+
+    rag = {**work_order, 'response_format': {'type': 'json_object'}}
+    assert m.decode(
+        '/v1/chat/completions',
+        'application/json',
+        json.dumps(rag, ensure_ascii=False).encode(),
+        'rag-answer-v2',
+        'rag_only',
+    )[0] == 'qwen'
+
+
+def test_scoped_runtime_limits_and_duration_are_enforced(tmp_path, monkeypatch):
+    config = {
+        'private': str(tmp_path / 'run'),
+        'host': '127.0.0.1',
+        'port': 11436,
+        'scope': 'rag_only',
+        'limits': {'asr': 1, 'embedding': 1, 'reranker': 1, 'qwen': 2},
+        'duration_seconds': 7200,
+    }
+    path = tmp_path / 'config.json'
+    path.write_text(json.dumps(config), encoding='utf-8')
+    scoped = m.Runner(path)
+    monkeypatch.setattr(m.time, 'time', lambda: 1000.0)
+    folder, deadline = scoped.reserve('embedding', 'one')
+    assert deadline == 8200.0
+    assert json.loads((folder / 'reservation.json').read_text())['max_calls'] == 1
+    m.save(folder / 'result.json', {'status': 'SUCCESS'})
+    with pytest.raises(RuntimeError, match='CALL_LIMIT'):
+        scoped.reserve('embedding', 'two')
+
+
+def test_scoped_runtime_checks_configured_window_before_reservation(tmp_path, monkeypatch):
+    config = {
+        'private': str(tmp_path / 'run'), 'host': '127.0.0.1', 'port': 11436,
+        'limits': {'asr': 1, 'embedding': 2, 'reranker': 2, 'qwen': 2},
+        'duration_seconds': 7200,
+    }
+    path = tmp_path / 'config.json'
+    path.write_text(json.dumps(config), encoding='utf-8')
+    scoped = m.Runner(path)
+    clock = [100.0]
+    monkeypatch.setattr(m.time, 'time', lambda: clock[0])
+    first, _ = scoped.reserve('embedding', 'one')
+    m.save(first / 'result.json', {'status': 'SUCCESS'})
+    clock[0] = 2000.0
+    second, deadline = scoped.reserve('reranker', 'two')
+    assert deadline == 7300.0
+    m.save(second / 'result.json', {'status': 'SUCCESS'})
+    clock[0] = 7300.0
+    with pytest.raises(RuntimeError, match='WINDOW_EXHAUSTED'):
+        scoped.reserve('qwen', 'three')
+    assert len(list(scoped.private.glob('call-*'))) == 2
+
+
+def test_drain_atomically_blocks_new_admission_without_disturbing_active_request(tmp_path):
+    scoped = runner(tmp_path)
+    assert scoped.acquire_request() is True
+    assert scoped.begin_drain() is True
+    scoped.lock.release()
+    assert scoped.acquire_request() is False
+    assert scoped.admission() == {'accepting_requests': False, 'request_active': False}
+
+
+@pytest.mark.parametrize('bad', [
+    {'scope': 'work_order_only'},
+    {'limits': {'asr': 1, 'embedding': 12, 'reranker': 8, 'qwen': 19}},
+    {'duration_seconds': 7201},
+])
+def test_scoped_runtime_rejects_widened_configuration(tmp_path, bad):
+    config = {'private': str(tmp_path / 'run'), 'host': '127.0.0.1', 'port': 11436, **bad}
+    path = tmp_path / 'config.json'
+    path.write_text(json.dumps(config), encoding='utf-8')
+    with pytest.raises(ValueError):
+        m.Runner(path)
+
+
 def continuation_runner(tmp_path,valid_review=True):
     private=tmp_path/'run';evidence=tmp_path/'evidence';private.mkdir();evidence.mkdir()
     input_hash='same-synthetic-audio'

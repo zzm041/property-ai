@@ -32,7 +32,7 @@ from app.provider.errors import (
 )
 from app.provider.factory import (
     build_embedding_provider,
-    build_llm_provider,
+    build_rag_llm_provider,
     build_milvus_store,
     build_reranker_provider,
 )
@@ -116,7 +116,7 @@ class RetrievalService:
         embedder = build_embedding_provider(settings)
         store = build_milvus_store(settings)
         reranker = build_reranker_provider(settings)
-        llm = build_llm_provider(settings)
+        llm = build_rag_llm_provider(settings)
         try:
             query_vector = embedder.embed((question,))[0]
             hits = store.search(

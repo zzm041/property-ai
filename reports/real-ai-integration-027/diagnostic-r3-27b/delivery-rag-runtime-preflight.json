@@ -1,0 +1,57 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "checked_at": "2026-09-28T13:58:36.4153536+08:00",
+  "base_sha": "018107d0bbd523b4bb930a0752a20a8a44a67352",
+  "result": "READY_NO_INFERENCE_RESOURCE_BLOCKED_FOR_MODEL_CALLS",
+  "adapter": {
+    "endpoint": "127.0.0.1:11436",
+    "listener_pid": 44724,
+    "scope": "rag_only",
+    "request_active": false,
+    "reservation_gate": "READY",
+    "adapter_sha256": "5F8A94040FCB3CD48DC4FE3C74166B07E4D1D8D9EAD0F3A6D4ABF2E9E08F83AB",
+    "config_sha256": "01F9B2852392185F4AB92C8F9C81373F41BDBE2D96CB183152B2FF03D2F9A546",
+    "token_sha256": "459BE65B2503C101C11C8317AE048498317206841B20FB658602548C5D36B13B",
+    "health_loaded_model": false,
+    "call_ledger_count": 0
+  },
+  "lifecycle_check": {
+    "exact_idle_stop": "PASS",
+    "authenticated_drain_before_stop": "PASS",
+    "port_released": "PASS",
+    "restart_with_retained_assets_ledger_and_token": "PASS",
+    "post_restart_status": "PASS",
+    "model_calls": 0
+  },
+  "current_resources": {
+    "gpu_total_mib": 16303,
+    "gpu_used_mib": 6145,
+    "gpu_free_mib": 9851,
+    "ram_available_mib": 8206,
+    "decision": "No model request was made during lifecycle validation. The resource sample is not treated as durable admission evidence for a later request."
+  },
+  "container_connectivity": {
+    "source": "running property-ai-delivery-check API container",
+    "target": "http://host.docker.internal:11436/healthz",
+    "authenticated": true,
+    "status": "ready",
+    "scope": "rag_only",
+    "inference": false
+  },
+  "software_boundaries": {
+    "work_order_llm_provider": "development",
+    "rag_llm_provider": "separately configurable and defaults to inherit",
+    "work_order_protocol_allowed_by_adapter": false,
+    "embedding_limit": 12,
+    "reranker_limit": 8,
+    "qwen_limit": 18,
+    "asr_limit": 1,
+    "window_seconds": 7200
+  },
+  "not_proven": [
+    "No embedding, reranking, Qwen or ASR request was made in this preflight.",
+    "The 1024-dimensional delivery collection was not created or changed.",
+    "8093 remains on its prior Development knowledge configuration until resource guards permit the bounded real RAG run.",
+    "This does not authorize or prove real work-order AUTO."
+  ]
+}

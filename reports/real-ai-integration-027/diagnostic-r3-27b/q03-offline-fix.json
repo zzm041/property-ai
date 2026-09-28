@@ -1,0 +1,42 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "checked_at": "2026-09-28T13:58:36.4153536+08:00",
+  "base_sha": "018107d0bbd523b4bb930a0752a20a8a44a67352",
+  "scope": "Generic service-side evidence rejection fix using immutable saved 9B outputs; no model calls.",
+  "accepted_after_fix": [
+    "GOLD-004",
+    "GOLD-022"
+  ],
+  "still_rejected": [
+    "PHOTO-002",
+    "GOLD-012",
+    "NOVEL-004"
+  ],
+  "safety_properties": [
+    "Raw model output remains unchanged and traceable.",
+    "Only redundant informational observations or a historical duplicate of the same accepted current identity may be ignored.",
+    "Unknown evidence, cross-source evidence, dangerous fabrication, unrelated historical facts, and core conflicts still reject the output.",
+    "A subject may carry across clauses only for an explicitly enumerated same-subject continuation; catalog-unknown or conflicting subjects are rejected.",
+    "Historical context remains attached across a comma unless the next clause has an explicit current-time marker."
+  ],
+  "focused_test": {
+    "result": "PASS",
+    "passed": 112,
+    "warnings": 3,
+    "files": [
+      "backend/tests/unit/test_day2_providers.py",
+      "backend/tests/unit/test_knowledge_retrieval_scope.py",
+      "backend/tests/unit/test_observed_event_027.py",
+      "backend/tests/unit/test_local_ai_http_027.py",
+      "backend/tests/unit/test_delivery_artifact.py"
+    ],
+    "note": "Warnings are the existing pytest-asyncio/Starlette/cache-path warnings; a project-local base temp was used after the host default temp directory denied access."
+  },
+  "pure_unit_regression": {
+    "result": "PASS",
+    "passed": 1155,
+    "warnings": 3,
+    "duration_seconds": 13.82,
+    "model_calls": 0
+  }
+}

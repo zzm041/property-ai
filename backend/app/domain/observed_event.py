@@ -139,11 +139,15 @@ SUBJECT_PATTERNS = {
 }
 _UNCERTAIN = re.compile(r"猜|怀疑|认为|声称|可能|也许|好像|听说|据说|一人说|另一人说|有人说|他说|她说|转述|邻居说|家人说|对方说|无法判断|无法确认|不知道|未确认|没.*确认|尚未")
 _HISTORY = re.compile(r"以前|上次|历史|去年|早先|曾经|昨晚|上月|上个月")
+_CURRENT_TIME = re.compile(r"今天|现在|目前|此刻|刚才|正在|又开始|仍在|还在|当下|本次")
 _NEGATIVE = re.compile(r"(?:并非|不是|未见|没有|没|无|未)(?:正在|发生|明显|任何|出现|看到|发现|再)?[^，,。；;!?！？]{0,4}$")
 _POST_NEGATIVE = re.compile(r"^[”’\"\s]*(?:并|从|始终|根本)?(?:没有|未|不曾|不存在)")
 _LEADING_UNCERTAIN_SPEAKER = re.compile(
     r"^(?:我|本人|用户|住户|邻居|家人|对方|他|她|有人|一人|另一人|维修人员|工作人员)"
 )
+_SUBJECTLESS_CONTINUATION_PREFIX = {
+    "不制冷": re.compile(r"^(?:出风|送风)(?:但|却|仍|仍然|还是)?$")
+}
 
 
 def _is_leading_uncertain_modifier(text: str) -> bool:
@@ -158,6 +162,19 @@ def _is_leading_uncertain_modifier(text: str) -> bool:
     )
 
 
+def _supported_subjects(text: str) -> set[str]:
+    return {subject for subject, pattern in SUBJECT_PATTERNS.items() if re.search(pattern, text)}
+
+
+def _previous_clause(text: str, clause_start: int) -> str:
+    if clause_start <= 0:
+        return ""
+    end = clause_start - 1
+    delimiters = "，,。；;!?！？"
+    start = max((text.rfind(char, 0, end) for char in delimiters), default=-1)
+    return text[start + 1:end].strip()
+
+
 def _clause_for_match(text: str, match: re.Match[str]) -> tuple[str, int]:
     delimiters = "，,。；;!?！？"
     left = max((text.rfind(char, 0, match.start()) for char in delimiters), default=-1)
@@ -169,7 +186,9 @@ def _clause_for_match(text: str, match: re.Match[str]) -> tuple[str, int]:
         prior_right = left
         prior_left = max((text.rfind(char, 0, prior_right) for char in delimiters), default=-1)
         prior = text[prior_left + 1:prior_right].strip()
-        if _is_leading_uncertain_modifier(prior):
+        if _is_leading_uncertain_modifier(prior) or (
+            _HISTORY.search(prior) and not _CURRENT_TIME.search(clause)
+        ):
             clause = prior + "，" + clause
             clause_start = prior_left + 1
     return clause, clause_start
@@ -179,6 +198,7 @@ def bind_observations(
     output: ObservedAnalysisOutput, catalog: Mapping[str, Mapping[str, object]],
 ) -> tuple[str, dict[str, object]]:
     normalized = []
+    rejected = []
     for item in output.observations:
         evidence = catalog.get(item.evidence_id)
         if evidence is None:
@@ -187,37 +207,79 @@ def bind_observations(
         source = str(evidence.get("source") or "")
         if not quote or item.evidence_id.split(":", 1)[0] != source:
             raise ValueError("Observation evidence catalog is invalid")
-        matches = list(re.finditer(PATTERNS[item.label], quote))
-        if not matches:
-            raise ValueError("Evidence does not support observable label")
-        selected_clause = quote
-        if item.label != "现象待核实":
-            confirmed = []
-            postposed_negative = False
-            for candidate in matches:
-                clause, clause_start = _clause_for_match(quote, candidate)
-                if _UNCERTAIN.search(clause) or _HISTORY.search(clause):
-                    continue
-                local_start = candidate.start() - clause_start
-                local_end = candidate.end() - clause_start
-                prefix = clause[:local_start]
-                suffix = clause[local_end:]
-                if item.label != "外观无明显异常" and _NEGATIVE.search(prefix):
-                    continue
-                if item.label != "外观无明显异常" and _POST_NEGATIVE.search(suffix):
-                    postposed_negative = True
-                    continue
-                confirmed.append((candidate, clause))
-            if not confirmed and postposed_negative:
-                raise ValueError("Postposed negated observation")
-            if not confirmed:
-                raise ValueError("Observation is not confirmed current evidence")
-            match, selected_clause = confirmed[0]
-        else:
-            match = matches[0]
-            selected_clause, _ = _clause_for_match(quote, match)
-        if item.subject != "未确定" and not re.search(SUBJECT_PATTERNS[item.subject], selected_clause):
-            raise ValueError("Subject not supported by the selected evidence")
+        rejection_kind = None
+        try:
+            matches = list(re.finditer(PATTERNS[item.label], quote))
+            if not matches:
+                raise ValueError("Evidence does not support observable label")
+            selected_clause = quote
+            selected_clause_start = 0
+            if item.label != "现象待核实":
+                confirmed = []
+                postposed_negative = False
+                historical = False
+                uncertain = False
+                prefixed_negative = False
+                for candidate in matches:
+                    clause, clause_start = _clause_for_match(quote, candidate)
+                    if _UNCERTAIN.search(clause):
+                        uncertain = True
+                        continue
+                    if _HISTORY.search(clause):
+                        historical = True
+                        continue
+                    local_start = candidate.start() - clause_start
+                    local_end = candidate.end() - clause_start
+                    prefix = clause[:local_start]
+                    suffix = clause[local_end:]
+                    if item.label != "外观无明显异常" and _NEGATIVE.search(prefix):
+                        prefixed_negative = True
+                        continue
+                    if item.label != "外观无明显异常" and _POST_NEGATIVE.search(suffix):
+                        postposed_negative = True
+                        continue
+                    confirmed.append((candidate, clause, clause_start))
+                if not confirmed and postposed_negative:
+                    rejection_kind = "postposed_negative"
+                    raise ValueError("Postposed negated observation")
+                if not confirmed and prefixed_negative:
+                    rejection_kind = "prefixed_negative"
+                    raise ValueError("Negated observation")
+                if not confirmed and uncertain:
+                    rejection_kind = "uncertain"
+                    raise ValueError("Observation is not confirmed current evidence")
+                if not confirmed and historical:
+                    rejection_kind = "historical"
+                    raise ValueError("Observation is not confirmed current evidence")
+                if not confirmed:
+                    raise ValueError("Observation is not confirmed current evidence")
+                match, selected_clause, selected_clause_start = confirmed[0]
+            else:
+                match = matches[0]
+                selected_clause, selected_clause_start = _clause_for_match(quote, match)
+            if item.subject != "未确定" and not re.search(SUBJECT_PATTERNS[item.subject], selected_clause):
+                clause_subjects = _supported_subjects(selected_clause)
+                local_start = match.start() - selected_clause_start
+                prefix = selected_clause[:local_start].strip()
+                continuation = _SUBJECTLESS_CONTINUATION_PREFIX.get(item.label)
+                prior_clause = _previous_clause(quote, selected_clause_start)
+                if (
+                    clause_subjects
+                    or continuation is None
+                    or continuation.fullmatch(prefix) is None
+                    or not re.search(SUBJECT_PATTERNS[item.subject], prior_clause)
+                ):
+                    raise ValueError("Subject not supported by the selected evidence")
+        except ValueError as exc:
+            rejected.append({
+                **item.model_dump(mode="json"),
+                "source": source,
+                "quote": quote,
+                "reason": str(exc),
+                **({"reason_code": rejection_kind} if rejection_kind else {}),
+                **({"span": evidence["span"]} if "span" in evidence else {}),
+            })
+            continue
         normalized.append({
             "label": item.label,
             "subject": item.subject,
@@ -228,6 +290,25 @@ def bind_observations(
             **({"span": evidence["span"]} if "span" in evidence else {}),
         })
     effective = [row for row in normalized if row["effective"]]
+    ignored = []
+    effective_identities = {(row["label"], row["subject"]) for row in effective}
+    for row in rejected:
+        informational_redundancy = row["label"] in _INFORMATIONAL_LABELS and bool(effective)
+        repeated_current_identity = (
+            row.get("reason_code") == "historical"
+            and (row["label"], row["subject"]) in effective_identities
+        )
+        if not informational_redundancy and not repeated_current_identity:
+            raise ValueError(str(row["reason"]))
+        ignored.append({
+            **row,
+            "disposition": "NOT_TRUSTED_REDUNDANT_OBSERVATION",
+            "ignored_reason": (
+                "informational observation is not needed for the accepted current fault"
+                if informational_redundancy
+                else "unconfirmed or historical duplicate of an accepted current observation"
+            ),
+        })
     identity_source = effective or normalized
     identity = sorted({
         (row["label"], row["subject"], row["quote"] if row["label"] == "现象待核实" or row["subject"] == "未确定" else "")
@@ -239,6 +320,7 @@ def bind_observations(
         "observations": normalized,
         "effective_observations": effective,
         "informational_observations": [row for row in normalized if not row["effective"]],
+        "ignored_observations": ignored,
         "effective_key": key,
         "raw_model_output": output.model_dump(mode="json"),
     }

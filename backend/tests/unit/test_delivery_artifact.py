@@ -158,6 +158,25 @@ def test_delivery_compose_includes_runtime_isolation_and_persistence_fixes() -> 
     assert nginx.count("proxy_pass http://$api_upstream") == 4
 
 
+def test_delivery_rag_runtime_is_isolated_bounded_and_not_an_auto_switch() -> None:
+    compose = (ROOT / "deploy" / "docker-compose.delivery.yml").read_text(encoding="utf-8")
+    runtime = (ROOT / "deploy" / "rag-runtime.ps1").read_text(encoding="utf-8")
+    example = (ROOT / "deploy" / ".env.delivery.example").read_text(encoding="utf-8")
+
+    assert "LOCAL_AI_INTERNAL_TOKEN: ${DELIVERY_RAG_INTERNAL_TOKEN:-}" in compose
+    assert "RAG_LLM_API_KEY: ${DELIVERY_RAG_INTERNAL_TOKEN:-}" not in compose
+    assert '"host.docker.internal:host-gateway"' in compose
+    assert 'scope = "rag_only"' in runtime
+    assert 'embedding = 12; reranker = 8; qwen = 18' in runtime
+    assert 'duration_seconds = 7200' in runtime
+    assert "request_active" in runtime
+    assert "process start time does not match" in runtime
+    assert 'RAG_LLM_PROVIDER=inherit' in example
+    assert 'LLM_PROVIDER=development' in example
+    assert 'MILVUS_COLLECTION=knowledge_chunks_delivery_check' in example
+    assert 'EMBEDDING_DIMENSIONS=8' in example
+
+
 def test_delivery_backup_uses_binary_safe_compose_copy() -> None:
     script = (ROOT / "deploy" / "delivery.ps1").read_text(encoding="utf-8")
     assert 'Invoke-Compose cp "mysql:$containerTarget" $hostTemp' in script

@@ -41,6 +41,11 @@ def bind(value, *, report=None, asr=None, vision=None):
     return bind_observations(ObservedAnalysisOutput.model_validate(value), catalog(report=report, asr=asr, vision=vision))
 
 
+def saved_case(relative_path, case_id):
+    record = json.loads((Path(__file__).resolve().parents[3] / relative_path).read_text(encoding="utf-8"))
+    return next(row for row in record["results"] if row["id"] == case_id)
+
+
 def test_server_builds_stable_current_source_ids_without_history():
     evidence = catalog(
         report="水龙头滴水。插座没电。",
@@ -145,6 +150,116 @@ def test_normal_and_unconfirmed_context_remain_traceable_but_not_in_effective_ke
     assert len(trace["effective_observations"]) == 1
     assert len(trace["informational_observations"]) == 2
     assert trace["raw_model_output"] == with_context
+
+
+def test_invalid_redundant_informational_observation_does_not_reject_core_fault():
+    report = "空调出风但不凉，旁边照明正常。"
+    value = payload(report, label="不制冷", subject="空调")
+    value.update(category="hvac", required_skill="maintenance")
+    value["observations"].append({
+        "label": "外观无明显异常", "subject": "空调", "evidence_id": "report:1",
+    })
+    _, trace = bind(value, report=report)
+    assert [row["label"] for row in trace["effective_observations"]] == ["不制冷"]
+    assert trace["ignored_observations"] == [{
+        "label": "外观无明显异常",
+        "subject": "空调",
+        "evidence_id": "report:1",
+        "source": "report",
+        "quote": report,
+        "reason": "Subject not supported by the selected evidence",
+        "span": [0, len(report)],
+        "disposition": "NOT_TRUSTED_REDUNDANT_OBSERVATION",
+        "ignored_reason": "informational observation is not needed for the accepted current fault",
+    }]
+    assert trace["raw_model_output"] == value
+
+
+def test_historical_duplicate_can_be_ignored_only_when_current_identity_is_accepted():
+    report = "昨晚洗手盆下面漏过，关阀后停了。今天洗手盆下面又开始滴水。"
+    value = payload(report, subject="排水接头", evidence_id="report:2")
+    value["observations"].append({
+        "label": "滴渗水", "subject": "排水接头", "evidence_id": "report:1",
+    })
+    _, trace = bind(value, report=report)
+    assert len(trace["effective_observations"]) == 1
+    assert trace["ignored_observations"][0]["ignored_reason"].startswith("unconfirmed or historical")
+
+
+def test_unrelated_historical_or_dangerous_observation_cannot_be_silently_ignored():
+    report = "昨晚插座出现火花。今天洗手盆下面开始滴水。"
+    value = payload(report, subject="排水接头", evidence_id="report:2")
+    value["observations"].append({
+        "label": "火花烧损", "subject": "插座", "evidence_id": "report:1",
+    })
+    with pytest.raises(ValueError, match="not confirmed current"):
+        bind(value, report=report)
+
+
+def test_same_subject_current_positive_and_negative_are_not_treated_as_history_redundancy():
+    report = "插座正在冒烟。插座没有冒烟。"
+    value = payload(report, label="火花烧损", subject="插座", evidence_id="report:1")
+    value.update(category="electrical", required_skill="maintenance", risk="electric")
+    value["observations"].append({
+        "label": "火花烧损", "subject": "插座", "evidence_id": "report:2",
+    })
+    with pytest.raises(ValueError, match="Negated observation"):
+        bind(value, report=report)
+
+
+def test_same_subject_current_guess_is_not_treated_as_history_redundancy():
+    report = "插座正在冒烟。住户猜插座可能冒烟。"
+    value = payload(report, label="火花烧损", subject="插座", evidence_id="report:1")
+    value.update(category="electrical", required_skill="maintenance", risk="electric")
+    value["observations"].append({
+        "label": "火花烧损", "subject": "插座", "evidence_id": "report:2",
+    })
+    with pytest.raises(ValueError, match="not confirmed current"):
+        bind(value, report=report)
+
+
+def test_unknown_catalog_subject_cannot_borrow_an_unrelated_unique_subject():
+    report = "插座没有发黑，电表发黑。"
+    value = payload(report, label="烧焦变色", subject="插座")
+    value.update(category="electrical", required_skill="maintenance", risk="electric")
+    with pytest.raises(ValueError, match="Subject not supported"):
+        bind(value, report=report)
+
+
+def test_invalid_information_cannot_be_dropped_without_a_valid_effective_fault():
+    text = "照明正常，没有冒烟。"
+    value = payload(text, label="外观无明显异常", subject="空调")
+    with pytest.raises(ValueError, match="Subject not supported"):
+        bind(value, report=text)
+
+
+def test_saved_q03_outputs_accept_core_fault_and_record_ignored_redundancy():
+    service = AnalysisService.__new__(AnalysisService)
+    service._settings = Settings(_env_file=None, llm_provider="production")
+    fixed = "reports/real-ai-integration-027/diagnostic-r3-9b-v11/candidate-03/fixed.json"
+    for case_id, ignored_count in (("GOLD-004", 1), ("GOLD-022", 1)):
+        row = saved_case(fixed, case_id)
+        evidence = catalog(report=row["input"]["report"])
+        mapped, error = service._validate_payload(row["raw_payload"], evidence_catalog=evidence)
+        assert error is None and mapped is not None
+        assert len(mapped.event_trace["effective_observations"]) == 1
+        assert len(mapped.event_trace["ignored_observations"]) == ignored_count
+        assert mapped.event_trace["raw_model_output"] == row["raw_payload"]
+
+
+@pytest.mark.parametrize(("relative_path", "case_id"), [
+    ("reports/real-ai-integration-027/diagnostic-r3-9b-v11/candidate-03/fixed.json", "PHOTO-002"),
+    ("reports/real-ai-integration-027/diagnostic-r3-9b-v11/candidate-03/fixed.json", "GOLD-012"),
+    ("reports/real-ai-integration-027/diagnostic-r3-9b-v11/candidate-03/novel.json", "NOVEL-004"),
+])
+def test_saved_danger_conflict_and_cross_object_failures_remain_rejected(relative_path, case_id):
+    service = AnalysisService.__new__(AnalysisService)
+    service._settings = Settings(_env_file=None, llm_provider="production")
+    row = saved_case(relative_path, case_id)
+    report = row["input"].get("report") or row["input"].get("paired_report")
+    evidence = catalog(report=report)
+    mapped, error = service._validate_payload(row["raw_payload"], evidence_catalog=evidence)
+    assert mapped is None and error == "AI.INVALID_OUTPUT"
 
 
 @pytest.mark.parametrize(("text", "label", "subject"), [

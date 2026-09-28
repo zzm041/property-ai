@@ -63,6 +63,26 @@ def build_llm_provider(settings: Settings) -> LLMProvider:
     return DevelopmentLLMProvider(settings.llm_provider_behavior)
 
 
+def build_rag_llm_provider(settings: Settings) -> LLMProvider:
+    """Build the knowledge-answer model without widening work-order rollout."""
+
+    if settings.rag_llm_provider == "inherit":
+        return build_llm_provider(settings)
+    if settings.rag_llm_provider == "production":
+        return QwenLLMProvider(
+            base_url=settings.rag_llm_base_url,
+            model=settings.rag_llm_model or settings.llm_model,
+            api_key=settings.resolve_local_ai_key(
+                settings.rag_llm_api_key,
+                settings.rag_llm_base_url,
+            ),
+            timeout_seconds=settings.rag_llm_timeout_seconds,
+            disable_thinking=settings.rag_llm_disable_thinking,
+            max_output_tokens=settings.rag_llm_max_output_tokens,
+        )
+    return DevelopmentLLMProvider(settings.llm_provider_behavior)
+
+
 def build_vlm_provider(
     settings: Settings,
     storage: StorageProvider | None = None,
@@ -101,7 +121,10 @@ def build_embedding_provider(settings: Settings) -> EmbeddingProvider:
             endpoint=settings.embedding_endpoint,
             timeout_seconds=settings.embedding_timeout_seconds,
             dimensions=settings.embedding_dimensions,
-            api_key=settings.embedding_api_key.get_secret_value(),
+            api_key=settings.resolve_local_ai_key(
+                settings.embedding_api_key,
+                settings.embedding_endpoint,
+            ),
             model=settings.embedding_model,
         )
     return DevelopmentEmbeddingProvider(
@@ -115,7 +138,10 @@ def build_reranker_provider(settings: Settings) -> RerankerProvider:
         return HttpRerankerProvider(
             endpoint=settings.reranker_endpoint,
             timeout_seconds=settings.reranker_timeout_seconds,
-            api_key=settings.reranker_api_key.get_secret_value(),
+            api_key=settings.resolve_local_ai_key(
+                settings.reranker_api_key,
+                settings.reranker_endpoint,
+            ),
             model=settings.reranker_model,
         )
     return DevelopmentRerankerProvider(settings.reranker_provider_behavior)

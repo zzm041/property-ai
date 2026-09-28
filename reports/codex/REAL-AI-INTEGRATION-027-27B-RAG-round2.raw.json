@@ -1,0 +1,79 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "review_round": 2,
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "verdict": "PASS",
+  "verdict_scope": "仅关闭上一轮四项源码问题及其直接回归；不是模型质量、真实 RAG、AUTO 或 Production PASS。",
+  "base_sha": "018107d0bbd523b4bb930a0752a20a8a44a67352",
+  "reviewed_sha": "018107d0bbd523b4bb930a0752a20a8a44a67352 + scoped uncommitted changes",
+  "reviewed_hashes": {
+    "backend/app/core/config.py": "4FE5A3F55B8D69E5A86E33225BCDE086D474D5E7F4BA8A9E249AFCCBA063028D",
+    "backend/app/domain/observed_event.py": "C436BD91E5EE2E370F3C376436A4CDCBB83891C52FE1B9C93CB177DEB65DF085",
+    "scripts/ops/local_ai_http.py": "5F8A94040FCB3CD48DC4FE3C74166B07E4D1D8D9EAD0F3A6D4ABF2E9E08F83AB",
+    "deploy/rag-runtime.ps1": "F0E943A35BF1297AF9C366080776F9F8FDE52F94BCD3E23E8B4C8DC7DCC9882B",
+    "deploy/docker-compose.delivery.yml": "15BD92198269C7086E7D8354955A679C7EE3E9B1984535F4235238EF264D46A2",
+    "backend/app/provider/factory.py": "466083757DE31C70B254C691EF4732DEA9C22CEBCAA2A42E8AC9F3E98C6AB79A"
+  },
+  "findings": [],
+  "closed_findings": [
+    {
+      "id": "027-INCREMENTAL-R1-02",
+      "status": "CLOSED",
+      "evidence": "reserve 在创建 call 目录之前使用 self.duration_seconds 检查首次预约以来的截止时间，并使用同一配置计算 deadline。新增断言证明 7200 秒窗口超过 1800 秒仍可预约、到达 7200 秒时拒绝且不创建第三条记录；既有默认窗口和 continuation 分支保留。"
+    },
+    {
+      "id": "027-INCREMENTAL-R1-03",
+      "status": "CLOSED",
+      "evidence": "Compose 不再覆盖三个独立 Provider API Key，仅传入 LOCAL_AI_INTERNAL_TOKEN。resolve_local_ai_key 优先返回显式密钥，只有显式密钥为空且 endpoint 为允许的本地主机时才回退到共享令牌。RAG、embedding、reranker 工厂均使用该函数；直接测试检查本地回退与外部独立密钥保留。微信生产校验仍位于可达的安全校验路径。"
+    },
+    {
+      "id": "027-INCREMENTAL-R1-04",
+      "status": "CLOSED",
+      "evidence": "acquire_request 与 begin_drain 共享 state_lock，drain 原子关闭后续准入并报告已有请求状态。受认证的 /admin/drain 接入该逻辑；PowerShell 先 drain，有活动请求则拒绝终止，无活动请求才停止已核对 PID/创建时间的进程。直接测试覆盖已有请求不被扰动、释放后仍不能重新准入。"
+    },
+    {
+      "id": "027-INCREMENTAL-R1-05",
+      "status": "CLOSED",
+      "evidence": "移除整段唯一目录主体的通用回填。跨分句继承限制为明确枚举的“不制冷/出风或送风”续句形式，并核对相邻前句主体；烧焦变色等危险标签不适用该回退。新增“插座没有发黑，电表发黑”负测，保存的 Q03 正例及危险、冲突、跨对象拒绝断言保留。"
+    }
+  ],
+  "verified_conditions": [
+    "本轮五个指定关键文件的实际 SHA-256 均与送审值一致。",
+    "上一轮已关闭的当前否定/猜测误作历史冗余问题仍保持修复，没有重开。",
+    "未知 evidence ID、来源不匹配仍直接拒绝；原始模型输出与被忽略 observation 的原因仍保留。",
+    "RAG 与工单 LLM 的独立配置和默认 inherit 兼容路径保留；本轮没有自动切换工单 Provider。",
+    "rag_only 协议限制、UNKNOWN 阻断、既有调用上限与资源保护未被本次修复删除。",
+    "保存的生命周期摘要绑定当前适配器源码哈希，记录 start/health/drain/stop/restart/status、ledger=0；其结论明确为无推理预检。",
+    "未发现需要阻止本次限定源码交付的新 CURRENT_TASK_BLOCKER。"
+  ],
+  "tests_evidence": {
+    "verification_method": "只读取主实施会话保存的结果摘要和相关测试源码；审查者未执行测试，也未独立见证运行过程。",
+    "focused": {
+      "reported_result": "112 passed, 3 warnings",
+      "source": "D:/property-ai/reports/real-ai-integration-027/diagnostic-r3-27b/q03-offline-fix.json"
+    },
+    "pure_unit": {
+      "reported_result": "1155 passed, 3 warnings",
+      "reported_duration_seconds": 13.82,
+      "source": "D:/property-ai/reports/real-ai-integration-027/diagnostic-r3-27b/q03-offline-fix.json"
+    },
+    "lifecycle": {
+      "reported_result": "无推理生命周期检查通过，调用账本为 0",
+      "source": "D:/property-ai/reports/real-ai-integration-027/diagnostic-r3-27b/delivery-rag-runtime-preflight.json",
+      "boundary": "不证明真实模型推理、知识问答质量或并发运行压力表现。"
+    },
+    "evidence_hashes": {
+      "q03-offline-fix.json": "5646ECFCAF04799F996C5D0D0705C6A475C6A7D8A288331409EFF1B6E030E060",
+      "delivery-rag-runtime-preflight.json": "0728F2FE7B41148A87829451347BBB08469192D714E447FBD1E0BF5D11990E7D"
+    }
+  },
+  "unverified": [
+    "本审查没有修改文件、运行测试、模型、页面或业务请求，没有操作数据库、队列或进程，也没有创建其他审查者。",
+    "未重新运行固定模型集；Q03 软件修复不追认原模型失败为通过。",
+    "未进行本轮真实 embedding、reranking、Qwen、ASR 或知识问答验证。",
+    "未创建或修改 1024 维集合，未验证真实 AUTO，未获得 27B 模型质量证据。",
+    "瞬时资源样本不能作为之后模型请求的持续准入证明；下载前资源阻断与模型质量结论仍须分开。",
+    "整体 REAL-AI-INTEGRATION-027、真实 AUTO 与 Production 仍未完整通过。"
+  ],
+  "next_action": "保存本次原始审查结果并绑定上述源码哈希；更新四项 finding 为 CLOSED，按准确路径保存本轮修复。后续真实 RAG 或模型验证须继续遵守既有授权、预算和实时资源守卫，本次 PASS 不新增调用、下载、业务切换或发布授权。"
+}

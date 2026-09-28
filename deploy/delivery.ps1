@@ -1,6 +1,6 @@
 param(
     [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateSet("config", "init", "up", "stop", "status", "backup", "restore-check", "diagnose")]
+    [ValidateSet("config", "init", "up", "stop", "status", "backup", "restore-check", "diagnose", "rag-start", "rag-stop", "rag-status")]
     [string]$Action,
     [Parameter(Position = 1)]
     [string]$Argument,
@@ -14,12 +14,17 @@ $ComposeFile = Join-Path $DeployDir "docker-compose.delivery.yml"
 $EnvFile = Join-Path $DeployDir ".env.delivery"
 $BootstrapEnvFile = Join-Path $DeployDir ".env.delivery.bootstrap"
 $BackupDir = Join-Path $DeployDir "backups"
+$RagRuntime = Join-Path $DeployDir "rag-runtime.ps1"
+$RagTokenPath = Join-Path (Split-Path -Parent $DeployDir) "tmp\delivery-rag-runtime\internal-token.txt"
 
 if (-not (Test-Path -LiteralPath $EnvFile) -or -not (Test-Path -LiteralPath $BootstrapEnvFile)) {
     throw "Missing delivery env files; copy both examples and replace every placeholder."
 }
 
 function Invoke-Compose {
+    if (Test-Path -LiteralPath $RagTokenPath -PathType Leaf) {
+        $env:DELIVERY_RAG_INTERNAL_TOKEN = (Get-Content -Raw -LiteralPath $RagTokenPath).Trim()
+    }
     & docker compose --env-file $EnvFile -f $ComposeFile @args
     if ($LASTEXITCODE -ne 0) { throw "docker compose failed ($LASTEXITCODE)" }
 }
@@ -77,6 +82,18 @@ function Read-BackupManifest([string]$DumpPath, [string]$Database) {
 }
 
 switch ($Action) {
+    "rag-start" {
+        & $RagRuntime start
+        if ($LASTEXITCODE -ne 0) { throw "delivery RAG start failed ($LASTEXITCODE)" }
+    }
+    "rag-stop" {
+        & $RagRuntime stop
+        if ($LASTEXITCODE -ne 0) { throw "delivery RAG stop failed ($LASTEXITCODE)" }
+    }
+    "rag-status" {
+        & $RagRuntime status
+        if ($LASTEXITCODE -ne 0) { throw "delivery RAG status failed ($LASTEXITCODE)" }
+    }
     "config" {
         Assert-NoPlaceholders
         Write-Output "delivery configuration is syntactically valid"

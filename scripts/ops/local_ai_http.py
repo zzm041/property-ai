@@ -33,7 +33,7 @@ from app.domain.observed_event import work_order_analysis_response_format
 from app.domain.vision import VISION_ANALYSIS_PROMPT_VERSION,vision_analysis_response_format
 
 QWEN_CANDIDATES={
-    'qwen3.5:4b':('2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd','0.34.2'),
+    'qwen3.5:4b':('2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd','0.34.3'),
     'qwen3.5:9b':('6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7','0.34.3'),
 }
 QWEN_MODEL=os.environ.get('PROPERTY_AI_LOCAL_QWEN_MODEL','qwen3.5:4b')
@@ -107,7 +107,7 @@ def validate(kind,value):
             if not isinstance(image_url,str) or not image_url.startswith('data:image/') or ';base64,' not in image_url:raise ValueError('VLM_INPUT')
         elif not isinstance(content,str) or not 0<len(content)<=10000:raise ValueError('QWEN_INPUT')
 
-def decode(path,content_type,body,prompt_version):
+def decode(path,content_type,body,prompt_version,scope='all'):
     if path=='/v1/audio/transcriptions':
         if not content_type.startswith('multipart/form-data;'):raise ValueError('MULTIPART_REQUIRED')
         msg=BytesParser(policy=policy.default).parsebytes(('Content-Type: '+content_type+'\r\nMIME-Version: 1.0\r\n\r\n').encode()+body)
@@ -126,6 +126,8 @@ def decode(path,content_type,body,prompt_version):
             if set(obj)!={'model','query','documents'} or obj['model']!=MODELS['reranker']:raise ValueError('MODEL_OR_FIELDS')
             kind='reranker';value={k:obj[k] for k in ('query','documents')}
         elif path=='/v1/chat/completions':
+            if scope=='rag_only' and prompt_version!='rag-answer-v2':
+                raise ValueError('RAG_ONLY_NO_AUTO_AUTHORIZATION')
             expected_format=(
                 {'type':'json_object'} if prompt_version=='rag-answer-v2'
                 else WORK_ORDER_RESPONSE_FORMAT if prompt_version==WORK_ORDER_PROMPT_VERSION
@@ -161,9 +163,21 @@ class Runner:
         self.path=Path(config_path).resolve();self.config=json.loads(self.path.read_text(encoding='utf-8'))
         self.private=Path(self.config['private']);self.private.mkdir(parents=True,exist_ok=True)
         self.lock=threading.Lock()
+        self.state_lock=threading.Lock()
+        self.accepting_requests=True
         # The launcher records and verifies pinned source/weights; runtime config
         # cannot widen invocation caps or choose arbitrary upstream endpoints.
         if self.config['host']!='127.0.0.1' or self.config['port']!=11436:raise ValueError('LOOPBACK_ONLY')
+        self.scope=self.config.get('scope','all')
+        if self.scope not in {'all','rag_only'}:raise ValueError('INVALID_SCOPE')
+        self.limits=self.config.get('limits',LIMITS)
+        if set(self.limits)!=set(LIMITS) or any(
+            not isinstance(self.limits[k],int) or not 0<self.limits[k]<=LIMITS[k]
+            for k in LIMITS
+        ):raise ValueError('INVALID_LIMITS')
+        self.duration_seconds=self.config.get('duration_seconds',1800)
+        if not isinstance(self.duration_seconds,int) or not 0<self.duration_seconds<=7200:
+            raise ValueError('INVALID_DURATION')
         self.continuation=self.config.get('continuation')
         if self.continuation:
             c=self.continuation
@@ -171,6 +185,17 @@ class Runner:
             if c.get('base_count')!=29 or not 0<c.get('duration_seconds',0)<=900:raise ValueError('CONTINUATION_LIMIT')
             if set(c.get('limits',{}))!=set(CONTINUATION_MAX) or any(not 0<c['limits'][k]<=CONTINUATION_MAX[k] for k in CONTINUATION_MAX):raise ValueError('CONTINUATION_LIMIT')
             if c.get('asr_start_ram_mib')!=11264:raise ValueError('ASR_ADMISSION_LIMIT')
+    def acquire_request(self):
+        with self.state_lock:
+            if not self.accepting_requests:return False
+            return self.lock.acquire(blocking=False)
+    def begin_drain(self):
+        with self.state_lock:
+            self.accepting_requests=False
+            return self.lock.locked()
+    def admission(self):
+        with self.state_lock:
+            return {'accepting_requests':self.accepting_requests,'request_active':self.lock.locked()}
     @staticmethod
     def _sha(path):
         return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -231,11 +256,11 @@ class Runner:
             if sum(r['kind']==kind for r in new)>=self.continuation['limits'][kind]:raise RuntimeError('R2_CALL_LIMIT')
             metadata={'window':'r2-continuation-01','window_start_unix':start,'incremental_max_calls':self.continuation['limits'][kind],'replay_of':replay_of}
         else:
-            if records and now-records[0]['unix']>=1800:raise RuntimeError('R2_WINDOW_EXHAUSTED')
-            if sum(r['kind']==kind for r in records)>=LIMITS[kind]:raise RuntimeError('R2_CALL_LIMIT')
-            deadline=(records[0]['unix'] if records else now)+1800;metadata={}
+            if records and now-records[0]['unix']>=self.duration_seconds:raise RuntimeError('R2_WINDOW_EXHAUSTED')
+            if sum(r['kind']==kind for r in records)>=self.limits[kind]:raise RuntimeError('R2_CALL_LIMIT')
+            deadline=(records[0]['unix'] if records else now)+self.duration_seconds;metadata={}
         folder=self.private/f'call-{len(records)+1:03d}';folder.mkdir()
-        save(folder/'reservation.json',{'kind':kind,'unix':now,'utc':stamp(),'model':MODELS[kind],'max_calls':LIMITS[kind],'input_hash':input_hash,**metadata})
+        save(folder/'reservation.json',{'kind':kind,'unix':now,'utc':stamp(),'model':MODELS[kind],'max_calls':self.limits[kind],'input_hash':input_hash,**metadata})
         return folder,deadline
     def run(self,kind,value):
         validate(kind,value)
@@ -322,18 +347,23 @@ def serve(config_path):
         def do_GET(self):
             if not self.authorized():return self.reply(401,{'error':'AUTH_REQUIRED'})
             if self.path!='/healthz':return self.reply(404,{'error':'NOT_FOUND'})
-            return self.reply(200,{'status':'ready','inference':False,'scope':'R2_ONLY','models':MODELS,'reservation_gate':runner.gate()})
+            return self.reply(200,{'status':'ready','inference':False,'scope':runner.scope,'models':MODELS,'reservation_gate':runner.gate(),**runner.admission()})
         def do_POST(self):
             if not self.authorized():return self.reply(401,{'error':'AUTH_REQUIRED'})
+            if self.path=='/admin/drain':
+                if self.headers.get('Transfer-Encoding') or self.headers.get('Content-Length')!='0':
+                    return self.reply(400,{'error':'EMPTY_BODY_REQUIRED'})
+                active=runner.begin_drain()
+                return self.reply(200,{'accepting_requests':False,'request_active':active})
             if self.headers.get('Transfer-Encoding') or len(self.headers.get_all('Content-Length',[]))!=1:return self.reply(400,{'error':'CONTENT_LENGTH_REQUIRED'})
             try:
                 size=int(self.headers['Content-Length'])
                 if not 0<size<=MAX_BODY:return self.reply(413,{'error':'BODY_LIMIT'})
                 body=self.rfile.read(size)
                 if len(body)!=size:raise ValueError('INCOMPLETE_BODY')
-                kind,value=decode(self.path,self.headers.get('Content-Type',''),body,self.headers.get('X-Prompt-Version',''))
+                kind,value=decode(self.path,self.headers.get('Content-Type',''),body,self.headers.get('X-Prompt-Version',''),runner.scope)
             except (ValueError,TypeError,KeyError,UnicodeError):return self.reply(422,{'error':'INVALID_REQUEST'})
-            if not runner.lock.acquire(blocking=False):return self.reply(503,{'error':'SERIAL_MODEL_BUSY_NO_RETRY'})
+            if not runner.acquire_request():return self.reply(503,{'error':'MODEL_DRAINING_OR_BUSY_NO_RETRY'})
             try:return self.reply(200,runner.run(kind,value))
             except Exception:return self.reply(503,{'error':'MODEL_GUARD_OR_REQUEST_FAILED_NO_RETRY'})
             finally:runner.lock.release()

@@ -1,0 +1,53 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "checked_at": "2026-09-28T13:58:36.4153536+08:00",
+  "base_sha": "018107d0bbd523b4bb930a0752a20a8a44a67352",
+  "candidate": {
+    "source": "official Ollama library",
+    "tag": "qwen3.5:27b-q4_K_M",
+    "manifest_digest_prefix": "7653528ba5cb",
+    "reported_size": "17GB",
+    "quantization": "Q4_K_M",
+    "parameter_size": "27.8B",
+    "capabilities": [
+      "text",
+      "image"
+    ],
+    "license": "Apache License 2.0",
+    "references": [
+      "https://registry.ollama.com/library/qwen3.5%3A27b-q4_K_M",
+      "https://registry.ollama.com/library/qwen3.5/tags"
+    ]
+  },
+  "local_runtime": {
+    "ollama_version": "0.34.3",
+    "isolated_endpoint": "127.0.0.1:11435",
+    "loaded_models": [],
+    "gpu": {
+      "total_mib": 16303,
+      "used_mib": 6145,
+      "free_mib": 9851,
+      "required_free_floor_during_run_mib": 2000
+    },
+    "ram": {
+      "total_mib": 32103,
+      "available_mib": 8206,
+      "required_free_floor_during_run_mib": 4500
+    },
+    "disk": {
+      "drive": "D:",
+      "free_bytes": 58546741248,
+      "free_gib": 54.526,
+      "required_before_download_gib": 30
+    }
+  },
+  "decision": {
+    "status": "RESOURCE_BLOCKED_BEFORE_DOWNLOAD",
+    "reason": "The 17GB quantized weights cannot fit in the currently usable GPU memory while preserving the 2000MiB VRAM floor. The required CPU spill is about 9GiB before KV, image, and runtime overhead, while only about 3.6GiB of the current 8206MiB available RAM may be consumed without crossing the 4500MiB floor.",
+    "download_started": false,
+    "model_calls": 0,
+    "unrelated_applications_stopped": false,
+    "protection_thresholds_changed": false,
+    "next_safe_condition": "Recheck only after unrelated system usage changes and both the pre-load and in-run resource guards can be met; do not download first."
+  }
+}
