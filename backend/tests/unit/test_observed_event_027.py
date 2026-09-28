@@ -168,6 +168,7 @@ def test_invalid_redundant_informational_observation_does_not_reject_core_fault(
         "source": "report",
         "quote": report,
         "reason": "Subject not supported by the selected evidence",
+        "reason_code": "subject_unsupported",
         "span": [0, len(report)],
         "disposition": "NOT_TRUSTED_REDUNDANT_OBSERVATION",
         "ignored_reason": "informational observation is not needed for the accepted current fault",
@@ -363,6 +364,57 @@ def test_subject_must_be_supported_by_selected_server_evidence():
     value = payload("外壳已经发黑", label="烧焦变色", subject="插座")
     with pytest.raises(ValueError, match="Subject not supported"):
         bind(value, report=value["summary"])
+
+
+def test_supported_faults_keep_risk_while_overattached_subject_is_reduced_explicitly():
+    text = "插座正在连续冒火花，塑料外壳已经发黑，还有明显焦味。"
+    value = payload(text, label="火花烧损", subject="插座")
+    value.update(category="electrical", required_skill="maintenance", risk="electric",
+                 severity="high", priority="p1")
+    value["observations"].extend([
+        {"label": "烧焦变色", "subject": "插座", "evidence_id": "report:1"},
+        {"label": "焦煳气味", "subject": "插座", "evidence_id": "report:1"},
+    ])
+
+    _, trace = bind(value, report=text)
+
+    assert [(row["label"], row["subject"]) for row in trace["effective_observations"]] == [
+        ("火花烧损", "插座"),
+        ("烧焦变色", "未确定"),
+        ("焦煳气味", "未确定"),
+    ]
+    assert len(trace["adjusted_observations"]) == 2
+    assert {row["raw_subject"] for row in trace["adjusted_observations"]} == {"插座"}
+    assert trace["raw_model_output"] == value
+
+
+def test_subject_reduction_does_not_accept_a_standalone_cross_object_claim():
+    text = "插座没有发黑，电表发黑。"
+    value = payload(text, label="烧焦变色", subject="插座")
+    value.update(category="electrical", required_skill="maintenance", risk="electric")
+    with pytest.raises(ValueError, match="Subject not supported"):
+        bind(value, report=text)
+
+
+def test_saved_qwen38_candidate3_danger_keeps_raw_subject_error_and_effective_risk():
+    row = saved_case(
+        "reports/real-ai-integration-027/diagnostic-r3-27b/candidate-03/screen.json",
+        "GOLD-007",
+    )
+    service = AnalysisService.__new__(AnalysisService)
+    service._settings = Settings(_env_file=None, llm_provider="production")
+
+    mapped, error = service._validate_payload(
+        row["raw_payload"], evidence_catalog=catalog(report=row["input"]["report"]),
+    )
+
+    assert error is None and mapped is not None
+    assert mapped.risk.value == "electric"
+    assert [item["subject"] for item in mapped.event_trace["adjusted_observations"]] == [
+        "未确定", "未确定",
+    ]
+    assert all(item["raw_subject"] == "插座" for item in mapped.event_trace["adjusted_observations"])
+    assert mapped.event_trace["raw_model_output"] == row["raw_payload"]
 
 
 @pytest.mark.parametrize(("text", "label", "subject"), [

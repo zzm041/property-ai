@@ -1,0 +1,43 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "phase": "qwen38-27b-q3km-g55-bound-no-inference",
+  "bound_at_utc": "2026-09-28T16:23:08.0976454Z",
+  "launched_at_utc": "2026-09-28T13:08:12.8407578Z",
+  "runtime_parent": {
+    "path": "reports/real-ai-integration-027/qwen38-27b-q3km-runtime.json",
+    "sha256": "3a805e0f94485e7d29ac84ddbdd6e0eb1e3062a239ff7cba161e78e5abbc8227"
+  },
+  "pid": 35828,
+  "executable": "C:/Users/lmj/AppData/Local/Programs/Ollama/ollama.exe",
+  "executable_sha256": "F282BAB3CB8ECE9F1843811C08E54FEC449557EFADC49EE0F9AF07F1B93407FC",
+  "host": "127.0.0.1:11435",
+  "models": "D:/property-ai/tmp/selfhost-ai-local/models",
+  "ollama_version": "0.34.3",
+  "no_cloud": true,
+  "max_loaded_models": 1,
+  "concurrency": 1,
+  "context_length": 4096,
+  "keep_alive": "30s",
+  "gpu_reserved_bytes": 5368709120,
+  "model": "qwen38-27b-q3km-g55:7af3b8f",
+  "manifest_sha256": "EB18A122286F7A67D36DC8129F9CAA1C0F7BB8449D7669A79E3ECB3D81289E0C",
+  "num_gpu_layers": 55,
+  "model_blob_sha256": "FA09D2FBE7D10FE6D91D3E647BD5A2782EC028C2ACD9588DD73C9757F82D9631",
+  "vision_projector_sha256": "9793AB158AEFDCE41D531D37A5458287DCDFC2D10585F4AF106802810DFC2618",
+  "vision_projector_bound": true,
+  "resident_models_at_binding": 0,
+  "inference_during_binding": false,
+  "resource_admission_observation": {
+    "observed_at_utc": "2026-09-28T16:22:56Z",
+    "ram_free_mib": 11432,
+    "gpu_used_mib": 1489,
+    "gpu_free_mib": 14507,
+    "gpu_utilization_percent": 24,
+    "ram_floor_mib": 4500,
+    "gpu_floor_mib": 2000,
+    "decision": "ELIGIBLE_FOR_G55_SCREEN_NOT_A_RUNTIME_PASS"
+  },
+  "business_runtime_changed": false,
+  "api_worker_beat_changed": false,
+  "status": "RESOURCE_ADJUSTED_BOUND_NO_INFERENCE"
+}

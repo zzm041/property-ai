@@ -147,12 +147,20 @@ def test_reviewed_unknown_resolution_rejects_semantic_or_receipt_drift(tmp_path,
 
 def test_qwen38_screen_starts_with_real_image_and_is_one_frozen_replacement_candidate():
     screen=helpers['QWEN38_SCREEN_IDS']
-    assert len(screen)==8 and screen[0]=='PHOTO-002'
+    assert len(screen)==8 and screen[:2]==('GOLD-007','GOLD-008')
     assert sum(case_id.startswith('PHOTO-') for case_id in screen)==2
     source=Path(helpers['__file__']).read_text(encoding='utf-8')
-    assert "if qwen38:assert args.candidate==2" in source
-    assert "QWEN38_MODEL='qwen38-27b-q3km-g52:7af3b8f'" in source
-    assert "if bounded_candidate and args.phase=='fixed' and args.candidate==1:" in source
+    assert "if qwen38:assert args.candidate in {2,3,4}" in source
+    assert "QWEN38_MODEL='qwen38-27b-q3km-g55:7af3b8f'" in source
+    assert "if bounded_candidate and args.phase=='fixed' and (args.candidate==1 or (qwen38 and args.candidate>=3)):" in source
+
+def test_qwen38_budget_and_candidate3_novel_set_are_frozen():
+    source=Path(helpers['__file__']).read_text(encoding='utf-8')
+    assert 'TWENTY_SEVEN_B_TOTAL_CALL_LIMIT=120' in source
+    assert "if qwen38 and args.candidate>=3" in source
+    novel=Path(helpers['__file__']).parents[3]/'reports'/'real-ai-integration-027'/'qwen38-v12-novel-set.json'
+    payload=json.loads(novel.read_text(encoding='utf-8'))
+    assert payload['frozen_before_first_inference'] is True and len(payload['cases'])==4
 
 def test_delivery_ollama_runtime_reserves_qwen38_resource_headroom():
     source=(Path(helpers['__file__']).parents[3]/'deploy'/'ollama-runtime.ps1').read_text(encoding='utf-8-sig')

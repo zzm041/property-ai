@@ -307,6 +307,7 @@ def bind_observations(
                     quote, selected_clause_start, prefix or match.group(0), item.subject,
                 )
                 if clause_subjects or not (explicit_continuation or unique_subject_continuation):
+                    rejection_kind = "subject_unsupported"
                     raise ValueError("Subject not supported by the selected evidence")
         except ValueError as exc:
             rejected.append({
@@ -327,6 +328,49 @@ def bind_observations(
             "effective": item.label not in _INFORMATIONAL_LABELS,
             **({"span": evidence["span"]} if "span" in evidence else {}),
         })
+    # A model may correctly extract several current phenomena from one server
+    # evidence segment yet over-attach the one explicit component to every
+    # phenomenon.  Keep the raw output, and only reduce that unsupported
+    # subject certainty when the same evidence independently contains an
+    # accepted current observation for the claimed component.  This preserves
+    # the phenomenon and risk without treating an unknown subject as a
+    # cross-object wildcard.  Standalone or competing-subject mismatches still
+    # fail closed below.
+    adjusted = []
+    still_rejected = []
+    for row in rejected:
+        can_reduce_subject = (
+            row.get("reason_code") == "subject_unsupported"
+            and row["label"] not in _INFORMATIONAL_LABELS
+            and any(
+                accepted["effective"]
+                and accepted["evidence_id"] == row["evidence_id"]
+                and accepted["subject"] == row["subject"]
+                for accepted in normalized
+            )
+        )
+        if not can_reduce_subject:
+            still_rejected.append(row)
+            continue
+        accepted = {
+            "label": row["label"],
+            "subject": "未确定",
+            "evidence_id": row["evidence_id"],
+            "source": row["source"],
+            "quote": row["quote"],
+            "effective": True,
+            **({"span": row["span"]} if "span" in row else {}),
+        }
+        normalized.append(accepted)
+        adjusted.append({
+            **accepted,
+            "raw_subject": row["subject"],
+            "disposition": "SUBJECT_CERTAINTY_REDUCED",
+            "adjustment_reason": (
+                "the phenomenon is supported, but its clause does not support the model-selected subject"
+            ),
+        })
+    rejected = still_rejected
     effective = [row for row in normalized if row["effective"]]
     ignored = []
     effective_identities = {(row["label"], row["subject"]) for row in effective}
@@ -378,6 +422,7 @@ def bind_observations(
         "effective_observations": effective,
         "informational_observations": [row for row in normalized if not row["effective"]],
         "ignored_observations": ignored,
+        "adjusted_observations": adjusted,
         "effective_key": key,
         "raw_model_output": output.model_dump(mode="json"),
     }

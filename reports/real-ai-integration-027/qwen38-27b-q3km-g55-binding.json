@@ -1,0 +1,49 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "candidate": "qtum/Qwen3.8-27B-GGUF Q3_K_M",
+  "source_type": "community_quantization",
+  "repository": "qtum/Qwen3.8-27B-GGUF",
+  "revision": "7af3b8fef254c9246345e0aa6dfc5ea8b5c45f02",
+  "license": "apache-2.0",
+  "pipeline_tag": "image-text-to-text",
+  "model_file": {
+    "name": "Qwen3.8-27B-Q3_K_M.gguf",
+    "bytes": 14210448032,
+    "sha256": "fa09d2fbe7d10fe6d91d3e647bd5a2782ec028c2acd9588dd73c9757f82d9631"
+  },
+  "vision_projector": {
+    "name": "mmproj-Qwen3.8-27B-Q8_0.gguf",
+    "bytes": 629247136,
+    "sha256": "9793ab158aefdce41d531d37a5458287dcdfc2d10585f4af106802810dfc2618"
+  },
+  "total_runtime_asset_bytes": 14839695168,
+  "asset_limit_bytes": 21474836480,
+  "source_record": {
+    "path": "reports/real-ai-integration-027/qwen38-27b-q3km-candidate-source.json",
+    "sha256": "10ed2fd1125f67bf2b64e20bf30f87eb08f1d889c6d6e07c1f25201f71867be2"
+  },
+  "ollama_model": "qwen38-27b-q3km-g55:7af3b8f",
+  "ollama_manifest_digest": "eb18a122286f7a67d36dc8129f9caa1c0f7bb8449d7669a79e3ecb3d81289e0c",
+  "ollama_import": {
+    "version": "0.34.3",
+    "endpoint": "127.0.0.1:11435",
+    "manifest_path": "D:/property-ai/tmp/selfhost-ai-local/models/manifests/registry.ollama.ai/library/qwen38-27b-q3km-g55/7af3b8f",
+    "model_layer_media_type": "application/vnd.ollama.image.model",
+    "projector_layer_media_type": "application/vnd.ollama.image.projector",
+    "capabilities": ["tools", "thinking", "completion", "vision"],
+    "family": "qwen35",
+    "parameter_size": "26.9B",
+    "quantization": "Q3_K_M",
+    "context_parameter": 4096,
+    "temperature_parameter": 0,
+    "num_gpu_parameter": 55,
+    "parent_runtime_alias": "qwen38-27b-q3km-g52:7af3b8f",
+    "parent_runtime_manifest_digest": "cb8f818e5c95a3825d1febea2fbeee5a95216cb759c6793b439d0d074ba8db6b",
+    "runtime_adjustment_reason": "Candidate 3 completed its last vision response but observed 4314 MiB free RAM, below the unchanged 4500 MiB floor, while 3348 MiB GPU remained free. This alias reuses the exact verified model and projector layers and moves three additional layers to GPU; no model asset was downloaded or duplicated.",
+    "resident_models_before_and_after_import": 0,
+    "inference_performed": false
+  },
+  "created_at_utc": "2026-09-28T16:23:08.0976454Z",
+  "business_runtime_changed": false,
+  "inference_performed": false
+}
