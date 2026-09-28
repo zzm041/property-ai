@@ -1,5 +1,17 @@
 # Project handoff (latest facts only)
 
+## Current checkpoint — 9B v11 quality stop and hardened restore success (2026-09-28)
+
+Product/protocol commit: `5bb3f65`; immutable diagnostic/review/restore evidence commit: `8a96399` (continuing from `a8f50e86347df430f70823668337b5ab8486263f`). The fixed deadline remains **2026-09-29 22:36:10 Asia/Shanghai**.
+
+The work-order analysis contract now uses stable server-created evidence IDs for current resident text, ASR text and image observations. The server resolves each ID back to its original source text/span, retains raw model output separately, and binds label, negation/history/hearsay scope and subject to the same selected clause. The final scoped validator repair rejects standalone uncertainty such as `我怀疑，插座冒烟` and `可能，插座冒烟` without suppressing a separate directly observed current event. Direct contract tests passed **113**, affected regression passed **213**, and the current pure unit suite passed **1133**, each with the existing single warning. The independent incremental reviewer closed finding `9B-C3-OFFLINE-R1-01` as `PASS_SCOPED_FIX`; this is a validator result only.
+
+The unchanged official Ollama `qwen3.5:9b` candidate completed one new fixed set of 24 text plus 4 image cases and the four predeclared unseen text cases: **36/80 Qwen requests**, **66.942 model seconds**, zero UNKNOWN requests, sampled minimum RAM **6448 MiB** and free VRAM **3322 MiB**. Independent review remains **NOT_READY**. Preserved critical examples include unsupported burn/smoke facts in PHOTO-002 and NOVEL-004, conflicting hearsay promoted to current facts in GOLD-012, cross-object evidence in GOLD-008 and exaggerated flooding risk in NOVEL-001. No 8093 Provider switch, real-AI AUTO work order, ASR, Embedding or Reranker request followed. The running 8093 delivery candidate therefore remains the prior `7dd193b` Development-analysis version; real AUTO and delivery RAG are not claimed.
+
+The packaged restore path now has a successful hardened run, not only negative/static evidence. Backup `deploy/backups/property_ai_delivery_check-restore029-20260928T0400Z.sql` (150408 bytes, SHA-256 `618AEFD5FA2B86A875D16AE3E92712B49FC329E353029D393AF3DE2CA195D9A3`) was imported by a temporary target-only account into the exact new database `property_ai_delivery_check_restore_check_029`. Source and restore match revision 0014, 64 tables, 688 columns, 595 indexes, 116 foreign keys and the recorded representative counts. No temporary restore account remains; API/Worker never connected to the restore database. This closes the scoped local database restore success path only, not media-byte recovery, target-host disaster recovery or Production release.
+
+The 9B business switch is now a real blocker rather than an internal checkpoint: the final same-candidate quality set contains core fact/risk/source failures and the approved package forbids another candidate or added calls. Completing local real AUTO needs one new, explicit model-quality decision (for example a stronger local model/resource envelope or an authorized bounded next candidate). External trusted identity proof, real WeChat/SMS/device, target host/domain/TLS/storage and formal deployment/release remain separate Production blockers.
+
 ## Current checkpoint — delivery package and organization onboarding scoped PASS (2026-09-28)
 
 Product/deployment/evidence commit: `7dd193b50ae778ce51fea706a61dc45853dd75d9` (continuing from `40a224287978405860e5a96ae33e94ccf97c0de9`). The fixed deadline remains **2026-09-29 22:36:10 Asia/Shanghai**.
