@@ -3,10 +3,38 @@
   "checkpoint": "candidate05-resource-stop-fix",
   "recorded_utc": "2026-09-28T17:05:05.6623083Z",
   "model_inference_calls": 0,
-  "source_sha256": {
+  "round1_source_sha256": {
     "scripts/ops/local_ai_runtime_control.py": "785D2A2CCE4A9AC8D3F14F840CB6BBBEEB2227A31A7B89A9D54E440C6FE6A143",
     "scripts/ops/local_ai_http.py": "A7EBEA23E96BAC328A0841467AFCE08C7F0B770FE4690D9FCBA0F7DF6188984D",
     "reports/auth-identity-ai-001/local-qwen/run-quality28.py": "13643DAA33757CEC11824F853B16ABE644BE142335F886949967D7990ED0AC28"
+  },
+  "round2": {
+    "recorded_utc": "2026-09-28T17:10:36.4881420Z",
+    "source_sha256": {
+      "scripts/ops/local_ai_runtime_control.py": "39F70F5521E9F5A5E0F8C05392B9C5251E24B284B47B420CFB9863E0BFBEB477",
+      "scripts/ops/local_ai_http.py": "FE9FA6F03C5CB8F31D4D59D712CF934988148A34AFCD9A6DF5C1DB2D7F4D22F1",
+      "backend/tests/unit/test_local_ai_http_027.py": "BB17E463B4034642DACF4D4D953E44EAFA726E25B5796CEA1F323EE1DAE42F5F",
+      "backend/tests/unit/test_local_ai_runtime_control.py": "CA9D96D9A3BB8F38B293F197E6722065F59406462CECC46F5D7EEAEA03802C5A"
+    },
+    "focused_tests": "45 passed, 1 existing warning",
+    "model_inference_calls": 0,
+    "changes": [
+      "Capture the exact root plus observable descendant identities before taskkill and confirm every captured identity has exited.",
+      "Any non-zero taskkill result now fails closed; it is never promoted to a confirmed tree exit.",
+      "Verify the immutable runtime receipt and the 11435 listener owner when the work-order adapter starts and before every Qwen request, before reservation.",
+      "A Qwen child client failure or missing unique response now triggers the same receipt-bound remote stop path."
+    ],
+    "no_model_parent_child_stop_selftest": {
+      "listener": "127.0.0.1:11439",
+      "root_pid": 5660,
+      "captured_process_count": 4,
+      "captured_child_pid": 35836,
+      "taskkill_exit_code": 0,
+      "tree_exit_confirmed": true,
+      "listener_exit_confirmed": true,
+      "model_loaded": false,
+      "other_processes_touched": false
+    }
   },
   "focused_tests": {
     "files": [

@@ -28,7 +28,11 @@ sys.path.insert(0,str(Path(__file__).resolve().parent))
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'backend'))
 from local_ai_models import MODEL_DIRS,offline,load,infer
 from local_ai_process import RequestJob,join_request_job
-from local_ai_runtime_control import terminate_bound_runtime
+from local_ai_runtime_control import (
+    bound_runtime_identity,
+    loopback_listener_pid,
+    terminate_bound_runtime,
+)
 from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
 from app.domain.observed_event import work_order_analysis_response_format
 from app.domain.vision import VISION_ANALYSIS_PROMPT_VERSION,vision_analysis_response_format
@@ -196,6 +200,7 @@ class Runner:
             self.runtime_binding=json.loads(binding.read_text(encoding='utf-8'))
         if self.scope=='work_order_only' and self.runtime_binding is None:
             raise ValueError('WORK_ORDER_RUNTIME_BINDING_REQUIRED')
+        if self.scope=='work_order_only':self.verify_qwen_runtime_binding()
         if self.continuation:
             c=self.continuation
             if c.get('task_id')!='REAL-AI-INTEGRATION-027' or c.get('run_id')!='ai027-b439223fda':raise ValueError('CONTINUATION_SCOPE')
@@ -216,6 +221,12 @@ class Runner:
     @staticmethod
     def _sha(path):
         return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    def verify_qwen_runtime_binding(self):
+        if self.runtime_binding is None:raise RuntimeError('QWEN_RUNTIME_BINDING_REQUIRED')
+        identity=bound_runtime_identity(self.runtime_binding)
+        if loopback_listener_pid(11435)!=int(identity['pid']):
+            raise RuntimeError('QWEN_RUNTIME_LISTENER_IDENTITY_CHANGED')
+        return identity
     def _resolution(self,path,result):
         if not self.continuation:return None
         for spec in self.continuation.get('resolutions',[]):
@@ -281,7 +292,9 @@ class Runner:
         return folder,deadline
     def run(self,kind,value):
         validate(kind,value)
-        if kind=='qwen':qwen_guard()
+        if kind=='qwen':
+            if self.scope=='work_order_only':self.verify_qwen_runtime_binding()
+            qwen_guard()
         else:
             # Existing Qwen runtime unloads its own idle model after30s. Wait
             # serially, without a probe inference/retry or lowering the floor.
@@ -326,9 +339,20 @@ class Runner:
                     elif time.monotonic()-phase_start>(120 if phase=='load' else 60):reason=phase.upper()+'_TIMEOUT'
                     if reason:break
         finally:
+            if reason is None and p is not None and p.poll() is not None:
+                if p.returncode!=0:
+                    reason='REMOTE_CLIENT_FAILED'
+                elif kind=='qwen':
+                    observed=[]
+                    for line in stdout.read_text(encoding='utf-8').splitlines():
+                        try:observed.append(json.loads(line))
+                        except ValueError:pass
+                    if len([event for event in observed if 'result' in event])!=1:
+                        reason='REMOTE_RESPONSE_INVALID'
             if kind=='qwen' and reason in {
                 'RESOURCE_FLOOR','RESOURCE_OBSERVATION_FAILED','INFERENCE_TIMEOUT',
-                'LOAD_TIMEOUT','R2_WINDOW_EXHAUSTED',
+                'LOAD_TIMEOUT','R2_WINDOW_EXHAUSTED','REMOTE_CLIENT_FAILED',
+                'REMOTE_RESPONSE_INVALID','DESCENDANTS_REMAINED_AFTER_LAUNCHER_EXIT',
             }:
                 try:
                     if self.runtime_binding is None:

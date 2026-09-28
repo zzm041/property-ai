@@ -22,19 +22,30 @@ def test_termination_rejects_listener_owned_by_another_process(monkeypatch):
         m.terminate_bound_runtime(receipt)
 
 
-def test_nonzero_taskkill_is_accepted_only_after_independent_exit_confirmation(monkeypatch):
+def test_nonzero_taskkill_fails_closed_even_when_root_already_disappeared(monkeypatch):
     receipt={'pid':12,'executable':'C:/fixed/python.exe','launched_at_utc':'2026-09-29T00:00:00+00:00'}
-    identities=iter([{'pid':12},RuntimeError('gone')])
-    def identity(value):
-        result=next(identities)
-        if isinstance(result,Exception):raise result
-        return result
-    monkeypatch.setattr(m,'bound_runtime_identity',identity)
+    tree=[{'pid':12,'path':'C:/fixed/python.exe','started_utc':'2026-09-29T00:00:00+00:00'},
+        {'pid':13,'path':'C:/fixed/runner.exe','started_utc':'2026-09-29T00:00:01+00:00'}]
+    monkeypatch.setattr(m,'bound_runtime_identity',lambda value:tree[0])
+    monkeypatch.setattr(m,'bound_process_tree',lambda value:tree)
     monkeypatch.setattr(m,'loopback_listener_pid',lambda port:12)
     monkeypatch.setattr(m,'loopback_listener_closed',lambda port:True)
     monkeypatch.setattr(m.subprocess,'run',lambda *a,**k:SimpleNamespace(returncode=128))
-    result=m.terminate_bound_runtime(receipt)
-    assert result['taskkill_exit_race'] is True
-    assert result['stopped']=={
-        'pid':12,'tree_exit_confirmed':True,'listener_exit_confirmed':True,
-    }
+    with pytest.raises(RuntimeError,match='TREE_TERMINATION_FAILED'):
+        m.terminate_bound_runtime(receipt)
+
+
+def test_surviving_captured_descendant_fails_closed(monkeypatch):
+    receipt={'pid':12,'executable':'C:/fixed/python.exe','launched_at_utc':'2026-09-29T00:00:00+00:00'}
+    tree=[{'pid':12},{'pid':13}]
+    monkeypatch.setattr(m,'bound_runtime_identity',lambda value:tree[0])
+    monkeypatch.setattr(m,'bound_process_tree',lambda value:tree)
+    monkeypatch.setattr(m,'loopback_listener_pid',lambda port:12)
+    monkeypatch.setattr(m,'loopback_listener_closed',lambda port:True)
+    monkeypatch.setattr(m,'_same_process_is_alive',lambda identity:identity['pid']==13)
+    monkeypatch.setattr(m.subprocess,'run',lambda *a,**k:SimpleNamespace(returncode=0))
+    clock=[0]
+    monkeypatch.setattr(m.time,'monotonic',lambda:clock[0])
+    monkeypatch.setattr(m.time,'sleep',lambda seconds:clock.__setitem__(0,clock[0]+seconds))
+    with pytest.raises(RuntimeError,match='EXIT_UNCONFIRMED'):
+        m.terminate_bound_runtime(receipt)

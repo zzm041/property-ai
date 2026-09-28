@@ -1,0 +1,69 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-CANDIDATE05-RESOURCE-GATE",
+  "reviewed_sha": "27e97cf9038130d6d7724dbf5a6a5aebe436ffc3",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "verdict": "NEEDS_CHANGES",
+  "checked": [
+    "只读核对27e97cf相对d1f78b7的指定增量、直接测试源码、qwen38-resource-stop-evidence.json及原质量审查；未重审固定集语义。",
+    "三个实现文件实际SHA256与资源修复证据一致。",
+    "终止前检查PID、可执行路径、启动时间及127.0.0.1监听归属；未出现按进程名批量终止。",
+    "适配器运行采样已使用RAM 4500MiB和GPU 2000MiB底线；明确捕获资源观察失败。",
+    "父监控识别资源或阶段超时后，代码先尝试远端终止，再清理本地请求Job；未确认远端或本地退出时持久化UNKNOWN，后续预约被阻断。",
+    "work_order_only无绑定文件时拒绝初始化，并限制独立端口及RAG/向量接口。",
+    "42 passed、1 warning来自保存的实施方汇总；本审查未执行测试。保存的无模型自测支持单个哑监听进程被结束，但不包含后代进程退出验证。",
+    "原candidate05资源失败和已接受语义结论保持，不将本次自测写成模型运行成功。"
+  ],
+  "findings": [
+    {
+      "id": "C05-R1-01",
+      "status": "OPEN",
+      "severity": "HIGH",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/scripts/ops/local_ai_runtime_control.py:94-122",
+      "trigger": "taskkill返回非0，例如根进程在检查后先退出，但其模型runner后代仍存活；随后根PID与监听均消失。",
+      "impact": "当前代码没有检查后代，仍返回tree_exit_confirmed=true。适配器可据此将失败请求标为FAILED/CONTROLLED_STOP并允许后续预约，不能可靠保证模型执行及资源占用已经结束。",
+      "evidence": [
+        "实现只轮询bound_runtime_identity(runtime)和loopback_listener_closed，未记录或核对后代身份。",
+        "test_nonzero_taskkill_is_accepted_only_after_independent_exit_confirmation明确将returncode=128、根身份查询抛异常及监听消失判为树退出成功。",
+        "保存的selftest仅启动一个http.server进程，没有仍存活后代的反例。"
+      ],
+      "recommendation": "最小修正可先对非0终止结果失败关闭，不把根退出提升为树退出；若保留该竞态接受路径，必须增加可核对的后代所有权与全部退出证明。使用无模型父子哑进程验证，不重跑固定诊断集。"
+    },
+    {
+      "id": "C05-RESOURCE-R2-02",
+      "severity": "MEDIUM",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/scripts/ops/local_ai_http.py:190-201; Runner.run",
+      "trigger": "绑定收据内容hash正确，但绑定进程已退出或11435已由另一进程接管。",
+      "impact": "初始化只读取收据，没有验证实际PID/路径/启动时间/监听；请求前qwen_guard也只核对版本、模型和资源。因而可以向不受该收据控制的进程发起推理，直到需要终止时才发现无法控制它。",
+      "evidence": [
+        "bound_runtime_identity与监听归属检查只发生在terminate_bound_runtime中。",
+        "work_order_only初始化测试仅覆盖缺失绑定，未覆盖过期绑定或监听所有者变化。",
+        "Runner.run在qwen_guard之后直接预约并启动HTTP子进程，没有活动runtime身份校验。"
+      ],
+      "recommendation": "在work_order_only启动及每次模型预约前，核对收据必要字段和当前完整runtime身份；不匹配时在推理与预约前拒绝。补直接漂移负测。"
+    },
+    {
+      "id": "C05-RESOURCE-R2-03",
+      "severity": "MEDIUM",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/scripts/ops/local_ai_http.py:child; Runner.run finally",
+      "trigger": "child的direct timeout先于父监控赋值INFERENCE_TIMEOUT退出。",
+      "impact": "父循环可因p.poll()已结束而退出，reason仍为None，跳过远端终止。结果会正确标UNKNOWN并阻断后续，但正在远端运行的推理仍未被资源保护主动停止。",
+      "evidence": [
+        "子进程HTTP超时为60秒，父监控也在inference阶段超过60秒才赋INFERENCE_TIMEOUT，存在正常竞态。",
+        "远端终止仅在reason属于列举的资源或超时值时执行，不覆盖无完整结果的Qwen子进程异常退出。",
+        "新增模拟测试均通过低RAM触发reason，未覆盖子进程先超时退出。"
+      ],
+      "recommendation": "Qwen子进程异常退出且未取得可确认完整响应时，也进入收据绑定的远端终止流程；未确认则保持UNKNOWN。增加不运行模型的子进程超时模拟测试。"
+    }
+  ],
+  "residual_limits": [
+    "候选05语义门槛已满足的结论不变，本次未重新评判模型质量。",
+    "未运行模型、页面、业务、数据库、队列或测试，未修改文件。",
+    "单监听哑进程退出不能外推为实际Ollama runner树、GPU资源或8093 AUTO已验证。",
+    "实际业务启动的累计预算、固定截止、冻结源码加载与正常AUTO闭环仍需各自证据；本审查不新增调用授权。",
+    "真实AUTO及Production尚未通过，既有scoped真实RAG结论保持。"
+  ],
+  "next_action": "仅收口上述资源保护分支，补无模型直接测试与父子哑进程证据，再作窄复核。"
+}

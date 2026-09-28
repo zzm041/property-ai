@@ -212,6 +212,27 @@ def test_work_order_scope_requires_reviewed_runtime_binding(tmp_path):
         m.Runner(path)
 
 
+def test_work_order_scope_rejects_stale_runtime_before_start_or_reservation(tmp_path,monkeypatch):
+    evidence=tmp_path/'evidence';evidence.mkdir();binding=evidence/'runtime.json'
+    binding.write_text(json.dumps({'pid':42,'executable':'fixed','launched_at_utc':'fixed'}),encoding='utf-8')
+    config={'private':str(tmp_path/'run'),'host':'127.0.0.1','port':11437,
+        'scope':'work_order_only','evidence_root':str(evidence),
+        'runtime_binding_path':str(binding),
+        'runtime_binding_sha256':hashlib.sha256(binding.read_bytes()).hexdigest()}
+    path=tmp_path/'config.json';path.write_text(json.dumps(config),encoding='utf-8')
+    monkeypatch.setattr(m,'bound_runtime_identity',lambda value:{'pid':42})
+    monkeypatch.setattr(m,'loopback_listener_pid',lambda port:43)
+    with pytest.raises(RuntimeError,match='LISTENER_IDENTITY_CHANGED'):
+        m.Runner(path)
+    monkeypatch.setattr(m,'loopback_listener_pid',lambda port:42)
+    scoped=m.Runner(path)
+    monkeypatch.setattr(m,'bound_runtime_identity',lambda value:(_ for _ in ()).throw(RuntimeError('MODEL_RUNTIME_IDENTITY_CHANGED')))
+    monkeypatch.setattr(m,'validate',lambda *args:None)
+    with pytest.raises(RuntimeError,match='IDENTITY_CHANGED'):
+        scoped.run('qwen',{})
+    assert not list(scoped.private.glob('call-*'))
+
+
 def continuation_runner(tmp_path,valid_review=True):
     private=tmp_path/'run';evidence=tmp_path/'evidence';private.mkdir();evidence.mkdir()
     input_hash='same-synthetic-audio'
@@ -336,6 +357,29 @@ def test_resource_stop_confirms_job_or_persists_unknown(tmp_path,monkeypatch,kin
         assert saved['remote_completion']==('CONTROLLED_STOP' if remote_stops else 'UNKNOWN')
     if expected=='UNKNOWN':
         with pytest.raises(RuntimeError,match='COMPLETION_UNKNOWN'):m.Runner(r.path).reserve('reranker','different')
+
+
+def test_qwen_child_failure_stops_bound_remote_runtime(tmp_path,monkeypatch):
+    r=runner(tmp_path);r.runtime_binding={'pid':42,'executable':'fixed','launched_at_utc':'fixed'}
+    r.config['bge_python']='dummy-not-executed';stops=[]
+    class Job:
+        name='unit-request-job'
+        def active(self):return 0
+        def terminate_and_confirm(self):pass
+        def close(self):pass
+    class Proc:
+        pid=123;returncode=7
+        def __init__(self,*a,**kw):pass
+        def poll(self):return self.returncode
+        def wait(self,timeout):return self.returncode
+    monkeypatch.setattr(m,'RequestJob',Job);monkeypatch.setattr(m.subprocess,'Popen',Proc)
+    monkeypatch.setattr(m,'qwen_guard',lambda:None);monkeypatch.setattr(m,'validate',lambda *a:None)
+    monkeypatch.setattr(m,'terminate_bound_runtime',lambda *a,**k:stops.append(True) or {'stopped':{'tree_exit_confirmed':True,'listener_exit_confirmed':True}})
+    with pytest.raises(RuntimeError,match='REMOTE_CLIENT_FAILED'):
+        r.run('qwen',{})
+    saved=json.loads((r.private/'call-001/result.json').read_text(encoding='utf-8'))
+    assert stops==[True] and saved['status']=='FAILED'
+    assert saved['remote_completion']=='CONTROLLED_STOP'
 
 def test_real_provider_marks_prompt_and_rejects_truncation():
     seen=[]
