@@ -1,0 +1,78 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-DELIVERY-AUTO",
+  "run_id": "delivery-auto-702c3db745",
+  "captured_at": "2026-09-28T17:42:32Z",
+  "status": "READY_EXCEPT_WECHAT_IDE_CLIENT_AUTHORIZATION",
+  "git": {
+    "head": "8f838af53009c9f8c9904d9d8afc41e87773ba58",
+    "fixed_runtime_source": "168ae05e7f5b4bf9b5a72414f87ae6d44db95801"
+  },
+  "runtime": {
+    "environment": "8093/property-ai-delivery-check@0014",
+    "image": "property-ai-delivery:168ae05",
+    "api": "healthy",
+    "worker": "running",
+    "beat": "running",
+    "same_image": true,
+    "main_queue": {
+      "name": "property_ai.delivery_check",
+      "ready": 0,
+      "unacknowledged": 0,
+      "consumers": 1
+    },
+    "dlq": {
+      "name": "property_ai.delivery_check.dlq",
+      "ready": 1,
+      "unacknowledged": 0,
+      "consumers": 0,
+      "message_body_read": false,
+      "replayed_or_cleared": false
+    }
+  },
+  "work_ai": {
+    "endpoint": "http://127.0.0.1:11437",
+    "scope": "work_order_only",
+    "source_commit": "168ae05e7f5b4bf9b5a72414f87ae6d44db95801",
+    "model": "qwen38-27b-q3km-g55:7af3b8f",
+    "status": "ready",
+    "reservation_gate": "READY",
+    "accepting_requests": true,
+    "request_active": false,
+    "calls_for_this_run": 0,
+    "inference_on_start": false
+  },
+  "prepared_business_data": {
+    "fixture": "fixture-public.json",
+    "organizations": 2,
+    "properties": 2,
+    "employees": 3,
+    "residents": 5,
+    "work_orders": 0,
+    "direct_database_business_writes": false
+  },
+  "completed_non_ai_concurrency": {
+    "evidence": "light-concurrency.json",
+    "authenticated_sessions": 20,
+    "distinct_users": 10,
+    "duration_seconds": 60.521,
+    "completed_requests": 1200,
+    "errors": 0,
+    "throughput_rps": 19.828,
+    "p95_latency_ms": 221.942,
+    "cross_property_statuses": [403, 403],
+    "ai_requests": 0,
+    "boundary": "controlled local API read load, not 20 devices or production scale"
+  },
+  "remaining_gate": {
+    "operation": "authorize the Codex automation client in the existing WeChat Developer Tools session",
+    "reason": "The supported WeChat IDE automation interface requires an explicit client authorization. The authorization request was not approved, and no alternate or raw-protocol bypass was used.",
+    "work_orders_created": 0,
+    "model_requests_started": 0,
+    "real_auto_status": "NOT_EXECUTED"
+  },
+  "protected_files": {
+    "miniprogram/project.config.json": "untouched and excluded",
+    "backend/app/model/ai.py": "untouched and excluded",
+    "miniprogram/config/env.local.js": "ignored local runtime setting; not for commit"
+  }
+}

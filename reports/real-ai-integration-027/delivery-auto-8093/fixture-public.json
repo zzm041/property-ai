@@ -1,0 +1,73 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-DELIVERY-AUTO",
+  "run_id": "delivery-auto-702c3db745",
+  "status": "PREPARED",
+  "environment": "8093/property-ai-delivery-check@0014",
+  "objects": {
+    "organizations": [
+      {
+        "tenant_id": 5,
+        "property_id": 5,
+        "manager_user_id": 3,
+        "building_id": 1,
+        "unit_id": 1,
+        "house_ids": [
+          1,
+          2,
+          3
+        ],
+        "employee_ids": [
+          1,
+          2
+        ],
+        "resident_user_ids": [
+          6,
+          7,
+          8
+        ]
+      },
+      {
+        "tenant_id": 6,
+        "property_id": 6,
+        "manager_user_id": 9,
+        "building_id": 2,
+        "unit_id": 2,
+        "house_ids": [
+          4,
+          5
+        ],
+        "employee_ids": [
+          3
+        ],
+        "resident_user_ids": [
+          11,
+          12
+        ]
+      }
+    ],
+    "phone_sha256_16": {
+      "managerA": "A484B559FE9452A5",
+      "managerB": "6977017927DCE630",
+      "staffA1": "61E59A974B7AA086",
+      "staffA2": "3B890CAB6168AAEC",
+      "staffB1": "8212CD98C7B25E90",
+      "residentA1": "08E1BCFF51191237",
+      "residentA2": "5A99C377F7D69CDB",
+      "residentA3": "E7C1C10B3F61FE10",
+      "residentB1": "7F38756625E4554F",
+      "residentB2": "490866142EFE1B97"
+    }
+  },
+  "preparation": {
+    "normal_authenticated_sessions": true,
+    "organization_business_api": true,
+    "property_business_api": true,
+    "employee_invite_and_claim": true,
+    "resident_bind_and_approval": true,
+    "staff_checkin": true,
+    "direct_database_business_write": false,
+    "work_orders_created": 0,
+    "model_requests": 0
+  },
+  "redaction": "No phone, password, token, OTP, invite token, or resident text is stored here."
+}

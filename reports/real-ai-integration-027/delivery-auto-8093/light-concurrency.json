@@ -1,0 +1,33 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-DELIVERY-AUTO-CONCURRENCY",
+  "run_id": "delivery-auto-702c3db745",
+  "captured_at": "2026-09-28T17:40:05.432Z",
+  "environment": "8093/property-ai-delivery-check@0014",
+  "sessions": 20,
+  "distinct_users": 10,
+  "properties": [
+    5,
+    6
+  ],
+  "duration_seconds": 60.521,
+  "cycles": 60,
+  "completed_requests": 1200,
+  "errors": 0,
+  "throughput_rps": 19.828,
+  "latency_ms": {
+    "min": 11.859,
+    "p50": 187.489,
+    "p95": 221.942,
+    "max": 312.252
+  },
+  "cross_property": {
+    "manager_a_to_b_status": 403,
+    "manager_b_to_a_status": 403
+  },
+  "ai_requests": 0,
+  "boundaries": {
+    "page_clicks": 0,
+    "real_devices": 0,
+    "claimed_capacity": "20 authenticated local sessions at a controlled read rate; not 20 devices or production scale"
+  }
+}

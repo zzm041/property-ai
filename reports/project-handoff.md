@@ -1,5 +1,17 @@
 # Project handoff (latest facts only)
 
+## Current checkpoint — 8093 fixed runtime and bounded business fixture ready; page authorization required (2026-09-29)
+
+Current repository HEAD is `8f838af53009c9f8c9904d9d8afc41e87773ba58`; the fixed runtime source is `168ae05e7f5b4bf9b5a72414f87ae6d44db95801`. The fixed deadline remains **2026-09-29 22:36:10 Asia/Shanghai**. The 8093 API, Worker and Beat are running the same `property-ai-delivery:168ae05` image against `property_ai_delivery_check@0014`. The dedicated main queue has 0 ready / 0 unacknowledged / 1 consumer; the DLQ retains 1 historical message with no consumer and was not read, replayed or cleared.
+
+The bounded work-order adapter on loopback 11437 is `ready`, idle and accepting requests with reservation gate `READY`, source `168ae05`, scope `work_order_only`, and model `qwen38-27b-q3km-g55:7af3b8f`. Starting and checking it performed no inference. The preserved Qwen package history and old NOT_READY/raw results are unchanged; this checkpoint does not reinterpret them.
+
+New synthetic run `delivery-auto-702c3db745` prepared two isolated organizations/properties through authenticated business APIs: 3 maintenance employees claimed invitations and checked in, and 5 residents obtained approved house relations. Password authentication was established through the exact test-only authentication facility; the formal 8093 API remains staging and does not expose the test inbox. No work order or model request has been created. Public IDs and hashed-phone evidence are in `reports/real-ai-integration-027/delivery-auto-8093/fixture-public.json`; private synthetic credentials remain only in ignored local runtime state.
+
+The required non-AI concurrency baseline is complete: 20 authenticated sessions across 10 distinct users and two properties made 1,200 controlled reads over 60.521 seconds with 0 errors, 19.828 requests/second, p95 221.942 ms, and reciprocal cross-property manager access rejected with 403. It is API load evidence, not 20 devices or page clicks. The exact record is `reports/real-ai-integration-027/delivery-auto-8093/light-concurrency.json`.
+
+The remaining immediate gate is the supported WeChat Developer Tools client authorization. The existing IDE/automator was started, but the supported `wechatide` client requires explicit authorization for client `Codex`; that authorization request was not approved. No raw WebSocket or alternate protocol was used to bypass it. Therefore the page-created work orders, real model calls, real AUTO, the overlapping five-user image submissions, voice association and mixed-load result remain **NOT EXECUTED**, not failed or passed. Exact current runtime state is `reports/real-ai-integration-027/delivery-auto-8093/runtime-checkpoint.json`. The local ignored mini-program API setting targets 8093; `miniprogram/project.config.json`, `backend/app/model/ai.py` and unrelated WIP remain excluded.
+
 ## Current checkpoint — Qwen3.8 27B Q3_K_M fixed set completed; semantic gate NOT READY (2026-09-28)
 
 Current scoped source/evidence milestone is `485d7e7` (reviewed from base `dd920f99d5e3478877b7c0dc3ff703b042aca5e8` with hashes bound before commit). The fixed deadline remains **2026-09-29 22:36:10 Asia/Shanghai**. The accepted 8093 real-RAG result remains unchanged; work-order analysis on 8093 was **not** switched and no real-AUTO work order or concurrency business run was created.
