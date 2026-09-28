@@ -334,7 +334,7 @@ def main():
         sys.argv.remove('--supplement')
         runpy.run_path(str(OUT/'run-approved-supplement.py'), run_name='__main__')
         return
-    parser=argparse.ArgumentParser();parser.add_argument('--round',type=int,choices=range(4));parser.add_argument('--model',choices=('qwen3.5:4b','qwen3.5:9b',TWENTY_SEVEN_B_MODEL,QWEN38_MODEL),default='qwen3.5:4b');parser.add_argument('--phase',choices=('screen','fixed','novel'));parser.add_argument('--candidate',type=int,choices=(1,2,3,4));parser.add_argument('--resume-incomplete-screen',action='store_true');parser.add_argument('--resume-screen-collector-failure',action='store_true');parser.add_argument('--resume-resource-adjusted-screen',action='store_true');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--round',type=int,choices=range(4));parser.add_argument('--model',choices=('qwen3.5:4b','qwen3.5:9b',TWENTY_SEVEN_B_MODEL,QWEN38_MODEL),default='qwen3.5:4b');parser.add_argument('--phase',choices=('screen','fixed','novel'));parser.add_argument('--candidate',type=int,choices=(1,2,3,4,5));parser.add_argument('--resume-incomplete-screen',action='store_true');parser.add_argument('--resume-screen-collector-failure',action='store_true');parser.add_argument('--resume-resource-adjusted-screen',action='store_true');args=parser.parse_args()
     bounded_candidate=args.model!='qwen3.5:4b'
     twenty_seven_b=args.model==TWENTY_SEVEN_B_MODEL
     qwen38=args.model==QWEN38_MODEL
@@ -347,7 +347,7 @@ def main():
     else:
         assert args.round is None and args.phase is not None and args.candidate is not None,'Bounded candidate mode requires --phase and --candidate'
         if twenty_seven_b:assert args.candidate==1,'Retired Q4 27B has one historical candidate'
-        if qwen38:assert args.candidate in {2,3,4},'Qwen3.8 may only continue its bounded protocol candidates'
+        if qwen38:assert args.candidate in {2,3,4,5},'Qwen3.8 may only continue its bounded protocol candidates'
         assert args.candidate==1 or qwen38 or args.phase in {'fixed','novel'},'Later candidates cannot add another screen after the bounded repair'
         assert qwen38 or args.candidate!=3 or args.phase in {'fixed','novel'},'Delivery v11 candidate uses one complete fixed run and one novel run'
         assert sum((args.resume_incomplete_screen,args.resume_screen_collector_failure,args.resume_resource_adjusted_screen))<=1,'Only one bounded screen recovery is allowed'

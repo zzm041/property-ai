@@ -417,6 +417,48 @@ def test_saved_qwen38_candidate3_danger_keeps_raw_subject_error_and_effective_ri
     assert mapped.event_trace["raw_model_output"] == row["raw_payload"]
 
 
+def test_low_confidence_component_identification_reduces_subject_without_creating_fault():
+    vision = "图像中可见一个蓝色的阀门，带有手柄和法兰连接件。阀门表面有反光，未见足以确认故障的可见证据。"
+    value = payload(vision, label="现象待核实", subject="阀门管道", evidence_id="vision:1")
+    value.update(category="other", required_skill="other", confidence=.3)
+
+    _, trace = bind(value, vision=vision)
+
+    assert trace["effective_observations"] == []
+    assert trace["informational_observations"][0]["subject"] == "未确定"
+    assert trace["adjusted_observations"][0]["raw_subject"] == "阀门管道"
+    assert trace["raw_model_output"] == value
+
+
+def test_informational_subject_reduction_requires_low_confidence_clarification_contract():
+    vision = "图像中可见一个蓝色阀门。未见足以确认故障的可见证据。"
+    value = payload(vision, label="现象待核实", subject="阀门管道", evidence_id="vision:1")
+    for overrides in (
+        {"category": "other", "required_skill": "other", "confidence": .9},
+        {"category": "water_supply", "required_skill": "maintenance", "confidence": .3},
+    ):
+        with pytest.raises(ValueError, match="Subject not supported"):
+            bind({**value, **overrides}, vision=vision)
+
+
+def test_saved_qwen38_candidate4_normal_valve_is_valid_non_effective_clarification():
+    row = saved_case(
+        "reports/real-ai-integration-027/diagnostic-r3-27b/candidate-04/screen.json",
+        "PHOTO-004",
+    )
+    vision_result = row["stages"][0]["provider_result"][0]
+    service = AnalysisService.__new__(AnalysisService)
+    service._settings = Settings(_env_file=None, llm_provider="production")
+
+    mapped, error = service._validate_payload(
+        row["raw_payload"], evidence_catalog=catalog(report=row["input"].get("paired_report"), vision=vision_result),
+    )
+
+    assert error is None and mapped is not None and mapped.low_confidence
+    assert mapped.event_trace["effective_observations"] == []
+    assert mapped.event_trace["raw_model_output"] == row["raw_payload"]
+
+
 @pytest.mark.parametrize(("text", "label", "subject"), [
     ("插座刚才有一缕烟，现在没有了。", "现象待核实", "插座"),
     ("厨房进水软管裂开，水一直喷出。", "滴渗水", "阀门管道"),

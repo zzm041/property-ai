@@ -150,7 +150,7 @@ def test_qwen38_screen_starts_with_real_image_and_is_one_frozen_replacement_cand
     assert len(screen)==8 and screen[:2]==('GOLD-007','GOLD-008')
     assert sum(case_id.startswith('PHOTO-') for case_id in screen)==2
     source=Path(helpers['__file__']).read_text(encoding='utf-8')
-    assert "if qwen38:assert args.candidate in {2,3,4}" in source
+    assert "if qwen38:assert args.candidate in {2,3,4,5}" in source
     assert "QWEN38_MODEL='qwen38-27b-q3km-g55:7af3b8f'" in source
     assert "if bounded_candidate and args.phase=='fixed' and (args.candidate==1 or (qwen38 and args.candidate>=3)):" in source
 

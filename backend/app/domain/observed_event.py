@@ -339,14 +339,25 @@ def bind_observations(
     adjusted = []
     still_rejected = []
     for row in rejected:
+        informational_clarification = (
+            row["label"] in _INFORMATIONAL_LABELS
+            and output.category == "other"
+            and output.required_skill == "other"
+            and output.confidence < 0.7
+        )
         can_reduce_subject = (
             row.get("reason_code") == "subject_unsupported"
-            and row["label"] not in _INFORMATIONAL_LABELS
-            and any(
-                accepted["effective"]
-                and accepted["evidence_id"] == row["evidence_id"]
-                and accepted["subject"] == row["subject"]
-                for accepted in normalized
+            and (
+                informational_clarification
+                or (
+                    row["label"] not in _INFORMATIONAL_LABELS
+                    and any(
+                        accepted["effective"]
+                        and accepted["evidence_id"] == row["evidence_id"]
+                        and accepted["subject"] == row["subject"]
+                        for accepted in normalized
+                    )
+                )
             )
         )
         if not can_reduce_subject:
@@ -358,7 +369,7 @@ def bind_observations(
             "evidence_id": row["evidence_id"],
             "source": row["source"],
             "quote": row["quote"],
-            "effective": True,
+            "effective": row["label"] not in _INFORMATIONAL_LABELS,
             **({"span": row["span"]} if "span" in row else {}),
         }
         normalized.append(accepted)
