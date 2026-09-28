@@ -1,5 +1,15 @@
 # Project handoff (latest facts only)
 
+## Current checkpoint — delivery package and organization onboarding scoped PASS (2026-09-28)
+
+Product/deployment/evidence commit: `7dd193b50ae778ce51fea706a61dc45853dd75d9` (continuing from `40a224287978405860e5a96ae33e94ccf97c0de9`). The fixed deadline remains **2026-09-29 22:36:10 Asia/Shanghai**.
+
+The isolated `property-ai-delivery-check` package now proves an empty persistent database can be guardedly migrated through 0014, bootstrapped with a local SYSTEM_ADMIN, started with fixed Python/dependencies and digest-pinned infrastructure, stopped/restarted without losing data, and reached through the packaged Nginx/API/Worker/Beat stack. The current 8093 API, Worker and Beat use the same application image `sha256:512ac31d70e8b353639ebc16fdd539a215bc407036979737cf4687865ddf3317`; the database is at 0014 and the dedicated queue is `0 ready / 0 unacked / 1 consumer`. Backup creation, manifest/hash checking, non-overwrite behavior and same-name concurrent single-winner publication are verified. The hardened restricted-account restore importer has source/static negative evidence, but its successful import was not rerun because the preserved restore target already exists; the earlier successful isolated restore is separate historical evidence.
+
+`DELIVERY-ORGANIZATION-ONBOARDING-028` is **PASS_SCOPED_LOCAL_DELIVERY_RUNTIME_INDEPENDENT_REVIEW**. An actual WeChat Developer Tools page using a normal SYSTEM_ADMIN password session created tenant4/property4 and granted distinct normal user2 only the tenant4 TENANT_ADMIN scope in one transaction. User2 then used normal password re-login and saw only editable property4. SELECT-only readback binds the same tenant, property, role grant, one idempotency record and actor1 audit rows. The final page preserves the idempotency key across an unknown response for the same request and clears it only after confirmed success. Final focused tests are **18 passed, 1 warning**; final pure unit regression is **1134 passed, 1 warning**. Independent round2 review closed `028-R1-01` through `028-R1-04` and returned `PASS_SCOPED` in `reports/codex/DELIVERY-ORGANIZATION-ONBOARDING-028-round2.raw.json`.
+
+This is a real local Development deployment and organization-onboarding result, not full Production V1 acceptance. Work-order analysis in the delivery environment remains Development. The 9B candidate2 completed its fixed set (24 text + 4 image cases, 32 new requests), but independent review returned **NOT_READY** because 11/28 cases were mechanically rejected and retained critical negation, conflict/source and evidence-contract failures. No real-AI AUTO work order was run. Trusted identity proof, real WeChat/SMS/provider activation, native-device acceptance, production host/domain/TLS/storage, production backup/restore acceptance and formal deployment/release remain open.
+
 ## Current checkpoint — AUTH001 3317 / 0014 scoped runtime accepted (2026-09-28)
 
 Scoped product/runtime-support implementation commit: `e62f53c` (reviewed source baseline `4cc9fa0da8ceef128b742f923cc7a2d0a23a2382`).
