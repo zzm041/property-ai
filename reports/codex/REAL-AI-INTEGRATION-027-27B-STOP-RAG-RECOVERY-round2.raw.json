@@ -1,0 +1,53 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-27B-STOP-RAG-RECOVERY",
+  "review_round": 2,
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_sha": "6a3820a25705f31c06ca87bc996f2870e1636f96 + scoped WIP",
+  "verdict": "PASS_SCOPED_INCREMENTAL",
+  "source_hashes": {
+    "deploy/ollama-runtime.ps1": "00E27972F6BD86AF182E1936D0D09D4507A4B4FFA9D7AAFB8D5DF67EA34A3B83",
+    "deploy/delivery.ps1": "FCCFF9E841E214C0470B9C834EEAE5C0BB64C7B37B5FE1AD875DFA8821CC37DE",
+    "deploy/README.md": "BD0825134A97A03CDE6D3C6177B4769B6EE2724EC95A8511E66DB2B7765617A7"
+  },
+  "findings": [],
+  "finding_resolution": [
+    {
+      "id": "27B-RECOVERY-R1-01",
+      "status": "CLOSED_SCOPED",
+      "evidence": "停止分支在 11436 仍监听时拒绝执行，要求先使用既有 rag-stop 排空；随后要求零驻留模型，通过绑定身份校验后执行精确 taskkill /PID /T /F，要求命令成功、根进程消失和监听释放。失败分支不归档当前收据。",
+      "boundary": "关闭源码层面的直接缺口；成功停止及完整子进程回收路径尚未实际运行验证。"
+    },
+    {
+      "id": "27B-RECOVERY-R1-02",
+      "status": "CLOSED_SCOPED",
+      "evidence": "CreateNew/FileShare.None 锁覆盖启动检查至收据保存；只有持锁操作清理锁。当前收据使用 CreateNew 并 Flush(true)，不覆盖既有文件；GUID 日志路径避免覆盖旧日志。"
+    }
+  ],
+  "evidence_checked": {
+    "path": "D:/property-ai/reports/real-ai-integration-027/diagnostic-r3-27b/ollama-runtime-focused-evidence.json",
+    "sha256": "BA780FEEE5900B35A225D6409A5830B4EB76A16D7E777AB6FD7358CB203EA46C",
+    "reported_checks": [
+      "PowerShell 解析通过。",
+      "状态检查绑定 PID 44860、Ollama 0.34.3。",
+      "重复启动保持同一 PID，没有创建副本。",
+      "RAG 仍监听时停止退出码为 1，Ollama 与 RAG 监听均保留。",
+      "上述检查没有发送推理请求。"
+    ],
+    "reviewer_boundary": "实际读取源码、哈希及实施方保存的验证记录；未自行执行这些检查。"
+  },
+  "verified_boundaries": [
+    "送审三份源码及文档哈希一致。",
+    "27B 原 screen、预算账本和请求解决记录哈希均与 round1 相同；没有追加预约或改写 UNKNOWN。",
+    "原一次资源失败证据保留，27B 仍为 NOT_READY_RESOURCE_FLOOR，没有重试或有效质量结果。",
+    "既有真实 RAG 的 PASS_SCOPED_REAL_RAG 保留，不因本次无推理生命周期检查扩大验收范围。",
+    "真实 AUTO 未运行，Production 未通过。",
+    "没有发现本次定向修复引入的新当前任务阻塞。"
+  ],
+  "unverified": [
+    "成功停止、停止后新实例启动、实际并发启动和硬退出恢复未运行验证。",
+    "进程树真实回收与操作系统响应时延未在本轮实测。",
+    "未重跑 RAG、模型质量或业务流程。",
+    "审查者未运行测试、模型、页面、业务、进程、数据库或队列操作，未修改文件。"
+  ],
+  "next_action": "保存本轮审查及准确哈希，提交范围内修复和证据；保留成功停止路径的未验证标记。不得据此重试 27B、解除历史 UNKNOWN、切换真实 AUTO 或升级 Production 结论。"
+}

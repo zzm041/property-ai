@@ -74,9 +74,12 @@ Copy-Item deploy/.env.delivery.bootstrap.example deploy/.env.delivery.bootstrap
 ./deploy/delivery.ps1 status
 ./deploy/delivery.ps1 backup
 ./deploy/delivery.ps1 diagnose
+./deploy/delivery.ps1 ollama-start # 启动固定 loopback 11435 模型服务；健康检查不加载模型
+./deploy/delivery.ps1 ollama-status
 ./deploy/delivery.ps1 rag-start   # 只启动本机 RAG-only 适配器，健康检查不加载模型
 ./deploy/delivery.ps1 rag-status
 ./deploy/delivery.ps1 rag-stop    # 请求执行中会拒绝停止；保留模型、账本和私密令牌
+./deploy/delivery.ps1 ollama-stop  # 仅停止该入口记录的精确实例；保留权重和日志
 ./deploy/delivery.ps1 stop   # 保留全部具名卷
 ```
 
@@ -98,6 +101,10 @@ docker compose --env-file deploy/.env.delivery -f deploy/docker-compose.delivery
 
 知识问答与工单分析具有独立的模型发布门槛。`RAG_LLM_PROVIDER=inherit` 保持旧配置；只有知识问答已经通过而工单分析仍未达标时，可在私密配置中单独设置 `RAG_LLM_PROVIDER=production`、`RAG_LLM_BASE_URL`、`RAG_LLM_MODEL` 和 `RAG_LLM_API_KEY`，同时继续保持 `LLM_PROVIDER=development`。真实知识接线还必须成组设置 1024 维 bge-m3、真实 reranker、`MILVUS_METRIC_TYPE=COSINE`、`EMBEDDING_NORMALIZATION=l2` 以及全新的隔离集合名。该隔离不会授权真实工单 AUTO；两条能力必须分别验收。
 
-Windows 本地 RAG 适配器由 `delivery.ps1 rag-start|rag-status|rag-stop` 管理。它只绑定 loopback 11436，自动生成并保留 Git 忽略的内部令牌，使用追加式调用账本，并拒绝工单分析协议。Compose 通过 `host.docker.internal` 访问该端口；Linux 部署应由部署方把同名私密令牌注入 `DELIVERY_RAG_INTERNAL_TOKEN`，并把私有模型服务地址写入 `.env.delivery`，不得把令牌提交到 Git。
+Windows 本地 Ollama 服务由 `delivery.ps1 ollama-start|ollama-status|ollama-stop` 管理。它只绑定 loopback 11435，固定已审可执行文件哈希、项目模型目录、单模型单并发、no-cloud 和显存保留配置；启动与状态检查不执行推理。可用 `PROPERTY_AI_OLLAMA_EXE` 覆盖可执行文件位置，但文件哈希仍必须匹配。停止操作只接受当前收据绑定的 PID、启动时间、路径和监听归属，不按进程名批量停止。
+
+停止顺序固定为 `rag-stop` 后 `ollama-stop`：前者先拒绝新请求并确认没有活动请求，后者还要求模型已从显存卸载，再终止收据绑定的完整进程树。若 11436 仍在监听、模型仍驻留或任一退出状态无法确认，停止操作失败关闭并保留当前收据。每次新启动使用排他预约、原子收据和唯一日志文件；旧日志及停止收据不会被下一次启动覆盖。
+
+Windows 本地 RAG 适配器由 `delivery.ps1 rag-start|rag-status|rag-stop` 管理。应先启动上述 Ollama 服务；适配器只绑定 loopback 11436，自动生成并保留 Git 忽略的内部令牌，使用追加式调用账本，并拒绝工单分析协议。Compose 通过 `host.docker.internal` 访问该端口；Linux 部署应由部署方把同名私密令牌注入 `DELIVERY_RAG_INTERNAL_TOKEN`，并把私有模型服务地址写入 `.env.delivery`，不得把令牌提交到 Git。
 
 本地 CPU 首次加载 bge-m3 可能明显慢于后续请求。交付配置模板为 embedding/reranker 分别预留 45 秒和 15 秒提供方超时；仍应保留适配器自身的资源、调用次数和阶段时限保护，不能用无限 HTTP 超时替代它们。若部署硬件或模型资产变化，应基于该环境实测重新收敛这两个值。

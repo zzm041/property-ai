@@ -1,0 +1,24 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "request_id": "candidate-01-screen-001",
+  "recorded_at_utc": "2026-09-28T08:45:14.8734744Z",
+  "original_screen_path": "reports/real-ai-integration-027/diagnostic-r3-27b/candidate-01/screen.json",
+  "original_screen_sha256": "06F80FA5B52AA5539BFA04E4C0ED1DC49276AA71013EE38D6C391AECEB607DDC",
+  "original_budget_path": "reports/real-ai-integration-027/diagnostic-r3-27b/qwen-budget.jsonl",
+  "original_budget_sha256": "4EED83C04B31F0856C5364FE5830F8D0D908B7DAFC4DF23611B0652E5848F7F3",
+  "historical_immediate_remote_completion": "UNKNOWN",
+  "current_execution_state": "NOT_EXECUTING",
+  "current_evidence": {
+    "bound_runtime_pid_40700_present": false,
+    "old_runtime_log_has_completion_response": false,
+    "old_runtime_stderr_sha256": "E5C2CC042ED9131F077A7716A64C27370BDA0B02418452F063463985B2E64898",
+    "old_runtime_stdout_sha256": "2AF26D3E0AAF287E370257BBA81B01B8357BD0BEE98EA53A9C170AC49431B31E",
+    "replacement_runtime_pid": 44860,
+    "replacement_runtime_started_at_utc": "2026-09-28T08:43:16.7229283Z",
+    "replacement_runtime_resident_models": 0,
+    "replacement_runtime_state_sha256": "F5CF6EF4D08F840C54120CE887CB64746485B0F20571877F834906C76B8DAB27"
+  },
+  "budget_effect": "NONE_ORIGINAL_UNKNOWN_RETAINED",
+  "next_request_allowed": false,
+  "reason": "The one authorized 27B candidate crossed the GPU floor and is stopped; this record does not rewrite the UNKNOWN completion or permit another request."
+}

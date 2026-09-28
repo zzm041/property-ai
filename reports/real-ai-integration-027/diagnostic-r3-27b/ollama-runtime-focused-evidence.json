@@ -1,0 +1,59 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-27B-STOP-RAG-RECOVERY",
+  "recorded_at_utc": "2026-09-28T08:55:00Z",
+  "scope": "no-inference focused verification of the project-owned Ollama runtime lifecycle",
+  "source_hashes": {
+    "deploy/ollama-runtime.ps1": "00E27972F6BD86AF182E1936D0D09D4507A4B4FFA9D7AAFB8D5DF67EA34A3B83",
+    "deploy/delivery.ps1": "FCCFF9E841E214C0470B9C834EEAE5C0BB64C7B37B5FE1AD875DFA8821CC37DE",
+    "deploy/README.md": "BD0825134A97A03CDE6D3C6177B4769B6EE2724EC95A8511E66DB2B7765617A7"
+  },
+  "checks": [
+    {
+      "name": "powershell_parse",
+      "result": "PASS"
+    },
+    {
+      "name": "bound_runtime_status",
+      "result": "PASS",
+      "pid": 44860,
+      "ollama_version": "0.34.3",
+      "inference_sent": false
+    },
+    {
+      "name": "idempotent_start_with_existing_bound_instance",
+      "result": "PASS",
+      "pid_before": 44860,
+      "pid_after": 44860,
+      "duplicate_instance_created": false,
+      "inference_sent": false
+    },
+    {
+      "name": "stop_while_rag_adapter_is_listening",
+      "result": "REJECTED_AS_REQUIRED",
+      "exit_code": 1,
+      "message": "RAG adapter is still listening; run rag-stop and confirm drain before ollama-stop",
+      "ollama_pid_alive_after_rejection": true,
+      "rag_listener_retained": true,
+      "rag_listener_pid_after_rejection": 44724,
+      "process_stopped": false,
+      "inference_sent": false
+    }
+  ],
+  "implemented_guards": {
+    "start_lock": "exclusive create-new lock",
+    "state_receipt": "create-new and flushed before publication",
+    "per_run_logs": true,
+    "stop_requires_rag_listener_absent": true,
+    "stop_requires_zero_resident_models": true,
+    "stop_targets_exact_receipt_bound_tree": true,
+    "stop_requires_root_and_listener_exit_confirmation": true,
+    "uncertainty_fails_closed_and_preserves_receipt": true
+  },
+  "not_executed": [
+    "successful stop path, because the accepted RAG runtime was deliberately retained",
+    "model inference",
+    "RAG business replay",
+    "27B retry",
+    "real AUTO"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "candidate": "qwen3.5:27b-q4_K_M",
+  "model": "qwen3.5:27b-q4_K_M",
+  "quantization": "Q4_K_M",
+  "source": "official Ollama library",
+  "manifest_reference": "registry.ollama.ai/library/qwen3.5:27b-q4_K_M",
+  "digest": "7653528ba5cba4dd8e19da24aaddc7f4d0b5ecd93571c0825dfd4137958ec06e",
+  "size_bytes": 17420432728,
+  "manifest": {
+    "sha256": "7653528ba5cba4dd8e19da24aaddc7f4d0b5ecd93571c0825dfd4137958ec06e",
+    "bytes": 710
+  },
+  "weight_layer": {
+    "digest": "sha256:d4b8b4f4c350f5d322dc8235175eeae02d32c6f3fd70bdb9ea481e3abb7d7fc4",
+    "bytes": 17420420832,
+    "local_sha256_verified": true
+  },
+  "license_layer": {
+    "digest": "sha256:7339fa418c9ad3e8e12e74ad0fd26a9cc4be8703f9c110728a992b193be85cb2",
+    "bytes": 11355,
+    "local_sha256_verified": true,
+    "identified_text": "Apache License 2.0"
+  },
+  "installed_model": {
+    "format": "gguf",
+    "family": "qwen35",
+    "parameter_size": "27.8B",
+    "quantization": "Q4_K_M",
+    "context_length": 262144,
+    "embedding_length": 5120,
+    "capabilities": [
+      "completion",
+      "vision",
+      "tools",
+      "thinking"
+    ]
+  },
+  "download": {
+    "completed_at_utc": "2026-09-28T08:37:43.4417177Z",
+    "first_attempt_result": "MAIN_WEIGHT_COMPLETE_THEN_AUXILIARY_BLOB_HEAD_UNEXPECTED_EOF",
+    "bounded_completion_attempt_result": "SUCCESS_REUSED_EXISTING_MAIN_WEIGHT",
+    "large_weight_download_count": 1,
+    "post_download_free_bytes_on_d": 41041055744,
+    "asset_limit_bytes": 21474836480,
+    "minimum_pre_download_free_bytes": 32212254720
+  }
+}

@@ -1,6 +1,6 @@
 param(
     [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateSet("config", "init", "up", "stop", "status", "backup", "restore-check", "diagnose", "rag-start", "rag-stop", "rag-status")]
+    [ValidateSet("config", "init", "up", "stop", "status", "backup", "restore-check", "diagnose", "ollama-start", "ollama-stop", "ollama-status", "rag-start", "rag-stop", "rag-status")]
     [string]$Action,
     [Parameter(Position = 1)]
     [string]$Argument,
@@ -14,6 +14,7 @@ $ComposeFile = Join-Path $DeployDir "docker-compose.delivery.yml"
 $EnvFile = Join-Path $DeployDir ".env.delivery"
 $BootstrapEnvFile = Join-Path $DeployDir ".env.delivery.bootstrap"
 $BackupDir = Join-Path $DeployDir "backups"
+$OllamaRuntime = Join-Path $DeployDir "ollama-runtime.ps1"
 $RagRuntime = Join-Path $DeployDir "rag-runtime.ps1"
 $RagTokenPath = Join-Path (Split-Path -Parent $DeployDir) "tmp\delivery-rag-runtime\internal-token.txt"
 
@@ -82,6 +83,18 @@ function Read-BackupManifest([string]$DumpPath, [string]$Database) {
 }
 
 switch ($Action) {
+    "ollama-start" {
+        & $OllamaRuntime start
+        if ($LASTEXITCODE -ne 0) { throw "delivery Ollama start failed ($LASTEXITCODE)" }
+    }
+    "ollama-stop" {
+        & $OllamaRuntime stop
+        if ($LASTEXITCODE -ne 0) { throw "delivery Ollama stop failed ($LASTEXITCODE)" }
+    }
+    "ollama-status" {
+        & $OllamaRuntime status
+        if ($LASTEXITCODE -ne 0) { throw "delivery Ollama status failed ($LASTEXITCODE)" }
+    }
     "rag-start" {
         & $RagRuntime start
         if ($LASTEXITCODE -ne 0) { throw "delivery RAG start failed ($LASTEXITCODE)" }

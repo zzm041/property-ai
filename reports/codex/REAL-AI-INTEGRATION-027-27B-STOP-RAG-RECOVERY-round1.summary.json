@@ -1,0 +1,34 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-27B-STOP-RAG-RECOVERY",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_sha": "6a3820a25705f31c06ca87bc996f2870e1636f96 + scoped WIP",
+  "verdict": "NEEDS_CHANGES",
+  "record_type": "此前结构化结论的忠实摘要，非原始回复全文",
+  "findings": [
+    {
+      "id": "27B-RECOVERY-R1-01",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "severity": "HIGH",
+      "location": "D:/property-ai/deploy/ollama-runtime.ps1:137（修复前）",
+      "trigger": "RAG 仍接受请求或存在模型子进程时执行 ollama-stop。",
+      "impact": "可能中断在途请求并留下未确认退出的模型子进程。",
+      "evidence": "原停止分支没有 drain 或活动请求保护，仅停止根进程并检查监听消失。",
+      "recommendation": "阻止新请求并确认空闲，精确处理绑定进程树；不能确认退出时失败关闭。"
+    },
+    {
+      "id": "27B-RECOVERY-R1-02",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "severity": "MEDIUM",
+      "location": "D:/property-ai/deploy/ollama-runtime.ps1:73（修复前）",
+      "trigger": "并发 start 或停止后再次启动。",
+      "impact": "可能覆盖当前实例收据及历史日志。",
+      "evidence": "原启动过程没有互斥，使用 WriteAllText 覆盖收据，重复使用固定日志路径。",
+      "recommendation": "排他预约、禁止覆盖收据、每次运行使用唯一日志。"
+    }
+  ],
+  "accepted_boundaries": [
+    "27B 一次请求越过 GPU 底线，没有有效回答，历史 UNKNOWN 必须保留。",
+    "既有 PASS_SCOPED_REAL_RAG 可保留；恢复服务不等于重新验收 RAG。",
+    "27B 质量不可评估，真实 AUTO 和 Production 未通过。"
+  ]
+}
