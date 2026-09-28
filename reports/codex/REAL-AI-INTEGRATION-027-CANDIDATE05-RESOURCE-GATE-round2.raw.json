@@ -1,0 +1,55 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-CANDIDATE05-RESOURCE-GATE",
+  "reviewed_sha": "ed3d4a501a9b8286118a5b411598e28434585a97",
+  "round": 2,
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "verdict": "PASS_SCOPED_RESOURCE_GATE",
+  "checked": [
+    "只读核对ed3d4a5相对27e97cf的资源控制、适配器及直接测试增量，未重审固定28例语义。",
+    "实际源码hash与round2证据一致：local_ai_runtime_control.py=39F70F5521E9F5A5E0F8C05392B9C5251E24B284B47B420CFB9863E0BFBEB477；local_ai_http.py=FE9FA6F03C5CB8F31D4D59D712CF934988148A34AFCD9A6DF5C1DB2D7F4D22F1。",
+    "RAM 4500MiB、GPU 2000MiB运行底线未降低；远端终止未确认或本地请求Job清理失败仍记录UNKNOWN并阻断后续预约。",
+    "保存证据报告45 passed、1个既有warning，以及无模型父子自测捕获4个进程、taskkill返回0、捕获身份及监听均退出。该数字属于读取实施方证据，非本审查执行结果。",
+    "旧42项结果、首次自测失败及candidate05历史资源失败继续保留，没有以新证据改写历史。"
+  ],
+  "findings": [
+    {
+      "id": "C05-R1-01",
+      "status": "CLOSED",
+      "location": "D:/property-ai/scripts/ops/local_ai_runtime_control.py:bound_process_tree、terminate_bound_runtime",
+      "evidence": [
+        "终止前再次核对绑定根进程，记录根及可观察后代的PID、路径和启动时间。",
+        "taskkill非0立即失败关闭，不再将根退出竞态写成成功树退出。",
+        "taskkill返回0后逐一确认已捕获进程身份均退出，并单独确认监听消失。",
+        "直接负测覆盖非0终止结果和仍存活的后代；保存的父子哑进程自测补充了原单进程证据边界。"
+      ]
+    },
+    {
+      "id": "C05-RESOURCE-R2-02",
+      "status": "CLOSED",
+      "location": "D:/property-ai/scripts/ops/local_ai_http.py:Runner.__init__、verify_qwen_runtime_binding、Runner.run",
+      "evidence": [
+        "work_order_only初始化时验证实际PID、路径、启动时间与11435监听所有者。",
+        "每次Qwen请求在qwen_guard、预约及子进程启动前重新检查活动runtime身份。",
+        "新增负测覆盖启动时监听所有者变化，以及启动后进程身份漂移；断言拒绝后未创建call预约。"
+      ]
+    },
+    {
+      "id": "C05-RESOURCE-R2-03",
+      "status": "CLOSED",
+      "location": "D:/property-ai/scripts/ops/local_ai_http.py:Runner.run finally",
+      "evidence": [
+        "Qwen客户端先行非0退出转换为REMOTE_CLIENT_FAILED；正常退出但缺少唯一结果转换为REMOTE_RESPONSE_INVALID。",
+        "两种情况均进入收据绑定的远端终止路径，再清理并确认本地请求Job。",
+        "新增模拟测试覆盖父监控未先触发超时、客户端已非0退出的路径，验证远端终止被调用及受控失败结果。"
+      ]
+    }
+  ],
+  "residual_limits": [
+    "本结论关闭的是上述资源执行保护问题，不代表实际Ollama资源越界终止已经重新演练成功。",
+    "进程树证据覆盖taskkill成功及终止前捕获的可观察身份，不是长期运行或所有操作系统故障的完整保证。",
+    "本审查未运行测试、模型、页面、业务、数据库、队列或进程操作，未修改任何文件。",
+    "候选05已接受的有限语义门槛保持；历史RAM越界及原终止失败不得改写为当时通过。",
+    "8093真实AUTO闭环、通知、并发占用和Production仍未验收；既有scoped真实RAG结论不扩大。"
+  ],
+  "next_action": "可继续用户已授权的8093 bounded AUTO准备与验证：固定本次源码和实际runtime收据，启动前核对资源、剩余累计额度与固定截止，并确保业务调用接入有界保护及累计记账。只使用新的合成对象，不重跑固定集；任何新UNKNOWN立即阻断后续调用。"
+}
