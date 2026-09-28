@@ -243,6 +243,17 @@ def incomplete_collector_recovery_items(all_items,continuation):
     if [item['id'] for item in selected]!=[SCREEN_IDS[-1]]:
         raise AssertionError('Collector recovery must run only the unattempted final photo')
     return selected
+def incomplete_fixed_resume_items(all_items,fixed):
+    if (fixed.get('status')!='INCOMPLETE' or fixed.get('stop_reason')!='RESOURCE_FLOOR_CROSSED'
+            or fixed.get('phase')!='fixed' or fixed.get('candidate')!=5):
+        raise AssertionError('Only the recorded candidate-05 resource-floor fixed run may resume')
+    completed=[row.get('id') for row in fixed.get('results',[])]
+    canonical=[item['id'] for item in all_items]
+    if completed!=canonical[:len(completed)] or len(completed)!=26:
+        raise AssertionError('Recorded fixed prefix changed; never skip or replay a non-prefix case')
+    if fixed.get('attempted_requests')!=22 or fixed.get('reused_requests')!=6:
+        raise AssertionError('Recorded fixed request accounting changed')
+    return [item for item in all_items if item['id'] not in completed]
 def validate_incomplete_screen_binding(screen,current,canonical_first,binding,current_collector_sha):
     controls={key:current['controls'][key] for key in (
         'context','temperature','thinking','llm_max_tokens','vlm_max_tokens','timeout_seconds','parallel'
@@ -334,7 +345,7 @@ def main():
         sys.argv.remove('--supplement')
         runpy.run_path(str(OUT/'run-approved-supplement.py'), run_name='__main__')
         return
-    parser=argparse.ArgumentParser();parser.add_argument('--round',type=int,choices=range(4));parser.add_argument('--model',choices=('qwen3.5:4b','qwen3.5:9b',TWENTY_SEVEN_B_MODEL,QWEN38_MODEL),default='qwen3.5:4b');parser.add_argument('--phase',choices=('screen','fixed','novel'));parser.add_argument('--candidate',type=int,choices=(1,2,3,4,5));parser.add_argument('--resume-incomplete-screen',action='store_true');parser.add_argument('--resume-screen-collector-failure',action='store_true');parser.add_argument('--resume-resource-adjusted-screen',action='store_true');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--round',type=int,choices=range(4));parser.add_argument('--model',choices=('qwen3.5:4b','qwen3.5:9b',TWENTY_SEVEN_B_MODEL,QWEN38_MODEL),default='qwen3.5:4b');parser.add_argument('--phase',choices=('screen','fixed','novel'));parser.add_argument('--candidate',type=int,choices=(1,2,3,4,5));parser.add_argument('--resume-incomplete-screen',action='store_true');parser.add_argument('--resume-screen-collector-failure',action='store_true');parser.add_argument('--resume-resource-adjusted-screen',action='store_true');parser.add_argument('--resume-incomplete-fixed',action='store_true');args=parser.parse_args()
     bounded_candidate=args.model!='qwen3.5:4b'
     twenty_seven_b=args.model==TWENTY_SEVEN_B_MODEL
     qwen38=args.model==QWEN38_MODEL
@@ -350,19 +361,21 @@ def main():
         if qwen38:assert args.candidate in {2,3,4,5},'Qwen3.8 may only continue its bounded protocol candidates'
         assert args.candidate==1 or qwen38 or args.phase in {'fixed','novel'},'Later candidates cannot add another screen after the bounded repair'
         assert qwen38 or args.candidate!=3 or args.phase in {'fixed','novel'},'Delivery v11 candidate uses one complete fixed run and one novel run'
-        assert sum((args.resume_incomplete_screen,args.resume_screen_collector_failure,args.resume_resource_adjusted_screen))<=1,'Only one bounded screen recovery is allowed'
+        assert sum((args.resume_incomplete_screen,args.resume_screen_collector_failure,args.resume_resource_adjusted_screen,args.resume_incomplete_fixed))<=1,'Only one bounded recovery is allowed'
         assert not (args.resume_incomplete_screen or args.resume_screen_collector_failure) or (args.candidate==1 and args.phase=='screen'),'Only candidate-01 screen can resume'
         assert not args.resume_resource_adjusted_screen or (qwen38 and args.phase=='screen'),'Only Qwen3.8 can run the reviewed resource-adjusted screen'
+        assert not args.resume_incomplete_fixed or (qwen38 and args.candidate==5 and args.phase=='fixed'),'Only Qwen3.8 candidate-05 fixed may resume'
         budget_root=(ROOT/'reports/real-ai-integration-027/diagnostic-r3-27b' if large_candidate else
                      ROOT/'reports/real-ai-integration-027/diagnostic-r3-9b-v11'
                      if args.candidate==3 else ROOT/'reports/real-ai-integration-027/diagnostic-r3-9b')
         active_call_limit=(TWENTY_SEVEN_B_TOTAL_CALL_LIMIT if large_candidate else
                            DELIVERY_V11_TOTAL_CALL_LIMIT if args.candidate==3 else HISTORICAL_NINE_B_TOTAL_CALL_LIMIT)
         run_out=budget_root/f'candidate-{args.candidate:02d}';run_out.mkdir(parents=True,exist_ok=True)
-        phase_label=('screen-g52' if args.resume_resource_adjusted_screen else
+        phase_label=('fixed-continuation' if args.resume_incomplete_fixed else
+                     'screen-g52' if args.resume_resource_adjusted_screen else
                      'screen-continuation-recovery' if args.resume_screen_collector_failure else
                      'screen-continuation' if args.resume_incomplete_screen else args.phase)
-        target=run_out/f'{phase_label}.json';max_requests=2 if args.resume_screen_collector_failure else 9 if args.resume_incomplete_screen else 10 if args.phase=='screen' else 4 if args.phase=='novel' else 22 if args.candidate==1 else 32
+        target=run_out/f'{phase_label}.json';max_requests=4 if args.resume_incomplete_fixed else 2 if args.resume_screen_collector_failure else 9 if args.resume_incomplete_screen else 10 if args.phase=='screen' else 4 if args.phase=='novel' else 22 if args.candidate==1 else 32
     assert not target.exists(),'Recorded round is immutable: inspect or explicit new repair round; no replay'
     helpers=runpy.run_path(str(OUT/'probe-model.py'));api=helpers['api'];sample=helpers['resource_sample']
     textpath=OUT/'gold-set-24.json';photopath=OUT/'repair-image-gold.json'
@@ -400,6 +413,9 @@ def main():
                     else 'frozen_before_first_9b_inference')
         assert novel[frozen_key] is True and len(novel['cases'])==4
         selected_items=novel['cases']
+    elif bounded_candidate and args.phase=='fixed' and args.resume_incomplete_fixed:
+        prior_incomplete_fixed=json.loads((run_out/'fixed.json').read_text(encoding='utf-8'))
+        selected_items=incomplete_fixed_resume_items(all_items,prior_incomplete_fixed)
     else:selected_items=all_items
     downloads=json.loads((OUT/'repair-image-downloads.json').read_text(encoding='utf-8'))
     bounded_manifest_path=ROOT/'reports/real-ai-integration-027/qwen35-9b-bounded-images.json'
@@ -607,6 +623,19 @@ def main():
             save()
     try:
         save()
+        if bounded_candidate and args.resume_incomplete_fixed:
+            stable_controls=('context','temperature','thinking','llm_max_tokens','vlm_max_tokens','timeout_seconds','guard_cleanup_margin_seconds','parallel')
+            prior=prior_incomplete_fixed
+            assert protocol_source_hashes_match(prior['source_hashes'],e['source_hashes']),'Fixed model/protocol source changed before continuation'
+            assert prior['model']==e['model'] and prior['model_digest']==e['model_digest']
+            assert prior['prompt_version']==e['prompt_version'] and prior['vision_prompt_version']==e['vision_prompt_version']
+            assert prior['gold_hashes']==e['gold_hashes'] and prior['runtime']==e['runtime']
+            assert prior.get('candidate_source_binding')==e['candidate_source_binding']
+            assert prior.get('model_input_contract_sha256')==e['model_input_contract_sha256']
+            assert all(prior['controls'][key]==e['controls'][key] for key in stable_controls)
+            e['resume_from']={'path':str(run_out/'fixed.json'),'sha256':sha(run_out/'fixed.json'),
+                              'completed_case_ids':[row['id'] for row in prior['results']]}
+            save()
         reused={}
         reused_sources={}
         if bounded_candidate and args.phase=='fixed' and (args.candidate==1 or (qwen38 and args.candidate>=3)):
@@ -614,7 +643,11 @@ def main():
             screen=json.loads(screen_path.read_text(encoding='utf-8'))
             if large_candidate:
                 stable_controls=('context','temperature','thinking','llm_max_tokens','vlm_max_tokens','timeout_seconds','guard_cleanup_margin_seconds','parallel')
-                assert screen['source_hashes']==e['source_hashes'],'27B collector or protocol source changed after screen'
+                assert (
+                    screen['source_hashes']==e['source_hashes']
+                    or args.resume_incomplete_fixed
+                    and protocol_source_hashes_match(screen['source_hashes'],e['source_hashes'])
+                ),'27B protocol source changed after screen'
                 assert screen.get('candidate_source_binding')==e['candidate_source_binding'],'27B candidate source changed after screen'
                 assert screen.get('model_input_contract_sha256')==e['model_input_contract_sha256'],'27B input contract changed after screen'
                 assert screen['runtime']==e['runtime'],'27B runtime identity changed after screen'
@@ -671,7 +704,18 @@ def main():
             assert screen['gold_hashes']==e['gold_hashes']
             reused={row['id']:row for row in screen_rows};assert tuple(reused)==screen_ids and attempted==10
         if bounded_candidate and args.phase=='novel':
-            fixed=json.loads((run_out/'fixed.json').read_text(encoding='utf-8'))
+            fixed_path=run_out/'fixed.json';fixed=json.loads(fixed_path.read_text(encoding='utf-8'))
+            if fixed['status']=='INCOMPLETE':
+                continuation_path=run_out/'fixed-continuation.json'
+                continuation=json.loads(continuation_path.read_text(encoding='utf-8'))
+                assert continuation['status']=='RECORDED_NEEDS_SEMANTIC_REVIEW'
+                assert continuation.get('resume_from',{}).get('sha256')==sha(fixed_path)
+                assert [row['id'] for row in fixed['results']+continuation['results']]==[item['id'] for item in all_items]
+                assert fixed['attempted_requests']+continuation['attempted_requests']==22
+                assert fixed['reused_requests']+continuation['reused_requests']==10
+                assert protocol_source_hashes_match(fixed['source_hashes'],e['source_hashes'])
+                assert protocol_source_hashes_match(continuation['source_hashes'],e['source_hashes'])
+                fixed={**fixed,'status':'RECORDED_NEEDS_SEMANTIC_REVIEW','source_hashes':e['source_hashes']}
             assert fixed['status']=='RECORDED_NEEDS_SEMANTIC_REVIEW' and fixed['source_hashes']==e['source_hashes'] and fixed['gold_hashes']==e['gold_hashes']
             if large_candidate:
                 stable_controls=('context','temperature','thinking','llm_max_tokens','vlm_max_tokens','timeout_seconds','guard_cleanup_margin_seconds','parallel')
@@ -710,8 +754,8 @@ def main():
             )
             save();print(json.dumps({'case':item['id'],'requests':e['attempted_requests'],'payload':payload},ensure_ascii=False),flush=True)
             if e.get('stop_reason'):break
-        expected_cases=1 if args.resume_screen_collector_failure else 7 if args.resume_incomplete_screen else 8 if bounded_candidate and args.phase=='screen' else 4 if bounded_candidate and args.phase=='novel' else 28
-        expected_calls=2 if args.resume_screen_collector_failure else 9 if args.resume_incomplete_screen else 10 if bounded_candidate and args.phase=='screen' else 4 if bounded_candidate and args.phase=='novel' else 32
+        expected_cases=2 if args.resume_incomplete_fixed else 1 if args.resume_screen_collector_failure else 7 if args.resume_incomplete_screen else 8 if bounded_candidate and args.phase=='screen' else 4 if bounded_candidate and args.phase=='novel' else 28
+        expected_calls=4 if args.resume_incomplete_fixed else 2 if args.resume_screen_collector_failure else 9 if args.resume_incomplete_screen else 10 if bounded_candidate and args.phase=='screen' else 4 if bounded_candidate and args.phase=='novel' else 32
         e['status']='RECORDED_NEEDS_SEMANTIC_REVIEW' if len(e['results'])==expected_cases and e['attempted_requests']+e['reused_requests']==expected_calls and not e.get('stop_reason') else 'INCOMPLETE'
     except Exception as exc:e['status']='INCOMPLETE';e.setdefault('stop_reason',type(exc).__name__);raise
     finally:

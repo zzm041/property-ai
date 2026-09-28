@@ -162,6 +162,16 @@ def test_qwen38_budget_and_candidate3_novel_set_are_frozen():
     payload=json.loads(novel.read_text(encoding='utf-8'))
     assert payload['frozen_before_first_inference'] is True and len(payload['cases'])==4
 
+def test_qwen38_fixed_resume_accepts_only_the_exact_recorded_prefix():
+    all_items=[{'id':f'C{i:02d}'} for i in range(28)]
+    fixed={'status':'INCOMPLETE','stop_reason':'RESOURCE_FLOOR_CROSSED','phase':'fixed','candidate':5,
+           'attempted_requests':22,'reused_requests':6,'results':[{'id':row['id']} for row in all_items[:26]]}
+    assert [row['id'] for row in helpers['incomplete_fixed_resume_items'](all_items,fixed)]==['C26','C27']
+    with pytest.raises(AssertionError,match='prefix'):
+        helpers['incomplete_fixed_resume_items'](all_items,{**fixed,'results':fixed['results'][:-1]+[{'id':'C27'}]})
+    with pytest.raises(AssertionError,match='candidate-05'):
+        helpers['incomplete_fixed_resume_items'](all_items,{**fixed,'candidate':4})
+
 def test_delivery_ollama_runtime_reserves_qwen38_resource_headroom():
     source=(Path(helpers['__file__']).parents[3]/'deploy'/'ollama-runtime.ps1').read_text(encoding='utf-8-sig')
     assert '[long]$GpuOverheadBytes = 5368709120' in source
