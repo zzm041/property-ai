@@ -1,0 +1,86 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "run_id": "delivery-rag-027-preflight-20260928",
+  "received_at_utc": "2026-09-28T06:24:03.536Z",
+  "result": "PAGE_READY_NO_MODEL_CALL",
+  "interaction": "normal password page login and actual knowledge-management navigation",
+  "api_origin": "http://127.0.0.1:8093",
+  "user_id": 2,
+  "roles": [
+    "TENANT_ADMIN"
+  ],
+  "property_id": 4,
+  "visible_property_count": 1,
+  "phone_sha256_16": "d901e8933c66c30a",
+  "screenshot": "delivery-rag-027-preflight-20260928-01-knowledge-page.png",
+  "superseded_screenshot": {
+    "file": "delivery-rag-027-preflight-20260928-00-rag-page-preflight.png",
+    "reason": "The first capture showed the home page and is retained but not used as knowledge-page evidence."
+  },
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/password/login",
+      "status": 200,
+      "request_id": "8313e3e1a54b447c99eb39ebb18593e0",
+      "received_at_utc": "2026-09-28T06:23:59.812Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "c3bc7edc63ec446d9bf41c3c35e615cc",
+      "received_at_utc": "2026-09-28T06:23:59.829Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "59309240ba4141a29a4b14a104fc6432",
+      "received_at_utc": "2026-09-28T06:24:00.514Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "ff476c6847ab481cb7b168632baa8cdd",
+      "received_at_utc": "2026-09-28T06:24:00.534Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "235bf9bed40942b784e88c592297bf0b",
+      "received_at_utc": "2026-09-28T06:24:01.414Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "7bb84a82ee7047439fdc51ff850aef7e",
+      "received_at_utc": "2026-09-28T06:24:01.435Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "16a51cad4cf6440bb8507c8592d301af",
+      "received_at_utc": "2026-09-28T06:24:02.540Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "4d39f3cf96db4f3785e18c4f47e1e9d0",
+      "received_at_utc": "2026-09-28T06:24:02.544Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "3820ccf8b4864b13ac5e967331caee14",
+      "received_at_utc": "2026-09-28T06:24:02.569Z"
+    }
+  ],
+  "model_calls": 0
+}

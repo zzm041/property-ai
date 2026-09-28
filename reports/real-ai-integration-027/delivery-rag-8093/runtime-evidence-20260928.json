@@ -1,0 +1,89 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "recorded_at": "2026-09-28T14:29:33.7944354+08:00",
+  "result": "RUNTIME_READY_PAGE_PREFLIGHT_PASS_MODEL_CALLS_RESOURCE_BLOCKED",
+  "source": {
+    "commit": "77981930f6a4d41cbb5b3fcb3e1b1689f8d5e31c",
+    "image": "property-ai-delivery:7798193",
+    "image_digest": "sha256:c246ec1be7334d566c766973c0a00b1c3b9489de203724cc286c01ee21de2653"
+  },
+  "runtime": {
+    "api": "running and healthy on 127.0.0.1:8093",
+    "worker": "running",
+    "beat": "running",
+    "same_image_for_api_worker_beat": true,
+    "queue": {
+      "vhost": "property_ai_delivery_check",
+      "name": "property_ai.delivery_check",
+      "ready": 0,
+      "unacknowledged": 0,
+      "consumers": 1
+    }
+  },
+  "providers": {
+    "work_order_llm": "development",
+    "rag_llm": {
+      "provider": "production",
+      "endpoint": "http://host.docker.internal:11436",
+      "model": "qwen3.5:4b"
+    },
+    "embedding": {
+      "provider": "production",
+      "model": "bge-m3",
+      "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+      "dimensions": 1024,
+      "normalization": "l2"
+    },
+    "reranker": {
+      "provider": "production",
+      "model": "bge-reranker-v2-m3"
+    }
+  },
+  "vector_collection": {
+    "name": "knowledge_chunks_delivery_real_1024",
+    "exists": true,
+    "dimensions": 1024,
+    "index": "FLAT",
+    "metric": "COSINE",
+    "model_metadata_matches": true,
+    "vectors_ingested_in_this_run": 0
+  },
+  "adapter": {
+    "endpoint": "127.0.0.1:11436",
+    "listener_pid_at_check": 44724,
+    "recorded_identity_and_start_time_match": true,
+    "scope": "rag_only",
+    "request_active": false,
+    "accepting_requests": true,
+    "reservation_gate": "READY",
+    "call_ledger_count": 0
+  },
+  "page_preflight": {
+    "result": "PASS_NO_MODEL_CALL",
+    "login": "normal password page login",
+    "user_id": 2,
+    "roles": ["TENANT_ADMIN"],
+    "property_id": 4,
+    "visible_property_count": 1,
+    "knowledge_page_screenshot": "delivery-rag-027-preflight-20260928-01-knowledge-page.png",
+    "request_evidence": "delivery-rag-027-preflight-20260928-page-preflight.json"
+  },
+  "resource_guard": {
+    "available_ram_mib": 6039,
+    "required_start_ram_mib": 8192,
+    "gpu_total_mib": 16303,
+    "gpu_used_mib": 6149,
+    "gpu_free_mib": 9847,
+    "required_runtime_gpu_free_mib": 2000,
+    "decision": "No model request was allowed because the RAM start guard failed."
+  },
+  "boundaries": {
+    "new_model_calls": 0,
+    "qwen_27b_downloaded": false,
+    "real_rag_answer_verified": false,
+    "real_auto_switched": false,
+    "work_order_provider_remains_development": true,
+    "database_migration": false,
+    "external_cost": false
+  }
+}

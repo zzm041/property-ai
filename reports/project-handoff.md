@@ -1,5 +1,17 @@
 # Project handoff (latest facts only)
 
+## Current checkpoint — 27B resource stop and delivery RAG runtime preflight (2026-09-28)
+
+Product/runtime source commit: `77981930f6a4d41cbb5b3fcb3e1b1689f8d5e31c` (continuing from `018107d0bbd523b4bb930a0752a20a8a44a67352`). The fixed deadline remains **2026-09-29 22:36:10 Asia/Shanghai**.
+
+The generic evidence validator no longer rejects a whole otherwise valid analysis solely because of a non-essential equivalent Chinese observation, while cross-source evidence, dangerous fabrication, unrelated history and core conflicts remain rejected. Focused directly affected tests passed **112** and the pure unit suite passed **1155**, both with three existing warnings. Independent round 2 returned `PASS` for this scoped source change in `reports/codex/REAL-AI-INTEGRATION-027-27B-RAG-round2.raw.json`; it does not prove a model or business result.
+
+The isolated 8093 API, Worker and Beat now run the same fixed image `sha256:c246ec1be7334d566c766973c0a00b1c3b9489de203724cc286c01ee21de2653`. The dedicated queue is **0 ready / 0 unacknowledged / 1 consumer**. Work-order analysis remains Development. Knowledge configuration is independently wired to the RAG-only loopback adapter, real bge-m3 embedding, real reranker and the new `knowledge_chunks_delivery_real_1024` collection (1024 dimensions, FLAT/COSINE, matching model metadata). The adapter identity/start time matches its immutable receipt, is idle and accepting requests, and its model-call ledger remains **0**.
+
+Actual WeChat Developer Tools evidence now shows normal password login by synthetic TENANT_ADMIN user 2, navigation to the knowledge-maintenance page, one authorized property and the empty document form/list. The first screenshot accidentally captured the home page and is retained but superseded; the inspected knowledge-page screenshot is `reports/real-ai-integration-027/delivery-rag-8093/delivery-rag-027-preflight-20260928-01-knowledge-page.png`. No document was created and no model request was sent.
+
+The approved official Ollama `qwen3.5:27b` Q4_K_M candidate reports a 17 GB asset, but it was **not downloaded**. At the final admission check, available RAM was **6039 MiB**, below the unchanged **8192 MiB** start floor; GPU was 9847 MiB free. Consequently both the 27B quality branch and the real-RAG document/answer branch stopped before inference. Real RAG, real AUTO and the complete local product remain open; there is no false PASS. The next safe execution point is a fresh resource check after the user independently frees enough RAM, followed by the already approved bounded fixed-set/RAG flow without changing thresholds.
+
 ## Current checkpoint — 9B v11 quality stop and hardened restore success (2026-09-28)
 
 Product/protocol commit: `5bb3f65`; immutable diagnostic/review/restore evidence commit: `8a96399` (continuing from `a8f50e86347df430f70823668337b5ab8486263f`). The fixed deadline remains **2026-09-29 22:36:10 Asia/Shanghai**.
