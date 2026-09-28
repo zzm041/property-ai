@@ -28,6 +28,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parent))
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'backend'))
 from local_ai_models import MODEL_DIRS,offline,load,infer
 from local_ai_process import RequestJob,join_request_job
+from local_ai_runtime_control import terminate_bound_runtime
 from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
 from app.domain.observed_event import work_order_analysis_response_format
 from app.domain.vision import VISION_ANALYSIS_PROMPT_VERSION,vision_analysis_response_format
@@ -35,6 +36,7 @@ from app.domain.vision import VISION_ANALYSIS_PROMPT_VERSION,vision_analysis_res
 QWEN_CANDIDATES={
     'qwen3.5:4b':('2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd','0.34.3'),
     'qwen3.5:9b':('6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7','0.34.3'),
+    'qwen38-27b-q3km-g55:7af3b8f':('eb18a122286f7a67d36dc8129f9caa1c0f7bb8449d7669a79e3ecb3d81289e0c','0.34.3'),
 }
 QWEN_MODEL=os.environ.get('PROPERTY_AI_LOCAL_QWEN_MODEL','qwen3.5:4b')
 if QWEN_MODEL not in QWEN_CANDIDATES:raise RuntimeError('UNAPPROVED_QWEN_CANDIDATE')
@@ -128,6 +130,8 @@ def decode(path,content_type,body,prompt_version,scope='all'):
         elif path=='/v1/chat/completions':
             if scope=='rag_only' and prompt_version!='rag-answer-v2':
                 raise ValueError('RAG_ONLY_NO_AUTO_AUTHORIZATION')
+            if scope=='work_order_only' and prompt_version=='rag-answer-v2':
+                raise ValueError('WORK_ORDER_ONLY_NO_RAG_AUTHORIZATION')
             expected_format=(
                 {'type':'json_object'} if prompt_version=='rag-answer-v2'
                 else WORK_ORDER_RESPONSE_FORMAT if prompt_version==WORK_ORDER_PROMPT_VERSION
@@ -138,6 +142,8 @@ def decode(path,content_type,body,prompt_version,scope='all'):
             if obj.get('response_format')!=expected_format:raise ValueError('QWEN_SCHEMA_MISMATCH')
             kind='qwen';value=obj
         else:raise ValueError('ENDPOINT_NOT_ALLOWED')
+    if scope=='work_order_only' and kind in {'embedding','reranker'}:
+        raise ValueError('WORK_ORDER_ONLY_ENDPOINT')
     validate(kind,value);return kind,value
 
 def child(config_path,input_path,job_name):
@@ -167,9 +173,11 @@ class Runner:
         self.accepting_requests=True
         # The launcher records and verifies pinned source/weights; runtime config
         # cannot widen invocation caps or choose arbitrary upstream endpoints.
-        if self.config['host']!='127.0.0.1' or self.config['port']!=11436:raise ValueError('LOOPBACK_ONLY')
+        if self.config['host']!='127.0.0.1' or self.config['port'] not in {11436,11437}:raise ValueError('LOOPBACK_ONLY')
         self.scope=self.config.get('scope','all')
-        if self.scope not in {'all','rag_only'}:raise ValueError('INVALID_SCOPE')
+        if self.scope not in {'all','rag_only','work_order_only'}:raise ValueError('INVALID_SCOPE')
+        if self.scope=='rag_only' and self.config['port']!=11436:raise ValueError('INVALID_SCOPE_PORT')
+        if self.scope=='work_order_only' and self.config['port']!=11437:raise ValueError('INVALID_SCOPE_PORT')
         self.limits=self.config.get('limits',LIMITS)
         if set(self.limits)!=set(LIMITS) or any(
             not isinstance(self.limits[k],int) or not 0<self.limits[k]<=LIMITS[k]
@@ -179,6 +187,15 @@ class Runner:
         if not isinstance(self.duration_seconds,int) or not 0<self.duration_seconds<=7200:
             raise ValueError('INVALID_DURATION')
         self.continuation=self.config.get('continuation')
+        self.runtime_binding=None
+        binding_path=self.config.get('runtime_binding_path')
+        if binding_path:
+            binding=Path(binding_path).resolve();evidence_root=Path(self.config['evidence_root']).resolve()
+            if not binding.is_relative_to(evidence_root):raise ValueError('RUNTIME_BINDING_SCOPE')
+            if self._sha(binding)!=self.config.get('runtime_binding_sha256'):raise ValueError('RUNTIME_BINDING_DRIFT')
+            self.runtime_binding=json.loads(binding.read_text(encoding='utf-8'))
+        if self.scope=='work_order_only' and self.runtime_binding is None:
+            raise ValueError('WORK_ORDER_RUNTIME_BINDING_REQUIRED')
         if self.continuation:
             c=self.continuation
             if c.get('task_id')!='REAL-AI-INTEGRATION-027' or c.get('run_id')!='ai027-b439223fda':raise ValueError('CONTINUATION_SCOPE')
@@ -288,6 +305,7 @@ class Runner:
         samples=[];events=[];reason=None;start=time.monotonic();phase='load';phase_start=start
         stdout=folder/'stdout.jsonl';stderr=folder/'stderr.txt'
         p=None;owned_exit_confirmed=False;cleanup_error=None
+        remote_stop=None;remote_stop_error=None
         try:
             with stdout.open('xb') as out,stderr.open('xb') as err:
                 p=subprocess.Popen(command,stdout=out,stderr=err,creationflags=subprocess.CREATE_NO_WINDOW,cwd=self.private)
@@ -303,11 +321,23 @@ class Runner:
                         try:events.append(json.loads(line))
                         except ValueError:pass
                     if any(e.get('phase')=='inference' for e in events) and phase!='inference':phase='inference';phase_start=time.monotonic()
-                    if point['ram_free_mib']<(2000 if kind=='qwen' else 4500) or point.get('gpu_free_mib',2001)<2000:reason='RESOURCE_FLOOR'
+                    if point['ram_free_mib']<4500 or point.get('gpu_free_mib',2001)<2000:reason='RESOURCE_FLOOR'
                     elif time.time()>=deadline:reason='R2_WINDOW_EXHAUSTED'
                     elif time.monotonic()-phase_start>(120 if phase=='load' else 60):reason=phase.upper()+'_TIMEOUT'
                     if reason:break
         finally:
+            if kind=='qwen' and reason in {
+                'RESOURCE_FLOOR','RESOURCE_OBSERVATION_FAILED','INFERENCE_TIMEOUT',
+                'LOAD_TIMEOUT','R2_WINDOW_EXHAUSTED',
+            }:
+                try:
+                    if self.runtime_binding is None:
+                        raise RuntimeError('QWEN_RUNTIME_BINDING_REQUIRED')
+                    remote_stop=terminate_bound_runtime(
+                        self.runtime_binding,listener_port=11435
+                    )
+                except Exception as exc:
+                    remote_stop_error=type(exc).__name__
             try:
                 if not reason and job.active():reason='DESCENDANTS_REMAINED_AFTER_LAUNCHER_EXIT'
                 job.terminate_and_confirm()
@@ -321,13 +351,24 @@ class Runner:
             except ValueError:pass
         results=[e['result'] for e in events if 'result' in e]
         success=p.returncode==0 and len(results)==1 and not reason and owned_exit_confirmed
-        # Local HTTP-client exit cannot establish that remote Ollama stopped.
-        unknown=not owned_exit_confirmed or (kind=='qwen' and not success)
+        controlled_remote_stop=bool(
+            (remote_stop or {}).get('stopped',{}).get('tree_exit_confirmed')
+            and (remote_stop or {}).get('stopped',{}).get('listener_exit_confirmed')
+        )
+        # A failed Qwen request is known-complete only when both the owned HTTP
+        # client and the receipt-bound remote runtime have demonstrably exited.
+        unknown=(
+            not owned_exit_confirmed
+            or (kind=='qwen' and not success and not controlled_remote_stop)
+        )
         save(folder/'result.json',{'status':'SUCCESS' if success else ('UNKNOWN' if unknown else 'FAILED'),'reason':reason,'exit_code':p.returncode,
             'model':MODELS[kind],'revision':DIGEST if kind=='qwen' else MODEL_DIRS[kind][1],
             'events':events,'samples':samples,'total_seconds':time.monotonic()-start,'child_pid':p.pid,
             'request_job':job.name,'owned_exit_confirmed':owned_exit_confirmed,'cleanup_error':cleanup_error,
-            'remote_completion':'UNKNOWN' if kind=='qwen' and not success else 'NOT_UNKNOWN'})
+            'remote_stop':remote_stop,'remote_stop_error':remote_stop_error,
+            'remote_completion':'CONTROLLED_STOP' if controlled_remote_stop else (
+                'UNKNOWN' if kind=='qwen' and not success else 'NOT_UNKNOWN'
+            )})
         if not success:raise RuntimeError(reason or 'MODEL_REQUEST_FAILED_NO_RETRY')
         return results[0]
 
@@ -368,7 +409,7 @@ def serve(config_path):
             except Exception:return self.reply(503,{'error':'MODEL_GUARD_OR_REQUEST_FAILED_NO_RETRY'})
             finally:runner.lock.release()
     server=ThreadingHTTPServer((runner.config['host'],runner.config['port']),Handler)
-    print(json.dumps({'pid':os.getpid(),'listen':'127.0.0.1:11436','python':sys.executable,'source':str(Path(__file__).resolve()),'utc':stamp(),'health_inference':False}),flush=True)
+    print(json.dumps({'pid':os.getpid(),'listen':f"{runner.config['host']}:{runner.config['port']}",'python':sys.executable,'source':str(Path(__file__).resolve()),'utc':stamp(),'health_inference':False}),flush=True)
     server.serve_forever()
 
 if __name__=='__main__':

@@ -1,0 +1,55 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "checkpoint": "candidate05-resource-stop-fix",
+  "recorded_utc": "2026-09-28T17:05:05.6623083Z",
+  "model_inference_calls": 0,
+  "source_sha256": {
+    "scripts/ops/local_ai_runtime_control.py": "785D2A2CCE4A9AC8D3F14F840CB6BBBEEB2227A31A7B89A9D54E440C6FE6A143",
+    "scripts/ops/local_ai_http.py": "A7EBEA23E96BAC328A0841467AFCE08C7F0B770FE4690D9FCBA0F7DF6188984D",
+    "reports/auth-identity-ai-001/local-qwen/run-quality28.py": "13643DAA33757CEC11824F853B16ABE644BE142335F886949967D7990ED0AC28"
+  },
+  "focused_tests": {
+    "files": [
+      "backend/tests/unit/test_local_ai_http_027.py",
+      "backend/tests/unit/test_local_ai_runtime_control.py"
+    ],
+    "result": "42 passed, 1 warning",
+    "warning": "Existing Starlette/anyio deprecation warning",
+    "initial_environment_error": "The first invocation used the unavailable default pytest temp root and produced 21 fixture setup permission errors after 21 tests passed; it did not exercise business services or models.",
+    "verified_invocation": "Project-local isolated pytest basetemp; no live inference, database, queue, or page operations."
+  },
+  "no_model_stop_selftest": {
+    "listener": "127.0.0.1:11439",
+    "first_attempt": {
+      "result": "FAILED",
+      "reason": "Windows connect probe returned WSAEWOULDBLOCK while the listener table already showed the owned process had exited.",
+      "process_exit_observed": true,
+      "model_loaded": false
+    },
+    "corrective_change": "Listener exit now uses the same OS listener ownership table as the pre-stop identity check; it does not infer liveness from a transient connect code.",
+    "verified_attempt": {
+      "result": "PASS",
+      "owned_pid": 38948,
+      "owned_executable": "D:\\property-ai\\tmp\\uv-python\\cpython-3.12.10-windows-x86_64-none\\python.exe",
+      "taskkill_exit_code": 0,
+      "tree_exit_confirmed": true,
+      "listener_exit_confirmed": true,
+      "other_processes_touched": false,
+      "model_loaded": false
+    }
+  },
+  "scope": {
+    "completed": [
+      "receipt-bound PID, executable, start-time and loopback listener verification",
+      "4500 MiB RAM and 2000 MiB GPU runtime floors for Qwen",
+      "controlled remote runtime stop before a failed request can be marked known-complete",
+      "fail-closed UNKNOWN when remote stop or owned client cleanup is unconfirmed",
+      "work-order-only adapter refuses startup without an immutable runtime binding"
+    ],
+    "not_claimed": [
+      "No model inference was rerun.",
+      "The historical candidate-05 resource-floor result was not rewritten.",
+      "8093 was not switched to the real model by this checkpoint."
+    ]
+  }
+}

@@ -38,6 +38,8 @@ def test_only_explicit_reviewed_qwen_candidates_can_configure_adapter(monkeypatc
     assert candidate.MODELS['qwen']=='qwen3.5:9b'
     assert candidate.DIGEST=='6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7'
     assert candidate.QWEN_RUNTIME_VERSION=='0.34.3'
+    current=_load_adapter_candidate(monkeypatch,'qwen38-27b-q3km-g55:7af3b8f')
+    assert current.DIGEST=='eb18a122286f7a67d36dc8129f9caa1c0f7bb8449d7669a79e3ecb3d81289e0c'
     with pytest.raises(RuntimeError,match='UNAPPROVED_QWEN_CANDIDATE'):
         _load_adapter_candidate(monkeypatch,'qwen3.5:latest')
 
@@ -124,6 +126,18 @@ def test_rag_only_scope_rejects_work_order_protocol_but_allows_rag():
     )[0] == 'qwen'
 
 
+def test_work_order_scope_rejects_rag_and_vector_endpoints():
+    rag = {
+        'model': m.MODELS['qwen'], 'messages': [{'role': 'user', 'content': '资料'}],
+        'response_format': {'type': 'json_object'}, 'temperature': 0,
+        'reasoning_effort': 'none', 'max_tokens': 512,
+    }
+    with pytest.raises(ValueError, match='WORK_ORDER_ONLY_NO_RAG_AUTHORIZATION'):
+        m.decode('/v1/chat/completions','application/json',json.dumps(rag).encode(),'rag-answer-v2','work_order_only')
+    with pytest.raises(ValueError, match='WORK_ORDER_ONLY_ENDPOINT'):
+        m.decode('/v1/embeddings','application/json',json.dumps({'model':'bge-m3','input':['a']}).encode(),'','work_order_only')
+
+
 def test_scoped_runtime_limits_and_duration_are_enforced(tmp_path, monkeypatch):
     config = {
         'private': str(tmp_path / 'run'),
@@ -187,6 +201,14 @@ def test_scoped_runtime_rejects_widened_configuration(tmp_path, bad):
     path = tmp_path / 'config.json'
     path.write_text(json.dumps(config), encoding='utf-8')
     with pytest.raises(ValueError):
+        m.Runner(path)
+
+
+def test_work_order_scope_requires_reviewed_runtime_binding(tmp_path):
+    config={'private':str(tmp_path/'run'),'host':'127.0.0.1','port':11437,
+        'scope':'work_order_only','evidence_root':str(tmp_path)}
+    path=tmp_path/'config.json';path.write_text(json.dumps(config),encoding='utf-8')
+    with pytest.raises(ValueError,match='WORK_ORDER_RUNTIME_BINDING_REQUIRED'):
         m.Runner(path)
 
 
@@ -279,10 +301,13 @@ def test_unknown_or_legacy_unproved_failure_blocks_all_new_inputs(tmp_path,recor
     assert len(list(r.private.glob('call-*')))==1
 
 
-@pytest.mark.parametrize('kind,cleanup_fails,expected',[
-    ('embedding',False,'FAILED'),('embedding',True,'UNKNOWN'),('qwen',False,'UNKNOWN')])
-def test_resource_stop_confirms_job_or_persists_unknown(tmp_path,monkeypatch,kind,cleanup_fails,expected):
+@pytest.mark.parametrize('kind,cleanup_fails,remote_stops,expected',[
+    ('embedding',False,False,'FAILED'),('embedding',True,False,'UNKNOWN'),
+    ('qwen',False,False,'UNKNOWN'),('qwen',False,True,'FAILED')])
+def test_resource_stop_confirms_job_or_persists_unknown(tmp_path,monkeypatch,kind,cleanup_fails,remote_stops,expected):
     r=runner(tmp_path);r.config['bge_python']='dummy-not-executed';started=[False];terminated=[]
+    if kind=='qwen':
+        r.runtime_binding={'pid':42,'executable':'fixed','launched_at_utc':'fixed'}
     class Job:
         name='unit-request-job'
         def active(self):return 1
@@ -299,10 +324,16 @@ def test_resource_stop_confirms_job_or_persists_unknown(tmp_path,monkeypatch,kin
     monkeypatch.setattr(m,'qwen_guard',lambda:None);monkeypatch.setattr(m,'validate',lambda *a:None)
     monkeypatch.setattr(m,'ram',lambda:1000 if started[0] else 10000)
     monkeypatch.setattr(m,'gpu',lambda:7000);monkeypatch.setattr(m.time,'sleep',lambda n:None)
+    def stop_runtime(*args,**kwargs):
+        if not remote_stops:raise RuntimeError('stop failed')
+        return {'stopped':{'tree_exit_confirmed':True,'listener_exit_confirmed':True}}
+    monkeypatch.setattr(m,'terminate_bound_runtime',stop_runtime)
     with pytest.raises(RuntimeError,match='RESOURCE_FLOOR'):r.run(kind,['synthetic'])
     saved=json.loads((r.private/'call-001/result.json').read_text(encoding='utf-8'))
     assert saved['status']==expected and terminated==[True]
     assert saved['owned_exit_confirmed'] is (not cleanup_fails)
+    if kind=='qwen':
+        assert saved['remote_completion']==('CONTROLLED_STOP' if remote_stops else 'UNKNOWN')
     if expected=='UNKNOWN':
         with pytest.raises(RuntimeError,match='COMPLETION_UNKNOWN'):m.Runner(r.path).reserve('reranker','different')
 

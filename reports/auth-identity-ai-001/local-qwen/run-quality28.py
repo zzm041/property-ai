@@ -9,7 +9,6 @@ import os
 import re
 import runpy
 import site
-import socket
 import subprocess
 import sys
 import threading
@@ -57,8 +56,9 @@ MODEL_INPUT_CONTRACT={
     'controls':{'context':4096,'temperature':0,'thinking':False,'llm_max_tokens':512,
                 'vlm_max_tokens':256,'timeout_seconds':60,'parallel':1},
 }
-site.addsitedir(str(ROOT/'.venv/Lib/site-packages'));sys.path.insert(0,str(ROOT/'backend'))
+site.addsitedir(str(ROOT/'.venv/Lib/site-packages'));sys.path.insert(0,str(ROOT/'backend'));sys.path.insert(0,str(ROOT/'scripts/ops'))
 import httpx
+from local_ai_runtime_control import terminate_bound_runtime
 from app.core.config import Settings
 from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION,WorkOrderAnalysisOutput,map_analysis_output
 from app.domain.observed_event import build_evidence_catalog
@@ -180,41 +180,6 @@ def protocol_source_hashes_match(left,right):
 def model_input_contract_sha256():
     encoded=json.dumps(MODEL_INPUT_CONTRACT,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()
     return hashlib.sha256(encoded).hexdigest()
-def bound_runtime_identity(runtime):
-    pid=int(runtime['pid'])
-    command=(
-        f"$p=Get-Process -Id {pid} -ErrorAction Stop; "
-        "[ordered]@{pid=$p.Id;path=$p.Path;started_utc=$p.StartTime.ToUniversalTime().ToString('o')} | ConvertTo-Json -Compress"
-    )
-    actual=json.loads(subprocess.check_output(['powershell','-NoProfile','-Command',command],text=True))
-    expected=datetime.fromisoformat(runtime['launched_at_utc'].replace('Z','+00:00'))
-    observed=datetime.fromisoformat(actual['started_utc'].replace('Z','+00:00'))
-    if actual['pid']!=pid or Path(actual['path']).resolve()!=Path(runtime['executable']).resolve() or abs((observed-expected).total_seconds())>1:
-        raise RuntimeError('MODEL_RUNTIME_IDENTITY_CHANGED')
-    return actual
-def loopback_listener_closed(host='127.0.0.1',port=11435):
-    """Return True only when the loopback listener is explicitly refused."""
-    with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as probe:
-        probe.settimeout(.25);code=probe.connect_ex((host,port))
-    if code in {10061,111}:return True
-    if code==0:return False
-    raise RuntimeError(f'MODEL_RUNTIME_LISTENER_STATUS_UNKNOWN_{code}')
-def terminate_bound_runtime(runtime):
-    """Stop only the exact project-owned Ollama service tree after a guard breach."""
-    actual=bound_runtime_identity(runtime)
-    pid=int(runtime['pid'])
-    stopped=subprocess.run(['taskkill','/PID',str(pid),'/T','/F'],capture_output=True,text=True,timeout=15)
-    if stopped.returncode!=0:raise RuntimeError('MODEL_RUNTIME_TREE_TERMINATION_FAILED')
-    for _ in range(40):
-        try:bound_runtime_identity(runtime)
-        except (RuntimeError,subprocess.CalledProcessError):break
-        time.sleep(.25)
-    else:raise RuntimeError('MODEL_RUNTIME_EXIT_UNCONFIRMED')
-    for _ in range(40):
-        if loopback_listener_closed():break
-        time.sleep(.25)
-    else:raise RuntimeError('MODEL_RUNTIME_LISTENER_STILL_AVAILABLE')
-    return {'verified_before_stop':actual,'stopped':{'pid':pid,'tree_exit_confirmed':True,'listener_exit_confirmed':True}}
 def runtime_guard_reason(*,now,deadline,observed,observation_error,ram_floor):
     if now>=deadline:return 'REQUEST_WALL_OR_CUMULATIVE_DEADLINE'
     if observation_error is not None:return 'RESOURCE_OBSERVATION_FAILED'

@@ -1,0 +1,98 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-CANDIDATE05-QUALITY",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_sha": "d1f78b7b47125a7e8dbc9dd06160435b45010210",
+  "verdict": "NOT_READY",
+  "verdict_scope": "候选05的本小集语义门槛已满足；但实际8093有界AUTO执行前，资源越界终止失败这一运行安全门尚未关闭。本结论不是重新判定模型语义失败。",
+  "checked_conditions": {
+    "source": [
+      "实际核对HEAD及工作区，未将预存model/ai.py、project.config.json或其他任务差异纳入本包。",
+      "读取96eac8a、c0cbc5f、0980ed4、d1f78b7及必要前序增量，核对prompt、Vision、observed_event、直接测试及分析/自动派单调用上下文。",
+      "当前observed_event.py SHA256为FF4B2683E87D687EDED321F4BAB31F206AA337745554234F1EAE0391470AC5AC，与offline-revalidation绑定一致。"
+    ],
+    "raw_semantics": [
+      "实际读取固定28例及novel4例原始输入、响应内容和有效决策；通过图像工具查看全部4张维修图片。",
+      "未发现本候选中导致错误分流的历史污染、危险事实编造、核心否定倒置或遗漏普通混合维修主诉。",
+      "GOLD-022正确保留洗手盆下方滴水；GOLD-024不再把厨房供水对照解释为水渍。",
+      "PHOTO-003保留图片烧损与用户否认之间的来源差异和electric风险，未确认安全使用；PHOTO-004识别正常阀门且不制造维修故障。",
+      "GOLD-009的maintenance字段仍偏离冻结other/other口径，但gas会在候选选择前进入既定HIGH_RISK后备，不构成已证实错误AUTO。",
+      "GOLD-012/013的原始类别或技能仍与冻结other/other有差异，但冲突/来源未知如实保留，低置信阻止候选选择、Assignment与Incident聚合；不能将这些原始字段标为全部严格命中。"
+    ],
+    "effective_decisions": [
+      "主体降确定性保留原始输出、raw_subject及调整原因；不删除已确认现象或风险，未知主体事件键包含证据内容，并非跨对象通配符。",
+      "信息性主体调整限定other/other；即使confidence为0.95，映射仍进入非派单分支。NOVEL-Q3-001没有被制造为维修事件。",
+      "频率承接仅扩展相邻分句表达，仍要求唯一前置主体并拒绝历史、不确定、否定及竞争主体；未发现本轮新增的直接安全回归。",
+      "novel原运行中的两项机械拒绝仍保留。d1f78b7之后的32例有效结果属于离线重验，不是重新推理成功。",
+      "32例raw_payload与原始LLM响应及offline trace中的raw_model_output逐项一致，无手工修改答案后计通过。"
+    ],
+    "fixed_and_novel_binding": {
+      "fixed_cases": 28,
+      "fixed_unique_requests": 32,
+      "screen_requests_reused": 10,
+      "new_fixed_requests": 22,
+      "continuation_new_requests": 0,
+      "novel_requests": 4,
+      "candidate05_total_actual_requests": 36,
+      "model": "qwen38-27b-q3km-g55:7af3b8f",
+      "model_digest": "eb18a122286f7a67d36dc8129f9caa1c0f7bb8449d7669a79e3ecb3d81289e0c",
+      "prompt": "wo-analysis-v13-subject-fallback",
+      "vision_prompt": "repair-photo-v7-confidence-scale",
+      "verification": "固定26例与续接2例组成唯一完整28例；续接仅复用同候选screen的PHOTO-003/004。复用输入和stages逐项一致，来源hash匹配。36条响应hash与账本一致。",
+      "novel_boundary": "4例在候选05运行前已提交并冻结，运行输入与冻结文件一致；能提供有限的未运行输入检查。但最终校验器根据其中两例作过离线修复，因此不能称最终校验器的完全未接触盲测或广泛泛化证明。"
+    },
+    "budget": {
+      "reservations": 101,
+      "unique_request_ids": 101,
+      "completions": 101,
+      "request_limit": 120,
+      "historical_requests_retained": 46,
+      "qwen_seconds": 1001.326,
+      "carried_forward_other_model_seconds": 74.5,
+      "total_model_seconds": 1075.826,
+      "seconds_limit": 7200,
+      "deadline_utc": "2026-09-29T14:36:10Z",
+      "historical_unknown": "candidate-01-screen-001，原UNKNOWN及11.005秒未改写；仅通过既有已审resolution/normalization收据处理当前执行已退出。",
+      "new_unknowns": 0,
+      "candidate05_model_seconds": 327.823,
+      "maximum_single_request_seconds": 19.756,
+      "resource_boundary": "最低RAM为4362MiB，低于4500底线；最低GPU free为2744MiB。不能报告全程资源通过。"
+    }
+  },
+  "findings": [
+    {
+      "id": "C05-R1-01",
+      "severity": "HIGH",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/reports/real-ai-integration-027/diagnostic-r3-27b/candidate-05/fixed.json: PHOTO-002 LLM / candidate-05-fixed-022；D:/property-ai/reports/auth-identity-ai-001/local-qwen/run-quality28.py:577-584",
+      "trigger": "运行采样发现RAM 4362MiB低于4500MiB，尝试终止绑定模型进程树时发生RuntimeError。",
+      "impact": "本次确实停止了后续固定集请求，但未证明越界时能及时终止正在执行的推理。不能将当前空闲、后续完整HTTP响应或零调用续接视为资源终止机制已经有效，也不能直接据此放行缺少等效保护的8093业务调用。",
+      "evidence": [
+        "原阶段保存guard_stop_reason=RESOURCE_FLOOR_CROSSED、breach_action=TERMINATE_EXACT_BOUND_PROJECT_MODEL_RUNTIME_TREE及runtime_stop_error=RuntimeError，没有成功runtime_stop收据。",
+        "阶段随后收到HTTP 200及完整响应，latency_seconds=8.792，resident_after仍有该模型；故账本RESPONSE_RECEIVED合理，不应另造UNKNOWN。",
+        "fixed.json保留INCOMPLETE；fixed-continuation为零新增调用的同源复用。这些证明没有重放失败请求，但不证明实时终止成功。"
+      ],
+      "recommendation": "不重跑本28例。实际AUTO前，定位并修复精确终止失败，或核对业务有界适配器的等效资源/时间保护；保留失败原因与可验证的退出收据。停止失败且无完整响应时必须UNKNOWN并阻断后续预约。可先用不加载模型的专属哑进程验证保护路径，再做同一问题的窄复审。"
+    }
+  ],
+  "basis_summary": {
+    "model_semantic_gate": "满足本固定小集进入有界AUTO验证的语义条件，未发现新的核心语义阻塞；并非所有原始字段逐字命中金标。",
+    "effective_decision_gate": "当前源码及已保存离线重验支持正常维修保持自动分流，合理澄清与既定危险后备未被普遍扩大；没有把正常任务大量转人工来制造通过。",
+    "business_execution_gate": "资源越界终止失败尚未关闭，因此本次整体放行结论为NOT_READY；这一阻塞不要求废弃或重跑已接受语义证据。",
+    "evidence_hashes": {
+      "screen": "88134CBE805BF742A6DAE18E43AB05A7AC236596BAB44686A6AAFEFD9F1C0F9A",
+      "fixed": "61AC72EB35B6815D07BECCC2A100716B1CB76418D55EADF30E5CD5057E16590F",
+      "fixed_continuation": "D8A6F524730A1CB1F7C966AC9A15E5908490E13BA0879A9255A95992D91BA6EB",
+      "novel": "B0C1F63FC080B5A2182ECACB9761F88EB5FFA25FBECBE2A6655EF7F7DBE460AE",
+      "offline_revalidation": "EE672C932C5E63B956C46971529532392DD417FAE16A0337EEA79AEC2B788026",
+      "budget": "699271BFD67CF395694C83F34547071D2ED26482A9735CF64E6003FF837ACCEF"
+    }
+  },
+  "unverified": [
+    "本审查未运行测试、模型、页面、业务请求、数据库、队列或进程操作，未修改任何文件。",
+    "读取了直接测试源码与保存的离线重验结果，未独立执行专项测试。",
+    "未验证8093实际Provider切换、独立Worker真实AUTO、Assignment、负载、通知及并发业务闭环。",
+    "未验证资源保护成功终止路径、长时间运行或真实居民数据场景。",
+    "已有scoped真实RAG结论不扩大也不撤销；AUTO和Production仍未通过。"
+  ],
+  "next_action": "仅关闭C05-R1-01并窄复审资源执行门；不再调整本轮模型语义判据或重跑固定集。通过后，在既有用户授权、剩余累计预算与固定截止内进入8093 bounded AUTO，使用新的合成业务对象并保留全部历史结果。"
+}
