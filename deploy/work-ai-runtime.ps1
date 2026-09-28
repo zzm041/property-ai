@@ -178,7 +178,7 @@ switch ($Action) {
             limits=[ordered]@{asr=1;embedding=1;reranker=1;qwen=18}
             duration_seconds=7200;asr_start_ram_mib=11264;evidence_root=$RuntimeDir
             runtime_binding_path=$bindingPath
-            runtime_binding_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $bindingPath).Hash
+            runtime_binding_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $bindingPath).Hash.ToLowerInvariant()
         }
         [IO.File]::WriteAllText($ConfigPath, ($config | ConvertTo-Json -Depth 5), [Text.UTF8Encoding]::new($false))
         $stdout=Join-Path $RuntimeDir "adapter.stdout.log";$stderr=Join-Path $RuntimeDir "adapter.stderr.log"
