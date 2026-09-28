@@ -1,0 +1,29 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "recorded_at_utc": "2026-09-28T04:59:22Z",
+  "finding": "9B-C3-OFFLINE-R1-01",
+  "supersedes_for_source_binding": "post-review-safety-fix2.json",
+  "repair": [
+    "A short standalone uncertainty modifier keeps scope over the following comma clause after an allowed speaker prefix is removed.",
+    "The validator rejects confirmed-current interpretations of both '我怀疑，插座冒烟' and '可能，插座冒烟'.",
+    "A complete uncertain cause such as '我怀疑线路老化' does not suppress a separate directly observed current event."
+  ],
+  "tests": {
+    "direct_and_contract": {"result": "PASS", "count": 113, "warnings": 1},
+    "affected_regression": {"result": "PASS", "count": 213, "warnings": 1},
+    "pure_unit": {"result": "PASS", "count": 1133, "warnings": 1}
+  },
+  "source_sha256": {
+    "backend/app/domain/observed_event.py": "9C300522395BDBD0FA9F61B2F6F81A277BF9E4B840AFB50DA1B270537E17B2F9",
+    "backend/tests/unit/test_observed_event_027.py": "59CBF67BD30A43C98AA532FDC352303761945A728DED819E9D30773CE3D3CAFC"
+  },
+  "independent_review": {
+    "record": "reports/codex/REAL-AI-INTEGRATION-027-9B-DELIVERY-V11-OFFLINE-FIX3.raw.json",
+    "decision": "PASS_SCOPED_FIX",
+    "finding_status": "CLOSED"
+  },
+  "quality_decision": "NOT_READY",
+  "business_switch_allowed": false,
+  "model_requests_added": 0,
+  "boundary": "The scoped validator repair does not overturn the immutable model semantic failures or authorize an 8093 real-AI/AUTO switch."
+}

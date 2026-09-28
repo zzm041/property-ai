@@ -1,0 +1,82 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "candidate": "delivery-v11-candidate-03",
+  "frozen_at_utc": "2026-09-28T04:36:07.2924679Z",
+  "base_head": "a8f50e86347df430f70823668337b5ab8486263f",
+  "model": "qwen3.5:9b",
+  "model_digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+  "prompt_version": "wo-analysis-v11-evidence-id",
+  "event_contract": "observed-event-v2-source-id",
+  "controls": {
+    "context": 4096,
+    "temperature": 0,
+    "thinking": false,
+    "llm_max_tokens": 512,
+    "vlm_max_tokens": 256,
+    "parallel": 1,
+    "qwen_request_limit": 80,
+    "model_execution_seconds_limit": 7200,
+    "deadline_utc": "2026-09-29T14:36:10Z"
+  },
+  "candidate2_problem_table": [
+    {
+      "cases": ["GOLD-004", "GOLD-008"],
+      "class": "MODEL_OUTPUT_AND_PROTOCOL_ADAPTER",
+      "finding": "The model understood the route but had to author brittle quote fragments; the selected fragment lost the subject or did not by itself match the label.",
+      "repair": "The server now creates stable evidence IDs and resolves the complete original segment before validation."
+    },
+    {
+      "cases": ["GOLD-012", "PHOTO-002"],
+      "class": "CORE_SEMANTIC_SAFETY",
+      "finding": "Conflicting hearsay was emitted as two confirmed faults, and a negated burn statement was emitted as a positive burn observation.",
+      "repair": "The service still rejects confirmed labels selected from conflict, hearsay or negated evidence; prompt instructions require one unresolved observation for conflict and forbid negative facts as actionable observations."
+    },
+    {
+      "cases": ["GOLD-016", "GOLD-018", "GOLD-020", "GOLD-022", "GOLD-023", "PHOTO-003"],
+      "class": "INFORMATIONAL_CONTEXT_VERSUS_EFFECTIVE_EVENT",
+      "finding": "The useful route was present but guesses, history or normal/negative context made the whole result fail or changed the incident key.",
+      "repair": "Raw and resolved context remains auditable, while only confirmed actionable observations enter the effective event key; invalid positive claims remain rejected."
+    },
+    {
+      "cases": ["PHOTO-004"],
+      "class": "SOURCE_PROVENANCE",
+      "finding": "Report text was mislabeled as vision evidence.",
+      "repair": "The model can only select a server-owned evidence ID; source and original text are resolved by the service and cannot be authored by the model."
+    }
+  ],
+  "offline_checks": {
+    "result": "PASS",
+    "tests": "108 passed, 1 warning",
+    "coverage": [
+      "stable report/asr/vision evidence IDs and history exclusion",
+      "unknown and cross-source IDs",
+      "negation, history, hearsay, conflict and subject checks",
+      "raw model output preservation",
+      "informational observations excluded from effective incident identity",
+      "adapter uses the canonical runtime schema",
+      "bounded collector and restore guards"
+    ]
+  },
+  "predeclared_unseen_set": {
+    "path": "reports/real-ai-integration-027/qwen35-9b-novel-set.json",
+    "sha256": "080BA74BAF0F16438AD7E2E25022DC41AAB8108971E16F25CC9C3A31D71A1754",
+    "cases": ["NOVEL-001", "NOVEL-002", "NOVEL-003", "NOVEL-004"],
+    "previous_qwen_requests": 0
+  },
+  "source_sha256": {
+    "backend/app/domain/ai.py": "3D33857C86A9473231749185B4E4AE42F4E6C99F60730AF89FDA0D22EBD45A76",
+    "backend/app/domain/observed_event.py": "0CB1C6E0F83319304CF230B9B8C361E4182EB4B493D0F51ECE00C685489FD77E",
+    "backend/app/service/analysis.py": "4367367860F7CAF4E0393027228B0B21C1138B995A1A443E73B6E638AA1A41D1",
+    "backend/app/service/auto_dispatch.py": "33C6520E369C181C94F27D23F018F343609C8C5BC53F084FA591E3215ACF46AE",
+    "scripts/ops/local_ai_http.py": "7EF7203F7645B6FDE16CC2B9C6AEC6423DC5D5EAC47F648FCC9129C26534AFFE",
+    "reports/auth-identity-ai-001/local-qwen/run-quality28.py": "C52315BD05D2AF04A54C7CAAC853BFD568E503129AF0589E1D464EADF84C880B",
+    "reports/auth-identity-ai-001/local-qwen/gold-set-24.json": "C3C93B419B7D5DEA12B529152CDE661C16826CC708B1D80D5B26D39D70DDFC1F",
+    "reports/auth-identity-ai-001/local-qwen/repair-image-gold.json": "DF10ABFDE5A0144C480E29041DDEDCC146A0182A6452DACD2ED97498C88CFDBE",
+    "reports/real-ai-integration-027/qwen35-9b-bounded-images.json": "47A48E4ACA82B1BAE50C25C9E51A8926194E1538C40DCC2DA35FC12CFA7419BD"
+  },
+  "boundaries": [
+    "Candidate2 raw outputs and NOT_READY review remain unchanged.",
+    "No model answer was edited or reclassified as a historical pass.",
+    "No business database, queue or work order is accessed by this diagnostic."
+  ]
+}

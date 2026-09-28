@@ -1,0 +1,34 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "incremental_round": 3,
+  "decision": "PASS_SCOPED_FIX",
+  "overall_quality": "NOT_READY",
+  "business_switch_allowed": false,
+  "finding_resolution": {
+    "id": "9B-C3-OFFLINE-R1-01",
+    "status": "CLOSED",
+    "basis": [
+      "独立前导修饰现在去除说话者后复用_UNCERTAIN完整匹配；“我怀疑，插座冒烟”和“可能，插座冒烟”会保留不确定性作用域并拒绝确认为当前事实。",
+      "“我怀疑线路老化”不是独立修饰词，因此不会遮蔽随后明确的“插座正在冒烟”；对应正测已加入。",
+      "主体仍只在选中标签的selected_clause中核对，“插座没有发黑，墙面发黑”不能借用另一对象的肯定证据。",
+      "既有前导转述、历史故障拒绝及独立当前分句接受逻辑未被本次修复移除。"
+    ]
+  },
+  "new_blockers_in_reviewed_fix": [],
+  "reviewed_hashes": {
+    "D:/property-ai/backend/app/domain/observed_event.py": "9C300522395BDBD0FA9F61B2F6F81A277BF9E4B840AFB50DA1B270537E17B2F9",
+    "D:/property-ai/backend/tests/unit/test_observed_event_027.py": "59CBF67BD30A43C98AA532FDC352303761945A728DED819E9D30773CE3D3CAFC"
+  },
+  "tests_evidence": {
+    "actually_read": "最新修饰识别、分句回接、主体绑定代码，以及两个不确定性负测、独立原因猜测正测和既有主体/历史测试。",
+    "implementer_report": "113 passed, 1 warning",
+    "boundary": "本次未运行测试；该数字来自实施方消息，不冒称独立重跑或已读取原始测试日志。"
+  },
+  "unverified": [
+    "本结论仅关闭该校验器回归，不证明所有自然语言否定、历史和猜测表达均已覆盖。",
+    "未重新推理、重映射固定集或操作页面、业务、数据库、队列；未修改文件或创建审查者。",
+    "此前模型事实、风险、冲突表达及正常AUTO可用性问题仍未关闭；旧机械接受数量不自动绑定到新源码。"
+  ],
+  "next_action": "保存本次窄复审结论并绑定准确源码hash；保留原模型输出和NOT_READY，不切换API/Worker或启动AUTO。后续模型诊断继续受原批准范围及预算限制，不因本次源码修复通过自动获得追加授权。"
+}

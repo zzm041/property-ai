@@ -1,0 +1,64 @@
+{
+  "task_id": "DELIVERY-RESTORE-CHECK-029",
+  "verified_at_utc": "2026-09-28T04:31:36.5696492Z",
+  "source_head_before_wip": "a8f50e86347df430f70823668337b5ab8486263f",
+  "source_database": "property_ai_delivery_check",
+  "restore_database": "property_ai_delivery_check_restore_check_029",
+  "backup": {
+    "path": "deploy/backups/property_ai_delivery_check-restore029-20260928T0400Z.sql",
+    "bytes": 150408,
+    "sha256": "618AEFD5FA2B86A875D16AE3E92712B49FC329E353029D393AF3DE2CA195D9A3",
+    "created_at_utc": "2026-09-28T04:27:47.8549811Z"
+  },
+  "first_attempt": {
+    "result": "FAILED_BEFORE_IMPORT",
+    "cause": "the shell interpreted MySQL identifier backticks in the temporary-account GRANT command",
+    "effects": [
+      "the exact approved empty restore database had been created",
+      "the dump import had not started",
+      "the temporary restore account and container dump were removed"
+    ]
+  },
+  "resume": {
+    "guard": "only the explicitly approved _restore_check_029 database may resume, and only while it exists with zero tables",
+    "result": "PASS_SCOPED_LOCAL_RESTORE",
+    "import_identity": "temporary account restricted to the restore database",
+    "temporary_accounts_remaining": 0
+  },
+  "snapshot_comparison": {
+    "revision": "20260926_0014_identity_merge_sla_versions",
+    "tables": 64,
+    "columns": 688,
+    "indexes": 595,
+    "foreign_keys": 116,
+    "representative_counts": {
+      "tenants": 4,
+      "properties": 4,
+      "users": 2,
+      "work_orders": 0,
+      "task_intents": 0,
+      "user_roles": 5,
+      "audit_logs": 37,
+      "identity_recovery_cases": 0,
+      "account_merges": 0,
+      "sla_policy_versions": 0,
+      "work_order_sla_applications": 0
+    },
+    "source_and_restore_match": true
+  },
+  "isolation": {
+    "api_database": "mysql/property_ai_delivery_check",
+    "worker_database": "mysql/property_ai_delivery_check",
+    "application_connected_to_restore_database": false,
+    "rabbitmq_vhost": "property_ai_delivery_check",
+    "business_queue": "property_ai.delivery_check",
+    "business_queue_ready": 0,
+    "business_queue_unacknowledged": 0,
+    "business_queue_consumers": 1,
+    "message_bodies_read": false
+  },
+  "limits": [
+    "This verifies the database snapshot restore path only.",
+    "It does not verify media-byte restore, target-host disaster recovery, production credentials, or formal release."
+  ]
+}

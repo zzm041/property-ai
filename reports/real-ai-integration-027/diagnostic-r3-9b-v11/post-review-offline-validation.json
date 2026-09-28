@@ -1,0 +1,52 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "recorded_at_utc": "2026-09-28T04:48:27.1294730Z",
+  "purpose": "Narrow offline repair of generalized Chinese evidence validation after the independent candidate-03 review; no new model request and no model answer modification.",
+  "review_decision_before_repair": "NOT_READY",
+  "changes": [
+    "Normal or unresolved context remains traceable but cannot alter the effective incident key.",
+    "Common equivalent phrases cover no-water, wall-surface peeling and elevator-hall cleanup without case IDs.",
+    "Current and historical clauses are evaluated locally so a current fault is not rejected merely because a separate clause mentions history.",
+    "Historical, uncertain, negated, unsupported-subject and unsupported-label claims remain rejected."
+  ],
+  "focused_tests": {
+    "result": "PASS",
+    "count": 117,
+    "warnings": 1,
+    "warning": "existing Starlette TestClient deprecation warning"
+  },
+  "immutable_raw_output_offline_remap": {
+    "fixed": {
+      "accepted_by_updated_evidence_validator": 24,
+      "rejected": [
+        {"id": "GOLD-008", "reason": "unsupported subject"},
+        {"id": "GOLD-012", "reason": "conflicting hearsay is not confirmed current evidence"},
+        {"id": "GOLD-022", "reason": "historical clause does not support the claimed subject/current event"},
+        {"id": "PHOTO-002", "reason": "smoke evidence does not support burn discoloration"}
+      ]
+    },
+    "novel": {
+      "accepted_by_updated_evidence_validator": 3,
+      "rejected": [
+        {"id": "NOVEL-004", "reason": "switch-panel evidence does not support subject=socket; the unsupported burn label remains in the raw output"}
+      ]
+    }
+  },
+  "semantic_failures_unchanged": [
+    "PHOTO-002 invents burn discoloration from a past smoke statement.",
+    "NOVEL-004 invents burn discoloration and the wrong device subject.",
+    "GOLD-012 still emits conflicting reports as confirmed faults.",
+    "GOLD-008 binds pooled floor water to a ceiling/wall subject.",
+    "NOVEL-001 still assigns flooding risk to only a few drops without spread."
+  ],
+  "source_sha256": {
+    "backend/app/domain/observed_event.py": "DF373C7FCFD6679FD3BF401ABE833A2A46A590B9A6BDD206444B1430612D6B9A",
+    "backend/tests/unit/test_observed_event_027.py": "A6FDBFCC4E7E8DE3682A78DD430713230F7DE1996244844431B35268D2799AC5",
+    "candidate-03/fixed.json": "3DA66D7A3730ACCB2A81E30479FDB96A48CDCE142DAAEEABD88DFDE69687E0FF",
+    "candidate-03/novel.json": "F5827B088E701171A225487CFA89CD5D6D6991A6C829C6BD905C593D8A2F7C13",
+    "qwen-budget.jsonl": "4F3787A933E63C295EED4C8C8804C4A2B162303A92FE15CCCC79BD56753F5A09"
+  },
+  "decision": "NOT_READY",
+  "business_switch_allowed": false,
+  "boundary": "The repair reduces avoidable whole-result rejection but cannot change the preserved semantic failures or authorize AUTO."
+}

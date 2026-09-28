@@ -1,0 +1,48 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "decision": "NEEDS_CHANGES",
+  "overall_quality": "NOT_READY",
+  "business_switch_allowed": false,
+  "reviewed_source": {
+    "path": "D:/property-ai/backend/app/domain/observed_event.py",
+    "sha256": "DF373C7FCFD6679FD3BF401ABE833A2A46A590B9A6BDD206444B1430612D6B9A",
+    "test_path": "D:/property-ai/backend/tests/unit/test_observed_event_027.py",
+    "test_sha256": "A6FDBFCC4E7E8DE3682A78DD430713230F7DE1996244844431B35268D2799AC5"
+  },
+  "findings": [
+    {
+      "id": "9B-C3-OFFLINE-R1-01",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "severity": "HIGH",
+      "location": "D:/property-ai/backend/app/domain/observed_event.py:172-194",
+      "trigger": "同一证据段包含多个对象，或逗号前的历史、转述、猜测修饰后续分句。",
+      "impact": "局部选择肯定标签却从整个证据段匹配主体，且没有保留跨分句统领的不确定性，可能放行危险对象误绑定。",
+      "evidence": [
+        "插座没有发黑，墙面发黑可错误放行烧焦变色/插座。",
+        "据说，插座冒烟可因逗号切分而丢失据说作用域。",
+        "新增测试未覆盖这两个反例。"
+      ],
+      "recommendation": "让标签、主体及否定/时态/转述共同绑定到同一可证明事实，并补直接负测。"
+    }
+  ],
+  "offline_remap_assessment": {
+    "reported_counts": "fixed 24/28, novel 3/4",
+    "assessment": "代码路径与保存报告相符，但不能视为独立安全或质量确认。",
+    "remaining_semantics": [
+      "PHOTO-002 and NOVEL-004 unsupported danger labels remain.",
+      "GOLD-012 conflict, GOLD-008 subject and GOLD-022 history remain rejected.",
+      "NOVEL-001 flooding exaggeration remains."
+    ]
+  },
+  "verified_conditions": [
+    "Original fixed, novel and budget hashes remain unchanged.",
+    "No case-ID special casing was added.",
+    "NOT_READY and no AUTO remain correct."
+  ],
+  "unverified": [
+    "Reviewer did not run tests, models, pages, APIs, databases or queues.",
+    "The changed offline validator cannot rewrite the original mechanical result."
+  ],
+  "next_action": "Fix only the clause-binding regression, add direct tests, preserve original failures and NOT_READY, and do not add inference."
+}

@@ -1,0 +1,138 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "review_type": "INDEPENDENT_READ_ONLY",
+  "review_round": "delivery-v11-candidate-03-quality",
+  "reviewed_head": "a8f50e86347df430f70823668337b5ab8486263f",
+  "decision": "NOT_READY",
+  "overall_task_verdict": "NOT_FULL_PASS",
+  "conclusion": "来源ID协议改善了证据绑定，但本候选仍有无依据危险标签、冲突表达不合格和正常报修被协议整体拒绝的问题，未达到有界AUTO业务门槛。服务端拦截有效不等于正常自动化能力通过，也没有证据表明这些失败已造成实际错派。",
+  "source_scope": {
+    "freeze": {
+      "path": "D:/property-ai/reports/real-ai-integration-027/diagnostic-r3-9b-v11/offline-repair-and-freeze.json",
+      "sha256": "069B9F44D860F1829E40D0F5FB30F57AFB1BC3F5BFF0396B4C8DE73810B347B7",
+      "verification": "冻结清单登记的9项文件SHA-256均与当前文件一致。fixed和novel的source_hashes、gold_hashes一致。"
+    },
+    "model": "qwen3.5:9b Q4_K_M",
+    "model_digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+    "prompt_version": "wo-analysis-v11-evidence-id",
+    "event_contract": "observed-event-v2-source-id",
+    "reviewed_diff": [
+      "D:/property-ai/backend/app/domain/observed_event.py",
+      "D:/property-ai/backend/app/domain/ai.py",
+      "D:/property-ai/backend/app/service/analysis.py",
+      "D:/property-ai/scripts/ops/local_ai_http.py"
+    ]
+  },
+  "blockers": [
+    {
+      "id": "9B-C3-Q01",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "severity": "HIGH",
+      "location": "candidate-03/fixed.json PHOTO-002; candidate-03/novel.json NOVEL-004",
+      "trigger": "输入只报告曾冒烟，或报告开关面板出现火花但没有烧焦变色和插座事实。",
+      "impact": "结构化字段补造危险现象或设备对象，不能作为可信事件、风险及维修依据。摘要正确不能抵消这些字段错误。",
+      "evidence": [
+        "PHOTO-002把仅有曾冒烟的report:1标为烧焦变色，confidence=0.85；实际图片无明显烧焦；服务端AI.INVALID_OUTPUT。",
+        "NOVEL-004把开关面板火花标为subject=插座，并增加输入没有的烧焦变色，confidence=0.95；服务端AI.INVALID_OUTPUT。"
+      ],
+      "boundary": "均被当前校验拦截；本轮没有Assignment、业务通知或错误派单运行证据。"
+    },
+    {
+      "id": "9B-C3-Q02",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "severity": "MEDIUM",
+      "location": "candidate-03/fixed.json GOLD-012 and GOLD-013",
+      "trigger": "同一对象存在矛盾转述，或噪声来源仍不确定。",
+      "impact": "未按冻结规则形成可接受的待澄清结果，不能以摘要承认不确定性代替结构化字段和置信度遵从。",
+      "evidence": [
+        "GOLD-012摘要承认矛盾且confidence=0.6，但仍把矛盾转述列为两个确认故障并错误绑定主体。",
+        "GOLD-013保留来源不确定，但category=hvac、confidence=0.95。"
+      ]
+    },
+    {
+      "id": "9B-C3-Q03",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "severity": "HIGH",
+      "location": "backend/app/domain/observed_event.py and fixed/novel related cases",
+      "trigger": "正常主诉包含多余观察或等价中文、地点未被字面词表覆盖。",
+      "impact": "整个分析被拒绝，正常报修无法沿AUTO链继续。",
+      "evidence": [
+        "GOLD-004/015/021/024主故障大体正确但冗余观察导致整体拒绝。",
+        "GOLD-022额外引用昨晚片段作为当前观察。",
+        "NOVEL-001墙皮鼓起掉块未被原词表接受；NOVEL-002电梯厅未被原主体词表接受。",
+        "PHOTO-003主要烧损识别正确，但附加待核实观察导致整体拒绝。"
+      ],
+      "recommendation": "修复可泛化中文证据校验和无关观察导致整体失败，不按case ID放行或关闭事实保护。"
+    },
+    {
+      "id": "9B-C3-Q04",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "severity": "MEDIUM",
+      "location": "candidate-03/novel.json NOVEL-001",
+      "trigger": "只有几滴水且没有扩散或接触插座。",
+      "impact": "输出risk=flooding、confidence=0.95，违反少量滴水风险规则。",
+      "boundary": "这是风险夸大，不是已发生洪水或错误派单。"
+    }
+  ],
+  "non_blocking_and_calibrations": [
+    {"cases": ["GOLD-014"], "assessment": "保留滴水和插座无电两项并使用maintenance；category差异不等于细分工种错派。"},
+    {"cases": ["NOVEL-003"], "assessment": "confidence=0.85校准不理想，但other/other在map_analysis_output中为low_confidence，不能称为实际AUTO。"},
+    {"cases": ["GOLD-018", "GOLD-019", "GOLD-020", "PHOTO-004"], "assessment": "未延续旧候选的历史燃气污染、提示注入服从或来源伪装问题；不追认旧候选PASS。"},
+    {"cases": ["PHOTO-001", "PHOTO-003", "PHOTO-004"], "assessment": "实际查看缩放图片；主要内容分别为表层剥落、插座孔附近烧损、蓝色阀门。"},
+    {"location": "run-quality28.py diagnostic_mechanical_checks", "assessment": "business_fallback只记录mapped.low_confidence，不涵盖SAFETY/GAS保护，不能据此直接认定AUTO资格。"}
+  ],
+  "verified_conditions": {
+    "request_binding": {
+      "fixed_cases": 28,
+      "fixed_requests": 32,
+      "novel_cases": 4,
+      "novel_requests": 4,
+      "reused_requests": 0,
+      "unique_request_ids": 36,
+      "reserved_records": 36,
+      "completed_records": 36,
+      "unknown_or_unmatched_reservations": 0,
+      "raw_response_hash_mismatches": 0,
+      "same_candidate": true,
+      "same_llm_prompt_prefix_and_schema": true,
+      "controls": "context4096, temperature0, thinking off, LLM512, VLM256, serial same digest"
+    },
+    "budget_and_resources": {
+      "recorded_call_limit": 80,
+      "used_calls": 36,
+      "model_execution_seconds_limit": 7200,
+      "recorded_model_seconds": 66.942,
+      "first_reservation_utc": "2026-09-28T04:37:10.606585Z",
+      "last_completion_utc": "2026-09-28T04:38:46.707775Z",
+      "deadline_utc": "2026-09-29T14:36:10Z",
+      "latency_seconds": {"minimum": 1.161, "median": 1.74, "maximum": 8.254},
+      "sampled_minimum_free_ram_mib": 6448,
+      "sampled_minimum_free_vram_mib": 3322
+    },
+    "format_and_mechanism": {
+      "http_200": 36,
+      "finish_reason_stop": 36,
+      "raw_json_checks_passed": 36,
+      "maximum_prompt_tokens": 1772,
+      "maximum_completion_tokens": 231,
+      "recorded_total_tokens": 63163,
+      "fixed_service_validation_rejected": ["GOLD-004", "GOLD-008", "GOLD-012", "GOLD-013", "GOLD-015", "GOLD-021", "GOLD-022", "GOLD-024", "PHOTO-002", "PHOTO-003"],
+      "novel_service_validation_rejected": ["NOVEL-001", "NOVEL-002", "NOVEL-004"],
+      "boundary": "18/28 fixed and 1/4 novel mechanical acceptance was not a quality or AUTO pass."
+    },
+    "images": "Four actual scaled repair images were inspected and their request bytes matched the bounded manifest.",
+    "software_boundary": "Server resolves source IDs; raw fields remain; unified maintenance rules and safety fallbacks remain."
+  },
+  "reviewed_evidence": [
+    {"path": "D:/property-ai/reports/real-ai-integration-027/diagnostic-r3-9b-v11/candidate-03/fixed.json", "sha256": "3DA66D7A3730ACCB2A81E30479FDB96A48CDCE142DAAEEABD88DFDE69687E0FF"},
+    {"path": "D:/property-ai/reports/real-ai-integration-027/diagnostic-r3-9b-v11/candidate-03/novel.json", "sha256": "F5827B088E701171A225487CFA89CD5D6D6991A6C829C6BD905C593D8A2F7C13"},
+    {"path": "D:/property-ai/reports/real-ai-integration-027/diagnostic-r3-9b-v11/qwen-budget.jsonl", "sha256": "4F3787A933E63C295EED4C8C8804C4A2B162303A92FE15CCCC79BD56753F5A09"}
+  ],
+  "unverified": [
+    "Reviewer did not run tests, models, pages, APIs, databases or queues and did not modify files.",
+    "No real business switch, staff filtering, Assignment or notification flow was executed.",
+    "No real resident data, voice, real RAG, concurrency capacity or Production deployment was verified.",
+    "The conclusion applies only to this model, quantization, prompt, protocol and input wrapper."
+  ],
+  "next_action": "Keep NOT_READY, do not switch API/Worker or start AUTO. Fix generalized evidence validation offline without rewriting answers or replacing failed samples; any later inference remains separately bounded."
+}

@@ -1,0 +1,38 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "incremental_round": 2,
+  "decision": "NEEDS_CHANGES",
+  "overall_quality": "NOT_READY",
+  "business_switch_allowed": false,
+  "finding_resolution": {
+    "id": "9B-C3-OFFLINE-R1-01",
+    "status": "PARTIALLY_FIXED_OPEN",
+    "closed_parts": [
+      "“插座没有发黑，墙面发黑”不能再借墙面的肯定命中支持插座：主体检查已改为selected_clause。",
+      "“据说，插座正在冒烟”通过回接前导转述词被拒绝。",
+      "源码及测试保留独立历史分句不压制明确当前现象的正例，以及仅历史故障不能成为当前事件的负例。"
+    ],
+    "remaining_blocker": {
+      "classification": "CURRENT_TASK_BLOCKER",
+      "severity": "HIGH",
+      "location": "D:/property-ai/backend/app/domain/observed_event.py：_clause_for_match的前导修饰回接分支",
+      "trigger": "使用既有_UNCERTAIN支持、但不在新回接白名单中的独立猜测修饰，例如“我怀疑，插座冒烟。”或“可能，插座冒烟。”。",
+      "impact": "逗号仍会剥离统领不确定性，使冒烟被当作已确认现象；这是同一作用域回归，尚不能声称猜测保护完整保留。",
+      "evidence": "前导回接仅匹配据说、听说及若干‘说’类表达；怀疑、可能未回接。后续_UNCERTAIN只检查不含这些词的局部分句，主体插座又在该分句内，因此静态路径可通过。未执行反例。",
+      "recommendation": "补齐独立前导猜测/不确定性修饰的作用域识别，复用既有语义类别并增加直接等价负测；同时保留明确当前/历史分句正例，不把整段一律判失败。"
+    }
+  },
+  "reviewed_hashes": {
+    "backend/app/domain/observed_event.py": "3225DE42393B15E3E8C817F7A59235793478EBF92F120C67CCCFE8F884EA1292",
+    "backend/tests/unit/test_observed_event_027.py": "7B128314315D97C79418618C258EF8E2D61D4F0C1BF1CF09CB9B5E9700F0D20B"
+  },
+  "evidence_read": "D:/property-ai/reports/real-ai-integration-027/diagnostic-r3-9b-v11/post-review-safety-fix2.json及对应源码、测试",
+  "tests_boundary": "119 passed、1 warning以及22/28、3/4离线机械接受为保存的实施方结果；本审查没有运行测试或重映射。",
+  "unchanged_boundaries": [
+    "机械接受不等于语义、AUTO或Production通过。",
+    "原模型语义失败及NOT_READY继续保留。",
+    "未运行模型、业务、页面、数据库或队列，未写文件或创建审查者。"
+  ],
+  "next_action": "仅完成同一finding剩余前导修饰作用域修复与直接专项；不追加推理、不切换业务。"
+}

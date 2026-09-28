@@ -1,0 +1,32 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "recorded_at_utc": "2026-09-28T04:51:00Z",
+  "finding": "9B-C3-OFFLINE-R1-01",
+  "repair": [
+    "A label match, its negation/history/hearsay scope, and its subject now bind to the same local evidence clause.",
+    "A short leading hearsay introducer such as '据说，' remains in scope for the following clause.",
+    "A positive observation for one object cannot borrow a different object's subject from elsewhere in the evidence segment."
+  ],
+  "direct_regressions": [
+    "插座没有发黑，墙面发黑 cannot validate 烧焦变色/插座",
+    "据说，插座正在冒烟 cannot validate a confirmed current event",
+    "a separate historical clause does not suppress a later confirmed current clause",
+    "a historical fault cannot support a current event"
+  ],
+  "focused_tests": {"result": "PASS", "count": 119, "warnings": 1},
+  "immutable_raw_output_offline_remap": {
+    "fixed": {
+      "accepted": 22,
+      "rejected": ["GOLD-004", "GOLD-008", "GOLD-012", "GOLD-022", "PHOTO-002", "PHOTO-004"]
+    },
+    "novel": {"accepted": 3, "rejected": ["NOVEL-004"]},
+    "boundary": "Mechanical acceptance is not a semantic or AUTO pass. The original inference records remain unchanged."
+  },
+  "source_sha256": {
+    "backend/app/domain/observed_event.py": "3225DE42393B15E3E8C817F7A59235793478EBF92F120C67CCCFE8F884EA1292",
+    "backend/tests/unit/test_observed_event_027.py": "7B128314315D97C79418618C258EF8E2D61D4F0C1BF1CF09CB9B5E9700F0D20B"
+  },
+  "decision": "NOT_READY",
+  "business_switch_allowed": false,
+  "model_requests_added": 0
+}
