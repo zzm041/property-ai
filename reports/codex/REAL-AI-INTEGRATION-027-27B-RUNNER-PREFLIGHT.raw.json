@@ -1,0 +1,51 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-27B-RUNNER-PREFLIGHT",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_sha": "8d7a0b6354e91b2330efb382f7f0a88073cbf7c6 + scoped WIP",
+  "verdict": "PASS_SCOPED_PREFLIGHT",
+  "source_hashes": {
+    "collector": "C0AA9E78163106079A679AB62A411C1C41A8337D33E773EC8ACE222DB89AE2FA",
+    "focused_tests": "39814C466430EC22CFC05936E6EF112E24A249F571475C943748478831A7FBCE",
+    "budget": "FBE552BF04383E6A6F37470E9E19B83E74104559BC2F94BDF57687E842AEAD4A"
+  },
+  "findings": [],
+  "closed_findings": [
+    {
+      "id": "27B-PREFLIGHT-R1-02",
+      "status": "CLOSED",
+      "evidence": "未定义的 direct 调用已移除。监听探针仅将明确连接拒绝视为关闭，超时等其他状态抛错；受绑定进程树终止成功、根进程检查结束及监听关闭后，函数才返回受控退出证明。后置 sample/resident 异常分别捕获，不再跳过完成账本。对应测试检查精确 taskkill 参数、连接拒绝与不确定状态。"
+    },
+    {
+      "id": "27B-PREFLIGHT-R1-03",
+      "status": "CLOSED",
+      "evidence": "runtime_guard_reason 独立检查截止，采样异常不再绕过监督，而是返回 RESOURCE_OBSERVATION_FAILED。单调时钟窗口取单次、累计剩余及绝对截止剩余的最小值，并预留 15 秒清理时间；预约前仍要求完整请求余量。直接断言覆盖截止与采样同时失败、单独采样失败及 RAM/GPU 越界。"
+    },
+    {
+      "id": "27B-PREFLIGHT-R1-04",
+      "status": "CLOSED",
+      "evidence": "screen→fixed 与 fixed→novel 的候选来源、源码、输入契约、稳定控制参数及运行绑定保留；新增清理余量也纳入 controls 比较。"
+    },
+    {
+      "id": "27B-PREFLIGHT-R1-01",
+      "status": "CLOSED_UNCHANGED",
+      "evidence": "产品 Settings 上限保持 60 秒，180 秒只用于诊断注入客户端和 VLM。"
+    }
+  ],
+  "verified_conditions": [
+    "实际文件哈希与最终送审值一致。",
+    "原 RAG 预约/完成两行保留；追加 74.5 秒非 Qwen 模型耗时，没有重复计算原 5.375 秒。",
+    "当前账本为 attempted=1、model_seconds=79.875、unknown=[]；没有新增 27B 预约。",
+    "没有发现本次窄范围修复引入的新当前任务阻塞。"
+  ],
+  "tests_evidence": {
+    "reported_result": "23 passed，1 个既有 pytest-asyncio warning；AST 和无推理构造检查通过。",
+    "reviewer_boundary": "实际读取测试源码与断言；结果来自实施方报告，审查者未运行测试、终止函数或模型。"
+  },
+  "unverified": [
+    "实际进程树终止、操作系统响应时延和真实资源越界回收尚未运行验证；本结论不保证硬实时退出。",
+    "实际 27B 资产来源、digest/tag 和专属运行身份仍须在执行前完成绑定与核对。",
+    "未运行模型、页面、业务请求、数据库、队列或进程操作，未修改文件。",
+    "没有 27B 质量、真实 AUTO 或 Production PASS。"
+  ],
+  "next_action": "保存本次预检与上述哈希；只有实际候选来源、运行身份及实时资源守卫均满足后，才在既有授权和不重置的预算内执行。UNKNOWN 或受控停止仍须保留原始记录，不自动重放。"
+}

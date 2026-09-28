@@ -1,7 +1,9 @@
 """Collector-only checks; no inference, business requests or fixtures."""
 import json
+import subprocess
 from pathlib import Path
 import runpy
+import pytest
 helpers=runpy.run_path(str(Path(__file__).with_name('run-quality28.py')))
 check=helpers['raw_json_checks']
 def body(value):return json.dumps({'choices':[{'message':{'content':json.dumps(value)}}]})
@@ -39,6 +41,58 @@ def test_budget_accepts_response_backed_provider_rejection():
          'remote_completion':'RESPONSE_RECEIVED'},
     ])
     assert state=={'attempted':1,'model_seconds':3.5,'unknown':[]}
+
+def test_runtime_guard_deadline_and_observation_fail_closed():
+    guard=helpers['runtime_guard_reason']
+    assert guard(now=10,deadline=10,observed=None,observation_error=RuntimeError('sample'),ram_floor=4500)==\
+        'REQUEST_WALL_OR_CUMULATIVE_DEADLINE'
+    assert guard(now=9,deadline=10,observed=None,observation_error=RuntimeError('sample'),ram_floor=4500)==\
+        'RESOURCE_OBSERVATION_FAILED'
+    assert guard(now=9,deadline=10,observed={'ram_free_mib':4499,'gpu_free_mib':9000},
+                 observation_error=None,ram_floor=4500)=='RESOURCE_FLOOR_CROSSED'
+    assert guard(now=9,deadline=10,observed={'ram_free_mib':9000,'gpu_free_mib':1999},
+                 observation_error=None,ram_floor=4500)=='RESOURCE_FLOOR_CROSSED'
+    assert guard(now=9,deadline=10,observed={'ram_free_mib':9000,'gpu_free_mib':2000},
+                 observation_error=None,ram_floor=4500) is None
+
+class _FakeSocket:
+    def __init__(self,code):self.code=code
+    def __enter__(self):return self
+    def __exit__(self,*_args):return False
+    def settimeout(self,_timeout):pass
+    def connect_ex(self,address):
+        assert address==('127.0.0.1',11435)
+        return self.code
+
+@pytest.mark.parametrize(('code','expected'),[(10061,True),(111,True),(0,False)])
+def test_loopback_listener_closed_requires_explicit_refusal(monkeypatch,code,expected):
+    monkeypatch.setattr(helpers['socket'],'socket',lambda *_args,**_kwargs:_FakeSocket(code))
+    assert helpers['loopback_listener_closed']() is expected
+
+def test_loopback_listener_closed_rejects_ambiguous_status(monkeypatch):
+    monkeypatch.setattr(helpers['socket'],'socket',lambda *_args,**_kwargs:_FakeSocket(10060))
+    with pytest.raises(RuntimeError,match='LISTENER_STATUS_UNKNOWN_10060'):
+        helpers['loopback_listener_closed']()
+
+def test_terminate_bound_runtime_confirms_exact_tree_and_listener(monkeypatch):
+    runtime={'pid':40700,'executable':r'C:\\ollama.exe','launched_at_utc':'2026-09-27T14:46:24Z'}
+    identity={'pid':40700,'path':runtime['executable'],'started_utc':runtime['launched_at_utc']}
+    calls={'identity':0}
+    def identity_then_gone(_runtime):
+        calls['identity']+=1
+        if calls['identity']==1:return identity
+        raise subprocess.CalledProcessError(1,['powershell'])
+    runtime_globals=helpers['terminate_bound_runtime'].__globals__
+    monkeypatch.setitem(runtime_globals,'bound_runtime_identity',identity_then_gone)
+    def exact_taskkill(args,**kwargs):
+        assert args==['taskkill','/PID','40700','/T','/F']
+        assert kwargs=={'capture_output':True,'text':True,'timeout':15}
+        return type('R',(),{'returncode':0})()
+    monkeypatch.setattr(helpers['subprocess'],'run',exact_taskkill)
+    monkeypatch.setitem(runtime_globals,'loopback_listener_closed',lambda:True)
+    result=helpers['terminate_bound_runtime'](runtime)
+    assert result['verified_before_stop']==identity
+    assert result['stopped']=={'pid':40700,'tree_exit_confirmed':True,'listener_exit_confirmed':True}
 
 def test_mechanical_check_uses_observed_event_contract_not_legacy_subcategory():
     payload={'category':'cleaning','observations':[{'label':'杂物清扫','subject':'楼道地面',

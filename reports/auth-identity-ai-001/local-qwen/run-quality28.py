@@ -1,6 +1,6 @@
 """Bounded real 28-case diagnostics; existing provider pipeline, no business IO."""
 from pathlib import Path
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 import argparse
 import hashlib
 import json
@@ -9,6 +9,7 @@ import os
 import re
 import runpy
 import site
+import socket
 import subprocess
 import sys
 import threading
@@ -22,6 +23,14 @@ DELIVERY_V11_TOTAL_CALL_LIMIT=80
 NINE_B_TOTAL_MODEL_SECONDS=7200
 NINE_B_START_GPU_FREE_MIB=8200
 NINE_B_RESIDENT_REQUEST_GPU_FREE_MIB=2500
+TWENTY_SEVEN_B_MODEL='qwen3.5:27b-q4_K_M'
+TWENTY_SEVEN_B_TOTAL_CALL_LIMIT=80
+TWENTY_SEVEN_B_REQUEST_TIMEOUT_SECONDS=180
+TWENTY_SEVEN_B_RESIDENT_REQUEST_GPU_FREE_MIB=2000
+TWENTY_SEVEN_B_ADMISSION_OVERHEAD_MIB=1536
+TWENTY_SEVEN_B_TERMINATION_MARGIN_SECONDS=15
+TWENTY_SEVEN_B_CANDIDATE_SOURCE=ROOT/'reports/real-ai-integration-027/qwen35-27b-candidate-source.json'
+TWENTY_SEVEN_B_RUNTIME=ROOT/'reports/real-ai-integration-027/qwen35-27b-runtime.json'
 COLLECTOR_PATH='reports/auth-identity-ai-001/local-qwen/run-quality28.py'
 NINE_B_RESUME_BINDING=ROOT/'reports/real-ai-integration-027/qwen35-9b-resume-binding.json'
 NINE_B_COLLECTOR_RECOVERY_BINDING=ROOT/'reports/real-ai-integration-027/qwen35-9b-collector-recovery-binding.json'
@@ -64,11 +73,15 @@ def budget_state_from_events(events):
     unknown=[]
     for row in reserved:
         completion=completed.get(row['request_id'])
-        if completion is None or completion.get('remote_completion')!='RESPONSE_RECEIVED':
+        if completion is None or completion.get('remote_completion') not in {
+            'RESPONSE_RECEIVED','CONTROLLED_RUNTIME_TERMINATION_CONFIRMED'
+        }:
             unknown.append(row['request_id'])
     return {
         'attempted':len(reserved),
-        'model_seconds':sum(float(row['model_seconds']) for row in completed.values()),
+        'model_seconds':sum(float(row['model_seconds']) for row in completed.values())+sum(
+            float(row['model_seconds']) for row in events if row.get('event')=='MODEL_SECONDS_CARRIED_FORWARD'
+        ),
         'unknown':unknown,
     }
 def protocol_source_hashes_match(left,right):
@@ -79,6 +92,46 @@ def protocol_source_hashes_match(left,right):
 def model_input_contract_sha256():
     encoded=json.dumps(MODEL_INPUT_CONTRACT,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()
     return hashlib.sha256(encoded).hexdigest()
+def bound_runtime_identity(runtime):
+    pid=int(runtime['pid'])
+    command=(
+        f"$p=Get-Process -Id {pid} -ErrorAction Stop; "
+        "[ordered]@{pid=$p.Id;path=$p.Path;started_utc=$p.StartTime.ToUniversalTime().ToString('o')} | ConvertTo-Json -Compress"
+    )
+    actual=json.loads(subprocess.check_output(['powershell','-NoProfile','-Command',command],text=True))
+    expected=datetime.fromisoformat(runtime['launched_at_utc'].replace('Z','+00:00'))
+    observed=datetime.fromisoformat(actual['started_utc'].replace('Z','+00:00'))
+    if actual['pid']!=pid or Path(actual['path']).resolve()!=Path(runtime['executable']).resolve() or abs((observed-expected).total_seconds())>1:
+        raise RuntimeError('MODEL_RUNTIME_IDENTITY_CHANGED')
+    return actual
+def loopback_listener_closed(host='127.0.0.1',port=11435):
+    """Return True only when the loopback listener is explicitly refused."""
+    with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as probe:
+        probe.settimeout(.25);code=probe.connect_ex((host,port))
+    if code in {10061,111}:return True
+    if code==0:return False
+    raise RuntimeError(f'MODEL_RUNTIME_LISTENER_STATUS_UNKNOWN_{code}')
+def terminate_bound_runtime(runtime):
+    """Stop only the exact project-owned Ollama service tree after a guard breach."""
+    actual=bound_runtime_identity(runtime)
+    pid=int(runtime['pid'])
+    stopped=subprocess.run(['taskkill','/PID',str(pid),'/T','/F'],capture_output=True,text=True,timeout=15)
+    if stopped.returncode!=0:raise RuntimeError('MODEL_RUNTIME_TREE_TERMINATION_FAILED')
+    for _ in range(40):
+        try:bound_runtime_identity(runtime)
+        except (RuntimeError,subprocess.CalledProcessError):break
+        time.sleep(.25)
+    else:raise RuntimeError('MODEL_RUNTIME_EXIT_UNCONFIRMED')
+    for _ in range(40):
+        if loopback_listener_closed():break
+        time.sleep(.25)
+    else:raise RuntimeError('MODEL_RUNTIME_LISTENER_STILL_AVAILABLE')
+    return {'verified_before_stop':actual,'stopped':{'pid':pid,'tree_exit_confirmed':True,'listener_exit_confirmed':True}}
+def runtime_guard_reason(*,now,deadline,observed,observation_error,ram_floor):
+    if now>=deadline:return 'REQUEST_WALL_OR_CUMULATIVE_DEADLINE'
+    if observation_error is not None:return 'RESOURCE_OBSERVATION_FAILED'
+    if observed['ram_free_mib']<ram_floor or observed['gpu_free_mib']<2000:return 'RESOURCE_FLOOR_CROSSED'
+    return None
 def incomplete_screen_resume_items(all_items,screen):
     if (screen.get('status')!='INCOMPLETE' or screen.get('stop_reason')!='RESOURCE_FLOOR_CROSSED'
             or screen.get('candidate')!=1 or screen.get('phase')!='screen'):
@@ -193,20 +246,25 @@ def main():
         sys.argv.remove('--supplement')
         runpy.run_path(str(OUT/'run-approved-supplement.py'), run_name='__main__')
         return
-    parser=argparse.ArgumentParser();parser.add_argument('--round',type=int,choices=range(4));parser.add_argument('--model',choices=('qwen3.5:4b','qwen3.5:9b'),default='qwen3.5:4b');parser.add_argument('--phase',choices=('screen','fixed','novel'));parser.add_argument('--candidate',type=int,choices=(1,2,3));parser.add_argument('--resume-incomplete-screen',action='store_true');parser.add_argument('--resume-screen-collector-failure',action='store_true');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--round',type=int,choices=range(4));parser.add_argument('--model',choices=('qwen3.5:4b','qwen3.5:9b',TWENTY_SEVEN_B_MODEL),default='qwen3.5:4b');parser.add_argument('--phase',choices=('screen','fixed','novel'));parser.add_argument('--candidate',type=int,choices=(1,2,3));parser.add_argument('--resume-incomplete-screen',action='store_true');parser.add_argument('--resume-screen-collector-failure',action='store_true');args=parser.parse_args()
+    bounded_candidate=args.model!='qwen3.5:4b'
+    twenty_seven_b=args.model==TWENTY_SEVEN_B_MODEL
+    candidate_source_binding=None
     if args.model=='qwen3.5:4b':
         assert args.round is not None and args.phase is None and args.candidate is None,'Historical 4B mode requires --round only'
         target=OUT/f'quality28-round{args.round}.json';run_out=OUT;max_requests=32
     else:
-        assert args.round is None and args.phase is not None and args.candidate is not None,'9B mode requires --phase and --candidate'
+        assert args.round is None and args.phase is not None and args.candidate is not None,'Bounded candidate mode requires --phase and --candidate'
+        if twenty_seven_b:assert args.candidate==1,'27B has one authorized candidate'
         assert args.candidate==1 or args.phase in {'fixed','novel'},'Later candidates cannot add another screen after the bounded repair'
         assert args.candidate!=3 or args.phase in {'fixed','novel'},'Delivery v11 candidate uses one complete fixed run and one novel run'
         assert not (args.resume_incomplete_screen and args.resume_screen_collector_failure),'Only one bounded screen recovery is allowed'
         assert not (args.resume_incomplete_screen or args.resume_screen_collector_failure) or (args.candidate==1 and args.phase=='screen'),'Only candidate-01 screen can resume'
-        budget_root=(ROOT/'reports/real-ai-integration-027/diagnostic-r3-9b-v11'
+        budget_root=(ROOT/'reports/real-ai-integration-027/diagnostic-r3-27b' if twenty_seven_b else
+                     ROOT/'reports/real-ai-integration-027/diagnostic-r3-9b-v11'
                      if args.candidate==3 else ROOT/'reports/real-ai-integration-027/diagnostic-r3-9b')
-        active_call_limit=(DELIVERY_V11_TOTAL_CALL_LIMIT
-                           if args.candidate==3 else HISTORICAL_NINE_B_TOTAL_CALL_LIMIT)
+        active_call_limit=(TWENTY_SEVEN_B_TOTAL_CALL_LIMIT if twenty_seven_b else
+                           DELIVERY_V11_TOTAL_CALL_LIMIT if args.candidate==3 else HISTORICAL_NINE_B_TOTAL_CALL_LIMIT)
         run_out=budget_root/f'candidate-{args.candidate:02d}';run_out.mkdir(parents=True,exist_ok=True)
         phase_label=('screen-continuation-recovery' if args.resume_screen_collector_failure else
                      'screen-continuation' if args.resume_incomplete_screen else args.phase)
@@ -219,13 +277,13 @@ def main():
     gold=json.loads(textpath.read_text(encoding='utf-8'));photos=json.loads(photopath.read_text(encoding='utf-8'))
     assert len(gold['cases'])==24 and len(photos['cases'])==4
     overlay_path=ROOT/'reports/real-ai-integration-027/qwen35-9b-evaluation-overlay.json'
-    overlay=(json.loads(overlay_path.read_text(encoding='utf-8')) if args.model=='qwen3.5:9b' else None)
+    overlay=(json.loads(overlay_path.read_text(encoding='utf-8')) if bounded_candidate else None)
     novel_path=ROOT/'reports/real-ai-integration-027/qwen35-9b-novel-set.json'
-    novel=(json.loads(novel_path.read_text(encoding='utf-8')) if args.model=='qwen3.5:9b' else None)
+    novel=(json.loads(novel_path.read_text(encoding='utf-8')) if bounded_candidate else None)
     if overlay is not None:
         assert overlay['base_gold_unchanged'] is True and set(overlay['cases'])=={item['id'] for item in gold['cases']}
     all_items=gold['cases']+photos['cases']
-    if args.model=='qwen3.5:9b' and args.phase=='screen':
+    if bounded_candidate and args.phase=='screen':
         if args.resume_screen_collector_failure:
             selected_items=incomplete_collector_recovery_items(
                 all_items,json.loads((run_out/'screen-continuation.json').read_text(encoding='utf-8'))
@@ -235,14 +293,14 @@ def main():
         else:
             selected_items=[item for item in all_items if item['id'] in SCREEN_IDS]
             assert tuple(item['id'] for item in selected_items)==SCREEN_IDS
-    elif args.model=='qwen3.5:9b' and args.phase=='novel':
+    elif bounded_candidate and args.phase=='novel':
         assert novel['frozen_before_first_9b_inference'] is True and len(novel['cases'])==4
         selected_items=novel['cases']
     else:selected_items=all_items
     downloads=json.loads((OUT/'repair-image-downloads.json').read_text(encoding='utf-8'))
     bounded_manifest_path=ROOT/'reports/real-ai-integration-027/qwen35-9b-bounded-images.json'
     bounded_manifest=(json.loads(bounded_manifest_path.read_text(encoding='utf-8'))
-                      if args.model=='qwen3.5:9b' and args.candidate>=2 else None)
+                      if bounded_candidate and (twenty_seven_b or args.candidate>=2) else None)
     images={}
     for p in photos['cases']:
         original_path=OUT/'repair-images'/p['file'];row=next(r for r in downloads if Path(r['file']).name==p['file'])
@@ -255,8 +313,17 @@ def main():
             path=OUT/'repair-images-1024'/p['file']
             assert sha(path)==image_record['output_sha256']
         images[p['file']]=path.read_bytes()
-    digest=(json.loads((OUT/'download-4b-result.json').read_text(encoding='utf-8'))['manifest_sha256']
-            if args.model=='qwen3.5:4b' else '6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7')
+    if args.model=='qwen3.5:4b':
+        digest=json.loads((OUT/'download-4b-result.json').read_text(encoding='utf-8'))['manifest_sha256']
+    elif args.model=='qwen3.5:9b':
+        digest='6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7'
+    else:
+        candidate_source=json.loads(TWENTY_SEVEN_B_CANDIDATE_SOURCE.read_text(encoding='utf-8'))
+        assert candidate_source['model']==TWENTY_SEVEN_B_MODEL and candidate_source['source']=='official Ollama library'
+        digest=candidate_source['digest']
+        assert re.fullmatch('[0-9a-f]{64}',digest),'Invalid pinned 27B digest'
+        assert isinstance(candidate_source['size_bytes'],int) and 0<candidate_source['size_bytes']<=20*1024**3
+        candidate_source_binding={'path':str(TWENTY_SEVEN_B_CANDIDATE_SOURCE),'sha256':sha(TWENTY_SEVEN_B_CANDIDATE_SOURCE)}
     expected_version='0.34.2' if args.model=='qwen3.5:4b' else '0.34.3'
     assert api('/api/version')['version']==expected_version
     assert next(r for r in api('/api/tags')['models'] if r['name']==args.model)['digest']==digest
@@ -266,9 +333,11 @@ def main():
         return rows
     runtime_path=(ROOT/'reports/real-ai-integration-027/qwen35-9b-runtime-resume.json')
     runtime=(json.loads((OUT/'diagnostic-runtime28.json').read_text(encoding='utf-8-sig')) if args.model=='qwen3.5:4b' else
+             json.loads(TWENTY_SEVEN_B_RUNTIME.read_text(encoding='utf-8-sig')) if twenty_seven_b else
              json.loads((runtime_path if runtime_path.exists() else ROOT/'reports/real-ai-integration-027/qwen35-9b-runtime.json').read_text(encoding='utf-8-sig')))
     assert runtime['no_cloud'] and runtime['context_length']==4096 and runtime['concurrency']==1
-    budget_path=(budget_root/'qwen-budget.jsonl') if args.model=='qwen3.5:9b' else run_out/'qwen-budget.jsonl'
+    runtime_identity=bound_runtime_identity(runtime) if twenty_seven_b else None
+    budget_path=(budget_root/'qwen-budget.jsonl') if bounded_candidate else run_out/'qwen-budget.jsonl'
     def budget_events():
         if not budget_path.exists():return []
         return [json.loads(line) for line in budget_path.read_text(encoding='utf-8').splitlines() if line.strip()]
@@ -279,19 +348,23 @@ def main():
         fd=os.open(budget_path,os.O_APPEND|os.O_CREAT|os.O_WRONLY,0o600)
         try:os.write(fd,payload);os.fsync(fd)
         finally:os.close(fd)
-    if args.model=='qwen3.5:9b':
+    request_timeout=TWENTY_SEVEN_B_REQUEST_TIMEOUT_SECONDS if twenty_seven_b else 60
+    if bounded_candidate:
         state=budget_state();assert not state['unknown'],f'Prior request completion UNKNOWN: {state["unknown"]}'
-        assert state['attempted']<active_call_limit and state['model_seconds']<NINE_B_TOTAL_MODEL_SECONDS
-        assert datetime.now(UTC)<NINE_B_DEADLINE_UTC,'48-hour delivery window expired'
-    e={'task_id':'REAL-AI-INTEGRATION-027' if args.model.endswith(':9b') else 'SELFHOST-AI-LOCAL-001','round':args.round,'phase':phase_label if args.model.endswith(':9b') else args.phase,'candidate':args.candidate,'repair_rounds_used':args.round,'base_sha':'f5c8154',
+        assert state['attempted']<active_call_limit and state['model_seconds']+request_timeout<=NINE_B_TOTAL_MODEL_SECONDS
+        assert datetime.now(UTC)+timedelta(seconds=request_timeout)<=NINE_B_DEADLINE_UTC,'Insufficient bounded time before the delivery deadline'
+    e={'task_id':'REAL-AI-INTEGRATION-027' if bounded_candidate else 'SELFHOST-AI-LOCAL-001','round':args.round,'phase':phase_label if bounded_candidate else args.phase,'candidate':args.candidate,'repair_rounds_used':args.round,'base_sha':'f5c8154',
        'source_sha':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'at_utc':datetime.now(UTC).isoformat(),
        'model':args.model,'model_digest':digest,'quantization':'Q4_K_M','prompt_version':WORK_ORDER_ANALYSIS_PROMPT_VERSION,
+       'candidate_source_binding':candidate_source_binding,
        'vision_prompt_version':getattr(QwenVLMProvider,'prompt_version','unversioned-original'),
        'source_hashes':{p:sha(ROOT/p) for p in ['backend/app/service/analysis.py','backend/app/domain/ai.py','backend/app/domain/observed_event.py','backend/app/provider/llm/__init__.py','backend/app/provider/vision/__init__.py','backend/app/provider/http.py','reports/auth-identity-ai-001/local-qwen/run-quality28.py']},
        'gold_hashes':{textpath.name:sha(textpath),photopath.name:sha(photopath),**({'qwen35-9b-evaluation-overlay.json':sha(overlay_path),'qwen35-9b-novel-set.json':sha(novel_path)} if overlay is not None else {}),**({'qwen35-9b-bounded-images.json':sha(bounded_manifest_path)} if bounded_manifest is not None else {})},'runtime':runtime,
+       'runtime_identity':runtime_identity,
        'image_input':({'mode':'proportional-jpeg-max-1024','manifest':str(bounded_manifest_path),'manifest_sha256':sha(bounded_manifest_path)} if bounded_manifest is not None else {'mode':'original-gold-files'}),
-       'controls':{'context':4096,'temperature':0,'thinking':False,'llm_max_tokens':512,'vlm_max_tokens':256,'timeout_seconds':60,'parallel':1,'max_cases':1 if args.resume_screen_collector_failure else 7 if args.resume_incomplete_screen else 8 if args.phase=='screen' else 4 if args.phase=='novel' else 28,'max_inference_requests':max_requests},
-       'cumulative_budget':{'path':str(budget_path),'call_limit':active_call_limit,'model_seconds_limit':NINE_B_TOTAL_MODEL_SECONDS,'deadline_utc':NINE_B_DEADLINE_UTC.isoformat()} if args.model=='qwen3.5:9b' else None,
+       'controls':{'context':4096,'temperature':0,'thinking':False,'llm_max_tokens':512,'vlm_max_tokens':256,'timeout_seconds':request_timeout,'guard_cleanup_margin_seconds':TWENTY_SEVEN_B_TERMINATION_MARGIN_SECONDS if twenty_seven_b else 0,'parallel':1,'max_cases':1 if args.resume_screen_collector_failure else 7 if args.resume_incomplete_screen else 8 if args.phase=='screen' else 4 if args.phase=='novel' else 28,'max_inference_requests':max_requests},
+       'model_input_contract_sha256':model_input_contract_sha256(),
+       'cumulative_budget':{'path':str(budget_path),'call_limit':active_call_limit,'model_seconds_limit':NINE_B_TOTAL_MODEL_SECONDS,'deadline_utc':NINE_B_DEADLINE_UTC.isoformat()} if bounded_candidate else None,
        'business_calls':False,'database_access':False,'queue_access':False,'business_runtime_changed':False,'attempted_requests':0,'reused_requests':0,'results':[],'status':'RUNNING'}
     if args.resume_incomplete_screen:
         screen=json.loads((run_out/'screen.json').read_text(encoding='utf-8'))
@@ -314,10 +387,10 @@ def main():
         body=json.loads(request.content);assert body['model']==args.model and body['temperature']==0 and body['reasoning_effort']=='none'
         assert body['max_tokens']==(256 if current['kind']=='VLM' else 512)
         assert e['attempted_requests']<max_requests
-        if args.model=='qwen3.5:9b':
+        if bounded_candidate:
             state=budget_state();assert not state['unknown'],'Prior request completion UNKNOWN'
-            assert state['attempted']<active_call_limit and state['model_seconds']<NINE_B_TOTAL_MODEL_SECONDS
-            assert datetime.now(UTC)<NINE_B_DEADLINE_UTC,'48-hour delivery window expired'
+            assert state['attempted']<active_call_limit and state['model_seconds']+request_timeout<=NINE_B_TOTAL_MODEL_SECONDS
+            assert datetime.now(UTC)+timedelta(seconds=request_timeout)<=NINE_B_DEADLINE_UTC,'Insufficient bounded time before the delivery deadline'
             request_id=f'candidate-{args.candidate:02d}-{e["phase"]}-{e["attempted_requests"]+1:03d}'
             append_budget({'event':'RESERVED','request_id':request_id,'candidate':args.candidate,'phase':e['phase'],'kind':current['kind'],'body_sha256':hashlib.sha256(request.content).hexdigest()})
             current['budget_request_id']=request_id
@@ -331,24 +404,65 @@ def main():
         try:current['usage']=response.json().get('usage')
         except (ValueError,AttributeError):current['usage']=None
         save()
-    client=httpx.Client(trust_env=False,timeout=60,event_hooks={'request':[request_hook],'response':[response_hook]})
-    settings=Settings(_env_file=None,app_env='test',llm_provider='production',llm_base_url='http://127.0.0.1:11435/v1',llm_model=args.model,llm_api_key='local-loopback-no-auth',llm_disable_thinking=True,llm_max_output_tokens=512,llm_timeout_seconds=60)
+    client=httpx.Client(trust_env=False,timeout=request_timeout,event_hooks={'request':[request_hook],'response':[response_hook]})
+    # Product Settings deliberately caps provider timeouts at 60 seconds.  The
+    # authorized 27B diagnostic extends only its isolated HTTP client timeout;
+    # it must not widen the application configuration contract.
+    settings=Settings(_env_file=None,app_env='test',llm_provider='production',llm_base_url='http://127.0.0.1:11435/v1',llm_model=args.model,llm_api_key='local-loopback-no-auth',llm_disable_thinking=True,llm_max_output_tokens=512,llm_timeout_seconds=min(request_timeout,60))
     service=AnalysisService.__new__(AnalysisService);service._settings=settings;service._llm=build_llm_provider(settings);service._llm._client=client;service._clock=lambda:datetime.now(UTC)
-    service._vlm=QwenVLMProvider(base_url='http://127.0.0.1:11435/v1',model=args.model,api_key='local-loopback-no-auth',timeout_seconds=60,storage=PhotoStorage(images),client=client,disable_thinking=True,max_output_tokens=256)
+    service._vlm=QwenVLMProvider(base_url='http://127.0.0.1:11435/v1',model=args.model,api_key='local-loopback-no-auth',timeout_seconds=request_timeout,storage=PhotoStorage(images),client=client,disable_thinking=True,max_output_tokens=256)
     logs=[];service._write_call_log=lambda *a,**kw:logs.append(kw)
     def stage(kind,call,case):
         nonlocal current
         loaded=resident();before=sample()
-        required_gpu=(NINE_B_RESIDENT_REQUEST_GPU_FREE_MIB if loaded else
-                      NINE_B_START_GPU_FREE_MIB if args.model=='qwen3.5:9b' else 6000)
+        required_gpu=((TWENTY_SEVEN_B_RESIDENT_REQUEST_GPU_FREE_MIB if twenty_seven_b else NINE_B_RESIDENT_REQUEST_GPU_FREE_MIB) if loaded else
+                      NINE_B_START_GPU_FREE_MIB if bounded_candidate else 6000)
         if before['ram_free_mib']<4500 or before['gpu_free_mib']<required_gpu:
             e['stop_reason']='RESOURCE_HEADROOM';e['guard_sample']=before;save();raise RuntimeError('RESOURCE_HEADROOM')
-        current={'kind':kind,'at_utc':datetime.now(UTC).isoformat(),'before':before,'resident_before':loaded,'samples':[],'attempted':False,'status':'STARTING'}
+        if twenty_seven_b and not loaded:
+            usable_mib=(before['ram_free_mib']-4500)+(before['gpu_free_mib']-2000)
+            required_mib=math.ceil(candidate_source['size_bytes']/1048576)+TWENTY_SEVEN_B_ADMISSION_OVERHEAD_MIB
+            e['capacity_admission']={
+                'model_size_bytes':candidate_source['size_bytes'],
+                'fixed_runtime_kv_image_overhead_mib':TWENTY_SEVEN_B_ADMISSION_OVERHEAD_MIB,
+                'usable_ram_plus_gpu_above_floors_mib':usable_mib,
+                'required_mib':required_mib,
+            }
+            if usable_mib<required_mib:
+                e['stop_reason']='RESOURCE_CAPACITY';e['guard_sample']=before;save();raise RuntimeError('RESOURCE_CAPACITY')
+        state_at_start=budget_state() if bounded_candidate else {'model_seconds':0}
+        remaining_budget_seconds=NINE_B_TOTAL_MODEL_SECONDS-state_at_start['model_seconds']
+        remaining_deadline_seconds=(NINE_B_DEADLINE_UTC-datetime.now(UTC)).total_seconds() if bounded_candidate else request_timeout
+        allowed_wall_seconds=min(request_timeout,remaining_budget_seconds,remaining_deadline_seconds)-(TWENTY_SEVEN_B_TERMINATION_MARGIN_SECONDS if twenty_seven_b else 0)
+        if allowed_wall_seconds<=0:
+            e['stop_reason']='REQUEST_TIME_BUDGET_EXHAUSTED';save();raise RuntimeError('REQUEST_TIME_BUDGET_EXHAUSTED')
+        current={'kind':kind,'at_utc':datetime.now(UTC).isoformat(),'before':before,'resident_before':loaded,'samples':[],'attempted':False,'status':'STARTING','wall_limit_seconds':allowed_wall_seconds}
         case['stages'].append(current);save();stop=threading.Event();started=time.perf_counter();logs.clear()
+        wall_deadline=time.monotonic()+allowed_wall_seconds
+        def terminate_for_guard(reason,observed):
+            if current.get('guard_stop_reason'):return
+            current['guard_stop_reason']=reason;current['guard_sample']=observed
+            if twenty_seven_b:
+                current['breach_action']='TERMINATE_EXACT_BOUND_PROJECT_MODEL_RUNTIME_TREE'
+                try:current['runtime_stop']=terminate_bound_runtime(runtime)
+                except Exception as exc:current['runtime_stop_error']=type(exc).__name__
+            else:
+                current['breach_action']='STOP_BEFORE_NEXT_RESERVATION'
         def monitor():
-            while not stop.wait(1):
-                try:current['samples'].append(sample())
-                except Exception as exc:current['samples'].append({'error_type':type(exc).__name__})
+            while not stop.wait(.25):
+                observed=None;observation_error=None
+                try:
+                    observed=sample();current['samples'].append(observed)
+                except Exception as exc:
+                    observation_error=type(exc).__name__;current['samples'].append({'error_type':observation_error})
+                reason=runtime_guard_reason(
+                    now=time.monotonic(),deadline=wall_deadline,observed=observed,
+                    observation_error=observation_error,ram_floor=4500 if twenty_seven_b else 2000,
+                )
+                if reason:
+                    if reason=='RESOURCE_FLOOR_CROSSED':current['runtime_floor_breach']=observed
+                    terminate_for_guard(reason,observed or {'error_type':observation_error})
+                    break
         monitor_thread=threading.Thread(target=monitor,daemon=True);monitor_thread.start()
         try:
             answer=call();current['provider_result']=answer;current['status']='RECORDED'
@@ -357,21 +471,37 @@ def main():
             current['status']='EXCEPTION';current['error_type']=type(exc).__name__
             raise
         finally:
-            stop.set();monitor_thread.join(timeout=10);current['latency_seconds']=round(time.perf_counter()-started,3)
-            current['call_log']=list(logs);current['after']=sample();current['resident_after']=resident()
-            measured=[before,current['after']]+[s for s in current['samples'] if 'ram_free_mib' in s]
+            stop.set();monitor_thread.join(timeout=20);current['latency_seconds']=round(time.perf_counter()-started,3)
+            current['call_log']=list(logs)
+            try:current['after']=sample()
+            except Exception as exc:current['after']={'error_type':type(exc).__name__}
+            try:current['resident_after']=resident()
+            except Exception as exc:
+                current['resident_after']=None;current['resident_after_error']=type(exc).__name__
+            measured=[before]+([current['after']] if 'ram_free_mib' in current['after'] else [])+[s for s in current['samples'] if 'ram_free_mib' in s]
             current['min_ram_free_mib']=min(s['ram_free_mib'] for s in measured);current['min_gpu_free_mib']=min(s['gpu_free_mib'] for s in measured)
-            if args.model=='qwen3.5:9b' and current.get('budget_request_id'):
-                append_budget({'event':'COMPLETED','request_id':current['budget_request_id'],'candidate':args.candidate,'phase':e['phase'],'kind':kind,'status':current['status'],'model_seconds':current['latency_seconds'],'raw_response_sha256':current.get('raw_response_sha256'),'remote_completion':'RESPONSE_RECEIVED' if current.get('raw_response_sha256') else 'UNKNOWN'})
-            if current['min_ram_free_mib']<2000 or current['min_gpu_free_mib']<2000:e['stop_reason']='RESOURCE_FLOOR_CROSSED'
+            if bounded_candidate and current.get('budget_request_id'):
+                controlled_stop=bool(current.get('runtime_stop',{}).get('stopped',{}).get('tree_exit_confirmed'))
+                append_budget({'event':'COMPLETED','request_id':current['budget_request_id'],'candidate':args.candidate,'phase':e['phase'],'kind':kind,'status':current['status'],'model_seconds':current['latency_seconds'],'raw_response_sha256':current.get('raw_response_sha256'),'remote_completion':'RESPONSE_RECEIVED' if current.get('raw_response_sha256') else 'CONTROLLED_RUNTIME_TERMINATION_CONFIRMED' if controlled_stop else 'UNKNOWN'})
+            if current.get('guard_stop_reason'):e['stop_reason']=current['guard_stop_reason']
+            elif current.get('runtime_floor_breach') or current['min_ram_free_mib']<(4500 if twenty_seven_b else 2000) or current['min_gpu_free_mib']<2000:e['stop_reason']='RESOURCE_FLOOR_CROSSED'
             save()
     try:
         save()
         reused={}
         reused_sources={}
-        if args.model=='qwen3.5:9b' and args.phase=='fixed' and args.candidate==1:
+        if bounded_candidate and args.phase=='fixed' and args.candidate==1:
             screen_path=run_out/'screen.json';assert screen_path.exists(),'Complete identical screen phase is required before fixed phase'
             screen=json.loads(screen_path.read_text(encoding='utf-8'))
+            if twenty_seven_b:
+                stable_controls=('context','temperature','thinking','llm_max_tokens','vlm_max_tokens','timeout_seconds','guard_cleanup_margin_seconds','parallel')
+                assert screen['source_hashes']==e['source_hashes'],'27B collector or protocol source changed after screen'
+                assert screen.get('candidate_source_binding')==e['candidate_source_binding'],'27B candidate source changed after screen'
+                assert screen.get('model_input_contract_sha256')==e['model_input_contract_sha256'],'27B input contract changed after screen'
+                assert screen['runtime']==e['runtime'],'27B runtime identity changed after screen'
+                assert all(screen['controls'][key]==e['controls'][key] for key in stable_controls),'27B controls changed after screen'
+                canonical={item['id']:item for item in all_items}
+                assert all(row.get('input')==canonical.get(row.get('id')) for row in screen.get('results',[])),'27B canonical screen input changed'
             continuation_path=run_out/'screen-continuation.json'
             if screen['status']=='INCOMPLETE':
                 assert continuation_path.exists(),'Immutable incomplete screen requires its explicit continuation'
@@ -421,16 +551,23 @@ def main():
             assert screen['prompt_version']==e['prompt_version'] and screen['vision_prompt_version']==e['vision_prompt_version']
             assert screen['gold_hashes']==e['gold_hashes']
             reused={row['id']:row for row in screen_rows};assert tuple(reused)==SCREEN_IDS and attempted==10
-        if args.model=='qwen3.5:9b' and args.phase=='novel':
+        if bounded_candidate and args.phase=='novel':
             fixed=json.loads((run_out/'fixed.json').read_text(encoding='utf-8'))
             assert fixed['status']=='RECORDED_NEEDS_SEMANTIC_REVIEW' and fixed['source_hashes']==e['source_hashes'] and fixed['gold_hashes']==e['gold_hashes']
+            if twenty_seven_b:
+                stable_controls=('context','temperature','thinking','llm_max_tokens','vlm_max_tokens','timeout_seconds','guard_cleanup_margin_seconds','parallel')
+                assert fixed['model']==args.model and fixed['model_digest']==digest,'27B model changed before novel set'
+                assert fixed.get('candidate_source_binding')==e['candidate_source_binding'],'27B candidate source changed before novel set'
+                assert fixed.get('model_input_contract_sha256')==e['model_input_contract_sha256'],'27B input contract changed before novel set'
+                assert fixed['runtime']==e['runtime'] and fixed.get('runtime_identity')==e['runtime_identity'],'27B runtime changed before novel set'
+                assert all(fixed['controls'][key]==e['controls'][key] for key in stable_controls),'27B controls changed before novel set'
         for item in selected_items:
             if item['id'] in reused:
                 case=json.loads(json.dumps(reused[item['id']]))
                 source_path=reused_sources[item['id']]
                 case['reused_from']={'path':str(source_path),'source_sha256':sha(source_path),'protocol_source_hashes_verified':True,
                     'frozen_controls_and_canonical_input_verified':True,
-                    'resume_binding_sha256':sha(NINE_B_RESUME_BINDING) if NINE_B_RESUME_BINDING.exists() else None}
+                    'resume_binding_sha256':None if twenty_seven_b else sha(NINE_B_RESUME_BINDING) if NINE_B_RESUME_BINDING.exists() else None}
                 e['results'].append(case);e['reused_requests']+=2 if item['id'].startswith('PHOTO') else 1;save();continue
             is_photo=item['id'].startswith('PHOTO');report=item['paired_report'] if is_photo else item['report']
             case={'id':item['id'],'input':item,'stages':[],'semantic_review':'PENDING_INDIVIDUAL_REVIEW_NOT_AUTOMATIC_PASS'};e['results'].append(case)
@@ -454,8 +591,8 @@ def main():
             )
             save();print(json.dumps({'case':item['id'],'requests':e['attempted_requests'],'payload':payload},ensure_ascii=False),flush=True)
             if e.get('stop_reason'):break
-        expected_cases=1 if args.resume_screen_collector_failure else 7 if args.resume_incomplete_screen else 8 if args.model=='qwen3.5:9b' and args.phase=='screen' else 4 if args.model=='qwen3.5:9b' and args.phase=='novel' else 28
-        expected_calls=2 if args.resume_screen_collector_failure else 9 if args.resume_incomplete_screen else 10 if args.model=='qwen3.5:9b' and args.phase=='screen' else 4 if args.model=='qwen3.5:9b' and args.phase=='novel' else 32
+        expected_cases=1 if args.resume_screen_collector_failure else 7 if args.resume_incomplete_screen else 8 if bounded_candidate and args.phase=='screen' else 4 if bounded_candidate and args.phase=='novel' else 28
+        expected_calls=2 if args.resume_screen_collector_failure else 9 if args.resume_incomplete_screen else 10 if bounded_candidate and args.phase=='screen' else 4 if bounded_candidate and args.phase=='novel' else 32
         e['status']='RECORDED_NEEDS_SEMANTIC_REVIEW' if len(e['results'])==expected_cases and e['attempted_requests']+e['reused_requests']==expected_calls and not e.get('stop_reason') else 'INCOMPLETE'
     except Exception as exc:e['status']='INCOMPLETE';e.setdefault('stop_reason',type(exc).__name__);raise
     finally:
