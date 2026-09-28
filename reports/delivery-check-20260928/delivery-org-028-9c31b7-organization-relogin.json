@@ -1,0 +1,25 @@
+{
+  "task_id": "DELIVERY-ORGANIZATION-ONBOARDING-028",
+  "run_id": "delivery-org-028-9c31b7",
+  "received_at_utc": "2026-09-27T22:18:11.905Z",
+  "interaction": "normal password re-login and actual management page navigation",
+  "user_id": 1,
+  "role_seen": "TENANT_ADMIN",
+  "scope": {
+    "scope_type": "TENANT",
+    "tenant_id": 2,
+    "property_id": null
+  },
+  "management_property": {
+    "id": 2,
+    "tenant_id": 2,
+    "name": "交付验收小区-delivery-org-028-9c31b7",
+    "can_edit": true
+  },
+  "screenshot": "delivery-org-028-9c31b7-relogin-property-scope.png",
+  "boundaries": {
+    "business_request": false,
+    "seed_login": false,
+    "page_state_faked": false
+  }
+}

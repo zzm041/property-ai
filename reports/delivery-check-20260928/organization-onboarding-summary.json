@@ -1,0 +1,175 @@
+{
+  "task_id": "DELIVERY-ORGANIZATION-ONBOARDING-028",
+  "status": "PASS_SCOPED_LOCAL_DELIVERY_RUNTIME_INDEPENDENT_REVIEW",
+  "independent_review": {
+    "decision": "PASS_SCOPED",
+    "path": "reports/codex/DELIVERY-ORGANIZATION-ONBOARDING-028-round2.raw.json",
+    "closed_findings": ["028-R1-01", "028-R1-02", "028-R1-03", "028-R1-04"]
+  },
+  "runtime": {
+    "api": "http://127.0.0.1:8093/api/v1",
+    "database": "property-ai-delivery-check mysql/property_ai_delivery_check@20260926_0014_identity_merge_sla_versions",
+    "application_image": "sha256:512ac31d70e8b353639ebc16fdd539a215bc407036979737cf4687865ddf3317",
+    "api_worker_beat_same_image": true,
+    "provider_mode": "Development; this task made zero model requests"
+  },
+  "focused_tests": {
+    "result": "18 passed, 1 existing warning after the final backup concurrency fix",
+    "scope": "organization transaction, permission, phone prerequisite, idempotent replay/conflict, audit, RBAC, deployment safety and client wiring"
+  },
+  "candidate_unit_regression": {
+    "result": "1134 passed, 1 existing warning in 14.08s",
+    "junit": "unit-round2b-junit.xml",
+    "junit_sha256": "585F95B7C74D8D8386006D00E3A27D4615FE3698BFC7E4BF9E78CD3B97D6C2CF"
+  },
+  "page_runs": [
+    {
+      "run_id": "delivery-org-028-6f4a2c",
+      "result": "tenant 1/property 1 created and TENANT_ADMIN granted",
+      "screenshot": "withheld outside Git because the first success view retained the synthetic phone input",
+      "privacy_followup": "product clears initialAdminPhone immediately after a successful response"
+    },
+    {
+      "run_id": "delivery-org-028-9c31b7",
+      "result": "tenant 2/property 2 created and TENANT_ADMIN granted",
+      "interaction": "normal password login and actual WeChat DevTools page controls",
+      "post_success_phone_field": "empty",
+      "relogin": "normal password re-login returned TENANT_ADMIN tenant 2 scope",
+      "management_page": "property 2 visible and editable",
+      "screenshots": [
+        "delivery-org-028-9c31b7-organization-created.png",
+        "delivery-org-028-9c31b7-relogin-property-scope.png"
+      ]
+    },
+    {
+      "run_id": "delivery-org-028-idem-020e2ee5",
+      "result": "tenant 3/property 3 created with one persistent idempotency record and TENANT_ADMIN granted",
+      "interaction": "normal password login and actual WeChat DevTools page controls",
+      "post_success_phone_field": "empty; visually inspected",
+      "relogin": "normal password re-login returned TENANT_ADMIN tenant 3 scope",
+      "management_page": "property 3 visible and editable; visually inspected",
+      "same_key_runtime_replay": "returned tenant 3/property 3; resource and audit counts unchanged",
+      "screenshots": [
+        "delivery-org-028-idem-020e2ee5-organization-created.png",
+        "delivery-org-028-idem-020e2ee5-relogin-property-scope.png"
+      ]
+    },
+    {
+      "run_id": "delivery-org-028-independent-05",
+      "result": "SYSTEM_ADMIN user 1 created tenant 4/property 4 and granted distinct normal user 2 TENANT_ADMIN",
+      "interaction": "normal password login and actual WeChat DevTools page controls against 8093",
+      "precondition": "user 2 had no role, scope or SYSTEM_ADMIN before onboarding; Development SMS was used only to establish its local password",
+      "relogin": "user 2 normal password re-login returned tenant 4 TENANT_ADMIN and no SYSTEM_ADMIN",
+      "management_page": "only property 4 was visible and editable; unrelated property count was zero",
+      "screenshots_visually_inspected": true,
+      "screenshots": [
+        "delivery-org-028-independent-05-organization-created.png",
+        "delivery-org-028-independent-05-relogin-property-scope.png"
+      ]
+    }
+  ],
+  "api_request_metadata": [
+    {
+      "method": "POST",
+      "path": "/api/v1/system/organizations",
+      "status": 200,
+      "request_id": "bee2fd5cacc44853955805d256118ae6"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/system/organizations",
+      "status": 200,
+      "request_id": "55f15231dcc64b6eae57570f79448781"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "purpose": "post-grant normal re-login"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/property-archive?property_id=2&tenant_id=2",
+      "status": 200,
+      "request_id": "1651b49b4b874e7faed067d3dec82d5f"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/system/organizations",
+      "status": 200,
+      "request_id": "593fdad7ff97421aa0dbfd03db012fac",
+      "purpose": "actual page submit with Idempotency-Key"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/system/organizations",
+      "status": 200,
+      "request_id": "e10fe31c035e4a859dfecbd031ecc45e",
+      "purpose": "same-key runtime replay through normal password session"
+    }
+  ],
+  "database_readback": {
+    "tenants": [
+      {"id": 1, "status": "ACTIVE", "property_id": 1, "timezone": "Asia/Shanghai"},
+      {"id": 2, "status": "ACTIVE", "property_id": 2, "timezone": "Asia/Shanghai"},
+      {"id": 3, "status": "ACTIVE", "property_id": 3, "timezone": "Asia/Shanghai"},
+      {"id": 4, "status": "ACTIVE", "property_id": 4, "timezone": "Asia/Shanghai"}
+    ],
+    "system_admin_user_id": 1,
+    "tenant_admin_scopes": [1, 2, 3],
+    "independent_tenant_admin": {
+      "user_id": 2,
+      "tenant_admin_scopes": [4],
+      "system_admin_grant_count": 0,
+      "visible_property_ids": [4]
+    },
+    "organization_audits": [
+      {"action": "ORGANIZATION_TENANT_CREATED", "resource_id": 1, "tenant_id": 1},
+      {"action": "ORGANIZATION_PROPERTY_CREATED", "resource_id": 1, "tenant_id": 1, "property_id": 1},
+      {"action": "ORGANIZATION_TENANT_CREATED", "resource_id": 2, "tenant_id": 2},
+      {"action": "ORGANIZATION_PROPERTY_CREATED", "resource_id": 2, "tenant_id": 2, "property_id": 2},
+      {"action": "ORGANIZATION_TENANT_CREATED", "resource_id": 3, "tenant_id": 3},
+      {"action": "ORGANIZATION_PROPERTY_CREATED", "resource_id": 3, "tenant_id": 3, "property_id": 3},
+      {"action": "ORGANIZATION_TENANT_CREATED", "resource_id": 4, "tenant_id": 4, "actor_user_id": 1},
+      {"action": "ORGANIZATION_PROPERTY_CREATED", "resource_id": 4, "tenant_id": 4, "property_id": 4, "actor_user_id": 1}
+    ],
+    "role_grant_count_for_run_3": 1,
+    "idempotency_record_count_for_run_3": 1,
+    "same_key_replay_added_business_rows": false,
+    "role_grant_count_for_independent_run": 1,
+    "idempotency_record_count_for_independent_run": 1
+  },
+  "boundaries": {
+    "new_migration": false,
+    "seed_login": false,
+    "dev_auth": false,
+    "direct_business_sql_write": false,
+    "page_state_faked": false,
+    "real_identity_provider": false,
+    "production_acceptance": false
+  },
+  "source_sha256": {
+    "backend/app/service/organization.py": "7D41678F40821384B6E5612DF7480368016D4D46EEF3D1D77A5BAAB81E24577B",
+    "backend/app/api/v1/system_organization.py": "0F0E9FB830D747F9F65C91985D1ABC40F32FFEDBB4A37368519AA3E8E6EC7160",
+    "backend/app/schema/organization.py": "FE646EECFDA4AE088E08941823B7C59144519610159BDBE6BB9D02DE08BFA5DF",
+    "backend/tests/unit/test_organization_onboarding.py": "409C31B30AD56E6177A5A669DE061C431490BBD7868E1100665C0F448D3153EC",
+    "miniprogram/pages/system/organizations.js": "5E01C59E730A73ACF697E18B79F13B5A9A15D11D02D8FF005764D5E28FB32D95",
+    "miniprogram/services/api.js": "C9B953D07521C856C38E6FBB7E33C6CB400AD817D52CF9E998748E16E5FFFB54"
+  },
+  "evidence_sha256": {
+    "delivery-org-028-9c31b7-organization-page.json": "B9937BA7A04236CB3740F4B67F68ADC340F86FD063C7CC4EC305B0BFA30A5EE1",
+    "delivery-org-028-9c31b7-organization-created.png": "E682402253D90695375D8353EBACCABB53F7398422B32FBDBD00434B07B2E9B0",
+    "delivery-org-028-9c31b7-organization-relogin.json": "E1002C0AE30F31BE06128AE883474135DA83239A6B0569B66E4C59766642D7BD",
+    "delivery-org-028-9c31b7-relogin-property-scope.png": "BADAB3B160DE088100B60C55A553965BC26508622399099C417094DA6F80950C",
+    "delivery-org-028-idem-020e2ee5-organization-page.json": "9DFA2C21AB1D0A6698C9BBB657E44C4BDCCC2BCC8C772EAEF2DCB4777DC0C4AC",
+    "delivery-org-028-idem-020e2ee5-organization-created.png": "E3CCAFE5605AF859A3015AB986A72B7F91A1FD170978016D272455D21EBE2001",
+    "delivery-org-028-idem-020e2ee5-organization-relogin.json": "A7C53BA3E08C49424418013BAD19785EE5C6BD0D5E122F58D0BE075D499F1F8D",
+    "delivery-org-028-idem-020e2ee5-relogin-property-scope.png": "BBF58E21FD58907B184A9584F4D850CCA9E279F796B35469F7B0D8146E4F80A0",
+    "delivery-org-028-independent-05-independent-admin-prerequisite.json": "485799E49C28D999AD2FC2DDFA88393AA9F1F919E4E495F3DA93D3BDEBE54381",
+    "delivery-org-028-independent-05-organization-page.json": "337DC4A6715A6784C7D56EA6120537AD75336B64996417FB5E67DBA6904B05C5",
+    "delivery-org-028-independent-05-organization-created.png": "7683E7712B1C0ACEE49221129B4F0E94A71B7DECCCE5A281BE2C5FD6B978448A",
+    "delivery-org-028-independent-05-organization-relogin.json": "7BABDF2A3075966F542068D0A96C7A45E8D026862A088BF1F30D87AD2D323489",
+    "delivery-org-028-independent-05-relogin-property-scope.png": "88744728186D17738E77C7AD342A873A94894D6468A472CEB4B5141DB6989592",
+    "delivery-org-028-independent-05-runtime-db.json": "FDEC35F89A9160B2992A23DBAFF7F9A60B26467755D02670E0D16F952CF73F5D"
+  }
+}

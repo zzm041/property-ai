@@ -32,6 +32,8 @@ class AuditAction(StrEnum):
     DEV_SEED_USER_CREATED = "DEV_SEED_USER_CREATED"
     DEV_SEED_ROLE_CREATED = "DEV_SEED_ROLE_CREATED"
     DEV_SEED_PERMISSION_CREATED = "DEV_SEED_PERMISSION_CREATED"
+    ORGANIZATION_TENANT_CREATED = "ORGANIZATION_TENANT_CREATED"
+    ORGANIZATION_PROPERTY_CREATED = "ORGANIZATION_PROPERTY_CREATED"
     RESIDENT_BIND_REQUEST_CREATED = "RESIDENT_BIND_REQUEST_CREATED"
     RESIDENT_BIND_REQUEST_APPROVED = "RESIDENT_BIND_REQUEST_APPROVED"
     RESIDENT_BIND_REQUEST_REJECTED = "RESIDENT_BIND_REQUEST_REJECTED"
@@ -149,6 +151,12 @@ _USER_ROLE_DETAIL_KEYS = frozenset(
 )
 _ROLE_PERMISSION_DETAIL_KEYS = frozenset(
     {"role_code", "permission_code", "source"}
+)
+_ORGANIZATION_TENANT_DETAIL_KEYS = frozenset(
+    {"name", "initial_admin_user_id"}
+)
+_ORGANIZATION_PROPERTY_DETAIL_KEYS = frozenset(
+    {"name", "timezone", "initial_admin_user_id"}
 )
 _RESIDENT_BIND_DETAIL_KEYS = frozenset({"house_id", "relation_type"})
 _RESIDENT_APPROVE_DETAIL_KEYS = frozenset(
@@ -338,6 +346,18 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             resource_type=AuditResourceType.PROPERTY,
             allowed_detail_keys=frozenset({"seed_key", "source"}),
             required_detail_keys=frozenset({"seed_key", "source"}),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.ORGANIZATION_TENANT_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.TENANT,
+            allowed_detail_keys=_ORGANIZATION_TENANT_DETAIL_KEYS,
+            required_detail_keys=_ORGANIZATION_TENANT_DETAIL_KEYS,
+            allowed_scope_types=frozenset({ScopeType.TENANT}),
+        ),
+        AuditAction.ORGANIZATION_PROPERTY_CREATED: AuditActionPolicy(
+            resource_type=AuditResourceType.PROPERTY,
+            allowed_detail_keys=_ORGANIZATION_PROPERTY_DETAIL_KEYS,
+            required_detail_keys=_ORGANIZATION_PROPERTY_DETAIL_KEYS,
             allowed_scope_types=frozenset({ScopeType.PROPERTY}),
         ),
         AuditAction.DEV_SEED_USER_CREATED: AuditActionPolicy(

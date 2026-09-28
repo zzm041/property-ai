@@ -13,9 +13,16 @@ depends_on = None
 def upgrade():
     bind = op.get_bind()
     url = bind.engine.url
-    if (os.environ.get("APP_ENV") != "test" or url.drivername != "mysql+pymysql"
-            or url.host != "127.0.0.1" or url.port != 3307
-            or url.database != "property_ai_auth001_test"):
+    target = f"{url.host}:{url.port}/{url.database}"
+    auth001 = (os.environ.get("APP_ENV") == "test" and url.drivername == "mysql+pymysql"
+               and url.host == "127.0.0.1" and url.port == 3307
+               and url.database == "property_ai_auth001_test")
+    delivery = (os.environ.get("PROPERTY_AI_DELIVERY_MIGRATION") == "approved"
+                and os.environ.get("PROPERTY_AI_APPROVE_DELIVERY_TARGET") == target
+                and os.environ.get("APP_ENV") == "staging" and url.drivername == "mysql+pymysql"
+                and url.host == "mysql" and url.port == 3306
+                and url.database == "property_ai_delivery_check")
+    if not auth001 and not delivery:
         raise RuntimeError("0012 approved only for exact AUTH001 test target")
     if bind.execute(sa.text("SELECT version_num FROM alembic_version")).scalar_one() != down_revision:
         raise RuntimeError("0012 requires actual0011; no stamp/backfill permitted")

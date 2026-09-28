@@ -11,6 +11,7 @@ Otherwise later 0008 must revise 0009. Never create sibling heads.
 """
 
 from collections.abc import Sequence
+import os
 
 from alembic import op
 import sqlalchemy as sa
@@ -29,10 +30,22 @@ _TABLE_KW = {
 
 
 def _require_isolated_auth_schema() -> None:
-    name = op.get_bind().execute(sa.text("SELECT DATABASE()")).scalar()
-    if name != "property_ai_auth001_test":
+    bind = op.get_bind()
+    url = bind.engine.url
+    name = bind.execute(sa.text("SELECT DATABASE()" )).scalar()
+    delivery_target = f"{url.host}:{url.port}/{url.database}"
+    approved_delivery = (
+        os.environ.get("PROPERTY_AI_DELIVERY_MIGRATION") == "approved"
+        and os.environ.get("PROPERTY_AI_APPROVE_DELIVERY_TARGET") == delivery_target
+        and os.environ.get("APP_ENV") == "staging"
+        and url.drivername == "mysql+pymysql"
+        and url.host == "mysql"
+        and url.port == 3306
+        and name == "property_ai_delivery_check"
+    )
+    if name != "property_ai_auth001_test" and not approved_delivery:
         raise RuntimeError(
-            "Migration 20260919_0009 may only apply to property_ai_auth001_test, "
+            "Migration 20260919_0009 requires AUTH001 or an explicit delivery target, "
             f"not {name!r}"
         )
 

@@ -6,6 +6,7 @@ from sqlalchemy import and_, select, tuple_
 from sqlalchemy.orm import Session
 
 from app.model.property import Building, House, Property, Tenant, Unit
+from app.model.work_order import IdempotencyRecord
 
 
 class PropertyRepository:
@@ -38,6 +39,24 @@ class PropertyRepository:
         self._session.add(house)
         self._session.flush()
         return house
+
+    def get_idempotency(
+        self,
+        *,
+        user_id: int,
+        idempotency_key: str,
+    ) -> IdempotencyRecord | None:
+        return self._session.scalar(
+            select(IdempotencyRecord).where(
+                IdempotencyRecord.user_id == user_id,
+                IdempotencyRecord.idempotency_key == idempotency_key,
+            )
+        )
+
+    def add_idempotency(self, record: IdempotencyRecord) -> IdempotencyRecord:
+        self._session.add(record)
+        self._session.flush()
+        return record
 
     def get_tenant(self, tenant_id: int) -> Tenant | None:
         return self._session.scalar(

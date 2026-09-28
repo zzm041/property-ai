@@ -1,4 +1,4 @@
-FROM python:3.12.10-slim-bookworm
+FROM python:3.12.10-slim-bookworm@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -10,8 +10,10 @@ RUN python -c "import sys; assert sys.version_info[:3] == (3, 12, 10), sys.versi
 
 RUN useradd --create-home --uid 10001 appuser
 
+COPY deploy/requirements.delivery.lock /requirements.delivery.lock
 COPY backend/ /app/
-RUN pip install --upgrade pip && pip install .
+RUN pip install --no-cache-dir --requirement /requirements.delivery.lock \
+    && pip install --no-cache-dir --no-deps .
 
 USER appuser
 

@@ -1,0 +1,15 @@
+Focused command: Python 3.12.10 pytest backend/tests/unit/test_delivery_artifact.py backend/tests/unit/test_organization_onboarding.py -q
+Initial focused result before the concurrency fix: 18 passed, 3 warnings in 0.60s. Two warnings were local pytest cache write warnings; one was the existing Starlette dependency deprecation warning.
+First post-concurrency-fix run: 17 passed, 1 failed, 1 warning because the static test still expected the old direct-to-final docker copy. The product script had already moved to the unique temporary target; only that stale assertion was corrected.
+Final focused result: 18 passed, 1 existing Starlette dependency deprecation warning in 0.18s.
+
+Executable client command: node reports/delivery-check-20260928/test-organization-page-idempotency.js
+Executable client result: unknown response + unchanged body reused one key; confirmed success cleared it; changed body used a new key; 3 calls.
+
+Full candidate command: Python 3.12.10 pytest backend/tests/unit -q -p no:cacheprovider --junitxml=reports/delivery-check-20260928/unit-round2b-junit.xml
+Full candidate result: 1134 passed, 1 existing Starlette dependency deprecation warning in 14.08s.
+JUnit SHA-256: 585F95B7C74D8D8386006D00E3A27D4615FE3698BFC7E4BF9E78CD3B97D6C2CF
+
+PowerShell parser result: deploy/delivery.ps1 PASS.
+Backup/restore safety results: outside path refused; existing backup target refused; correctly hashed USE-other-database fixture refused; existing restore target refused without overwrite.
+Concurrent same-name backup result: exactly one success, one atomic reservation refusal, one matching SQL/manifest pair, and no leftover reservation.

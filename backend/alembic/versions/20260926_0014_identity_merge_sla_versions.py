@@ -25,15 +25,27 @@ def _execution_guard() -> None:
     approved_database = os.environ.get("PROPERTY_AI_APPROVE_0014_DATABASE")
     approved_target = os.environ.get("PROPERTY_AI_APPROVE_0014_TARGET")
     actual_target = f"{url.host}:{url.port}/{url.database}"
-    if (
-        os.environ.get("APP_ENV") != "test"
-        or approved_database != "property_ai_auth001_test"
-        or approved_target != actual_target
-        or url.drivername != "mysql+pymysql"
-        or url.database != approved_database
-        or url.host != "127.0.0.1"
-        or url.port not in {3307, 3317}
-    ):
+    auth001 = (
+        os.environ.get("APP_ENV") == "test"
+        and approved_database == "property_ai_auth001_test"
+        and approved_target == actual_target
+        and url.drivername == "mysql+pymysql"
+        and url.database == approved_database
+        and url.host == "127.0.0.1"
+        and url.port in {3307, 3317}
+    )
+    delivery = (
+        os.environ.get("PROPERTY_AI_DELIVERY_MIGRATION") == "approved"
+        and os.environ.get("PROPERTY_AI_APPROVE_DELIVERY_TARGET") == actual_target
+        and os.environ.get("APP_ENV") == "staging"
+        and approved_database == "property_ai_delivery_check"
+        and approved_target == actual_target
+        and url.drivername == "mysql+pymysql"
+        and url.database == approved_database
+        and url.host == "mysql"
+        and url.port == 3306
+    )
+    if not auth001 and not delivery:
         raise RuntimeError("0014 requires an explicit exact local target approval")
     current = bind.execute(sa.text("SELECT version_num FROM alembic_version")).scalar_one()
     if current != down_revision:

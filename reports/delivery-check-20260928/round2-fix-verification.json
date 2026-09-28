@@ -1,0 +1,91 @@
+{
+  "task_id": "DELIVERY-ORGANIZATION-ONBOARDING-028 / DELIVERY-CHECK-20260928",
+  "review_round": 2,
+  "source_head_before_wip": "40a224287978405860e5a96ae33e94ccf97c0de9",
+  "status": "IMPLEMENTER_FIXES_VERIFIED_PENDING_INDEPENDENT_REVIEW",
+  "findings": {
+    "028-R1-01": {
+      "implementation": "restore-check accepts only an in-directory .sql file with a matching generated manifest, rejects cross-database/global statements before database creation, and imports through a temporary account granted only on the new restore database",
+      "direct_checks": [
+        "PowerShell parser PASS",
+        "outside deploy/backups path refused",
+        "correctly hashed USE other_database fixture refused before restore-target inspection",
+        "18 focused unit tests passed"
+      ],
+      "actual_runtime_boundary": "The earlier isolated restore remains preserved. The hardened importer was not re-run because its fixed target already exists and the non-overwrite rule correctly refused it."
+    },
+    "028-R1-02": {
+      "implementation": "backup output is restricted to deploy/backups, uses UTC plus a random suffix by default, atomically reserves an explicit target with FileMode.CreateNew/FileShare.None, writes unique temporary SQL/manifest files, publishes both with non-overwriting File.Move, and refuses an existing SQL or manifest",
+      "direct_checks": [
+        "new backup property_ai_delivery_check-20260928T033318Z-0887ac81.sql and manifest created",
+        "backup SHA-256 989FB8126E0C4C2FE49DA8BE980E6FB733C8C52799F2760A41FEAFD29EA48711",
+        "second use of that output path refused without overwrite",
+        "two simultaneous processes targeting property_ai_delivery_check-concurrency-028.sql produced exactly one success and one reservation refusal",
+        "the published concurrent SQL/manifest pair matched SHA-256 E866753E0EA312EC233784792F5EBC54D93DE311AAAC14A0BA1283E6F6A0888D and no reservation remained"
+      ]
+    },
+    "028-R1-03": {
+      "run_id": "delivery-org-028-independent-05",
+      "prerequisite": "normal synthetic user 2 obtained a password via the isolated Development reset flow; before onboarding it had no role, scope or SYSTEM_ADMIN",
+      "actual_page": "SYSTEM_ADMIN user 1 created tenant 4/property 4 on 8093 and selected user 2 as the distinct initial administrator",
+      "relogin": "user 2 used normal password login, had TENANT_ADMIN only for tenant 4, saw editable property 4 and zero unrelated properties",
+      "database": "SELECT-only readback found exactly the tenant-scope grant, no SYSTEM_ADMIN grant, two matching audit records and one onboarding idempotency record storing initial_admin_user_id=2",
+      "screenshots_visually_inspected": true
+    },
+    "028-R1-04": {
+      "implementation": "the page retains one idempotency key while the canonical request body is unchanged after an unknown response, clears it only on confirmed success, and allocates a new key after the body changes",
+      "executable_client_check": {
+        "script": "test-organization-page-idempotency.js",
+        "unknown_response_same_body_reused_key": true,
+        "confirmed_success_cleared_pending": true,
+        "changed_body_used_new_key": true,
+        "call_count": 3
+      },
+      "server_runtime_replay": "the pre-existing run delivery-org-028-idem-020e2ee5 remains valid server-side same-key evidence"
+    }
+  },
+  "tests": {
+    "focused": "18 passed, 1 warning in 0.18s after the stale direct-copy assertion was updated for the reviewed temp-file publication design",
+    "full_pure_unit": "1134 passed, 1 warning in 14.08s on the final round2b source",
+    "junit": "unit-round2b-junit.xml",
+    "junit_sha256": "585F95B7C74D8D8386006D00E3A27D4615FE3698BFC7E4BF9E78CD3B97D6C2CF"
+  },
+  "runtime_after_page": {
+    "http": "http://127.0.0.1:8093",
+    "revision": "20260926_0014_identity_merge_sla_versions",
+    "application_image": "sha256:512ac31d70e8b353639ebc16fdd539a215bc407036979737cf4687865ddf3317",
+    "api_worker_beat_same_image": true,
+    "health": "ok",
+    "readiness": "ready",
+    "tenant_count": 4,
+    "property_count": 4,
+    "user_count": 2,
+    "queue": "property_ai.delivery_check",
+    "queue_ready": 0,
+    "queue_unacknowledged": 0,
+    "queue_consumers": 1,
+    "temporary_test_auth_api": "stopped after prerequisite completion; container retained"
+  },
+  "source_sha256": {
+    "deploy/delivery.ps1": "9B9C4B5151DCB9D1602105DA3080B6CA2308D33C9272A140BF35B5A0CA6111E4",
+    "backend/tests/unit/test_delivery_artifact.py": "6836B03775052C9143519E4205F8F4B319B543FF57AE40E2D91029229AF8F4CB",
+    "miniprogram/pages/system/organizations.js": "5E01C59E730A73ACF697E18B79F13B5A9A15D11D02D8FF005764D5E28FB32D95",
+    "reports/delivery-check-20260928/test-organization-page-idempotency.js": "468335950C809ECCC886CB773D5413BCC3764A36CD5BFFEFB8C5D527F4C2DEBF"
+  },
+  "evidence_sha256": {
+    "delivery-org-028-independent-05-independent-admin-prerequisite.json": "485799E49C28D999AD2FC2DDFA88393AA9F1F919E4E495F3DA93D3BDEBE54381",
+    "delivery-org-028-independent-05-organization-page.json": "337DC4A6715A6784C7D56EA6120537AD75336B64996417FB5E67DBA6904B05C5",
+    "delivery-org-028-independent-05-organization-created.png": "7683E7712B1C0ACEE49221129B4F0E94A71B7DECCCE5A281BE2C5FD6B978448A",
+    "delivery-org-028-independent-05-organization-relogin.json": "7BABDF2A3075966F542068D0A96C7A45E8D026862A088BF1F30D87AD2D323489",
+    "delivery-org-028-independent-05-relogin-property-scope.png": "88744728186D17738E77C7AD342A873A94894D6468A472CEB4B5141DB6989592",
+    "delivery-org-028-independent-05-runtime-db.json": "FDEC35F89A9160B2992A23DBAFF7F9A60B26467755D02670E0D16F952CF73F5D"
+  },
+  "boundaries": {
+    "development_sms_prerequisite_only": true,
+    "seed_login": false,
+    "dev_auth": false,
+    "direct_business_sql_write": false,
+    "model_requests": 0,
+    "production_acceptance": false
+  }
+}

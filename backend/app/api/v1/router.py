@@ -27,6 +27,7 @@ from app.api.v1.task_intents import router as task_intents_router
 from app.api.v1.supervisor_incidents import router as supervisor_incidents_router
 from app.api.v1.supervisor_staff import router as supervisor_staff_router
 from app.api.v1.supervisor_work_orders import router as supervisor_work_orders_router
+from app.api.v1.system_organization import router as system_organization_router
 from app.api.v1.wechat_auth import router as wechat_auth_router
 from app.api.v1.identity_recovery import router as identity_recovery_router
 from app.api.v1.work_orders import router as work_orders_router
@@ -36,6 +37,7 @@ from app.core.config import Settings
 def build_api_router(settings: Settings) -> APIRouter:
     router = APIRouter()
     router.include_router(health_router)
+    router.include_router(system_organization_router)
     router.include_router(me_router)
     router.include_router(credential_auth_router)
     router.include_router(property_catalog_router)

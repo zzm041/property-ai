@@ -1,0 +1,90 @@
+{
+  "task": "PRODUCTION-V1-DELIVERY-CHECK",
+  "recorded_at": "2026-09-28T06:00:03+08:00",
+  "source_head_before_delivery_wip": "40a224287978405860e5a96ae33e94ccf97c0de9",
+  "project": "property-ai-delivery-check",
+  "scope": "isolated local deployment artifact verification",
+  "image": {
+    "name": "property-ai-delivery:local",
+    "digest": "sha256:ffb79d69809a90c05dc02d4094228110ab0dde3bbec491a39891ceef7e6478ca",
+    "python": "3.12.10",
+    "architecture": "x86_64",
+    "dependency_lock_entries": 61,
+    "dependency_lock_matches_pip_freeze": true
+  },
+  "current_application_image": {
+    "digest": "sha256:512ac31d70e8b353639ebc16fdd539a215bc407036979737cf4687865ddf3317",
+    "api_worker_beat_same_image": true,
+    "note": "The earlier ffb79d image proves clean initialization; the current image adds the reviewed organization-onboarding slice."
+  },
+  "runtime": {
+    "http": "http://127.0.0.1:8093",
+    "mysql": "127.0.0.1:3327/property_ai_delivery_check",
+    "revision": "20260926_0014_identity_merge_sla_versions",
+    "table_count": 64,
+    "bootstrap_user_count": 1,
+    "current_user_count": 2,
+    "current_tenant_count": 4,
+    "current_property_count": 4,
+    "audit_count_after_login": 2,
+    "api_image_matches": true,
+    "worker_image_matches": true,
+    "beat_image_matches": true,
+    "queue": "property_ai.delivery_check",
+    "queue_messages_ready": 0,
+    "queue_messages_unacknowledged": 0,
+    "queue_consumers": 1
+  },
+  "verified": {
+    "clean_empty_database_migration_to_0014": true,
+    "normal_password_login_issued_access_and_refresh": true,
+    "stop_without_volume_delete_and_restart": true,
+    "ready_after_restart": true,
+    "redis_authenticated_healthcheck": true,
+    "milvus_uses_project_minio_credentials": true,
+    "beat_persistent_schedule_writable": true,
+    "nginx_survives_api_container_replacement": true,
+    "backup_created": true,
+    "restore_to_new_database": true,
+    "existing_restore_target_refused": true,
+    "hardened_backup_manifest_created": true,
+    "hardened_backup_existing_target_refused": true,
+    "hardened_backup_same_name_concurrency_single_winner": true,
+    "hardened_restore_outside_path_refused": true,
+    "hardened_restore_dangerous_sql_refused": true,
+    "organization_onboarding_actual_page": true,
+    "independent_tenant_admin_scope_actual_page": true
+  },
+  "hardened_backup": {
+    "filename": "property_ai_delivery_check-20260928T033318Z-0887ac81.sql",
+    "sha256": "989FB8126E0C4C2FE49DA8BE980E6FB733C8C52799F2760A41FEAFD29EA48711",
+    "manifest_created": true,
+    "successful_reimport_this_round": false,
+    "reason": "The preserved restore target already exists and the hardened entry correctly refused overwrite; the earlier isolated successful restore remains separate historical runtime evidence."
+  },
+  "backup": {
+    "filename": "property_ai_delivery_check-20260927T214857Z.sql",
+    "bytes": 134051,
+    "sha256": "3CC3B496B5E934408237BE7F1BCDB74785A526236BB67E886415FC3D6EE71DF2",
+    "restore_database": "property_ai_delivery_check_restore_check",
+    "source_tables": 64,
+    "restore_tables": 64,
+    "source_users": 1,
+    "restore_users": 1,
+    "source_audits": 2,
+    "restore_audits": 2,
+    "source_revision": "20260926_0014_identity_merge_sla_versions",
+    "restore_revision": "20260926_0014_identity_merge_sla_versions"
+  },
+  "provider_boundary": {
+    "work_order_analysis": "Development",
+    "identity_proof": "disabled",
+    "llm_ready_probe": "not_checked",
+    "vlm_ready_probe": "not_checked",
+    "asr_ready_probe": "not_checked",
+    "embedding_ready_probe": "not_checked",
+    "reranker_ready_probe": "not_checked",
+    "real_auto": "NOT_READY",
+    "production_claim": false
+  }
+}

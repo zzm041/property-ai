@@ -1,0 +1,20 @@
+PRODUCTION-V1-DELIVERY-CHECK verification summary
+
+Focused deployment artifact tests:
+  6 passed, 1 existing dependency warning
+
+Direct regressions after prompt/0014 guard alignment:
+  2 passed, 1 existing dependency warning
+
+Complete pure unit candidate regression:
+  1122 passed, 1 existing dependency warning
+  basetemp: D:\property-ai\tmp\pytest-final-20260928b
+
+The preceding host-default-temp attempt produced 29 setup errors because
+C:\Users\lmj\AppData\Local\Temp\pytest-of-lmj was not accessible.  It also
+found two real consistency failures, both fixed and covered by the successful
+candidate regression above.  The failed attempt is not counted as a pass.
+
+No model request, business work order, queue replay, database migration outside
+the isolated delivery database, or shared-service operation was performed by
+these test runs.

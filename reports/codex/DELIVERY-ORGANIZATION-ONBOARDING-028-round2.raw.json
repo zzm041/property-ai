@@ -1,0 +1,112 @@
+{
+  "task_id": "DELIVERY-ORGANIZATION-ONBOARDING-028 / DELIVERY-CHECK-20260928",
+  "review_round": 2,
+  "review_type": "INDEPENDENT_READ_ONLY",
+  "recorded_head": "40a224287978405860e5a96ae33e94ccf97c0de9",
+  "decision": "PASS_SCOPED",
+  "scope": "仅复核028-R1-01至028-R1-04及其直接回归；结论绑定当前未提交WIP，不代表Production通过。",
+  "finding_resolution": [
+    {
+      "id": "028-R1-01",
+      "status": "CLOSED",
+      "location": "D:/property-ai/deploy/delivery.ps1：Resolve-BackupPath、Read-BackupManifest、restore-check",
+      "basis": "创建恢复库前检查备份目录、SQL扩展名、manifest格式、源库名、字节数及SHA-256，并拒绝列明的跨库/全局语句；导入不再使用root，而使用随机临时账号及恢复目标库授权。既有恢复目标仍拒绝覆盖。",
+      "evidence_boundary": "关闭的是原root导入任意路径dump的源码安全问题。保存材料记录了路径、危险语句和既有目标拒绝检查；加固后的成功导入未重跑，不能沿用旧成功恢复证明新导入链已运行通过。该入口仅接受受控本地备份，不是通用不可信SQL沙箱。"
+    },
+    {
+      "id": "028-R1-02",
+      "status": "CLOSED",
+      "location": "D:/property-ai/deploy/delivery.ps1：backup",
+      "basis": "本轮初始修复仍存在的检查后覆盖竞态已再次修正：CreateNew及FileShare.None排他预约目标，SQL和manifest先写GUID临时路径，随后以不覆盖的File.Move发布。未取得预约的进程不会清理他人的预约；finally不删除最终备份。中途失败可能留下不完整备份，但后续会拒绝覆盖或因缺少匹配manifest拒绝恢复，不会假报成功。",
+      "evidence": {
+        "reviewed_script_sha256": "9B9C4B5151DCB9D1602105DA3080B6CA2308D33C9272A140BF35B5A0CA6111E4",
+        "reported_concurrent_result": "两个同名备份进程：1成功、1预约拒绝",
+        "independently_read_artifact": "D:/property-ai/deploy/backups/property_ai_delivery_check-concurrency-028.sql",
+        "bytes": 150408,
+        "actual_and_manifest_sha256": "E866753E0EA312EC233784792F5EBC54D93DE311AAAC14A0BA1283E6F6A0888D",
+        "reservation_present_at_review": false
+      }
+    },
+    {
+      "id": "028-R1-03",
+      "status": "CLOSED",
+      "location": "D:/property-ai/reports/delivery-check-20260928/delivery-org-028-independent-05-*",
+      "basis": "新证据明确区分SYSTEM_ADMIN创建者user1和首位管理员user2。user2前置roles/scopes为空；正常密码重登后具有tenant4的TENANT_ADMIN授权，无SYSTEM_ADMIN，管理页面仅返回property4。创建页面真实请求指向8093的正式登录及system/organizations接口；数据库回读的tenant4、property4、目标user2、actor1审计及单条幂等记录相互对应。",
+      "image_verification": "已通过图像工具实际查看两张PNG：创建结果为tenant4/property4/管理员2，手机号输入已清空；重登管理页显示同一independent-05小区。未仅凭截图路径或PASS字段下结论。",
+      "evidence_boundary": "user2密码前置使用8094隔离Development短信重置设施，随后业务采用正常密码会话；不是可信生产短信或身份Provider验收。"
+    },
+    {
+      "id": "028-R1-04",
+      "status": "CLOSED",
+      "location": "D:/property-ai/miniprogram/pages/system/organizations.js：submit",
+      "basis": "页面保存规范化请求正文的fingerprint和待确认幂等键；响应失败不清除，同正文重试复用该键，确认成功后清除，正文不同则生成新键。VM脚本读取并执行当前页面源码，检查第一次响应丢失、第二次同键同体及成功清理、第三次新正文新键；并非单独复制一套页面逻辑。",
+      "evidence_boundary": "客户端响应丢失为VM模拟，未重新制造真实页面网络丢包；此前服务端同键重放证据保留。"
+    }
+  ],
+  "new_blockers": [],
+  "reviewed_source": [
+    {"path": "D:/property-ai/deploy/delivery.ps1", "sha256": "9B9C4B5151DCB9D1602105DA3080B6CA2308D33C9272A140BF35B5A0CA6111E4"},
+    {"path": "D:/property-ai/backend/tests/unit/test_delivery_artifact.py", "sha256": "6836B03775052C9143519E4205F8F4B319B543FF57AE40E2D91029229AF8F4CB"},
+    {"path": "D:/property-ai/miniprogram/pages/system/organizations.js", "sha256": "5E01C59E730A73ACF697E18B79F13B5A9A15D11D02D8FF005764D5E28FB32D95"},
+    {"path": "D:/property-ai/reports/delivery-check-20260928/test-organization-page-idempotency.js", "sha256": "468335950C809ECCC886CB773D5413BCC3764A36CD5BFFEFB8C5D527F4C2DEBF"},
+    {"path": "D:/property-ai/reports/delivery-check-20260928/prepare-independent-admin-password.js"},
+    {"path": "D:/property-ai/reports/delivery-check-20260928/run-organization-page.js"},
+    {"path": "D:/property-ai/reports/delivery-check-20260928/verify-organization-relogin.js"},
+    {"path": "D:/property-ai/deploy/README.md"}
+  ],
+  "reviewed_evidence": {
+    "documents": [
+      "D:/property-ai/reports/codex/DELIVERY-ORGANIZATION-ONBOARDING-028-round1.raw.json",
+      "D:/property-ai/reports/delivery-check-20260928/round2-fix-verification.json",
+      "D:/property-ai/reports/delivery-check-20260928/round2-tests.txt",
+      "D:/property-ai/reports/delivery-check-20260928/runtime-summary.json",
+      "D:/property-ai/reports/delivery-check-20260928/README.md",
+      "D:/property-ai/reports/delivery-check-20260928/delivery-org-028-independent-05-independent-admin-prerequisite.json",
+      "D:/property-ai/reports/delivery-check-20260928/delivery-org-028-independent-05-organization-page.json",
+      "D:/property-ai/reports/delivery-check-20260928/delivery-org-028-independent-05-organization-relogin.json",
+      "D:/property-ai/reports/delivery-check-20260928/delivery-org-028-independent-05-runtime-db.json"
+    ],
+    "images_actually_viewed": [
+      "D:/property-ai/reports/delivery-check-20260928/delivery-org-028-independent-05-organization-created.png",
+      "D:/property-ai/reports/delivery-check-20260928/delivery-org-028-independent-05-relogin-property-scope.png"
+    ],
+    "hash_verification": "四个登记源码hash及六个independent-05证据hash均与round2-fix-verification.json一致；另核对了并发备份文件与manifest的字节数和SHA-256，未读取SQL正文。"
+  },
+  "tests_evidence": {
+    "focused_final": "保存摘要报告18 passed、1 existing warning；审查者未执行。",
+    "retained_failure": "首次并发修复后17 passed、1 failed：静态测试仍期待旧的直接复制目标；修正测试断言后通过。原失败已在摘要保留。",
+    "client_vm": "保存摘要报告3次调用及幂等断言通过；已实际读取VM测试和当前页面源码，未运行。",
+    "final_pure_unit": {
+      "path": "D:/property-ai/reports/delivery-check-20260928/unit-round2b-junit.xml",
+      "sha256": "585F95B7C74D8D8386006D00E3A27D4615FE3698BFC7E4BF9E78CD3B97D6C2CF",
+      "actual_suite_attributes": {"tests": 1134, "failures": 0, "errors": 0, "skipped": 0, "time_seconds": 14.078},
+      "warning_boundary": "1 warning来自保存的运行摘要；JUnit未提供源码hash属性，不能将JUnit本身表述为密码学意义的同源运行证明。"
+    },
+    "earlier_junit": {
+      "path": "D:/property-ai/reports/delivery-check-20260928/unit-round2-junit.xml",
+      "sha256": "1B7B006486AE53DDD993B86A046FCFBA73F58E40343E06457319E2A6A73CEDB9",
+      "actual_summary": "1134 tests，0 failures/errors/skipped，15.874秒；保留为较早一轮，不与最终运行合并计数。"
+    }
+  },
+  "verified_conditions": [
+    "四项既有finding在本轮限定范围关闭，无新当前任务阻塞。",
+    "备份最终发布不会覆盖已存在的SQL或manifest；排他预约失败者不清理成功者资产。",
+    "独立管理员、创建结果、重登范围、数据库授权和审计指向同一组对象。",
+    "查看的页面和公开JSON未包含登录密码、token或完整管理员手机号；合成组织联系电话明确属于测试资料。",
+    "README已删除组织初始化入口缺失的过时表述，并保留Development与Production边界。",
+    "runtime-summary区分初始部署镜像ffb79d与组织功能镜像512ac31，并明确加固导入本轮未成功重跑。",
+    "本审查仅读取文件、Git/hash元数据及图片；未修改文件，未运行测试、页面、HTTP、业务、数据库、队列、Docker或模型。"
+  ],
+  "remaining_unverified": [
+    "加固后的目标受限账号成功恢复导入及其完整数据校验尚无新运行证据；既有恢复库未删除或覆盖。",
+    "并发备份进程结果、专项测试及VM执行结果来自实施方保存摘要；审查者未独立执行。",
+    "未新增真实首次并发组织创建或真实网络响应丢失演练；不得扩大为所有故障恢复场景已通过。",
+    "本轮未重新核验正在运行的容器、数据库或队列；环境结论绑定保存证据时点。"
+  ],
+  "release_blockers": [
+    "9B候选仍为NOT_READY，真实模型AUTO业务闭环未完成。",
+    "可信身份及其他正式Provider激活、正式外部通道与生产验收仍未完成。",
+    "本地Development部署及组织初始化通过不等于完整Production V1发布通过；正式备份恢复及生产运行验收边界继续保留。"
+  ],
+  "next_action": "由主实施会话保存本轮原始JSON，按准确路径提交本任务代码与脱敏证据并更新交接；不得纳入预存配置、密钥或SQL备份。无需为关闭本轮finding重跑既有业务；加固成功恢复保持待验证，随后继续已批准的软件工作。"
+}

@@ -40,6 +40,9 @@
 <view class="card" wx:if="{{canReviewIdentity}}">
   <button class="btn" data-url="/pages/supervisor/identity-recovery" bindtap="go">身份恢复审核</button>
 </view>
+<view class="card" wx:if="{{canBootstrapOrganization}}">
+  <button class="btn" data-url="/pages/system/organizations" bindtap="go">建立物业组织</button>
+</view>
 <view class="card" wx:if="{{canViewStats}}">
   <button class="btn" data-url="/pages/supervisor/dashboard" bindtap="go">运营统计与配置</button>
 </view>

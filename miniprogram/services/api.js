@@ -331,6 +331,13 @@ module.exports = {
   devToken: (seedKey) =>
     request({ path: "/auth/dev/token", method: "POST", data: { seed_key: seedKey } }),
   me: () => request({ path: "/me" }),
+  createOrganization: (body, idempotencyKey) =>
+    request({
+      path: "/system/organizations",
+      method: "POST",
+      data: body,
+      headers: { "Idempotency-Key": idempotencyKey },
+    }),
   contactDefault: () => request({ path: "/me/contact-phone" }),
   workOrderContact: (id, reveal = false) => request({ path: `/work-orders/${id}/contact?reveal=${reveal ? 'true' : 'false'}` }),
   houses: (afterId = 0, limit = 50) => request({ path: `/me/houses?after_id=${afterId}&limit=${limit}` }),

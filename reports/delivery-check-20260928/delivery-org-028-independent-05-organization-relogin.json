@@ -1,0 +1,27 @@
+{
+  "task_id": "DELIVERY-ORGANIZATION-ONBOARDING-028",
+  "run_id": "delivery-org-028-independent-05",
+  "received_at_utc": "2026-09-27T22:56:56.716Z",
+  "interaction": "normal password re-login and actual management page navigation",
+  "user_id": 2,
+  "system_admin_absent": true,
+  "role_seen": "TENANT_ADMIN",
+  "scope": {
+    "scope_type": "TENANT",
+    "tenant_id": 4,
+    "property_id": null
+  },
+  "management_property": {
+    "id": 4,
+    "tenant_id": 4,
+    "name": "交付验收小区-delivery-org-028-independent-05",
+    "can_edit": true
+  },
+  "unrelated_property_ids_visible": [],
+  "screenshot": "delivery-org-028-independent-05-relogin-property-scope.png",
+  "boundaries": {
+    "business_request": false,
+    "seed_login": false,
+    "page_state_faked": false
+  }
+}

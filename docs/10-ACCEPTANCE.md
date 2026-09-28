@@ -45,6 +45,7 @@
 
 ### B2 房产与住户
 
+- 干净部署后，SYSTEM_ADMIN 可通过正常页面建立首个 Tenant/Property，并把已正常注册的 ACTIVE 账号设为首位 TENANT_ADMIN；创建、授权和审计原子完成，重新登录后管理范围生效。
 - 物业可建楼栋房屋；House 无 owner_name 业务字段。
 - 住户申请绑定 → 自动或人工审核 → `ResidentHouseRelation`。
 - 退租后历史关系可查，当前关系正确。

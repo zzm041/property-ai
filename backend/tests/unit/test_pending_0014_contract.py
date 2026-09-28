@@ -15,7 +15,11 @@ def test_pending_0014_is_single_head_guarded_and_never_reuses_forbidden_ids() ->
     assert 'revision = "20260926_0014_identity_merge_sla_versions"' in source
     assert "APP_ENV" in source and "property_ai_auth001_test" in source
     assert "PROPERTY_AI_APPROVE_0014_TARGET" in source
-    assert "url.port not in {3307, 3317}" in source
+    assert "url.port in {3307, 3317}" in source
+    assert 'url.host == "mysql"' in source
+    assert 'url.port == 3306' in source
+    assert 'approved_database == "property_ai_delivery_check"' in source
+    assert "PROPERTY_AI_DELIVERY_MIGRATION" in source
     assert "0014 requires actual 0012" in source
     assert "op.drop_" not in source
     assert "uq_user_phones_active_e164" in source

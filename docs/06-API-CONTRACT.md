@@ -87,6 +87,7 @@
 
 | 方法 | 路径 | 角色 |
 | --- | --- | --- |
+| POST | `/system/organizations` | SYSTEM_ADMIN 建立租户、首个小区并授予已注册有效账号 TENANT_ADMIN；三者同事务 |
 | GET | `/properties` | 登录用户可见范围 |
 | GET | `/properties/{id}/buildings` | 住户申请绑定或管理员 |
 | GET | `/buildings/{id}/units` | 同上 |
@@ -101,6 +102,8 @@
 | PATCH | `/admin/houses/{id}` | 维护档案 |
 
 批准申请必须创建 `ResidentHouseRelation`，而不是改 House 姓名字段。
+
+`POST /system/organizations` 要求 `Idempotency-Key`；同键同请求返回原租户、小区和首位管理员，不重复建立授权或审计，同键异体请求返回冲突。首位管理员以当前 ACTIVE 手机凭证定位，手机号必须先经正常认证流程注册；客户端不能提交 user_id、角色或“已认证”标记。服务端重新加载当前 SYSTEM_ADMIN 权限，在一个事务内建立 Tenant、Property、TENANT_ADMIN grant、幂等结果和审计。名称/授权冲突时整体回滚，不留下半成品组织。该接口不读取其他住户号码，也不改变账号手机号。
 
 ## 5. 员工
 

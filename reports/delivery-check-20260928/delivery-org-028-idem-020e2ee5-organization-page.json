@@ -1,0 +1,38 @@
+{
+  "task_id": "DELIVERY-ORGANIZATION-ONBOARDING-028",
+  "run_id": "delivery-org-028-idem-020e2ee5",
+  "received_at_utc": "2026-09-27T22:28:38.611Z",
+  "interaction": "WeChat DevTools automator through actual page controls",
+  "api_base": "http://127.0.0.1:8093/api/v1",
+  "login": {
+    "method": "password",
+    "role": "SYSTEM_ADMIN",
+    "user_id": 1,
+    "phone_sha256_16": "bde679e1fbef0f0a"
+  },
+  "submitted_fields": {
+    "tenant_name": "交付验收物业-delivery-org-028-idem-020e2ee5",
+    "tenant_contact": "021-55550000",
+    "property_name": "交付验收小区-delivery-org-028-idem-020e2ee5",
+    "property_address": "上海市合成测试路 28 号",
+    "timezone": "Asia/Shanghai",
+    "initial_admin_phone_redacted": true
+  },
+  "result": {
+    "tenant_id": 3,
+    "tenant_name": "交付验收物业-delivery-org-028-idem-020e2ee5",
+    "property_id": 3,
+    "property_name": "交付验收小区-delivery-org-028-idem-020e2ee5",
+    "initial_admin_user_id": 1,
+    "initial_admin_role": "TENANT_ADMIN"
+  },
+  "notice": "物业组织已建立，首位管理员重新登录后即可进入管理范围",
+  "screenshot": "delivery-org-028-idem-020e2ee5-organization-created.png",
+  "boundaries": {
+    "seed_login": false,
+    "dev_auth": false,
+    "business_sql_write": false,
+    "page_state_faked": false,
+    "model_requests": 0
+  }
+}

@@ -1,0 +1,86 @@
+"""Guarded clean-delivery migration: 0012, bootstrap, compatibility, head."""
+from __future__ import annotations
+
+import os
+import subprocess
+
+from sqlalchemy import create_engine, text
+from sqlalchemy.engine import make_url
+
+from app.cli.bootstrap_system_admin import main as bootstrap_system_admin
+from app.core.config import get_settings
+
+
+HEAD = "20260926_0014_identity_merge_sla_versions"
+PRE_BOOTSTRAP = "20260925_0012_task_intents"
+
+
+def _target() -> tuple[str, str]:
+    settings = get_settings()
+    url = make_url(settings.active_database_url)
+    actual = f"{url.host}:{url.port}/{url.database}"
+    if (
+        os.environ.get("PROPERTY_AI_DELIVERY_MIGRATION") != "approved"
+        or os.environ.get("PROPERTY_AI_APPROVE_DELIVERY_TARGET") != actual
+        or settings.app_env != "staging"
+        or url.drivername != "mysql+pymysql"
+        or url.host != "mysql"
+        or url.port != 3306
+        or url.database != "property_ai_delivery_check"
+    ):
+        raise RuntimeError("delivery migration refused outside the exact configured target")
+    return settings.active_database_url, actual
+
+
+def _revision(engine) -> str | None:
+    with engine.connect() as connection:
+        exists = connection.execute(text(
+            "SELECT COUNT(*) FROM information_schema.tables "
+            "WHERE table_schema=DATABASE() AND table_name='alembic_version'"
+        )).scalar_one()
+        if not exists:
+            return None
+        return connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
+
+
+def _alembic(target: str) -> None:
+    subprocess.run(["alembic", "upgrade", target], check=True)
+
+
+def main() -> int:
+    database_url, actual = _target()
+    engine = create_engine(database_url, pool_pre_ping=True)
+    try:
+        current = _revision(engine)
+        if current == HEAD:
+            print(f"delivery database already at {HEAD}")
+            return 0
+        if current not in {None, PRE_BOOTSTRAP}:
+            raise RuntimeError(f"delivery migration refuses unexpected revision {current!r}")
+        if current is None:
+            _alembic(PRE_BOOTSTRAP)
+        bootstrap_system_admin()
+        with engine.begin() as connection:
+            column = connection.execute(text(
+                "SELECT CHARACTER_MAXIMUM_LENGTH,IS_NULLABLE,COLUMN_KEY FROM information_schema.columns "
+                "WHERE table_schema=DATABASE() AND table_name='alembic_version' AND column_name='version_num'"
+            )).one()
+            if tuple(column) == (32, "NO", "PRI"):
+                connection.execute(text(
+                    "ALTER TABLE alembic_version MODIFY version_num VARCHAR(64) NOT NULL"
+                ))
+            elif tuple(column) != (64, "NO", "PRI"):
+                raise RuntimeError(f"unexpected alembic version column shape: {tuple(column)!r}")
+        os.environ["PROPERTY_AI_APPROVE_0014_DATABASE"] = "property_ai_delivery_check"
+        os.environ["PROPERTY_AI_APPROVE_0014_TARGET"] = actual
+        _alembic("head")
+        if _revision(engine) != HEAD:
+            raise RuntimeError("delivery migration did not reach the expected head")
+        print(f"delivery database migrated to {HEAD}")
+        return 0
+    finally:
+        engine.dispose()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

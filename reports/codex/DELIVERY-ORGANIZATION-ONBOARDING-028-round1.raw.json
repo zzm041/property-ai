@@ -1,0 +1,129 @@
+{
+  "task_id": "DELIVERY-ORGANIZATION-ONBOARDING-028 / DELIVERY-CHECK-20260928",
+  "review_round": 1,
+  "review_type": "INDEPENDENT_READ_ONLY",
+  "recorded_head": "40a224287978405860e5a96ae33e94ccf97c0de9",
+  "decision": "NEEDS_CHANGES",
+  "reviewed_source": {
+    "boundary": "本轮集中初审读取的交付包及组织初始化实现；审查期间开始的修复尚未复核，不自动纳入本轮通过范围。",
+    "deployment": [
+      "D:/property-ai/deploy/Dockerfile",
+      "D:/property-ai/deploy/docker-compose.delivery.yml",
+      "D:/property-ai/deploy/delivery.ps1",
+      "D:/property-ai/deploy/.env.delivery.example",
+      "D:/property-ai/deploy/.env.delivery.bootstrap.example",
+      "D:/property-ai/deploy/requirements.delivery.lock",
+      "D:/property-ai/deploy/README.md",
+      "D:/property-ai/deploy/nginx.conf",
+      "D:/property-ai/.dockerignore",
+      "D:/property-ai/backend/app/cli/bootstrap_system_admin.py",
+      "D:/property-ai/backend/app/cli/delivery_migrate.py",
+      "D:/property-ai/scripts/ops/prepare_delivery_env.py",
+      "D:/property-ai/backend/tests/unit/test_delivery_artifact.py",
+      "D:/property-ai/backend/tests/unit/test_pending_0014_contract.py",
+      "0009、0011、0012、0014的本轮精确迁移guard差异"
+    ],
+    "organization": [
+      "D:/property-ai/backend/app/api/v1/system_organization.py",
+      "D:/property-ai/backend/app/schema/organization.py",
+      "D:/property-ai/backend/app/service/organization.py",
+      "D:/property-ai/backend/app/repository/property.py",
+      "D:/property-ai/backend/app/domain/audit.py",
+      "D:/property-ai/backend/app/api/v1/router.py",
+      "D:/property-ai/backend/tests/unit/test_organization_onboarding.py",
+      "D:/property-ai/miniprogram/pages/system/organizations.js及对应wxml/json/wxss",
+      "miniprogram/app.json、home.js/home.wxml、services/api.js的本轮差异",
+      "docs/06-API-CONTRACT.md、docs/10-ACCEPTANCE.md的本轮差异",
+      "既有RBAC授权、有效手机号查询、事务、幂等约束及页面加载工具的必要调用上下文"
+    ]
+  },
+  "reviewed_evidence": [
+    "D:/property-ai/reports/delivery-check-20260928/runtime-summary.json",
+    "D:/property-ai/reports/delivery-check-20260928/organization-onboarding-summary.json",
+    "D:/property-ai/reports/delivery-check-20260928/delivery-org-028-idem-020e2ee5-organization-page.json",
+    "D:/property-ai/reports/delivery-check-20260928/delivery-org-028-idem-020e2ee5-organization-relogin.json",
+    "D:/property-ai/reports/delivery-check-20260928/delivery-org-028-idem-020e2ee5-runtime-db.json",
+    "D:/property-ai/reports/delivery-check-20260928/delivery-org-028-idem-020e2ee5-organization-created.png：实际通过图像工具查看",
+    "D:/property-ai/reports/delivery-check-20260928/delivery-org-028-idem-020e2ee5-relogin-property-scope.png：实际通过图像工具查看",
+    "D:/property-ai/reports/delivery-check-20260928/tests.txt",
+    "D:/property-ai/reports/delivery-check-20260928/README.md",
+    "页面采集脚本中实际输入、点击、登录及scope选择的相关实现"
+  ],
+  "findings": [
+    {
+      "id": "028-R1-01",
+      "severity": "HIGH",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/deploy/delivery.ps1，restore-check分支",
+      "trigger": "传入的SQL包含USE、跨库限定对象、CREATE/DROP DATABASE或其他超出恢复目标的语句。",
+      "impact": "脚本以MySQL root执行任意dump。mysql命令后的目标库名只设置默认数据库，不能限制SQL作用范围，因此仍可能修改主库或其他schema；脚本随后无条件宣称primary database was not changed。",
+      "evidence": "当前只校验新恢复库不存在及文件存在，然后以root执行mysql <dump；没有dump内容/来源绑定校验，也没有仅限目标库的导入权限。已有正常dump恢复成功不能证明恶意或误选dump安全。",
+      "recommendation": "限制恢复连接只能操作新目标库，或复用可靠的安全dump校验及来源哈希约束；在任何建库/导入前拒绝跨库及危险指令，补负向测试，不以单个默认数据库参数声称隔离。"
+    },
+    {
+      "id": "028-R1-02",
+      "severity": "MEDIUM",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/deploy/delivery.ps1，backup分支",
+      "trigger": "用户指定已存在的输出路径，或默认秒级时间戳发生碰撞。",
+      "impact": "docker compose cp可能覆盖既有备份、配置或其他文件，违背可恢复保全与不覆盖边界。",
+      "evidence": "Argument仅经GetFullPath解析，复制前没有拒绝既存目标或受保护文件；默认文件名只有秒级时间戳。",
+      "recommendation": "使用明确的新文件目标，复制前拒绝已存在目标及配置等受保护路径；必要时采用独占预约和临时文件完成后落盘，补已有文件、路径冲突的负向测试。"
+    },
+    {
+      "id": "028-R1-03",
+      "severity": "MEDIUM",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/reports/delivery-check-20260928/delivery-org-028-idem-020e2ee5-organization-page.json及organization-relogin.json",
+      "trigger": "以创建组织的SYSTEM_ADMIN本人作为首位TENANT_ADMIN，并用同一账号重登验证管理范围。",
+      "impact": "该账号原有SYSTEM权限足以访问管理页面；新增TENANT_ADMIN角色可见和页面can_edit=true，不能证明普通新租户管理员获得正确范围，也不能证明跨租户隔离。",
+      "evidence": "创建页记录login.role=SYSTEM_ADMIN、user_id=1，结果initial_admin_user_id=1；重登仍为user_id=1，仅摘录role_seen=TENANT_ADMIN，未证明SYSTEM权限被移除。采集脚本按目标tenant筛选grant，没有排除该账号的其他权限。",
+      "recommendation": "保留已有证据，使用独立、正常注册且没有SYSTEM权限的有效账号作为目标；验证授权前后、正常重登、目标范围可访问及无关范围被拒绝。不要为验收临时扩大权限。"
+    },
+    {
+      "id": "028-R1-04",
+      "severity": "MEDIUM",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/miniprogram/pages/system/organizations.js，submit",
+      "trigger": "首次组织创建已提交，但响应丢失或客户端出现网络错误；用户在同一表单上重试。",
+      "impact": "每次submit重新生成Idempotency-Key，页面无法利用已有服务端同键重放取回原成功结果；相同租户名称通常会变为409冲突，用户不知道组织其实已建立。",
+      "evidence": "初审读取实现将Date.now()/Math.random()生成键放在每次submit内部，没有保存未确定请求的键或正文；现有运行重放是独立请求使用原键，不能覆盖页面此恢复行为。",
+      "recommendation": "同一未完成请求稳定保留键及对应正文；未知响应后重试复用，明确改变正文时再开启新请求。补页面级或可执行客户端测试，证明响应丢失重试不会换键或重复建立组织。"
+    }
+  ],
+  "verified_conditions": [
+    "接口使用正常认证依赖和同步Endpoint；服务端重新加载当前principal，要求ACTIVE、SYSTEM范围SYSTEM_ADMIN和role:manage。",
+    "首位管理员手机号由Schema规范化并经ACTIVE手机凭证查询定位；客户端不能提交任意user_id或角色。既有RBAC方法会锁定并重新检查目标用户ACTIVE状态。",
+    "Tenant、Property、TENANT_ADMIN授权、管理审计和幂等结果位于同一Service所有事务中；Repository只flush，不自行commit。",
+    "服务端同键同体路径返回既存组织结果且不再授权或审计，同键异体返回冲突；已保存运行记录支持一次同键重入。",
+    "run delivery-org-028-idem-020e2ee5对应创建请求593fdad7ff97421aa0dbfd03db012fac和重放e10fe31c035e4a859dfecbd031ecc45e；保存的DB回读为1 tenant、1 property、1 idempotency、1 tenant-admin grant及2条组织审计。",
+    "实际查看两张截图：组织3/小区3结果一致，成功后的首位管理员手机号输入为空；未在这两张截图发现完整目标手机号或token。",
+    "组织service/API/schema及api.js的实际哈希与保存摘要一致，指定四份页面JSON/截图哈希一致。审查期间organizations.js及其测试发生后续修改，旧运行证据不能自动绑定修复版。",
+    "Compose使用相对构建路径、独立命名项目及持久卷；API/Worker/Beat引用同一应用镜像定义，不依赖旧PID、开发机绝对路径或数据库快照。",
+    "迁移位于显式tools服务，普通API/Worker/Beat启动不自动迁移；本轮迁移差异为delivery guard，未见业务DDL或revision/parent变更。",
+    "delivery迁移与bootstrap入口要求staging、精确mysql:3306/property_ai_delivery_check及显式目标授权，不能仅凭APP_ENV放行。",
+    "保存的早期部署摘要对应ffb79d镜像，后续组织验收摘要对应512ac31镜像；两阶段证据不能混为同一次运行。",
+    "未运行测试、模型、页面、业务请求、数据库、队列或Docker操作，未修改工作区。"
+  ],
+  "tests_evidence": {
+    "current_implementer_report": "专项21 passed, 1 warning；完整纯单元1134 passed, 1 warning。",
+    "actually_read": "organization-onboarding-summary.json记录21/1134；tests.txt实际仍记录较早6项部署专项、2项直接回归及1122纯单元结果。",
+    "boundary": "已审查相关测试源码，但未独立执行；没有把较早tests.txt冒称当前21/1134的原始输出，也没有把mock事务断言当作真实数据库并发验收。"
+  },
+  "unverified": [
+    "普通无SYSTEM权限目标账号的重登授权和跨租户隔离尚未被本组运行证据证明。",
+    "首次创建的并发同键竞态、提交后响应丢失的实际页面恢复未被现有运行重放证明。",
+    "备份覆盖拒绝和危险SQL恢复隔离尚未通过安全验证。",
+    "部署启动、重启、备份恢复和API/Worker/Beat实际同镜像信息来自保存的实施方摘要；本审查没有重新操作环境。",
+    "当前1134/21结果的原始逐次输出未在指定证据中读取到。",
+    "README末段仍称缺少组织初始化产品入口，已与本轮源码不符，需同步限定表述。",
+    "审查期间新增修复尚待同一任务窄复核。"
+  ],
+  "release_blockers": [
+    "9B candidate-02仍为NOT_READY，真实AUTO闭环未完成。",
+    "可信真实身份Provider、企业微信/短信等正式通道及相应验收未完成。",
+    "本地Development交付排练不等于Production发布通过；正式环境、TLS、凭证、运行维护及发布批准仍保留。",
+    "恢复工具风险解决前，不应将当前restore-check作为安全生产恢复入口。"
+  ],
+  "next_action": "保存本轮原始NEEDS_CHANGES及028-R1-01至04。仅修复这四项并补直接测试/必要的普通目标账号证据，保留现有运行与历史失败；完成后由同一独立只读审查者窄复核，不重跑无关模块，不推进真实AI或Production声明。"
+}

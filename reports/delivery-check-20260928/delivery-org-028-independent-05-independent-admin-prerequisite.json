@@ -1,0 +1,14 @@
+{
+  "task_id": "DELIVERY-ORGANIZATION-ONBOARDING-028",
+  "run_id": "delivery-org-028-independent-05",
+  "recorded_at_utc": "2026-09-27T22:56:47.346Z",
+  "purpose": "establish a normal password credential for the independent synthetic target account",
+  "api": "http://127.0.0.1:8094/api/v1",
+  "provider_boundary": "Development SMS test facility only",
+  "user_id": 2,
+  "phone_sha256_16": "D901E8933C66C30A",
+  "password_login_verified": true,
+  "system_admin_absent_before_onboarding": true,
+  "roles_before_onboarding": [],
+  "scopes_before_onboarding": []
+}

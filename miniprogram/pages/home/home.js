@@ -13,6 +13,7 @@ Page({
     canManageIncidents: false,
     canViewProperty: false,
     canReviewIdentity: false,
+    canBootstrapOrganization: false,
     propertyId: "",
     tenantId: "",
     loading: false,
@@ -49,6 +50,9 @@ Page({
             canManageIncidents: permissions.indexOf("incident:manage") >= 0,
             canViewProperty: permissions.indexOf("property:read") >= 0,
             canReviewIdentity: permissions.indexOf("identity:review") >= 0,
+            canBootstrapOrganization:
+              (me.roles || []).indexOf("SYSTEM_ADMIN") >= 0 &&
+              permissions.indexOf("role:manage") >= 0,
             propertyId,
             tenantId,
           });

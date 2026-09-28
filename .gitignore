@@ -55,6 +55,7 @@ miniprogram/config/env.local.js
 # Docker volumes / local compose overrides
 docker-compose.override.yml
 .docker/
+deploy/backups/
 
 # Cursor / agent local
 .cursor/*.log

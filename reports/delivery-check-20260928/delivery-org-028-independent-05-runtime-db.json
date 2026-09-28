@@ -1,0 +1,47 @@
+{
+  "task_id": "DELIVERY-ORGANIZATION-ONBOARDING-028",
+  "run_id": "delivery-org-028-independent-05",
+  "database": "property-ai-delivery-check/mysql/property_ai_delivery_check",
+  "query_mode": "SELECT-only readback after actual page submission",
+  "tenant": {
+    "id": 4,
+    "status": "ACTIVE"
+  },
+  "property": {
+    "id": 4,
+    "tenant_id": 4,
+    "timezone": "Asia/Shanghai"
+  },
+  "initial_admin": {
+    "user_id": 2,
+    "role_code": "TENANT_ADMIN",
+    "scope_type": "TENANT",
+    "tenant_id": 4,
+    "property_id": null,
+    "system_admin_grant_count": 0
+  },
+  "audits": [
+    {
+      "action": "ORGANIZATION_TENANT_CREATED",
+      "actor_user_id": 1,
+      "tenant_id": 4,
+      "property_id": null,
+      "resource_type": "TENANT",
+      "resource_id": 4
+    },
+    {
+      "action": "ORGANIZATION_PROPERTY_CREATED",
+      "actor_user_id": 1,
+      "tenant_id": 4,
+      "property_id": 4,
+      "resource_type": "PROPERTY",
+      "resource_id": 4
+    }
+  ],
+  "idempotency": {
+    "record_count": 1,
+    "resource_type": "ORGANIZATION_ONBOARDING",
+    "stored_initial_admin_user_id": 2
+  },
+  "sensitive_values_included": false
+}

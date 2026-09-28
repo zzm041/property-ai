@@ -58,3 +58,37 @@ TLS：`deploy/nginx-tls.conf.example`。无真实证书时：
 HTTPS CONFIGURATION = READY
 LIVE TLS = BLOCKED_BY_DOMAIN_CERT
 ```
+
+## Delivery candidate（持久化、可重复启动）
+
+`docker-compose.delivery.yml` 是单机交付制品，不依赖开发机绝对路径、旧容器 ID、PID 或历史数据库快照。它使用独立 Compose 项目和具名持久卷；API、Worker、Beat 不会自动执行迁移。
+
+Windows 本地验证：
+
+```powershell
+Copy-Item deploy/.env.delivery.example deploy/.env.delivery
+Copy-Item deploy/.env.delivery.bootstrap.example deploy/.env.delivery.bootstrap
+# 仅在本机编辑两份文件并替换占位值；它们均被 Git 忽略。
+./deploy/delivery.ps1 config
+./deploy/delivery.ps1 init
+./deploy/delivery.ps1 status
+./deploy/delivery.ps1 backup
+./deploy/delivery.ps1 diagnose
+./deploy/delivery.ps1 stop   # 保留全部具名卷
+```
+
+`init` 的固定顺序是：基础设施健康 → 单独执行 `alembic upgrade head` → API/Worker/Beat/Nginx。再次启动用 `up`，不得用 `down -v`。`backup [文件名.sql]` 只在 `deploy/backups/` 内新建不覆盖的 SQL 和 SHA-256 清单；省略文件名时使用 UTC 时间与随机后缀。显式同名并发请求通过原子预约互斥，SQL 与清单先写各自的唯一临时文件，再以不覆盖的文件移动发布。`restore-check <dump>` 只接受该目录内与清单哈希、字节数和源库名一致且不含跨库/全局语句的备份，并以仅获目标库权限的临时账号导入全新的 `<MYSQL_DATABASE>_restore_check`。目标已存在时拒绝覆盖，应用不会连接恢复库。
+
+实际迁移分为受控的 0012 前置、一次性 SYSTEM_ADMIN 初始化、`alembic_version` 兼容扩宽和 0014。管理员手机号/密码只来自 `.env.delivery.bootstrap`，仅 migrate 服务读取，日志不输出原值；成功后应移入部署方 secret manager 或从主机文件中安全移除。历史迁移的业务 DDL 不变，新增的 delivery guard 只接受 `staging + mysql:3306/property_ai_delivery_check + 显式目标授权`。
+
+Linux 服务器使用相同 Compose 文件和 `.env.delivery`，命令等价为：
+
+```bash
+docker compose --env-file deploy/.env.delivery -f deploy/docker-compose.delivery.yml config --quiet
+docker compose --env-file deploy/.env.delivery -f deploy/docker-compose.delivery.yml up -d mysql redis rabbitmq etcd minio milvus
+docker compose --env-file deploy/.env.delivery -f deploy/docker-compose.delivery.yml --profile tools run --rm migrate
+docker compose --env-file deploy/.env.delivery -f deploy/docker-compose.delivery.yml up -d api worker beat nginx
+docker compose --env-file deploy/.env.delivery -f deploy/docker-compose.delivery.yml ps
+```
+
+本地 clean-room 排练可以保留 Development 微信/短信/AI Provider。正式激活必须在私密配置中切换到企业通道及自托管 Provider；未配置可信身份 Provider 时，身份接管继续失败关闭。`EMBEDDING_DIMENSIONS=8` 只用于 Development 排练；真实 bge-m3 使用新的 1024 维集合，禁止复用 8 维集合。
