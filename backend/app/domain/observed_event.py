@@ -149,7 +149,8 @@ _SUBJECTLESS_CONTINUATION_PREFIX = {
     "不制冷": re.compile(r"^(?:出风|送风)(?:但|却|仍|仍然|还是)?$")
 }
 _GENERIC_SUBJECT_CONTINUATION = re.compile(
-    r"^(?:现在|目前|此刻|刚才|随后|之后|仍|仍然|还|还在|正|正在|已经|已|尚未|不再|持续|"
+    r"^(?:现在(?:每隔(?:几|[一二三四五六七八九十0-9]+)(?:秒|分钟|分|小时))?|"
+    r"目前|此刻|刚才|随后|之后|仍|仍然|还|还在|正|正在|已经|已|尚未|不再|持续|"
     r"还在(?:缓慢|持续)|"
     r"水(?:正|一直|持续|不断)?|表面|外观|一人说|另一人说|有人说)$"
 )
@@ -343,7 +344,6 @@ def bind_observations(
             row["label"] in _INFORMATIONAL_LABELS
             and output.category == "other"
             and output.required_skill == "other"
-            and output.confidence < 0.7
         )
         can_reduce_subject = (
             row.get("reason_code") == "subject_unsupported"

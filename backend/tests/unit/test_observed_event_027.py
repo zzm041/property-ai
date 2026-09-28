@@ -430,15 +430,15 @@ def test_low_confidence_component_identification_reduces_subject_without_creatin
     assert trace["raw_model_output"] == value
 
 
-def test_informational_subject_reduction_requires_low_confidence_clarification_contract():
+def test_informational_subject_reduction_requires_non_dispatch_contract():
     vision = "图像中可见一个蓝色阀门。未见足以确认故障的可见证据。"
     value = payload(vision, label="现象待核实", subject="阀门管道", evidence_id="vision:1")
-    for overrides in (
-        {"category": "other", "required_skill": "other", "confidence": .9},
-        {"category": "water_supply", "required_skill": "maintenance", "confidence": .3},
-    ):
+    for overrides in ({"category": "water_supply", "required_skill": "maintenance", "confidence": .3},):
         with pytest.raises(ValueError, match="Subject not supported"):
             bind({**value, **overrides}, vision=vision)
+
+    _, trace = bind({**value, "category": "other", "required_skill": "other", "confidence": .95}, vision=vision)
+    assert trace["effective_observations"] == []
 
 
 def test_saved_qwen38_candidate4_normal_valve_is_valid_non_effective_clarification():
@@ -457,6 +457,13 @@ def test_saved_qwen38_candidate4_normal_valve_is_valid_non_effective_clarificati
     assert error is None and mapped is not None and mapped.low_confidence
     assert mapped.event_trace["effective_observations"] == []
     assert mapped.event_trace["raw_model_output"] == row["raw_payload"]
+
+
+def test_frequency_clause_carries_the_unique_immediately_prior_subject():
+    text = "厨房洗手盆下方的排水接头已经裂开，现在每隔几秒滴一滴水。"
+    value = payload(text, subject="排水接头")
+    _, trace = bind(value, report=text)
+    assert trace["effective_observations"][0]["subject"] == "排水接头"
 
 
 @pytest.mark.parametrize(("text", "label", "subject"), [

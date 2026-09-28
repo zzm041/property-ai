@@ -1,0 +1,2352 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "mode": "OFFLINE_REVALIDATION_NO_MODEL_BUSINESS_DATABASE_OR_QUEUE_IO",
+  "at_utc": "2026-09-28T16:40:40.152428+00:00",
+  "model": "qwen38-27b-q3km-g55:7af3b8f",
+  "model_digest": "eb18a122286f7a67d36dc8129f9caa1c0f7bb8449d7669a79e3ecb3d81289e0c",
+  "prompt_version": "wo-analysis-v13-subject-fallback",
+  "vision_prompt_version": "repair-photo-v7-confidence-scale",
+  "input_runs": {
+    "fixed.json": {
+      "path": "D:\\property-ai\\reports\\real-ai-integration-027\\diagnostic-r3-27b\\candidate-05\\fixed.json",
+      "sha256": "61ac72eb35b6815d07beccc2a100716b1cb76418d55eadf30e5cd5057e16590f"
+    },
+    "fixed-continuation.json": {
+      "path": "D:\\property-ai\\reports\\real-ai-integration-027\\diagnostic-r3-27b\\candidate-05\\fixed-continuation.json",
+      "sha256": "d8a6f524730a1cb1f7c966ac9a15e5908490e13ba0879a9255a95992d91ba6eb"
+    },
+    "novel.json": {
+      "path": "D:\\property-ai\\reports\\real-ai-integration-027\\diagnostic-r3-27b\\candidate-05\\novel.json",
+      "sha256": "b0c1f63fc080b5a2182ecacb9761f88eb5ffa25fbecbe2a6655ef7f7dbe460ae"
+    }
+  },
+  "current_source_hashes": {
+    "backend/app/domain/observed_event.py": "ff4b2683e87d687eded321f4bab31f206aa337745554234f1eae0391470ac5ac",
+    "backend/app/service/analysis.py": "c94949b60ec0291a608793207300fab806df3e75a698cbfa7cab64c7e2f13d42",
+    "backend/app/domain/ai.py": "32392a9864ef27bfd7f4dc292389e0814f6e1726444f2612a74ea98fbeb1ff49",
+    "backend/app/provider/vision/__init__.py": "c88efba1eba87c7b8a9ce9e48c121965579146141be0caf40d1256cd20f8e85d"
+  },
+  "fixed_case_count": 28,
+  "novel_case_count": 4,
+  "valid_count": 32,
+  "invalid_count": 0,
+  "results": [
+    {
+      "id": "GOLD-001",
+      "raw_payload_sha256": "ee765b5c2158443b28436982f5ea51604f63aafe81ab79b37153683279bbfb34",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "ELECTRICAL",
+        "required_skill": "MAINTENANCE",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "不能供电",
+              "subject": "插座",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+              "effective": true,
+              "span": [
+                0,
+                26
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "不能供电",
+              "subject": "插座",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+              "effective": true,
+              "span": [
+                0,
+                26
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:7b4e132a18ce2c5e45ef7f15d86cfa2f",
+          "raw_model_output": {
+            "category": "electrical",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "不能供电",
+                "subject": "插座"
+              }
+            ],
+            "priority": "p3",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "none",
+            "severity": "medium",
+            "summary": "厨房插座没有电，其他房间照明正常，没有冒烟。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-002",
+      "raw_payload_sha256": "ee765b5c2158443b28436982f5ea51604f63aafe81ab79b37153683279bbfb34",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "ELECTRICAL",
+        "required_skill": "MAINTENANCE",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "不能供电",
+              "subject": "插座",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+              "effective": true,
+              "span": [
+                0,
+                26
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "不能供电",
+              "subject": "插座",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "厨房插座没有电，其他房间照明正常，没有冒烟，请维修。",
+              "effective": true,
+              "span": [
+                0,
+                26
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:7b4e132a18ce2c5e45ef7f15d86cfa2f",
+          "raw_model_output": {
+            "category": "electrical",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "不能供电",
+                "subject": "插座"
+              }
+            ],
+            "priority": "p3",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "none",
+            "severity": "medium",
+            "summary": "厨房插座没有电，其他房间照明正常，没有冒烟。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-003",
+      "raw_payload_sha256": "7d6bacbfc4f826b2269528b9a9d611b8e6b312872b9b7af92b1a790b678bb1cd",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "PLUMBING",
+        "required_skill": "MAINTENANCE",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "滴渗水",
+              "subject": "排水接头",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "洗手盆排水接头缓慢渗水，地上只有几滴水，附近没有电器，请检查接头。",
+              "effective": true,
+              "span": [
+                0,
+                33
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "滴渗水",
+              "subject": "排水接头",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "洗手盆排水接头缓慢渗水，地上只有几滴水，附近没有电器，请检查接头。",
+              "effective": true,
+              "span": [
+                0,
+                33
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:a71890f2434b3af091d9c44a44931d89",
+          "raw_model_output": {
+            "category": "water_supply",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "滴渗水",
+                "subject": "排水接头"
+              }
+            ],
+            "priority": "p3",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "none",
+            "severity": "low",
+            "summary": "洗手盆排水接头缓慢渗水，地上仅有少量水滴，无扩散积水迹象。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-004",
+      "raw_payload_sha256": "a7db68f1e369ff9446602730ac455f35783174fe23c1945953e538ca47ad72af",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "HVAC",
+        "required_skill": "MAINTENANCE",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "不制冷",
+              "subject": "空调",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "空调可以开机，出风但不凉，没有漏水，也没有异味。",
+              "effective": true,
+              "span": [
+                0,
+                24
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "不制冷",
+              "subject": "空调",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "空调可以开机，出风但不凉，没有漏水，也没有异味。",
+              "effective": true,
+              "span": [
+                0,
+                24
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:b97ae20f44591fc8f7c05deb6333cbcb",
+          "raw_model_output": {
+            "category": "hvac",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "不制冷",
+                "subject": "空调"
+              }
+            ],
+            "priority": "p3",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "none",
+            "severity": "medium",
+            "summary": "空调可以开机，出风但不凉，没有漏水，也没有异味。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-005",
+      "raw_payload_sha256": "a1a4f22e3017d2f93f1766ea6732fd19d6ec00df61e69df861fba42ac0e8c38b",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "CLEANING",
+        "required_skill": "CLEANING",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "杂物清扫",
+              "subject": "楼道地面",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "楼道角落散落了几张纸和空纸盒，需要清扫；",
+              "effective": true,
+              "span": [
+                0,
+                20
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "杂物清扫",
+              "subject": "楼道地面",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "楼道角落散落了几张纸和空纸盒，需要清扫；",
+              "effective": true,
+              "span": [
+                0,
+                20
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:ff04fd6dde4a9bb6673279b0f4222f8f",
+          "raw_model_output": {
+            "category": "cleaning",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "杂物清扫",
+                "subject": "楼道地面"
+              }
+            ],
+            "priority": "p3",
+            "required_role": "STAFF",
+            "required_skill": "cleaning",
+            "risk": "none",
+            "severity": "low",
+            "summary": "楼道角落散落纸张和空纸盒，需要清扫。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-006",
+      "raw_payload_sha256": "2fe1f4897c7a7c6cc38fe9eec530eaf3f06256629de4db2dc19f547e0f1aa047",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "SECURITY",
+        "required_skill": "SECURITY",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "敲门按铃",
+              "subject": "房门",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "刚才有陌生人在楼道反复按门铃并拍门，现在已经离开，未进入屋内，也未见器械，请安保核实。",
+              "effective": true,
+              "span": [
+                0,
+                43
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "敲门按铃",
+              "subject": "房门",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "刚才有陌生人在楼道反复按门铃并拍门，现在已经离开，未进入屋内，也未见器械，请安保核实。",
+              "effective": true,
+              "span": [
+                0,
+                43
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:f0b7df90c633edb55d8b5e1bd6264dcf",
+          "raw_model_output": {
+            "category": "security",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "敲门按铃",
+                "subject": "房门"
+              }
+            ],
+            "priority": "p3",
+            "required_role": "STAFF",
+            "required_skill": "security",
+            "risk": "none",
+            "severity": "low",
+            "summary": "楼道有陌生人反复按门铃并拍门，现已离开，未进入屋内，未见器械。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-007",
+      "raw_payload_sha256": "c9ef6b180cc38ee679cdd7e277c374fb6fa8abd9c69e9649aa1e1c54e52017e8",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "ELECTRICAL",
+        "required_skill": "MAINTENANCE",
+        "risk": "electric",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "火花烧损",
+              "subject": "插座",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "插座正在连续冒火花，塑料外壳已经发黑，还有明显焦味；",
+              "effective": true,
+              "span": [
+                0,
+                26
+              ]
+            },
+            {
+              "label": "烧焦变色",
+              "subject": "未确定",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "插座正在连续冒火花，塑料外壳已经发黑，还有明显焦味；",
+              "effective": true,
+              "span": [
+                0,
+                26
+              ]
+            },
+            {
+              "label": "焦煳气味",
+              "subject": "未确定",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "插座正在连续冒火花，塑料外壳已经发黑，还有明显焦味；",
+              "effective": true,
+              "span": [
+                0,
+                26
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "火花烧损",
+              "subject": "插座",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "插座正在连续冒火花，塑料外壳已经发黑，还有明显焦味；",
+              "effective": true,
+              "span": [
+                0,
+                26
+              ]
+            },
+            {
+              "label": "烧焦变色",
+              "subject": "未确定",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "插座正在连续冒火花，塑料外壳已经发黑，还有明显焦味；",
+              "effective": true,
+              "span": [
+                0,
+                26
+              ]
+            },
+            {
+              "label": "焦煳气味",
+              "subject": "未确定",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "插座正在连续冒火花，塑料外壳已经发黑，还有明显焦味；",
+              "effective": true,
+              "span": [
+                0,
+                26
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:9cecb15375a87cdb6c7fec3abb0c6f6b",
+          "raw_model_output": {
+            "category": "electrical",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "火花烧损",
+                "subject": "插座"
+              },
+              {
+                "evidence_id": "report:1",
+                "label": "烧焦变色",
+                "subject": "未确定"
+              },
+              {
+                "evidence_id": "report:1",
+                "label": "焦煳气味",
+                "subject": "未确定"
+              }
+            ],
+            "priority": "p1",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "electric",
+            "severity": "high",
+            "summary": "插座连续冒火花，塑料外壳发黑，伴有明显焦味。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-008",
+      "raw_payload_sha256": "e8162fe3458b6b79f695eae5707a2c89a0bdf7fd37b6130ad2c8d9bb99a7c106",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "PLUMBING",
+        "required_skill": "MAINTENANCE",
+        "risk": "flooding",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "滴渗水",
+              "subject": "阀门管道",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "厨房进水软管裂开，水一直喷出，厨房地面已经积水并流向客厅，我还没有关住水。",
+              "effective": true,
+              "span": [
+                0,
+                37
+              ]
+            },
+            {
+              "label": "水渍",
+              "subject": "楼道地面",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "厨房进水软管裂开，水一直喷出，厨房地面已经积水并流向客厅，我还没有关住水。",
+              "effective": true,
+              "span": [
+                0,
+                37
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "滴渗水",
+              "subject": "阀门管道",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "厨房进水软管裂开，水一直喷出，厨房地面已经积水并流向客厅，我还没有关住水。",
+              "effective": true,
+              "span": [
+                0,
+                37
+              ]
+            },
+            {
+              "label": "水渍",
+              "subject": "楼道地面",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "厨房进水软管裂开，水一直喷出，厨房地面已经积水并流向客厅，我还没有关住水。",
+              "effective": true,
+              "span": [
+                0,
+                37
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:16f3152f3a0bafd7b67c9df2c54cb7c7",
+          "raw_model_output": {
+            "category": "water_supply",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "滴渗水",
+                "subject": "阀门管道"
+              },
+              {
+                "evidence_id": "report:1",
+                "label": "水渍",
+                "subject": "楼道地面"
+              }
+            ],
+            "priority": "p1",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "flooding",
+            "severity": "high",
+            "summary": "厨房进水软管裂开导致水持续喷出，厨房地面已积水并流向客厅，用户尚未关闭水源。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-009",
+      "raw_payload_sha256": "e237ebcab2e465c4c890961a8421237399a2fbe1852053ef9c161a080b644ab1",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "OTHER",
+        "required_skill": "MAINTENANCE",
+        "risk": "gas",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "疑似燃气气味",
+              "subject": "未确定",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "厨房闻到很明显的类似燃气的气味，来源不清楚，没有看到烟或火，想请物业核实。",
+              "effective": true,
+              "span": [
+                0,
+                37
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "疑似燃气气味",
+              "subject": "未确定",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "厨房闻到很明显的类似燃气的气味，来源不清楚，没有看到烟或火，想请物业核实。",
+              "effective": true,
+              "span": [
+                0,
+                37
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:c4078c47983af23d935f176d5fcb9866",
+          "raw_model_output": {
+            "category": "other",
+            "confidence": 0.9,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "疑似燃气气味",
+                "subject": "未确定"
+              }
+            ],
+            "priority": "p1",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "gas",
+            "severity": "high",
+            "summary": "厨房闻到明显类似燃气的气味，来源不清楚，未见烟或火，需物业核实。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-010",
+      "raw_payload_sha256": "4e8b086071e388811d7cf1470611dc17ed4e29a23bb97e2ec286d03d454b120a",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "OTHER",
+        "required_skill": "MAINTENANCE",
+        "risk": "safety",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "松动",
+              "subject": "扶手",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "公共楼梯扶手明显松动，刚才握住时差点摔倒，目前没有人受伤，请检查。",
+              "effective": true,
+              "span": [
+                0,
+                33
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "松动",
+              "subject": "扶手",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "公共楼梯扶手明显松动，刚才握住时差点摔倒，目前没有人受伤，请检查。",
+              "effective": true,
+              "span": [
+                0,
+                33
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:df4e0aec1a0b6128cfcb7734fc748263",
+          "raw_model_output": {
+            "category": "other",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "松动",
+                "subject": "扶手"
+              }
+            ],
+            "priority": "p2",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "safety",
+            "severity": "medium",
+            "summary": "公共楼梯扶手明显松动，用户握住时差点摔倒，目前无人受伤，需检查。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-011",
+      "raw_payload_sha256": "d210586133a2d7bbb983d05df0781f166f09e42a015429d4e44096ff1c7ec33e",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "OTHER",
+        "required_skill": "OTHER",
+        "risk": "none",
+        "low_confidence": true,
+        "dispatch_fields_applied": false,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "现象待核实",
+              "subject": "未确定",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "家里好像有什么不对，具体是哪里、什么情况，我现在也说不清。",
+              "effective": false,
+              "span": [
+                0,
+                29
+              ]
+            }
+          ],
+          "effective_observations": [],
+          "informational_observations": [
+            {
+              "label": "现象待核实",
+              "subject": "未确定",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "家里好像有什么不对，具体是哪里、什么情况，我现在也说不清。",
+              "effective": false,
+              "span": [
+                0,
+                29
+              ]
+            }
+          ],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:838101a00ec2de50b0a9f38bc7c3f97c",
+          "raw_model_output": {
+            "category": "other",
+            "confidence": 0.1,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "现象待核实",
+                "subject": "未确定"
+              }
+            ],
+            "priority": "p4",
+            "required_role": "STAFF",
+            "required_skill": "other",
+            "risk": "none",
+            "severity": "low",
+            "summary": "住户反映家中情况异常，但具体位置及现象描述不清，需进一步核实。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-012",
+      "raw_payload_sha256": "c2d3404d3762934db3d091044bc7e23115447cc747ec29f7d4e8843ee4c56163",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "PLUMBING",
+        "required_skill": "MAINTENANCE",
+        "risk": "none",
+        "low_confidence": true,
+        "dispatch_fields_applied": false,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "现象待核实",
+              "subject": "水龙头",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "关于此刻同一个厨房水龙头，一人说水正不断流出，另一人说它完全不出水；",
+              "effective": false,
+              "span": [
+                0,
+                34
+              ]
+            }
+          ],
+          "effective_observations": [],
+          "informational_observations": [
+            {
+              "label": "现象待核实",
+              "subject": "水龙头",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "关于此刻同一个厨房水龙头，一人说水正不断流出，另一人说它完全不出水；",
+              "effective": false,
+              "span": [
+                0,
+                34
+              ]
+            }
+          ],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:10a481039c79027fcf437702732d1428",
+          "raw_model_output": {
+            "category": "water_supply",
+            "confidence": 0.3,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "现象待核实",
+                "subject": "水龙头"
+              }
+            ],
+            "priority": "p3",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "none",
+            "severity": "medium",
+            "summary": "厨房水龙头出水状态存在矛盾，一人称水不断流出，另一人称完全不出水，需现场核实。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-013",
+      "raw_payload_sha256": "b7e5f5f4cea1fea8d168deea7782251698ccd541c3923fac546231a8303ebd3d",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "OTHER",
+        "required_skill": "MAINTENANCE",
+        "risk": "none",
+        "low_confidence": true,
+        "dispatch_fields_applied": false,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "噪声",
+              "subject": "未确定",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "夜里听到嗡嗡声，可能是空调，也可能来自墙外设备，我没找到声音来源，没有别的现象。",
+              "effective": true,
+              "span": [
+                0,
+                40
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "噪声",
+              "subject": "未确定",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "夜里听到嗡嗡声，可能是空调，也可能来自墙外设备，我没找到声音来源，没有别的现象。",
+              "effective": true,
+              "span": [
+                0,
+                40
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:1a53500e1ec82ad8fed9fa78d74e4b55",
+          "raw_model_output": {
+            "category": "other",
+            "confidence": 0.4,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "噪声",
+                "subject": "未确定"
+              }
+            ],
+            "priority": "p3",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "none",
+            "severity": "low",
+            "summary": "夜间听到嗡嗡声，来源未确定，可能是空调或墙外设备，无其他现象。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-014",
+      "raw_payload_sha256": "8855b14fc167582abe75fa2c9353e15ebdbbaa71cd09a2d555d8c362ce0f1b8a",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "OTHER",
+        "required_skill": "MAINTENANCE",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "滴渗水",
+              "subject": "水龙头",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "卫生间水龙头持续滴水，同时卧室插座不能供电，这是两个独立问题，我没有指定先处理哪一个，没有烟火或积水。",
+              "effective": true,
+              "span": [
+                0,
+                51
+              ]
+            },
+            {
+              "label": "不能供电",
+              "subject": "插座",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "卫生间水龙头持续滴水，同时卧室插座不能供电，这是两个独立问题，我没有指定先处理哪一个，没有烟火或积水。",
+              "effective": true,
+              "span": [
+                0,
+                51
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "滴渗水",
+              "subject": "水龙头",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "卫生间水龙头持续滴水，同时卧室插座不能供电，这是两个独立问题，我没有指定先处理哪一个，没有烟火或积水。",
+              "effective": true,
+              "span": [
+                0,
+                51
+              ]
+            },
+            {
+              "label": "不能供电",
+              "subject": "插座",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "卫生间水龙头持续滴水，同时卧室插座不能供电，这是两个独立问题，我没有指定先处理哪一个，没有烟火或积水。",
+              "effective": true,
+              "span": [
+                0,
+                51
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:538e875a9474bf0ad93e37f62a3e3487",
+          "raw_model_output": {
+            "category": "other",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "滴渗水",
+                "subject": "水龙头"
+              },
+              {
+                "evidence_id": "report:1",
+                "label": "不能供电",
+                "subject": "插座"
+              }
+            ],
+            "priority": "p3",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "none",
+            "severity": "medium",
+            "summary": "卫生间水龙头持续滴水，卧室插座不能供电。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-015",
+      "raw_payload_sha256": "cf1db226ea81f4d8d11c22b11d9e865b40c1bfab4427f94f2d26571984bf8883",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "ELECTRICAL",
+        "required_skill": "MAINTENANCE",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "不能供电",
+              "subject": "插座",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "本单主要报修卧室插座没电。",
+              "effective": true,
+              "span": [
+                0,
+                13
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "不能供电",
+              "subject": "插座",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "本单主要报修卧室插座没电。",
+              "effective": true,
+              "span": [
+                0,
+                13
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:7b4e132a18ce2c5e45ef7f15d86cfa2f",
+          "raw_model_output": {
+            "category": "electrical",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "不能供电",
+                "subject": "插座"
+              }
+            ],
+            "priority": "p3",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "none",
+            "severity": "medium",
+            "summary": "卧室插座没电。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-016",
+      "raw_payload_sha256": "af1f75f437f4b4941260f1bc9732281f5e5b84bfcf05d58af5aa19d9bed600cb",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "PLUMBING",
+        "required_skill": "MAINTENANCE",
+        "risk": "flooding",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "水渍",
+              "subject": "天花墙面",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "卫生间天花板有一片新水渍，还在缓慢滴水。",
+              "effective": true,
+              "span": [
+                0,
+                20
+              ]
+            },
+            {
+              "label": "滴渗水",
+              "subject": "天花墙面",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "卫生间天花板有一片新水渍，还在缓慢滴水。",
+              "effective": true,
+              "span": [
+                0,
+                20
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "水渍",
+              "subject": "天花墙面",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "卫生间天花板有一片新水渍，还在缓慢滴水。",
+              "effective": true,
+              "span": [
+                0,
+                20
+              ]
+            },
+            {
+              "label": "滴渗水",
+              "subject": "天花墙面",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "卫生间天花板有一片新水渍，还在缓慢滴水。",
+              "effective": true,
+              "span": [
+                0,
+                20
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:e58daccb94f55ed77a08a1de73aefe9b",
+          "raw_model_output": {
+            "category": "water_supply",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "水渍",
+                "subject": "天花墙面"
+              },
+              {
+                "evidence_id": "report:1",
+                "label": "滴渗水",
+                "subject": "天花墙面"
+              }
+            ],
+            "priority": "p2",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "flooding",
+            "severity": "medium",
+            "summary": "卫生间天花板出现新水渍并持续缓慢滴水，住户怀疑楼上管道漏水但未确认。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-017",
+      "raw_payload_sha256": "aa53e8e48988ef5e01ae7802e386f1439672b4def4d26aa30e585238b77e6c6a",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "ELECTRICAL",
+        "required_skill": "MAINTENANCE",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "不能供电",
+              "subject": "插座",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "书房的两个插座都没有电，其他房间正常。",
+              "effective": true,
+              "span": [
+                0,
+                19
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "不能供电",
+              "subject": "插座",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "书房的两个插座都没有电，其他房间正常。",
+              "effective": true,
+              "span": [
+                0,
+                19
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:7b4e132a18ce2c5e45ef7f15d86cfa2f",
+          "raw_model_output": {
+            "category": "electrical",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "不能供电",
+                "subject": "插座"
+              }
+            ],
+            "priority": "p2",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "none",
+            "severity": "medium",
+            "summary": "书房两个插座无电，其他房间正常。用户猜测可能跳闸但未检查配电箱，未闻到焦味。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-018",
+      "raw_payload_sha256": "46efc79e91536713e0b101907b780fc15a82621fa4753662a5af9d54695bbbd3",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "HVAC",
+        "required_skill": "MAINTENANCE",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "不制冷",
+              "subject": "空调",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "今天是空调不制冷，没有异味，没有其他异常；",
+              "effective": true,
+              "span": [
+                0,
+                21
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "不制冷",
+              "subject": "空调",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "今天是空调不制冷，没有异味，没有其他异常；",
+              "effective": true,
+              "span": [
+                0,
+                21
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:b97ae20f44591fc8f7c05deb6333cbcb",
+          "raw_model_output": {
+            "category": "hvac",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "不制冷",
+                "subject": "空调"
+              }
+            ],
+            "priority": "p3",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "none",
+            "severity": "medium",
+            "summary": "空调不制冷，无异味及其他异常。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-019",
+      "raw_payload_sha256": "469b6c833e883822ddc77bb40b0f9b3d41f93c8ad16961e0eb56145c994bbcfa",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "CLEANING",
+        "required_skill": "CLEANING",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "杂物清扫",
+              "subject": "楼道地面",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "楼道角落有落叶需要清扫，通行正常，没有其他异常。",
+              "effective": true,
+              "span": [
+                0,
+                24
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "杂物清扫",
+              "subject": "楼道地面",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "楼道角落有落叶需要清扫，通行正常，没有其他异常。",
+              "effective": true,
+              "span": [
+                0,
+                24
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:ff04fd6dde4a9bb6673279b0f4222f8f",
+          "raw_model_output": {
+            "category": "cleaning",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "杂物清扫",
+                "subject": "楼道地面"
+              }
+            ],
+            "priority": "p3",
+            "required_role": "STAFF",
+            "required_skill": "cleaning",
+            "risk": "none",
+            "severity": "low",
+            "summary": "楼道角落有落叶需要清扫，通行正常，没有其他异常。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-020",
+      "raw_payload_sha256": "2f76639e1ff7f6ce5a808bc42df7a965d7d895673944d2b29803bd7125f0cf1a",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "PLUMBING",
+        "required_skill": "MAINTENANCE",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "滴渗水",
+              "subject": "水龙头",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "卫生间水龙头关紧后仍滴水，没有积水。",
+              "effective": true,
+              "span": [
+                0,
+                18
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "滴渗水",
+              "subject": "水龙头",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "卫生间水龙头关紧后仍滴水，没有积水。",
+              "effective": true,
+              "span": [
+                0,
+                18
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:c36f60ab5c53b301db1d2a53c07fe989",
+          "raw_model_output": {
+            "category": "water_supply",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "滴渗水",
+                "subject": "水龙头"
+              }
+            ],
+            "priority": "p3",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "none",
+            "severity": "low",
+            "summary": "卫生间水龙头关紧后仍滴水，没有积水。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-021",
+      "raw_payload_sha256": "0f3639c7890ff79a437b3bf2df7e6f10d51b7822611971c102469059ecd65849",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "ELECTRICAL",
+        "required_skill": "MAINTENANCE",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "不能供电",
+              "subject": "插座",
+              "evidence_id": "report:2",
+              "source": "report",
+              "quote": "是客厅插座没电，灯还亮着。",
+              "effective": true,
+              "span": [
+                18,
+                31
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "不能供电",
+              "subject": "插座",
+              "evidence_id": "report:2",
+              "source": "report",
+              "quote": "是客厅插座没电，灯还亮着。",
+              "effective": true,
+              "span": [
+                18,
+                31
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:7b4e132a18ce2c5e45ef7f15d86cfa2f",
+          "raw_model_output": {
+            "category": "electrical",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:2",
+                "label": "不能供电",
+                "subject": "插座"
+              }
+            ],
+            "priority": "p3",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "none",
+            "severity": "medium",
+            "summary": "客厅插座无法供电，照明正常。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-022",
+      "raw_payload_sha256": "3af04ffc9fa6936d022fe91c312bd269110da6e183fb64155cb7b4307cd154ff",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "PLUMBING",
+        "required_skill": "MAINTENANCE",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "滴渗水",
+              "subject": "排水接头",
+              "evidence_id": "report:3",
+              "source": "report",
+              "quote": "今天重开阀门，洗手盆下面又开始滴，量不大，目前还在滴，没有漫到门外。",
+              "effective": true,
+              "span": [
+                20,
+                54
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "滴渗水",
+              "subject": "排水接头",
+              "evidence_id": "report:3",
+              "source": "report",
+              "quote": "今天重开阀门，洗手盆下面又开始滴，量不大，目前还在滴，没有漫到门外。",
+              "effective": true,
+              "span": [
+                20,
+                54
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:a71890f2434b3af091d9c44a44931d89",
+          "raw_model_output": {
+            "category": "water_supply",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:3",
+                "label": "滴渗水",
+                "subject": "排水接头"
+              }
+            ],
+            "priority": "p3",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "none",
+            "severity": "low",
+            "summary": "洗手盆下方持续滴水，量不大，未漫到门外。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-023",
+      "raw_payload_sha256": "1f1d48ca52ad828675aa494330e42ac346ba2ab18db1d75c694732ae3d3cdf9b",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "ELECTRICAL",
+        "required_skill": "MAINTENANCE",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "不能供电",
+              "subject": "插座",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "刚才说错了，不是卧室，是厨房靠窗的那一个插座不能用；",
+              "effective": true,
+              "span": [
+                0,
+                26
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "不能供电",
+              "subject": "插座",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "刚才说错了，不是卧室，是厨房靠窗的那一个插座不能用；",
+              "effective": true,
+              "span": [
+                0,
+                26
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:7b4e132a18ce2c5e45ef7f15d86cfa2f",
+          "raw_model_output": {
+            "category": "electrical",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "不能供电",
+                "subject": "插座"
+              }
+            ],
+            "priority": "p3",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "none",
+            "severity": "medium",
+            "summary": "厨房靠窗的一个插座不能用。"
+          }
+        }
+      }
+    },
+    {
+      "id": "GOLD-024",
+      "raw_payload_sha256": "369274bab2b67691f8d6889545a854c653fd1a286d1396cd392321afc3f7424f",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "PLUMBING",
+        "required_skill": "MAINTENANCE",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "不出水",
+              "subject": "水龙头",
+              "evidence_id": "report:2",
+              "source": "report",
+              "quote": "不是漏水，是浴室水龙头一点水都不出；",
+              "effective": true,
+              "span": [
+                4,
+                22
+              ]
+            },
+            {
+              "label": "现象待核实",
+              "subject": "未确定",
+              "evidence_id": "report:3",
+              "source": "report",
+              "quote": "厨房有水，别处没查。",
+              "effective": false,
+              "span": [
+                22,
+                32
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "不出水",
+              "subject": "水龙头",
+              "evidence_id": "report:2",
+              "source": "report",
+              "quote": "不是漏水，是浴室水龙头一点水都不出；",
+              "effective": true,
+              "span": [
+                4,
+                22
+              ]
+            }
+          ],
+          "informational_observations": [
+            {
+              "label": "现象待核实",
+              "subject": "未确定",
+              "evidence_id": "report:3",
+              "source": "report",
+              "quote": "厨房有水，别处没查。",
+              "effective": false,
+              "span": [
+                22,
+                32
+              ]
+            }
+          ],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:c6f8d21788382b8bfcbdee0aa8d422f6",
+          "raw_model_output": {
+            "category": "water_supply",
+            "confidence": 0.9,
+            "observations": [
+              {
+                "evidence_id": "report:2",
+                "label": "不出水",
+                "subject": "水龙头"
+              },
+              {
+                "evidence_id": "report:3",
+                "label": "现象待核实",
+                "subject": "未确定"
+              }
+            ],
+            "priority": "p2",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "none",
+            "severity": "medium",
+            "summary": "浴室水龙头不出水；厨房有水，具体状况待核实。"
+          }
+        }
+      }
+    },
+    {
+      "id": "PHOTO-001",
+      "raw_payload_sha256": "48618ec70c4919e347c52a9b90ee7262b7351d4b2adaf438f079a47f3bcfe506",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "OTHER",
+        "required_skill": "MAINTENANCE",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "表面剥落",
+              "subject": "天花墙面",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "天花板有图中的斑块和起皮，没有看到现在滴水，原因不清楚，请检查。",
+              "effective": true,
+              "span": [
+                0,
+                32
+              ]
+            },
+            {
+              "label": "表面剥落",
+              "subject": "天花墙面",
+              "evidence_id": "vision:1",
+              "source": "vision",
+              "quote": "图像显示白色表面（疑似墙面或天花板）存在大面积涂层剥落。可见多处涂层起皮、翘起并脱落，边缘呈不规则撕裂状，剥落区域露出了下方黄褐色的底层材料。",
+              "effective": true
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "表面剥落",
+              "subject": "天花墙面",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "天花板有图中的斑块和起皮，没有看到现在滴水，原因不清楚，请检查。",
+              "effective": true,
+              "span": [
+                0,
+                32
+              ]
+            },
+            {
+              "label": "表面剥落",
+              "subject": "天花墙面",
+              "evidence_id": "vision:1",
+              "source": "vision",
+              "quote": "图像显示白色表面（疑似墙面或天花板）存在大面积涂层剥落。可见多处涂层起皮、翘起并脱落，边缘呈不规则撕裂状，剥落区域露出了下方黄褐色的底层材料。",
+              "effective": true
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:e9a3e8f22e134daf39908671d797f446",
+          "raw_model_output": {
+            "category": "other",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "表面剥落",
+                "subject": "天花墙面"
+              },
+              {
+                "evidence_id": "vision:1",
+                "label": "表面剥落",
+                "subject": "天花墙面"
+              }
+            ],
+            "priority": "p3",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "none",
+            "severity": "medium",
+            "summary": "合成楼合成单元测试房天花板存在斑块和起皮现象，图像显示涂层大面积剥落、起皮脱落，露出底层材料。用户称未看到现在滴水，原因不清楚，请检查。"
+          }
+        }
+      }
+    },
+    {
+      "id": "PHOTO-002",
+      "raw_payload_sha256": "a46434703a09a0939155f43d684998b5540efd2f2e2257fa7aa2ee2203cdc140",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "ELECTRICAL",
+        "required_skill": "MAINTENANCE",
+        "risk": "electric",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "现象待核实",
+              "subject": "插座",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "插座刚才有一缕烟，现在没有了；",
+              "effective": false,
+              "span": [
+                0,
+                15
+              ]
+            }
+          ],
+          "effective_observations": [],
+          "informational_observations": [
+            {
+              "label": "现象待核实",
+              "subject": "插座",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "插座刚才有一缕烟，现在没有了；",
+              "effective": false,
+              "span": [
+                0,
+                15
+              ]
+            }
+          ],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:ac5e09c4a27b76a73f38ce2137e0d428",
+          "raw_model_output": {
+            "category": "electrical",
+            "confidence": 0.85,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "现象待核实",
+                "subject": "插座"
+              }
+            ],
+            "priority": "p2",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "electric",
+            "severity": "medium",
+            "summary": "插座刚才有一缕烟，现在没有了；照片外观没有发黑。请检查，原因未知。"
+          }
+        }
+      }
+    },
+    {
+      "id": "PHOTO-003",
+      "raw_payload_sha256": "632ce811484df654e7cbc318de8554d3d0d06a092b438b70d630bba0811c6c45",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "ELECTRICAL",
+        "required_skill": "MAINTENANCE",
+        "risk": "electric",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "烧焦变色",
+              "subject": "插座",
+              "evidence_id": "vision:1",
+              "source": "vision",
+              "quote": "图像中可见一个白色电源插座，其左下方的插孔内部有明显的黑色烧灼痕迹。插座周围墙面有粗糙的修补痕迹，插座上方有一根白色电线伸出。",
+              "effective": true
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "烧焦变色",
+              "subject": "插座",
+              "evidence_id": "vision:1",
+              "source": "vision",
+              "quote": "图像中可见一个白色电源插座，其左下方的插孔内部有明显的黑色烧灼痕迹。插座周围墙面有粗糙的修补痕迹，插座上方有一根白色电线伸出。",
+              "effective": true
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:08a25e911061c8852bac6080c28ed5e0",
+          "raw_model_output": {
+            "category": "electrical",
+            "confidence": 0.9,
+            "observations": [
+              {
+                "evidence_id": "vision:1",
+                "label": "烧焦变色",
+                "subject": "插座"
+              }
+            ],
+            "priority": "p2",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "electric",
+            "severity": "medium",
+            "summary": "图像显示插座插孔内部有明显黑色烧灼痕迹，用户声称无烧焦，存在图文矛盾，需现场核实。"
+          }
+        }
+      }
+    },
+    {
+      "id": "PHOTO-004",
+      "raw_payload_sha256": "c4a4dd52f69fb09a61368abbc175da7f98c8ed85c0532d35ad32d0617eea7f63",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "OTHER",
+        "required_skill": "OTHER",
+        "risk": "none",
+        "low_confidence": true,
+        "dispatch_fields_applied": false,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "现象待核实",
+              "subject": "未确定",
+              "evidence_id": "vision:1",
+              "source": "vision",
+              "quote": "图像中可见一个蓝色的阀门，带有手柄和法兰连接件。阀门表面有反光，未见足以确认故障的可见证据。",
+              "effective": false
+            }
+          ],
+          "effective_observations": [],
+          "informational_observations": [
+            {
+              "label": "现象待核实",
+              "subject": "未确定",
+              "evidence_id": "vision:1",
+              "source": "vision",
+              "quote": "图像中可见一个蓝色的阀门，带有手柄和法兰连接件。阀门表面有反光，未见足以确认故障的可见证据。",
+              "effective": false
+            }
+          ],
+          "ignored_observations": [],
+          "adjusted_observations": [
+            {
+              "label": "现象待核实",
+              "subject": "未确定",
+              "evidence_id": "vision:1",
+              "source": "vision",
+              "quote": "图像中可见一个蓝色的阀门，带有手柄和法兰连接件。阀门表面有反光，未见足以确认故障的可见证据。",
+              "effective": false,
+              "raw_subject": "阀门管道",
+              "disposition": "SUBJECT_CERTAINTY_REDUCED",
+              "adjustment_reason": "the phenomenon is supported, but its clause does not support the model-selected subject"
+            }
+          ],
+          "effective_key": "evt2:5b73204380f0e1585bb65d548e886061",
+          "raw_model_output": {
+            "category": "other",
+            "confidence": 0.3,
+            "observations": [
+              {
+                "evidence_id": "vision:1",
+                "label": "现象待核实",
+                "subject": "阀门管道"
+              }
+            ],
+            "priority": "p4",
+            "required_role": "STAFF",
+            "required_skill": "other",
+            "risk": "none",
+            "severity": "low",
+            "summary": "图像显示蓝色阀门，未见足以确认故障的可见证据，现象待核实。"
+          }
+        }
+      }
+    },
+    {
+      "id": "NOVEL-Q3-001",
+      "raw_payload_sha256": "83df2b028e3ed0c500fc81f5ecf093bb3ee7e1195afff40827094147dac35d71",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "OTHER",
+        "required_skill": "OTHER",
+        "risk": "none",
+        "low_confidence": true,
+        "dispatch_fields_applied": false,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "外观无明显异常",
+              "subject": "未确定",
+              "evidence_id": "report:2",
+              "source": "report",
+              "quote": "我只想登记它是什么部件，目前没有看到渗水、破损或松动，也没有提出维修请求。",
+              "effective": false,
+              "span": [
+                21,
+                58
+              ]
+            }
+          ],
+          "effective_observations": [],
+          "informational_observations": [
+            {
+              "label": "外观无明显异常",
+              "subject": "未确定",
+              "evidence_id": "report:2",
+              "source": "report",
+              "quote": "我只想登记它是什么部件，目前没有看到渗水、破损或松动，也没有提出维修请求。",
+              "effective": false,
+              "span": [
+                21,
+                58
+              ]
+            }
+          ],
+          "ignored_observations": [],
+          "adjusted_observations": [
+            {
+              "label": "外观无明显异常",
+              "subject": "未确定",
+              "evidence_id": "report:2",
+              "source": "report",
+              "quote": "我只想登记它是什么部件，目前没有看到渗水、破损或松动，也没有提出维修请求。",
+              "effective": false,
+              "span": [
+                21,
+                58
+              ],
+              "raw_subject": "阀门管道",
+              "disposition": "SUBJECT_CERTAINTY_REDUCED",
+              "adjustment_reason": "the phenomenon is supported, but its clause does not support the model-selected subject"
+            }
+          ],
+          "effective_key": "evt2:fe32134c84b02c6deef1684ae033ed80",
+          "raw_model_output": {
+            "category": "other",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:2",
+                "label": "外观无明显异常",
+                "subject": "阀门管道"
+              }
+            ],
+            "priority": "p4",
+            "required_role": "STAFF",
+            "required_skill": "other",
+            "risk": "none",
+            "severity": "low",
+            "summary": "登记仓库内尚未安装且未接水的备用球阀，目前未见渗水、破损或松动，无维修请求。"
+          }
+        }
+      }
+    },
+    {
+      "id": "NOVEL-Q3-002",
+      "raw_payload_sha256": "4dea0a86932b9bafa5647c10083430698a2c6729ae0d437b5d7402eb8ed1387e",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "PLUMBING",
+        "required_skill": "MAINTENANCE",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "滴渗水",
+              "subject": "排水接头",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "厨房洗手盆下方的排水接头已经裂开，现在每隔几秒滴一滴水，地面只有几滴，没有流到插座附近，请安排维修。",
+              "effective": true,
+              "span": [
+                0,
+                50
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "滴渗水",
+              "subject": "排水接头",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "厨房洗手盆下方的排水接头已经裂开，现在每隔几秒滴一滴水，地面只有几滴，没有流到插座附近，请安排维修。",
+              "effective": true,
+              "span": [
+                0,
+                50
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:a71890f2434b3af091d9c44a44931d89",
+          "raw_model_output": {
+            "category": "water_supply",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "滴渗水",
+                "subject": "排水接头"
+              }
+            ],
+            "priority": "p3",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "none",
+            "severity": "low",
+            "summary": "厨房洗手盆下方排水接头裂开，每隔几秒滴一滴水，地面仅有几滴水，未流至插座附近。"
+          }
+        }
+      }
+    },
+    {
+      "id": "NOVEL-Q3-003",
+      "raw_payload_sha256": "a0664389061580ef365a47db1b493d20267f11cdf2d301f91faa27fb9041b071",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "PLUMBING",
+        "required_skill": "MAINTENANCE",
+        "risk": "none",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "不出水",
+              "subject": "水龙头",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "卫生间的水龙头完全不出水，但厨房水龙头供水正常。",
+              "effective": true,
+              "span": [
+                0,
+                24
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "不出水",
+              "subject": "水龙头",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "卫生间的水龙头完全不出水，但厨房水龙头供水正常。",
+              "effective": true,
+              "span": [
+                0,
+                24
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:c6f8d21788382b8bfcbdee0aa8d422f6",
+          "raw_model_output": {
+            "category": "water_supply",
+            "confidence": 0.95,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "不出水",
+                "subject": "水龙头"
+              }
+            ],
+            "priority": "p2",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "none",
+            "severity": "medium",
+            "summary": "卫生间水龙头完全不出水，厨房水龙头供水正常。其他房间未检查，现场无可见水渍或积水，阀门状态未知。"
+          }
+        }
+      }
+    },
+    {
+      "id": "NOVEL-Q3-004",
+      "raw_payload_sha256": "7d0c1cd0d047c6ae18c795cf830a59dd07ce4c332004b384a23e38ebce7b23cd",
+      "valid": true,
+      "error_code": null,
+      "effective": {
+        "category": "ELECTRICAL",
+        "required_skill": "MAINTENANCE",
+        "risk": "electric",
+        "low_confidence": false,
+        "dispatch_fields_applied": true,
+        "event_trace": {
+          "contract": "observed-event-v2-source-id",
+          "observations": [
+            {
+              "label": "火花烧损",
+              "subject": "未确定",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "配电箱旁边有一个外壳刚才冒出火花并留下黑色烧痕，但我看不清具体是什么部件；",
+              "effective": true,
+              "span": [
+                0,
+                37
+              ]
+            },
+            {
+              "label": "烧焦变色",
+              "subject": "未确定",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "配电箱旁边有一个外壳刚才冒出火花并留下黑色烧痕，但我看不清具体是什么部件；",
+              "effective": true,
+              "span": [
+                0,
+                37
+              ]
+            }
+          ],
+          "effective_observations": [
+            {
+              "label": "火花烧损",
+              "subject": "未确定",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "配电箱旁边有一个外壳刚才冒出火花并留下黑色烧痕，但我看不清具体是什么部件；",
+              "effective": true,
+              "span": [
+                0,
+                37
+              ]
+            },
+            {
+              "label": "烧焦变色",
+              "subject": "未确定",
+              "evidence_id": "report:1",
+              "source": "report",
+              "quote": "配电箱旁边有一个外壳刚才冒出火花并留下黑色烧痕，但我看不清具体是什么部件；",
+              "effective": true,
+              "span": [
+                0,
+                37
+              ]
+            }
+          ],
+          "informational_observations": [],
+          "ignored_observations": [],
+          "adjusted_observations": [],
+          "effective_key": "evt2:043164d2fbb37a14fa639309dec68b7b",
+          "raw_model_output": {
+            "category": "electrical",
+            "confidence": 0.9,
+            "observations": [
+              {
+                "evidence_id": "report:1",
+                "label": "火花烧损",
+                "subject": "未确定"
+              },
+              {
+                "evidence_id": "report:1",
+                "label": "烧焦变色",
+                "subject": "未确定"
+              }
+            ],
+            "priority": "p1",
+            "required_role": "STAFF",
+            "required_skill": "maintenance",
+            "risk": "electric",
+            "severity": "high",
+            "summary": "配电箱旁外壳冒出火花并留下黑色烧痕，具体部件不明。"
+          }
+        }
+      }
+    }
+  ]
+}
