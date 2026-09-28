@@ -190,6 +190,12 @@ class Runner:
         self.duration_seconds=self.config.get('duration_seconds',1800)
         if not isinstance(self.duration_seconds,int) or not 0<self.duration_seconds<=7200:
             raise ValueError('INVALID_DURATION')
+        self.asr_start_ram_mib=self.config.get('asr_start_ram_mib',8192)
+        if (
+            not isinstance(self.asr_start_ram_mib,int)
+            or not 8192<=self.asr_start_ram_mib<=32768
+            or (self.scope=='work_order_only' and self.asr_start_ram_mib<11264)
+        ):raise ValueError('ASR_ADMISSION_LIMIT')
         self.continuation=self.config.get('continuation')
         self.runtime_binding=None
         binding_path=self.config.get('runtime_binding_path')
@@ -299,7 +305,7 @@ class Runner:
             # Existing Qwen runtime unloads its own idle model after30s. Wait
             # serially, without a probe inference/retry or lowering the floor.
             started=time.monotonic();samples=[]
-            minimum=self.continuation['asr_start_ram_mib'] if kind=='asr' and self.continuation else 8192
+            minimum=self.asr_start_ram_mib if kind=='asr' else 8192
             while True:
                 available=ram();samples.append(available)
                 if available>=minimum:break

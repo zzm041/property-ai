@@ -206,17 +206,35 @@ def test_scoped_runtime_rejects_widened_configuration(tmp_path, bad):
 
 def test_work_order_scope_requires_reviewed_runtime_binding(tmp_path):
     config={'private':str(tmp_path/'run'),'host':'127.0.0.1','port':11437,
-        'scope':'work_order_only','evidence_root':str(tmp_path)}
+        'scope':'work_order_only','evidence_root':str(tmp_path),'asr_start_ram_mib':11264}
     path=tmp_path/'config.json';path.write_text(json.dumps(config),encoding='utf-8')
     with pytest.raises(ValueError,match='WORK_ORDER_RUNTIME_BINDING_REQUIRED'):
         m.Runner(path)
+
+
+def test_work_order_scope_keeps_asr_start_floor(tmp_path,monkeypatch):
+    evidence=tmp_path/'evidence';evidence.mkdir();binding=evidence/'runtime.json'
+    binding.write_text(json.dumps({'pid':42,'executable':'fixed','launched_at_utc':'fixed'}),encoding='utf-8')
+    base={'private':str(tmp_path/'run'),'host':'127.0.0.1','port':11437,
+        'scope':'work_order_only','evidence_root':str(evidence),
+        'runtime_binding_path':str(binding),
+        'runtime_binding_sha256':hashlib.sha256(binding.read_bytes()).hexdigest()}
+    monkeypatch.setattr(m,'bound_runtime_identity',lambda value:{'pid':42})
+    monkeypatch.setattr(m,'loopback_listener_pid',lambda port:42)
+    for value in (8192,11263):
+        path=tmp_path/f'config-{value}.json'
+        path.write_text(json.dumps({**base,'asr_start_ram_mib':value}),encoding='utf-8')
+        with pytest.raises(ValueError,match='ASR_ADMISSION_LIMIT'):m.Runner(path)
+    path=tmp_path/'config-ok.json'
+    path.write_text(json.dumps({**base,'asr_start_ram_mib':11264}),encoding='utf-8')
+    assert m.Runner(path).asr_start_ram_mib==11264
 
 
 def test_work_order_scope_rejects_stale_runtime_before_start_or_reservation(tmp_path,monkeypatch):
     evidence=tmp_path/'evidence';evidence.mkdir();binding=evidence/'runtime.json'
     binding.write_text(json.dumps({'pid':42,'executable':'fixed','launched_at_utc':'fixed'}),encoding='utf-8')
     config={'private':str(tmp_path/'run'),'host':'127.0.0.1','port':11437,
-        'scope':'work_order_only','evidence_root':str(evidence),
+        'scope':'work_order_only','evidence_root':str(evidence),'asr_start_ram_mib':11264,
         'runtime_binding_path':str(binding),
         'runtime_binding_sha256':hashlib.sha256(binding.read_bytes()).hexdigest()}
     path=tmp_path/'config.json';path.write_text(json.dumps(config),encoding='utf-8')

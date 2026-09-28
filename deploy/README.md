@@ -79,6 +79,9 @@ Copy-Item deploy/.env.delivery.bootstrap.example deploy/.env.delivery.bootstrap
 ./deploy/delivery.ps1 rag-start   # 只启动本机 RAG-only 适配器，健康检查不加载模型
 ./deploy/delivery.ps1 rag-status
 ./deploy/delivery.ps1 rag-stop    # 请求执行中会拒绝停止；保留模型、账本和私密令牌
+./deploy/delivery.ps1 work-ai-start  # 启动冻结的工单/图片/语音适配器；健康检查不推理
+./deploy/delivery.ps1 work-ai-status
+./deploy/delivery.ps1 work-ai-stop   # 精确停止适配器；不停止模型服务
 ./deploy/delivery.ps1 ollama-stop  # 仅停止该入口记录的精确实例；保留权重和日志
 ./deploy/delivery.ps1 stop   # 保留全部具名卷
 ```

@@ -1,6 +1,6 @@
 param(
     [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateSet("config", "init", "up", "stop", "status", "backup", "restore-check", "diagnose", "ollama-start", "ollama-stop", "ollama-status", "rag-start", "rag-stop", "rag-status")]
+    [ValidateSet("config", "init", "up", "stop", "status", "backup", "restore-check", "diagnose", "ollama-start", "ollama-stop", "ollama-status", "rag-start", "rag-stop", "rag-status", "work-ai-start", "work-ai-stop", "work-ai-status")]
     [string]$Action,
     [Parameter(Position = 1)]
     [string]$Argument,
@@ -17,6 +17,8 @@ $BackupDir = Join-Path $DeployDir "backups"
 $OllamaRuntime = Join-Path $DeployDir "ollama-runtime.ps1"
 $RagRuntime = Join-Path $DeployDir "rag-runtime.ps1"
 $RagTokenPath = Join-Path (Split-Path -Parent $DeployDir) "tmp\delivery-rag-runtime\internal-token.txt"
+$WorkAiRuntime = Join-Path $DeployDir "work-ai-runtime.ps1"
+$WorkAiTokenPath = Join-Path (Split-Path -Parent $DeployDir) "tmp\delivery-work-ai-runtime\internal-token.txt"
 
 if (-not (Test-Path -LiteralPath $EnvFile) -or -not (Test-Path -LiteralPath $BootstrapEnvFile)) {
     throw "Missing delivery env files; copy both examples and replace every placeholder."
@@ -25,6 +27,9 @@ if (-not (Test-Path -LiteralPath $EnvFile) -or -not (Test-Path -LiteralPath $Boo
 function Invoke-Compose {
     if (Test-Path -LiteralPath $RagTokenPath -PathType Leaf) {
         $env:DELIVERY_RAG_INTERNAL_TOKEN = (Get-Content -Raw -LiteralPath $RagTokenPath).Trim()
+    }
+    if (Test-Path -LiteralPath $WorkAiTokenPath -PathType Leaf) {
+        $env:DELIVERY_WORK_AI_INTERNAL_TOKEN = (Get-Content -Raw -LiteralPath $WorkAiTokenPath).Trim()
     }
     & docker compose --env-file $EnvFile -f $ComposeFile @args
     if ($LASTEXITCODE -ne 0) { throw "docker compose failed ($LASTEXITCODE)" }
@@ -83,6 +88,18 @@ function Read-BackupManifest([string]$DumpPath, [string]$Database) {
 }
 
 switch ($Action) {
+    "work-ai-start" {
+        & $WorkAiRuntime start
+        if ($LASTEXITCODE -ne 0) { throw "delivery work AI start failed ($LASTEXITCODE)" }
+    }
+    "work-ai-stop" {
+        & $WorkAiRuntime stop
+        if ($LASTEXITCODE -ne 0) { throw "delivery work AI stop failed ($LASTEXITCODE)" }
+    }
+    "work-ai-status" {
+        & $WorkAiRuntime status
+        if ($LASTEXITCODE -ne 0) { throw "delivery work AI status failed ($LASTEXITCODE)" }
+    }
     "ollama-start" {
         & $OllamaRuntime start
         if ($LASTEXITCODE -ne 0) { throw "delivery Ollama start failed ($LASTEXITCODE)" }

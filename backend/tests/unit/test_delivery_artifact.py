@@ -177,6 +177,22 @@ def test_delivery_rag_runtime_is_isolated_bounded_and_not_an_auto_switch() -> No
     assert 'EMBEDDING_DIMENSIONS=8' in example
 
 
+def test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded() -> None:
+    compose=(ROOT/'deploy/docker-compose.delivery.yml').read_text(encoding='utf-8')
+    runtime=(ROOT/'deploy/work-ai-runtime.ps1').read_text(encoding='utf-8')
+    launcher=(ROOT/'deploy/delivery.ps1').read_text(encoding='utf-8')
+    assert 'LLM_API_KEY: ${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}' in compose
+    assert 'VLM_API_KEY: ${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}' in compose
+    assert 'ASR_API_KEY: ${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}' in compose
+    assert 'scope="work_order_only"' in runtime
+    assert 'port=11437' in runtime
+    assert 'runtime_binding_sha256=' in runtime
+    assert 'asr_start_ram_mib=11264' in runtime
+    assert 'qwen=18' in runtime and 'duration_seconds=7200' in runtime
+    assert 'git -C $RepoRoot archive' in runtime
+    assert 'work-ai-start' in launcher and 'work-ai-status' in launcher and 'work-ai-stop' in launcher
+
+
 def test_delivery_backup_uses_binary_safe_compose_copy() -> None:
     script = (ROOT / "deploy" / "delivery.ps1").read_text(encoding="utf-8")
     assert 'Invoke-Compose cp "mysql:$containerTarget" $hostTemp' in script

@@ -146,6 +146,9 @@ services:
     env_file: ${DELIVERY_ENV_FILE:-.env.delivery}
     environment:
       LOCAL_AI_INTERNAL_TOKEN: ${DELIVERY_RAG_INTERNAL_TOKEN:-}
+      LLM_API_KEY: ${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}
+      VLM_API_KEY: ${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}
+      ASR_API_KEY: ${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
