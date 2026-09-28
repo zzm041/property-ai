@@ -31,6 +31,12 @@ TWENTY_SEVEN_B_ADMISSION_OVERHEAD_MIB=1536
 TWENTY_SEVEN_B_TERMINATION_MARGIN_SECONDS=15
 TWENTY_SEVEN_B_CANDIDATE_SOURCE=ROOT/'reports/real-ai-integration-027/qwen35-27b-candidate-source.json'
 TWENTY_SEVEN_B_RUNTIME=ROOT/'reports/real-ai-integration-027/qwen35-27b-runtime.json'
+QWEN38_MODEL='qwen38-27b-q3km-g52:7af3b8f'
+QWEN38_CANDIDATE_SOURCE=ROOT/'reports/real-ai-integration-027/qwen38-27b-q3km-candidate-source.json'
+QWEN38_RUNTIME=ROOT/'reports/real-ai-integration-027/qwen38-27b-q3km-runtime.json'
+QWEN38_UNKNOWN_RESOLUTION_BINDING=ROOT/'reports/real-ai-integration-027/qwen38-unknown-resolution-binding.json'
+QWEN38_LEDGER_NORMALIZATION=ROOT/'reports/real-ai-integration-027/qwen38-ledger-normalization.json'
+QWEN38_SCREEN_IDS=('PHOTO-002','GOLD-005','GOLD-006','GOLD-008','GOLD-012','GOLD-018','GOLD-021','PHOTO-004')
 COLLECTOR_PATH='reports/auth-identity-ai-001/local-qwen/run-quality28.py'
 NINE_B_RESUME_BINDING=ROOT/'reports/real-ai-integration-027/qwen35-9b-resume-binding.json'
 NINE_B_COLLECTOR_RECOVERY_BINDING=ROOT/'reports/real-ai-integration-027/qwen35-9b-collector-recovery-binding.json'
@@ -61,7 +67,12 @@ from app.provider.vision import QwenVLMProvider
 from app.service.analysis import AnalysisService,AnalysisSnapshot,MediaRef
 
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
-def budget_state_from_events(events):
+def sha_matches(value,path):
+    return isinstance(value,str) and re.fullmatch('[0-9a-fA-F]{64}',value) is not None and value.lower()==sha(path)
+def canonical_rows_sha256(rows):
+    encoded=json.dumps(rows,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()
+    return hashlib.sha256(encoded).hexdigest()
+def budget_state_from_events(events, reviewed_resolutions=frozenset()):
     """Treat a transport failure without a response as remotely UNKNOWN.
 
     A local HTTP exception is not proof that Ollama stopped evaluating the
@@ -73,9 +84,9 @@ def budget_state_from_events(events):
     unknown=[]
     for row in reserved:
         completion=completed.get(row['request_id'])
-        if completion is None or completion.get('remote_completion') not in {
+        if (completion is None or completion.get('remote_completion') not in {
             'RESPONSE_RECEIVED','CONTROLLED_RUNTIME_TERMINATION_CONFIRMED'
-        }:
+        }) and row['request_id'] not in reviewed_resolutions:
             unknown.append(row['request_id'])
     return {
         'attempted':len(reserved),
@@ -84,6 +95,83 @@ def budget_state_from_events(events):
         ),
         'unknown':unknown,
     }
+def reviewed_resolution_ids(events,binding_path,ledger_path):
+    """Allow only an independently reviewed, exact historical UNKNOWN exit.
+
+    The original completion stays UNKNOWN and consumes its request/time budget.
+    This binding only proves that the old execution is no longer running so a
+    different frozen candidate can reserve a later request.  A new UNKNOWN is
+    absent from the exact binding and therefore still blocks.
+    """
+    if not binding_path.exists():return frozenset()
+    binding=json.loads(binding_path.read_text(encoding='utf-8'))
+    allowed=(ROOT/'reports').resolve()
+    resolution=(ROOT/binding['resolution_path']).resolve()
+    review=(ROOT/binding['review_path']).resolve()
+    if not resolution.is_relative_to(allowed) or not review.is_relative_to(allowed):
+        raise RuntimeError('UNKNOWN_RESOLUTION_PATH_SCOPE')
+    if not sha_matches(binding.get('resolution_sha256'),resolution):
+        raise RuntimeError('UNKNOWN_RESOLUTION_EVIDENCE_DRIFT')
+    prior_review=(ROOT/binding['prior_incremental_review_path']).resolve()
+    if not prior_review.is_relative_to(allowed) or not sha_matches(binding.get('prior_incremental_review_sha256'),prior_review):
+        raise RuntimeError('UNKNOWN_RESOLUTION_PRIOR_REVIEW_DRIFT')
+    resolution_data=json.loads(resolution.read_text(encoding='utf-8'))
+    review_data=json.loads(review.read_text(encoding='utf-8'))
+    normalization_path=(ROOT/'reports/real-ai-integration-027/qwen38-ledger-normalization.json').resolve()
+    if not normalization_path.is_relative_to(allowed) or not normalization_path.exists():
+        raise RuntimeError('UNKNOWN_RESOLUTION_NORMALIZATION_MISSING')
+    normalization=json.loads(normalization_path.read_text(encoding='utf-8'))
+    normalization_review=(ROOT/normalization['review_path']).resolve()
+    if not normalization_review.is_relative_to(allowed) or not normalization_review.exists():
+        raise RuntimeError('UNKNOWN_RESOLUTION_NORMALIZATION_REVIEW_MISSING')
+    normalization_review_data=json.loads(normalization_review.read_text(encoding='utf-8'))
+    request_id=binding['request_id']
+    completions=[row for row in events if row.get('event')=='COMPLETED' and row.get('request_id')==request_id]
+    receipts=[row for row in events if row.get('event')=='REVIEWED_UNKNOWN_RESOLUTION' and row.get('request_id')==request_id]
+    ledger_bytes=ledger_path.read_bytes()
+    receipt_offsets=[]
+    receipt_ends=[]
+    receipt_lines=[]
+    offset=0
+    for line in ledger_bytes.splitlines(keepends=True):
+        row=json.loads(line)
+        if row.get('event')=='REVIEWED_UNKNOWN_RESOLUTION' and row.get('request_id')==request_id:
+            receipt_offsets.append(offset)
+            receipt_ends.append(offset+len(line))
+            receipt_lines.append(line)
+        offset+=len(line)
+    prefix_rows=[]
+    if len(receipt_offsets)==1:
+        prefix_rows=[json.loads(line) for line in ledger_bytes[:receipt_offsets[0]].splitlines() if line.strip()]
+    if (
+        binding.get('decision')!='ALLOW_DIFFERENT_FROZEN_CANDIDATE_AFTER_REVIEWED_CURRENT_EXIT'
+        or len(completions)!=1 or completions[0].get('remote_completion')!='UNKNOWN'
+        or resolution_data.get('request_id')!=request_id
+        or resolution_data.get('historical_immediate_remote_completion')!='UNKNOWN'
+        or resolution_data.get('current_execution_state')!='NOT_EXECUTING'
+        or review_data.get('verdict')!='PASS_SCOPED_REPLACEMENT_RESERVATION'
+        or not sha_matches(review_data.get('binding_sha256'),binding_path)
+        or len(receipts)!=1
+        or len(receipt_offsets)!=1
+        or not isinstance(binding.get('ledger_prefix_sha256'),str)
+        or re.fullmatch('[0-9a-fA-F]{64}',binding['ledger_prefix_sha256']) is None
+        or not sha_matches(receipts[0].get('binding_sha256'),binding_path)
+        or not sha_matches(receipts[0].get('review_sha256'),review)
+        or normalization.get('decision')!='ACCEPT_LINE_ENDING_NORMALIZATION_WITH_IDENTICAL_LEDGER_EVENTS'
+        or normalization.get('request_id')!=request_id
+        or normalization.get('parent_binding_sha256','').lower()!=sha(binding_path)
+        or normalization.get('parent_review_sha256','').lower()!=sha(review)
+        or normalization.get('original_raw_prefix_sha256','').lower()!=binding['ledger_prefix_sha256'].lower()
+        or normalization.get('normalized_raw_prefix_sha256','').lower()!=hashlib.sha256(ledger_bytes[:receipt_offsets[0]]).hexdigest()
+        or normalization.get('canonical_prefix_events_sha256','').lower()!=canonical_rows_sha256(prefix_rows)
+        or normalization.get('pre_receipt_event_count')!=len(prefix_rows)
+        or normalization.get('receipt_line_sha256','').lower()!=hashlib.sha256(receipt_lines[0]).hexdigest()
+        or normalization.get('ledger_through_receipt_sha256','').lower()!=hashlib.sha256(ledger_bytes[:receipt_ends[0]]).hexdigest()
+        or normalization_review_data.get('verdict')!='PASS_SCOPED_LEDGER_NORMALIZATION'
+        or not sha_matches(normalization_review_data.get('normalization_sha256'),normalization_path)
+    ):
+        raise RuntimeError('UNKNOWN_RESOLUTION_SEMANTICS')
+    return frozenset({request_id})
 def protocol_source_hashes_match(left,right):
     """Collector-only resume changes must not relax model/protocol source binding."""
     left=dict(left);right=dict(right)
@@ -246,27 +334,33 @@ def main():
         sys.argv.remove('--supplement')
         runpy.run_path(str(OUT/'run-approved-supplement.py'), run_name='__main__')
         return
-    parser=argparse.ArgumentParser();parser.add_argument('--round',type=int,choices=range(4));parser.add_argument('--model',choices=('qwen3.5:4b','qwen3.5:9b',TWENTY_SEVEN_B_MODEL),default='qwen3.5:4b');parser.add_argument('--phase',choices=('screen','fixed','novel'));parser.add_argument('--candidate',type=int,choices=(1,2,3));parser.add_argument('--resume-incomplete-screen',action='store_true');parser.add_argument('--resume-screen-collector-failure',action='store_true');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--round',type=int,choices=range(4));parser.add_argument('--model',choices=('qwen3.5:4b','qwen3.5:9b',TWENTY_SEVEN_B_MODEL,QWEN38_MODEL),default='qwen3.5:4b');parser.add_argument('--phase',choices=('screen','fixed','novel'));parser.add_argument('--candidate',type=int,choices=(1,2,3));parser.add_argument('--resume-incomplete-screen',action='store_true');parser.add_argument('--resume-screen-collector-failure',action='store_true');parser.add_argument('--resume-resource-adjusted-screen',action='store_true');args=parser.parse_args()
     bounded_candidate=args.model!='qwen3.5:4b'
     twenty_seven_b=args.model==TWENTY_SEVEN_B_MODEL
+    qwen38=args.model==QWEN38_MODEL
+    large_candidate=twenty_seven_b or qwen38
+    screen_ids=QWEN38_SCREEN_IDS if qwen38 else SCREEN_IDS
     candidate_source_binding=None
     if args.model=='qwen3.5:4b':
         assert args.round is not None and args.phase is None and args.candidate is None,'Historical 4B mode requires --round only'
         target=OUT/f'quality28-round{args.round}.json';run_out=OUT;max_requests=32
     else:
         assert args.round is None and args.phase is not None and args.candidate is not None,'Bounded candidate mode requires --phase and --candidate'
-        if twenty_seven_b:assert args.candidate==1,'27B has one authorized candidate'
-        assert args.candidate==1 or args.phase in {'fixed','novel'},'Later candidates cannot add another screen after the bounded repair'
+        if twenty_seven_b:assert args.candidate==1,'Retired Q4 27B has one historical candidate'
+        if qwen38:assert args.candidate==2,'Qwen3.8 Q3_K_M is the single replacement candidate'
+        assert args.candidate==1 or qwen38 or args.phase in {'fixed','novel'},'Later candidates cannot add another screen after the bounded repair'
         assert args.candidate!=3 or args.phase in {'fixed','novel'},'Delivery v11 candidate uses one complete fixed run and one novel run'
-        assert not (args.resume_incomplete_screen and args.resume_screen_collector_failure),'Only one bounded screen recovery is allowed'
+        assert sum((args.resume_incomplete_screen,args.resume_screen_collector_failure,args.resume_resource_adjusted_screen))<=1,'Only one bounded screen recovery is allowed'
         assert not (args.resume_incomplete_screen or args.resume_screen_collector_failure) or (args.candidate==1 and args.phase=='screen'),'Only candidate-01 screen can resume'
-        budget_root=(ROOT/'reports/real-ai-integration-027/diagnostic-r3-27b' if twenty_seven_b else
+        assert not args.resume_resource_adjusted_screen or (qwen38 and args.phase=='screen'),'Only Qwen3.8 can run the reviewed resource-adjusted screen'
+        budget_root=(ROOT/'reports/real-ai-integration-027/diagnostic-r3-27b' if large_candidate else
                      ROOT/'reports/real-ai-integration-027/diagnostic-r3-9b-v11'
                      if args.candidate==3 else ROOT/'reports/real-ai-integration-027/diagnostic-r3-9b')
-        active_call_limit=(TWENTY_SEVEN_B_TOTAL_CALL_LIMIT if twenty_seven_b else
+        active_call_limit=(TWENTY_SEVEN_B_TOTAL_CALL_LIMIT if large_candidate else
                            DELIVERY_V11_TOTAL_CALL_LIMIT if args.candidate==3 else HISTORICAL_NINE_B_TOTAL_CALL_LIMIT)
         run_out=budget_root/f'candidate-{args.candidate:02d}';run_out.mkdir(parents=True,exist_ok=True)
-        phase_label=('screen-continuation-recovery' if args.resume_screen_collector_failure else
+        phase_label=('screen-g52' if args.resume_resource_adjusted_screen else
+                     'screen-continuation-recovery' if args.resume_screen_collector_failure else
                      'screen-continuation' if args.resume_incomplete_screen else args.phase)
         target=run_out/f'{phase_label}.json';max_requests=2 if args.resume_screen_collector_failure else 9 if args.resume_incomplete_screen else 10 if args.phase=='screen' else 4 if args.phase=='novel' else 22 if args.candidate==1 else 32
     assert not target.exists(),'Recorded round is immutable: inspect or explicit new repair round; no replay'
@@ -284,15 +378,22 @@ def main():
         assert overlay['base_gold_unchanged'] is True and set(overlay['cases'])=={item['id'] for item in gold['cases']}
     all_items=gold['cases']+photos['cases']
     if bounded_candidate and args.phase=='screen':
-        if args.resume_screen_collector_failure:
+        if args.resume_resource_adjusted_screen:
+            prior=json.loads((run_out/'screen-resource-adjusted.json').read_text(encoding='utf-8'))
+            assert prior['status']=='INCOMPLETE' and prior.get('stop_reason')=='RESOURCE_FLOOR_CROSSED'
+            assert prior['attempted_requests']==1 and prior['results'][0]['id']=='PHOTO-002'
+            by_id={item['id']:item for item in all_items}
+            selected_items=[by_id[case_id] for case_id in screen_ids]
+        elif args.resume_screen_collector_failure:
             selected_items=incomplete_collector_recovery_items(
                 all_items,json.loads((run_out/'screen-continuation.json').read_text(encoding='utf-8'))
             )
         elif args.resume_incomplete_screen:
             selected_items=incomplete_screen_resume_items(all_items,json.loads((run_out/'screen.json').read_text(encoding='utf-8')))
         else:
-            selected_items=[item for item in all_items if item['id'] in SCREEN_IDS]
-            assert tuple(item['id'] for item in selected_items)==SCREEN_IDS
+            by_id={item['id']:item for item in all_items}
+            selected_items=[by_id[case_id] for case_id in screen_ids]
+            assert tuple(item['id'] for item in selected_items)==screen_ids
     elif bounded_candidate and args.phase=='novel':
         assert novel['frozen_before_first_9b_inference'] is True and len(novel['cases'])==4
         selected_items=novel['cases']
@@ -300,7 +401,7 @@ def main():
     downloads=json.loads((OUT/'repair-image-downloads.json').read_text(encoding='utf-8'))
     bounded_manifest_path=ROOT/'reports/real-ai-integration-027/qwen35-9b-bounded-images.json'
     bounded_manifest=(json.loads(bounded_manifest_path.read_text(encoding='utf-8'))
-                      if bounded_candidate and (twenty_seven_b or args.candidate>=2) else None)
+                      if bounded_candidate and (large_candidate or args.candidate>=2) else None)
     images={}
     for p in photos['cases']:
         original_path=OUT/'repair-images'/p['file'];row=next(r for r in downloads if Path(r['file']).name==p['file'])
@@ -317,13 +418,24 @@ def main():
         digest=json.loads((OUT/'download-4b-result.json').read_text(encoding='utf-8'))['manifest_sha256']
     elif args.model=='qwen3.5:9b':
         digest='6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7'
-    else:
+    elif twenty_seven_b:
         candidate_source=json.loads(TWENTY_SEVEN_B_CANDIDATE_SOURCE.read_text(encoding='utf-8'))
         assert candidate_source['model']==TWENTY_SEVEN_B_MODEL and candidate_source['source']=='official Ollama library'
         digest=candidate_source['digest']
         assert re.fullmatch('[0-9a-f]{64}',digest),'Invalid pinned 27B digest'
         assert isinstance(candidate_source['size_bytes'],int) and 0<candidate_source['size_bytes']<=20*1024**3
         candidate_source_binding={'path':str(TWENTY_SEVEN_B_CANDIDATE_SOURCE),'sha256':sha(TWENTY_SEVEN_B_CANDIDATE_SOURCE)}
+    else:
+        candidate_source=json.loads(QWEN38_CANDIDATE_SOURCE.read_text(encoding='utf-8'))
+        assert candidate_source['source_type']=='community_quantization'
+        assert candidate_source['revision']=='7af3b8fef254c9246345e0aa6dfc5ea8b5c45f02'
+        assert candidate_source['ollama_model']==QWEN38_MODEL
+        digest=candidate_source['ollama_manifest_digest']
+        assert re.fullmatch('[0-9a-f]{64}',digest),'Invalid pinned Qwen3.8 manifest digest'
+        assert candidate_source['model_file']['sha256']=='fa09d2fbe7d10fe6d91d3e647bd5a2782ec028c2acd9588dd73c9757f82d9631'
+        assert candidate_source['vision_projector']['sha256']=='9793ab158aefdce41d531d37a5458287dcdfc2d10585f4af106802810dfc2618'
+        assert 0<candidate_source['total_runtime_asset_bytes']<=20*1024**3
+        candidate_source_binding={'path':str(QWEN38_CANDIDATE_SOURCE),'sha256':sha(QWEN38_CANDIDATE_SOURCE)}
     expected_version='0.34.2' if args.model=='qwen3.5:4b' else '0.34.3'
     assert api('/api/version')['version']==expected_version
     assert next(r for r in api('/api/tags')['models'] if r['name']==args.model)['digest']==digest
@@ -333,36 +445,39 @@ def main():
         return rows
     runtime_path=(ROOT/'reports/real-ai-integration-027/qwen35-9b-runtime-resume.json')
     runtime=(json.loads((OUT/'diagnostic-runtime28.json').read_text(encoding='utf-8-sig')) if args.model=='qwen3.5:4b' else
+             json.loads(QWEN38_RUNTIME.read_text(encoding='utf-8-sig')) if qwen38 else
              json.loads(TWENTY_SEVEN_B_RUNTIME.read_text(encoding='utf-8-sig')) if twenty_seven_b else
              json.loads((runtime_path if runtime_path.exists() else ROOT/'reports/real-ai-integration-027/qwen35-9b-runtime.json').read_text(encoding='utf-8-sig')))
     assert runtime['no_cloud'] and runtime['context_length']==4096 and runtime['concurrency']==1
-    runtime_identity=bound_runtime_identity(runtime) if twenty_seven_b else None
+    runtime_identity=bound_runtime_identity(runtime) if large_candidate else None
     budget_path=(budget_root/'qwen-budget.jsonl') if bounded_candidate else run_out/'qwen-budget.jsonl'
     def budget_events():
         if not budget_path.exists():return []
         return [json.loads(line) for line in budget_path.read_text(encoding='utf-8').splitlines() if line.strip()]
     def budget_state():
-        return budget_state_from_events(budget_events())
+        events=budget_events()
+        reviewed=(reviewed_resolution_ids(events,QWEN38_UNKNOWN_RESOLUTION_BINDING,budget_path) if qwen38 else frozenset())
+        return budget_state_from_events(events,reviewed)
     def append_budget(row):
         payload=(json.dumps({'at_utc':datetime.now(UTC).isoformat(),**row},ensure_ascii=False,separators=(',',':'))+'\n').encode()
         fd=os.open(budget_path,os.O_APPEND|os.O_CREAT|os.O_WRONLY,0o600)
         try:os.write(fd,payload);os.fsync(fd)
         finally:os.close(fd)
-    request_timeout=TWENTY_SEVEN_B_REQUEST_TIMEOUT_SECONDS if twenty_seven_b else 60
+    request_timeout=TWENTY_SEVEN_B_REQUEST_TIMEOUT_SECONDS if large_candidate else 60
     if bounded_candidate:
         state=budget_state();assert not state['unknown'],f'Prior request completion UNKNOWN: {state["unknown"]}'
         assert state['attempted']<active_call_limit and state['model_seconds']+request_timeout<=NINE_B_TOTAL_MODEL_SECONDS
         assert datetime.now(UTC)+timedelta(seconds=request_timeout)<=NINE_B_DEADLINE_UTC,'Insufficient bounded time before the delivery deadline'
     e={'task_id':'REAL-AI-INTEGRATION-027' if bounded_candidate else 'SELFHOST-AI-LOCAL-001','round':args.round,'phase':phase_label if bounded_candidate else args.phase,'candidate':args.candidate,'repair_rounds_used':args.round,'base_sha':'f5c8154',
        'source_sha':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'at_utc':datetime.now(UTC).isoformat(),
-       'model':args.model,'model_digest':digest,'quantization':'Q4_K_M','prompt_version':WORK_ORDER_ANALYSIS_PROMPT_VERSION,
+       'model':args.model,'model_digest':digest,'quantization':'Q3_K_M' if qwen38 else 'Q4_K_M','prompt_version':WORK_ORDER_ANALYSIS_PROMPT_VERSION,
        'candidate_source_binding':candidate_source_binding,
        'vision_prompt_version':getattr(QwenVLMProvider,'prompt_version','unversioned-original'),
        'source_hashes':{p:sha(ROOT/p) for p in ['backend/app/service/analysis.py','backend/app/domain/ai.py','backend/app/domain/observed_event.py','backend/app/provider/llm/__init__.py','backend/app/provider/vision/__init__.py','backend/app/provider/http.py','reports/auth-identity-ai-001/local-qwen/run-quality28.py']},
        'gold_hashes':{textpath.name:sha(textpath),photopath.name:sha(photopath),**({'qwen35-9b-evaluation-overlay.json':sha(overlay_path),'qwen35-9b-novel-set.json':sha(novel_path)} if overlay is not None else {}),**({'qwen35-9b-bounded-images.json':sha(bounded_manifest_path)} if bounded_manifest is not None else {})},'runtime':runtime,
        'runtime_identity':runtime_identity,
        'image_input':({'mode':'proportional-jpeg-max-1024','manifest':str(bounded_manifest_path),'manifest_sha256':sha(bounded_manifest_path)} if bounded_manifest is not None else {'mode':'original-gold-files'}),
-       'controls':{'context':4096,'temperature':0,'thinking':False,'llm_max_tokens':512,'vlm_max_tokens':256,'timeout_seconds':request_timeout,'guard_cleanup_margin_seconds':TWENTY_SEVEN_B_TERMINATION_MARGIN_SECONDS if twenty_seven_b else 0,'parallel':1,'max_cases':1 if args.resume_screen_collector_failure else 7 if args.resume_incomplete_screen else 8 if args.phase=='screen' else 4 if args.phase=='novel' else 28,'max_inference_requests':max_requests},
+       'controls':{'context':4096,'temperature':0,'thinking':False,'llm_max_tokens':512,'vlm_max_tokens':256,'timeout_seconds':request_timeout,'guard_cleanup_margin_seconds':TWENTY_SEVEN_B_TERMINATION_MARGIN_SECONDS if large_candidate else 0,'parallel':1,'max_cases':1 if args.resume_screen_collector_failure else 7 if args.resume_incomplete_screen else 8 if args.phase=='screen' else 4 if args.phase=='novel' else 28,'max_inference_requests':max_requests},
        'model_input_contract_sha256':model_input_contract_sha256(),
        'cumulative_budget':{'path':str(budget_path),'call_limit':active_call_limit,'model_seconds_limit':NINE_B_TOTAL_MODEL_SECONDS,'deadline_utc':NINE_B_DEADLINE_UTC.isoformat()} if bounded_candidate else None,
        'business_calls':False,'database_access':False,'queue_access':False,'business_runtime_changed':False,'attempted_requests':0,'reused_requests':0,'results':[],'status':'RUNNING'}
@@ -415,15 +530,16 @@ def main():
     def stage(kind,call,case):
         nonlocal current
         loaded=resident();before=sample()
-        required_gpu=((TWENTY_SEVEN_B_RESIDENT_REQUEST_GPU_FREE_MIB if twenty_seven_b else NINE_B_RESIDENT_REQUEST_GPU_FREE_MIB) if loaded else
+        required_gpu=((TWENTY_SEVEN_B_RESIDENT_REQUEST_GPU_FREE_MIB if large_candidate else NINE_B_RESIDENT_REQUEST_GPU_FREE_MIB) if loaded else
                       NINE_B_START_GPU_FREE_MIB if bounded_candidate else 6000)
         if before['ram_free_mib']<4500 or before['gpu_free_mib']<required_gpu:
             e['stop_reason']='RESOURCE_HEADROOM';e['guard_sample']=before;save();raise RuntimeError('RESOURCE_HEADROOM')
-        if twenty_seven_b and not loaded:
+        if large_candidate and not loaded:
             usable_mib=(before['ram_free_mib']-4500)+(before['gpu_free_mib']-2000)
-            required_mib=math.ceil(candidate_source['size_bytes']/1048576)+TWENTY_SEVEN_B_ADMISSION_OVERHEAD_MIB
+            candidate_bytes=(candidate_source['total_runtime_asset_bytes'] if qwen38 else candidate_source['size_bytes'])
+            required_mib=math.ceil(candidate_bytes/1048576)+TWENTY_SEVEN_B_ADMISSION_OVERHEAD_MIB
             e['capacity_admission']={
-                'model_size_bytes':candidate_source['size_bytes'],
+                'model_size_bytes':candidate_bytes,
                 'fixed_runtime_kv_image_overhead_mib':TWENTY_SEVEN_B_ADMISSION_OVERHEAD_MIB,
                 'usable_ram_plus_gpu_above_floors_mib':usable_mib,
                 'required_mib':required_mib,
@@ -433,7 +549,7 @@ def main():
         state_at_start=budget_state() if bounded_candidate else {'model_seconds':0}
         remaining_budget_seconds=NINE_B_TOTAL_MODEL_SECONDS-state_at_start['model_seconds']
         remaining_deadline_seconds=(NINE_B_DEADLINE_UTC-datetime.now(UTC)).total_seconds() if bounded_candidate else request_timeout
-        allowed_wall_seconds=min(request_timeout,remaining_budget_seconds,remaining_deadline_seconds)-(TWENTY_SEVEN_B_TERMINATION_MARGIN_SECONDS if twenty_seven_b else 0)
+        allowed_wall_seconds=min(request_timeout,remaining_budget_seconds,remaining_deadline_seconds)-(TWENTY_SEVEN_B_TERMINATION_MARGIN_SECONDS if large_candidate else 0)
         if allowed_wall_seconds<=0:
             e['stop_reason']='REQUEST_TIME_BUDGET_EXHAUSTED';save();raise RuntimeError('REQUEST_TIME_BUDGET_EXHAUSTED')
         current={'kind':kind,'at_utc':datetime.now(UTC).isoformat(),'before':before,'resident_before':loaded,'samples':[],'attempted':False,'status':'STARTING','wall_limit_seconds':allowed_wall_seconds}
@@ -442,7 +558,7 @@ def main():
         def terminate_for_guard(reason,observed):
             if current.get('guard_stop_reason'):return
             current['guard_stop_reason']=reason;current['guard_sample']=observed
-            if twenty_seven_b:
+            if large_candidate:
                 current['breach_action']='TERMINATE_EXACT_BOUND_PROJECT_MODEL_RUNTIME_TREE'
                 try:current['runtime_stop']=terminate_bound_runtime(runtime)
                 except Exception as exc:current['runtime_stop_error']=type(exc).__name__
@@ -457,7 +573,7 @@ def main():
                     observation_error=type(exc).__name__;current['samples'].append({'error_type':observation_error})
                 reason=runtime_guard_reason(
                     now=time.monotonic(),deadline=wall_deadline,observed=observed,
-                    observation_error=observation_error,ram_floor=4500 if twenty_seven_b else 2000,
+                    observation_error=observation_error,ram_floor=4500 if large_candidate else 2000,
                 )
                 if reason:
                     if reason=='RESOURCE_FLOOR_CROSSED':current['runtime_floor_breach']=observed
@@ -484,16 +600,16 @@ def main():
                 controlled_stop=bool(current.get('runtime_stop',{}).get('stopped',{}).get('tree_exit_confirmed'))
                 append_budget({'event':'COMPLETED','request_id':current['budget_request_id'],'candidate':args.candidate,'phase':e['phase'],'kind':kind,'status':current['status'],'model_seconds':current['latency_seconds'],'raw_response_sha256':current.get('raw_response_sha256'),'remote_completion':'RESPONSE_RECEIVED' if current.get('raw_response_sha256') else 'CONTROLLED_RUNTIME_TERMINATION_CONFIRMED' if controlled_stop else 'UNKNOWN'})
             if current.get('guard_stop_reason'):e['stop_reason']=current['guard_stop_reason']
-            elif current.get('runtime_floor_breach') or current['min_ram_free_mib']<(4500 if twenty_seven_b else 2000) or current['min_gpu_free_mib']<2000:e['stop_reason']='RESOURCE_FLOOR_CROSSED'
+            elif current.get('runtime_floor_breach') or current['min_ram_free_mib']<(4500 if large_candidate else 2000) or current['min_gpu_free_mib']<2000:e['stop_reason']='RESOURCE_FLOOR_CROSSED'
             save()
     try:
         save()
         reused={}
         reused_sources={}
         if bounded_candidate and args.phase=='fixed' and args.candidate==1:
-            screen_path=run_out/'screen.json';assert screen_path.exists(),'Complete identical screen phase is required before fixed phase'
+            screen_path=(run_out/'screen-g52.json' if qwen38 else run_out/'screen.json');assert screen_path.exists(),'Complete identical screen phase is required before fixed phase'
             screen=json.loads(screen_path.read_text(encoding='utf-8'))
-            if twenty_seven_b:
+            if large_candidate:
                 stable_controls=('context','temperature','thinking','llm_max_tokens','vlm_max_tokens','timeout_seconds','guard_cleanup_margin_seconds','parallel')
                 assert screen['source_hashes']==e['source_hashes'],'27B collector or protocol source changed after screen'
                 assert screen.get('candidate_source_binding')==e['candidate_source_binding'],'27B candidate source changed after screen'
@@ -550,11 +666,11 @@ def main():
             assert screen['model']==args.model and screen['model_digest']==digest
             assert screen['prompt_version']==e['prompt_version'] and screen['vision_prompt_version']==e['vision_prompt_version']
             assert screen['gold_hashes']==e['gold_hashes']
-            reused={row['id']:row for row in screen_rows};assert tuple(reused)==SCREEN_IDS and attempted==10
+            reused={row['id']:row for row in screen_rows};assert tuple(reused)==screen_ids and attempted==10
         if bounded_candidate and args.phase=='novel':
             fixed=json.loads((run_out/'fixed.json').read_text(encoding='utf-8'))
             assert fixed['status']=='RECORDED_NEEDS_SEMANTIC_REVIEW' and fixed['source_hashes']==e['source_hashes'] and fixed['gold_hashes']==e['gold_hashes']
-            if twenty_seven_b:
+            if large_candidate:
                 stable_controls=('context','temperature','thinking','llm_max_tokens','vlm_max_tokens','timeout_seconds','guard_cleanup_margin_seconds','parallel')
                 assert fixed['model']==args.model and fixed['model_digest']==digest,'27B model changed before novel set'
                 assert fixed.get('candidate_source_binding')==e['candidate_source_binding'],'27B candidate source changed before novel set'
@@ -567,7 +683,7 @@ def main():
                 source_path=reused_sources[item['id']]
                 case['reused_from']={'path':str(source_path),'source_sha256':sha(source_path),'protocol_source_hashes_verified':True,
                     'frozen_controls_and_canonical_input_verified':True,
-                    'resume_binding_sha256':None if twenty_seven_b else sha(NINE_B_RESUME_BINDING) if NINE_B_RESUME_BINDING.exists() else None}
+                    'resume_binding_sha256':None if large_candidate else sha(NINE_B_RESUME_BINDING) if NINE_B_RESUME_BINDING.exists() else None}
                 e['results'].append(case);e['reused_requests']+=2 if item['id'].startswith('PHOTO') else 1;save();continue
             is_photo=item['id'].startswith('PHOTO');report=item['paired_report'] if is_photo else item['report']
             case={'id':item['id'],'input':item,'stages':[],'semantic_review':'PENDING_INDIVIDUAL_REVIEW_NOT_AUTOMATIC_PASS'};e['results'].append(case)

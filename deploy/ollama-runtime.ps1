@@ -1,7 +1,9 @@
 param(
     [Parameter(Position = 0, Mandatory = $true)]
     [ValidateSet("start", "stop", "status")]
-    [string]$Action
+    [string]$Action,
+    [ValidateRange(2147483648, 8589934592)]
+    [long]$GpuOverheadBytes = 5368709120
 )
 
 $ErrorActionPreference = "Stop"
@@ -126,7 +128,7 @@ switch ($Action) {
             $env:OLLAMA_MAX_QUEUE = "2"
             $env:OLLAMA_KEEP_ALIVE = "30s"
             $env:OLLAMA_LOAD_TIMEOUT = "120s"
-            $env:OLLAMA_GPU_OVERHEAD = "2147483648"
+            $env:OLLAMA_GPU_OVERHEAD = [string]$GpuOverheadBytes
             $env:OLLAMA_IGPU_ENABLE = "0"
             $env:OLLAMA_DEBUG = "0"
             $env:OLLAMA_ORIGINS = "http://127.0.0.1:11435"
@@ -148,7 +150,7 @@ switch ($Action) {
                 concurrency = 1
                 context_length = 4096
                 keep_alive = "30s"
-                gpu_reserved_bytes = 2147483648
+                gpu_reserved_bytes = $GpuOverheadBytes
                 inference_on_start = $false
             }
             $stateStream = $null

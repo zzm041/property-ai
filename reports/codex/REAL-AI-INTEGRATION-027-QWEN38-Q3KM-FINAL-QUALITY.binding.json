@@ -1,0 +1,40 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-QWEN38-Q3KM-FINAL-QUALITY",
+  "recorded_at_utc": "2026-09-28T13:35:52.1527631Z",
+  "git_head": "dd920f99d5e3478877b7c0dc3ff703b042aca5e8",
+  "working_tree_scope": "scoped WIP; unrelated pre-existing changes excluded",
+  "review": {
+    "path": "reports/codex/REAL-AI-INTEGRATION-027-QWEN38-Q3KM-FINAL-QUALITY.raw.json",
+    "sha256": "fb6a684fcb558c6b0dbd33ee8797fe0071c43721d2e5619dec02c7d165896c70",
+    "verdict": "NOT_READY_FOR_BOUNDED_AUTO"
+  },
+  "reviewed_inputs": {
+    "fixed_evidence": {
+      "path": "reports/real-ai-integration-027/diagnostic-r3-27b/candidate-02/fixed.json",
+      "sha256": "4ff70a59652f9709f10050436441afdf0604e57fd4c82b79ae54e42cc0f09f8d"
+    },
+    "budget": {
+      "path": "reports/real-ai-integration-027/diagnostic-r3-27b/qwen-budget.jsonl",
+      "sha256": "dff6d256c4a4a961708c238883e4e0769888bee2127cfbcd753f76100e32642f"
+    },
+    "observed_event_source": {
+      "path": "backend/app/domain/observed_event.py",
+      "sha256": "caa9e28cd513e9d2252d8789e0b2c6be29a80348d916ff1ee6091bab451e25b7"
+    },
+    "observed_event_tests": {
+      "path": "backend/tests/unit/test_observed_event_027.py",
+      "sha256": "bebcdcac52b1026121775a71cff754bbe7b1c60d5819a4536cfd6eb632a25110"
+    }
+  },
+  "tracking": {
+    "result_summary_path": "reports/real-ai-integration-027/diagnostic-r3-27b/qwen38-q3km-result-summary.json",
+    "result_summary_sha256": "85eeae9289163785fc6fead96cf923b9771f5cf5976ff4184e8bd742ded09d8a",
+    "handoff_sha256_after_update": "e059a1c104c50bdbd462f7247cea8cde0a330c565ba8de3c2cc3dc8f8021f1ea",
+    "coverage_matrix_sha256_after_update": "a59969194b580e6e01caee101ebf217d8e8f78b03831d547dbae5d9701dbbcee"
+  },
+  "runtime_boundary": {
+    "delivery_8093_provider_switched": false,
+    "real_auto_work_orders_created": 0,
+    "existing_real_rag_status": "PASS_SCOPED_REAL_RAG_UNCHANGED"
+  }
+}

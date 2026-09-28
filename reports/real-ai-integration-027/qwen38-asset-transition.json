@@ -1,0 +1,51 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "recorded_at_utc": "2026-09-28T11:53:52.6120825Z",
+  "ollama_endpoint": "http://127.0.0.1:11435",
+  "precondition": {
+    "resident_models": 0,
+    "rag_adapter_request_active": false,
+    "rag_model_retained": "qwen3.5:4b"
+  },
+  "retired_models": [
+    {
+      "name": "qwen3.5:27b-q4_K_M",
+      "digest": "7653528ba5cba4dd8e19da24aaddc7f4d0b5ecd93571c0825dfd4137958ec06e",
+      "delete_http_status": 200
+    },
+    {
+      "name": "qwen3.5:9b",
+      "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+      "delete_http_status": 200
+    },
+    {
+      "name": "qwen3.5:2b",
+      "digest": "324d162be6ca5629ae4517c8710434d0bd2d665bc94dbad46e9af8fbf8a2f0df",
+      "delete_http_status": 200
+    }
+  ],
+  "released_bytes": 26756292608,
+  "released_gib": 24.919,
+  "retained_models": [
+    {
+      "name": "qwen3.5:4b",
+      "digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+      "purpose": "accepted scoped real RAG"
+    }
+  ],
+  "deletion_method": "Ollama DELETE /api/delete with exact model names after digest and idle checks",
+  "manual_blob_deletion": false,
+  "historical_evidence_deleted": false,
+  "post_delete_verification": {
+    "ollama_tags": [
+      {
+        "name": "qwen3.5:4b",
+        "digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd"
+      }
+    ],
+    "resident_models": 0,
+    "scoped_project_duplicate_or_partial_scan": [],
+    "rag_adapter_status": "ready_idle_accepting",
+    "rag_inference_during_cleanup": false
+  }
+}

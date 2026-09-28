@@ -128,9 +128,9 @@ PATTERNS = {
     "烧焦变色": r"烧(?:焦|黑)|焦黑|熏黑|发黑|黑色.*(?:痕|插孔)",
     "焦煳气味": r"焦(?:煳|糊)?味|烧焦味|糊味",
     "松动": r"松动|松了", "水渍": r"水渍|水迹|积水|棕黄|黄褐|黄色.*斑",
-    "表面剥落": r"剥落|脱落|起皮|鼓起|掉.{0,4}(?:块|片)",
+    "表面剥落": r"剥落|脱落|起皮|鼓起|掉.{0,4}(?:块|片)|掉漆|涂层.{0,8}(?:磨损|破损)|露出.{0,8}(?:金属|底色)",
     "外观无明显异常": r"无.*(?:烧|损|烟|异常|渗水|漏水|异味|积水|火花|焦味)|没有.*(?:损|烟|异常|渗水|漏水|异味|积水|火花|焦味)|正常|完好|未见明显",
-    "现象待核实": r"不清楚|说不清|无法判断|无法确认|不知道|没找到|不确定|未确定|未确认|待核实|可能|怀疑|认为|声称|猜|未见|尚未|矛盾|没有|没说|没查|不是|漏听|没.字",
+    "现象待核实": r"不清楚|说不清|无法判断|无法确认|不知道|没找到|不确定|未确定|未确认|待核实|可能|怀疑|认为|声称|猜|未见|尚未|矛盾|一人说|另一人说|有人说|说法.{0,4}(?:矛盾|不一)|没有|没说|没查|不是|漏听|没.字",
 }
 SUBJECT_PATTERNS = {
     "水龙头": r"水龙头|龙头", "排水接头": r"排水|接头|洗手盆", "天花墙面": r"天花|墙|涂层",
@@ -148,6 +148,11 @@ _LEADING_UNCERTAIN_SPEAKER = re.compile(
 _SUBJECTLESS_CONTINUATION_PREFIX = {
     "不制冷": re.compile(r"^(?:出风|送风)(?:但|却|仍|仍然|还是)?$")
 }
+_GENERIC_SUBJECT_CONTINUATION = re.compile(
+    r"^(?:现在|目前|此刻|刚才|随后|之后|仍|仍然|还|还在|正|正在|已经|已|尚未|不再|持续|"
+    r"还在(?:缓慢|持续)|"
+    r"水(?:正|一直|持续|不断)?|表面|外观|一人说|另一人说|有人说)$"
+)
 
 
 def _is_leading_uncertain_modifier(text: str) -> bool:
@@ -173,6 +178,30 @@ def _previous_clause(text: str, clause_start: int) -> str:
     delimiters = "，,。；;!?！？"
     start = max((text.rfind(char, 0, end) for char in delimiters), default=-1)
     return text[start + 1:end].strip()
+
+
+def _prior_clause_carries_unique_subject(
+    text: str, clause_start: int, current_prefix: str, subject: str,
+) -> bool:
+    """Resolve a nearby omitted Chinese subject without crossing sentences.
+
+    The continuation must follow a comma/semicolon, contain no competing
+    catalogued subject, and the immediately preceding clause must contain the
+    one requested subject without hearsay or historical qualification.
+    """
+    if clause_start <= 0 or text[clause_start - 1] not in "，,；;":
+        return False
+    compact = re.sub(r"\s+", "", current_prefix)
+    if not compact or _GENERIC_SUBJECT_CONTINUATION.fullmatch(compact) is None:
+        return False
+    prior = _previous_clause(text, clause_start)
+    return (
+        _supported_subjects(prior) == {subject}
+        and not _UNCERTAIN.search(prior)
+        and not _HISTORY.search(prior)
+        and not _NEGATIVE.search(prior)
+        and not _POST_NEGATIVE.search(prior)
+    )
 
 
 def _clause_for_match(text: str, match: re.Match[str]) -> tuple[str, int]:
@@ -263,12 +292,21 @@ def bind_observations(
                 prefix = selected_clause[:local_start].strip()
                 continuation = _SUBJECTLESS_CONTINUATION_PREFIX.get(item.label)
                 prior_clause = _previous_clause(quote, selected_clause_start)
-                if (
-                    clause_subjects
-                    or continuation is None
-                    or continuation.fullmatch(prefix) is None
-                    or not re.search(SUBJECT_PATTERNS[item.subject], prior_clause)
-                ):
+                explicit_continuation = (
+                    continuation is not None
+                    and continuation.fullmatch(prefix) is not None
+                    and selected_clause_start > 0
+                    and quote[selected_clause_start - 1] in "，,；;"
+                    and _supported_subjects(prior_clause) == {item.subject}
+                    and not _UNCERTAIN.search(prior_clause)
+                    and not _HISTORY.search(prior_clause)
+                    and not _NEGATIVE.search(prior_clause)
+                    and not _POST_NEGATIVE.search(prior_clause)
+                )
+                unique_subject_continuation = _prior_clause_carries_unique_subject(
+                    quote, selected_clause_start, prefix or match.group(0), item.subject,
+                )
+                if clause_subjects or not (explicit_continuation or unique_subject_continuation):
                     raise ValueError("Subject not supported by the selected evidence")
         except ValueError as exc:
             rejected.append({

@@ -1,0 +1,26 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "decision": "ACCEPT_LINE_ENDING_NORMALIZATION_WITH_IDENTICAL_LEDGER_EVENTS",
+  "request_id": "candidate-01-screen-001",
+  "recorded_at_utc": "2026-09-28T12:58:49.5505144Z",
+  "parent_binding_path": "reports/real-ai-integration-027/qwen38-unknown-resolution-binding.json",
+  "parent_binding_sha256": "F819668FAAC7F5AEEC37EF646E9BA3D1DE26F35C3F3C8D5B44B55EDA8FE4311A",
+  "parent_review_path": "reports/codex/REAL-AI-INTEGRATION-027-QWEN38-PREFLIGHT.raw.json",
+  "parent_review_sha256": "CC769FB7BC454092AA374278B0303F4445DA3414A0788EA59D03220447D4896B",
+  "original_raw_prefix_sha256": "4EED83C04B31F0856C5364FE5830F8D0D908B7DAFC4DF23611B0652E5848F7F3",
+  "normalized_raw_prefix_sha256": "3B66204BFD8597BA4EDD152227D918FF9F1D2BF30AB93A1D6A7D2196BCF15DDC",
+  "canonical_prefix_events_sha256": "2D6EB44CBDB1C7CC2AAF7ED07A53B64B4392B7F1FE2C363051A5453CFE169763",
+  "pre_receipt_event_count": 5,
+  "receipt_line_sha256": "307120FBBB5D3C56C427A10D5AA77786EB02CE118E7126C4100A790145001879",
+  "ledger_through_receipt_sha256": "4683CCD7973F3DB35A12C360A9EB47623CAFC8E158450434C55CA1E7BCE5E7B1",
+  "cause": "The approved append operation preserved every parsed JSON event but normalized pre-existing mixed line endings before adding the unique receipt.",
+  "scope": {
+    "parsed_event_content_changed": false,
+    "new_reservation_or_completion_added": false,
+    "inference_executed": false,
+    "historical_unknown_rewritten": false,
+    "additional_allowance": 0
+  },
+  "review_path": "reports/codex/REAL-AI-INTEGRATION-027-QWEN38-PREFLIGHT-NORMALIZATION.raw.json",
+  "required_review_verdict": "PASS_SCOPED_LEDGER_NORMALIZATION"
+}

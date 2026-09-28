@@ -1,0 +1,63 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "branch": "qtum/Qwen3.8-27B-GGUF Q3_K_M",
+  "status": "NOT_READY_FOR_BOUNDED_AUTO",
+  "base_sha": "dd920f99d5e3478877b7c0dc3ff703b042aca5e8",
+  "candidate": {
+    "ollama_tag": "qwen38-27b-q3km-g52:7af3b8f",
+    "manifest_digest": "cb8f818e5c95a3825d1febea2fbeee5a95216cb759c6793b439d0d074ba8db6b",
+    "weight_sha256": "fa09a6c3ab911f1b91f08f2eb3b74938a46ec79193631773cdbf0ba4d7539631",
+    "vision_projector_sha256": "9793ab158aefdce41d531d37a5458287dcdfc2d10585f4af106802810dfc2618",
+    "community_quantization": true,
+    "context_length": 4096,
+    "gpu_layers": 52,
+    "temperature": 0
+  },
+  "asset_transition": {
+    "retired_models_removed": ["Qwen3.5-27B Q4_K_M", "Qwen3.5-9B", "Qwen3.5-2B"],
+    "released_gib": 24.919,
+    "retained_models": ["Qwen3.5-4B RAG", "ASR", "bge-m3", "reranker"],
+    "historical_evidence_retained": true
+  },
+  "fixed_quality": {
+    "cases": 28,
+    "requests": 32,
+    "reused_requests": 0,
+    "model_seconds": 301.206,
+    "minimum_ram_free_mib": 4693,
+    "minimum_gpu_free_mib": 3562,
+    "resource_guard_breaches": 0,
+    "saved_schema_and_mapping_passes": 24,
+    "semantic_decision": "NOT_READY",
+    "current_task_blockers": ["QWEN38-QF-01", "QWEN38-QF-02", "QWEN38-QF-03", "QWEN38-QF-04"]
+  },
+  "offline_fix": {
+    "scope": "adjacent-clause omitted Chinese subject with unique, current, non-negated evidence",
+    "gold_016_revalidated": true,
+    "focused_tests": "86 passed, 1 warning",
+    "new_model_calls": 0
+  },
+  "package_budget": {
+    "qwen_requests_used": 46,
+    "qwen_request_limit": 80,
+    "qwen_seconds": 460.983,
+    "all_model_seconds": 535.483,
+    "all_model_seconds_limit": 7200,
+    "historical_unknowns_retained": ["candidate-01-screen-001"],
+    "new_unknowns": []
+  },
+  "runtime_decision": {
+    "delivery_8093_provider_switched": false,
+    "real_auto_work_orders_created": 0,
+    "concurrency_business_run_started": false,
+    "existing_real_rag_status": "PASS_SCOPED_REAL_RAG_UNCHANGED"
+  },
+  "independent_review": {
+    "path": "reports/codex/REAL-AI-INTEGRATION-027-QWEN38-Q3KM-FINAL-QUALITY.raw.json",
+    "verdict": "NOT_READY_FOR_BOUNDED_AUTO",
+    "fixed_evidence_sha256": "4ff70a59652f9709f10050436441afdf0604e57fd4c82b79ae54e42cc0f09f8d",
+    "observed_event_sha256": "caa9e28cd513e9d2252d8789e0b2c6be29a80348d916ff1ee6091bab451e25b7",
+    "observed_event_tests_sha256": "bebcdcac52b1026121775a71cff754bbe7b1c60d5819a4536cfd6eb632a25110"
+  },
+  "conclusion": "The Q3_K_M candidate is runnable within the bounded local resource floor but fails the required normal-task semantic quality gate. It must not be connected to 8093 AUTO. The accepted real RAG path remains separate and unchanged."
+}

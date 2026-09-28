@@ -1,0 +1,48 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-QWEN38-PREFLIGHT",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_head": "dd920f99d5e3478877b7c0dc3ff703b042aca5e8 + scoped WIP",
+  "verdict": "PASS_SCOPED_REPLACEMENT_RESERVATION",
+  "binding_sha256": "F819668FAAC7F5AEEC37EF646E9BA3D1DE26F35C3F3C8D5B44B55EDA8FE4311A",
+  "findings": [],
+  "closed_findings": [
+    {
+      "id": "QWEN38-PREFLIGHT-R1-01",
+      "status": "CLOSED",
+      "location": "D:/property-ai/reports/auth-identity-ai-001/local-qwen/run-quality28.py:69",
+      "evidence": "原大小写直接比较会拒绝实际大写哈希收据。现统一校验 64 位十六进制格式并按小写比较；直接测试覆盖大写绑定、畸形值、内容漂移、账本前缀漂移和审查收据漂移。"
+    }
+  ],
+  "reviewed_hashes": {
+    "collector": "A0EC4FEEA7BCB17281B758360A4471CBDFD80CC8DB7174D8C9D8BAE5CE0A246D",
+    "collector_tests": "CE465FD4686141716980742903F6CB2E54F61F545527F70C3F76576F0923A55E",
+    "preflight": "7CB985D0E9216BA0104B4B5D5438C1489CF0F1B7FE6CEED7C7E78AC3C4E43851",
+    "candidate_source": "29A2B5799BB6A7F871BD61C8D716C63D56F6362AD0A09192643B1CD3A4E26C9A",
+    "runtime": "E8C40582DAD3BBE023A4CDF55BB401C44A8024127F7F29F5BEC15EFE96237C98"
+  },
+  "checked": [
+    "实际读取指定资产转换、候选来源、运行绑定、预检、UNKNOWN 绑定、原解决记录、原复审及完整现有账本，并检查采集器准确差异和直接测试。",
+    "退役 Q4 27B、9B、2B 的本地 manifest 已不存在；4B manifest 保留且哈希与已验收 RAG 候选一致。精确删除方式和空闲前置来自保存的转换记录。",
+    "候选明确标注为社区量化，固定 HF revision 7af3b8fef254c9246345e0aa6dfc5ea8b5c45f02；来源记录声明 Apache-2.0，未冒称官方量化。",
+    "实际读取本地 Ollama manifest，确认分别包含 model 和 projector 层，其摘要和字节数与来源记录一致；两个 blob 的实际长度匹配，合计 14839695168 字节，低于 20 GiB。",
+    "manifest 摘要为 657092d0ef75f042cdf11db9db2280b19ad92da47457148f8f44252cec975e96；保存记录显示 Ollama 0.34.3、vision capability、零驻留及未执行推理。",
+    "原 candidate-01-screen-001 仍为 UNKNOWN；原账本哈希未变，既有两次请求及 90.88 秒仍计入预算。",
+    "解除预约阻断必须同时匹配原解决记录、原复审哈希、新审查 verdict 与 binding 哈希、唯一追加收据及原始账本前缀；任何其他 UNKNOWN 仍阻断。",
+    "替换分支仅允许固定 qwen38-27b-q3km:7af3b8f、candidate 2；首例 PHOTO-002 先执行 VLM。screen、fixed、novel 之间继续绑定同一候选、协议、输入、控制参数和运行身份。",
+    "累计 80 次、7200 秒及 2026-09-29T14:36:10Z 截止未重置；冷启动 GPU 8200 MiB、运行 GPU 2000 MiB/RAM 4500 MiB、180 秒请求及清理余量仍保留。",
+    "当前账本尚未追加解除收据或替换候选预约；本结论只放行严格条件满足后的预约，不是模型质量或 AUTO PASS。"
+  ],
+  "tests_evidence": {
+    "initial_report": "26 passed，1 个既有 warning。",
+    "final_report": "27 passed，1 个既有 pytest-asyncio warning。",
+    "boundary": "实际读取最终测试源码及更新后的预检记录；测试结果为实施方保存的报告，审查者没有运行测试。"
+  },
+  "unverified": [
+    "没有重新计算约 14.8 GB blob 全文哈希；读取了实施方校验收据，并独立核对本地 manifest 哈希、层摘要和文件长度。",
+    "没有在线访问 HF 或查询当前 Ollama；许可、vision capability、零驻留和运行状态采用保存记录，不等于实际图片推理验证。",
+    "尚无替换候选的有效图片、文字、固定集或 novel 质量结果，也没有真实 AUTO。",
+    "既有 RAG scoped PASS 保留，但未重跑 RAG；Production 未通过。",
+    "审查者未修改文件，未运行模型、页面、业务、数据库、队列或进程操作，未创建其他审查者。"
+  ],
+  "next_action": "原样保存本审查，并按绑定要求追加唯一 REVIEWED_UNKNOWN_RESOLUTION 收据；重新核对实时资源和绑定身份后，才可在原预算及截止内执行 PHOTO-002 首例。保留旧 UNKNOWN；出现任何新 UNKNOWN、资源越界或绑定漂移立即停止，不自动重放，不切换业务 AUTO。"
+}

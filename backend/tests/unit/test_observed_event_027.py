@@ -332,6 +332,45 @@ def test_subject_must_be_supported_by_selected_server_evidence():
         bind(value, report=value["summary"])
 
 
+@pytest.mark.parametrize(("text", "label", "subject"), [
+    ("插座刚才有一缕烟，现在没有了。", "现象待核实", "插座"),
+    ("厨房进水软管裂开，水一直喷出。", "滴渗水", "阀门管道"),
+    ("卫生间天花板有一片新水渍，还在缓慢滴水。", "滴渗水", "天花墙面"),
+    ("关于此刻同一个厨房水龙头，一人说水不断流出，另一人说完全不出水。", "现象待核实", "水龙头"),
+    ("阀体表面蓝色涂层明显磨损和掉漆，露出金属底色。", "表面剥落", "阀门管道"),
+])
+def test_equivalent_observation_and_local_unique_subject_carry(text, label, subject):
+    _, trace = bind(payload(text, label=label, subject=subject), report=text)
+    assert trace["observations"][0]["subject"] == subject
+
+
+def test_subject_carry_does_not_cross_a_sentence_boundary():
+    text = "插座刚才有一缕烟。现在没有了。"
+    with pytest.raises(ValueError, match="Subject not supported"):
+        bind(payload(text, label="现象待核实", subject="插座", evidence_id="report:2"), report=text)
+
+
+def test_label_specific_subject_carry_rejects_a_negated_prior_subject():
+    text = "不是空调，出风但不凉。"
+    with pytest.raises(ValueError, match="Subject not supported"):
+        bind(payload(text, label="不制冷", subject="空调"), report=text)
+
+
+@pytest.mark.parametrize("text", [
+    "我怀疑天花板有问题，还在缓慢滴水。",
+    "洗手盆下面有水，电表还在缓慢滴水。",
+])
+def test_subject_carry_rejects_uncertain_or_competing_prior_subject(text):
+    with pytest.raises(ValueError, match="Subject not supported"):
+        bind(payload(text, label="滴渗水", subject="天花墙面"), report=text)
+
+
+def test_subject_carry_rejects_the_same_negated_prior_subject():
+    text = "不是水龙头，正在滴水。"
+    with pytest.raises(ValueError, match="Subject not supported"):
+        bind(payload(text, label="滴渗水", subject="水龙头"), report=text)
+
+
 def test_visible_pooled_water_uses_existing_water_stain_event():
     value = payload("厨房地面已经积水并流向客厅", label="水渍", subject="楼道地面")
     value.update(risk="flooding", severity="high", priority="p1")

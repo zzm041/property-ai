@@ -1,0 +1,64 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "checkpoint": "QWEN38_Q3KM_REPLACEMENT_PREFLIGHT",
+  "recorded_at_utc": "2026-09-28T12:47:47.2181910Z",
+  "source_head": "dd920f99d5e3478877b7c0dc3ff703b042aca5e8",
+  "candidate": "qwen38-27b-q3km:7af3b8f",
+  "source_revision": "7af3b8fef254c9246345e0aa6dfc5ea8b5c45f02",
+  "community_quantization": true,
+  "download": {
+    "model_bytes": 14210448032,
+    "model_sha256": "FA09D2FBE7D10FE6D91D3E647BD5A2782EC028C2ACD9588DD73C9757F82D9631",
+    "projector_bytes": 629247136,
+    "projector_sha256": "9793AB158AEFDCE41D531D37A5458287DCDFC2D10585F4AF106802810DFC2618",
+    "total_bytes": 14839695168,
+    "asset_limit_bytes": 21474836480,
+    "duplicate_download_sources_removed_after_import_verification": true
+  },
+  "ollama_import": {
+    "endpoint": "127.0.0.1:11435",
+    "version": "0.34.3",
+    "manifest_sha256": "657092D0EF75F042CDF11DB9DB2280B19AD92DA47457148F8F44252CEC975E96",
+    "model_layer_sha256": "FA09D2FBE7D10FE6D91D3E647BD5A2782EC028C2ACD9588DD73C9757F82D9631",
+    "projector_layer_sha256": "9793AB158AEFDCE41D531D37A5458287DCDFC2D10585F4AF106802810DFC2618",
+    "projector_media_type": "application/vnd.ollama.image.projector",
+    "capabilities": ["tools", "thinking", "completion", "vision"],
+    "quantization": "Q3_K_M",
+    "resident_models": 0,
+    "inference_performed": false
+  },
+  "resource_observation": {
+    "ram_free_mib": 13833,
+    "gpu_free_mib": 14558,
+    "ram_floor_mib": 4500,
+    "gpu_floor_mib": 2000,
+    "status": "ELIGIBLE_FOR_ONE_REVIEWED_FIRST_IMAGE_REQUEST_NOT_RUNTIME_PASS"
+  },
+  "budget": {
+    "ledger_sha256_before_resolution_receipt": "4EED83C04B31F0856C5364FE5830F8D0D908B7DAFC4DF23611B0652E5848F7F3",
+    "historical_qwen_attempts": 2,
+    "historical_model_seconds": 90.88,
+    "old_unknown_preserved": true,
+    "new_qwen_requests_this_checkpoint": 0,
+    "new_unknowns": 0,
+    "limit": 80,
+    "seconds_limit": 7200,
+    "deadline_utc": "2026-09-29T14:36:10Z"
+  },
+  "focused_tests": {
+    "result": "27 passed, 1 existing pytest-asyncio warning",
+    "inference": false,
+    "business_io": false
+  },
+  "bindings": {
+    "asset_transition_sha256": "86AD4F01FE9858FE5ED5F350038B5C5A9F3632DB0206D34C85B490D3727C8368",
+    "candidate_source_sha256": "29A2B5799BB6A7F871BD61C8D716C63D56F6362AD0A09192643B1CD3A4E26C9A",
+    "runtime_sha256": "E8C40582DAD3BBE023A4CDF55BB401C44A8024127F7F29F5BEC15EFE96237C98",
+    "unknown_resolution_binding_sha256": "F819668FAAC7F5AEEC37EF646E9BA3D1DE26F35C3F3C8D5B44B55EDA8FE4311A",
+    "collector_sha256": "A0EC4FEEA7BCB17281B758360A4471CBDFD80CC8DB7174D8C9D8BAE5CE0A246D",
+    "collector_test_sha256": "CE465FD4686141716980742903F6CB2E54F61F545527F70C3F76576F0923A55E",
+    "modelfile_sha256": "C5C9EB87D3F43D08E847DF475D01AE68B44B4C8194E81D414DA804E1680ED86B"
+  },
+  "next_gate": "INDEPENDENT_READ_ONLY_REVIEW_REQUIRED_BEFORE_LEDGER_RECEIPT_AND_FIRST_IMAGE_REQUEST",
+  "real_auto_allowed": false
+}

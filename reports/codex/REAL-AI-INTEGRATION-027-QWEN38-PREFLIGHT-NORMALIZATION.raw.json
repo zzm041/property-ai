@@ -1,0 +1,41 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-QWEN38-LEDGER-NORMALIZATION",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_head": "dd920f99d5e3478877b7c0dc3ff703b042aca5e8 + scoped WIP",
+  "verdict": "PASS_SCOPED_LEDGER_NORMALIZATION",
+  "normalization_sha256": "53ADDC7533A2CD15330A2C76A688B69B553A2F33E7475C84F179D3E31D0D8FA3",
+  "findings": [],
+  "reviewed_hashes": {
+    "collector": "71685199E55B74D35A370BDBB4CF5DAD7CA6E78F2A77B9DADFC18D66C3F78313",
+    "collector_tests": "F4480A78B07D1D48461A1FA4A67E7C02DEEC13737C71C311FCED3E5972DE0074",
+    "parent_binding": "F819668FAAC7F5AEEC37EF646E9BA3D1DE26F35C3F3C8D5B44B55EDA8FE4311A",
+    "parent_review": "CC769FB7BC454092AA374278B0303F4445DA3414A0788EA59D03220447D4896B"
+  },
+  "checked": [
+    "实际读取指定文件、准确差异、原审查及当前完整六行账本。",
+    "前五行与 HEAD 中历史账本逐行比较，排除换行符后文本完全一致，事件顺序未变；第六行仅为唯一 REVIEWED_UNKNOWN_RESOLUTION 收据。",
+    "独立计算的归一化前缀、规范化事件、收据行及截至收据的账本哈希，均与 normalization 记录一致。",
+    "candidate-01-screen-001 的原完成状态仍为 UNKNOWN；既有两次请求和 90.88 秒模型用量仍计入，没有新增 RESERVED 或 COMPLETED。",
+    "运行守卫要求匹配原绑定、原复审、归一化记录、唯一收据、前缀字节哈希、事件哈希、行数和新审查 verdict/normalization 哈希；不是通用放宽换行或内容校验。",
+    "事件内容、顺序、新增前缀行或收据发生变化会导致绑定校验失败；重复收据也被拒绝。",
+    "仅豁免已审历史请求的预约阻断，任何不同请求的新 UNKNOWN 仍由预算守卫阻断。",
+    "没有增加调用次数、模型时间或截止额度；没有发现本次增量的当前任务阻塞。"
+  ],
+  "verified_ledger_hashes": {
+    "normalized_prefix": "3B66204BFD8597BA4EDD152227D918FF9F1D2BF30AB93A1D6A7D2196BCF15DDC",
+    "canonical_prefix_events": "2D6EB44CBDB1C7CC2AAF7ED07A53B64B4392B7F1FE2C363051A5453CFE169763",
+    "receipt_line": "307120FBBB5D3C56C427A10D5AA77786EB02CE118E7126C4100A790145001879",
+    "ledger_through_receipt": "4683CCD7973F3DB35A12C360A9EB47623CAFC8E158450434C55CA1E7BCE5E7B1"
+  },
+  "tests_evidence": {
+    "first_run": "实施方报告：25 passed，3 个默认临时目录权限导致的 setup errors。",
+    "isolated_basetemp_run": "实施方报告：28 passed，1 个既有 warning。",
+    "boundary": "实际读取直接测试及断言，未运行测试；上述运行数字来自实施方报告，不能包装成首次全部通过。"
+  },
+  "unverified": [
+    "未运行模型、页面、业务、数据库、队列或进程操作，未修改工作区，未创建审查者。",
+    "当前账本没有新增推理预约；未以在线模型查询另行核实。",
+    "尚无替换候选的质量或真实 AUTO 验收结果；本结论不升级为模型、RAG 或 Production PASS。"
+  ],
+  "next_action": "原样保存本审查供归一化守卫核对；现有唯一解除收据不得再次追加。随后仅在既有授权、实时资源、身份和冻结配置均满足时继续原候选预约；新 UNKNOWN 或任何绑定漂移仍立即阻断。"
+}

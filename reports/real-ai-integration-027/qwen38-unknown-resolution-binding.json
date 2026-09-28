@@ -1,0 +1,22 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "decision": "ALLOW_DIFFERENT_FROZEN_CANDIDATE_AFTER_REVIEWED_CURRENT_EXIT",
+  "request_id": "candidate-01-screen-001",
+  "historical_remote_completion": "UNKNOWN",
+  "historical_result_must_remain_unchanged": true,
+  "replacement_candidate": "qwen38-27b-q3km:7af3b8f",
+  "resolution_path": "reports/real-ai-integration-027/diagnostic-r3-27b/candidate-01/request-current-resolution.json",
+  "resolution_sha256": "224DB8B7C6BD0B56166E2A08AB3DF442718C190DFEA61EFF0409D7253738AF17",
+  "ledger_prefix_sha256": "4EED83C04B31F0856C5364FE5830F8D0D908B7DAFC4DF23611B0652E5848F7F3",
+  "prior_incremental_review_path": "reports/codex/REAL-AI-INTEGRATION-027-27B-STOP-RAG-RECOVERY-round2.raw.json",
+  "prior_incremental_review_sha256": "CA93BA9889FA3F0C15A3BC20D7F234C52763193ACC23E50E5256DD82C128DF83",
+  "review_path": "reports/codex/REAL-AI-INTEGRATION-027-QWEN38-PREFLIGHT.raw.json",
+  "required_review_verdict": "PASS_SCOPED_REPLACEMENT_RESERVATION",
+  "budget_effect": {
+    "additional_allowance": 0,
+    "old_request_still_counted": true,
+    "old_model_seconds_still_counted": true,
+    "new_unknowns_still_block": true
+  },
+  "authorization": "Owner approved exact current-exit binding followed by the single frozen Qwen3.8 Q3_K_M replacement candidate; this does not rewrite or replay the old request."
+}

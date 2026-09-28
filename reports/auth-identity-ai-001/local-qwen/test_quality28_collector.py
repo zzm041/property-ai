@@ -1,4 +1,5 @@
 """Collector-only checks; no inference, business requests or fixtures."""
+import hashlib
 import json
 import subprocess
 from pathlib import Path
@@ -33,6 +34,131 @@ def test_budget_blocks_transport_failure_without_remote_response():
          'remote_completion':'UNKNOWN'},
     ])
     assert state=={'attempted':1,'model_seconds':60.0,'unknown':['request-1']}
+
+def test_reviewed_resolution_preserves_attempt_and_time_but_only_unblocks_exact_request():
+    state=helpers['budget_state_from_events']([
+        {'event':'RESERVED','request_id':'old-request'},
+        {'event':'COMPLETED','request_id':'old-request','model_seconds':11.0,
+         'remote_completion':'UNKNOWN'},
+        {'event':'RESERVED','request_id':'new-request'},
+        {'event':'COMPLETED','request_id':'new-request','model_seconds':7.0,
+         'remote_completion':'UNKNOWN'},
+    ],frozenset({'old-request'}))
+    assert state=={'attempted':2,'model_seconds':18.0,'unknown':['new-request']}
+
+def test_sha_binding_accepts_case_only_and_rejects_malformed_or_drifted_values(tmp_path):
+    evidence=tmp_path/'evidence.json'
+    evidence.write_text('{}',encoding='utf-8')
+    digest=helpers['sha'](evidence)
+    assert helpers['sha_matches'](digest.upper(),evidence)
+    assert not helpers['sha_matches']('G'*64,evidence)
+    assert not helpers['sha_matches'](digest[:-1]+'0',evidence)
+
+def test_reviewed_unknown_resolution_requires_exact_evidence_review_and_receipt(tmp_path,monkeypatch):
+    monkeypatch.setitem(helpers['reviewed_resolution_ids'].__globals__,'ROOT',tmp_path)
+    evidence=tmp_path/'reports'/'evidence.json';review=tmp_path/'reports'/'review.json'
+    binding=tmp_path/'reports'/'binding.json';evidence.parent.mkdir()
+    evidence.write_text(json.dumps({
+        'request_id':'old-request','historical_immediate_remote_completion':'UNKNOWN',
+        'current_execution_state':'NOT_EXECUTING',
+    }),encoding='utf-8')
+    prior_review=tmp_path/'reports'/'prior-review.json'
+    prior_review.write_text(json.dumps({'verdict':'PASS_SCOPED_INCREMENTAL'}),encoding='utf-8')
+    rows=[
+        {'event':'RESERVED','request_id':'old-request'},
+        {'event':'COMPLETED','request_id':'old-request','model_seconds':11.0,
+         'remote_completion':'UNKNOWN'},
+    ]
+    original_prefix=('\r\n'.join(json.dumps(row,separators=(',',':')) for row in rows)+'\r\n').encode()
+    normalized_prefix=('\n'.join(json.dumps(row,separators=(',',':')) for row in rows)+'\n').encode()
+    binding_payload={
+        'decision':'ALLOW_DIFFERENT_FROZEN_CANDIDATE_AFTER_REVIEWED_CURRENT_EXIT',
+        'request_id':'old-request','resolution_path':'reports/evidence.json',
+        'resolution_sha256':helpers['sha'](evidence).upper(),'review_path':'reports/review.json',
+        'prior_incremental_review_path':'reports/prior-review.json',
+        'prior_incremental_review_sha256':helpers['sha'](prior_review).upper(),
+        'ledger_prefix_sha256':hashlib.sha256(original_prefix).hexdigest().upper(),
+    }
+    binding.write_text(json.dumps(binding_payload),encoding='utf-8')
+    review.write_text(json.dumps({
+        'verdict':'PASS_SCOPED_REPLACEMENT_RESERVATION',
+        'binding_sha256':helpers['sha'](binding).upper(),
+    }),encoding='utf-8')
+    events=[
+        *rows,
+        {'event':'REVIEWED_UNKNOWN_RESOLUTION','request_id':'old-request',
+         'binding_sha256':helpers['sha'](binding).upper(),'review_sha256':helpers['sha'](review).upper()},
+    ]
+    ledger=tmp_path/'reports'/'ledger.jsonl'
+    receipt_line=(json.dumps(events[-1],separators=(',',':'))+'\n').encode()
+    ledger.write_bytes(normalized_prefix+receipt_line)
+    normalization=tmp_path/'reports'/'real-ai-integration-027'/'qwen38-ledger-normalization.json'
+    normalization.parent.mkdir()
+    normalization_review=tmp_path/'reports'/'normalization-review.json'
+    normalization.write_text(json.dumps({
+        'decision':'ACCEPT_LINE_ENDING_NORMALIZATION_WITH_IDENTICAL_LEDGER_EVENTS',
+        'request_id':'old-request',
+        'parent_binding_sha256':helpers['sha'](binding).upper(),
+        'parent_review_sha256':helpers['sha'](review).upper(),
+        'original_raw_prefix_sha256':hashlib.sha256(original_prefix).hexdigest().upper(),
+        'normalized_raw_prefix_sha256':hashlib.sha256(normalized_prefix).hexdigest().upper(),
+        'canonical_prefix_events_sha256':helpers['canonical_rows_sha256'](rows).upper(),
+        'pre_receipt_event_count':len(rows),
+        'receipt_line_sha256':hashlib.sha256(receipt_line).hexdigest().upper(),
+        'ledger_through_receipt_sha256':hashlib.sha256(normalized_prefix+receipt_line).hexdigest().upper(),
+        'review_path':'reports/normalization-review.json',
+    }),encoding='utf-8')
+    normalization_review.write_text(json.dumps({
+        'verdict':'PASS_SCOPED_LEDGER_NORMALIZATION',
+        'normalization_sha256':helpers['sha'](normalization).upper(),
+    }),encoding='utf-8')
+    assert helpers['reviewed_resolution_ids'](events,binding,ledger)==frozenset({'old-request'})
+    ledger.write_bytes(b' '+normalized_prefix+receipt_line)
+    with pytest.raises(RuntimeError,match='UNKNOWN_RESOLUTION_SEMANTICS'):
+        helpers['reviewed_resolution_ids'](events,binding,ledger)
+    ledger.write_bytes(normalized_prefix+receipt_line)
+    events[-1]['review_sha256']='0'*64
+    with pytest.raises(RuntimeError,match='UNKNOWN_RESOLUTION_SEMANTICS'):
+        helpers['reviewed_resolution_ids'](events,binding,ledger)
+
+def test_reviewed_unknown_resolution_rejects_semantic_or_receipt_drift(tmp_path,monkeypatch):
+    monkeypatch.setitem(helpers['reviewed_resolution_ids'].__globals__,'ROOT',tmp_path)
+    reports=tmp_path/'reports';reports.mkdir()
+    evidence=reports/'evidence.json';prior=reports/'prior.json';review=reports/'review.json';binding=reports/'binding.json'
+    evidence.write_text(json.dumps({'request_id':'old','historical_immediate_remote_completion':'UNKNOWN','current_execution_state':'NOT_EXECUTING'}),encoding='utf-8')
+    prior.write_text('{}',encoding='utf-8')
+    rows=[{'event':'RESERVED','request_id':'old'},{'event':'COMPLETED','request_id':'old','model_seconds':1,'remote_completion':'UNKNOWN'}]
+    original=('\r\n'.join(json.dumps(x,separators=(',',':')) for x in rows)+'\r\n').encode()
+    binding.write_text(json.dumps({'decision':'ALLOW_DIFFERENT_FROZEN_CANDIDATE_AFTER_REVIEWED_CURRENT_EXIT','request_id':'old','resolution_path':'reports/evidence.json','resolution_sha256':helpers['sha'](evidence),'review_path':'reports/review.json','prior_incremental_review_path':'reports/prior.json','prior_incremental_review_sha256':helpers['sha'](prior),'ledger_prefix_sha256':hashlib.sha256(original).hexdigest()}),encoding='utf-8')
+    review.write_text(json.dumps({'verdict':'PASS_SCOPED_REPLACEMENT_RESERVATION','binding_sha256':helpers['sha'](binding)}),encoding='utf-8')
+    receipt={'event':'REVIEWED_UNKNOWN_RESOLUTION','request_id':'old','binding_sha256':helpers['sha'](binding),'review_sha256':helpers['sha'](review)}
+    events=rows+[receipt];prefix=('\n'.join(json.dumps(x,separators=(',',':')) for x in rows)+'\n').encode();receipt_line=(json.dumps(receipt,separators=(',',':'))+'\n').encode()
+    ledger=reports/'ledger.jsonl';ledger.write_bytes(prefix+receipt_line)
+    norm=reports/'real-ai-integration-027'/'qwen38-ledger-normalization.json';norm.parent.mkdir();norm_review=reports/'norm-review.json'
+    norm.write_text(json.dumps({'decision':'ACCEPT_LINE_ENDING_NORMALIZATION_WITH_IDENTICAL_LEDGER_EVENTS','request_id':'old','parent_binding_sha256':helpers['sha'](binding),'parent_review_sha256':helpers['sha'](review),'original_raw_prefix_sha256':hashlib.sha256(original).hexdigest(),'normalized_raw_prefix_sha256':hashlib.sha256(prefix).hexdigest(),'canonical_prefix_events_sha256':helpers['canonical_rows_sha256'](rows),'pre_receipt_event_count':2,'receipt_line_sha256':hashlib.sha256(receipt_line).hexdigest(),'ledger_through_receipt_sha256':hashlib.sha256(prefix+receipt_line).hexdigest(),'review_path':'reports/norm-review.json'}),encoding='utf-8')
+    norm_review.write_text(json.dumps({'verdict':'PASS_SCOPED_LEDGER_NORMALIZATION','normalization_sha256':helpers['sha'](norm)}),encoding='utf-8')
+    altered=[dict(rows[0]),{**rows[1],'model_seconds':2},receipt]
+    altered_prefix=('\n'.join(json.dumps(x,separators=(',',':')) for x in altered[:2])+'\n').encode();ledger.write_bytes(altered_prefix+receipt_line)
+    with pytest.raises(RuntimeError,match='UNKNOWN_RESOLUTION_SEMANTICS'):
+        helpers['reviewed_resolution_ids'](altered,binding,ledger)
+    ledger.write_bytes(prefix+receipt_line+receipt_line)
+    with pytest.raises(RuntimeError,match='UNKNOWN_RESOLUTION_SEMANTICS'):
+        helpers['reviewed_resolution_ids'](events+[receipt],binding,ledger)
+
+def test_qwen38_screen_starts_with_real_image_and_is_one_frozen_replacement_candidate():
+    screen=helpers['QWEN38_SCREEN_IDS']
+    assert len(screen)==8 and screen[0]=='PHOTO-002'
+    assert sum(case_id.startswith('PHOTO-') for case_id in screen)==2
+    source=Path(helpers['__file__']).read_text(encoding='utf-8')
+    assert "if qwen38:assert args.candidate==2" in source
+    assert "QWEN38_MODEL='qwen38-27b-q3km-g52:7af3b8f'" in source
+    assert "if bounded_candidate and args.phase=='fixed' and args.candidate==1:" in source
+
+def test_delivery_ollama_runtime_reserves_qwen38_resource_headroom():
+    source=(Path(helpers['__file__']).parents[3]/'deploy'/'ollama-runtime.ps1').read_text(encoding='utf-8-sig')
+    assert '[long]$GpuOverheadBytes = 5368709120' in source
+    assert '$env:OLLAMA_GPU_OVERHEAD = [string]$GpuOverheadBytes' in source
+    assert 'gpu_reserved_bytes = $GpuOverheadBytes' in source
 
 def test_budget_accepts_response_backed_provider_rejection():
     state=helpers['budget_state_from_events']([
@@ -130,7 +256,8 @@ def test_collector_failure_recovery_runs_only_unattempted_last_photo():
 def test_photo_mechanical_check_does_not_require_text_accept_matrix():
     source=Path(helpers['__file__']).read_text(encoding='utf-8')
     assert "accepted=[] if is_photo else" in source
-    assert "phase_label=('screen-continuation-recovery'" in source
+    assert "'screen-continuation-recovery' if args.resume_screen_collector_failure" in source
+    assert "'screen-g52' if args.resume_resource_adjusted_screen" in source
 
 def test_screen_resume_source_compatibility_ignores_only_collector():
     collector=helpers['COLLECTOR_PATH']
