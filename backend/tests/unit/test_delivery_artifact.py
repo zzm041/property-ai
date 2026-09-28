@@ -188,6 +188,7 @@ def test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded() -> Non
     assert 'port=11437' in runtime
     assert 'runtime_binding_sha256=' in runtime
     assert 'runtime_binding_sha256=(Get-FileHash' in runtime and '.Hash.ToLowerInvariant()' in runtime
+    assert '([DateTimeOffset]$ollama.started_at_utc).UtcDateTime.ToString("o")' in runtime
     assert 'asr_start_ram_mib=11264' in runtime
     assert 'qwen=18' in runtime and 'duration_seconds=7200' in runtime
     assert 'git -C $RepoRoot archive' in runtime

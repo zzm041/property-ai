@@ -120,7 +120,7 @@ function New-RuntimeBinding {
     $binding = [ordered]@{
         pid = [int]$ollama.pid
         executable = [string]$ollama.executable
-        launched_at_utc = [string]$ollama.started_at_utc
+        launched_at_utc = ([DateTimeOffset]$ollama.started_at_utc).UtcDateTime.ToString("o")
         listener = "127.0.0.1:11435"
         source_receipt_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $OllamaCurrent).Hash
     }
