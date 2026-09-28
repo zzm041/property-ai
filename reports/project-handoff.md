@@ -2,7 +2,7 @@
 
 ## Current checkpoint — Qwen3.8 27B Q3_K_M fixed set completed; semantic gate NOT READY (2026-09-28)
 
-Current HEAD remains `dd920f99d5e3478877b7c0dc3ff703b042aca5e8` plus scoped, uncommitted REAL-AI-INTEGRATION-027 WIP. The fixed deadline remains **2026-09-29 22:36:10 Asia/Shanghai**. The accepted 8093 real-RAG result remains unchanged; work-order analysis on 8093 was **not** switched and no real-AUTO work order or concurrency business run was created.
+Current scoped source/evidence milestone is `485d7e7` (reviewed from base `dd920f99d5e3478877b7c0dc3ff703b042aca5e8` with hashes bound before commit). The fixed deadline remains **2026-09-29 22:36:10 Asia/Shanghai**. The accepted 8093 real-RAG result remains unchanged; work-order analysis on 8093 was **not** switched and no real-AUTO work order or concurrency business run was created.
 
 The exact community candidate is `qtum/Qwen3.8-27B-GGUF` Q3_K_M revision `7af3b8fef254c9246345e0aa6dfc5ea8b5c45f02`, loaded as `qwen38-27b-q3km-g52:7af3b8f` with manifest digest `cb8f818e5c95a3825d1febea2fbeee5a95216cb759c6793b439d0d074ba8db6b`, 4096 context, temperature 0 and 52 GPU layers. The retired Qwen3.5 27B Q4, 9B and 2B assets were removed through the project-owned Ollama endpoint after idle/ownership checks, releasing 24.919 GiB; the 4B RAG, ASR, bge-m3 and reranker assets were retained. Source/digest/history evidence remains in `reports/real-ai-integration-027/qwen38-asset-transition.json` and the Qwen38 candidate/runtime records.
 
