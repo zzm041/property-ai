@@ -1,0 +1,49 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "set_version": "qwen38-v12-novel-v1",
+  "frozen_before_first_inference": true,
+  "frozen_at_utc": "2026-09-28T16:20:00Z",
+  "scope": "Four synthetic Chinese text cases frozen before the v12 candidate inference. They distinguish component identification from supported repair evidence and are not used to tune the v12 prompt.",
+  "cases": [
+    {
+      "id": "NOVEL-Q3-001",
+      "tags": ["部件识别", "无故障证据", "禁止派单"],
+      "report": "这是仓库里尚未安装、也没有接水的备用球阀。我只想登记它是什么部件，目前没有看到渗水、破损或松动，也没有提出维修请求。",
+      "history": [],
+      "facts": ["备用球阀未安装未接水", "仅识别部件", "没有可见故障或维修诉求"],
+      "forbidden": ["正在漏水", "阀门损坏", "自动派维修人员", "高置信维修事件"],
+      "accept": [["other", "other", ["none"]]],
+      "manual": "LOW"
+    },
+    {
+      "id": "NOVEL-Q3-002",
+      "tags": ["真实损坏", "排水接头", "普通维修"],
+      "report": "厨房洗手盆下方的排水接头已经裂开，现在每隔几秒滴一滴水，地面只有几滴，没有流到插座附近，请安排维修。",
+      "history": [],
+      "facts": ["排水接头裂开并持续少量滴水", "地面只有少量水", "未接近插座", "存在维修诉求"],
+      "forbidden": ["水龙头漏水", "大面积积水", "电气危险", "仅识别部件"],
+      "accept": [["water_supply", "maintenance", ["none"]]],
+      "manual": "RULES"
+    },
+    {
+      "id": "NOVEL-Q3-003",
+      "tags": ["正常对照", "供水与水渍分离", "位置未知"],
+      "report": "卫生间的水龙头完全不出水，但厨房水龙头供水正常。其他房间还没检查，现场没有水渍或积水，也不知道阀门状态。",
+      "history": [],
+      "facts": ["卫生间水龙头不出水", "厨房供水正常", "没有水渍积水", "其他位置和阀门状态未知"],
+      "forbidden": ["厨房有水渍", "整栋停水", "阀门已关闭", "漏水"],
+      "accept": [["water_supply", "maintenance", ["none"]]],
+      "manual": "RULES"
+    },
+    {
+      "id": "NOVEL-Q3-004",
+      "tags": ["主诉明确", "部件未确定", "风险保留"],
+      "report": "配电箱旁边有一个外壳刚才冒出火花并留下黑色烧痕，但我看不清具体是什么部件；现在没有烟，也没人受伤，请尽快处理。",
+      "history": [],
+      "facts": ["未确定部件出现火花和烧焦变色", "当前无烟无人受伤", "存在明确维修诉求"],
+      "forbidden": ["确定是插座", "确定是配电箱内部", "已经安全", "忽略电气风险"],
+      "accept": [["electrical", "maintenance", ["electric"]]],
+      "manual": "RISK"
+    }
+  ]
+}

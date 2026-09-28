@@ -233,6 +233,39 @@ def test_invalid_information_cannot_be_dropped_without_a_valid_effective_fault()
         bind(value, report=text)
 
 
+def test_unsupported_cosmetic_vision_extra_does_not_hide_supported_electrical_danger():
+    vision = "插座一个插孔有明显黑色烧灼痕迹，周围墙面有粗糙修补痕迹。"
+    value = payload(vision, label="烧焦变色", subject="插座", evidence_id="vision:1")
+    value.update(category="electrical", required_skill="maintenance", risk="electric")
+    value["observations"].append({
+        "label": "表面剥落", "subject": "天花墙面", "evidence_id": "vision:1",
+    })
+    _, trace = bind(value, vision=vision)
+    assert [row["label"] for row in trace["effective_observations"]] == ["烧焦变色"]
+    assert trace["ignored_observations"][0]["disposition"] == "NOT_TRUSTED_REDUNDANT_OBSERVATION"
+    assert "noncritical cosmetic" in trace["ignored_observations"][0]["ignored_reason"]
+    assert trace["raw_model_output"] == value
+
+
+@pytest.mark.parametrize("category,risk", [("other", "none"), ("electrical", "none")])
+def test_unsupported_cosmetic_vision_extra_cannot_be_dropped_without_independent_danger(category, risk):
+    vision = "蓝色阀门平放在地面，表面有反光和正常金属连接件。"
+    value = payload(vision, label="表面剥落", subject="阀门管道", evidence_id="vision:1")
+    value.update(category=category, required_skill="maintenance", risk=risk)
+    with pytest.raises(ValueError, match="Evidence does not support"):
+        bind(value, vision=vision)
+
+
+def test_cosmetic_extra_from_another_source_cannot_be_dropped_from_vision_danger():
+    value = payload("墙面有粗糙修补痕迹。", label="表面剥落", subject="天花墙面")
+    value.update(category="electrical", required_skill="maintenance", risk="electric")
+    value["observations"].insert(0, {
+        "label": "烧焦变色", "subject": "插座", "evidence_id": "vision:1",
+    })
+    with pytest.raises(ValueError, match="Evidence does not support"):
+        bind(value, report="墙面有粗糙修补痕迹。", vision="插座有明显黑色烧灼痕迹。")
+
+
 def test_saved_q03_outputs_accept_core_fault_and_record_ignored_redundancy():
     service = AnalysisService.__new__(AnalysisService)
     service._settings = Settings(_env_file=None, llm_provider="production")

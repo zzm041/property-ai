@@ -24,7 +24,7 @@ NINE_B_TOTAL_MODEL_SECONDS=7200
 NINE_B_START_GPU_FREE_MIB=8200
 NINE_B_RESIDENT_REQUEST_GPU_FREE_MIB=2500
 TWENTY_SEVEN_B_MODEL='qwen3.5:27b-q4_K_M'
-TWENTY_SEVEN_B_TOTAL_CALL_LIMIT=80
+TWENTY_SEVEN_B_TOTAL_CALL_LIMIT=120
 TWENTY_SEVEN_B_REQUEST_TIMEOUT_SECONDS=180
 TWENTY_SEVEN_B_RESIDENT_REQUEST_GPU_FREE_MIB=2000
 TWENTY_SEVEN_B_ADMISSION_OVERHEAD_MIB=1536
@@ -36,7 +36,7 @@ QWEN38_CANDIDATE_SOURCE=ROOT/'reports/real-ai-integration-027/qwen38-27b-q3km-ca
 QWEN38_RUNTIME=ROOT/'reports/real-ai-integration-027/qwen38-27b-q3km-runtime.json'
 QWEN38_UNKNOWN_RESOLUTION_BINDING=ROOT/'reports/real-ai-integration-027/qwen38-unknown-resolution-binding.json'
 QWEN38_LEDGER_NORMALIZATION=ROOT/'reports/real-ai-integration-027/qwen38-ledger-normalization.json'
-QWEN38_SCREEN_IDS=('PHOTO-002','GOLD-005','GOLD-006','GOLD-008','GOLD-012','GOLD-018','GOLD-021','PHOTO-004')
+QWEN38_SCREEN_IDS=('GOLD-007','GOLD-008','GOLD-012','GOLD-018','GOLD-022','GOLD-024','PHOTO-003','PHOTO-004')
 COLLECTOR_PATH='reports/auth-identity-ai-001/local-qwen/run-quality28.py'
 NINE_B_RESUME_BINDING=ROOT/'reports/real-ai-integration-027/qwen35-9b-resume-binding.json'
 NINE_B_COLLECTOR_RECOVERY_BINDING=ROOT/'reports/real-ai-integration-027/qwen35-9b-collector-recovery-binding.json'
@@ -334,7 +334,7 @@ def main():
         sys.argv.remove('--supplement')
         runpy.run_path(str(OUT/'run-approved-supplement.py'), run_name='__main__')
         return
-    parser=argparse.ArgumentParser();parser.add_argument('--round',type=int,choices=range(4));parser.add_argument('--model',choices=('qwen3.5:4b','qwen3.5:9b',TWENTY_SEVEN_B_MODEL,QWEN38_MODEL),default='qwen3.5:4b');parser.add_argument('--phase',choices=('screen','fixed','novel'));parser.add_argument('--candidate',type=int,choices=(1,2,3));parser.add_argument('--resume-incomplete-screen',action='store_true');parser.add_argument('--resume-screen-collector-failure',action='store_true');parser.add_argument('--resume-resource-adjusted-screen',action='store_true');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--round',type=int,choices=range(4));parser.add_argument('--model',choices=('qwen3.5:4b','qwen3.5:9b',TWENTY_SEVEN_B_MODEL,QWEN38_MODEL),default='qwen3.5:4b');parser.add_argument('--phase',choices=('screen','fixed','novel'));parser.add_argument('--candidate',type=int,choices=(1,2,3,4));parser.add_argument('--resume-incomplete-screen',action='store_true');parser.add_argument('--resume-screen-collector-failure',action='store_true');parser.add_argument('--resume-resource-adjusted-screen',action='store_true');args=parser.parse_args()
     bounded_candidate=args.model!='qwen3.5:4b'
     twenty_seven_b=args.model==TWENTY_SEVEN_B_MODEL
     qwen38=args.model==QWEN38_MODEL
@@ -347,9 +347,9 @@ def main():
     else:
         assert args.round is None and args.phase is not None and args.candidate is not None,'Bounded candidate mode requires --phase and --candidate'
         if twenty_seven_b:assert args.candidate==1,'Retired Q4 27B has one historical candidate'
-        if qwen38:assert args.candidate==2,'Qwen3.8 Q3_K_M is the single replacement candidate'
+        if qwen38:assert args.candidate in {2,3,4},'Qwen3.8 may only continue its bounded protocol candidates'
         assert args.candidate==1 or qwen38 or args.phase in {'fixed','novel'},'Later candidates cannot add another screen after the bounded repair'
-        assert args.candidate!=3 or args.phase in {'fixed','novel'},'Delivery v11 candidate uses one complete fixed run and one novel run'
+        assert qwen38 or args.candidate!=3 or args.phase in {'fixed','novel'},'Delivery v11 candidate uses one complete fixed run and one novel run'
         assert sum((args.resume_incomplete_screen,args.resume_screen_collector_failure,args.resume_resource_adjusted_screen))<=1,'Only one bounded screen recovery is allowed'
         assert not (args.resume_incomplete_screen or args.resume_screen_collector_failure) or (args.candidate==1 and args.phase=='screen'),'Only candidate-01 screen can resume'
         assert not args.resume_resource_adjusted_screen or (qwen38 and args.phase=='screen'),'Only Qwen3.8 can run the reviewed resource-adjusted screen'
@@ -372,7 +372,8 @@ def main():
     assert len(gold['cases'])==24 and len(photos['cases'])==4
     overlay_path=ROOT/'reports/real-ai-integration-027/qwen35-9b-evaluation-overlay.json'
     overlay=(json.loads(overlay_path.read_text(encoding='utf-8')) if bounded_candidate else None)
-    novel_path=ROOT/'reports/real-ai-integration-027/qwen35-9b-novel-set.json'
+    novel_path=(ROOT/'reports/real-ai-integration-027/qwen38-v12-novel-set.json'
+                if qwen38 and args.candidate>=3 else ROOT/'reports/real-ai-integration-027/qwen35-9b-novel-set.json')
     novel=(json.loads(novel_path.read_text(encoding='utf-8')) if bounded_candidate else None)
     if overlay is not None:
         assert overlay['base_gold_unchanged'] is True and set(overlay['cases'])=={item['id'] for item in gold['cases']}
@@ -395,7 +396,9 @@ def main():
             selected_items=[by_id[case_id] for case_id in screen_ids]
             assert tuple(item['id'] for item in selected_items)==screen_ids
     elif bounded_candidate and args.phase=='novel':
-        assert novel['frozen_before_first_9b_inference'] is True and len(novel['cases'])==4
+        frozen_key=('frozen_before_first_inference' if qwen38 and args.candidate>=3
+                    else 'frozen_before_first_9b_inference')
+        assert novel[frozen_key] is True and len(novel['cases'])==4
         selected_items=novel['cases']
     else:selected_items=all_items
     downloads=json.loads((OUT/'repair-image-downloads.json').read_text(encoding='utf-8'))
@@ -468,13 +471,13 @@ def main():
         state=budget_state();assert not state['unknown'],f'Prior request completion UNKNOWN: {state["unknown"]}'
         assert state['attempted']<active_call_limit and state['model_seconds']+request_timeout<=NINE_B_TOTAL_MODEL_SECONDS
         assert datetime.now(UTC)+timedelta(seconds=request_timeout)<=NINE_B_DEADLINE_UTC,'Insufficient bounded time before the delivery deadline'
-    e={'task_id':'REAL-AI-INTEGRATION-027' if bounded_candidate else 'SELFHOST-AI-LOCAL-001','round':args.round,'phase':phase_label if bounded_candidate else args.phase,'candidate':args.candidate,'repair_rounds_used':args.round,'base_sha':'f5c8154',
+    e={'task_id':'REAL-AI-INTEGRATION-027' if bounded_candidate else 'SELFHOST-AI-LOCAL-001','round':args.round,'phase':phase_label if bounded_candidate else args.phase,'candidate':args.candidate,'repair_rounds_used':args.round,'base_sha':'e5071877fcd8bea3f0c732e91101e4137d25f445',
        'source_sha':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'at_utc':datetime.now(UTC).isoformat(),
        'model':args.model,'model_digest':digest,'quantization':'Q3_K_M' if qwen38 else 'Q4_K_M','prompt_version':WORK_ORDER_ANALYSIS_PROMPT_VERSION,
        'candidate_source_binding':candidate_source_binding,
        'vision_prompt_version':getattr(QwenVLMProvider,'prompt_version','unversioned-original'),
-       'source_hashes':{p:sha(ROOT/p) for p in ['backend/app/service/analysis.py','backend/app/domain/ai.py','backend/app/domain/observed_event.py','backend/app/provider/llm/__init__.py','backend/app/provider/vision/__init__.py','backend/app/provider/http.py','reports/auth-identity-ai-001/local-qwen/run-quality28.py']},
-       'gold_hashes':{textpath.name:sha(textpath),photopath.name:sha(photopath),**({'qwen35-9b-evaluation-overlay.json':sha(overlay_path),'qwen35-9b-novel-set.json':sha(novel_path)} if overlay is not None else {}),**({'qwen35-9b-bounded-images.json':sha(bounded_manifest_path)} if bounded_manifest is not None else {})},'runtime':runtime,
+       'source_hashes':{p:sha(ROOT/p) for p in ['backend/app/service/analysis.py','backend/app/domain/ai.py','backend/app/domain/vision.py','backend/app/domain/observed_event.py','backend/app/provider/llm/__init__.py','backend/app/provider/vision/__init__.py','backend/app/provider/http.py','reports/auth-identity-ai-001/local-qwen/run-quality28.py']},
+       'gold_hashes':{textpath.name:sha(textpath),photopath.name:sha(photopath),**({'qwen35-9b-evaluation-overlay.json':sha(overlay_path),novel_path.name:sha(novel_path)} if overlay is not None else {}),**({'qwen35-9b-bounded-images.json':sha(bounded_manifest_path)} if bounded_manifest is not None else {})},'runtime':runtime,
        'runtime_identity':runtime_identity,
        'image_input':({'mode':'proportional-jpeg-max-1024','manifest':str(bounded_manifest_path),'manifest_sha256':sha(bounded_manifest_path)} if bounded_manifest is not None else {'mode':'original-gold-files'}),
        'controls':{'context':4096,'temperature':0,'thinking':False,'llm_max_tokens':512,'vlm_max_tokens':256,'timeout_seconds':request_timeout,'guard_cleanup_margin_seconds':TWENTY_SEVEN_B_TERMINATION_MARGIN_SECONDS if large_candidate else 0,'parallel':1,'max_cases':1 if args.resume_screen_collector_failure else 7 if args.resume_incomplete_screen else 8 if args.phase=='screen' else 4 if args.phase=='novel' else 28,'max_inference_requests':max_requests},
@@ -606,8 +609,8 @@ def main():
         save()
         reused={}
         reused_sources={}
-        if bounded_candidate and args.phase=='fixed' and args.candidate==1:
-            screen_path=(run_out/'screen-g52.json' if qwen38 else run_out/'screen.json');assert screen_path.exists(),'Complete identical screen phase is required before fixed phase'
+        if bounded_candidate and args.phase=='fixed' and (args.candidate==1 or (qwen38 and args.candidate>=3)):
+            screen_path=run_out/'screen.json';assert screen_path.exists(),'Complete identical screen phase is required before fixed phase'
             screen=json.loads(screen_path.read_text(encoding='utf-8'))
             if large_candidate:
                 stable_controls=('context','temperature','thinking','llm_max_tokens','vlm_max_tokens','timeout_seconds','guard_cleanup_margin_seconds','parallel')

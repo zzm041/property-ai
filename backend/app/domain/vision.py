@@ -3,7 +3,7 @@
 from copy import deepcopy
 
 
-VISION_ANALYSIS_PROMPT_VERSION = "repair-photo-v5-strict-schema"
+VISION_ANALYSIS_PROMPT_VERSION = "repair-photo-v6-visible-fault"
 
 _VISION_RESPONSE_FORMAT = {
     "type": "json_schema",

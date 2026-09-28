@@ -31,6 +31,8 @@ def test_request_controls_are_explicit_and_default_payload_unchanged(vision, bou
             content = body["messages"][0]["content"]
             assert content[1]["image_url"]["url"].startswith("data:image/png;base64,")
             assert '可直接观察到' in content[0]['text']
+            assert '先区分部件识别与可见故障' in content[0]['text']
+            assert '不得把反光、正常露出的金属' in content[0]['text']
             assert request.headers["X-Prompt-Version"] == VISION_ANALYSIS_PROMPT_VERSION
             assert QwenVLMProvider.prompt_version == VISION_ANALYSIS_PROMPT_VERSION
         return httpx.Response(200, json={"choices": [{"message": {"content": json.dumps({"description": "synthetic", "labels": [], "confidence": 0.5})}}]})

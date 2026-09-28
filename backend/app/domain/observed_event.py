@@ -336,7 +336,24 @@ def bind_observations(
             row.get("reason_code") == "historical"
             and (row["label"], row["subject"]) in effective_identities
         )
-        if not informational_redundancy and not repeated_current_identity:
+        # Preserve a supported electrical danger even if the VLM also emitted
+        # one unsupported cosmetic label from that same image.  This is not a
+        # general invalid-field filter: the extra label remains in the raw and
+        # ignored traces, and a cosmetic-only result still fails closed.
+        noncritical_vision_cosmetic = (
+            row["label"] == "表面剥落"
+            and row["source"] == "vision"
+            and row["reason"] == "Evidence does not support observable label"
+            and output.category == "electrical"
+            and output.risk == "electric"
+            and any(
+                accepted["source"] == "vision"
+                and accepted["evidence_id"] == row["evidence_id"]
+                and accepted["label"] in {"烧焦变色", "火花烧损"}
+                for accepted in effective
+            )
+        )
+        if not informational_redundancy and not repeated_current_identity and not noncritical_vision_cosmetic:
             raise ValueError(str(row["reason"]))
         ignored.append({
             **row,
@@ -345,6 +362,8 @@ def bind_observations(
                 "informational observation is not needed for the accepted current fault"
                 if informational_redundancy
                 else "unconfirmed or historical duplicate of an accepted current observation"
+                if repeated_current_identity
+                else "unsupported noncritical cosmetic observation did not change the accepted electrical danger"
             ),
         })
     identity_source = effective or normalized
