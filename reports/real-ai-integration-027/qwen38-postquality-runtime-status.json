@@ -1,0 +1,50 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "observed_at_utc": "2026-09-28T13:42:57.1151107Z",
+  "git_head": "5b32cb37376906fa5190c91dd54ac3951f158d55",
+  "delivery": {
+    "project": "property-ai-delivery-check",
+    "endpoint": "http://127.0.0.1:8093",
+    "application_image": "property-ai-delivery:7798193",
+    "api": "UP_HEALTHY",
+    "worker": "UP",
+    "beat": "UP",
+    "nginx": "UP",
+    "mysql": "UP_HEALTHY",
+    "rabbitmq": "UP_HEALTHY",
+    "redis": "UP_HEALTHY",
+    "minio": "UP_HEALTHY",
+    "milvus": "UP_HEALTHY",
+    "readiness": "READY"
+  },
+  "ollama": {
+    "endpoint": "127.0.0.1:11435",
+    "pid": 35828,
+    "version": "0.34.3",
+    "no_cloud": true,
+    "max_loaded_models": 1,
+    "concurrency": 1,
+    "context_length": 4096,
+    "inference_on_status": false
+  },
+  "rag_adapter": {
+    "endpoint": "http://127.0.0.1:11436",
+    "launcher_pid": 25184,
+    "listener_pid": 44272,
+    "listener_started_at_utc": "2026-09-28T13:42:45.1620238Z",
+    "adapter_sha256": "5F8A94040FCB3CD48DC4FE3C74166B07E4D1D8D9EAD0F3A6D4ABF2E9E08F83AB",
+    "config_sha256": "01F9B2852392185F4AB92C8F9C81373F41BDBE2D96CB183152B2FF03D2F9A546",
+    "scope": "rag_only",
+    "status": "ready",
+    "reservation_gate": "READY",
+    "accepting_requests": true,
+    "request_active": false,
+    "inference_on_start_or_status": false
+  },
+  "work_order_ai": {
+    "provider_switched_to_qwen38": false,
+    "real_auto_created": 0,
+    "reason": "independent quality verdict NOT_READY_FOR_BOUNDED_AUTO"
+  },
+  "boundary": "Runtime identity/readiness only. No page action, document, RAG question, model inference, database write, queue mutation or work order was produced by this status check."
+}
