@@ -181,7 +181,9 @@ switch ($Action) {
             runtime_binding_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $bindingPath).Hash.ToLowerInvariant()
         }
         [IO.File]::WriteAllText($ConfigPath, ($config | ConvertTo-Json -Depth 5), [Text.UTF8Encoding]::new($false))
-        $stdout=Join-Path $RuntimeDir "adapter.stdout.log";$stderr=Join-Path $RuntimeDir "adapter.stderr.log"
+        $operationId=[guid]::NewGuid().ToString("N")
+        $stdout=Join-Path $RuntimeDir "adapter-$operationId.stdout.log"
+        $stderr=Join-Path $RuntimeDir "adapter-$operationId.stderr.log"
         $oldToken=$env:LOCAL_AI_INTERNAL_TOKEN;$oldModel=$env:PROPERTY_AI_LOCAL_QWEN_MODEL
         try {
             $env:LOCAL_AI_INTERNAL_TOKEN=$token;$env:PROPERTY_AI_LOCAL_QWEN_MODEL=$ModelName
@@ -205,6 +207,7 @@ switch ($Action) {
             config_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $ConfigPath).Hash
             runtime_binding_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $bindingPath).Hash
             token_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $SecretPath).Hash
+            stdout=$stdout;stderr=$stderr
             endpoint="http://127.0.0.1:11437";scope="work_order_only";models=$health.models;inference_on_start=$false
         }
         [IO.File]::WriteAllText($CurrentPath, ($state | ConvertTo-Json -Depth 6), [Text.UTF8Encoding]::new($false))

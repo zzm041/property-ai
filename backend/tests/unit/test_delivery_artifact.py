@@ -191,6 +191,7 @@ def test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded() -> Non
     assert 'asr_start_ram_mib=11264' in runtime
     assert 'qwen=18' in runtime and 'duration_seconds=7200' in runtime
     assert 'git -C $RepoRoot archive' in runtime
+    assert 'adapter-$operationId.stdout.log' in runtime and 'adapter-$operationId.stderr.log' in runtime
     assert '__SOURCE_COMMIT__' not in runtime and '__ADAPTER_SHA256__' not in runtime
     assert 'D3FE47942D44E316C3D1FD96930910A413E4D21752DFCAAF41FEA434DBD280DC' in runtime
     assert 'work-ai-start' in launcher and 'work-ai-status' in launcher and 'work-ai-stop' in launcher
