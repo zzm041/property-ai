@@ -1,0 +1,52 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-DELIVERY-8093-REAL-RAG",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_sha": "9c424c9b09623c051bb808a9f28042602e98bc0a + scoped WIP",
+  "verdict": "PASS_SCOPED_REAL_RAG",
+  "checked": [
+    "实际查看回答与归档后查询两张截图：前者显示中文答案、指定合成文档及 v2 引用；后者显示 insufficient_knowledge 且没有引用卡片。",
+    "页面记录对应正常密码登录 user 2、TENANT_ADMIN、property 4、document 1/version 2；回答、归档请求及归档后查询均有同轮实际 wx.request 记录。",
+    "实际读取 call-001 至 call-009 的预约和结果元数据，逐项匹配脱敏索引中的文件哈希。共 6 embedding、2 reranker、1 Qwen、0 ASR；均 SUCCESS、owned_exit_confirmed=true，无 UNKNOWN，累计约 79.875 秒，处于同一有界窗口内。",
+    "实际读取 call-008 的合成输入与原始 Qwen 输出：输入只提供 chunk-id 2 的本轮资料，输出 citation_chunk_ids=[2]，中文回答与页面一致。",
+    "实测账本中首次 embedding 为 30.625 秒、首次 reranker 为 6.016 秒，分别超过原 8 秒和 5 秒客户端超时；45 秒和 15 秒模板值有本轮数据依据，并未移除适配器资源、阶段或总预算保护。",
+    "两个失败页面记录仍保留：首次入库等待超时，以及首次续跑问答返回 500。适配器完成不被误记为对应页面成功；v1 FAILED 与 v2 成功分开记录。",
+    "当前 resume 修复绑定精确文档 ID、标题和预期版本；已有待处理任务只等待，缺失或失败拒绝，不再自动追加版本。",
+    "当前脚本增加截图文件存在且非空检查；报告明确披露本次成功流程的 active/archived 两张截图缺失，并区分实际执行脚本与事后加固脚本。",
+    "所读公开材料和两张截图未发现明文密码、Token 或完整手机号。凭证准备明确使用隔离 Development SMS，不冒充真实身份供应商。"
+  ],
+  "findings": [],
+  "closed_findings": [
+    {
+      "id": "RAG-FULL-R1-01",
+      "status": "CLOSED",
+      "description": "resume 可能重复创建版本或将非预期旧版本当作完成。",
+      "evidence": "当前分支删除自动新建版本行为，强制精确标题和 expected version；预期版本或任务不存在即拒绝，只有匹配当前版本或等待其既有任务两条路径。"
+    },
+    {
+      "id": "RAG-FULL-R1-02",
+      "status": "CLOSED",
+      "description": "模型调用及超时结论此前只有汇总。",
+      "evidence": "已补逐 call 索引，并由本审查实际核对九组 reservation/result 文件哈希、模型版本、时间及退出状态。"
+    },
+    {
+      "id": "RAG-FULL-R1-03",
+      "status": "CLOSED",
+      "description": "运行脚本与事后截图、续跑加固脚本的绑定需要区分。",
+      "evidence": "报告分别记录成功运行脚本哈希与事后加固哈希；当前脚本实际 SHA-256 为 28FB305C70DD1C1BEA4242262C9980A4414F9B93289EB548BDD61E7ABEA62C65，缺失截图仍如实保留为缺口。"
+    }
+  ],
+  "verified_boundaries": [
+    "PASS 仅限本地 8093 的这一份合成资料、真实 bge-m3/reranker/Qwen3.5-4B 链路、v2 引用回答及归档后不再召回的实际证据。",
+    "已有两个失败不被新成功覆盖；数据库读回中的版本、任务和审计为实施方保存证据，不是本审查现场查询。",
+    "正常问答约 17.499 秒，归档后查询约 6.101 秒；不据此宣称生产性能验收通过。",
+    "真实工单 AUTO、27B 质量、真实身份 Provider 和 Production 仍未通过，本结论不授权其切换或发布。"
+  ],
+  "unverified": [
+    "审查者没有运行测试、模型、页面、业务请求、数据库或队列，没有修改文件或创建审查者。",
+    "事后 resume/截图加固只做静态复核，没有重新执行业务验证。",
+    "成功运行时脚本哈希按保存报告记录，本轮未独立恢复该版本全文。",
+    "本轮缺少 active-document 与 archived-document 两张截图，不声称已查看。",
+    "未以本单案例重新验证全部知识权限、并发、故障、资料质量或生产运行能力。"
+  ],
+  "next_action": "保存本次审查及准确源码、证据绑定，登记 scoped local real RAG 里程碑；不为补缺图或审查记录重复调用模型。保留失败与发布缺口，继续既有授权内的后续工作。"
+}

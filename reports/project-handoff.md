@@ -1,5 +1,17 @@
 # Project handoff (latest facts only)
 
+## Current checkpoint — 8093 scoped real RAG accepted; 27B asset download in progress (2026-09-28)
+
+Current source baseline is `9c424c9b09623c051bb808a9f28042602e98bc0a`; the fixed deadline remains **2026-09-29 22:36:10 Asia/Shanghai**. The isolated 8093 API, Worker and Beat remain on the same fixed product image `property-ai-delivery:7798193` (`sha256:c246ec1be7334d566c766973c0a00b1c3b9489de203724cc286c01ee21de2653`). Work-order analysis is still Development and no real-AUTO switch has occurred.
+
+`REAL-AI-INTEGRATION-027-DELIVERY-8093-REAL-RAG` is now **PASS_SCOPED_REAL_RAG**. A normal password-authenticated TENANT_ADMIN used the actual mini-program flow for synthetic document 1. Version 1 remains FAILED evidence after a real cold embedding/client-timeout sequence; it was not overwritten. Version 2 was independently ingested by the Worker into `knowledge_chunks_delivery_real_1024`, became ACTIVE, and the normal assistant page returned a Chinese answer with a citation bound to document 1/version 2/chunk 2. The same page archived the document, after which the answer was `insufficient_knowledge` with zero citations. MySQL evidence retains both versions, both task outcomes, two chunks and create/version/activate/archive audits.
+
+The bounded adapter ledger contains **9 successful provider executions**: 6 embeddings, 2 rerankers and 1 Qwen request, 0 ASR, approximately **79.875 seconds** total, all with confirmed owned-process exit and no UNKNOWN. Two client-side failures are separately retained and are not counted as successful page flows. Actual cold timing justified delivery template values `EMBEDDING_TIMEOUT_SECONDS=45` and `RERANKER_TIMEOUT_SECONDS=15`; model/resource/overall-budget guards remain intact. The successful page evidence is `reports/real-ai-integration-027/delivery-rag-8093/delivery-rag-027-full-20260928-1450-resume-02-page-evidence.json`; the answer/citation and post-archive screenshots were actually inspected. The missing ACTIVE/ARCHIVED management screenshots are explicitly unverified and were not regenerated.
+
+Independent review `reports/codex/REAL-AI-INTEGRATION-027-DELIVERY-8093-REAL-RAG.raw.json` inspected the two screenshots, raw per-call ledger and current exact-resume safeguards and returned `PASS_SCOPED_REAL_RAG`, closing `RAG-FULL-R1-01` through `03`. The page runner now binds exact document ID/title/version, refuses failed or missing resumptions, waits only for the expected pending task, and rejects missing screenshot files. This conclusion covers one local synthetic real-provider RAG flow only; general quality, scale, target security/performance, native device and Production release remain open.
+
+The approved official `qwen3.5:27b-q4_K_M` download has started once through the existing local Ollama runtime. No 27B inference or business request has occurred yet, and download completion, resource admission, model quality and real AUTO remain separate gates. The package ledger must continue from the RAG usage above rather than reset.
+
 ## Current checkpoint — 27B resource stop and delivery RAG runtime preflight (2026-09-28)
 
 Product/runtime source commit: `77981930f6a4d41cbb5b3fcb3e1b1689f8d5e31c` (continuing from `018107d0bbd523b4bb930a0752a20a8a44a67352`). The fixed deadline remains **2026-09-29 22:36:10 Asia/Shanghai**.

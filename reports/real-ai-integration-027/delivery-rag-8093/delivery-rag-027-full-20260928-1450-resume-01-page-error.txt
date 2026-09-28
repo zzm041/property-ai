@@ -1,0 +1,219 @@
+Error: knowledge answer: Internal server error
+    at waitData (D:\property-ai\reports\real-ai-integration-027\delivery-rag-8093\run-page-flow.js:98:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async ask (D:\property-ai\reports\real-ai-integration-027\delivery-rag-8093\run-page-flow.js:246:18)
+    at async main (D:\property-ai\reports\real-ai-integration-027\delivery-rag-8093\run-page-flow.js:387:22)
+{
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/password/login",
+      "status": 200,
+      "request_id": "cea946f577624eee885b18d83d89366a",
+      "received_at_utc": "2026-09-28T07:34:04.012Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "7ef7a94b3fe240aeb94407ecb71fa19c",
+      "received_at_utc": "2026-09-28T07:34:04.033Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "5f07a0806b824614be5cf943fb67d088",
+      "received_at_utc": "2026-09-28T07:34:04.736Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "8eb43c3835d14eea82aa7204ca65d795",
+      "received_at_utc": "2026-09-28T07:34:04.755Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "c5aecf4f12a14e1398acf49a09435530",
+      "received_at_utc": "2026-09-28T07:34:05.684Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "b99618d8320a4a01a75fe696bd218567",
+      "received_at_utc": "2026-09-28T07:34:05.702Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "dbd9cd2e2ee04b229c26d0b86ea057a1",
+      "received_at_utc": "2026-09-28T07:34:06.856Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "4092ab4f9597491b8df9400243a9799d",
+      "received_at_utc": "2026-09-28T07:34:06.862Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "1f1d442cf9b94439bcfeeb2041e19233",
+      "received_at_utc": "2026-09-28T07:34:06.886Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents/1",
+      "status": 200,
+      "request_id": "96c8d3b767a9438fa95bab834a177e20",
+      "received_at_utc": "2026-09-28T07:34:07.051Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/knowledge-documents/1/versions",
+      "status": 200,
+      "request_id": "846dc6812b624aaa9c29d048d1e99510",
+      "received_at_utc": "2026-09-28T07:34:07.404Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "e5280c8fadce49cba1dc5a31d3f6eb13",
+      "received_at_utc": "2026-09-28T07:34:07.425Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents/1",
+      "status": 200,
+      "request_id": "511667a28526440cb38e6c632a7e0ab4",
+      "received_at_utc": "2026-09-28T07:34:07.448Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "61f93fdfe3884c6cb868548a3614481e",
+      "received_at_utc": "2026-09-28T07:34:07.671Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "332a55af282f4ab38d5c6df7e63aeb06",
+      "received_at_utc": "2026-09-28T07:34:08.723Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "95f239de33224b76880c660b0916d382",
+      "received_at_utc": "2026-09-28T07:34:09.776Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "3427fdaf0bde477982fff367c4591cec",
+      "received_at_utc": "2026-09-28T07:34:10.823Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "de683b3cb8c742e49131be818e349dbe",
+      "received_at_utc": "2026-09-28T07:34:11.877Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "6827b68ec7d046f4a0a2103cdcb4c2d4",
+      "received_at_utc": "2026-09-28T07:34:12.932Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "b208fcd9c709404db5a8e1f912ada633",
+      "received_at_utc": "2026-09-28T07:34:13.973Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "b0d0cb4d150d4bba88c7225b3d95291a",
+      "received_at_utc": "2026-09-28T07:34:15.016Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "c1f86dc3c69a449fb873afd1302e73c7",
+      "received_at_utc": "2026-09-28T07:34:16.044Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "79a322da875f41a8ad022fdee18ecfb2",
+      "received_at_utc": "2026-09-28T07:34:17.076Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "985d4b567b3b4deba746baab49f03d31",
+      "received_at_utc": "2026-09-28T07:34:18.102Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents/1",
+      "status": 200,
+      "request_id": "44c17771ea054519ba0a66b1436b777c",
+      "received_at_utc": "2026-09-28T07:34:18.125Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "6f79ff81df8e4854b0ef8c83121a94a9",
+      "received_at_utc": "2026-09-28T07:34:26.238Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "b8e8bbcb614e4d958f3a04d5d4052316",
+      "received_at_utc": "2026-09-28T07:34:26.256Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "ac9de8100c4948058704ebe77138b55c",
+      "received_at_utc": "2026-09-28T07:34:27.383Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "4765a64d7d3a4d51a0d0febfd726d815",
+      "received_at_utc": "2026-09-28T07:34:27.387Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/assistant/query",
+      "status": 500,
+      "request_id": "f5d80209e47b4ea6baf36c6b33e2d9bc",
+      "received_at_utc": "2026-09-28T07:34:39.405Z"
+    }
+  ]
+}

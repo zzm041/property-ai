@@ -1,0 +1,20 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "recorded_at": "2026-09-28T15:39:16.7374300+08:00",
+  "scope": "sanitized index for the private append-only delivery RAG call ledger",
+  "private_root": "tmp/delivery-rag-runtime/calls",
+  "bodies_included": false,
+  "calls": [
+    {"name":"call-001","kind":"embedding","model":"bge-m3","reservation_sha256":"2296C35E1688E2D986F8A305AA0053C11A347FFE61CBC30C340AB0B21ABEB2DA","result_sha256":"31921DD4077E526EA73E450B58DD07A7A570D9A3D65666B77CFE4338C87EF78F","status":"SUCCESS","reason":null,"seconds":30.625,"owned_exit_confirmed":true},
+    {"name":"call-002","kind":"embedding","model":"bge-m3","reservation_sha256":"42E922F79B42B50ED870649A91F44F7626EEA15AECB6EA6B9C0DFE2E0B68B32E","result_sha256":"110F0BC3E08698C93E827C3A5080F9EE712396B201DBEC8FB4603492C5902F1A","status":"SUCCESS","reason":null,"seconds":6.766,"owned_exit_confirmed":true},
+    {"name":"call-003","kind":"embedding","model":"bge-m3","reservation_sha256":"1BD2267EE8245F795378797C84EC642AA36D5F2D1F1B87C53841CD7216670FDF","result_sha256":"67F4CB797AF606FD3FD27A45C41521B8177F04B6BFD4803E96AB702D4AE51D5A","status":"SUCCESS","reason":null,"seconds":6.766,"owned_exit_confirmed":true},
+    {"name":"call-004","kind":"embedding","model":"bge-m3","reservation_sha256":"80787B017A29AAAE7FEBC6E982167FABA7A7F85FD7BB7748ED3FB936FF2982DA","result_sha256":"B9BE185CCD8FDD75C6E3C061CB5D7B29755A954D5C3C06A22CF4D6F25B072630","status":"SUCCESS","reason":null,"seconds":6.765,"owned_exit_confirmed":true},
+    {"name":"call-005","kind":"reranker","model":"bge-reranker-v2-m3","reservation_sha256":"F274D8FC96361777256345D244DB0098D0985BD92112AB076D34CAAD4F7BE629","result_sha256":"70D734EB440DA4FAA73D6B36B75BC5C2986C2742F708C016EF691136E52824E4","status":"SUCCESS","reason":null,"seconds":6.016,"owned_exit_confirmed":true},
+    {"name":"call-006","kind":"embedding","model":"bge-m3","reservation_sha256":"660DF7B0F16009A5D3B9E38B235548013DF3FD81C581E0B03F98417C1DCF6C55","result_sha256":"1F88A1514376B24A6989C7CE1AFEAE23382FEA55EE7F5DE158B8C39BE9116807","status":"SUCCESS","reason":null,"seconds":6.782,"owned_exit_confirmed":true},
+    {"name":"call-007","kind":"reranker","model":"bge-reranker-v2-m3","reservation_sha256":"A4B0420389734B339B90E61CF393AFBF1C1329CB9DE27D262EEA09EF4D295BA6","result_sha256":"F6D99999F6163F1D96375A04084E404C636C5CAA162253405D5C94A09DE02634","status":"SUCCESS","reason":null,"seconds":5.015,"owned_exit_confirmed":true},
+    {"name":"call-008","kind":"qwen","model":"qwen3.5:4b","reservation_sha256":"3CAF662D9152F04B57E9198EC85C3204D346E15AC8DBFE9197002B41AEFF339A","result_sha256":"1338537084AEF402B3A43F4C6373E484512AA45574E9D4F53ECB8C74285F6BA9","status":"SUCCESS","reason":null,"seconds":5.375,"owned_exit_confirmed":true},
+    {"name":"call-009","kind":"embedding","model":"bge-m3","reservation_sha256":"26913E6E58FB2F418ACB424AFFA0A96096A8D8AD420CECF284884191957AB8D9","result_sha256":"CF6DFD8DC794F658F925E77BE0F7CA89AEFF1B8CC1E1402D03C8B2A15C950AD4","status":"SUCCESS","reason":null,"seconds":5.765,"owned_exit_confirmed":true}
+  ],
+  "totals": {"embedding":6,"reranker":2,"qwen":1,"asr":0,"seconds":79.875},
+  "boundary": "A SUCCESS ledger result establishes completion inside the local adapter. call-001 and call-005 still correspond to client-side timeout failures and are not counted as successful page operations."
+}

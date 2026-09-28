@@ -1,0 +1,93 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "milestone": "DELIVERY_8093_REAL_RAG",
+  "recorded_at": "2026-09-28T15:39:16.7374300+08:00",
+  "source_head_at_run": "9c424c9b09623c051bb808a9f28042602e98bc0a",
+  "result": "SCOPED_LOCAL_REAL_RAG_PAGE_FLOW_PASS",
+  "environment": {
+    "api": "http://127.0.0.1:8093/api/v1",
+    "database": "property_ai_delivery_check@0014",
+    "vector_collection": "knowledge_chunks_delivery_real_1024",
+    "adapter": "127.0.0.1:11436 rag_only",
+    "models": {
+      "embedding": "bge-m3",
+      "reranker": "bge-reranker-v2-m3",
+      "answer": "qwen3.5:4b"
+    }
+  },
+  "page_flow": {
+    "run_id": "delivery-rag-027-full-20260928-1450-resume-02",
+    "normal_password_login": true,
+    "user_id": 2,
+    "roles": ["TENANT_ADMIN"],
+    "property_id": 4,
+    "document_id": 1,
+    "active_version": 2,
+    "answer_status": "answered",
+    "citation_document_id": 1,
+    "citation_version": 2,
+    "answer_latency_ms": 17499,
+    "archive_request_status": 200,
+    "after_archive_status": "insufficient_knowledge",
+    "after_archive_citations": 0,
+    "after_archive_latency_ms": 6101
+  },
+  "database_readback": {
+    "document_status": "ARCHIVED",
+    "current_version": 2,
+    "versions": [[1, "FAILED"], [2, "ACTIVE"]],
+    "jobs": [[1, "FAILED", 4, "KB.UNAVAILABLE"], [2, "SUCCEEDED", 2, null]],
+    "chunk_rows": 2,
+    "audit_actions": [
+      "KNOWLEDGE_DOCUMENT_CREATED",
+      "KNOWLEDGE_DOCUMENT_VERSION_CREATED",
+      "KNOWLEDGE_DOCUMENT_ACTIVATED",
+      "KNOWLEDGE_DOCUMENT_ARCHIVED"
+    ]
+  },
+  "model_ledger": {
+    "sanitized_index": "model-ledger-summary-20260928.json",
+    "embedding_calls": 6,
+    "reranker_calls": 2,
+    "qwen_calls": 1,
+    "asr_calls": 0,
+    "all_owned_exits_confirmed": true,
+    "total_request_seconds": 79.875,
+    "notes": [
+      "call-001 completed in the adapter after the original 8 second embedding client timeout",
+      "call-005 completed in the adapter after the original 5 second reranker client timeout",
+      "the final successful page flow used the measured 45 second embedding and 15 second reranker client limits"
+    ]
+  },
+  "failures_preserved": [
+    "version 1 remains FAILED with KB.UNAVAILABLE",
+    "the first full page run remains saved as a timeout/failure record",
+    "the first resume run remains saved with the reranker client timeout"
+  ],
+  "visual_verification": {
+    "inspected": [
+      "delivery-rag-027-full-20260928-1450-resume-02-02-answer-with-citation.png",
+      "delivery-rag-027-full-20260928-1450-resume-02-04-archive-query.png"
+    ],
+    "observed": [
+      "the answer page displays the Chinese answer and cites document 1 version 2",
+      "the post-archive page displays insufficient_knowledge with no citation card"
+    ],
+    "missing_capture_boundary": "The page runner attempted active-document and archived-document screenshots, but those two files were not produced; request records and database/audit readback cover those state changes. They are not claimed as inspected screenshots."
+  },
+  "hashes": {
+    "page_evidence": "34162471DA59924BF5F0732298F514B4226F35E28962D6B6C458829ED2A61D00",
+    "answer_screenshot": "DB09B2C159C9D3DF4A10D560D251C47BE9EEC5211056B3E57B14BCE5EC290421",
+    "archive_query_screenshot": "83F7F1306BF32AC0FE7F577620D58FA2FF94ABEBCCF24C17919CD6FE1D69470B",
+    "page_runner_at_successful_run": "583723F4852B7DBC4188F7FC7468E16763641C45BA35E78ACD650D3A951B2A73",
+    "page_runner_after_screenshot_and_resume_hardening": "28FB305C70DD1C1BEA4242262C9980A4414F9B93289EB548BDD61E7ABEA62C65"
+  },
+  "boundaries": {
+    "real_rag": true,
+    "development_sms_used_only_for_local_credential_preparation": true,
+    "real_identity_provider": false,
+    "work_order_ai_provider": "development",
+    "real_auto": false,
+    "production_release": false
+  }
+}

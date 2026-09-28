@@ -1,0 +1,281 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "run_id": "delivery-rag-027-full-20260928-1450-resume-02",
+  "received_at_utc": "2026-09-28T07:37:32.862Z",
+  "interaction": "actual WeChat Developer Tools page controls and origin wx.request",
+  "api_origin": "http://127.0.0.1:8093",
+  "login": {
+    "method": "normal password page login",
+    "user_id": 2,
+    "roles": [
+      "TENANT_ADMIN"
+    ],
+    "phone_sha256_16": "d901e8933c66c30a"
+  },
+  "property_id": 4,
+  "document": {
+    "id": 1,
+    "version": 2,
+    "title": "delivery-rag-027-full-20260928-1450 消防通道纸箱处置规则",
+    "resumed_existing": true,
+    "status_before_archive": "ACTIVE",
+    "ingestion_jobs": [
+      {
+        "version": 2,
+        "status": "SUCCEEDED",
+        "error_code": null,
+        "attempt": 2,
+        "started_at": "2026-09-28T07:34:07.407891Z",
+        "finished_at": "2026-09-28T07:34:16.776623Z"
+      },
+      {
+        "version": 1,
+        "status": "FAILED",
+        "error_code": "KB.UNAVAILABLE",
+        "attempt": 4,
+        "started_at": "2026-09-28T07:29:17.521663Z",
+        "finished_at": "2026-09-28T07:29:25.573193Z"
+      }
+    ],
+    "status_after_archive": "ARCHIVED"
+  },
+  "answer": {
+    "question": "消防通道发现纸箱堆放时应该怎么办？",
+    "status": "answered",
+    "text": "发现纸箱堆放时，应联系物业服务中心，由工作人员安排清理；住户不要自行搬动带电设备。",
+    "citations": [
+      {
+        "document_id": 1,
+        "title": "delivery-rag-027-full-20260928-1450 消防通道纸箱处置规则",
+        "version": 2,
+        "source_locator": "delivery-rag-027-full-20260928-1450 消防通道纸箱处置规则#chunk-1",
+        "excerpt": "本合成小区消防通道必须保持畅通。发现纸箱堆放时，应联系物业服务中心，由工作人员安排清理；住户不要自行搬动带电设备。物业服务中心应记录处置完成情况。"
+      }
+    ],
+    "latency_ms": 17499
+  },
+  "after_archive": {
+    "status": "insufficient_knowledge",
+    "text": "当前知识库未能生成答案",
+    "citations": [],
+    "latency_ms": 6101
+  },
+  "screenshots": [
+    "delivery-rag-027-full-20260928-1450-resume-02-01-document-active.png",
+    "delivery-rag-027-full-20260928-1450-resume-02-02-answer-with-citation.png",
+    "delivery-rag-027-full-20260928-1450-resume-02-03-document-archived.png",
+    "delivery-rag-027-full-20260928-1450-resume-02-04-archive-query.png"
+  ],
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/password/login",
+      "status": 200,
+      "request_id": "ab3c09a30caa4f27b475fa73712a170e",
+      "received_at_utc": "2026-09-28T07:36:24.798Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "a359826ac98e4103a6c47b302d130ab3",
+      "received_at_utc": "2026-09-28T07:36:24.819Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "20f283c31b5e409e9600db8baceadec9",
+      "received_at_utc": "2026-09-28T07:36:25.552Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "411f2a97d34344a5a2b7d7bb7b67e627",
+      "received_at_utc": "2026-09-28T07:36:25.569Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "c9d86228f91c4bd4b6de243ba8daa2d5",
+      "received_at_utc": "2026-09-28T07:36:26.497Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "77b5b221acad4478bbd4d8359b81563d",
+      "received_at_utc": "2026-09-28T07:36:26.514Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "7e34b781f3cb45e882389bdf0a5c1bd5",
+      "received_at_utc": "2026-09-28T07:36:27.662Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "8a03477c05334133b8b252bae86e2962",
+      "received_at_utc": "2026-09-28T07:36:27.665Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "caafa7f97e524200abf5097d5bb27fe3",
+      "received_at_utc": "2026-09-28T07:36:27.689Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents/1",
+      "status": 200,
+      "request_id": "a2ed55ce6e1d426baf717f256315ab05",
+      "received_at_utc": "2026-09-28T07:36:28.002Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "7b813276c92647218756e2b0c448491c",
+      "received_at_utc": "2026-09-28T07:36:39.491Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "a7f6de65c0a54b22a0cb20ed1448fba0",
+      "received_at_utc": "2026-09-28T07:36:39.509Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "4a145bd2c8684c20b63c3888dae0f000",
+      "received_at_utc": "2026-09-28T07:36:40.639Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "293aad7740e840f2b495be146ee99347",
+      "received_at_utc": "2026-09-28T07:36:40.640Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/assistant/query",
+      "status": 200,
+      "request_id": "c42581327eda496e981eda5dacbf4e47",
+      "received_at_utc": "2026-09-28T07:36:58.319Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "4ab900560ef24945b8d88c6ec80d66e5",
+      "received_at_utc": "2026-09-28T07:37:05.441Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "d3fdad19d6d14f07b27f51c9bc3365b7",
+      "received_at_utc": "2026-09-28T07:37:05.457Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "f5c09a0cee634eaeb799b96aec90a899",
+      "received_at_utc": "2026-09-28T07:37:06.627Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "1a29401cfb6a48b6abf656aa37d6ce1b",
+      "received_at_utc": "2026-09-28T07:37:06.628Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "3193ce2a99ce4b81a32e2b14b0f3322f",
+      "received_at_utc": "2026-09-28T07:37:06.653Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents/1",
+      "status": 200,
+      "request_id": "01f60dcf6473486cbe7c7570477fc013",
+      "received_at_utc": "2026-09-28T07:37:06.915Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/knowledge-documents/1/archive",
+      "status": 200,
+      "request_id": "36ab199639954655a7c1bae54e6849c9",
+      "received_at_utc": "2026-09-28T07:37:07.211Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "f9113dd612ae49a8aeb7f9425d551f47",
+      "received_at_utc": "2026-09-28T07:37:07.231Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "e03ad5eaba754fc4b2b27cfc1c771e5b",
+      "received_at_utc": "2026-09-28T07:37:18.654Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "db52e38908dc443e90508aa8beee2897",
+      "received_at_utc": "2026-09-28T07:37:18.674Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "d3e85951ac6b4d2fb1b0ee0bddfbe926",
+      "received_at_utc": "2026-09-28T07:37:19.789Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "2ba34b945571491ba4d330145756d222",
+      "received_at_utc": "2026-09-28T07:37:19.793Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/assistant/query",
+      "status": 200,
+      "request_id": "3fb7a88d5b324383a381b2aa0db6cd7c",
+      "received_at_utc": "2026-09-28T07:37:25.730Z"
+    }
+  ],
+  "boundaries": {
+    "normal_page_controls": true,
+    "database_business_writes": false,
+    "response_mocked": false,
+    "work_order_requests_blocked": true,
+    "development_sms_only_for_local_login": true
+  },
+  "resource_admission": {
+    "checked_at_utc": "2026-09-28T07:36:27.954Z",
+    "available_ram_mib": 12540,
+    "required_start_ram_mib": 8192,
+    "gpu_free_mib": 14571,
+    "required_runtime_gpu_free_mib": 2000
+  }
+}

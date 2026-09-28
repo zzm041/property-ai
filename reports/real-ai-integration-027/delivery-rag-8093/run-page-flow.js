@@ -16,6 +16,9 @@ const PASSWORD = process.env.DELIVERY_RAG_PASSWORD;
 const RUN_ID = process.env.DELIVERY_RAG_RUN_ID;
 const MODE = process.env.DELIVERY_RAG_MODE || "preflight";
 const FULL_APPROVED = process.env.DELIVERY_RAG_FULL_APPROVED === "1";
+const RESUME_DOCUMENT_ID = Number(process.env.DELIVERY_RAG_RESUME_DOCUMENT_ID || 0);
+const RESUME_DOCUMENT_VERSION = Number(process.env.DELIVERY_RAG_RESUME_DOCUMENT_VERSION || 0);
+const RESUME_DOCUMENT_TITLE = process.env.DELIVERY_RAG_RESUME_DOCUMENT_TITLE || "";
 const LAUNCH_PROJECT = process.env.MP_AUTOMATOR_LAUNCH === "1";
 const PROJECT_PATH = "D:/property-ai/tmp/delivery-check-miniprogram-20260928";
 const CLI_PATH = "D:/微信web开发者工具/cli.bat";
@@ -28,6 +31,13 @@ const FULL_RUNTIME_GPU_FLOOR_MIB = 2000;
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function captureScreenshot(miniProgram, target) {
+  await tolerateTimeout(() => miniProgram.screenshot({ path: target }));
+  if (!fs.existsSync(target) || fs.statSync(target).size === 0) {
+    throw new Error(`screenshot was not produced: ${path.basename(target)}`);
+  }
 }
 
 function assertFullResourceAdmission() {
@@ -213,13 +223,17 @@ async function selectDocument(page, documentId) {
   throw new Error("created document is not visible");
 }
 
-async function waitIngestion(page, documentId) {
+async function waitIngestion(page, documentId, expectedVersion) {
   for (let attempt = 0; attempt < 90; attempt += 1) {
     await tolerateTimeout(() => byText(page, "button", "刷新知识状态").then((item) => item.tap()));
     const data = await waitData(page, (value) => value.items.some((item) => Number(item.id) === Number(documentId)), "knowledge list");
     const document = data.items.find((item) => Number(item.id) === Number(documentId));
-    if (document.current_version === 1) return selectDocument(page, documentId);
-    if ((document.ingestion_jobs || []).some((job) => job.status === "FAILED")) {
+    if (Number(document.current_version) === Number(expectedVersion)) {
+      return selectDocument(page, documentId);
+    }
+    if ((document.ingestion_jobs || []).some(
+      (job) => Number(job.version) === Number(expectedVersion) && job.status === "FAILED"
+    )) {
       throw new Error(`ingestion failed: ${JSON.stringify(document.ingestion_jobs)}`);
     }
     await sleep(1000);
@@ -249,6 +263,16 @@ async function ask(miniProgram, propertyId, question) {
 async function main() {
   if (!PHONE || !RUN_ID) throw new Error("private runtime inputs are missing");
   if (!new Set(["preflight", "full"]).has(MODE)) throw new Error(`unsupported mode ${MODE}`);
+  if (!Number.isInteger(RESUME_DOCUMENT_ID) || RESUME_DOCUMENT_ID < 0) {
+    throw new Error("DELIVERY_RAG_RESUME_DOCUMENT_ID must be a non-negative integer");
+  }
+  if (RESUME_DOCUMENT_ID > 0 && (
+    !Number.isInteger(RESUME_DOCUMENT_VERSION) ||
+    RESUME_DOCUMENT_VERSION < 1 ||
+    !RESUME_DOCUMENT_TITLE
+  )) {
+    throw new Error("resume requires the exact document title and expected version");
+  }
   if (MODE === "full" && !FULL_APPROVED) {
     throw new Error("full RAG flow requires explicit approval input");
   }
@@ -304,7 +328,7 @@ async function main() {
         throw new Error("knowledge-management page was not active at screenshot time");
       }
       const screenshot = path.join(OUT, `${RUN_ID}-00-rag-page-preflight.png`);
-      await tolerateTimeout(() => miniProgram.screenshot({ path: screenshot }));
+      await captureScreenshot(miniProgram, screenshot);
       const evidence = {
         task_id: "REAL-AI-INTEGRATION-027",
         run_id: RUN_ID,
@@ -338,25 +362,56 @@ async function main() {
       return;
     }
     const resourceAdmission = assertFullResourceAdmission();
-    const title = `${RUN_ID} 消防通道纸箱处置规则`;
-    const sourceText = "本合成小区消防通道必须保持畅通。发现纸箱堆放时，应联系物业服务中心，由工作人员安排清理；住户不要自行搬动带电设备。";
-    await fill(page, "input", "文档标题", title);
-    await fill(page, "textarea", "粘贴本版本知识正文", sourceText);
-    await tolerateTimeout(() => byText(page, "button", "建立并提交导入").then((item) => item.tap()));
-    const created = await waitData(page, (data) => data.selected && data.notice.includes("已建立"), "document create");
-    const documentId = Number(created.selected.id);
-    const active = await waitIngestion(page, documentId);
+    let title;
+    let documentId;
+    let documentVersion;
+    let active;
+    if (RESUME_DOCUMENT_ID > 0) {
+      documentId = RESUME_DOCUMENT_ID;
+      const resumed = await selectDocument(page, documentId);
+      title = resumed.selected.title;
+      if (title !== RESUME_DOCUMENT_TITLE) {
+        throw new Error("resume document title does not match the approved object");
+      }
+      documentVersion = RESUME_DOCUMENT_VERSION;
+      const expectedVersion = (resumed.selected.versions || []).find(
+        (item) => Number(item.version) === documentVersion
+      );
+      const expectedJob = (resumed.selected.ingestion_jobs || []).find(
+        (item) => Number(item.version) === documentVersion
+      );
+      if (!expectedVersion || !expectedJob) {
+        throw new Error("resume expected version or ingestion job is missing");
+      }
+      if (Number(resumed.selected.current_version) === documentVersion) {
+        active = resumed;
+      } else if (expectedJob.status === "PENDING" || expectedJob.status === "PROCESSING") {
+        active = await waitIngestion(page, documentId, documentVersion);
+      } else {
+        throw new Error(`resume expected version is not active or pending: ${expectedJob.status}`);
+      }
+    } else {
+      title = `${RUN_ID} 消防通道纸箱处置规则`;
+      const sourceText = "本合成小区消防通道必须保持畅通。发现纸箱堆放时，应联系物业服务中心，由工作人员安排清理；住户不要自行搬动带电设备。";
+      await fill(page, "input", "文档标题", title);
+      await fill(page, "textarea", "粘贴本版本知识正文", sourceText);
+      await tolerateTimeout(() => byText(page, "button", "建立并提交导入").then((item) => item.tap()));
+      const created = await waitData(page, (data) => data.selected && data.notice.includes("已建立"), "document create");
+      documentId = Number(created.selected.id);
+      documentVersion = 1;
+      active = await waitIngestion(page, documentId, documentVersion);
+    }
     const activeScreenshot = path.join(OUT, `${RUN_ID}-01-document-active.png`);
-    await tolerateTimeout(() => miniProgram.screenshot({ path: activeScreenshot }));
+    await captureScreenshot(miniProgram, activeScreenshot);
 
     const question = "消防通道发现纸箱堆放时应该怎么办？";
     const answered = await ask(miniProgram, propertyId, question);
     const citation = (answered.result.citations || []).find(
-      (item) => Number(item.document_id) === documentId && Number(item.version) === 1
+      (item) => Number(item.document_id) === documentId && Number(item.version) === documentVersion
     );
     if (!citation) throw new Error("answer did not cite the created active document version");
     const answerScreenshot = path.join(OUT, `${RUN_ID}-02-answer-with-citation.png`);
-    await tolerateTimeout(() => miniProgram.screenshot({ path: answerScreenshot }));
+    await captureScreenshot(miniProgram, answerScreenshot);
 
     page = await navigateFromHome(miniProgram, "知识库维护", "pages/supervisor/knowledge");
     await waitData(page, (data) => data.items.some((item) => Number(item.id) === documentId), "document list before archive");
@@ -364,14 +419,14 @@ async function main() {
     await tolerateTimeout(() => byText(page, "button", "归档文档").then((item) => item.tap()));
     await waitData(page, (data) => data.notice.includes("已归档"), "archive");
     const archivedScreenshot = path.join(OUT, `${RUN_ID}-03-document-archived.png`);
-    await tolerateTimeout(() => miniProgram.screenshot({ path: archivedScreenshot }));
+    await captureScreenshot(miniProgram, archivedScreenshot);
 
     const afterArchive = await ask(miniProgram, propertyId, question);
     if ((afterArchive.result.citations || []).some((item) => Number(item.document_id) === documentId)) {
       throw new Error("archived document remained retrievable");
     }
     const archiveQueryScreenshot = path.join(OUT, `${RUN_ID}-04-archive-query.png`);
-    await tolerateTimeout(() => miniProgram.screenshot({ path: archiveQueryScreenshot }));
+    await captureScreenshot(miniProgram, archiveQueryScreenshot);
 
     const evidence = {
       task_id: "REAL-AI-INTEGRATION-027",
@@ -390,8 +445,9 @@ async function main() {
       property_id: propertyId,
       document: {
         id: documentId,
-        version: 1,
+        version: documentVersion,
         title,
+        resumed_existing: RESUME_DOCUMENT_ID > 0,
         status_before_archive: active.selected.status,
         ingestion_jobs: active.selected.ingestion_jobs,
         status_after_archive: "ARCHIVED",
