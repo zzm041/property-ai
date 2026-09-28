@@ -1,0 +1,45 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-DELIVERY-RAG-PREFLIGHT",
+  "review_type": "INDEPENDENT_READ_ONLY",
+  "reviewed_sha": "fd878b40feb4747c9bc25ce7142e0f29ed4a1fc0",
+  "reviewed_range": "77981930f6a4d41cbb5b3fcb3e1b1689f8d5e31c..acbff98092aa80ae7adf3ffae32f16fd6e9f29c8，及 fd878b4 对两项 finding 的定向修复",
+  "verdict": "PASS_SCOPED",
+  "checked": [
+    "实际读取页面脚本、凭证准备脚本、页面及凭证 JSON、运行汇总和新增脱敏直接采集记录。",
+    "实际查看两张截图：00 是首页误截图；01 是知识库维护页，显示 independent-05 小区、空文档表单及空列表。错误截图被保留并明确废止为知识页证据。",
+    "页面记录为 8093 正常密码登录 user 2、TENANT_ADMIN、property 4；凭证准备记录的用户、角色及手机号摘要一致。凭证前置明确使用隔离 Development SMS，不冒充真实短信。",
+    "页面请求记录只有认证和读取操作，没有知识创建、问答或工单请求；请求观察器调用原始 wx.request，不伪造业务响应。",
+    "新增采集记录给出 API/Worker/Beat 相同镜像、专用 vhost/queue、Provider 设置、Milvus 配置、测试认证数据库目标、适配器身份和零调用账本，与运行汇总一致。",
+    "已检查的 JSON、脚本及截图未发现明文密码、Token、数据库凭据或完整手机号。",
+    "handoff 保留真实 RAG、真实 AUTO、27B 质量和完整产品未通过的边界。"
+  ],
+  "findings": [],
+  "closed_findings": [
+    {
+      "id": "RAG-DELIVERY-R1-01",
+      "status": "CLOSED",
+      "evidence": "run-page-flow.js 默认改为 preflight；full 必须显式启用且提供批准开关。首次知识写入前检查 RAM≥8192 MiB、GPU free≥2000 MiB；资源查询失败、超时或不足均抛错。工单请求拦截保留。",
+      "boundary": "仅静态核对修复；未执行脚本，也不把一次准入检查视为整个后续运行期间资源始终充足。"
+    },
+    {
+      "id": "RAG-DELIVERY-R1-02",
+      "status": "CLOSED",
+      "evidence": "runtime-evidence-20260928.json 已引用 runtime-readonly-capture-20260928.json 及页面、凭证和前置记录。新增采集提供具体容器启动时间、镜像摘要、队列数、配置与集合元数据，补足此前仅有汇总结论的证据缺口。",
+      "boundary": "接受为实施方保存的脱敏采集证据；审查者没有现场重新核验环境。"
+    }
+  ],
+  "verified_boundaries": [
+    "本轮结论仅覆盖交付 RAG 运行预检材料、页面预检及两项脚本修复。",
+    "运行配置中的 production Provider 选项不等于 Production 验收。",
+    "零模型调用、零本轮入库向量及未创建知识文档的范围保持；无真实知识回答证据。",
+    "27B 未下载，资源阻断不能解释为模型质量失败或成功。",
+    "工单 Provider 仍记录为 Development；未将真实 AUTO 或业务切换写成通过。"
+  ],
+  "unverified": [
+    "审查者没有运行测试、页面、模型、业务请求、数据库、队列或环境操作，没有修改文件或创建审查者。",
+    "未验证 full 流程实际运行、真实入库、检索回答、引用和归档效果。",
+    "未验证真实 AUTO、27B 推理质量或 Production。",
+    "保存的资源及进程记录是对应采集时刻的证据，不保证之后状态持续不变。"
+  ],
+  "next_action": "保存本次审查并关闭两项 finding。后续仅在既有授权及实时资源守卫满足后执行有界 RAG 流程；不得用本次预检 PASS 替代真实模型、业务或发布验收。"
+}
