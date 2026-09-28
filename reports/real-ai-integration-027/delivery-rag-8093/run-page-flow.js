@@ -1,8 +1,10 @@
 "use strict";
 
 const crypto = require("crypto");
+const childProcess = require("child_process");
 const fs = require("fs");
 const http = require("http");
+const os = require("os");
 const path = require("path");
 const automator = require(
   "C:/Users/lmj/AppData/Local/Temp/mp-automator-npm/node_modules/miniprogram-automator"
@@ -12,7 +14,8 @@ const WS = process.env.MP_AUTOMATOR_WS || "ws://127.0.0.1:9440";
 const PHONE = process.env.DELIVERY_RAG_PHONE;
 const PASSWORD = process.env.DELIVERY_RAG_PASSWORD;
 const RUN_ID = process.env.DELIVERY_RAG_RUN_ID;
-const MODE = process.env.DELIVERY_RAG_MODE || "full";
+const MODE = process.env.DELIVERY_RAG_MODE || "preflight";
+const FULL_APPROVED = process.env.DELIVERY_RAG_FULL_APPROVED === "1";
 const LAUNCH_PROJECT = process.env.MP_AUTOMATOR_LAUNCH === "1";
 const PROJECT_PATH = "D:/property-ai/tmp/delivery-check-miniprogram-20260928";
 const CLI_PATH = "D:/微信web开发者工具/cli.bat";
@@ -20,9 +23,49 @@ const API_ORIGIN = "http://127.0.0.1:8093";
 const API_BASE = `${API_ORIGIN}/api/v1`;
 const OUT = __dirname;
 const requests = [];
+const FULL_START_RAM_FLOOR_MIB = 8192;
+const FULL_RUNTIME_GPU_FLOOR_MIB = 2000;
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function assertFullResourceAdmission() {
+  if (!FULL_APPROVED) {
+    throw new Error("full RAG flow requires DELIVERY_RAG_FULL_APPROVED=1");
+  }
+  const availableRamMiB = Math.floor(os.freemem() / 1024 / 1024);
+  let gpuFreeMiB;
+  try {
+    const rows = childProcess.execFileSync(
+      "nvidia-smi",
+      ["--query-gpu=memory.free", "--format=csv,noheader,nounits"],
+      { encoding: "utf8", windowsHide: true, timeout: 5000 }
+    ).trim().split(/\r?\n/).map((value) => Number(value.trim()));
+    if (!rows.length || rows.some((value) => !Number.isFinite(value))) {
+      throw new Error("invalid GPU resource response");
+    }
+    gpuFreeMiB = Math.max(...rows);
+  } catch (error) {
+    throw new Error(`full RAG flow cannot verify GPU resources: ${error.message}`);
+  }
+  if (availableRamMiB < FULL_START_RAM_FLOOR_MIB) {
+    throw new Error(
+      `full RAG flow RAM guard failed: ${availableRamMiB}MiB < ${FULL_START_RAM_FLOOR_MIB}MiB`
+    );
+  }
+  if (gpuFreeMiB < FULL_RUNTIME_GPU_FLOOR_MIB) {
+    throw new Error(
+      `full RAG flow GPU guard failed: ${gpuFreeMiB}MiB < ${FULL_RUNTIME_GPU_FLOOR_MIB}MiB`
+    );
+  }
+  return {
+    checked_at_utc: new Date().toISOString(),
+    available_ram_mib: availableRamMiB,
+    required_start_ram_mib: FULL_START_RAM_FLOOR_MIB,
+    gpu_free_mib: gpuFreeMiB,
+    required_runtime_gpu_free_mib: FULL_RUNTIME_GPU_FLOOR_MIB,
+  };
 }
 
 async function tolerateTimeout(operation) {
@@ -205,6 +248,10 @@ async function ask(miniProgram, propertyId, question) {
 
 async function main() {
   if (!PHONE || !RUN_ID) throw new Error("private runtime inputs are missing");
+  if (!new Set(["preflight", "full"]).has(MODE)) throw new Error(`unsupported mode ${MODE}`);
+  if (MODE === "full" && !FULL_APPROVED) {
+    throw new Error("full RAG flow requires explicit approval input");
+  }
   const miniProgram = LAUNCH_PROJECT
     ? await automator.launch({ projectPath: PROJECT_PATH, cliPath: CLI_PATH })
     : await automator.connect({ wsEndpoint: WS });
@@ -290,7 +337,7 @@ async function main() {
       }));
       return;
     }
-    if (MODE !== "full") throw new Error(`unsupported mode ${MODE}`);
+    const resourceAdmission = assertFullResourceAdmission();
     const title = `${RUN_ID} 消防通道纸箱处置规则`;
     const sourceText = "本合成小区消防通道必须保持畅通。发现纸箱堆放时，应联系物业服务中心，由工作人员安排清理；住户不要自行搬动带电设备。";
     await fill(page, "input", "文档标题", title);
@@ -376,6 +423,7 @@ async function main() {
         work_order_requests_blocked: true,
         development_sms_only_for_local_login: true,
       },
+      resource_admission: resourceAdmission,
     };
     fs.writeFileSync(
       path.join(OUT, `${RUN_ID}-page-evidence.json`),

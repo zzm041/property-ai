@@ -1,0 +1,98 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "captured_at": "2026-09-28T14:29:33.7944354+08:00",
+  "capture_kind": "redacted direct read-only runtime inspection",
+  "source_commit": "77981930f6a4d41cbb5b3fcb3e1b1689f8d5e31c",
+  "containers": [
+    {
+      "name": "property-ai-delivery-check-api-1",
+      "image_digest": "sha256:c246ec1be7334d566c766973c0a00b1c3b9489de203724cc286c01ee21de2653",
+      "state": "running",
+      "health": "healthy",
+      "started_at_utc": "2026-09-28T06:08:56.921922365Z"
+    },
+    {
+      "name": "property-ai-delivery-check-worker-1",
+      "image_digest": "sha256:c246ec1be7334d566c766973c0a00b1c3b9489de203724cc286c01ee21de2653",
+      "state": "running",
+      "started_at_utc": "2026-09-28T06:08:57.074840606Z"
+    },
+    {
+      "name": "property-ai-delivery-check-beat-1",
+      "image_digest": "sha256:c246ec1be7334d566c766973c0a00b1c3b9489de203724cc286c01ee21de2653",
+      "state": "running",
+      "started_at_utc": "2026-09-28T06:08:56.774620171Z"
+    }
+  ],
+  "dedicated_queue": {
+    "vhost": "property_ai_delivery_check",
+    "name": "property_ai.delivery_check",
+    "messages_ready": 0,
+    "messages_unacknowledged": 0,
+    "consumers": 1
+  },
+  "application_settings": {
+    "app_env": "staging",
+    "llm_provider": "development",
+    "rag_llm_provider": "production",
+    "rag_llm_base_url": "http://host.docker.internal:11436",
+    "rag_llm_model": "qwen3.5:4b",
+    "embedding_provider": "production",
+    "embedding_model": "bge-m3",
+    "embedding_revision": "5617a9f61b028005a4858fdac845db406aefb181",
+    "embedding_normalization": "l2",
+    "embedding_dimensions": 1024,
+    "reranker_provider": "production",
+    "reranker_model": "bge-reranker-v2-m3",
+    "milvus_collection": "knowledge_chunks_delivery_real_1024",
+    "milvus_metric_type": "COSINE",
+    "celery_task_queue": "property_ai.delivery_check"
+  },
+  "milvus_collection": {
+    "exists": true,
+    "name": "knowledge_chunks_delivery_real_1024",
+    "dimension": 1024,
+    "description": "{\"contract\": \"embedding-v1\", \"model\": \"bge-m3\", \"normalization\": \"l2\", \"revision\": \"5617a9f61b028005a4858fdac845db406aefb181\"}",
+    "index": {
+      "index_type": "FLAT",
+      "metric_type": "COSINE"
+    }
+  },
+  "test_auth_helper": {
+    "container": "property-ai-delivery-check-test-auth-api",
+    "state_after_preparation": "exited",
+    "app_env": "test",
+    "active_test_database": {
+      "host": "mysql",
+      "port": 3306,
+      "database": "property_ai_delivery_check"
+    },
+    "development_database_not_active": "property_ai_delivery_unused",
+    "credentials_in_capture": false
+  },
+  "rag_adapter": {
+    "endpoint": "127.0.0.1:11436",
+    "listener_pid": 44724,
+    "listener_started_at_utc": "2026-09-28T05:56:27.0637649Z",
+    "recorded_identity_match": true,
+    "scope": "rag_only",
+    "status": "ready",
+    "inference": false,
+    "request_active": false,
+    "accepting_requests": true,
+    "reservation_gate": "READY",
+    "call_ledger_files": 0
+  },
+  "resources": {
+    "available_ram_mib": 6039,
+    "gpu_total_mib": 16303,
+    "gpu_used_mib": 6149,
+    "gpu_free_mib": 9847
+  },
+  "redaction": {
+    "tokens": "not captured",
+    "passwords": "not captured",
+    "database_credentials": "parsed in-process and not emitted",
+    "message_bodies": "not read"
+  }
+}

@@ -2,6 +2,7 @@
   "task_id": "REAL-AI-INTEGRATION-027",
   "recorded_at": "2026-09-28T14:29:33.7944354+08:00",
   "result": "RUNTIME_READY_PAGE_PREFLIGHT_PASS_MODEL_CALLS_RESOURCE_BLOCKED",
+  "direct_capture": "runtime-readonly-capture-20260928.json",
   "source": {
     "commit": "77981930f6a4d41cbb5b3fcb3e1b1689f8d5e31c",
     "image": "property-ai-delivery:7798193",
@@ -85,5 +86,12 @@
     "work_order_provider_remains_development": true,
     "database_migration": false,
     "external_cost": false
-  }
+  },
+  "source_records": [
+    "delivery-rag-027-preflight-20260928-credential-preparation.json",
+    "delivery-rag-027-preflight-20260928-page-preflight.json",
+    "delivery-rag-027-preflight-20260928-01-knowledge-page.png",
+    "../diagnostic-r3-27b/delivery-rag-runtime-preflight.json",
+    "../diagnostic-r3-27b/resource-preflight.json"
+  ]
 }
