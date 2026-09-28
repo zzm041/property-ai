@@ -74,9 +74,8 @@ def test_only_reviewed_rag_or_exact_work_order_schema_can_reach_qwen():
         m.decode('/v1/chat/completions','application/json',json.dumps(value,ensure_ascii=False).encode(),WORK_ORDER_ANALYSIS_PROMPT_VERSION)
 
 
-def test_committed_adapter_schema_is_generated_from_domain_contract():
-    path=ROOT/'scripts/ops/work_order_response_format.json'
-    assert json.loads(path.read_text(encoding='utf-8'))==work_order_analysis_response_format()
+def test_adapter_schema_is_generated_from_domain_contract_at_runtime():
+    assert m.WORK_ORDER_RESPONSE_FORMAT==work_order_analysis_response_format()
 
 
 def test_exact_vision_schema_and_multimodal_shape_are_guarded_without_wrapper_rewrite():

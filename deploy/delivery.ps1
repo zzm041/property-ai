@@ -3,7 +3,9 @@ param(
     [ValidateSet("config", "init", "up", "stop", "status", "backup", "restore-check", "diagnose")]
     [string]$Action,
     [Parameter(Position = 1)]
-    [string]$Argument
+    [string]$Argument,
+    [Parameter(Position = 2)]
+    [string]$RestoreDatabase
 )
 
 $ErrorActionPreference = "Stop"
@@ -176,17 +178,34 @@ switch ($Action) {
         if ($database -notmatch "^[A-Za-z0-9_]+$") { throw "unsafe MYSQL_DATABASE" }
         $dump = Resolve-BackupPath $Argument $true
         $null = Read-BackupManifest $dump $database
-        $restore = "${database}_restore_check"
-        if ($restore -notmatch "^[A-Za-z0-9_]+_restore_check$") { throw "unsafe restore database" }
+        $restore = if ($RestoreDatabase) { $RestoreDatabase } else { "${database}_restore_check" }
+        $approvedRestore = "${database}_restore_check_029"
+        if ($RestoreDatabase -and $restore -ne $approvedRestore) {
+            throw "explicit restore database is not the approved delivery target"
+        }
+        if ($restore -notmatch "^[A-Za-z0-9_]+_restore_check(?:_029)?$") { throw "unsafe restore database" }
         $existsCommand = 'mysql -N -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=''{0}''"' -f $restore
         $exists = (& docker compose --env-file $EnvFile -f $ComposeFile exec -T mysql sh -c $existsCommand | Out-String).Trim()
-        if ($LASTEXITCODE -ne 0 -or $exists -ne "0") { throw "restore target exists or could not be verified; it will not be overwritten" }
-        $createCommand = 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "CREATE DATABASE {0} CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci"' -f $restore
-        Invoke-Compose exec -T mysql sh -c $createCommand
+        if ($LASTEXITCODE -ne 0 -or $exists -notin @("0", "1")) {
+            throw "restore target exists or could not be verified; it will not be overwritten"
+        }
+        if ($exists -eq "1") {
+            if (-not $RestoreDatabase -or $restore -ne $approvedRestore) {
+                throw "restore target exists or could not be verified; it will not be overwritten"
+            }
+            $tableCountCommand = 'mysql -N -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=''{0}''"' -f $restore
+            $tableCount = (& docker compose --env-file $EnvFile -f $ComposeFile exec -T mysql sh -c $tableCountCommand | Out-String).Trim()
+            if ($LASTEXITCODE -ne 0 -or $tableCount -ne "0") {
+                throw "approved restore continuation target is not empty; it will not be overwritten"
+            }
+        } else {
+            $createCommand = 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "CREATE DATABASE {0} CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci"' -f $restore
+            Invoke-Compose exec -T mysql sh -c $createCommand
+        }
         $containerDump = "/tmp/delivery-restore-$([guid]::NewGuid().ToString('N')).sql"
         $restoreUser = "delivery_restore_$([guid]::NewGuid().ToString('N').Substring(0,12))"
         $restorePassword = [guid]::NewGuid().ToString("N")
-        $createUserCommand = 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "CREATE USER ''{0}''@''localhost'' IDENTIFIED BY ''{1}''; GRANT ALL PRIVILEGES ON `{2}`.* TO ''{0}''@''localhost'';"' -f $restoreUser,$restorePassword,$restore
+        $createUserCommand = 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "CREATE USER ''{0}''@''localhost'' IDENTIFIED BY ''{1}''; GRANT ALL PRIVILEGES ON {2}.* TO ''{0}''@''localhost'';"' -f $restoreUser,$restorePassword,$restore
         $dropUserCommand = 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "DROP USER IF EXISTS ''{0}''@''localhost''"' -f $restoreUser
         try {
             Invoke-Compose exec -T mysql sh -c $createUserCommand

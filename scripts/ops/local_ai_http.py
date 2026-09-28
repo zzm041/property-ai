@@ -28,6 +28,8 @@ sys.path.insert(0,str(Path(__file__).resolve().parent))
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'backend'))
 from local_ai_models import MODEL_DIRS,offline,load,infer
 from local_ai_process import RequestJob,join_request_job
+from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
+from app.domain.observed_event import work_order_analysis_response_format
 from app.domain.vision import VISION_ANALYSIS_PROMPT_VERSION,vision_analysis_response_format
 
 QWEN_CANDIDATES={
@@ -41,8 +43,8 @@ MODELS={'asr':'Qwen3-ASR-0.6B','embedding':'bge-m3','reranker':'bge-reranker-v2-
 LIMITS={'asr':1,'embedding':24,'reranker':18,'qwen':18}
 CONTINUATION_MAX={'asr':1,'embedding':6,'reranker':6,'qwen':6}
 MAX_BODY=1_100_000
-WORK_ORDER_PROMPT_VERSION='wo-analysis-v10-observed-event-r3fix2b'
-WORK_ORDER_RESPONSE_FORMAT=json.loads((Path(__file__).resolve().parent/'work_order_response_format.json').read_text(encoding='utf-8'))
+WORK_ORDER_PROMPT_VERSION=WORK_ORDER_ANALYSIS_PROMPT_VERSION
+WORK_ORDER_RESPONSE_FORMAT=work_order_analysis_response_format()
 VISION_RESPONSE_FORMAT=vision_analysis_response_format()
 
 def stamp():return datetime.now(UTC).isoformat()

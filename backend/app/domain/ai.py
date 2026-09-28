@@ -63,7 +63,7 @@ ANNOUNCEMENT_READ = "announcement:read"
 ANNOUNCEMENT_DRAFT = "announcement:draft"
 ANNOUNCEMENT_PUBLISH = "announcement:publish"
 
-WORK_ORDER_ANALYSIS_PROMPT_VERSION = "wo-analysis-v10-observed-event-r3fix2b"
+WORK_ORDER_ANALYSIS_PROMPT_VERSION = "wo-analysis-v11-evidence-id"
 DISPATCH_CONTRACT_VERSION = "category-duty-skill-v1"
 INCIDENT_SUMMARY_PROMPT_VERSION = "incident-summary-v1"
 ANNOUNCEMENT_DRAFT_PROMPT_VERSION = "announcement-draft-v1"

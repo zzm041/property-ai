@@ -163,6 +163,9 @@ def test_delivery_backup_uses_binary_safe_compose_copy() -> None:
     assert 'Invoke-Compose cp "mysql:$containerTarget" $hostTemp' in script
     assert "Invoke-Compose cp $dump \"mysql:$containerDump\"" in script
     assert "restore target exists or could not be verified" in script
+    assert '"${database}_restore_check_029"' in script
+    assert "explicit restore database is not the approved delivery target" in script
+    assert "approved restore continuation target is not empty" in script
     assert "backup path must stay inside deploy/backups" in script
     assert "backup target or manifest already exists" in script
     assert "backup target is already reserved by another operation" in script
@@ -174,6 +177,6 @@ def test_delivery_backup_uses_binary_safe_compose_copy() -> None:
     assert "trusted backup manifest is missing" in script
     assert "backup manifest does not match the dump" in script
     assert "dump contains a forbidden cross-database or global statement" in script
-    assert "GRANT ALL PRIVILEGES ON `{2}`.*" in script
+    assert "GRANT ALL PRIVILEGES ON {2}.*" in script
     assert 'exec mysql -u\"$DELIVERY_RESTORE_USER\"' in script
     assert 'exec mysql -uroot -p\"$MYSQL_ROOT_PASSWORD\" \'\'{0}\'\'' not in script
