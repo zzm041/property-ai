@@ -419,6 +419,12 @@ class AnalysisService:
                     or current.input_hash != prior_claim["input_hash"]
                 ):
                     return None
+                # ASR is derived during this durable task and may have been
+                # committed by a failed apply attempt. Keep retries bound to
+                # the first claimed input instead of treating that own output
+                # as new resident input and invalidating VLM/ASR checkpoints.
+                if prior_claim:
+                    input_hash = prior_claim["input_hash"]
                 # ASR is an output of this operation. Compare its original
                 # empty-ASR hash too; never accept arbitrary changed input just
                 # because the work order has moved out of PENDING_ANALYSIS.

@@ -233,6 +233,28 @@ def test_fenced_committed_analysis_survives_changed_historical_context(monkeypat
     assert s._prepare(work_order_id=30,request_id='old-task-after-append') is None
 
 
+def test_same_task_keeps_claimed_input_hash_after_asr_was_persisted(monkeypatch):
+    from app.core.config import Settings
+    from app.core.time import utc_now
+    monkeypatch.setattr('app.service.analysis.begin_owned_transaction',lambda _:nullcontext())
+    s=AnalysisService.__new__(AnalysisService);s._session=MagicMock();s._session.info={}
+    s._settings=Settings(_env_file=None);s._clock=utc_now;s._task_context=context(2);s._work_orders=repo(claim());s._ai=MagicMock()
+    r=record();r.house_id=3;r.created_at=utc_now()
+    s._work_orders.get_work_order_for_update.return_value=r
+    s._work_orders.get_content.return_value=NS(text='语音报修',extra_notes='',asr_text='已持久化转写')
+    s._ai.list_media_with_files.return_value=((NS(kind='AUDIO',taken_phase='REPORT'),
+                                                NS(storage_key='audio-key',mime_type='audio/wav')),)
+    s._ai.get_analysis_context.return_value={}
+    s._ai.get_building_id.return_value=4
+    current=NS(id=7,analysis_version=1,status='FAILED',input_hash='hash',
+               prompt_version='old',error_code='AI.UNAVAILABLE')
+    s._ai.get_current_analysis_for_update.return_value=current
+    snap=s._prepare(work_order_id=30,request_id='retry-after-asr')
+    assert snap.input_hash == 'hash'
+    assert snap.existing_asr_text == '已持久化转写'
+    assert current.input_hash == 'hash' and current.status == 'PROCESSING'
+
+
 def test_stale_task_completes_existing_tracking_as_ignored_without_replay(monkeypatch):
     from app.worker.tasks import _record_analysis_attempt_outcome
     complete=MagicMock();monkeypatch.setattr('app.worker.failed_tasks.complete_attempt',complete)
