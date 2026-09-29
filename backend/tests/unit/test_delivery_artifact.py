@@ -239,6 +239,9 @@ def test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded() -> Non
 
 def test_delivery_ollama_restart_requires_exact_controlled_stop_evidence() -> None:
     runtime=(ROOT/'deploy/ollama-runtime.ps1').read_text(encoding='utf-8')
+    assert 'D571E4CF0AD4456FCCD33D5B985B6D63BA5669C6E5A812391704083952AAE3D5' in runtime
+    assert '$ExpectedVersion = "0.34.4"' in runtime
+    assert '$version.version -ne $ExpectedVersion' in runtime
     assert 'calls\\call-003\\result.json' in runtime
     assert 'calls\\call-007\\result.json' in runtime
     assert 'C136825C9391FFC8F48395AB1A3E78A4638FC53F181FCAE84FBF47DF284BF85C' in runtime

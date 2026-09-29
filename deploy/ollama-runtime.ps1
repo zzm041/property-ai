@@ -28,7 +28,8 @@ $OllamaExe = if ($env:PROPERTY_AI_OLLAMA_EXE) {
 } else {
     "C:\Users\lmj\AppData\Local\Programs\Ollama\ollama.exe"
 }
-$ExpectedExeSha256 = "F282BAB3CB8ECE9F1843811C08E54FEC449557EFADC49EE0F9AF07F1B93407FC"
+$ExpectedExeSha256 = "D571E4CF0AD4456FCCD33D5B985B6D63BA5669C6E5A812391704083952AAE3D5"
+$ExpectedVersion = "0.34.4"
 $Endpoint = "127.0.0.1:11435"
 
 function Get-ListenerPid {
@@ -224,7 +225,7 @@ switch ($Action) {
                 if ($process.HasExited) { throw "owned Ollama runtime exited during startup; logs and receipt were retained" }
                 try { $version = Invoke-Version } catch { $version = $null }
             } until ($null -ne $version -or [DateTime]::UtcNow -ge $deadline)
-            if ($null -eq $version -or $version.version -ne "0.34.3") { throw "Ollama readiness/version check failed" }
+            if ($null -eq $version -or $version.version -ne $ExpectedVersion) { throw "Ollama readiness/version check failed" }
             $null = Assert-StateProcess $state
             [ordered]@{ state = $state; version = $version.version; inference_on_start = $false } | ConvertTo-Json -Depth 6
         } finally {

@@ -40,6 +40,7 @@ def test_only_explicit_reviewed_qwen_candidates_can_configure_adapter(monkeypatc
     assert candidate.QWEN_RUNTIME_VERSION=='0.34.3'
     current=_load_adapter_candidate(monkeypatch,'qwen38-27b-q3km-g55:7af3b8f')
     assert current.DIGEST=='eb18a122286f7a67d36dc8129f9caa1c0f7bb8449d7669a79e3ecb3d81289e0c'
+    assert current.QWEN_RUNTIME_VERSION=='0.34.4'
     with pytest.raises(RuntimeError,match='UNAPPROVED_QWEN_CANDIDATE'):
         _load_adapter_candidate(monkeypatch,'qwen3.5:latest')
 
