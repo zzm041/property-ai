@@ -75,10 +75,12 @@ function Retire-ControlledStopReceipt([object]$State) {
     }
     if ($null -eq $binding) { throw "controlled-stop evidence does not bind the stale receipt" }
     $sameProcess = $false
-    $currentPid = Get-Process -Id ([int]$State.pid) -ErrorAction SilentlyContinue
-    if ($null -ne $currentPid) {
+    $currentPid = Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$State.pid)" -ErrorAction SilentlyContinue
+    if ($null -ne $currentPid -and $null -ne $currentPid.CreationDate) {
         $recordedStart = ([DateTimeOffset]$State.started_at_utc).UtcDateTime
-        $sameProcess = [Math]::Abs(($currentPid.StartTime.ToUniversalTime() - $recordedStart).TotalMilliseconds) -le 1
+        $sameProcess = [Math]::Abs((([DateTime]$currentPid.CreationDate).ToUniversalTime() - $recordedStart).TotalMilliseconds) -le 1
+    } elseif ($null -ne $currentPid) {
+        $sameProcess = $true
     }
     if ($sameProcess -or $null -ne (Get-ListenerPid)) {
         throw "controlled-stop receipt cannot be retired while execution may still exist"
