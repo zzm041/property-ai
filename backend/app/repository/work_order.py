@@ -103,6 +103,23 @@ class WorkOrderRepository:
         ).order_by(WorkOrderLog.id.desc()).limit(1).with_for_update()
             .execution_options(populate_existing=True))
 
+    def latest_analysis_provider_checkpoint(
+        self,
+        work_order_id: int,
+        provider_type: str,
+    ) -> WorkOrderLog | None:
+        if provider_type not in {"ASR", "VLM"}:
+            raise ValueError("Unsupported provider checkpoint")
+        return self._session.scalar(
+            select(WorkOrderLog)
+            .where(
+                WorkOrderLog.work_order_id == work_order_id,
+                WorkOrderLog.event_code == f"AI_{provider_type}_CHECKPOINT",
+            )
+            .order_by(WorkOrderLog.id.desc())
+            .limit(1)
+        )
+
     def get_property_for_update(self, property_id: int) -> Property | None:
         return self._session.scalar(
             select(Property).where(Property.id == property_id).with_for_update()

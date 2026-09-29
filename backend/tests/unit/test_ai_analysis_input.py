@@ -99,6 +99,36 @@ def test_all_images_fail_text_still_reaches_existing_llm_fallback():
     assert s._vlm.inspect_image.call_count == 3
 
 
+def test_durable_retry_reuses_exact_vlm_checkpoint_without_another_image_call():
+    s = service()
+    s._task_context = {'task_id':'task-1', 'attempt':2}
+    s._load_provider_checkpoint = MagicMock(return_value='saved visual evidence')
+    s._save_provider_checkpoint = MagicMock()
+    s._run_vlm = MagicMock()
+    s._llm = DevelopmentLLMProvider()
+    bundle = s._call_providers(snapshot=snapshot(), request_id='retry', attempt=2)
+    assert bundle.vision_text == 'saved visual evidence'
+    s._run_vlm.assert_not_called()
+    s._save_provider_checkpoint.assert_not_called()
+
+
+def test_successful_vlm_is_checkpointed_but_partial_failure_is_not():
+    s = service()
+    s._task_context = {'task_id':'task-1', 'attempt':1}
+    s._load_provider_checkpoint = MagicMock(return_value=None)
+    s._save_provider_checkpoint = MagicMock()
+    s._run_vlm = MagicMock(return_value=('all images', None))
+    s._llm = DevelopmentLLMProvider()
+    s._call_providers(snapshot=snapshot(), request_id='first', attempt=1)
+    s._save_provider_checkpoint.assert_called_once_with(
+        snapshot(), 'VLM', 'all images', 'first')
+
+    s._save_provider_checkpoint.reset_mock()
+    s._run_vlm.return_value = ('partial images', 'AI.TIMEOUT')
+    s._call_providers(snapshot=snapshot(), request_id='partial', attempt=1)
+    s._save_provider_checkpoint.assert_not_called()
+
+
 @pytest.mark.parametrize('body', [
     {}, {'description': None}, {'description': ''}, {'description': ' \r\n\t'},
     {'description': 42}, {'description': []}, {'description': {}},

@@ -3,7 +3,12 @@
 No task platform or mutable JSON business record: each claim is an audit event
 under the existing WorkOrder mutex. Retry messages carry only its identifiers.
 """
+from hashlib import sha256
+
 from app.model.work_order import WorkOrderLog
+
+
+_CHECKPOINT_PROVIDERS = frozenset({"ASR", "VLM"})
 
 
 def accepts_attempt(repository, record, context: dict | None) -> bool:
@@ -65,3 +70,52 @@ def owns_attempt(repository, record, analysis, context: dict | None) -> bool:
     return (analysis is not None and analysis.id == claim["analysis_id"]
             and analysis.analysis_version == claim["analysis_version"]
             and analysis.input_hash == claim["input_hash"])
+
+
+def provider_checkpoint_payload(snapshot, context: dict, provider_type: str,
+                                model_version: str, value: str) -> dict[str, object]:
+    """Build an immutable partial-result checkpoint bound to one durable task input."""
+    if provider_type not in _CHECKPOINT_PROVIDERS:
+        raise ValueError("Unsupported provider checkpoint")
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError("Provider checkpoint requires non-empty text")
+    return {
+        "schema_version": 1,
+        "task_id": context["task_id"],
+        "attempt": context["attempt"],
+        "analysis_id": snapshot.analysis_id,
+        "analysis_version": snapshot.analysis_version,
+        "input_hash": snapshot.input_hash,
+        "provider_type": provider_type,
+        "model_version": model_version,
+        "value": value,
+        "value_sha256": sha256(value.encode("utf-8")).hexdigest(),
+    }
+
+
+def read_provider_checkpoint(payload: object, snapshot, context: dict,
+                             provider_type: str, model_version: str) -> str | None:
+    """Return only an intact checkpoint for this exact task, input and provider."""
+    if not isinstance(payload, dict) or provider_type not in _CHECKPOINT_PROVIDERS:
+        return None
+    expected = {
+        "schema_version": 1,
+        "task_id": context.get("task_id"),
+        "analysis_id": snapshot.analysis_id,
+        "analysis_version": snapshot.analysis_version,
+        "input_hash": snapshot.input_hash,
+        "provider_type": provider_type,
+        "model_version": model_version,
+    }
+    if any(payload.get(key) != value for key, value in expected.items()):
+        return None
+    attempt = payload.get("attempt")
+    if isinstance(attempt, bool) or not isinstance(attempt, int) or attempt > context.get("attempt", 0):
+        return None
+    value = payload.get("value")
+    digest = payload.get("value_sha256")
+    if not isinstance(value, str) or not value.strip() or not isinstance(digest, str):
+        return None
+    if sha256(value.encode("utf-8")).hexdigest() != digest:
+        return None
+    return value

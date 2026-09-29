@@ -86,8 +86,14 @@ from app.repository.ai import AiRepository
 from app.repository.identity import IdentityRepository
 from app.repository.work_order import WorkOrderRepository
 from app.service.audit import AuditService
-from app.service.analysis_attempt import accepts_attempt, claim_attempt, owns_attempt
-from app.service.task_intent import require_execution_lease
+from app.service.analysis_attempt import (
+    accepts_attempt,
+    claim_attempt,
+    owns_attempt,
+    provider_checkpoint_payload,
+    read_provider_checkpoint,
+)
+from app.service.task_intent import IntentLeaseLost, require_execution_lease
 from app.service.auth import AuthService
 from app.service.rbac import RbacService
 
@@ -564,10 +570,22 @@ class AnalysisService:
         vision_text = None
         error_code = None
         if snapshot.audio and asr_text is None:
-            asr_text, asr_error = self._run_asr(snapshot, request_id, attempt)
+            asr_text = self._load_provider_checkpoint(snapshot, "ASR")
+            if asr_text is None:
+                asr_text, asr_error = self._run_asr(snapshot, request_id, attempt)
+                if asr_text is not None and asr_error is None:
+                    self._save_provider_checkpoint(snapshot, "ASR", asr_text, request_id)
+            else:
+                asr_error = None
             error_code = asr_error or error_code
         if snapshot.images:
-            vision_text, vlm_error = self._run_vlm(snapshot, request_id, attempt)
+            vision_text = self._load_provider_checkpoint(snapshot, "VLM")
+            if vision_text is None:
+                vision_text, vlm_error = self._run_vlm(snapshot, request_id, attempt)
+                if vision_text is not None and vlm_error is None:
+                    self._save_provider_checkpoint(snapshot, "VLM", vision_text, request_id)
+            else:
+                vlm_error = None
             error_code = vlm_error or error_code
         payload, llm_error, call_status = self._run_llm(
             snapshot,
@@ -585,6 +603,90 @@ class AnalysisService:
             error_code=error_code,
             call_status=call_status,
         )
+
+    def _provider_model_version(self, provider_type: str) -> str:
+        provider = self._asr if provider_type == "ASR" else self._vlm
+        return str(getattr(provider, "model_version", "unknown"))
+
+    def _load_provider_checkpoint(
+        self,
+        snapshot: AnalysisSnapshot,
+        provider_type: str,
+    ) -> str | None:
+        context = getattr(self, "_task_context", None)
+        if not context:
+            return None
+        with begin_owned_transaction(self._session):
+            record = self._work_orders.get_work_order_for_update(snapshot.work_order_id)
+            require_execution_lease(self._session)
+            analysis = self._ai.get_current_analysis_for_update(snapshot.work_order_id)
+            if record is None or not owns_attempt(self._work_orders, record, analysis, context):
+                raise IntentLeaseLost()
+            checkpoint = self._work_orders.latest_analysis_provider_checkpoint(
+                snapshot.work_order_id,
+                provider_type,
+            )
+            if checkpoint is None:
+                return None
+            return read_provider_checkpoint(
+                checkpoint.payload_json,
+                snapshot,
+                context,
+                provider_type,
+                self._provider_model_version(provider_type),
+            )
+
+    def _save_provider_checkpoint(
+        self,
+        snapshot: AnalysisSnapshot,
+        provider_type: str,
+        value: str,
+        request_id: str,
+    ) -> None:
+        context = getattr(self, "_task_context", None)
+        if not context:
+            return
+        model_version = self._provider_model_version(provider_type)
+        payload = provider_checkpoint_payload(
+            snapshot,
+            context,
+            provider_type,
+            model_version,
+            value,
+        )
+        with begin_owned_transaction(self._session):
+            record = self._work_orders.get_work_order_for_update(snapshot.work_order_id)
+            require_execution_lease(self._session)
+            analysis = self._ai.get_current_analysis_for_update(snapshot.work_order_id)
+            if record is None or not owns_attempt(self._work_orders, record, analysis, context):
+                raise IntentLeaseLost()
+            existing = self._work_orders.latest_analysis_provider_checkpoint(
+                snapshot.work_order_id,
+                provider_type,
+            )
+            if existing is not None:
+                reused = read_provider_checkpoint(
+                    existing.payload_json,
+                    snapshot,
+                    context,
+                    provider_type,
+                    model_version,
+                )
+                if reused is not None:
+                    return
+            self._work_orders.add_log(WorkOrderLog(
+                tenant_id=record.tenant_id,
+                property_id=record.property_id,
+                work_order_id=record.id,
+                actor_user_id=None,
+                actor_type="SYSTEM",
+                from_status=record.status,
+                to_status=record.status,
+                process_reason=record.process_reason,
+                event_code=f"AI_{provider_type}_CHECKPOINT",
+                request_id=request_id,
+                payload_json=payload,
+            ))
 
     def _run_asr(
         self,

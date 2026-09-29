@@ -9,7 +9,13 @@ from sqlalchemy.exc import OperationalError
 from app.core.database import retryable_mysql_analysis_error_code
 from app.core.errors import AiErrorCode
 from app.service.analysis import AnalysisService
-from app.service.analysis_attempt import accepts_attempt, claim_attempt, owns_attempt
+from app.service.analysis_attempt import (
+    accepts_attempt,
+    claim_attempt,
+    owns_attempt,
+    provider_checkpoint_payload,
+    read_provider_checkpoint,
+)
 from app.worker.tasks import analyze_work_order_task, AnalysisDatabaseRetryExhausted
 
 
@@ -97,6 +103,18 @@ def test_claim_and_execution_token_are_durable_existing_history():
     assert owns_attempt(r, record(), analysis, c)
     r.latest_analysis_attempt.return_value = NS(payload_json={**log.payload_json, 'execution_token':'duplicate-worker'})
     assert not owns_attempt(r, record(), analysis, c)
+
+
+def test_provider_checkpoint_is_bound_to_exact_task_input_model_and_attempt():
+    snap = NS(analysis_id=7, analysis_version=1, input_hash='hash')
+    current = context(attempt=2)
+    payload = provider_checkpoint_payload(snap, current, 'VLM', 'qwen-fixed', 'visible damage')
+    assert read_provider_checkpoint(payload, snap, current, 'VLM', 'qwen-fixed') == 'visible damage'
+    assert read_provider_checkpoint(payload, snap, {**current, 'task_id':'other'}, 'VLM', 'qwen-fixed') is None
+    assert read_provider_checkpoint(payload, NS(**{**snap.__dict__, 'input_hash':'changed'}), current, 'VLM', 'qwen-fixed') is None
+    assert read_provider_checkpoint(payload, snap, current, 'VLM', 'different-model') is None
+    assert read_provider_checkpoint({**payload, 'attempt':3}, snap, current, 'VLM', 'qwen-fixed') is None
+    assert read_provider_checkpoint({**payload, 'value':'tampered'}, snap, current, 'VLM', 'qwen-fixed') is None
 
 
 def test_saved_analysis_dispatches_outside_apply_and_without_provider_recall():
