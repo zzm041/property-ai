@@ -15,6 +15,7 @@ import hmac
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import io
 import json
+import math
 import os
 from pathlib import Path
 import subprocess
@@ -46,9 +47,12 @@ QWEN_MODEL=os.environ.get('PROPERTY_AI_LOCAL_QWEN_MODEL','qwen3.5:4b')
 if QWEN_MODEL not in QWEN_CANDIDATES:raise RuntimeError('UNAPPROVED_QWEN_CANDIDATE')
 DIGEST,QWEN_RUNTIME_VERSION=QWEN_CANDIDATES[QWEN_MODEL]
 MODELS={'asr':'Qwen3-ASR-0.6B','embedding':'bge-m3','reranker':'bge-reranker-v2-m3','qwen':QWEN_MODEL}
-LIMITS={'asr':1,'embedding':24,'reranker':18,'qwen':18}
+LIMITS={'asr':2,'embedding':12,'reranker':8,'qwen':120}
 CONTINUATION_MAX={'asr':1,'embedding':6,'reranker':6,'qwen':6}
-MAX_BODY=1_100_000
+MAX_MEDIA_BYTES=10*1024*1024
+# A 10 MiB image expands by 4/3 as a data URL. Keep a small fixed allowance
+# for the prompt and JSON Schema while retaining an explicit request ceiling.
+MAX_BODY=15*1024*1024
 WORK_ORDER_PROMPT_VERSION=WORK_ORDER_ANALYSIS_PROMPT_VERSION
 WORK_ORDER_RESPONSE_FORMAT=work_order_analysis_response_format()
 VISION_RESPONSE_FORMAT=vision_analysis_response_format()
@@ -111,6 +115,9 @@ def validate(kind,value):
             if set(image_part)!={'type','image_url'} or image_part['type']!='image_url' or set(image_part['image_url'])!={'url'}:raise ValueError('VLM_INPUT')
             image_url=image_part['image_url']['url']
             if not isinstance(image_url,str) or not image_url.startswith('data:image/') or ';base64,' not in image_url:raise ValueError('VLM_INPUT')
+            try:image_bytes=base64.b64decode(image_url.split(';base64,',1)[1],validate=True)
+            except (ValueError,base64.binascii.Error) as exc:raise ValueError('VLM_INPUT') from exc
+            if not 0<len(image_bytes)<=MAX_MEDIA_BYTES:raise ValueError('VLM_INPUT')
         elif not isinstance(content,str) or not 0<len(content)<=10000:raise ValueError('QWEN_INPUT')
 
 def decode(path,content_type,body,prompt_version,scope='all'):
@@ -190,6 +197,20 @@ class Runner:
         self.duration_seconds=self.config.get('duration_seconds',1800)
         if not isinstance(self.duration_seconds,int) or not 0<self.duration_seconds<=7200:
             raise ValueError('INVALID_DURATION')
+        self.call_baseline=self.config.get('call_baseline',{kind:0 for kind in LIMITS})
+        if set(self.call_baseline)!=set(LIMITS) or any(
+            isinstance(self.call_baseline[k],bool)
+            or not isinstance(self.call_baseline[k],int)
+            or not 0<=self.call_baseline[k]<=self.limits[k]
+            for k in LIMITS
+        ):raise ValueError('INVALID_CALL_BASELINE')
+        self.duration_baseline_seconds=self.config.get('duration_baseline_seconds',0)
+        if (
+            isinstance(self.duration_baseline_seconds,bool)
+            or not isinstance(self.duration_baseline_seconds,(int,float))
+            or not math.isfinite(self.duration_baseline_seconds)
+            or not 0<=self.duration_baseline_seconds<self.duration_seconds
+        ):raise ValueError('INVALID_DURATION_BASELINE')
         self.asr_start_ram_mib=self.config.get('asr_start_ram_mib',8192)
         if (
             not isinstance(self.asr_start_ram_mib,int)
@@ -299,9 +320,21 @@ class Runner:
             if sum(r['kind']==kind for r in new)>=self.continuation['limits'][kind]:raise RuntimeError('R2_CALL_LIMIT')
             metadata={'window':'r2-continuation-01','window_start_unix':start,'incremental_max_calls':self.continuation['limits'][kind],'replay_of':replay_of}
         else:
-            if records and now-records[0]['unix']>=self.duration_seconds:raise RuntimeError('R2_WINDOW_EXHAUSTED')
-            if sum(r['kind']==kind for r in records)>=self.limits[kind]:raise RuntimeError('R2_CALL_LIMIT')
-            deadline=(records[0]['unix'] if records else now)+self.duration_seconds;metadata={'replay_of':replay_of}
+            if self.call_baseline[kind]+sum(r['kind']==kind for r in records)>=self.limits[kind]:raise RuntimeError('R2_CALL_LIMIT')
+            spent=float(self.duration_baseline_seconds)
+            for path in prior:
+                result=json.loads((path.parent/'result.json').read_text(encoding='utf-8'))
+                elapsed=result.get('total_seconds',0)
+                if isinstance(elapsed,bool) or not isinstance(elapsed,(int,float)) or not math.isfinite(elapsed) or elapsed<0:
+                    raise RuntimeError('R2_BUDGET_RECORD_INVALID')
+                spent+=float(elapsed)
+            remaining=self.duration_seconds-spent
+            if remaining<=0:raise RuntimeError('R2_WINDOW_EXHAUSTED')
+            deadline=now+remaining;metadata={
+                'replay_of':replay_of,'budget':'cumulative-model-runtime-v1',
+                'call_baseline':self.call_baseline[kind],
+                'cumulative_seconds_before':spent,
+            }
         folder=self.private/f'call-{len(records)+1:03d}';folder.mkdir()
         save(folder/'reservation.json',{'kind':kind,'unix':now,'utc':stamp(),'model':MODELS[kind],'max_calls':self.limits[kind],'input_hash':input_hash,**metadata})
         return folder,deadline

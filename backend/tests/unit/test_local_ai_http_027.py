@@ -1,5 +1,6 @@
 """No live inference, DB or service: bounded HTTP/ledger and vector contracts."""
 import importlib.util
+import base64
 import hashlib
 import json
 from pathlib import Path
@@ -99,6 +100,36 @@ def test_exact_vision_schema_and_multimodal_shape_are_guarded_without_wrapper_re
     with pytest.raises(ValueError,match='QWEN_SCHEMA_MISMATCH'):
         m.decode('/v1/chat/completions','application/json',json.dumps(value,ensure_ascii=False).encode(),VISION_ANALYSIS_PROMPT_VERSION)
 
+
+def test_vision_request_accepts_allowed_image_larger_than_old_transport_cap():
+    image=b'x'*947_681
+    value={
+        'model':'qwen3.5:4b',
+        'messages':[{'role':'user','content':[
+            {'type':'text','text':'仅描述合成维修图片中的可见现象'},
+            {'type':'image_url','image_url':{'url':'data:image/jpeg;base64,'+base64.b64encode(image).decode()}},
+        ]}],
+        'temperature':0,'reasoning_effort':'none','max_tokens':256,
+        'response_format':vision_analysis_response_format(),
+    }
+    raw=json.dumps(value,ensure_ascii=False).encode()
+    assert len(raw)>1_100_000 and len(raw)<m.MAX_BODY
+    assert m.decode('/v1/chat/completions','application/json',raw,VISION_ANALYSIS_PROMPT_VERSION)[0]=='qwen'
+
+
+def test_vision_request_rejects_invalid_or_oversized_decoded_media():
+    base={
+        'model':'qwen3.5:4b','temperature':0,'reasoning_effort':'none','max_tokens':256,
+        'response_format':vision_analysis_response_format(),
+    }
+    for encoded in ('not-base64!',base64.b64encode(b'x'*(m.MAX_MEDIA_BYTES+1)).decode()):
+        value={**base,'messages':[{'role':'user','content':[
+            {'type':'text','text':'合成维修图片'},
+            {'type':'image_url','image_url':{'url':'data:image/jpeg;base64,'+encoded}},
+        ]}]}
+        with pytest.raises(ValueError,match='VLM_INPUT'):
+            m.decode('/v1/chat/completions','application/json',json.dumps(value).encode(),VISION_ANALYSIS_PROMPT_VERSION)
+
 def runner(tmp_path):
     path=tmp_path/'config.json';path.write_text(json.dumps({'private':str(tmp_path/'run'),'host':'127.0.0.1','port':11436}))
     return m.Runner(path)
@@ -155,12 +186,12 @@ def test_scoped_runtime_limits_and_duration_are_enforced(tmp_path, monkeypatch):
     folder, deadline = scoped.reserve('embedding', 'one')
     assert deadline == 8200.0
     assert json.loads((folder / 'reservation.json').read_text())['max_calls'] == 1
-    m.save(folder / 'result.json', {'status': 'SUCCESS'})
+    m.save(folder / 'result.json', {'status': 'SUCCESS', 'total_seconds': 3.5})
     with pytest.raises(RuntimeError, match='CALL_LIMIT'):
         scoped.reserve('embedding', 'two')
 
 
-def test_scoped_runtime_checks_configured_window_before_reservation(tmp_path, monkeypatch):
+def test_scoped_runtime_uses_cumulative_execution_not_elapsed_wall_clock(tmp_path, monkeypatch):
     config = {
         'private': str(tmp_path / 'run'), 'host': '127.0.0.1', 'port': 11436,
         'limits': {'asr': 1, 'embedding': 2, 'reranker': 2, 'qwen': 2},
@@ -172,15 +203,32 @@ def test_scoped_runtime_checks_configured_window_before_reservation(tmp_path, mo
     clock = [100.0]
     monkeypatch.setattr(m.time, 'time', lambda: clock[0])
     first, _ = scoped.reserve('embedding', 'one')
-    m.save(first / 'result.json', {'status': 'SUCCESS'})
-    clock[0] = 2000.0
+    m.save(first / 'result.json', {'status': 'SUCCESS', 'total_seconds': 100.0})
+    clock[0] = 20_000.0
     second, deadline = scoped.reserve('reranker', 'two')
-    assert deadline == 7300.0
-    m.save(second / 'result.json', {'status': 'SUCCESS'})
-    clock[0] = 7300.0
+    assert deadline == 27_100.0
+    m.save(second / 'result.json', {'status': 'SUCCESS', 'total_seconds': 7100.0})
     with pytest.raises(RuntimeError, match='WINDOW_EXHAUSTED'):
         scoped.reserve('qwen', 'three')
     assert len(list(scoped.private.glob('call-*'))) == 2
+
+
+def test_scoped_runtime_applies_external_usage_baseline_to_same_total_budget(tmp_path,monkeypatch):
+    config={
+        'private':str(tmp_path/'run'),'host':'127.0.0.1','port':11436,
+        'limits':{'asr':2,'embedding':12,'reranker':8,'qwen':120},
+        'call_baseline':{'asr':1,'embedding':6,'reranker':2,'qwen':46},
+        'duration_seconds':7200,'duration_baseline_seconds':535.483,
+    }
+    path=tmp_path/'config.json';path.write_text(json.dumps(config),encoding='utf-8')
+    scoped=m.Runner(path);monkeypatch.setattr(m.time,'time',lambda:1000.)
+    folder,deadline=scoped.reserve('qwen','next')
+    record=json.loads((folder/'reservation.json').read_text())
+    assert deadline==pytest.approx(7664.517)
+    assert record['call_baseline']==46
+    assert record['cumulative_seconds_before']==pytest.approx(535.483)
+    m.save(folder/'result.json',{'status':'SUCCESS','total_seconds':1.25})
+    assert m.Runner(path).reserve('qwen','after')[0].name=='call-002'
 
 
 def test_drain_atomically_blocks_new_admission_without_disturbing_active_request(tmp_path):
@@ -194,8 +242,10 @@ def test_drain_atomically_blocks_new_admission_without_disturbing_active_request
 
 @pytest.mark.parametrize('bad', [
     {'scope': 'work_order_only'},
-    {'limits': {'asr': 1, 'embedding': 12, 'reranker': 8, 'qwen': 19}},
+    {'limits': {'asr': 2, 'embedding': 12, 'reranker': 8, 'qwen': 121}},
     {'duration_seconds': 7201},
+    {'call_baseline': {'asr': 0, 'embedding': 0, 'reranker': 0, 'qwen': 121}},
+    {'duration_baseline_seconds': 7200},
 ])
 def test_scoped_runtime_rejects_widened_configuration(tmp_path, bad):
     config = {'private': str(tmp_path / 'run'), 'host': '127.0.0.1', 'port': 11436, **bad}
@@ -392,12 +442,13 @@ def test_append_only_budget_survives_restart_and_reserves_before_load(tmp_path):
     r=runner(tmp_path);folder,_=r.reserve('asr')
     with pytest.raises(RuntimeError,match='COMPLETION_UNKNOWN'):m.Runner(r.path).reserve('embedding')
     m.save(folder/'result.json',{'status':'FAILED','owned_exit_confirmed':True})
-    with pytest.raises(RuntimeError,match='CALL_LIMIT'):m.Runner(r.path).reserve('asr')
+    second,_=m.Runner(r.path).reserve('asr','second')
+    m.save(second/'result.json',{'status':'FAILED','owned_exit_confirmed':True})
+    with pytest.raises(RuntimeError,match='CALL_LIMIT'):m.Runner(r.path).reserve('asr','third')
 
 def test_total_window_is_not_reset_by_another_model(tmp_path,monkeypatch):
     r=runner(tmp_path);monkeypatch.setattr(m.time,'time',lambda:100.)
-    folder,_=r.reserve('embedding');m.save(folder/'result.json',{'status':'SUCCESS'})
-    monkeypatch.setattr(m.time,'time',lambda:1900.)
+    folder,_=r.reserve('embedding');m.save(folder/'result.json',{'status':'SUCCESS','total_seconds':1800})
     with pytest.raises(RuntimeError,match='WINDOW_EXHAUSTED'):m.Runner(r.path).reserve('reranker')
 
 
