@@ -1,0 +1,45 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-RUNTIME-RECOVERY",
+  "captured_at": "2026-09-29T17:53:39.3097273+08:00",
+  "environment": "8093/property_ai_delivery_check@0014",
+  "runtime": {
+    "endpoint": "http://127.0.0.1:11437",
+    "source_commit": "3cf0d27cdeb8c8b76fae94457e9130b076e7eb78",
+    "launcher_pid": 30808,
+    "listener_pid": 30788,
+    "started_at_utc": "2026-09-29T09:52:25.4298416Z",
+    "adapter_sha256": "BD91628176E56D8CBF13ED3FF95197277D2A2BB6224BA7A30A4C2AC2DD7B0EE0",
+    "runtime_control_sha256": "CEA1B4AD6A5D2C12F70E233E28C791C86BC6EFDC5F2EA9864FDC022D57D13867",
+    "health": "READY",
+    "accepting_requests": true,
+    "request_active": false,
+    "inference_on_start": false
+  },
+  "cumulative_budget": {
+    "limits": {"asr": 2, "embedding": 12, "reranker": 8, "qwen": 120},
+    "call_baseline": {"asr": 1, "embedding": 6, "reranker": 2, "qwen": 46},
+    "duration_limit_seconds": 7200,
+    "duration_baseline_seconds": 535.483,
+    "existing_call_directories": ["call-001", "call-002", "call-003", "call-004", "call-005", "call-006", "call-007"]
+  },
+  "transport_limits": {
+    "decoded_media_bytes": 10485760,
+    "request_body_bytes": 15728640
+  },
+  "verification": {
+    "focused_tests": "68 passed, 3 warnings",
+    "powershell_parse": "PASS",
+    "independent_review": "PASS",
+    "independent_review_path": "reports/codex/REAL-AI-INTEGRATION-027-RUNTIME-RECOVERY-round3.raw.json",
+    "reviewed_head": "ab93429ae3b46952c0331226f50548337ee897cd"
+  },
+  "preserved_boundaries": {
+    "model_calls_during_replacement": 0,
+    "new_work_orders": 0,
+    "failed_work_orders_replayed": false,
+    "database_business_state_changed": false,
+    "historical_dlq_read_or_changed": false,
+    "package_work_order_count": "10/10",
+    "complete_local_delivery": false
+  }
+}

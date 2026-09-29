@@ -1,5 +1,17 @@
 # Project handoff (latest facts only)
 
+## Current checkpoint — fixed work-AI adapter loaded; failed five-order recovery needs an explicit bounded action (2026-09-29)
+
+Current tracking HEAD is `8d82b296273495f57c529b57f1ccbfa2d1142f86`; the runtime fix is `3cf0d27cdeb8c8b76fae94457e9130b076e7eb78`, its deterministic archive binding is `ab93429ae3b46952c0331226f50548337ee897cd`, and the fixed deadline remains **2026-09-29 22:36:10 Asia/Shanghai**. The package has consumed all ten authorized synthetic work orders. No new work order is authorized or available under that cap.
+
+The five-user overlapping submission actually created work orders 7–11 in **286.777 ms** across properties 5 and 6. This is authenticated API concurrency evidence, not five page clicks. All five durably reached `PENDING_ANALYSIS`, but the old adapter rejected every provider request before inference: its 7,200-second model budget was incorrectly treated as wall-clock expiry, and the 1.1 MB request-body limit could not carry an approved 947,681-byte JPEG after base64/JSON expansion. Each durable task intent exhausted three executions and is now `FAILED`; all analyses are `FAILED / AI.UNAVAILABLE`, Assignment count is zero, and work order 9 has no persisted ASR text. No new model reservation occurred. The original failures and work orders were not rewritten or replayed.
+
+The scoped adapter now uses cumulative recorded model seconds, fails closed on missing or invalid historical durations, permits at most 10 MiB decoded media inside a 15 MiB request body, and retains the approved total/baseline limits. Focused verification is **68 passed, 3 warnings** plus PowerShell parse success. The same independent read-only reviewer closed both findings and returned `PASS` in `reports/codex/REAL-AI-INTEGRATION-027-RUNTIME-RECOVERY-round3.raw.json` after independently hashing the actual Git archive bytes.
+
+The reviewed adapter was then loaded on `127.0.0.1:11437` with source `3cf0d27`, adapter SHA-256 `BD91628176E56D8CBF13ED3FF95197277D2A2BB6224BA7A30A4C2AC2DD7B0EE0`, and runtime-control SHA-256 `CEA1B4AD6A5D2C12F70E233E28C791C86BC6EFDC5F2EA9864FDC022D57D13867`. Post-start health is `READY`, accepting and idle; startup made zero inference calls, and call directories remain exactly `call-001` through `call-007`. Exact redacted state is `reports/real-ai-integration-027/delivery-auto-8093/runtime-recovery-loaded.json`.
+
+The remaining local delivery gap is runtime business proof, not the adapter load itself. Existing work orders 7–11 are terminal at the durable task-intent layer; processing them now requires an explicit scoped administrative recovery that creates a new immutable intent generation, preserves the failed generation and audit trail, and consumes the existing model budget. No such recovery has been performed. Work orders 3–5 remain separately protected from replay. Until a bounded recovery is authorized and succeeds, image AUTO, voice AUTO, five-user AI overlap, one resulting CLOSED flow and complete local delivery remain unproven.
+
 ## Current checkpoint — df14c08 loaded; IMG4 failed before inference; final overlap held at ASR RAM guard (2026-09-29)
 
 Current repository HEAD is `8c22f52`. The fixed deadline remains **2026-09-29 22:36:10 Asia/Shanghai**. The current authorization is at most ten new synthetic work orders for this package; `WO1`, `WO3`, `WO4`, `WO5` and the new IMG4 work order 6 consume five slots, leaving at most five. Work orders 3–5 remain immutable failure evidence and were not replayed or rewritten.

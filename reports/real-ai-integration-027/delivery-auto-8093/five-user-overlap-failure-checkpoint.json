@@ -1,0 +1,72 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-DELIVERY-AUTO-OVERLAP",
+  "run_id": "delivery-auto-702c3db745",
+  "captured_at": "2026-09-29T17:42:58.9152336+08:00",
+  "environment": "8093/property_ai_delivery_check@0014",
+  "runtime_image": "property-ai-delivery:df14c08",
+  "submission_evidence": {
+    "path": "reports/real-ai-integration-027/delivery-auto-8093/five-user-overlap-submit.json",
+    "sha256": "6D2141AA56519128F49BD10B0D9EFEB29CB1C82F139D4CD371F60F2DBDDC89FA",
+    "submitted": 5,
+    "work_order_ids": [7, 8, 9, 10, 11],
+    "overlap_confirmed": true,
+    "overlap_span_ms": 286.777,
+    "page_clicks": 0
+  },
+  "final_database_outcome": {
+    "work_order_status": "PENDING_ANALYSIS",
+    "analysis_status": "FAILED",
+    "analysis_error_code": "AI.UNAVAILABLE",
+    "assignment_count": 0,
+    "task_intent_status": "FAILED",
+    "publish_attempts_each": 3,
+    "execution_attempts_each": 3,
+    "asr_text_persisted": false
+  },
+  "provider_call_summary": {
+    "work_order_7": {"vlm": "AI.INVALID_OUTPUT", "llm": "AI.UNAVAILABLE", "attempts": 3},
+    "work_order_8": {"vlm": "AI.INVALID_OUTPUT", "llm": "AI.UNAVAILABLE", "attempts": 3},
+    "work_order_9": {"asr": "AI.UNAVAILABLE", "vlm": "AI.INVALID_OUTPUT", "llm": "AI.UNAVAILABLE", "attempts": 3},
+    "work_order_10": {"vlm": "AI.UNAVAILABLE", "llm": "AI.UNAVAILABLE", "attempts": 3},
+    "work_order_11": {"vlm": "AI.UNAVAILABLE", "llm": "AI.UNAVAILABLE", "attempts": 3}
+  },
+  "adapter_evidence": {
+    "source_commit": "19a417fc29199120a1e08b64008a90741ad7af78",
+    "adapter_sha256": "089CC518CDF13A9F09BFEF01E81C5E506504532FAFF97743D257C8475CB2B011",
+    "existing_call_directories_before_and_after": 7,
+    "new_model_reservations": 0,
+    "new_model_inference_calls": 0,
+    "health_after_failure": "READY_IDLE",
+    "configured_duration_seconds": 7200,
+    "first_existing_reservation_local_time": "2026-09-29T12:11:59+08:00",
+    "request_time_local": "2026-09-29T17:29:18+08:00"
+  },
+  "root_causes": [
+    {
+      "id": "027-OVERLAP-RUNTIME-01",
+      "cause": "The adapter treated the approved 7200-second cumulative model-execution budget as a wall-clock expiry measured from the first historical reservation.",
+      "effect": "Otherwise valid Qwen and ASR requests were rejected with HTTP 503 before a new reservation or inference."
+    },
+    {
+      "id": "027-OVERLAP-RUNTIME-02",
+      "cause": "The adapter request-body ceiling was 1100000 bytes, while the approved 947681-byte JPEG expands beyond that ceiling when encoded as a data URL inside the VLM JSON request.",
+      "effect": "The three valve-image VLM requests were rejected with HTTP 413 and recorded as AI.INVALID_OUTPUT before inference."
+    }
+  ],
+  "scoped_fix": {
+    "adapter_commit": "3cf0d27cdeb8c8b76fae94457e9130b076e7eb78",
+    "runtime_binding_commit": "a5778e59b3192cd03ab3e3f49527703a58c21c76",
+    "focused_tests": "68 passed, 1 warning",
+    "powershell_parse": "PASS",
+    "loaded": false,
+    "business_replay_performed": false
+  },
+  "boundaries": {
+    "package_work_order_count": "10/10",
+    "new_work_orders_remaining": 0,
+    "failed_work_orders_replayed": false,
+    "database_business_state_manually_changed": false,
+    "historical_dlq_read_or_changed": false,
+    "complete_local_delivery": false
+  }
+}

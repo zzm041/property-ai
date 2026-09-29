@@ -1,0 +1,42 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-OLLAMA0344-COMPAT",
+  "review_round": 4,
+  "authorization": "负责人批准的同任务例外窄复核；未重置问题历史或计数",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_head": "52eeacc82f5e38919f5c40697949c2a5ab67a932",
+  "reviewed_fix_sha": "368a04e9c811f330803a1310008652488c8abfa3",
+  "verdict": "PASS_SCOPED_INCREMENTAL",
+  "findings": [],
+  "closed_findings": [
+    {
+      "id": "OLLAMA0344-R3-01",
+      "status": "CLOSED",
+      "evidence": [
+        "Get-ListenerPid 先保存 netstat 输出，并在解析前要求 LASTEXITCODE=0；枚举失败直接抛错，不再解释为空监听。",
+        "Retire-RebootedReceipt 的系统启动时间及进程查询均使用 -ErrorAction Stop，查询失败不能继续到归档。",
+        "只有成功查询后的确无进程、无监听，且其余精确绑定条件全部满足，才进入 Move-Item。",
+        "新增直接静态断言覆盖这三处观测错误处理；原固定哈希、身份、启动时间和不可覆盖归档条件未放宽。"
+      ]
+    }
+  ],
+  "checked": [
+    "实际读取 aa77e60 至当前 HEAD 的两个指定文件差异及恢复分支。",
+    "请求中的368a04e4无法解析；按实际提交历史核对，修复提交为368a04e9c811f330803a1310008652488c8abfa3。",
+    "两个审查文件工作区无未提交差异。"
+  ],
+  "source_hashes": {
+    "D:/property-ai/deploy/ollama-runtime.ps1": "0EF239F43E6BDC094E3E8E9EF38FBC05DA56BD327377E4AA0A710E52D24EC1DE",
+    "D:/property-ai/backend/tests/unit/test_delivery_artifact.py": "DCB76EB2AFACA54D512FA5B9E7B40D1FC2C4F86D43195412F8C0EED0A47CD5AD"
+  },
+  "tests_evidence": {
+    "reported": "实施方报告最终58 passed、3 warnings，PowerShell parse OK。",
+    "boundary": "本审查读取测试源码，未执行测试；静态断言不等同真实观测故障演练。"
+  },
+  "residual_limits": [
+    "未执行实际收据归档、重启或健康检查。",
+    "历史正常退出仍未确认，原UNKNOWN、资源失败及预算不变。",
+    "本审查未修改文件，未运行模型、页面、业务、数据库、队列或进程控制操作。",
+    "本结论仅关闭观测失败处理缺口，不构成模型质量、AUTO或Production通过。"
+  ],
+  "next_action": "保存同任务round4结论。可在既有精确授权内执行受控恢复；入口必须重新成功核对实时条件，任何观测失败继续停止，不追加模型或业务授权。"
+}

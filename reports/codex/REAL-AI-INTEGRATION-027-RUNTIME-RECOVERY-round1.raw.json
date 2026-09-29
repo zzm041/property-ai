@@ -1,0 +1,54 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-RUNTIME-RECOVERY",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "base_sha": "52eeacc82f5e38919f5c40697949c2a5ab67a932",
+  "reviewed_sha": "69c23ef8afd4755929e91d17cf061fd4e65dfd82",
+  "verdict": "NEEDS_CHANGES",
+  "findings": [
+    {
+      "id": "RUNTIME-RECOVERY-R1-01",
+      "severity": "HIGH",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/deploy/work-ai-runtime.ps1:$ExpectedAdapterSha256 / Assert-Candidate",
+      "trigger": "First export of the frozen candidate from 084ced1398ce3cd4e84e71c7b37c4f35549c2001.",
+      "impact": "The archive bytes and configured hash differed, so Assert-Candidate would reject startup.",
+      "evidence": [
+        "Configured hash FDC8C58C5FC7079F8495901485B7E49850786408261C0CA95C6BB504BFEF15C1 matched the working-tree file.",
+        "Read-only hashing of the file from git archive produced C5D72029E22977FC7CB640EE194B488B99531D1A2DB017B3BC4869C63A2CD4A1.",
+        "Assert-Candidate checks the extracted archive file; repository core.autocrlf is true."
+      ]
+    },
+    {
+      "id": "RUNTIME-RECOVERY-R1-02",
+      "severity": "MEDIUM",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/scripts/ops/local_ai_http.py:Runner.reserve non-continuation cumulative branch",
+      "trigger": "A prior SUCCESS or confirmed FAILED result lacks total_seconds.",
+      "impact": "The record could pass the completion gate but contribute zero to the cumulative execution budget.",
+      "evidence": [
+        "The reviewed implementation used result.get('total_seconds',0).",
+        "The following numeric checks accepted the default zero.",
+        "Actual call-001 through call-007 all contain valid total_seconds and do not need historical rewriting."
+      ]
+    }
+  ],
+  "checked_conditions": [
+    "Read both specified commits, their exact diff, and direct request/reservation/cleanup context.",
+    "The 15 MiB transport limit can carry a 10 MiB image after base64 expansion, while decoded size and protocol checks remain enforced.",
+    "Loopback authentication, endpoint allow-listing, strict fields, prompt/schema, RAG/work isolation and single-request admission remain present.",
+    "The non-continuation path uses prior total_seconds plus the configured baseline; the legacy continuation retains its fixed wall-clock window.",
+    "Configured totals are Qwen120/ASR2/embedding12/reranker8 with baselines 46/1/6/2 and 7200 seconds with baseline 535.483 seconds.",
+    "The ledger still has call-001 through call-007 only; all seven are Qwen and contain valid durations.",
+    "The immutable call-001 resolution and runtime identity checks were not widened.",
+    "The five-user submission record identifies work orders 7 through 11 and accurately states that creation was API-based rather than page-click evidence."
+  ],
+  "tests_evidence": {
+    "reported": "63 passed, 1 warning; PowerShell parse OK.",
+    "review_boundary": "The reviewer read tests but did not run them."
+  },
+  "unverified": [
+    "No adapter reload, business replay, model request, page action, database operation or queue operation was performed by the reviewer.",
+    "Image AUTO, successful concurrent processing and Production acceptance remain unverified."
+  ],
+  "next_action": "Bind the frozen hash to the real Git archive bytes and reject missing total_seconds, then perform a narrow round-2 review without replaying business."
+}
