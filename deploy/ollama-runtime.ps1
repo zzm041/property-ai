@@ -18,10 +18,17 @@ $ControlledStops = @(
     [pscustomobject]@{
         Path = Join-Path $RepoRoot "tmp\delivery-work-ai-runtime\calls\call-003\result.json"
         Sha256 = "B725035C11585AF362F6652B7531BDB63DCBC3DF75F75182015EAF513A7603B1"
+        Reason = "RESOURCE_FLOOR"
     },
     [pscustomobject]@{
         Path = Join-Path $RepoRoot "tmp\delivery-work-ai-runtime\calls\call-007\result.json"
         Sha256 = "C136825C9391FFC8F48395AB1A3E78A4638FC53F181FCAE84FBF47DF284BF85C"
+        Reason = "RESOURCE_FLOOR"
+    },
+    [pscustomobject]@{
+        Path = Join-Path $RepoRoot "tmp\delivery-work-ai-runtime\calls\call-008\result.json"
+        Sha256 = "F34D19C9383FED33DE32535CBB48358D2F4C731AA537B349C767343C388FB5C4"
+        Reason = "REMOTE_CLIENT_FAILED"
     }
 )
 $ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models"
@@ -103,7 +110,7 @@ function Retire-ControlledStopReceipt([object]$State) {
         $stopped = $evidence.remote_stop.stopped
         if (
             $evidence.status -eq "FAILED" -and
-            $evidence.reason -eq "RESOURCE_FLOOR" -and
+            $evidence.reason -eq $candidate.Reason -and
             $evidence.remote_completion -eq "CONTROLLED_STOP" -and
             [int]$verified.pid -eq [int]$State.pid -and
             [IO.Path]::GetFullPath([string]$verified.path) -eq [IO.Path]::GetFullPath([string]$State.executable) -and

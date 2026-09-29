@@ -272,8 +272,11 @@ def test_delivery_ollama_restart_requires_exact_controlled_stop_evidence() -> No
     assert 'calls\\call-007\\result.json' in runtime
     assert 'C136825C9391FFC8F48395AB1A3E78A4638FC53F181FCAE84FBF47DF284BF85C' in runtime
     assert 'B725035C11585AF362F6652B7531BDB63DCBC3DF75F75182015EAF513A7603B1' in runtime
+    assert 'calls\\call-008\\result.json' in runtime
+    assert 'F34D19C9383FED33DE32535CBB48358D2F4C731AA537B349C767343C388FB5C4' in runtime
     assert '$evidence.remote_completion -eq "CONTROLLED_STOP"' in runtime
-    assert '$evidence.reason -eq "RESOURCE_FLOOR"' in runtime
+    assert 'Reason = "REMOTE_CLIENT_FAILED"' in runtime
+    assert '$evidence.reason -eq $candidate.Reason' in runtime
     assert '$stopped.tree_exit_confirmed -eq $true' in runtime
     assert '$stopped.listener_exit_confirmed -eq $true' in runtime
     assert '[int]$verified.pid -eq [int]$State.pid' in runtime
