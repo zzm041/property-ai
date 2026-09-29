@@ -1,0 +1,36 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-RUNTIME-RECOVERY",
+  "review_round": 5,
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_sha": "b46f4616872b21d865ff9d7eade4df8a36c68374",
+  "implementation_sha": "767077ec4f0a90351f897a70e91cc9592217dd46",
+  "verdict": "PASS",
+  "closed_findings": [{
+    "id": "RUNTIME-CONTEXT-R4-01",
+    "status": "CLOSED",
+    "evidence": [
+      "QWEN_CANDIDATES逐候选绑定digest、运行版本和上下文长度：4B/9B保持4096，Qwen38 g55固定8192。",
+      "qwen_guard继续精确核对模型名称、digest、运行版本和context_length，没有任意长度放行。",
+      "新增无模型测试覆盖三个候选合法配置，并验证Qwen38的旧4096上下文被拒绝。",
+      "Ollama入口固定8192并拒绝旧4096收据；work-ai入口绑定同一候选契约的冻结源码。",
+      "独立计算普通git archive字节：adapter为961A295D8CD0BB2548B2573DA4FE63F317945345B65CCEC70361DB7B009ACD44，runtime-control为CEA1B4AD6A5D2C12F70E233E28C791C86BC6EFDC5F2EA9864FDC022D57D13867。"
+    ]
+  }],
+  "findings": [],
+  "checked_conditions": [
+    "差异仅调整候选上下文契约、冻结源码绑定及直接测试。",
+    "版本、digest、loopback、no-cloud、单模型、单并发和资源保护未放宽。",
+    "累计预算及非法total_seconds拒绝逻辑未修改。"
+  ],
+  "tests_evidence": {
+    "implementer_reported": ["组合专项72 passed、3 warnings。", "绑定专项12 passed、3 warnings。", "PowerShell parse OK。"],
+    "independently_executed": false
+  },
+  "unverified": [
+    "尚未验证冻结版本实际加载后的8192上下文及连续VLM到LLM。",
+    "尚未验证扩大上下文后的实际资源和延迟。",
+    "未验证新的Assignment或完整业务闭环。",
+    "本结论不是真实AUTO或Production PASS。"
+  ],
+  "next_action": "保存审查；加载固定制品后在原阈值和累计账本内继续有界验证。"
+}

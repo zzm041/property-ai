@@ -1,0 +1,21 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-RUNTIME-RECOVERY",
+  "review_round": 6,
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_sha": "1043b45fece1da7c6d011da2204067ae429c1a62",
+  "base_sha": "b46f4616872b21d865ff9d7eade4df8a36c68374",
+  "verdict": "PASS",
+  "findings": [],
+  "checked": [
+    {"scope": "精确失败绑定", "evidence": "ControlledStops仍明确列举路径、SHA256和原因；call-003/007仅接受RESOURCE_FLOOR，call-008仅接受REMOTE_CLIENT_FAILED。"},
+    {"scope": "call-008原始结果", "evidence": "独立哈希为F34D19C9383FED33DE32535CBB48358D2F4C731AA537B349C767343C388FB5C4；FAILED/REMOTE_CLIENT_FAILED/CONTROLLED_STOP，原进程身份和整树/监听退出均有精确证据。"},
+    {"scope": "收据退休约束", "evidence": "仍要求状态、原因、完成语义、PID、路径、启动时间和退出证据精确匹配；当前执行检查和不可覆盖归档未放宽。"},
+    {"scope": "直接测试", "evidence": "实施方报告12 passed、3 warnings及PowerShell parse OK；本审查未运行测试。"}
+  ],
+  "unverified": [
+    "未执行收据退休、启动、停止或模型请求。",
+    "call-008仍是原失败；本结论不解决其他UNKNOWN，也不增加预算。",
+    "8192加载、VLM到LLM和业务AUTO尚未验证。"
+  ],
+  "next_action": "使用精确恢复入口加载并核对上下文后继续有界验证。"
+}

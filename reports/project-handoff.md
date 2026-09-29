@@ -1,5 +1,19 @@
 # Project handoff (latest facts only)
 
+## Current checkpoint — 8192 runtime loaded; bounded overlap recovery still fails before VLM reservation (2026-09-29)
+
+Current tracking HEAD before this evidence update is `1043b45fece1da7c6d011da2204067ae429c1a62`; fixed product/adapter source is `767077ec4f0a90351f897a70e91cc9592217dd46`. The fixed deadline remains **2026-09-29 22:36:10 Asia/Shanghai**. The package has consumed all ten authorized new synthetic work orders. No additional work order was created in this recovery, and work orders 3–5 were not replayed or rewritten.
+
+The isolated runtime now uses Ollama **0.34.4** on `127.0.0.1:11435` with the approved Qwen3.8 27B Q3_K_M candidate, exact executable hash, no-cloud, one loaded model, one inference slot and **8192** context. The work adapter on `127.0.0.1:11437` is bound to fixed source `767077e` and exact archive hash. Independent review round 4 found the former 8192/4096 mismatch; round 5 accepted the candidate-specific fix; round 6 accepted only the exact `call-008` controlled-stop receipt. This does not reinterpret any historical failure.
+
+The existing five overlapping work orders were recovered through the authenticated durable task-intent retry operation, not by direct database mutation. Generation 2 intents 29–33 all failed. After the reviewed context and receipt fixes were loaded, only work order 7 received a final bounded generation 3 intent 34. `call-009` produced a real ASR transcript and `call-010` produced a real aggregate Qwen analysis while remaining above the RAM/GPU floors. Nevertheless the work order still failed closed: its VLM checkpoint recorded `AI.UNAVAILABLE` before any new VLM reservation, then the overall analysis recorded `AI.INVALID_OUTPUT`. Work order 7 remains `PENDING_ANALYSIS`, generation 3 `FAILED`, with zero Assignment. Work orders 8–11 remain at their generation 2 `FAILED` intents with zero Assignment and were not retried after this final failure.
+
+The precise VLM cause is **UNKNOWN**. The current adapter returned a generic HTTP 503 without preserving the internal rejection reason. The saved request passes the frozen validator and current model/context guard when checked offline after the event, but that cannot reconstruct the lost runtime fact or justify another retry. The bounded repair/recovery round is therefore exhausted. Image AUTO, voice AUTO, five-user AI overlap and complete local delivery remain unproven. Exact redacted evidence is `reports/real-ai-integration-027/delivery-auto-8093/runtime-8192-attempt.json`.
+
+The current RAG adapter on `11436` is not running after the host restart. Earlier scoped real-RAG evidence remains valid, but the live all-services candidate is not integrated: the RAG 4B guard expects Ollama 0.34.3 with 4096 context while the shared runtime is fixed at 0.34.4 with 8192 context for Qwen38. Do not call the current 8093 candidate completely runnable until that live integration is resolved and verified.
+
+No further model call, intent recovery or work-order creation is authorized by this checkpoint. The smallest next decision is whether to approve one new bounded defect round that first preserves reason-specific adapter failure diagnostics and then permits one exact existing-object retry; it must not reset the ten-work-order cap or erase the three failed generations.
+
 ## Current checkpoint — fixed work-AI adapter loaded; failed five-order recovery needs an explicit bounded action (2026-09-29)
 
 Current tracking HEAD is `8d82b296273495f57c529b57f1ccbfa2d1142f86`; the runtime fix is `3cf0d27cdeb8c8b76fae94457e9130b076e7eb78`, its deterministic archive binding is `ab93429ae3b46952c0331226f50548337ee897cd`, and the fixed deadline remains **2026-09-29 22:36:10 Asia/Shanghai**. The package has consumed all ten authorized synthetic work orders. No new work order is authorized or available under that cap.

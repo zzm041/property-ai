@@ -1,0 +1,118 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-DELIVERY-AUTO-OVERLAP",
+  "captured_at": "2026-09-29T18:20:00+08:00",
+  "environment": "8093/property_ai_delivery_check@0014",
+  "scope": "bounded recovery of the existing five-user overlap; no new work order",
+  "runtime": {
+    "ollama_version": "0.34.4",
+    "ollama_pid": 31316,
+    "ollama_started_at_utc": "2026-09-29T10:13:23.4267861Z",
+    "ollama_executable_sha256": "D571E4CF0AD4456FCCD33D5B985B6D63BA5669C6E5A812391704083952AAE3D5",
+    "ollama_endpoint": "127.0.0.1:11435",
+    "ollama_context_length": 8192,
+    "ollama_no_cloud": true,
+    "ollama_max_loaded_models": 1,
+    "ollama_concurrency": 1,
+    "adapter_endpoint": "127.0.0.1:11437",
+    "adapter_source_commit": "767077ec4f0a90351f897a70e91cc9592217dd46",
+    "adapter_sha256": "961A295D8CD0BB2548B2573DA4FE63F317945345B65CCEC70361DB7B009ACD44",
+    "adapter_listener_pid": 17476,
+    "adapter_started_at_utc": "2026-09-29T10:13:37.9567942Z",
+    "model": "qwen38-27b-q3km-g55:7af3b8f"
+  },
+  "reviewed_runtime_changes": {
+    "context_round4": "NEEDS_CHANGES: 8192 Ollama and 4096 adapter mismatch found",
+    "context_round5": "PASS: Qwen38 fixed to 8192 while 4B/9B remain 4096",
+    "receipt_round6": "PASS: exact call-008 REMOTE_CLIENT_FAILED controlled-stop receipt accepted",
+    "review_paths": [
+      "reports/codex/REAL-AI-INTEGRATION-027-RUNTIME-CONTEXT-round4.raw.json",
+      "reports/codex/REAL-AI-INTEGRATION-027-RUNTIME-CONTEXT-round5.raw.json",
+      "reports/codex/REAL-AI-INTEGRATION-027-RUNTIME-RECEIPT-round6.raw.json"
+    ]
+  },
+  "recovery": {
+    "generation_1_to_2": {
+      "work_order_ids": [7, 8, 9, 10, 11],
+      "successor_intent_ids": [29, 30, 31, 32, 33],
+      "mechanism": "authenticated manager task-intent retry with DEPENDENCY_RECOVERED",
+      "result": "all successor intents FAILED after 3 of 3 executions"
+    },
+    "generation_2_to_3": {
+      "work_order_ids": [7],
+      "successor_intent_ids": [34],
+      "mechanism": "same audited task-intent retry endpoint",
+      "result": "FAILED after the bounded execution; no Assignment"
+    },
+    "new_work_orders_created": 0,
+    "direct_database_business_writes": false,
+    "historical_dlq_read_replayed_or_cleared": false
+  },
+  "model_calls": [
+    {
+      "call": "call-008",
+      "kind": "qwen",
+      "status": "FAILED",
+      "reason": "REMOTE_CLIENT_FAILED",
+      "total_seconds": 14.64,
+      "minimum_free_ram_mib": 11595,
+      "minimum_free_gpu_mib": 2801,
+      "boundary": "Ollama rejected a 4172-token request against the prior 4096 context; original failure retained"
+    },
+    {
+      "call": "call-009",
+      "kind": "asr",
+      "status": "SUCCESS",
+      "total_seconds": 33.375,
+      "minimum_free_ram_mib": 9681,
+      "result_summary": "Chinese transcription was returned for the approved non-sensitive audio",
+      "boundary": "a successful ASR segment is not a successful work order or AUTO assignment"
+    },
+    {
+      "call": "call-010",
+      "kind": "qwen",
+      "status": "SUCCESS",
+      "total_seconds": 31.906,
+      "minimum_free_ram_mib": 9264,
+      "minimum_free_gpu_mib": 2324,
+      "result_summary": "aggregate text analysis returned water_supply/p3/maintenance/low risk with a Chinese summary",
+      "boundary": "the aggregate LLM result did not make the work order successful because its VLM checkpoint had already failed"
+    }
+  ],
+  "work_order_outcome": [
+    {"work_order_id": 7, "status": "PENDING_ANALYSIS", "latest_generation": 3, "latest_intent_id": 34, "latest_intent_status": "FAILED", "analysis_error": "AI.INVALID_OUTPUT", "assignment_count": 0},
+    {"work_order_id": 8, "status": "PENDING_ANALYSIS", "latest_generation": 2, "latest_intent_id": 30, "latest_intent_status": "FAILED", "assignment_count": 0},
+    {"work_order_id": 9, "status": "PENDING_ANALYSIS", "latest_generation": 2, "latest_intent_id": 31, "latest_intent_status": "FAILED", "assignment_count": 0},
+    {"work_order_id": 10, "status": "PENDING_ANALYSIS", "latest_generation": 2, "latest_intent_id": 32, "latest_intent_status": "FAILED", "assignment_count": 0},
+    {"work_order_id": 11, "status": "PENDING_ANALYSIS", "latest_generation": 2, "latest_intent_id": 33, "latest_intent_status": "FAILED", "assignment_count": 0}
+  ],
+  "evidence_boundaries": {
+    "provider_receipts": "directly preserved at tmp/delivery-work-ai-runtime/calls/call-008 through call-010",
+    "runtime_receipts": "directly preserved at tmp/delivery-work-ai-runtime/current.json and tmp/delivery-ollama-runtime/current.json",
+    "work_order_intent_and_ai_call_rows": "implementer summary from contemporaneous read-only database queries; a separate raw redacted export was not saved",
+    "review_rule": "do not treat the summarized database rows as independently bound raw evidence and do not reconstruct missing raw output"
+  },
+  "unresolved": {
+    "failure": "work order 7 generation 3 recorded VLM AI.UNAVAILABLE before a model reservation; the adapter returned a generic HTTP 503 and did not preserve the internal reason",
+    "root_cause": "UNKNOWN",
+    "post_event_offline_checks": [
+      "the saved request passed the frozen adapter validate function",
+      "the current qwen residency guard accepted the running model/context"
+    ],
+    "limits": "post-event checks do not reconstruct the missing runtime error and do not justify another retry"
+  },
+  "stop": {
+    "reason": "the same task has reached the bounded recovery/fix round after a new unexplained provider failure",
+    "work_orders_8_to_11_retried_after_final_failure": false,
+    "new_model_call_started_after_call_010": false,
+    "complete_local_delivery": false,
+    "image_auto": "NOT_PROVEN",
+    "voice_auto": "NOT_PROVEN",
+    "five_user_auto_overlap": "NOT_PROVEN"
+  },
+  "live_rag_integration": {
+    "adapter_11436_running": false,
+    "historical_scoped_real_rag_evidence_retained": true,
+    "shared_runtime_conflict": "the RAG 4B candidate guard expects Ollama 0.34.3 with 4096 context, while the live shared Ollama is 0.34.4 with 8192 context",
+    "complete_same_time_candidate": "NOT_PROVEN"
+  }
+}

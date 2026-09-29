@@ -1,0 +1,76 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-RUNTIME-RECOVERY",
+  "review_round": 7,
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_sha": "1043b45fece1da7c6d011da2204067ae429c1a62",
+  "frozen_adapter_sha": "767077ec4f0a90351f897a70e91cc9592217dd46",
+  "verdict": "NEEDS_CHANGES",
+  "findings": [
+    {
+      "id": "RUNTIME-RECOVERY-R7-01",
+      "severity": "HIGH",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/scripts/ops/local_ai_http.py:341-361,479-481",
+      "trigger": "请求在获得模型预约前因运行身份、模型驻留、资源、预算或其他异常被拒绝。",
+      "impact": "所有异常被压成通用503，预约前又没有调用结果文件，无法追溯本次VLM失败的准确原因。不能据事后校验成功判断原故障已经解决，也不能据此继续消耗恢复轮次。",
+      "evidence": [
+        "Runner.run在reserve之前执行validate、运行身份和qwen_guard检查。",
+        "Handler捕获异常后仅返回MODEL_GUARD_OR_REQUEST_FAILED_NO_RETRY，没有保存原因；访问日志也被禁用。",
+        "runtime-8192-attempt.json将WO7 generation3的VLM失败记为AI.UNAVAILABLE、根因UNKNOWN；原始DB查询未保存，日志亦无具体原因。该运行事实目前只能作为实施方汇总接受，不能独立还原。"
+      ],
+      "recommendation": "在获得新的有界修复授权后，增加不含正文、电话、凭据的稳定原因码和请求阶段记录，并以无模型负测覆盖预约前失败。保留原UNKNOWN，不用事后推测补写原失败原因。"
+    },
+    {
+      "id": "RUNTIME-RECOVERY-R7-02",
+      "severity": "HIGH",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/deploy/rag-runtime.ps1:175-178；D:/property-ai/scripts/ops/local_ai_http.py:41-48,82-87；D:/property-ai/reports/project-handoff.md:15",
+      "trigger": "恢复现有RAG入口，并使其调用目前供Qwen38使用的共享11435 Ollama。",
+      "impact": "当前完整本地候选不能同时按现有契约提供工单AI和RAG。RAG选择4B，但其守卫要求0.34.3/4096；当前共享运行收据为0.34.4/8192。即使启动11436并通过无推理健康检查，真实Qwen请求仍有确定的契约冲突。",
+      "evidence": [
+        "RAG启动入口显式选择qwen3.5:4b。",
+        "4B候选绑定运行版本0.34.3、上下文4096；Qwen38绑定0.34.4、8192。",
+        "当前Ollama收据固定8192及已批准0.34.4可执行文件哈希。",
+        "交接明确报告11436离线；本审查未执行实时监听检查。"
+      ],
+      "recommendation": "先形成兼容、可绑定且不削弱单模型与资源保护的统一运行方案，再按批准范围验证。保留此前真实RAG的版本绑定历史PASS，不将其当作当前完整候选在线可用证据。"
+    }
+  ],
+  "checked": [
+    "已读取runtime-8192-attempt.json、handoff顶部检查点、round4/5/6审查记录，以及必要的适配器和启动入口上下文。",
+    "当前work适配器收据绑定767077ec及961A295D8CD0BB2548B2573DA4FE63F317945345B65CCEC70361DB7B009ACD44；实际冻结文件哈希一致，scope为work_order_only。",
+    "当前Ollama收据记录PID31316、8192、loopback、no-cloud、单模型和单并发；与已审入口契约一致。收据不是本审查对实时进程的独立探测。",
+    "实际读取call-008/009/010的reservation和result并计算哈希；call-008仍为原FAILED/REMOTE_CLIENT_FAILED/CONTROLLED_STOP，没有被成功证据覆盖。",
+    "call-009为ASR SUCCESS，33.375秒，owned_exit_confirmed=true；call-010为Qwen SUCCESS，31.906秒，owned_exit_confirmed=true。它们仅证明对应Provider片段成功。",
+    "call-010保存样本最低RAM9264MiB、GPU2324MiB，未触运行底线；不能用这些样本证明此前未预约VLM请求的资源状态。",
+    "call-010预约累计时间为668.061秒，执行后约699.967秒；记录延续原预算，没有在本次启动后从零计时。",
+    "只读目录枚举到call-010，没有call-011。未运行测试、HTTP、模型、页面、业务、数据库、队列或进程操作，未修改文件。"
+  ],
+  "unverified": [
+    "generation1到2、WO7 generation2到3、intent29至34、工单状态、AI调用记录及Assignment数量没有独立保存的原始脱敏DB导出；本审查只能将这些字段标为实施方查询汇总，不能声称独立核对了数据库对应关系。",
+    "没有可还原VLM通用503内部原因的原始记录。事后validator和驻留守卫通过不能证明事发时通过。",
+    "没有独立核对本轮API/Worker镜像、实时进程或11436监听；适配器冻结文件与收据绑定不替代完整服务同源证明。",
+    "未验证图像AUTO、语音AUTO、五用户自动派单并发或本轮新的CLOSED闭环。",
+    "未验证当前RAG与工单AI共享运行环境的实际兼容性。"
+  ],
+  "task_result": {
+    "context_and_receipt_fixes": "保留round5/6的限定源码与绑定PASS，不重新打开已关闭问题。",
+    "provider_segments": "call-009 ASR和call-010 Qwen成功；不升级为分析应用、Assignment或AUTO成功。",
+    "business_outcome": "按实施方汇总，WO7最新generation3失败且无Assignment；WO8至11仍为generation2失败且无Assignment。不得标记恢复通过。",
+    "root_cause_of_unreserved_vlm_failure": "UNKNOWN",
+    "complete_local_candidate": "BLOCKED",
+    "production": "NOT_PASS",
+    "retry_decision": "停止继续重试WO8至11，也不自动创建WO7的新generation；剩余调用预算不能覆盖已到达的返修与恢复停止条件。"
+  },
+  "next_action": "保存本轮失败收尾及证据等级。明确保留两个当前阻塞，先提出一次最小有界修复与运行兼容方案，等待批准；不得补造原日志、重跑既有成功证据、重置预算或把普通请求恢复当成新的无限重试入口。",
+  "approval_requests": [
+    {
+      "scope": "新增一次有界缺陷修复与复审",
+      "required_boundary": "先补预约前脱敏诊断和离线负测；若随后需要实际恢复，须明确唯一现有工单、最多新增generation及Provider调用次数、剩余累计预算和原截止时间。十个新工单上限及历史失败不变，WO8至11不默认纳入。"
+    },
+    {
+      "scope": "当前RAG与工单AI运行兼容方案",
+      "required_boundary": "任何运行版本、上下文或业务模型切换先明确具体方案及影响并获得批准；不得直接放宽4B守卫、恢复旧收据或因历史RAG通过而跳过当前兼容验证。"
+    }
+  ]
+}

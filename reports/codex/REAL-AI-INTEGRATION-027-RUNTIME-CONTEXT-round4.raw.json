@@ -1,0 +1,38 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-RUNTIME-RECOVERY",
+  "review_round": 4,
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_sha": "c66d727ba35830d7ee10b277239d564a811d3565",
+  "verdict": "NEEDS_CHANGES",
+  "findings": [
+    {
+      "id": "RUNTIME-CONTEXT-R4-01",
+      "severity": "HIGH",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/scripts/ops/local_ai_http.py:qwen_guard；D:/property-ai/deploy/work-ai-runtime.ps1:$SourceCommit",
+      "trigger": "新入口以8192上下文加载Qwen38后，VLM之后的LLM或其他后续请求检查同一驻留模型。",
+      "impact": "冻结适配器仍只接受4096上下文，会在预约前抛出QWEN_RESIDENCY_CHANGED，阻断VLM→LLM链路。只改Ollama启动配置尚不能形成可用修复。",
+      "recommendation": "为获批Qwen38候选精确绑定8192，保留4B/9B原4096约束；补无模型的接受/拒绝测试并更新冻结适配器提交及实际archive哈希。不得简单删除上下文校验。"
+    }
+  ],
+  "checked_conditions": [
+    "8192处于提供的已批准上限内；本次Ollama源码修改范围小，没有改变模型、版本、预算或资源底线。",
+    "Assert-ReviewedRuntimeState要求收据context_length精确等于8192，旧4096收据不会被start复用或status接纳。",
+    "实际读取Ollama失败日志：请求4172 tokens超过4096 context。",
+    "实际核对call-008结果：FAILED/REMOTE_CLIENT_FAILED/CONTROLLED_STOP、14.64秒、owned_exit_confirmed=true；原失败保留。",
+    "call-008全部保存样本的最低值为RAM11595MiB、GPU2801MiB，仍高于运行底线。",
+    "实际核对call-009：SUCCESS/NOT_UNKNOWN、33.375秒、owned_exit_confirmed=true；单次ASR成功不代表工单分析或派单成功。",
+    "loopback、no-cloud、单模型、单并发、0.34.4固定版本和可执行文件哈希守卫未因本次差异放宽。"
+  ],
+  "tests_evidence": {
+    "reported": "实施方报告68 passed、3 warnings，PowerShell parse OK。",
+    "boundary": "本审查读取测试差异，没有执行测试。"
+  },
+  "unverified": [
+    "尚未验证8192实际加载后的完整VLM→LLM请求链路和资源占用。",
+    "五个generation2意图仍FAILED且无Assignment属于实施方报告，本审查未查询数据库；不升级为业务通过。",
+    "未运行模型、页面、业务、数据库、队列或进程操作，未修改文件。",
+    "本次审查不增加重放、调用或新对象额度，不构成Production通过。"
+  ],
+  "next_action": "先收口RUNTIME-CONTEXT-R4-01的候选上下文与冻结绑定，再做同一问题窄复核；保留call-008失败和call-009独立成功边界，不以单段结果宣称AUTO完成。"
+}
