@@ -100,7 +100,7 @@ docker compose --env-file deploy/.env.delivery -f deploy/docker-compose.delivery
 docker compose --env-file deploy/.env.delivery -f deploy/docker-compose.delivery.yml ps
 ```
 
-本地 clean-room 排练可以保留 Development 微信/短信/AI Provider。正式激活必须在私密配置中切换到企业通道及自托管 Provider；未配置可信身份 Provider 时，身份接管继续失败关闭。`EMBEDDING_DIMENSIONS=8` 只用于 Development 排练；真实 bge-m3 使用新的 1024 维集合，禁止复用 8 维集合。
+本地 clean-room 排练可以保留 Development 微信/短信/AI Provider。使用真实 MinIO 但尚未接企业文件扫描服务时，必须在本机私密配置中显式设置 `FILE_SCANNER_PROVIDER=development`，保存的状态为 `skipped_dev`，不能写成经过恶意文件扫描；模板默认 `unavailable`，上传内容保持 `pending` 并失败关闭。Production 禁止 Development 文件扫描器。正式激活必须在私密配置中切换到企业通道及自托管 Provider；未配置可信身份 Provider 时，身份接管继续失败关闭。`EMBEDDING_DIMENSIONS=8` 只用于 Development 排练；真实 bge-m3 使用新的 1024 维集合，禁止复用 8 维集合。
 
 知识问答与工单分析具有独立的模型发布门槛。`RAG_LLM_PROVIDER=inherit` 保持旧配置；只有知识问答已经通过而工单分析仍未达标时，可在私密配置中单独设置 `RAG_LLM_PROVIDER=production`、`RAG_LLM_BASE_URL`、`RAG_LLM_MODEL` 和 `RAG_LLM_API_KEY`，同时继续保持 `LLM_PROVIDER=development`。真实知识接线还必须成组设置 1024 维 bge-m3、真实 reranker、`MILVUS_METRIC_TYPE=COSINE`、`EMBEDDING_NORMALIZATION=l2` 以及全新的隔离集合名。该隔离不会授权真实工单 AUTO；两条能力必须分别验收。
 

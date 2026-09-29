@@ -55,6 +55,8 @@ def _service(record: FileObject, *, content: bytes = JPEG) -> WorkOrderService:
     service._repository.list_work_orders_for_file.return_value = ()
     service._storage = MagicMock()
     service._storage.get_object.return_value = content
+    service._file_scanner = MagicMock()
+    service._file_scanner.scan.return_value = "skipped_dev"
     service._session = MagicMock()
     service._reload_actor = MagicMock(side_effect=lambda actor: actor)
     service._actor_can_see_file_tenant = MagicMock(return_value=True)
@@ -102,12 +104,33 @@ def test_upload_validates_bytes_and_records_actual_hash() -> None:
 
     assert result is record
     assert record.content_hash == sha256(JPEG).hexdigest()
+    assert record.scanner_status == "skipped_dev"
     service._storage.put_object.assert_called_once_with(
         record.storage_key,
         JPEG,
         record.mime_type,
     )
     service._session.flush.assert_called_once_with()
+
+
+def test_unavailable_scanner_keeps_production_upload_pending() -> None:
+    record = _file()
+    record.content_hash = _registration_content_hash(record)
+    record.scanner_status = "pending"
+    service = _service(record)
+    service._storage.get_object.side_effect = ProviderInvalidOutputError(
+        "Object was not found"
+    )
+    service._file_scanner.scan.return_value = "pending"
+
+    service._put_file_content(
+        actor=_actor(),
+        file_id=record.id,
+        content=JPEG,
+        request_id="persistent-media-pending-scan",
+    )
+
+    assert record.scanner_status == "pending"
 
 
 def test_same_file_content_retry_is_idempotent() -> None:

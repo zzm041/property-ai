@@ -73,7 +73,8 @@ from app.model.work_order import (
     WorkOrderReceipt,
     WorkOrderSlaApplication,
 )
-from app.provider.factory import build_storage_provider
+from app.provider.factory import build_file_scanner_provider, build_storage_provider
+from app.provider.file_scanner import FileScannerProvider
 from app.provider.storage import StorageProvider
 from app.repository.employee import EmployeeRepository
 from app.repository.ai import AiRepository
@@ -189,6 +190,7 @@ class WorkOrderService:
         ai_repository: AiRepository | None = None,
         principal_loader: Callable[[int], Principal] | None = None,
         storage: StorageProvider | None = None,
+        file_scanner: FileScannerProvider | None = None,
         settings: Settings | None = None,
         clock: Callable[[], datetime] = utc_now,
     ) -> None:
@@ -204,6 +206,9 @@ class WorkOrderService:
         ).load_principal
         self._settings = settings or get_settings()
         self._storage = storage or build_storage_provider(self._settings)
+        self._file_scanner = file_scanner or build_file_scanner_provider(
+            self._settings
+        )
         self._clock = clock
 
     def register_file(
@@ -429,6 +434,11 @@ class WorkOrderService:
                     status_code=409,
                 )
             record.content_hash = existing_hash
+            if record.scanner_status == "pending":
+                record.scanner_status = self._file_scanner.scan(
+                    content=existing,
+                    mime_type=record.mime_type,
+                )
             self._session.flush()
             return record
 
@@ -441,6 +451,11 @@ class WorkOrderService:
                 status_code=503,
             ) from exc
         record.content_hash = sha256(content).hexdigest()
+        if record.scanner_status == "pending":
+            record.scanner_status = self._file_scanner.scan(
+                content=content,
+                mime_type=record.mime_type,
+            )
         self._session.flush()
         return record
 

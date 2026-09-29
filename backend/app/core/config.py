@@ -176,6 +176,7 @@ class Settings(BaseSettings):
     storage_secret_key: SecretStr = SecretStr("")
     storage_region: str = "us-east-1"
     storage_presign_ttl_seconds: int = Field(default=300, ge=1, le=600)
+    file_scanner_provider: Literal["development", "unavailable"] = "unavailable"
 
     @property
     def should_enqueue_ai_on_create(self) -> bool:
@@ -228,6 +229,10 @@ class Settings(BaseSettings):
                 raise ValueError("Production WeChat login requires WECHAT_APP_SECRET")
         if self.app_env == "production":
             self._require_production_provider_credentials()
+            if self.file_scanner_provider == "development":
+                raise ValueError(
+                    "Production cannot use the Development file scanner"
+                )
         if self.identity_test_proof_enabled:
             target = make_url(self.active_database_url)
             actual_target = f"{target.host}:{target.port or 3306}/{target.database}"

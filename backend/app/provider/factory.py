@@ -35,6 +35,17 @@ from app.provider.identity_proof import (
     IsolatedTestIdentityProofProvider,
     UnavailableIdentityProofProvider,
 )
+from app.provider.file_scanner import (
+    DevelopmentFileScannerProvider,
+    FileScannerProvider,
+    UnavailableFileScannerProvider,
+)
+
+
+def build_file_scanner_provider(settings: Settings) -> FileScannerProvider:
+    if settings.file_scanner_provider == "development":
+        return DevelopmentFileScannerProvider()
+    return UnavailableFileScannerProvider()
 
 
 def build_storage_provider(settings: Settings) -> StorageProvider:

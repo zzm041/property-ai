@@ -259,7 +259,7 @@ def test_delivery_starts_and_diagnoses_durable_task_publisher() -> None:
     assert 'app.worker.task_intent_publisher' in compose
     assert 'DURABLE_TASKS_ENABLED=true' in example
     assert 'up -d api worker publisher beat nginx' in launcher
-    assert 'milvus api worker publisher beat nginx' in launcher
+    assert 'up -d mysql redis rabbitmq etcd minio milvus' in launcher
     assert 'logs --tail 120 api worker publisher beat nginx' in launcher
 
 

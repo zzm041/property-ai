@@ -15,6 +15,7 @@ from app.provider.errors import (
     ProviderUnavailableError,
 )
 from app.provider.factory import (
+    build_file_scanner_provider,
     build_asr_provider,
     build_embedding_provider,
     build_llm_provider,
@@ -23,6 +24,10 @@ from app.provider.factory import (
     build_storage_provider,
     build_vlm_provider,
     build_wechat_auth_provider,
+)
+from app.provider.file_scanner import (
+    DevelopmentFileScannerProvider,
+    UnavailableFileScannerProvider,
 )
 from app.provider.llm import DevelopmentLLMProvider, QwenLLMProvider
 from app.provider.reranker import HttpRerankerProvider
@@ -51,6 +56,24 @@ def test_factory_keeps_development_fakes_by_default() -> None:
     assert isinstance(build_asr_provider(settings), DevelopmentASRProvider)
     assert isinstance(build_wechat_auth_provider(settings), DevelopmentWeChatAuthProvider)
     assert isinstance(build_storage_provider(settings), DevelopmentStorageProvider)
+    assert isinstance(
+        build_file_scanner_provider(settings), UnavailableFileScannerProvider
+    )
+
+
+def test_development_file_scanner_is_explicit_and_rejected_in_production() -> None:
+    settings = _settings(file_scanner_provider="development")
+    assert isinstance(
+        build_file_scanner_provider(settings), DevelopmentFileScannerProvider
+    )
+
+    with pytest.raises(ValueError, match="Development file scanner"):
+        _settings(
+            app_env="production",
+            app_secret_key="delivery-production-secret-not-a-default",
+            wechat_login_enabled=False,
+            file_scanner_provider="development",
+        )
 
 
 def test_qwen_llm_parses_structured_json_and_strips_fences() -> None:
