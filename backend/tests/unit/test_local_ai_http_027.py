@@ -309,10 +309,10 @@ def test_reviewed_unknown_resolution_unblocks_one_exact_replay_without_continuat
     resolution_hash=hashlib.sha256(resolution.read_bytes()).hexdigest();review=evidence/'review.json'
     m.save(review,{'verdict':'PASS_SCOPED_CALL_RESOLUTION','resolution_sha256':resolution_hash})
     config={'private':str(private),'host':'127.0.0.1','port':11436,'evidence_root':str(evidence),
-        'resolutions':[{'record':'call-001','reservation_sha256':reservation_hash,
-            'result_sha256':result_hash,'resolution_path':str(resolution),
-            'resolution_sha256':resolution_hash,'review_path':str(review),
-            'review_sha256':hashlib.sha256(review.read_bytes()).hexdigest()}]}
+        'resolutions':[{'record':'call-001','reservation_sha256':reservation_hash.upper(),
+            'result_sha256':result_hash.upper(),'resolution_path':str(resolution),
+            'resolution_sha256':resolution_hash.upper(),'review_path':str(review),
+            'review_sha256':hashlib.sha256(review.read_bytes()).hexdigest().upper()}]}
     path=tmp_path/'config.json';path.write_text(json.dumps(config),encoding='utf-8')
     runner=m.Runner(path);monkeypatch.setattr(m.time,'time',lambda:100.)
     assert runner.gate()=='READY'

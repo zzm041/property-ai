@@ -243,8 +243,10 @@ class Runner:
             allowed=Path(self.config.get('resolution_root',self.config['evidence_root'])).resolve()
             if not report.is_relative_to(allowed) or not review.is_relative_to(allowed):raise RuntimeError('RESOLUTION_PATH_SCOPE')
             reservation_hash=self._sha(path);result_hash=self._sha(path.parent/'result.json')
-            if reservation_hash!=spec['reservation_sha256'] or result_hash!=spec['result_sha256']:raise RuntimeError('RESOLUTION_ORIGINAL_DRIFT')
-            if self._sha(report)!=spec['resolution_sha256'] or self._sha(review)!=spec['review_sha256']:raise RuntimeError('RESOLUTION_REVIEW_DRIFT')
+            if (reservation_hash.lower()!=spec['reservation_sha256'].lower()
+                    or result_hash.lower()!=spec['result_sha256'].lower()):raise RuntimeError('RESOLUTION_ORIGINAL_DRIFT')
+            if (self._sha(report).lower()!=spec['resolution_sha256'].lower()
+                    or self._sha(review).lower()!=spec['review_sha256'].lower()):raise RuntimeError('RESOLUTION_REVIEW_DRIFT')
             data=json.loads(report.read_text(encoding='utf-8'));verdict=json.loads(review.read_text(encoding='utf-8'))
             if (data.get('original',{}).get('reservation_sha256','').lower()!=reservation_hash.lower()
                     or data.get('original',{}).get('result_sha256','').lower()!=result_hash.lower()):raise RuntimeError('RESOLUTION_ORIGINAL_DRIFT')
@@ -252,7 +254,8 @@ class Runner:
             if original_status not in {'FAILED','UNKNOWN'} or data.get('original',{}).get('status')!=original_status:raise RuntimeError('RESOLUTION_SEMANTICS')
             if data.get('record')!=path.parent.name or data.get('original',{}).get('historical_immediate_exit_confirmed')!='UNKNOWN':raise RuntimeError('RESOLUTION_SEMANTICS')
             if data.get('current_execution',{}).get('currently_executing') is not False:raise RuntimeError('RESOLUTION_SEMANTICS')
-            if verdict.get('verdict')!='PASS_SCOPED_CALL_RESOLUTION' or verdict.get('resolution_sha256')!=spec['resolution_sha256']:raise RuntimeError('RESOLUTION_REVIEW_REQUIRED')
+            if (verdict.get('verdict')!='PASS_SCOPED_CALL_RESOLUTION'
+                    or verdict.get('resolution_sha256','').lower()!=spec['resolution_sha256'].lower()):raise RuntimeError('RESOLUTION_REVIEW_REQUIRED')
             return data
         return None
     def gate(self):
