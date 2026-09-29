@@ -249,6 +249,8 @@ def test_delivery_ollama_restart_requires_exact_controlled_stop_evidence() -> No
     assert '$stopped.listener_exit_confirmed -eq $true' in runtime
     assert '[int]$verified.pid -eq [int]$State.pid' in runtime
     assert 'if ($null -eq $binding)' in runtime
+    assert '$currentPid.StartTime.ToUniversalTime()' in runtime
+    assert 'if ($sameProcess -or $null -ne (Get-ListenerPid))' in runtime
     assert 'controlled-stop receipt cannot be retired while execution may still exist' in runtime
     assert 'Move-Item -LiteralPath $StatePath -Destination $archive' in runtime
 

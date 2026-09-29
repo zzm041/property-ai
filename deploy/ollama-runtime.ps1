@@ -74,7 +74,13 @@ function Retire-ControlledStopReceipt([object]$State) {
         }
     }
     if ($null -eq $binding) { throw "controlled-stop evidence does not bind the stale receipt" }
-    if ($null -ne (Get-Process -Id ([int]$State.pid) -ErrorAction SilentlyContinue) -or $null -ne (Get-ListenerPid)) {
+    $sameProcess = $false
+    $currentPid = Get-Process -Id ([int]$State.pid) -ErrorAction SilentlyContinue
+    if ($null -ne $currentPid) {
+        $recordedStart = ([DateTimeOffset]$State.started_at_utc).UtcDateTime
+        $sameProcess = [Math]::Abs(($currentPid.StartTime.ToUniversalTime() - $recordedStart).TotalMilliseconds) -le 1
+    }
+    if ($sameProcess -or $null -ne (Get-ListenerPid)) {
         throw "controlled-stop receipt cannot be retired while execution may still exist"
     }
     $archive = Join-Path $RuntimeDir ("retired-controlled-{0}.json" -f $State.operation_id)
