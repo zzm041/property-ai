@@ -12,10 +12,12 @@ $PrivateDir = Join-Path $RuntimeDir "calls"
 $SecretPath = Join-Path $RuntimeDir "internal-token.txt"
 $ConfigPath = Join-Path $RuntimeDir "config.json"
 $CurrentPath = Join-Path $RuntimeDir "current.json"
+$RagOllamaCurrent = Join-Path $RepoRoot "tmp\delivery-rag-ollama-runtime\current.json"
 $AdapterPath = Join-Path $RepoRoot "scripts\ops\local_ai_http.py"
 $PythonPath = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\bge-142-cpu\.venv\Scripts\python.exe"
 $AsrPython = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\asr-006-cpu\.venv\Scripts\python.exe"
 $ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models-hf"
+$QwenEndpoint = "http://127.0.0.1:11438"
 
 function Read-Token {
     if (-not (Test-Path -LiteralPath $SecretPath -PathType Leaf)) { return $null }
@@ -107,6 +109,7 @@ function New-CurrentState([object]$ListenerProcess, [object]$Health, [object]$La
         config_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $ConfigPath).Hash
         token_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $SecretPath).Hash
         endpoint = "http://127.0.0.1:11436"
+        qwen_endpoint = $QwenEndpoint
         scope = "rag_only"
         models = $Health.models
         inference_on_start = $false
@@ -118,9 +121,18 @@ function New-CurrentState([object]$ListenerProcess, [object]$Health, [object]$La
     return $state
 }
 
+function New-RuntimeBinding {
+    if (-not (Test-Path -LiteralPath $RagOllamaCurrent -PathType Leaf)) { throw "RAG Ollama receipt is missing" }
+    $ollama=Get-Content -Raw -LiteralPath $RagOllamaCurrent | ConvertFrom-Json
+    if($ollama.host -ne "127.0.0.1:11438" -or $ollama.no_cloud -ne $true -or [int]$ollama.context_length -ne 4096 -or [int]$ollama.concurrency -ne 1){throw "RAG Ollama receipt does not match the isolated contract"}
+    $bindingPath=Join-Path $RuntimeDir ("runtime-binding-{0}.json" -f [DateTime]::UtcNow.ToString("yyyyMMddTHHmmssZ"))
+    $binding=[ordered]@{pid=[int]$ollama.pid;executable=[string]$ollama.executable;launched_at_utc=([DateTimeOffset]$ollama.started_at_utc).UtcDateTime.ToString("o");listener="127.0.0.1:11438";source_receipt_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $RagOllamaCurrent).Hash}
+    [IO.File]::WriteAllText($bindingPath,($binding|ConvertTo-Json),[Text.UTF8Encoding]::new($false));return $bindingPath
+}
+
 switch ($Action) {
     "start" {
-        foreach ($path in @($AdapterPath, $PythonPath, $AsrPython, $ModelRoot)) {
+        foreach ($path in @($AdapterPath, $PythonPath, $AsrPython, $ModelRoot, $RagOllamaCurrent)) {
             if (-not (Test-Path -LiteralPath $path)) { throw "required local AI asset is missing: $path" }
         }
         New-Item -ItemType Directory -Force -Path $RuntimeDir,$PrivateDir | Out-Null
@@ -155,6 +167,7 @@ switch ($Action) {
             $token = New-Token
             [IO.File]::WriteAllText($SecretPath, $token, [Text.UTF8Encoding]::new($false))
         }
+        $bindingPath=New-RuntimeBinding
         $config = [ordered]@{
             host = "127.0.0.1"
             port = 11436
@@ -165,21 +178,30 @@ switch ($Action) {
             scope = "rag_only"
             limits = [ordered]@{ asr = 1; embedding = 12; reranker = 8; qwen = 18 }
             duration_seconds = 7200
+            shared_model_lock_path = (Join-Path $RepoRoot "tmp\delivery-ai-shared\model.lock")
+            shared_model_lock_wait_seconds = 55
+            evidence_root = $RuntimeDir
+            runtime_binding_path = $bindingPath
+            runtime_binding_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $bindingPath).Hash.ToLowerInvariant()
+            require_runtime_binding = $true
         }
         [IO.File]::WriteAllText($ConfigPath, ($config | ConvertTo-Json -Depth 5), [Text.UTF8Encoding]::new($false))
         $stdout = Join-Path $RuntimeDir "adapter.stdout.log"
         $stderr = Join-Path $RuntimeDir "adapter.stderr.log"
         $oldToken = $env:LOCAL_AI_INTERNAL_TOKEN
         $oldModel = $env:PROPERTY_AI_LOCAL_QWEN_MODEL
+        $oldEndpoint = $env:PROPERTY_AI_LOCAL_QWEN_ENDPOINT
         try {
             $env:LOCAL_AI_INTERNAL_TOKEN = $token
             $env:PROPERTY_AI_LOCAL_QWEN_MODEL = "qwen3.5:4b"
+            $env:PROPERTY_AI_LOCAL_QWEN_ENDPOINT = $QwenEndpoint
             $launcher = Start-Process -FilePath $PythonPath -ArgumentList @(
                 "-I", "-X", "utf8", $AdapterPath, "serve", "--config", $ConfigPath
             ) -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
         } finally {
             $env:LOCAL_AI_INTERNAL_TOKEN = $oldToken
             $env:PROPERTY_AI_LOCAL_QWEN_MODEL = $oldModel
+            $env:PROPERTY_AI_LOCAL_QWEN_ENDPOINT = $oldEndpoint
         }
         $deadline = [DateTime]::UtcNow.AddSeconds(15)
         do {

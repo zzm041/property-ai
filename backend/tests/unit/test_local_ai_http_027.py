@@ -35,6 +35,9 @@ def _load_adapter_candidate(monkeypatch, model):
 
 
 def test_only_explicit_reviewed_qwen_candidates_can_configure_adapter(monkeypatch):
+    rag=_load_adapter_candidate(monkeypatch,'qwen3.5:4b')
+    assert rag.QWEN_RUNTIME_VERSION=='0.34.4'
+    assert rag.QWEN_CONTEXT_LENGTH==4096
     candidate=_load_adapter_candidate(monkeypatch,'qwen3.5:9b')
     assert candidate.MODELS['qwen']=='qwen3.5:9b'
     assert candidate.DIGEST=='6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7'
@@ -164,6 +167,7 @@ def test_vision_request_rejects_invalid_or_oversized_decoded_media():
 
 def runner(tmp_path):
     path=tmp_path/'config.json';path.write_text(json.dumps({'private':str(tmp_path/'run'),'host':'127.0.0.1','port':11436}))
+    return m.Runner(path)
     return m.Runner(path)
 
 
@@ -343,6 +347,44 @@ def test_work_order_scope_rejects_stale_runtime_before_start_or_reservation(tmp_
     with pytest.raises(RuntimeError,match='IDENTITY_CHANGED'):
         scoped.run('qwen',{})
     assert not list(scoped.private.glob('call-*'))
+
+
+@pytest.mark.parametrize(('exc','expected'),[
+    (ValueError('bad'),'VALIDATION_REJECTED'),
+    (RuntimeError('MODEL_RUNTIME_IDENTITY_CHANGED'),'RUNTIME_IDENTITY_MISMATCH'),
+    (RuntimeError('QWEN_RESIDENCY_CHANGED'),'MODEL_RESIDENCY_MISMATCH'),
+    (RuntimeError('QWEN_RESOURCE_GUARD'),'RESOURCE_ADMISSION_REJECTED'),
+    (RuntimeError('R2_CALL_LIMIT'),'BUDGET_REJECTED'),
+    (ConnectionError('offline'),'REMOTE_UNAVAILABLE'),
+    (RuntimeError('unexpected'),'INTERNAL_PRE_RESERVATION_ERROR'),
+])
+def test_pre_reservation_failure_records_stable_redacted_reason_without_call(tmp_path,exc,expected):
+    scoped=runner(tmp_path)
+    reason=scoped.record_pre_reservation_failure(
+        exc,stage='UNIT_PRE_RESERVATION',kind='qwen',
+        input_hash='a'*64,request_binding='b'*64,
+    )
+    record=json.loads((scoped.private/'pre-reservation-failures.jsonl').read_text())
+    assert reason==expected and record['reason_code']==expected
+    assert record['reservation_created'] is False and record['fail_closed'] is True
+    assert set(record)=={'utc','stage','reason_code','scope','kind','model','model_digest',
+        'runtime_version','context_length','input_sha256','request_binding_sha256',
+        'reservation_created','fail_closed'}
+    assert not list(scoped.private.glob('call-*'))
+
+
+def test_shared_model_lock_serializes_adapters_without_reservation(tmp_path):
+    (tmp_path/'one').mkdir();(tmp_path/'two').mkdir()
+    first=runner(tmp_path/'one');second=runner(tmp_path/'two')
+    shared=tmp_path/'shared-model.lock'
+    first.shared_lock_path=shared;second.shared_lock_path=shared
+    second.shared_lock_wait_seconds=1
+    handle=first.acquire_shared_model_lock()
+    try:
+        with pytest.raises(RuntimeError,match='SHARED_MODEL_LOCK_TIMEOUT'):
+            second.acquire_shared_model_lock()
+    finally:first.release_shared_model_lock(handle)
+    assert not list(first.private.glob('call-*')) and not list(second.private.glob('call-*'))
 
 
 def continuation_runner(tmp_path,valid_review=True):

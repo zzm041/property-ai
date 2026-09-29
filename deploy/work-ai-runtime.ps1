@@ -202,6 +202,8 @@ switch ($Action) {
             call_baseline=[ordered]@{asr=1;embedding=6;reranker=2;qwen=46}
             duration_seconds=7200;duration_baseline_seconds=535.483
             asr_start_ram_mib=11264;evidence_root=$RuntimeDir
+            shared_model_lock_path=(Join-Path $RepoRoot "tmp\delivery-ai-shared\model.lock")
+            shared_model_lock_wait_seconds=55
             resolution_root=$ResolutionRoot
             resolutions=@([ordered]@{
                 record="call-001"

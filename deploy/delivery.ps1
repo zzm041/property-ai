@@ -1,6 +1,6 @@
 param(
     [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateSet("config", "init", "up", "stop", "status", "backup", "restore-check", "diagnose", "ollama-start", "ollama-stop", "ollama-status", "rag-start", "rag-stop", "rag-status", "work-ai-start", "work-ai-stop", "work-ai-status")]
+    [ValidateSet("config", "init", "up", "stop", "status", "backup", "restore-check", "diagnose", "ollama-start", "ollama-stop", "ollama-status", "rag-ollama-start", "rag-ollama-stop", "rag-ollama-status", "rag-start", "rag-stop", "rag-status", "work-ai-start", "work-ai-stop", "work-ai-status")]
     [string]$Action,
     [Parameter(Position = 1)]
     [string]$Argument,
@@ -15,6 +15,7 @@ $EnvFile = Join-Path $DeployDir ".env.delivery"
 $BootstrapEnvFile = Join-Path $DeployDir ".env.delivery.bootstrap"
 $BackupDir = Join-Path $DeployDir "backups"
 $OllamaRuntime = Join-Path $DeployDir "ollama-runtime.ps1"
+$RagOllamaRuntime = Join-Path $DeployDir "rag-ollama-runtime.ps1"
 $RagRuntime = Join-Path $DeployDir "rag-runtime.ps1"
 $RagTokenPath = Join-Path (Split-Path -Parent $DeployDir) "tmp\delivery-rag-runtime\internal-token.txt"
 $WorkAiRuntime = Join-Path $DeployDir "work-ai-runtime.ps1"
@@ -112,6 +113,9 @@ switch ($Action) {
         & $OllamaRuntime status
         if ($LASTEXITCODE -ne 0) { throw "delivery Ollama status failed ($LASTEXITCODE)" }
     }
+    "rag-ollama-start" { & $RagOllamaRuntime start; if ($LASTEXITCODE -ne 0) { throw "delivery RAG Ollama start failed ($LASTEXITCODE)" } }
+    "rag-ollama-stop" { & $RagOllamaRuntime stop; if ($LASTEXITCODE -ne 0) { throw "delivery RAG Ollama stop failed ($LASTEXITCODE)" } }
+    "rag-ollama-status" { & $RagOllamaRuntime status; if ($LASTEXITCODE -ne 0) { throw "delivery RAG Ollama status failed ($LASTEXITCODE)" } }
     "rag-start" {
         & $RagRuntime start
         if ($LASTEXITCODE -ne 0) { throw "delivery RAG start failed ($LASTEXITCODE)" }

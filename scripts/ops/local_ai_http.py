@@ -16,6 +16,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import io
 import json
 import math
+import msvcrt
 import os
 from pathlib import Path
 import subprocess
@@ -39,13 +40,15 @@ from app.domain.observed_event import work_order_analysis_response_format
 from app.domain.vision import VISION_ANALYSIS_PROMPT_VERSION,vision_analysis_response_format
 
 QWEN_CANDIDATES={
-    'qwen3.5:4b':('2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd','0.34.3',4096),
+    'qwen3.5:4b':('2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd','0.34.4',4096),
     'qwen3.5:9b':('6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7','0.34.3',4096),
     'qwen38-27b-q3km-g55:7af3b8f':('eb18a122286f7a67d36dc8129f9caa1c0f7bb8449d7669a79e3ecb3d81289e0c','0.34.4',8192),
 }
 QWEN_MODEL=os.environ.get('PROPERTY_AI_LOCAL_QWEN_MODEL','qwen3.5:4b')
 if QWEN_MODEL not in QWEN_CANDIDATES:raise RuntimeError('UNAPPROVED_QWEN_CANDIDATE')
 DIGEST,QWEN_RUNTIME_VERSION,QWEN_CONTEXT_LENGTH=QWEN_CANDIDATES[QWEN_MODEL]
+QWEN_ENDPOINT=os.environ.get('PROPERTY_AI_LOCAL_QWEN_ENDPOINT','http://127.0.0.1:11435')
+if QWEN_ENDPOINT not in {'http://127.0.0.1:11435','http://127.0.0.1:11438'}:raise RuntimeError('UNAPPROVED_QWEN_ENDPOINT')
 MODELS={'asr':'Qwen3-ASR-0.6B','embedding':'bge-m3','reranker':'bge-reranker-v2-m3','qwen':QWEN_MODEL}
 LIMITS={'asr':2,'embedding':12,'reranker':8,'qwen':120}
 CONTINUATION_MAX={'asr':1,'embedding':6,'reranker':6,'qwen':6}
@@ -73,7 +76,7 @@ def gpu():
     if len(values)!=1:raise RuntimeError('GPU_CHECK_FAILED')
     return values[0]
 def direct(path,body=None,timeout=3):
-    url='http://127.0.0.1:11435'+path
+    url=QWEN_ENDPOINT+path
     request=urllib.request.Request(url,data=None if body is None else json.dumps(body,ensure_ascii=False).encode(),headers={'Content-Type':'application/json'})
     class NoRedirect(urllib.request.HTTPRedirectHandler):
         def redirect_request(self,*args,**kwargs):return None
@@ -181,6 +184,7 @@ class Runner:
         self.private=Path(self.config['private']);self.private.mkdir(parents=True,exist_ok=True)
         self.lock=threading.Lock()
         self.state_lock=threading.Lock()
+        self.audit_lock=threading.Lock()
         self.accepting_requests=True
         # The launcher records and verifies pinned source/weights; runtime config
         # cannot widen invocation caps or choose arbitrary upstream endpoints.
@@ -217,6 +221,10 @@ class Runner:
             or not 8192<=self.asr_start_ram_mib<=32768
             or (self.scope=='work_order_only' and self.asr_start_ram_mib<11264)
         ):raise ValueError('ASR_ADMISSION_LIMIT')
+        self.shared_lock_path=Path(self.config.get('shared_model_lock_path',self.private.parent/'shared-model.lock')).resolve()
+        self.shared_lock_wait_seconds=self.config.get('shared_model_lock_wait_seconds',55)
+        if (not isinstance(self.shared_lock_wait_seconds,int)
+                or not 1<=self.shared_lock_wait_seconds<=55):raise ValueError('SHARED_MODEL_LOCK_LIMIT')
         self.continuation=self.config.get('continuation')
         self.resolutions=list(self.config.get('resolutions',[]))
         self.runtime_binding=None
@@ -226,9 +234,10 @@ class Runner:
             if not binding.is_relative_to(evidence_root):raise ValueError('RUNTIME_BINDING_SCOPE')
             if self._sha(binding)!=self.config.get('runtime_binding_sha256'):raise ValueError('RUNTIME_BINDING_DRIFT')
             self.runtime_binding=json.loads(binding.read_text(encoding='utf-8'))
-        if self.scope=='work_order_only' and self.runtime_binding is None:
-            raise ValueError('WORK_ORDER_RUNTIME_BINDING_REQUIRED')
-        if self.scope=='work_order_only':self.verify_qwen_runtime_binding()
+        self.require_runtime_binding=(self.scope=='work_order_only' or self.config.get('require_runtime_binding') is True)
+        if self.require_runtime_binding and self.runtime_binding is None:
+            raise ValueError('WORK_ORDER_RUNTIME_BINDING_REQUIRED' if self.scope=='work_order_only' else 'QWEN_RUNTIME_BINDING_REQUIRED')
+        if self.require_runtime_binding:self.verify_qwen_runtime_binding()
         if self.continuation:
             c=self.continuation
             if c.get('task_id')!='REAL-AI-INTEGRATION-027' or c.get('run_id')!='ai027-b439223fda':raise ValueError('CONTINUATION_SCOPE')
@@ -253,9 +262,55 @@ class Runner:
     def verify_qwen_runtime_binding(self):
         if self.runtime_binding is None:raise RuntimeError('QWEN_RUNTIME_BINDING_REQUIRED')
         identity=bound_runtime_identity(self.runtime_binding)
-        if loopback_listener_pid(11435)!=int(identity['pid']):
+        listener_port=int(QWEN_ENDPOINT.rsplit(':',1)[1])
+        if loopback_listener_pid(listener_port)!=int(identity['pid']):
             raise RuntimeError('QWEN_RUNTIME_LISTENER_IDENTITY_CHANGED')
         return identity
+    @staticmethod
+    def _failure_code(exc):
+        detail=str(exc)
+        if isinstance(exc,(ValueError,TypeError,KeyError,UnicodeError)):
+            return 'VALIDATION_REJECTED'
+        if 'IDENTITY' in detail or 'LISTENER' in detail:
+            return 'RUNTIME_IDENTITY_MISMATCH'
+        if any(value in detail for value in ('QWEN_VERSION_CHANGED','QWEN_DIGEST_CHANGED','QWEN_RESIDENCY_CHANGED')):
+            return 'MODEL_RESIDENCY_MISMATCH'
+        if any(value in detail for value in ('RESOURCE','RAM_GUARD','SHARED_MODEL_LOCK')):
+            return 'RESOURCE_ADMISSION_REJECTED'
+        if any(value in detail for value in ('CALL_LIMIT','WINDOW_EXHAUSTED','BUDGET','PREVIOUS_REQUEST','FAILED_INPUT')):
+            return 'BUDGET_REJECTED'
+        if isinstance(exc,(TimeoutError,ConnectionError,OSError)):
+            return 'REMOTE_UNAVAILABLE'
+        return 'INTERNAL_PRE_RESERVATION_ERROR'
+    def record_pre_reservation_failure(self,exc,*,stage,kind=None,input_hash=None,request_binding=None):
+        reason=self._failure_code(exc)
+        record={
+            'utc':stamp(),'stage':stage,'reason_code':reason,'scope':self.scope,
+            'kind':kind,'model':MODELS.get(kind),'model_digest':DIGEST if kind=='qwen' else None,
+            'runtime_version':QWEN_RUNTIME_VERSION if kind=='qwen' else None,
+            'context_length':QWEN_CONTEXT_LENGTH if kind=='qwen' else None,
+            'input_sha256':input_hash,'request_binding_sha256':request_binding,
+            'reservation_created':False,'fail_closed':True,
+        }
+        self.private.mkdir(parents=True,exist_ok=True)
+        with self.audit_lock,(self.private/'pre-reservation-failures.jsonl').open('a',encoding='utf-8') as f:
+            f.write(json.dumps(record,ensure_ascii=False,separators=(',',':'))+'\n');f.flush();os.fsync(f.fileno())
+        return reason
+    def acquire_shared_model_lock(self):
+        self.shared_lock_path.parent.mkdir(parents=True,exist_ok=True)
+        handle=self.shared_lock_path.open('a+b');handle.seek(0)
+        if handle.tell()==0:handle.write(b'0');handle.flush()
+        deadline=time.monotonic()+self.shared_lock_wait_seconds
+        while True:
+            try:
+                handle.seek(0);msvcrt.locking(handle.fileno(),msvcrt.LK_NBLCK,1);return handle
+            except OSError:
+                if time.monotonic()>=deadline:
+                    handle.close();raise RuntimeError('SHARED_MODEL_LOCK_TIMEOUT')
+                time.sleep(.1)
+    @staticmethod
+    def release_shared_model_lock(handle):
+        handle.seek(0);msvcrt.locking(handle.fileno(),msvcrt.LK_UNLCK,1);handle.close()
     def _resolution(self,path,result):
         if not self.resolutions:return None
         for spec in self.resolutions:
@@ -338,12 +393,20 @@ class Runner:
         folder=self.private/f'call-{len(records)+1:03d}';folder.mkdir()
         save(folder/'reservation.json',{'kind':kind,'unix':now,'utc':stamp(),'model':MODELS[kind],'max_calls':self.limits[kind],'input_hash':input_hash,**metadata})
         return folder,deadline
-    def run(self,kind,value):
-        validate(kind,value)
-        if kind=='qwen':
-            if self.scope=='work_order_only':self.verify_qwen_runtime_binding()
-            qwen_guard()
-        else:
+    def run(self,kind,value,request_binding=None):
+        input_hash=hashlib.sha256(value if isinstance(value,bytes) else json.dumps(value,ensure_ascii=False,sort_keys=True).encode()).hexdigest()
+        stage='VALIDATION'
+        try:
+            validate(kind,value)
+            if kind=='qwen':
+                stage='RUNTIME_IDENTITY'
+                if self.require_runtime_binding:self.verify_qwen_runtime_binding()
+                stage='MODEL_RESIDENCY_AND_RESOURCE'
+                qwen_guard()
+        except Exception as exc:
+            self.record_pre_reservation_failure(exc,stage=stage,kind=kind,input_hash=input_hash,request_binding=request_binding)
+            raise
+        if kind!='qwen':
             # Existing Qwen runtime unloads its own idle model after30s. Wait
             # serially, without a probe inference/retry or lowering the floor.
             started=time.monotonic();samples=[]
@@ -352,13 +415,17 @@ class Runner:
                 available=ram();samples.append(available)
                 if available>=minimum:break
                 if time.monotonic()-started>=35:
-                    raise RuntimeError('CPU_START_RAM_GUARD')
+                    exc=RuntimeError('CPU_START_RAM_GUARD')
+                    self.record_pre_reservation_failure(exc,stage='RESOURCE_ADMISSION',kind=kind,input_hash=input_hash,request_binding=request_binding)
+                    raise exc
                 time.sleep(.25)
             if len(samples)>1:
                 with (self.private/'resource-waits.jsonl').open('a',encoding='utf-8') as f:
                     f.write(json.dumps({'utc':stamp(),'kind':kind,'seconds':time.monotonic()-started,'ram_samples_mib':samples,'inference_calls':0})+'\n')
-        input_hash=hashlib.sha256(value if isinstance(value,bytes) else json.dumps(value,ensure_ascii=False,sort_keys=True).encode()).hexdigest()
-        folder,deadline=self.reserve(kind,input_hash)
+        try:folder,deadline=self.reserve(kind,input_hash)
+        except Exception as exc:
+            self.record_pre_reservation_failure(exc,stage='BUDGET_AND_LEDGER',kind=kind,input_hash=input_hash,request_binding=request_binding)
+            raise
         save(folder/'input.json',{'kind':kind,'value':base64.b64encode(value).decode() if kind=='asr' else value})
         environment='asr_python' if kind=='asr' else 'bge_python'
         job=RequestJob()
@@ -406,7 +473,7 @@ class Runner:
                     if self.runtime_binding is None:
                         raise RuntimeError('QWEN_RUNTIME_BINDING_REQUIRED')
                     remote_stop=terminate_bound_runtime(
-                        self.runtime_binding,listener_port=11435
+                        self.runtime_binding,listener_port=int(QWEN_ENDPOINT.rsplit(':',1)[1])
                     )
                 except Exception as exc:
                     remote_stop_error=type(exc).__name__
@@ -477,9 +544,19 @@ def serve(config_path):
                 kind,value=decode(self.path,self.headers.get('Content-Type',''),body,self.headers.get('X-Prompt-Version',''),runner.scope)
             except (ValueError,TypeError,KeyError,UnicodeError):return self.reply(422,{'error':'INVALID_REQUEST'})
             if not runner.acquire_request():return self.reply(503,{'error':'MODEL_DRAINING_OR_BUSY_NO_RETRY'})
-            try:return self.reply(200,runner.run(kind,value))
-            except Exception:return self.reply(503,{'error':'MODEL_GUARD_OR_REQUEST_FAILED_NO_RETRY'})
-            finally:runner.lock.release()
+            request_id=self.headers.get('X-Request-Id','')
+            request_binding=hashlib.sha256(request_id.encode()).hexdigest() if request_id else None
+            shared=None
+            try:
+                shared=runner.acquire_shared_model_lock()
+                return self.reply(200,runner.run(kind,value,request_binding=request_binding))
+            except Exception as exc:
+                if shared is None:
+                    runner.record_pre_reservation_failure(exc,stage='SHARED_RESOURCE_LOCK',kind=kind,request_binding=request_binding)
+                return self.reply(503,{'error':'MODEL_GUARD_OR_REQUEST_FAILED_NO_RETRY'})
+            finally:
+                if shared is not None:runner.release_shared_model_lock(shared)
+                runner.lock.release()
     server=ThreadingHTTPServer((runner.config['host'],runner.config['port']),Handler)
     print(json.dumps({'pid':os.getpid(),'listen':f"{runner.config['host']}:{runner.config['port']}",'python':sys.executable,'source':str(Path(__file__).resolve()),'utc':stamp(),'health_inference':False}),flush=True)
     server.serve_forever()
