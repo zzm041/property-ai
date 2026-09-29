@@ -1,0 +1,27 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-CALL003-CONTROLLED-STOP",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_sha": "c960355a21527609216af8611de8f29db61ee4ae + scoped WIP",
+  "verdict": "PASS",
+  "scope": "Exact call-003 controlled-stop receipt recovery; not model or AUTO acceptance",
+  "findings": [],
+  "checked": [
+    "The exact diff only advances the recovery evidence binding from call-002 to call-003 and adds the matching path and fixed-hash assertions; recovery guards are unchanged.",
+    "The reviewer computed call-003/result.json SHA256 as B725035C11585AF362F6652B7531BDB63DCBC3DF75F75182015EAF513A7603B1.",
+    "The result remains FAILED / RESOURCE_FLOOR / CONTROLLED_STOP with remote_stop_error=null, four captured processes, taskkill_exit_code=0, tree_exit_confirmed=true, and listener_exit_confirmed=true.",
+    "The stop evidence exactly matches current receipt operation b18a6ce805c3452290ec65c7b14548de PID2400, executable path, and start time 2026-09-29T04:54:52.2756863Z.",
+    "Fixed hash, failure reason, controlled-stop type, process identity, and exit flags must all match, and live PID/listener absence is still required before retirement.",
+    "The reviewed exclusive start lock, non-overwriting retirement target, and new receipt path are retained; resource floors and ledger are unchanged."
+  ],
+  "source_hashes": {
+    "D:/property-ai/deploy/ollama-runtime.ps1": "66439FE58D4E25FA3EEA7A5E179428E2EE39CBC06F83EF158063AEC0C38B3AF9",
+    "D:/property-ai/backend/tests/unit/test_delivery_artifact.py": "8371341732F05139401CB17044886F39DFF4D036E53677D3DE2B9222E4F2ACA1"
+  },
+  "residual_limits": [
+    "The reported 10 passed, one existing warning, parse OK, live PID/listener absence, and approximately 9907 MiB free RAM were not rerun by the reviewer.",
+    "Source assertions do not themselves prove the actual retirement, restart, or model retry.",
+    "The call-003 failure remains; this review does not clear other UNKNOWN work, add calls or time, or lower resource floors.",
+    "The reviewer did not modify files or run model, page, business, database, queue, or process actions."
+  ],
+  "next_action": "Perform the exact receipt recovery within the approved single bounded retry, recheck live resources and the existing ledger, and preserve both old failure and new runtime identity. Stop without another retry if the resource floor or UNKNOWN guard triggers again."
+}

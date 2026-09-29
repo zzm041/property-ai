@@ -211,6 +211,8 @@ def test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded() -> Non
 def test_delivery_ollama_restart_requires_exact_controlled_stop_evidence() -> None:
     runtime=(ROOT/'deploy/ollama-runtime.ps1').read_text(encoding='utf-8')
     assert 'ExpectedControlledStopSha256' in runtime
+    assert 'calls\\call-003\\result.json' in runtime
+    assert 'B725035C11585AF362F6652B7531BDB63DCBC3DF75F75182015EAF513A7603B1' in runtime
     assert '$evidence.remote_completion -ne "CONTROLLED_STOP"' in runtime
     assert '$evidence.reason -ne "RESOURCE_FLOOR"' in runtime
     assert '$stopped.tree_exit_confirmed -ne $true' in runtime

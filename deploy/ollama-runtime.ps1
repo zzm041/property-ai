@@ -12,8 +12,8 @@ $RepoRoot = Split-Path -Parent $DeployDir
 $RuntimeDir = Join-Path $RepoRoot "tmp\delivery-ollama-runtime"
 $StatePath = Join-Path $RuntimeDir "current.json"
 $StartLockPath = Join-Path $RuntimeDir "start.lock"
-$ControlledStopPath = Join-Path $RepoRoot "tmp\delivery-work-ai-runtime\calls\call-002\result.json"
-$ExpectedControlledStopSha256 = "BD9BB65B4E2E36B8DE645D48999197ED424334B7D6D2BEC6EEC858B9FADD430C"
+$ControlledStopPath = Join-Path $RepoRoot "tmp\delivery-work-ai-runtime\calls\call-003\result.json"
+$ExpectedControlledStopSha256 = "B725035C11585AF362F6652B7531BDB63DCBC3DF75F75182015EAF513A7603B1"
 $ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models"
 $OllamaExe = if ($env:PROPERTY_AI_OLLAMA_EXE) {
     $env:PROPERTY_AI_OLLAMA_EXE
