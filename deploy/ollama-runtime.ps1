@@ -102,6 +102,21 @@ function Assert-StateProcess([object]$State) {
     return $process
 }
 
+function Assert-ReviewedRuntimeState([object]$State, [object]$Version) {
+    if (
+        [IO.Path]::GetFullPath([string]$State.executable) -ne [IO.Path]::GetFullPath($OllamaExe) -or
+        [string]$State.executable_sha256 -ne $ExpectedExeSha256 -or
+        (Get-FileHash -Algorithm SHA256 -LiteralPath ([string]$State.executable)).Hash -ne $ExpectedExeSha256 -or
+        [string]$Version.version -ne $ExpectedVersion -or
+        [string]$State.host -ne $Endpoint -or
+        $State.no_cloud -ne $true -or
+        [int]$State.max_loaded_models -ne 1 -or
+        [int]$State.concurrency -ne 1
+    ) {
+        throw "recorded Ollama runtime does not match the reviewed version and isolation policy"
+    }
+}
+
 function Invoke-Version {
     $request = [Net.HttpWebRequest]::Create("http://127.0.0.1:11435/api/version")
     $request.Proxy = $null
@@ -164,6 +179,7 @@ switch ($Action) {
                 if ($null -eq $state) { throw "isolated Ollama port is occupied without this entry's receipt" }
                 $null = Assert-StateProcess $state
                 $version = Invoke-Version
+                Assert-ReviewedRuntimeState $state $version
                 [ordered]@{ state = $state; version = $version.version; inference_on_start = $false } | ConvertTo-Json -Depth 6
                 break
             }
@@ -240,6 +256,7 @@ switch ($Action) {
         if ($null -eq $state) { throw "delivery Ollama runtime has no current receipt" }
         $null = Assert-StateProcess $state
         $version = Invoke-Version
+        Assert-ReviewedRuntimeState $state $version
         [ordered]@{ state = $state; version = $version.version; inference_on_status = $false } | ConvertTo-Json -Depth 6
     }
     "stop" {

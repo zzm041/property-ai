@@ -243,6 +243,15 @@ def test_delivery_ollama_restart_requires_exact_controlled_stop_evidence() -> No
     assert 'D571E4CF0AD4456FCCD33D5B985B6D63BA5669C6E5A812391704083952AAE3D5' in runtime
     assert '$ExpectedVersion = "0.34.4"' in runtime
     assert '$version.version -ne $ExpectedVersion' in runtime
+    assert 'function Assert-ReviewedRuntimeState' in runtime
+    assert runtime.count('Assert-ReviewedRuntimeState $state $version') == 2
+    assert '[string]$State.executable_sha256 -ne $ExpectedExeSha256' in runtime
+    assert '(Get-FileHash -Algorithm SHA256 -LiteralPath ([string]$State.executable)).Hash -ne $ExpectedExeSha256' in runtime
+    assert '[string]$Version.version -ne $ExpectedVersion' in runtime
+    assert '[string]$State.host -ne $Endpoint' in runtime
+    assert '[int]$State.max_loaded_models -ne 1' in runtime
+    assert '[int]$State.concurrency -ne 1' in runtime
+    assert '$process = Assert-StateProcess $state' in runtime
     assert 'calls\\call-003\\result.json' in runtime
     assert 'calls\\call-007\\result.json' in runtime
     assert 'C136825C9391FFC8F48395AB1A3E78A4638FC53F181FCAE84FBF47DF284BF85C' in runtime
