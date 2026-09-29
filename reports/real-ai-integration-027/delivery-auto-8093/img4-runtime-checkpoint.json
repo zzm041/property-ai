@@ -1,0 +1,101 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "checkpoint": "IMG4_PAGE_SUBMISSION_AND_OVERLAP_PREPARATION",
+  "captured_at": "2026-09-29T15:27:15.7046839+08:00",
+  "source": {
+    "workspace_head": "4518bbee50cba8de5fa14d0d55f3258b223ce1ac",
+    "reviewed_fix": "df14c08e760c9cf4636b4d37f60cd8c4beabbd39",
+    "reviewed_fix_is_head_ancestor": true,
+    "build_input": "pure git archive at df14c08e760c9cf4636b4d37f60cd8c4beabbd39",
+    "image": "property-ai-delivery:df14c08",
+    "image_id": "sha256:1e5e82fceab65736fa89b4d01b21e89216cc236c4153ab2046c3a35706fc98fd",
+    "analysis_module_sha256": "216FBA4F44D9D686E7A96A711662BDDD0EE770348F5CE5315862DD85A5EA48ED"
+  },
+  "runtime": {
+    "environment": "8093/property_ai_delivery_check@0014",
+    "api_worker_beat_publisher_same_image": true,
+    "api_health": "healthy",
+    "work_adapter_after_token_repair": {
+      "http_status": 200,
+      "status": "ready",
+      "accepting": true,
+      "request_active": false,
+      "reservation_gate": "READY"
+    },
+    "rag_adapter": {
+      "endpoint": "127.0.0.1:11436",
+      "recorded_and_actual_listener_pid_match": true,
+      "recorded_and_actual_start_time_match": true,
+      "status": "ready",
+      "scope": "rag_only",
+      "request_active": false,
+      "accepting_requests": true
+    },
+    "rabbitmq": {
+      "queue": "property_ai.delivery_check",
+      "ready": 0,
+      "unacked": 0,
+      "consumers": 1,
+      "dlq_messages_preserved_unread": 2
+    }
+  },
+  "img4": {
+    "interaction": "actual WeChat mini-program page tap on #submit-work-order",
+    "work_order_id": 6,
+    "status": "PENDING_ANALYSIS",
+    "work_order_version": 1,
+    "analysis_id": 5,
+    "analysis_status": "FAILED",
+    "analysis_error_code": "AI.UNAVAILABLE",
+    "task_intent_id": 18,
+    "task_status": "FAILED",
+    "publish_attempt": 3,
+    "execution_attempt": 3,
+    "assignment_count": 0,
+    "media": {
+      "file_id": 6,
+      "kind": "IMAGE",
+      "mime_type": "image/jpeg",
+      "size_bytes": 143352,
+      "content_sha256": "d46a3154cd75d3b21e1e4132405467ae1ef855b5effe79fd6627d8a45ba4ded3"
+    },
+    "provider_attempts": {
+      "vlm": 3,
+      "llm": 3,
+      "all_latency_ms": 0,
+      "all_error_code": "AI.UNAVAILABLE",
+      "real_inference_started": false
+    },
+    "root_cause": "the first fixed-image recreation omitted the existing internal work-AI token environment; the same four services were recreated with the existing token after preserving this failure",
+    "replayed_or_rewritten": false,
+    "manually_assigned": false
+  },
+  "remaining_batch": {
+    "authorized_total_new_work_orders": 10,
+    "already_counted_before_this_checkpoint": ["WO1", "WO3", "WO4", "WO5"],
+    "img4_work_order_id": 6,
+    "remaining_capacity": 5,
+    "prepared_users": 5,
+    "prepared_properties": [5, 6],
+    "prepared_file_ids": [7, 8, 9, 10, 11, 12],
+    "prepared_media_types": ["image/jpeg", "audio/wav"],
+    "work_orders_created_by_overlap_script": 0,
+    "submission_guard": {
+      "required_free_ram_mib": 11264,
+      "initial_observed_free_ram_mib": 10268,
+      "guard_observed_free_ram_mib": 10135,
+      "observed_free_gpu_mib": 14460,
+      "decision": "BLOCKED_BEFORE_SUBMISSION"
+    },
+    "post_guard_database_check": {
+      "maximum_work_order_id": 6,
+      "work_order_count_above_id_6": 0,
+      "prepared_media_attachment_count": 0
+    }
+  },
+  "privacy": {
+    "credentials_or_tokens_recorded": false,
+    "full_contact_phone_recorded": false,
+    "resident_content_redacted_from_checkpoint": true
+  }
+}
