@@ -1,5 +1,15 @@
 # Project handoff (latest facts only)
 
+## Current checkpoint — df14c08 loaded; IMG4 failed before inference; final overlap held at ASR RAM guard (2026-09-29)
+
+Current repository HEAD is `8c22f52`. The fixed deadline remains **2026-09-29 22:36:10 Asia/Shanghai**. The current authorization is at most ten new synthetic work orders for this package; `WO1`, `WO3`, `WO4`, `WO5` and the new IMG4 work order 6 consume five slots, leaving at most five. Work orders 3–5 remain immutable failure evidence and were not replayed or rewritten.
+
+The reviewed `df14c08e760c9cf4636b4d37f60cd8c4beabbd39` source was exported as a pure Git archive and built as `property-ai-delivery:df14c08` (`sha256:1e5e82fceab65736fa89b4d01b21e89216cc236c4153ab2046c3a35706fc98fd`). API, Worker, Beat and publisher now run this same image; API is healthy, the work-order adapter is idle/ready, and the dedicated main queue is empty with one consumer. Two delivery DLQ messages remain unread and untouched. The RAG-only adapter's recorded/current PID and start time match and its status is ready/idle; no RAG call was repeated.
+
+IMG4/file6 was submitted by an actual WeChat mini-program page tap and became work order 6 with persisted image media. It failed closed as `PENDING_ANALYSIS` after three task attempts because the first fixed-image recreation omitted the existing internal work-AI token environment. All six VLM/LLM attempt logs are zero-millisecond `AI.UNAVAILABLE`; no real inference or Assignment occurred. The same four services were then recreated with the existing local token, and the adapter now passes authenticated readiness. Work order 6 was not replayed or manually repaired. Exact redacted evidence is `reports/real-ai-integration-027/delivery-auto-8093/img4-runtime-checkpoint.json` and screenshot 17.
+
+Five distinct normal users across properties 5 and 6 have authenticated and prepared six persisted media objects: five repair images and one approved non-sensitive WAV. No prepared media is attached to a work order and no work order above id 6 exists. The single-use overlap script has a hard pre-submit ASR guard. Its direct run observed **10135 MiB** free RAM, below the unchanged **11264 MiB** ASR start floor, and stopped before any submission. GPU free was sufficient. No safe project-owned resident model was found to unload; the remaining memory is held by the active application/desktop/WSL environment, so the final five-work-order image/voice overlap cannot be started safely until approximately 1.1 GiB additional system RAM is freed. The script and this checkpoint are preserved in `8c22f52`; credentials, tokens and full contact numbers are not recorded.
+
 ## Current checkpoint — 8093 real text AUTO complete; durable provider retry fix reviewed; additional work-order gate unresolved (2026-09-29)
 
 Current repository HEAD is `68fdb87ffbe77eb007e6ab81b42236eb952d2b83`. The fixed deadline remains **2026-09-29 22:36:10 Asia/Shanghai**. WeChat Developer Tools authorization for client `Codex` was explicitly approved and succeeded; it is no longer the blocker recorded in the preceding checkpoint.
