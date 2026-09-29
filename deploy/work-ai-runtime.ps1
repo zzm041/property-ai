@@ -14,11 +14,11 @@ $SecretPath = Join-Path $RuntimeDir "internal-token.txt"
 $ConfigPath = Join-Path $RuntimeDir "config.json"
 $CurrentPath = Join-Path $RuntimeDir "current.json"
 $OllamaCurrent = Join-Path $RepoRoot "tmp\delivery-ollama-runtime\current.json"
-$SourceCommit = "19a417fc29199120a1e08b64008a90741ad7af78"
+$SourceCommit = "084ced1398ce3cd4e84e71c7b37c4f35549c2001"
 $CandidateRoot = Join-Path $RuntimeDir "candidate-$SourceCommit"
 $AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
 $RuntimeControlPath = Join-Path $CandidateRoot "scripts\ops\local_ai_runtime_control.py"
-$ExpectedAdapterSha256 = "089CC518CDF13A9F09BFEF01E81C5E506504532FAFF97743D257C8475CB2B011"
+$ExpectedAdapterSha256 = "FDC8C58C5FC7079F8495901485B7E49850786408261C0CA95C6BB504BFEF15C1"
 $ExpectedRuntimeControlSha256 = "CEA1B4AD6A5D2C12F70E233E28C791C86BC6EFDC5F2EA9864FDC022D57D13867"
 $ResolutionRoot = Join-Path $RepoRoot "reports"
 $ResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\call-001-resolution.json"
@@ -198,8 +198,10 @@ switch ($Action) {
         $config = [ordered]@{
             host="127.0.0.1";port=11437;private=$PrivateDir;model_root=$ModelRoot
             asr_python=$AsrPython;bge_python=$PythonPath;scope="work_order_only"
-            limits=[ordered]@{asr=1;embedding=1;reranker=1;qwen=18}
-            duration_seconds=7200;asr_start_ram_mib=11264;evidence_root=$RuntimeDir
+            limits=[ordered]@{asr=2;embedding=12;reranker=8;qwen=120}
+            call_baseline=[ordered]@{asr=1;embedding=6;reranker=2;qwen=46}
+            duration_seconds=7200;duration_baseline_seconds=535.483
+            asr_start_ram_mib=11264;evidence_root=$RuntimeDir
             resolution_root=$ResolutionRoot
             resolutions=@([ordered]@{
                 record="call-001"

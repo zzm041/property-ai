@@ -224,12 +224,14 @@ def test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded() -> Non
     assert 'runtime_binding_sha256=(Get-FileHash' in runtime and '.Hash.ToLowerInvariant()' in runtime
     assert '([DateTimeOffset]$ollama.started_at_utc).UtcDateTime.ToString("o")' in runtime
     assert 'asr_start_ram_mib=11264' in runtime
-    assert 'qwen=18' in runtime and 'duration_seconds=7200' in runtime
+    assert 'asr=2;embedding=12;reranker=8;qwen=120' in runtime
+    assert 'call_baseline=[ordered]@{asr=1;embedding=6;reranker=2;qwen=46}' in runtime
+    assert 'duration_seconds=7200;duration_baseline_seconds=535.483' in runtime
     assert 'git -C $RepoRoot archive' in runtime
     assert 'adapter-$operationId.stdout.log' in runtime and 'adapter-$operationId.stderr.log' in runtime
     assert '__SOURCE_COMMIT__' not in runtime and '__ADAPTER_SHA256__' not in runtime
-    assert '089CC518CDF13A9F09BFEF01E81C5E506504532FAFF97743D257C8475CB2B011' in runtime
-    assert '19a417fc29199120a1e08b64008a90741ad7af78' in runtime
+    assert 'FDC8C58C5FC7079F8495901485B7E49850786408261C0CA95C6BB504BFEF15C1' in runtime
+    assert '084ced1398ce3cd4e84e71c7b37c4f35549c2001' in runtime
     assert 'call-001-resolution.json' in runtime
     assert 'PASS_SCOPED_CALL_RESOLUTION' not in runtime
     assert 'resolution_root=$ResolutionRoot' in runtime
