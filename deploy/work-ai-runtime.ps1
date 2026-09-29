@@ -13,11 +13,11 @@ $SecretPath = Join-Path $RuntimeDir "internal-token.txt"
 $ConfigPath = Join-Path $RuntimeDir "config.json"
 $CurrentPath = Join-Path $RuntimeDir "current.json"
 $OllamaCurrent = Join-Path $RepoRoot "tmp\delivery-ollama-runtime\current.json"
-$SourceCommit = "d6d83e9e1b039bfb763a74716d316ad19d7fff96"
+$SourceCommit = "3dc2312b42f10b9df5fa6d718230d56b1e1421a3"
 $CandidateRoot = Join-Path $RuntimeDir "candidate-$SourceCommit"
 $AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
 $RuntimeControlPath = Join-Path $CandidateRoot "scripts\ops\local_ai_runtime_control.py"
-$ExpectedAdapterSha256 = "FAE36A44B0A4375235176BC8AAB609007A26D91BD34092378CCB067544B0E569"
+$ExpectedAdapterSha256 = "103C818E348C658DA8263A36B107CDF13CAAC032FB8A6A301B43227E0A922595"
 $ExpectedRuntimeControlSha256 = "CEA1B4AD6A5D2C12F70E233E28C791C86BC6EFDC5F2EA9864FDC022D57D13867"
 $ResolutionRoot = Join-Path $RepoRoot "reports"
 $ResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\call-001-resolution.json"
@@ -254,7 +254,12 @@ switch ($Action) {
         $state=Read-Current;if ($null -eq $state) { throw "work AI runtime has no current receipt" }
         $process=Assert-CurrentProcess $state;$drain=Invoke-Drain (Read-Token)
         if ($drain.accepting_requests -ne $false -or $drain.request_active) { throw "work AI adapter is not safely drainable" }
-        Stop-Process -Id ([int]$state.listener_pid) -ErrorAction Stop
+        try {
+            Stop-Process -Id ([int]$state.listener_pid) -ErrorAction Stop
+        } catch {
+            & taskkill /PID ([int]$state.listener_pid) /F | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "exact work AI adapter process could not be stopped" }
+        }
         $deadline=[DateTime]::UtcNow.AddSeconds(10)
         do { Start-Sleep -Milliseconds 100 } until ((Get-Listener).Count -eq 0 -or [DateTime]::UtcNow -ge $deadline)
         if ((Get-Listener).Count -ne 0) { throw "11437 did not release after exact adapter stop" }
