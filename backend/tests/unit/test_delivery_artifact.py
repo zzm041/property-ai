@@ -253,6 +253,9 @@ def test_delivery_ollama_restart_requires_exact_controlled_stop_evidence() -> No
     assert '[string]$State.host -ne $Endpoint' in runtime
     assert '[int]$State.max_loaded_models -ne 1' in runtime
     assert '[int]$State.concurrency -ne 1' in runtime
+    assert '$ContextLength = 8192' in runtime
+    assert '[int]$State.context_length -ne $ContextLength' in runtime
+    assert '$env:OLLAMA_CONTEXT_LENGTH = [string]$ContextLength' in runtime
     assert '$process = Assert-StateProcess $state' in runtime
     assert 'function Retire-RebootedReceipt' in runtime
     assert 'ollama-0344-restart-resolution.json' in runtime

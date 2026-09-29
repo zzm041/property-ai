@@ -33,6 +33,7 @@ $OllamaExe = if ($env:PROPERTY_AI_OLLAMA_EXE) {
 $ExpectedExeSha256 = "D571E4CF0AD4456FCCD33D5B985B6D63BA5669C6E5A812391704083952AAE3D5"
 $ExpectedVersion = "0.34.4"
 $Endpoint = "127.0.0.1:11435"
+$ContextLength = 8192
 
 function Get-ListenerPid {
     $pids = @()
@@ -154,7 +155,8 @@ function Assert-ReviewedRuntimeState([object]$State, [object]$Version) {
         [string]$State.host -ne $Endpoint -or
         $State.no_cloud -ne $true -or
         [int]$State.max_loaded_models -ne 1 -or
-        [int]$State.concurrency -ne 1
+        [int]$State.concurrency -ne 1 -or
+        [int]$State.context_length -ne $ContextLength
     ) {
         throw "recorded Ollama runtime does not match the reviewed version and isolation policy"
     }
@@ -239,7 +241,7 @@ switch ($Action) {
             $env:OLLAMA_NOPRUNE = "1"
             $env:OLLAMA_MAX_LOADED_MODELS = "1"
             $env:OLLAMA_NUM_PARALLEL = "1"
-            $env:OLLAMA_CONTEXT_LENGTH = "4096"
+            $env:OLLAMA_CONTEXT_LENGTH = [string]$ContextLength
             $env:OLLAMA_MAX_QUEUE = "2"
             $env:OLLAMA_KEEP_ALIVE = "30s"
             $env:OLLAMA_LOAD_TIMEOUT = "120s"
@@ -263,7 +265,7 @@ switch ($Action) {
                 no_cloud = $true
                 max_loaded_models = 1
                 concurrency = 1
-                context_length = 4096
+                context_length = $ContextLength
                 keep_alive = "30s"
                 gpu_reserved_bytes = $GpuOverheadBytes
                 inference_on_start = $false
