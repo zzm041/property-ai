@@ -254,7 +254,9 @@ switch ($Action) {
         $state=Read-Current;if ($null -eq $state) { throw "work AI runtime has no current receipt" }
         $process=Assert-CurrentProcess $state;$drain=Invoke-Drain (Read-Token)
         if ($drain.accepting_requests -ne $false -or $drain.request_active) { throw "work AI adapter is not safely drainable" }
-        Stop-Process -Id $process.Id;$null=$process.WaitForExit(10000)
+        Stop-Process -Id ([int]$state.listener_pid) -ErrorAction Stop
+        $deadline=[DateTime]::UtcNow.AddSeconds(10)
+        do { Start-Sleep -Milliseconds 100 } until ((Get-Listener).Count -eq 0 -or [DateTime]::UtcNow -ge $deadline)
         if ((Get-Listener).Count -ne 0) { throw "11437 did not release after exact adapter stop" }
         Write-Output "delivery work AI adapter stopped; Ollama, model assets, ledger and token were retained"
     }
