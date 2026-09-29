@@ -259,6 +259,10 @@ def test_delivery_ollama_restart_requires_exact_controlled_stop_evidence() -> No
     assert '$null -ne $currentPid' in runtime
     assert '$null -ne (Get-ListenerPid)' in runtime
     assert 'retired-restart-{0}.json' in runtime
+    assert '$netstatLines = @(& netstat -ano -p TCP)' in runtime
+    assert 'if ($LASTEXITCODE -ne 0) { throw "could not inspect the isolated Ollama listener" }' in runtime
+    assert 'Get-CimInstance Win32_OperatingSystem -ErrorAction Stop' in runtime
+    assert 'Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$State.pid)" -ErrorAction Stop' in runtime
     assert 'calls\\call-003\\result.json' in runtime
     assert 'calls\\call-007\\result.json' in runtime
     assert 'C136825C9391FFC8F48395AB1A3E78A4638FC53F181FCAE84FBF47DF284BF85C' in runtime

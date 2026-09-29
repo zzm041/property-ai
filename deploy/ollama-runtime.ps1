@@ -36,7 +36,9 @@ $Endpoint = "127.0.0.1:11435"
 
 function Get-ListenerPid {
     $pids = @()
-    foreach ($line in (& netstat -ano -p TCP)) {
+    $netstatLines = @(& netstat -ano -p TCP)
+    if ($LASTEXITCODE -ne 0) { throw "could not inspect the isolated Ollama listener" }
+    foreach ($line in $netstatLines) {
         if ($line -match "^\s*TCP\s+127\.0\.0\.1:11435\s+\S+\s+LISTENING\s+(\d+)\s*$") {
             $pids += [int]$Matches[1]
         }
@@ -57,10 +59,10 @@ function Retire-RebootedReceipt([object]$State) {
         return $false
     }
     $resolution = Get-Content -Raw -LiteralPath $RestartResolutionPath | ConvertFrom-Json
-    $boot = (Get-CimInstance Win32_OperatingSystem).LastBootUpTime.ToUniversalTime()
+    $boot = (Get-CimInstance Win32_OperatingSystem -ErrorAction Stop).LastBootUpTime.ToUniversalTime()
     $recordedBoot = ([DateTimeOffset]$resolution.current_evidence.boot_time_utc).UtcDateTime
     $recordedStart = ([DateTimeOffset]$State.started_at_utc).UtcDateTime
-    $currentPid = Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$State.pid)" -ErrorAction SilentlyContinue
+    $currentPid = Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$State.pid)" -ErrorAction Stop
     if (
         $resolution.format -ne "property-ai-delivery-ollama-restart-resolution-v1" -or
         $resolution.task_id -ne "REAL-AI-INTEGRATION-027" -or
