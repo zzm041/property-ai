@@ -12,6 +12,8 @@ $RepoRoot = Split-Path -Parent $DeployDir
 $RuntimeDir = Join-Path $RepoRoot "tmp\delivery-ollama-runtime"
 $StatePath = Join-Path $RuntimeDir "current.json"
 $StartLockPath = Join-Path $RuntimeDir "start.lock"
+$RestartResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\ollama-0344-restart-resolution.json"
+$ExpectedRestartResolutionSha256 = "128943CB6C1B9CD653E1AB250B7D9D5330C2201184E2DA0B5399E3B4FB788317"
 $ControlledStops = @(
     [pscustomobject]@{
         Path = Join-Path $RepoRoot "tmp\delivery-work-ai-runtime\calls\call-003\result.json"
@@ -49,6 +51,42 @@ function Read-State {
     return Get-Content -Raw -LiteralPath $StatePath | ConvertFrom-Json
 }
 
+function Retire-RebootedReceipt([object]$State) {
+    if (-not (Test-Path -LiteralPath $RestartResolutionPath -PathType Leaf)) { return $false }
+    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $RestartResolutionPath).Hash -ne $ExpectedRestartResolutionSha256) {
+        return $false
+    }
+    $resolution = Get-Content -Raw -LiteralPath $RestartResolutionPath | ConvertFrom-Json
+    $boot = (Get-CimInstance Win32_OperatingSystem).LastBootUpTime.ToUniversalTime()
+    $recordedBoot = ([DateTimeOffset]$resolution.current_evidence.boot_time_utc).UtcDateTime
+    $recordedStart = ([DateTimeOffset]$State.started_at_utc).UtcDateTime
+    $currentPid = Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$State.pid)" -ErrorAction SilentlyContinue
+    if (
+        $resolution.format -ne "property-ai-delivery-ollama-restart-resolution-v1" -or
+        $resolution.task_id -ne "REAL-AI-INTEGRATION-027" -or
+        [string]$resolution.original.receipt_sha256 -ne (Get-FileHash -Algorithm SHA256 -LiteralPath $StatePath).Hash -or
+        [string]$resolution.original.operation_id -ne [string]$State.operation_id -or
+        [int]$resolution.original.pid -ne [int]$State.pid -or
+        ([DateTimeOffset]$resolution.original.started_at_utc).UtcDateTime -ne $recordedStart -or
+        [IO.Path]::GetFullPath([string]$resolution.original.executable) -ne [IO.Path]::GetFullPath([string]$State.executable) -or
+        [string]$resolution.original.executable_sha256 -ne [string]$State.executable_sha256 -or
+        [Math]::Abs(($boot - $recordedBoot).TotalMilliseconds) -gt 1 -or
+        $recordedBoot -le $recordedStart -or
+        $null -ne $currentPid -or
+        $null -ne (Get-ListenerPid) -or
+        $resolution.current_evidence.recorded_pid_exists -ne $false -or
+        [int]$resolution.current_evidence.listener_11435_count -ne 0 -or
+        [string]$resolution.current_evidence.current_executable_sha256 -ne $ExpectedExeSha256 -or
+        $resolution.semantics.historical_graceful_exit_confirmed -ne $false -or
+        $resolution.semantics.current_execution_absent -ne $true -or
+        $resolution.semantics.model_request_or_budget_effect -ne $false
+    ) { return $false }
+    $archive = Join-Path $RuntimeDir ("retired-restart-{0}.json" -f $State.operation_id)
+    if (Test-Path -LiteralPath $archive) { throw "restart-retired receipt archive already exists" }
+    Move-Item -LiteralPath $StatePath -Destination $archive
+    return $true
+}
+
 function Retire-ControlledStopReceipt([object]$State) {
     $existing = @($ControlledStops | Where-Object { Test-Path -LiteralPath $_.Path -PathType Leaf })
     if ($existing.Count -eq 0) { throw "stale current receipt exists without controlled-stop evidence" }
@@ -74,7 +112,10 @@ function Retire-ControlledStopReceipt([object]$State) {
             break
         }
     }
-    if ($null -eq $binding) { throw "controlled-stop evidence does not bind the stale receipt" }
+    if ($null -eq $binding) {
+        if (Retire-RebootedReceipt $State) { return }
+        throw "controlled-stop or reviewed restart evidence does not bind the stale receipt"
+    }
     $sameProcess = $false
     $currentPid = Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$State.pid)" -ErrorAction SilentlyContinue
     if ($null -ne $currentPid -and $null -ne $currentPid.CreationDate) {

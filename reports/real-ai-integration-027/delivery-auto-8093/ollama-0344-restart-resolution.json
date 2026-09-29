@@ -1,0 +1,27 @@
+{
+  "format": "property-ai-delivery-ollama-restart-resolution-v1",
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "captured_at": "2026-09-29T17:14:20.9535284+08:00",
+  "authorization": "owner-approved isolated Ollama 0.34.4 acceptance",
+  "original": {
+    "receipt_path": "D:/property-ai/tmp/delivery-ollama-runtime/current.json",
+    "receipt_sha256": "83D93D840ABBB8F3CEC58438C7722C29611232B6DB3D546A5A322F99E63057FC",
+    "operation_id": "af0a586cf75c4cd9b784a6be76ab3ae5",
+    "pid": 30556,
+    "started_at_utc": "2026-09-29T06:05:30.9954655Z",
+    "executable": "C:/Users/lmj/AppData/Local/Programs/Ollama/ollama.exe",
+    "executable_sha256": "F282BAB3CB8ECE9F1843811C08E54FEC449557EFADC49EE0F9AF07F1B93407FC"
+  },
+  "current_evidence": {
+    "boot_time_utc": "2026-09-29T08:45:38.5000000Z",
+    "recorded_pid_exists": false,
+    "listener_11435_count": 0,
+    "current_executable_sha256": "D571E4CF0AD4456FCCD33D5B985B6D63BA5669C6E5A812391704083952AAE3D5"
+  },
+  "semantics": {
+    "historical_graceful_exit_confirmed": false,
+    "current_execution_absent": true,
+    "original_receipt_preserved_by_archive": true,
+    "model_request_or_budget_effect": false
+  }
+}

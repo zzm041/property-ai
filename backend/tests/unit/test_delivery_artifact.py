@@ -252,6 +252,13 @@ def test_delivery_ollama_restart_requires_exact_controlled_stop_evidence() -> No
     assert '[int]$State.max_loaded_models -ne 1' in runtime
     assert '[int]$State.concurrency -ne 1' in runtime
     assert '$process = Assert-StateProcess $state' in runtime
+    assert 'function Retire-RebootedReceipt' in runtime
+    assert 'ollama-0344-restart-resolution.json' in runtime
+    assert '128943CB6C1B9CD653E1AB250B7D9D5330C2201184E2DA0B5399E3B4FB788317' in runtime
+    assert '$recordedBoot -le $recordedStart' in runtime
+    assert '$null -ne $currentPid' in runtime
+    assert '$null -ne (Get-ListenerPid)' in runtime
+    assert 'retired-restart-{0}.json' in runtime
     assert 'calls\\call-003\\result.json' in runtime
     assert 'calls\\call-007\\result.json' in runtime
     assert 'C136825C9391FFC8F48395AB1A3E78A4638FC53F181FCAE84FBF47DF284BF85C' in runtime
