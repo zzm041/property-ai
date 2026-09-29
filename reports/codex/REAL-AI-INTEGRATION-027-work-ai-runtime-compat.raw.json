@@ -1,0 +1,33 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-WORK-AI-RUNTIME-COMPAT",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_sha": "dba9ca94063142c1c2d942645241b158bd6afcdf + scoped WIP",
+  "verdict": "PASS",
+  "scope": "Windows PowerShell runtime entry compatibility fix; not AUTO or runtime business acceptance",
+  "findings": [],
+  "checked": [
+    "Read the exact diff and direct start, status, and stop call context for the two scoped files.",
+    "System.Net.Http is explicitly loaded; health and drain use SendAsync(...).GetAwaiter().GetResult() and no longer call unavailable synchronous Send.",
+    "HTTP calls still disable proxies, carry the existing authorization header, keep bounded timeouts, reject non-success responses, and do not print the token.",
+    "Listener checks, startup checks, startup wait, stop wait, and post-stop confirmation use array materialization for stable zero, one, and multiple result semantics.",
+    "The change retains listener PID, process creation time, drain, request-active, frozen-source, and runtime-binding checks, and does not change model budgets or resource floors.",
+    "The test assertions directly cover assembly loading, compatible HTTP invocation, absence of the old method, and critical array wrapping; they are source assertions rather than PowerShell behavior tests.",
+    "Read current receipt listener_pid=3692, source_commit=3dc2312b42f10b9df5fa6d718230d56b1e1421a3, scope=work_order_only, inference_on_start=false, with frozen adapter and runtime-binding hashes."
+  ],
+  "source_hashes": {
+    "D:/property-ai/deploy/work-ai-runtime.ps1": "1953BA716326CDB53F6E06D822379C986EA1812A5302D54F79268803A74C0801",
+    "D:/property-ai/backend/tests/unit/test_delivery_artifact.py": "7F0F8421A850C452737EF090E31277428CCC6192C75F3CEE07EA8A8CA5F3C4C0"
+  },
+  "tests_evidence": {
+    "reported": "Implementer reported 10 passed and 1 existing warning.",
+    "review_boundary": "The reviewer read source and assertions only and did not run tests or PowerShell entries."
+  },
+  "residual_limits": [
+    "Stopping PID41384, identifying and cleaning PID41056, and latest ready/request_active=false are implementer evidence; the reviewer did not issue live process or health queries.",
+    "The receipt records launch identity but does not alone prove current health, resource sufficiency, or successful business reservation.",
+    "The reviewer did not run page, model, business, database, or queue actions and did not edit files.",
+    "Historical call-001 UNKNOWN, call-002 RESOURCE_FLOOR, and task failures remain failures and are not reclassified.",
+    "No blocker was found in this compatibility diff, but this does not accept real AUTO or Production."
+  ],
+  "next_action": "Save this compatibility fix and review, then continue the already approved actual-page new-version flow through the existing identity, budget, resource and UNKNOWN guards. Bind work-order version, durable intent, publisher, Worker, analysis and Assignment evidence without replaying old failures."
+}

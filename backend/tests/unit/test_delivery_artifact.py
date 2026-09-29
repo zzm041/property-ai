@@ -181,6 +181,11 @@ def test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded() -> Non
     compose=(ROOT/'deploy/docker-compose.delivery.yml').read_text(encoding='utf-8')
     runtime=(ROOT/'deploy/work-ai-runtime.ps1').read_text(encoding='utf-8')
     launcher=(ROOT/'deploy/delivery.ps1').read_text(encoding='utf-8')
+    assert 'Add-Type -AssemblyName System.Net.Http' in runtime
+    assert '$client.SendAsync($request).GetAwaiter().GetResult()' in runtime
+    assert '$client.Send($request)' not in runtime
+    assert '$existing = @(Get-Listener)' in runtime
+    assert '$listener=@(Get-Listener)' in runtime
     assert 'LLM_API_KEY: ${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}' in compose
     assert 'VLM_API_KEY: ${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}' in compose
     assert 'ASR_API_KEY: ${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}' in compose

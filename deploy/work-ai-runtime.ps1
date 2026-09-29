@@ -5,6 +5,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+Add-Type -AssemblyName System.Net.Http
 $DeployDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = Split-Path -Parent $DeployDir
 $RuntimeDir = Join-Path $RepoRoot "tmp\delivery-work-ai-runtime"
@@ -64,7 +65,7 @@ function Invoke-Health([string]$Token) {
         $client.Timeout = [TimeSpan]::FromSeconds(2)
         $request = [Net.Http.HttpRequestMessage]::new([Net.Http.HttpMethod]::Get, "http://127.0.0.1:11437/healthz")
         $request.Headers.Authorization = [Net.Http.Headers.AuthenticationHeaderValue]::new("Bearer", $Token)
-        $response = $client.Send($request)
+        $response = $client.SendAsync($request).GetAwaiter().GetResult()
         if (-not $response.IsSuccessStatusCode) { throw "work AI health returned HTTP $([int]$response.StatusCode)" }
         return $response.Content.ReadAsStringAsync().GetAwaiter().GetResult() | ConvertFrom-Json
     } finally {
@@ -82,7 +83,7 @@ function Invoke-Drain([string]$Token) {
         $request = [Net.Http.HttpRequestMessage]::new([Net.Http.HttpMethod]::Post, "http://127.0.0.1:11437/admin/drain")
         $request.Headers.Authorization = [Net.Http.Headers.AuthenticationHeaderValue]::new("Bearer", $Token)
         $request.Content = [Net.Http.ByteArrayContent]::new([byte[]]::new(0))
-        $response = $client.Send($request)
+        $response = $client.SendAsync($request).GetAwaiter().GetResult()
         if (-not $response.IsSuccessStatusCode) { throw "work AI drain returned HTTP $([int]$response.StatusCode)" }
         return $response.Content.ReadAsStringAsync().GetAwaiter().GetResult() | ConvertFrom-Json
     } finally {
@@ -156,7 +157,7 @@ function Read-Current {
 }
 
 function Assert-CurrentProcess([object]$State) {
-    $listener = Get-Listener
+    $listener = @(Get-Listener)
     if ($listener.Count -ne 1 -or [int]$listener[0].OwningProcess -ne [int]$State.listener_pid) {
         throw "11437 listener does not match the recorded work AI instance"
     }
@@ -175,7 +176,7 @@ switch ($Action) {
         }
         New-Item -ItemType Directory -Force -Path $RuntimeDir,$PrivateDir | Out-Null
         Assert-Candidate
-        $existing = Get-Listener
+        $existing = @(Get-Listener)
         if ($existing.Count -gt 0) {
             $state = Read-Current
             $token = Read-Token
@@ -224,7 +225,7 @@ switch ($Action) {
             $env:LOCAL_AI_INTERNAL_TOKEN=$oldToken;$env:PROPERTY_AI_LOCAL_QWEN_MODEL=$oldModel
         }
         $deadline=[DateTime]::UtcNow.AddSeconds(15)
-        do { Start-Sleep -Milliseconds 250;$listener=Get-Listener } until ($listener.Count -eq 1 -or [DateTime]::UtcNow -ge $deadline)
+        do { Start-Sleep -Milliseconds 250;$listener=@(Get-Listener) } until ($listener.Count -eq 1 -or [DateTime]::UtcNow -ge $deadline)
         if ($listener.Count -ne 1) { throw "work AI adapter did not acquire 11437" }
         $listenerProcess=Get-Process -Id ([int]$listener[0].OwningProcess) -ErrorAction Stop
         $health=Invoke-Health $token
@@ -261,8 +262,8 @@ switch ($Action) {
             if ($LASTEXITCODE -ne 0) { throw "exact work AI adapter process could not be stopped" }
         }
         $deadline=[DateTime]::UtcNow.AddSeconds(10)
-        do { Start-Sleep -Milliseconds 100 } until ((Get-Listener).Count -eq 0 -or [DateTime]::UtcNow -ge $deadline)
-        if ((Get-Listener).Count -ne 0) { throw "11437 did not release after exact adapter stop" }
+        do { Start-Sleep -Milliseconds 100 } until (@(Get-Listener).Count -eq 0 -or [DateTime]::UtcNow -ge $deadline)
+        if (@(Get-Listener).Count -ne 0) { throw "11437 did not release after exact adapter stop" }
         Write-Output "delivery work AI adapter stopped; Ollama, model assets, ledger and token were retained"
     }
 }
