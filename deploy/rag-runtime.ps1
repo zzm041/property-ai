@@ -5,6 +5,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+Add-Type -AssemblyName System.Net.Http
 $DeployDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = Split-Path -Parent $DeployDir
 $RuntimeDir = Join-Path $RepoRoot "tmp\delivery-rag-runtime"
@@ -66,7 +67,7 @@ function Invoke-Health([string]$Token) {
         $client.Timeout = [TimeSpan]::FromSeconds(2)
         $request = [Net.Http.HttpRequestMessage]::new([Net.Http.HttpMethod]::Get, "http://127.0.0.1:11436/healthz")
         $request.Headers.Authorization = [Net.Http.Headers.AuthenticationHeaderValue]::new("Bearer", $Token)
-        $response = $client.Send($request)
+        $response = $client.SendAsync($request).GetAwaiter().GetResult()
         if (-not $response.IsSuccessStatusCode) { throw "RAG adapter health returned HTTP $([int]$response.StatusCode)" }
         return $response.Content.ReadAsStringAsync().GetAwaiter().GetResult() | ConvertFrom-Json
     } finally {
@@ -84,7 +85,7 @@ function Invoke-Drain([string]$Token) {
         $request = [Net.Http.HttpRequestMessage]::new([Net.Http.HttpMethod]::Post, "http://127.0.0.1:11436/admin/drain")
         $request.Headers.Authorization = [Net.Http.Headers.AuthenticationHeaderValue]::new("Bearer", $Token)
         $request.Content = [Net.Http.ByteArrayContent]::new([byte[]]::new(0))
-        $response = $client.Send($request)
+        $response = $client.SendAsync($request).GetAwaiter().GetResult()
         if (-not $response.IsSuccessStatusCode) { throw "RAG adapter drain returned HTTP $([int]$response.StatusCode)" }
         return $response.Content.ReadAsStringAsync().GetAwaiter().GetResult() | ConvertFrom-Json
     } finally {
@@ -99,7 +100,7 @@ function Read-Current {
 }
 
 function Assert-CurrentProcess([object]$State) {
-    $listener = Get-Listener
+    $listener = @(Get-Listener)
     if ($listener.Count -ne 1 -or [int]$listener[0].OwningProcess -ne [int]$State.listener_pid) {
         throw "11436 listener does not match the recorded delivery RAG instance"
     }
@@ -152,14 +153,23 @@ switch ($Action) {
             if (-not (Test-Path -LiteralPath $path)) { throw "required local AI asset is missing: $path" }
         }
         New-Item -ItemType Directory -Force -Path $RuntimeDir,$PrivateDir | Out-Null
-        $existing = Get-Listener
+        $existing = @(Get-Listener)
         if ($existing.Count -gt 0) {
             $state = Read-Current
             $token = Read-Token
             if (-not $token) { throw "11436 is occupied but the delivery RAG token is missing" }
             $health = Invoke-Health $token
             if ($health.scope -ne "rag_only" -or $health.request_active -or $health.accepting_requests -ne $true) { throw "recorded RAG adapter is not accepting idle RAG-only work" }
-            if ($null -eq $state) {
+            $adopt=$null -eq $state
+            if ($null -ne $state) {
+                try { $null=Assert-CurrentProcess $state } catch {
+                    if(Get-Process -Id ([int]$state.listener_pid) -ErrorAction SilentlyContinue){throw}
+                    $archive=Join-Path $RuntimeDir ("retired-current-{0}.json" -f [DateTime]::UtcNow.ToString("yyyyMMddTHHmmssZ"))
+                    Move-Item -LiteralPath $CurrentPath -Destination $archive
+                    $adopt=$true
+                }
+            }
+            if ($adopt) {
                 $lines = @(Get-Content -LiteralPath (Join-Path $RuntimeDir "adapter.stdout.log") | Where-Object { $_.Trim() })
                 if ($lines.Count -ne 1) { throw "unrecorded 11436 process cannot be attributed to this launch" }
                 $started = $lines[0] | ConvertFrom-Json
@@ -172,8 +182,6 @@ switch ($Action) {
                 ) { throw "unrecorded 11436 process cannot be attributed to this exact idle launch" }
                 $listenerProcess = Get-Process -Id ([int]$existing[0].OwningProcess) -ErrorAction Stop
                 $state = New-CurrentState $listenerProcess $health $null
-            } else {
-                $null = Assert-CurrentProcess $state
             }
             Write-Output ($state | ConvertTo-Json -Depth 5)
             break
@@ -222,7 +230,7 @@ switch ($Action) {
         $deadline = [DateTime]::UtcNow.AddSeconds(15)
         do {
             Start-Sleep -Milliseconds 250
-            $listener = Get-Listener
+            $listener = @(Get-Listener)
         } until ($listener.Count -eq 1 -or [DateTime]::UtcNow -ge $deadline)
         if ($listener.Count -ne 1) { throw "delivery RAG adapter did not acquire 11436" }
         $listenerProcess = Get-Process -Id ([int]$listener[0].OwningProcess) -ErrorAction Stop
@@ -249,7 +257,7 @@ switch ($Action) {
         if ($drain.request_active) { throw "delivery RAG request is active; adapter is draining and stop is deferred" }
         Stop-Process -Id $process.Id
         $null = $process.WaitForExit(10000)
-        if ((Get-Listener).Count -ne 0) { throw "11436 did not release after the exact adapter stopped" }
+        if (@(Get-Listener).Count -ne 0) { throw "11436 did not release after the exact adapter stopped" }
         if ($state.launcher_pid -and $state.launcher_started_at_utc -and [int]$state.launcher_pid -ne $process.Id) {
             $launcher = Get-Process -Id ([int]$state.launcher_pid) -ErrorAction SilentlyContinue
             if ($null -ne $launcher) {
