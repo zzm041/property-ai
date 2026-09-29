@@ -324,7 +324,7 @@ class Runner:
             spent=float(self.duration_baseline_seconds)
             for path in prior:
                 result=json.loads((path.parent/'result.json').read_text(encoding='utf-8'))
-                elapsed=result.get('total_seconds',0)
+                elapsed=result.get('total_seconds')
                 if isinstance(elapsed,bool) or not isinstance(elapsed,(int,float)) or not math.isfinite(elapsed) or elapsed<0:
                     raise RuntimeError('R2_BUDGET_RECORD_INVALID')
                 spent+=float(elapsed)

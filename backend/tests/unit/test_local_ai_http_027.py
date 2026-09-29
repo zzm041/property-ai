@@ -231,6 +231,17 @@ def test_scoped_runtime_applies_external_usage_baseline_to_same_total_budget(tmp
     assert m.Runner(path).reserve('qwen','after')[0].name=='call-002'
 
 
+@pytest.mark.parametrize('elapsed',[None,-1,float('inf'),'unknown',True])
+def test_cumulative_budget_rejects_missing_or_invalid_prior_duration(tmp_path,elapsed):
+    scoped=runner(tmp_path);folder,_=scoped.reserve('embedding','one')
+    result={'status':'SUCCESS'}
+    if elapsed is not None:result['total_seconds']=elapsed
+    m.save(folder/'result.json',result)
+    with pytest.raises(RuntimeError,match='BUDGET_RECORD_INVALID'):
+        m.Runner(scoped.path).reserve('reranker','two')
+    assert len(list(scoped.private.glob('call-*')))==1
+
+
 def test_drain_atomically_blocks_new_admission_without_disturbing_active_request(tmp_path):
     scoped = runner(tmp_path)
     assert scoped.acquire_request() is True
@@ -350,7 +361,7 @@ def test_reviewed_unknown_resolution_unblocks_one_exact_replay_without_continuat
     folder=private/'call-001';folder.mkdir();input_hash='same-work-order-input'
     reservation=folder/'reservation.json';result=folder/'result.json'
     m.save(reservation,{'kind':'qwen','unix':1.,'input_hash':input_hash})
-    m.save(result,{'status':'UNKNOWN','reason':'RESOURCE_FLOOR','owned_exit_confirmed':True})
+    m.save(result,{'status':'UNKNOWN','reason':'RESOURCE_FLOOR','owned_exit_confirmed':True,'total_seconds':1.0})
     reservation_hash=hashlib.sha256(reservation.read_bytes()).hexdigest()
     result_hash=hashlib.sha256(result.read_bytes()).hexdigest()
     resolution=evidence/'resolution.json'
@@ -441,9 +452,9 @@ def test_cpu_guard_times_out_without_reserving_or_loading(tmp_path,monkeypatch):
 def test_append_only_budget_survives_restart_and_reserves_before_load(tmp_path):
     r=runner(tmp_path);folder,_=r.reserve('asr')
     with pytest.raises(RuntimeError,match='COMPLETION_UNKNOWN'):m.Runner(r.path).reserve('embedding')
-    m.save(folder/'result.json',{'status':'FAILED','owned_exit_confirmed':True})
+    m.save(folder/'result.json',{'status':'FAILED','owned_exit_confirmed':True,'total_seconds':1.0})
     second,_=m.Runner(r.path).reserve('asr','second')
-    m.save(second/'result.json',{'status':'FAILED','owned_exit_confirmed':True})
+    m.save(second/'result.json',{'status':'FAILED','owned_exit_confirmed':True,'total_seconds':1.0})
     with pytest.raises(RuntimeError,match='CALL_LIMIT'):m.Runner(r.path).reserve('asr','third')
 
 def test_total_window_is_not_reset_by_another_model(tmp_path,monkeypatch):
