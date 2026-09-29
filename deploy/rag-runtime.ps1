@@ -13,7 +13,10 @@ $SecretPath = Join-Path $RuntimeDir "internal-token.txt"
 $ConfigPath = Join-Path $RuntimeDir "config.json"
 $CurrentPath = Join-Path $RuntimeDir "current.json"
 $RagOllamaCurrent = Join-Path $RepoRoot "tmp\delivery-rag-ollama-runtime\current.json"
-$AdapterPath = Join-Path $RepoRoot "scripts\ops\local_ai_http.py"
+$SourceCommit = "c8366e7a254db5e4e49dab58d45e5316a7d61ba3"
+$CandidateRoot = Join-Path $RuntimeDir "candidate-$SourceCommit"
+$AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
+$ExpectedAdapterSha256 = "702BE9B979EA6302C1CE3B57CE4340DE388459C59DAF2959A16743EBE71405A9"
 $PythonPath = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\bge-142-cpu\.venv\Scripts\python.exe"
 $AsrPython = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\asr-006-cpu\.venv\Scripts\python.exe"
 $ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models-hf"
@@ -32,6 +35,17 @@ function New-Token {
     $bytes = [byte[]]::new(32)
     [Security.Cryptography.RandomNumberGenerator]::Fill($bytes)
     return [Convert]::ToBase64String($bytes).TrimEnd("=").Replace("+", "-").Replace("/", "_")
+}
+
+function Assert-Candidate {
+    if (-not (Test-Path -LiteralPath $CandidateRoot -PathType Container)) {
+        New-Item -ItemType Directory -Force -Path $CandidateRoot | Out-Null
+        $archive=Join-Path $RuntimeDir "candidate-$SourceCommit.tar"
+        & git -C $RepoRoot archive --format=tar --output=$archive $SourceCommit backend/app scripts/ops/local_ai_http.py scripts/ops/local_ai_models.py scripts/ops/local_ai_process.py scripts/ops/local_ai_runtime_control.py
+        if($LASTEXITCODE -ne 0){throw "could not export frozen RAG candidate"}
+        try { & tar -xf $archive -C $CandidateRoot;if($LASTEXITCODE -ne 0){throw "could not extract frozen RAG candidate"} } finally { Remove-Item -LiteralPath $archive -Force }
+    }
+    if((Get-FileHash -Algorithm SHA256 -LiteralPath $AdapterPath).Hash -ne $ExpectedAdapterSha256){throw "frozen RAG adapter hash mismatch"}
 }
 
 function Get-Listener {
@@ -112,6 +126,7 @@ function New-CurrentState([object]$ListenerProcess, [object]$Health, [object]$La
         qwen_endpoint = $QwenEndpoint
         scope = "rag_only"
         models = $Health.models
+        source_commit = $SourceCommit
         inference_on_start = $false
     }
     $receipt = Join-Path $RuntimeDir ("launch-{0}.json" -f ([DateTime]::UtcNow.ToString("yyyyMMddTHHmmssZ")))
@@ -132,6 +147,7 @@ function New-RuntimeBinding {
 
 switch ($Action) {
     "start" {
+        Assert-Candidate
         foreach ($path in @($AdapterPath, $PythonPath, $AsrPython, $ModelRoot, $RagOllamaCurrent)) {
             if (-not (Test-Path -LiteralPath $path)) { throw "required local AI asset is missing: $path" }
         }
