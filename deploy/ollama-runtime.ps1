@@ -12,6 +12,8 @@ $RepoRoot = Split-Path -Parent $DeployDir
 $RuntimeDir = Join-Path $RepoRoot "tmp\delivery-ollama-runtime"
 $StatePath = Join-Path $RuntimeDir "current.json"
 $StartLockPath = Join-Path $RuntimeDir "start.lock"
+$ControlledStopPath = Join-Path $RepoRoot "tmp\delivery-work-ai-runtime\calls\call-002\result.json"
+$ExpectedControlledStopSha256 = "BD9BB65B4E2E36B8DE645D48999197ED424334B7D6D2BEC6EEC858B9FADD430C"
 $ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models"
 $OllamaExe = if ($env:PROPERTY_AI_OLLAMA_EXE) {
     $env:PROPERTY_AI_OLLAMA_EXE
@@ -36,6 +38,34 @@ function Get-ListenerPid {
 function Read-State {
     if (-not (Test-Path -LiteralPath $StatePath -PathType Leaf)) { return $null }
     return Get-Content -Raw -LiteralPath $StatePath | ConvertFrom-Json
+}
+
+function Retire-ControlledStopReceipt([object]$State) {
+    if (-not (Test-Path -LiteralPath $ControlledStopPath -PathType Leaf)) {
+        throw "stale current receipt exists without controlled-stop evidence"
+    }
+    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $ControlledStopPath).Hash -ne $ExpectedControlledStopSha256) {
+        throw "controlled-stop evidence hash mismatch"
+    }
+    $evidence = Get-Content -Raw -LiteralPath $ControlledStopPath | ConvertFrom-Json
+    $verified = $evidence.remote_stop.verified_before_stop
+    $stopped = $evidence.remote_stop.stopped
+    if (
+        $evidence.status -ne "FAILED" -or
+        $evidence.reason -ne "RESOURCE_FLOOR" -or
+        $evidence.remote_completion -ne "CONTROLLED_STOP" -or
+        [int]$verified.pid -ne [int]$State.pid -or
+        [IO.Path]::GetFullPath([string]$verified.path) -ne [IO.Path]::GetFullPath([string]$State.executable) -or
+        ([DateTimeOffset]$verified.started_utc).UtcDateTime -ne ([DateTimeOffset]$State.started_at_utc).UtcDateTime -or
+        $stopped.tree_exit_confirmed -ne $true -or
+        $stopped.listener_exit_confirmed -ne $true
+    ) { throw "controlled-stop evidence does not bind the stale receipt" }
+    if ($null -ne (Get-Process -Id ([int]$State.pid) -ErrorAction SilentlyContinue) -or $null -ne (Get-ListenerPid)) {
+        throw "controlled-stop receipt cannot be retired while execution may still exist"
+    }
+    $archive = Join-Path $RuntimeDir ("retired-controlled-{0}.json" -f $State.operation_id)
+    if (Test-Path -LiteralPath $archive) { throw "controlled-stop receipt archive already exists" }
+    Move-Item -LiteralPath $StatePath -Destination $archive
 }
 
 function Assert-StateProcess([object]$State) {
@@ -114,7 +144,10 @@ switch ($Action) {
                 [ordered]@{ state = $state; version = $version.version; inference_on_start = $false } | ConvertTo-Json -Depth 6
                 break
             }
-            if ($null -ne $state) { throw "stale current receipt exists; preserve and inspect it before a new start" }
+            if ($null -ne $state) {
+                Retire-ControlledStopReceipt $state
+                $state = $null
+            }
             $operationId = [guid]::NewGuid().ToString("N")
             $stdout = Join-Path $RuntimeDir "server-$operationId.stdout.log"
             $stderr = Join-Path $RuntimeDir "server-$operationId.stderr.log"

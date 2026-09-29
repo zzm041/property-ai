@@ -203,6 +203,18 @@ def test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded() -> Non
     assert 'work-ai-start' in launcher and 'work-ai-status' in launcher and 'work-ai-stop' in launcher
 
 
+def test_delivery_ollama_restart_requires_exact_controlled_stop_evidence() -> None:
+    runtime=(ROOT/'deploy/ollama-runtime.ps1').read_text(encoding='utf-8')
+    assert 'ExpectedControlledStopSha256' in runtime
+    assert '$evidence.remote_completion -ne "CONTROLLED_STOP"' in runtime
+    assert '$evidence.reason -ne "RESOURCE_FLOOR"' in runtime
+    assert '$stopped.tree_exit_confirmed -ne $true' in runtime
+    assert '$stopped.listener_exit_confirmed -ne $true' in runtime
+    assert '[int]$verified.pid -ne [int]$State.pid' in runtime
+    assert 'controlled-stop receipt cannot be retired while execution may still exist' in runtime
+    assert 'Move-Item -LiteralPath $StatePath -Destination $archive' in runtime
+
+
 def test_delivery_starts_and_diagnoses_durable_task_publisher() -> None:
     compose=(ROOT/'deploy/docker-compose.delivery.yml').read_text(encoding='utf-8')
     launcher=(ROOT/'deploy/delivery.ps1').read_text(encoding='utf-8')

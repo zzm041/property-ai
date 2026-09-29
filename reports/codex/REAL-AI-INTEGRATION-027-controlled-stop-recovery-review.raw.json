@@ -1,0 +1,33 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-CONTROLLED-STOP-RECEIPT-RECOVERY",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_sha": "ed789b9fe03b6c5b9da54dd2f51611d0ab54ea99 + scoped WIP",
+  "verdict": "PASS_SCOPED_CONTROLLED_STOP_RECOVERY",
+  "findings": [],
+  "checked": [
+    "实际读取 deploy/ollama-runtime.ps1 的增量及启动调用上下文、对应新增测试断言。",
+    "实际计算 call-002/result.json 的 SHA256，与脚本固定值 BD9BB65B4E2E36B8DE645D48999197ED424334B7D6D2BEC6EEC858B9FADD430C 完全一致。",
+    "结果保留 FAILED / RESOURCE_FLOOR / CONTROLLED_STOP；记录 taskkill_exit_code=0、捕获4个进程、tree_exit_confirmed=true、listener_exit_confirmed=true。",
+    "停止证据与当前旧收据的 PID 35828、可执行文件路径及启动时间逐项一致。",
+    "退役路径要求固定证据哈希、状态、原因、受控停止类型、完整进程身份和两个退出标志同时匹配；缺失或不符拒绝。",
+    "退役前仍须实时确认旧 PID 与 11435 监听均不存在；本审查只检查此代码，没有执行这些查询。",
+    "退役发生在现有排他 start.lock 内；目标按 operation_id 命名，既有目标拒绝，Move-Item 不使用覆盖选项。",
+    "退役保留旧收据，不修改 call-002 原始结果；随后沿用唯一日志和 CreateNew 新收据的正常启动路径。"
+  ],
+  "source_hashes": {
+    "D:/property-ai/deploy/ollama-runtime.ps1": "DEA46CA03337A7C66C587B879ABE087441649A6F2F6ED9D7208D3DE2FD328E06",
+    "D:/property-ai/backend/tests/unit/test_delivery_artifact.py": "F53DB5542DB6CE71F039A7FEA01B8F3C537394E6653B34E5ED1AE075A3B4DE68"
+  },
+  "tests_evidence": {
+    "reported": "实施方报告 10 passed、PowerShell parse OK。",
+    "independent_boundary": "本审查读取新增静态断言；没有执行测试或脚本，不将静态断言等同实际退役及重启验证。"
+  },
+  "residual_limits": [
+    "仅放行该固定哈希对应旧收据的受控退役与正常启动准备，不放行其他 UNKNOWN、其他停止记录或其他运行身份。",
+    "call-002 模型请求仍为 RESOURCE_FLOOR 失败，不升级为模型成功或 AUTO 成功。",
+    "当前任务链三次失败的报告不因收据恢复而被改写，也不自动授权重放业务任务。",
+    "实际退役、重启、新收据及运行身份尚未由本次审查验证。",
+    "本审查没有修改文件，没有运行模型、页面、业务、数据库、队列或进程操作。"
+  ],
+  "next_action": "在既有授权范围内使用该入口处理精确旧收据，保存退役及新启动身份记录；继续保留原失败证据。后续业务重试仍须遵守既有任务状态、预算和资源守卫，不能以本次恢复审查替代 AUTO 验收。"
+}
