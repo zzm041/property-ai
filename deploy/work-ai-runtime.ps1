@@ -119,10 +119,14 @@ function Assert-Candidate {
     foreach ($asset in @($ResolutionPath,$ResolutionReviewPath,$reservation,$result)) {
         if (-not (Test-Path -LiteralPath $asset -PathType Leaf)) { throw "reviewed call-001 resolution asset is missing" }
     }
-    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $ResolutionPath).Hash -ne $ExpectedResolutionSha256
-            -or (Get-FileHash -Algorithm SHA256 -LiteralPath $ResolutionReviewPath).Hash -ne $ExpectedResolutionReviewSha256
-            -or (Get-FileHash -Algorithm SHA256 -LiteralPath $reservation).Hash -ne $ExpectedReservationSha256
-            -or (Get-FileHash -Algorithm SHA256 -LiteralPath $result).Hash -ne $ExpectedResultSha256) {
+    $resolutionHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $ResolutionPath).Hash
+    $reviewHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $ResolutionReviewPath).Hash
+    $reservationHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $reservation).Hash
+    $resultHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $result).Hash
+    if (($resolutionHash -ne $ExpectedResolutionSha256) -or
+            ($reviewHash -ne $ExpectedResolutionReviewSha256) -or
+            ($reservationHash -ne $ExpectedReservationSha256) -or
+            ($resultHash -ne $ExpectedResultSha256)) {
         throw "reviewed call-001 resolution binding mismatch"
     }
 }
