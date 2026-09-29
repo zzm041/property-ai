@@ -39,13 +39,13 @@ from app.domain.observed_event import work_order_analysis_response_format
 from app.domain.vision import VISION_ANALYSIS_PROMPT_VERSION,vision_analysis_response_format
 
 QWEN_CANDIDATES={
-    'qwen3.5:4b':('2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd','0.34.3'),
-    'qwen3.5:9b':('6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7','0.34.3'),
-    'qwen38-27b-q3km-g55:7af3b8f':('eb18a122286f7a67d36dc8129f9caa1c0f7bb8449d7669a79e3ecb3d81289e0c','0.34.4'),
+    'qwen3.5:4b':('2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd','0.34.3',4096),
+    'qwen3.5:9b':('6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7','0.34.3',4096),
+    'qwen38-27b-q3km-g55:7af3b8f':('eb18a122286f7a67d36dc8129f9caa1c0f7bb8449d7669a79e3ecb3d81289e0c','0.34.4',8192),
 }
 QWEN_MODEL=os.environ.get('PROPERTY_AI_LOCAL_QWEN_MODEL','qwen3.5:4b')
 if QWEN_MODEL not in QWEN_CANDIDATES:raise RuntimeError('UNAPPROVED_QWEN_CANDIDATE')
-DIGEST,QWEN_RUNTIME_VERSION=QWEN_CANDIDATES[QWEN_MODEL]
+DIGEST,QWEN_RUNTIME_VERSION,QWEN_CONTEXT_LENGTH=QWEN_CANDIDATES[QWEN_MODEL]
 MODELS={'asr':'Qwen3-ASR-0.6B','embedding':'bge-m3','reranker':'bge-reranker-v2-m3','qwen':QWEN_MODEL}
 LIMITS={'asr':2,'embedding':12,'reranker':8,'qwen':120}
 CONTINUATION_MAX={'asr':1,'embedding':6,'reranker':6,'qwen':6}
@@ -84,7 +84,7 @@ def qwen_guard():
     tags=direct('/api/tags')['models']
     if not any(x['name']==MODELS['qwen'] and x['digest']==DIGEST for x in tags):raise RuntimeError('QWEN_DIGEST_CHANGED')
     loaded=direct('/api/ps')['models']
-    if len(loaded)>1 or any(x['name']!=MODELS['qwen'] or x['digest']!=DIGEST or x['context_length']!=4096 for x in loaded):raise RuntimeError('QWEN_RESIDENCY_CHANGED')
+    if len(loaded)>1 or any(x['name']!=MODELS['qwen'] or x['digest']!=DIGEST or x['context_length']!=QWEN_CONTEXT_LENGTH for x in loaded):raise RuntimeError('QWEN_RESIDENCY_CHANGED')
     if ram()<4500 or gpu()<(2500 if loaded else 6000):raise RuntimeError('QWEN_RESOURCE_GUARD')
 
 def validate(kind,value):

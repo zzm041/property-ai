@@ -39,11 +39,43 @@ def test_only_explicit_reviewed_qwen_candidates_can_configure_adapter(monkeypatc
     assert candidate.MODELS['qwen']=='qwen3.5:9b'
     assert candidate.DIGEST=='6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7'
     assert candidate.QWEN_RUNTIME_VERSION=='0.34.3'
+    assert candidate.QWEN_CONTEXT_LENGTH==4096
     current=_load_adapter_candidate(monkeypatch,'qwen38-27b-q3km-g55:7af3b8f')
     assert current.DIGEST=='eb18a122286f7a67d36dc8129f9caa1c0f7bb8449d7669a79e3ecb3d81289e0c'
     assert current.QWEN_RUNTIME_VERSION=='0.34.4'
+    assert current.QWEN_CONTEXT_LENGTH==8192
     with pytest.raises(RuntimeError,match='UNAPPROVED_QWEN_CANDIDATE'):
         _load_adapter_candidate(monkeypatch,'qwen3.5:latest')
+
+
+@pytest.mark.parametrize(('model','expected_context'),[
+    ('qwen3.5:4b',4096),
+    ('qwen3.5:9b',4096),
+    ('qwen38-27b-q3km-g55:7af3b8f',8192),
+])
+def test_qwen_residency_guard_binds_context_to_reviewed_candidate(monkeypatch,model,expected_context):
+    candidate=_load_adapter_candidate(monkeypatch,model)
+    def direct(path):
+        if path=='/api/version':return {'version':candidate.QWEN_RUNTIME_VERSION}
+        if path=='/api/tags':return {'models':[{'name':model,'digest':candidate.DIGEST}]}
+        if path=='/api/ps':return {'models':[{'name':model,'digest':candidate.DIGEST,'context_length':expected_context}]}
+        raise AssertionError(path)
+    monkeypatch.setattr(candidate,'direct',direct)
+    monkeypatch.setattr(candidate,'ram',lambda:12000)
+    monkeypatch.setattr(candidate,'gpu',lambda:4000)
+    candidate.qwen_guard()
+
+
+def test_qwen38_residency_guard_rejects_old_4096_context(monkeypatch):
+    candidate=_load_adapter_candidate(monkeypatch,'qwen38-27b-q3km-g55:7af3b8f')
+    def direct(path):
+        if path=='/api/version':return {'version':candidate.QWEN_RUNTIME_VERSION}
+        if path=='/api/tags':return {'models':[{'name':candidate.QWEN_MODEL,'digest':candidate.DIGEST}]}
+        if path=='/api/ps':return {'models':[{'name':candidate.QWEN_MODEL,'digest':candidate.DIGEST,'context_length':4096}]}
+        raise AssertionError(path)
+    monkeypatch.setattr(candidate,'direct',direct)
+    with pytest.raises(RuntimeError,match='QWEN_RESIDENCY_CHANGED'):
+        candidate.qwen_guard()
 
 @pytest.mark.parametrize('path,obj',[
     ('/v1/embeddings',{'model':'other','input':['a']}),
