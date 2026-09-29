@@ -1,0 +1,125 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "captured_at": "2026-09-29T14:10:58+08:00",
+  "scope": "8093 local delivery candidate: real page image work-order attempts, provider-stage durable retry fix, and controlled model-runtime recovery",
+  "source": {
+    "head": "df14c08e760c9cf4636b4d37f60cd8c4beabbd39",
+    "running_product_commit": "1e5eb5b",
+    "running_image": "property-ai-delivery:1e5eb5b",
+    "running_image_id": "sha256:3c9a528d5c1c3feb0584e53004f091f767e6351c116c9478bee1e763a6b7e996",
+    "same_image_services": ["api", "worker", "publisher", "beat"],
+    "subsequent_runtime_commits": ["d8ec0bf", "7b3648b", "96cb061", "df14c08"]
+  },
+  "tests": [
+    {
+      "scope": "analysis input, durable task intent, database recovery, maintenance dispatch and auto dispatch",
+      "result": "151 passed, 3 warnings",
+      "model_requests": 0
+    },
+    {
+      "scope": "delivery artifact and controlled-stop runtime",
+      "result": "12 passed, 3 warnings; PowerShell parse OK",
+      "model_requests": 0
+    }
+  ],
+  "runtime": {
+    "database": "property_ai_delivery_check@0014",
+    "api": "http://127.0.0.1:8093",
+    "queue": "property_ai.delivery_check",
+    "ollama": {
+      "endpoint": "127.0.0.1:11435",
+      "operation_id": "af0a586cf75c4cd9b784a6be76ab3ae5",
+      "pid": 30556,
+      "no_cloud": true,
+      "inference_on_start": false
+    },
+    "work_ai_adapter": {
+      "endpoint": "127.0.0.1:11437",
+      "listener_pid": 44660,
+      "scope": "work_order_only",
+      "request_active_at_check": false,
+      "reservation_gate": "READY"
+    }
+  },
+  "results": [
+    {
+      "work_order_id": 1,
+      "status": "CLOSED",
+      "capability": "actual page text report -> real local 27B -> AUTO assignment -> staff receipt -> resident confirmation",
+      "assignment_count": 1,
+      "receipt_count": 1,
+      "feedback_count": 1,
+      "evidence": "real-auto-wo1-evidence.json and screenshots 03-11"
+    },
+    {
+      "work_order_id": 3,
+      "status": "PENDING_ANALYSIS",
+      "outcome": "FAILED_RETAINED",
+      "evidence": "real page image report and stored media; call-005 and call-006 VLM success; call-007 aggregate LLM RESOURCE_FLOOR controlled stop; no Assignment",
+      "model_call_results_sha256": {
+        "call-005": "2C3273A944FCF19F861D6A32293A8ABEFF3976ED5B5B4BC8BE6301BAD3AFBDB1",
+        "call-006": "39E0436AECA0C852121D245C455589EE9EE27B82F6000833F53B434005F746D3",
+        "call-007": "C136825C9391FFC8F48395AB1A3E78A4638FC53F181FCAE84FBF47DF284BF85C"
+      }
+    },
+    {
+      "work_order_id": 4,
+      "status": "PENDING_ANALYSIS",
+      "outcome": "FAILED_RETAINED",
+      "evidence": "actual page image report; attachment file 4 stored and scanner_status skipped_dev; Ollama had been controlled-stopped, so three attempts returned AI.UNAVAILABLE before any new model reservation; no Assignment"
+    },
+    {
+      "work_order_id": 5,
+      "status": "PENDING_ANALYSIS",
+      "outcome": "FAILED_RETAINED",
+      "evidence": "actual page image report; attachment file 5 stored and scanner_status skipped_dev; restored Ollama had a new receipt while the old adapter retained the prior binding, so three attempts safely returned AI.UNAVAILABLE before any new model reservation; no Assignment"
+    }
+  ],
+  "fixes": [
+    {
+      "commit": "1e5eb5b",
+      "behavior": "append-only ASR/VLM provider checkpoint reusable only for the same durable task, analysis id/version, input hash, model version and non-newer attempt; every load/save remains behind the live execution lease and latest-attempt ownership fence"
+    },
+    {
+      "commits": ["d8ec0bf", "7b3648b", "96cb061"],
+      "behavior": "controlled-stop recovery accepts only fixed-hash call-003/call-007 evidence that exactly binds the stopped process identity; a recycled PID is distinguished by its creation time before retiring the stale receipt"
+    }
+  ],
+  "page_state": {
+    "current_prepared_form": {
+      "submitted": false,
+      "marker": "AUTO-CHECKPOINT-delivery-auto-702c3db745-IMG4",
+      "attachment_file_id": 6,
+      "attachment_scanner_status": "skipped_dev",
+      "screenshot": null,
+      "submit_blocker": "Execution approval rejected creation of another synthetic work order because it treated the earlier three-work-order ceiling as active; no workaround, API submission or database write was used."
+    },
+    "historical_internal_screenshot": {
+      "file": "16-checkpoint-image-form.png",
+      "sha256": "22E8775B95677526BE6F9D36EF10A55C8DB2237605351762DECF9942B236F081",
+      "marker": "AUTO-CHECKPOINT-delivery-auto-702c3db745-IMG2",
+      "attachment_file_id": 4,
+      "later_submitted_work_order_id": 4,
+      "contains_full_synthetic_test_phone": true,
+      "redacted": false,
+      "use": "internal review only; excluded from committed evidence"
+    }
+  },
+  "boundaries": {
+    "work_order_3_4_5_replayed_or_rewritten": false,
+    "manual_assignment": false,
+    "direct_database_business_write": false,
+    "historical_dlq_read_replayed_or_cleared": false,
+    "shared_services_touched": false,
+    "real_auto_image_pass": false,
+    "production_pass": false,
+    "df14c08_loaded_in_8093": false,
+    "df14c08_runtime_recovery_verified": false
+  },
+  "independent_review": {
+    "file": "reports/codex/REAL-AI-INTEGRATION-027-PROVIDER-CHECKPOINT-round1.raw.json",
+    "reviewed_sha": "df14c08e760c9cf4636b4d37f60cd8c4beabbd39",
+    "verdict": "PASS_SCOPED_INCREMENTAL",
+    "closed_findings": ["027-CHECKPOINT-R1-01", "027-CHECKPOINT-R1-02"]
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-PROVIDER-CHECKPOINT-INCREMENTAL",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "review_round": "round-1 scoped fixes",
+  "base_sha": "0c7889872db3b662d6881476142cb5a14b3f3e61",
+  "reviewed_sha": "df14c08e760c9cf4636b4d37f60cd8c4beabbd39",
+  "verdict": "PASS_SCOPED_INCREMENTAL",
+  "findings": [],
+  "closed_findings": [
+    {
+      "id": "027-CHECKPOINT-R1-01",
+      "status": "CLOSED",
+      "original_issue": "ASR 输出在失败尝试中持久化后，被下一尝试计入新的 input_hash，导致同任务已成功的 VLM 检查点无法复用。",
+      "fix_evidence": [
+        "df14c08 在既有任务版本、分析记录及 prior_claim 校验之后，沿用首次认领的 input_hash。",
+        "真实住户补充造成的工单版本变化仍先由 accepts_attempt 拒绝；分析记录或其已绑定哈希不符仍拒绝，没有以复用为由跳过这些围栏。",
+        "新增直接测试覆盖已持久化 ASR、FAILED 分析及同任务下一次尝试，断言 snapshot/current analysis 均保留首次哈希。"
+      ]
+    },
+    {
+      "id": "027-CHECKPOINT-R1-02",
+      "status": "CLOSED",
+      "original_issue": "证据索引把历史 IMG2 截图关联到当前 IMG4/file6 未提交表单。",
+      "fix_evidence": [
+        "更新索引明确截图16为历史 IMG2/file4，后续对应 WO4。",
+        "当前 IMG4/file6 独立标为未提交、没有截图，未再借用历史截图证明当前状态。",
+        "截图16包含完整合成测试电话，现明确为未脱敏、仅内部复审且排除提交，不再标作脱敏公共证据。"
+      ]
+    }
+  ],
+  "checked": [
+    "实际读取 c07de22、0c78898、1e5eb5b、d8ec0bf、7b3648b、96cb061 及 df14c08 的必要差异和直接调用上下文。",
+    "storage-init 要求显式批准标记、staging、production Storage Provider、精确 MinIO endpoint/bucket；未增加删除或重建路径。",
+    "Development scanner 仅返回 skipped_dev；Production 设置拒绝该 Provider，默认 unavailable 保持 pending，文件读取和附件使用仍检查扫描状态。未实现的正式扫描能力没有被写成完成。",
+    "ASR/VLM 检查点绑定 task、analysis id/version、input_hash、provider/model 和不晚于当前的 attempt，并核验值摘要；部分 VLM 失败不会保存成完整成功检查点。",
+    "检查点读写复用工单锁、有效执行租约与最新 attempt 所有权；最终 apply 仍校验工单状态、版本及分析哈希。",
+    "公开 WorkOrderLogData 仅投影既有字段和 reason，不返回检查点 value、完整 payload 或执行 token。",
+    "实际核对 call-003、call-007 结果哈希、FAILED/RESOURCE_FLOOR/CONTROLLED_STOP、停止前身份及完整退出标志。恢复逻辑只选择固定哈希且身份匹配的证据；PID 被复用时按创建时间区分，不以相同数字 PID 杀无关进程。",
+    "实际读取 WO1 汇总及 WO3–5 当前索引，核对 call-004/005/006/007 原始结果的哈希和状态字段。",
+    "实际查看截图16和截图11：前者是 IMG2 报修表单，后者显示工单1已归档、系统自动派单及处理回执；没有把截图16当成当前 IMG4 的提交成功。"
+  ],
+  "evidence_binding": {
+    "analysis_py_sha256": "310C77EDF09104297F9284D657DF7D60F3954F03822FBAFCAD395B4F56AB9889",
+    "test_database_recovery_025_sha256": "FC6B267DD25317DE4C8AA56170771EE68BA9CEF6F8682D7223E5E60DE870F7FD",
+    "runtime_index": "D:/property-ai/reports/real-ai-integration-027/delivery-auto-8093/provider-checkpoint-runtime-evidence.json",
+    "runtime_index_sha256": "8731B51A262DF1527C68DAD62AA79FDCD76791F0ADF29FB907792FC5F30E4D3B",
+    "internal_screenshot16_sha256": "22E8775B95677526BE6F9D36EF10A55C8DB2237605351762DECF9942B236F081"
+  },
+  "tests_evidence": {
+    "checkpoint_focused": "实施方本轮报告 151 passed、3 warnings，包含此前150项及新增反例。",
+    "delivery_focused": "实施方报告 12 passed、3 warnings、PowerShell parse OK。",
+    "boundary": "上述结果来自实施终端摘要，未提供独立原始测试日志文件。本审查读取测试源码及保存摘要，没有运行测试。"
+  },
+  "residual_limits": [
+    "运行索引仍绑定 property-ai-delivery:1e5eb5b；df14c08 的修复尚不能据此声称已加载或完成运行复用验收。",
+    "WO1 保留 scoped local 真实文字 AUTO CLOSED 证据；本轮未重新执行流程，也未独立查询数据库。汇总中的完整数据库计数属于保存的实施方证据。",
+    "WO3 的 VLM 成功不代表图片工单成功：后续 LLM 触及 RAM 底线，仍无 Assignment。",
+    "WO4、WO5 在无 Ollama 或旧运行绑定下的 AI.UNAVAILABLE 失败保持，不能改判 PASS。",
+    "没有真实 ASR+VLM 组合故障恢复运行证据；新修复当前为源码与报告专项范围。",
+    "当前 IMG4/file6 只有表单准备状态，不是新工单成功。原对象数量和执行批准边界不得因本次审查绕过。",
+    "本审查未修改文件，未运行测试、模型、页面、业务请求、数据库、队列或进程操作。",
+    "正式文件扫描、图片/语音完整 AUTO、容量可靠性及 Production 发布仍未通过。"
+  ],
+  "next_action": "保存本次审查及两个问题的关闭历史。仅在既有授权和资源预算允许时加载同源修复并验证新的精确业务路径；若对象数量仍受审批门限制，先取得该范围批准。不得重放 WO3–5、改写历史失败或把当前未提交表单列为成功。"
+}

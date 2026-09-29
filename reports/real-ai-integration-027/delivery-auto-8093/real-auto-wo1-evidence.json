@@ -1,0 +1,110 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "evidence_kind": "scoped_local_real_ai_auto_text_work_order",
+  "captured_at": "2026-09-29T13:22:35+08:00",
+  "environment": {
+    "api": "http://127.0.0.1:8093/api/v1",
+    "database": "property_ai_delivery_check@0014",
+    "runtime_image": "property-ai-delivery:d6d83e9",
+    "application_source_commit": "3dc2312b42f10b9df5fa6d718230d56b1e1421a3",
+    "adapter_endpoint": "http://127.0.0.1:11437",
+    "inference_endpoint": "http://127.0.0.1:11435",
+    "model": "qwen38-27b-q3km-g55:7af3b8f",
+    "network_boundary": "loopback/no-cloud",
+    "provider_scope": "local self-hosted Qwen-family candidate"
+  },
+  "page_flow": {
+    "work_order_id": 1,
+    "work_order_version_after_final_resident_confirmation": 11,
+    "submission_actor": "synthetic resident user 6",
+    "assignment_actor": "system AUTO",
+    "assigned_employee_id": 1,
+    "assigned_employee_user_id": 4,
+    "staff_actions": [
+      "accept",
+      "start_processing",
+      "submit_resolved_receipt"
+    ],
+    "resident_actions": [
+      "confirm_completion",
+      "reload_closed_detail"
+    ],
+    "final_status": "CLOSED",
+    "contact_phone_evidence": "masked +86****5192",
+    "interaction_mode": "WeChat Developer Tools page inputs and clicks",
+    "not_claimed": [
+      "physical-device microphone or camera acceptance",
+      "production provider acceptance",
+      "production capacity acceptance"
+    ]
+  },
+  "model_requests": [
+    {
+      "call_id": "call-003",
+      "work_order_input_version": 3,
+      "outcome": "FAILED_RESOURCE_FLOOR_CONTROLLED_STOP",
+      "duration_seconds": 13.2,
+      "minimum_free_ram_mib": 4398,
+      "ram_floor_mib": 4500,
+      "minimum_free_gpu_mib": 3012,
+      "gpu_floor_mib": 2000,
+      "owned_exit_confirmed": true,
+      "sha256": "B725035C11585AF362F6652B7531BDB63DCBC3DF75F75182015EAF513A7603B1"
+    },
+    {
+      "call_id": "call-004",
+      "work_order_input_version": 4,
+      "outcome": "SUCCESS",
+      "duration_seconds": 18.344,
+      "minimum_free_ram_mib": 5172,
+      "minimum_free_gpu_mib": 2919,
+      "owned_exit_confirmed": true,
+      "sha256": "47556534E0A78DA86D069AE966570DB44637C7B9B3E159D0868F1EFB7A115173",
+      "effective_analysis": {
+        "category": "water_supply",
+        "priority": "p2",
+        "severity": "medium",
+        "risk": "flooding",
+        "required_role": "STAFF",
+        "required_skill": "maintenance",
+        "confidence": 0.95,
+        "summary_language": "zh-CN"
+      }
+    }
+  ],
+  "database_evidence": {
+    "task_intents": [
+      {"id": 1, "input_version": 2, "state": "FAILED", "attempts": "3/3", "error_code": "AI.UNAVAILABLE"},
+      {"id": 2, "input_version": 3, "state": "FAILED", "attempts": "3/3", "error_code": "AI.UNAVAILABLE"},
+      {"id": 3, "input_version": 4, "state": "SUCCEEDED", "attempts": "1/1", "publish_count": 1, "execution_count": 1}
+    ],
+    "analysis": {"count": 1, "state": "COMPLETED", "category": "PLUMBING", "severity": "MEDIUM", "priority": "HIGH", "risk": "flooding", "required_role": "STAFF", "required_skill": "maintenance", "confidence": 0.95},
+    "assignment": {"count": 1, "source": "AUTO", "state": "ENDED", "employee_id": 1},
+    "process": {"cycle": 1, "employee_id": 1, "start_and_end_recorded": true},
+    "receipt": {"count": 1, "result": "resolved", "fee_type": "NONE"},
+    "logs": {"ANALYZE": 1, "ASSIGN": 1, "ACCEPT": 1, "START": 1, "RECEIPT_RESOLVED": 1, "CONFIRM": 1, "ARCHIVE": 1},
+    "notifications_by_user": {"manager_user_3": 1, "employee_user_4": 1, "resident_user_6": 6},
+    "employee_after_close": {"employee_id": 1, "duty_status": "ON_DUTY", "current_load": 0},
+    "historical_failed_attempts_preserved": true
+  },
+  "screenshots": [
+    {"file": "03-call003-supplement-form.png", "sha256": "F7AB87BC2B0924D270FA788C4DCC384BAC1868AA16DFA04B2BB45EF49DDDFDF9"},
+    {"file": "04-call003-supplement-saved.png", "sha256": "883CCD891606126BB664950CC613AEEBDB0FE784454CF3FEDC89BE72D7370126"},
+    {"file": "05-call004-supplement-saved.png", "sha256": "BE883D8C0EE828864F718FF0444FF79A83C9079DF3FA1F8E41F0D9AE3250F371"},
+    {"file": "06-auto-assigned-staff.png", "sha256": "B5DE771868BB0841FBB7F32B4AFF6791AC816B50049F6524E482CB6B3A5F0615"},
+    {"file": "07-staff-processing.png", "sha256": "1D5CE4A6F9667F12852FA88AE3CB9FD01FFC33626E959B11797DA32A147FBDFA"},
+    {"file": "08-staff-receipt-form.png", "sha256": "91BB45D5F9057B1BCB9FB2C55D1F68601B752A879D1EB2603073BEC6B88CE09C"},
+    {"file": "09-staff-resolved.png", "sha256": "DF9C5ADAB6335C1A3881FE78C46CDD68E844E2A991620023DEC3F3FC55B9A564"},
+    {"file": "10-resident-wait-confirm.png", "sha256": "B21D2190F77A057C7CB176EE77A647A39D576D82EA1B6AC994B6AED7ACE03A0C"},
+    {"file": "11-resident-closed.png", "sha256": "31DB510A953EC377EFD185DF66992705B1C8EE25FD8D502B614086622E1A8F15"}
+  ],
+  "scope_status": {
+    "text_work_order_real_auto": "PASS_SCOPED_LOCAL",
+    "image_work_order": "PENDING",
+    "voice_work_order": "PENDING",
+    "five_user_overlapping_image_submission": "PENDING",
+    "light_read_concurrency": "PASS_REUSED_EXISTING_EVIDENCE",
+    "real_rag": "PASS_REUSED_EXISTING_EVIDENCE",
+    "overall_production_v1": "NOT_COMPLETE"
+  }
+}
