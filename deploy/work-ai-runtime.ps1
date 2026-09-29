@@ -13,12 +13,19 @@ $SecretPath = Join-Path $RuntimeDir "internal-token.txt"
 $ConfigPath = Join-Path $RuntimeDir "config.json"
 $CurrentPath = Join-Path $RuntimeDir "current.json"
 $OllamaCurrent = Join-Path $RepoRoot "tmp\delivery-ollama-runtime\current.json"
-$SourceCommit = "168ae05e7f5b4bf9b5a72414f87ae6d44db95801"
+$SourceCommit = "d6d83e9e1b039bfb763a74716d316ad19d7fff96"
 $CandidateRoot = Join-Path $RuntimeDir "candidate-$SourceCommit"
 $AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
 $RuntimeControlPath = Join-Path $CandidateRoot "scripts\ops\local_ai_runtime_control.py"
-$ExpectedAdapterSha256 = "D3FE47942D44E316C3D1FD96930910A413E4D21752DFCAAF41FEA434DBD280DC"
-$ExpectedRuntimeControlSha256 = "CEA1B4AD6A5D2C12F70E233E28C791C86BC6EFDC5F2EA9864FDC022D57D13867"
+$ExpectedAdapterSha256 = "10B1780A98D57E6F7F0A909090117792A960AC7B08910C00BF92742077AC0DD6"
+$ExpectedRuntimeControlSha256 = "39F70F5521E9F5A5E0F8C05392B9C5251E24B284B47B420CFB9863E0BFBEB477"
+$ResolutionRoot = Join-Path $RepoRoot "reports"
+$ResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\call-001-resolution.json"
+$ResolutionReviewPath = Join-Path $RepoRoot "reports\codex\REAL-AI-INTEGRATION-027-DELIVERY-AUTO-call001-review-round1.raw.json"
+$ExpectedResolutionSha256 = "1DAEE269FDE7BF1EEB532528A9D12FE905D3F7D4A4FBB64A36FCB7A3B266E05E"
+$ExpectedResolutionReviewSha256 = "094E801BAA750929793B2FA231EADD272CC052B05A42CC39B20359B61D0F06B0"
+$ExpectedReservationSha256 = "C2DA7C7D75698C01A25451887C72A290B6844A00095073C324B9B5CD52C1855F"
+$ExpectedResultSha256 = "577F4DB0ACC0D4D94DB4A4B6CB6B2FA5B450E461F37008606F86016667702784"
 $PythonPath = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\bge-142-cpu\.venv\Scripts\python.exe"
 $AsrPython = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\asr-006-cpu\.venv\Scripts\python.exe"
 $ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models-hf"
@@ -107,6 +114,17 @@ function Assert-Candidate {
     if ((Get-FileHash -Algorithm SHA256 -LiteralPath $RuntimeControlPath).Hash -ne $ExpectedRuntimeControlSha256) {
         throw "frozen runtime control hash mismatch"
     }
+    $reservation = Join-Path $PrivateDir "call-001\reservation.json"
+    $result = Join-Path $PrivateDir "call-001\result.json"
+    foreach ($asset in @($ResolutionPath,$ResolutionReviewPath,$reservation,$result)) {
+        if (-not (Test-Path -LiteralPath $asset -PathType Leaf)) { throw "reviewed call-001 resolution asset is missing" }
+    }
+    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $ResolutionPath).Hash -ne $ExpectedResolutionSha256
+            -or (Get-FileHash -Algorithm SHA256 -LiteralPath $ResolutionReviewPath).Hash -ne $ExpectedResolutionReviewSha256
+            -or (Get-FileHash -Algorithm SHA256 -LiteralPath $reservation).Hash -ne $ExpectedReservationSha256
+            -or (Get-FileHash -Algorithm SHA256 -LiteralPath $result).Hash -ne $ExpectedResultSha256) {
+        throw "reviewed call-001 resolution binding mismatch"
+    }
 }
 
 function New-RuntimeBinding {
@@ -177,6 +195,16 @@ switch ($Action) {
             asr_python=$AsrPython;bge_python=$PythonPath;scope="work_order_only"
             limits=[ordered]@{asr=1;embedding=1;reranker=1;qwen=18}
             duration_seconds=7200;asr_start_ram_mib=11264;evidence_root=$RuntimeDir
+            resolution_root=$ResolutionRoot
+            resolutions=@([ordered]@{
+                record="call-001"
+                reservation_sha256=$ExpectedReservationSha256.ToLowerInvariant()
+                result_sha256=$ExpectedResultSha256.ToLowerInvariant()
+                resolution_path=$ResolutionPath
+                resolution_sha256=$ExpectedResolutionSha256
+                review_path=$ResolutionReviewPath
+                review_sha256=$ExpectedResolutionReviewSha256
+            })
             runtime_binding_path=$bindingPath
             runtime_binding_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $bindingPath).Hash.ToLowerInvariant()
         }
