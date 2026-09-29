@@ -7,7 +7,7 @@ from types import SimpleNamespace
 import pytest
 from sqlalchemy.engine import make_url
 
-from app.cli import bootstrap_system_admin, delivery_migrate
+from app.cli import bootstrap_system_admin, delivery_migrate, delivery_storage_init
 
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -156,6 +156,35 @@ def test_delivery_compose_includes_runtime_isolation_and_persistence_fixes() -> 
     nginx = (ROOT / "deploy" / "nginx.conf").read_text(encoding="utf-8")
     assert "resolver 127.0.0.11 valid=5s ipv6=off;" in nginx
     assert nginx.count("proxy_pass http://$api_upstream") == 4
+
+
+def test_delivery_storage_init_accepts_only_exact_bucket(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    settings = SimpleNamespace(
+        app_env="staging",
+        storage_provider="production",
+        storage_endpoint="http://minio:9000",
+        storage_bucket="property-ai-delivery-check",
+    )
+    monkeypatch.setenv("PROPERTY_AI_DELIVERY_STORAGE_INIT", "approved")
+    monkeypatch.setattr(delivery_storage_init, "get_settings", lambda: settings)
+    assert delivery_storage_init._settings() is settings
+
+    settings.storage_bucket = "property-ai-other"
+    with pytest.raises(RuntimeError, match="exact MinIO target"):
+        delivery_storage_init._settings()
+
+
+def test_delivery_starts_guarded_storage_initializer() -> None:
+    compose = (ROOT / "deploy" / "docker-compose.delivery.yml").read_text(
+        encoding="utf-8"
+    )
+    launcher = (ROOT / "deploy" / "delivery.ps1").read_text(encoding="utf-8")
+    assert "storage-init:" in compose
+    assert "PROPERTY_AI_DELIVERY_STORAGE_INIT: approved" in compose
+    assert 'app.cli.delivery_storage_init' in compose
+    assert launcher.count("--profile tools run --rm storage-init") == 2
 
 
 def test_delivery_rag_runtime_is_isolated_bounded_and_not_an_auto_switch() -> None:

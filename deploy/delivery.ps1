@@ -133,12 +133,15 @@ switch ($Action) {
         Invoke-Compose up -d mysql redis rabbitmq etcd minio milvus
         Invoke-Compose --profile tools build migrate
         Invoke-Compose --profile tools run --rm migrate
+        Invoke-Compose --profile tools run --rm storage-init
         Invoke-Compose up -d api worker publisher beat nginx
         Invoke-Compose ps
     }
     "up" {
         Assert-NoPlaceholders
-        Invoke-Compose up -d mysql redis rabbitmq etcd minio milvus api worker publisher beat nginx
+        Invoke-Compose up -d mysql redis rabbitmq etcd minio milvus
+        Invoke-Compose --profile tools run --rm storage-init
+        Invoke-Compose up -d api worker publisher beat nginx
         Invoke-Compose ps
     }
     "stop" {

@@ -141,6 +141,18 @@ services:
         condition: service_healthy
     restart: "no"
 
+  storage-init:
+    <<: *app-image
+    profiles: ["tools"]
+    env_file: ${DELIVERY_ENV_FILE:-.env.delivery}
+    environment:
+      PROPERTY_AI_DELIVERY_STORAGE_INIT: approved
+    command: ["python", "-m", "app.cli.delivery_storage_init"]
+    depends_on:
+      minio:
+        condition: service_healthy
+    restart: "no"
+
   api: &application
     <<: *app-image
     env_file: ${DELIVERY_ENV_FILE:-.env.delivery}
