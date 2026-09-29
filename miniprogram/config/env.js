@@ -39,13 +39,21 @@ function localIdentities() {
   return rows.filter((item) => item && item.seedKey && item.label);
 }
 
+function environmentNote() {
+  const local = loadLocal();
+  if (typeof local.envNote === "string") {
+    return local.envNote;
+  }
+  return envVersion() === "release" ? "" : "测试环境 · 外部服务状态以当前运行配置为准";
+}
+
 module.exports = {
   BASE_URL: resolveBaseUrl(),
   ENV_VERSION: envVersion(),
   LOCAL_PREVIEW: localPreviewEnabled(),
   LOCAL_IDENTITIES: localIdentities(),
   PREVIEW_HOUSE_ID: localPreviewEnabled() ? localPreviewHouseId() : "",
-  ENV_NOTE: "测试环境 · 短信与模型为开发替身，非正式供应商",
+  ENV_NOTE: environmentNote(),
 };
 
 function localPreviewHouseId() {

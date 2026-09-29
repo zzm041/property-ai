@@ -168,6 +168,27 @@ def test_test_publisher_cannot_scan_all_intents():
         publish_due(MagicMock(), Settings(_env_file=None, app_env="test", durable_tasks_enabled=True))
 
 
+def test_deployment_publisher_requires_durable_mode_before_engine_creation(monkeypatch):
+    from app.worker import task_intent_publisher as publisher
+    create = MagicMock();monkeypatch.setattr(publisher,"create_database_engine",create)
+    with pytest.raises(RuntimeError,match="DURABLE_TASKS_ENABLED"):
+        publisher.serve(seconds=30,settings=Settings(_env_file=None,app_env="staging",durable_tasks_enabled=False))
+    create.assert_not_called()
+
+
+def test_deployment_publisher_scans_only_intents_and_disposes_engine(monkeypatch):
+    from app.worker import task_intent_publisher as publisher
+    engine=MagicMock();run=MagicMock()
+    monkeypatch.setattr(publisher,"create_database_engine",lambda _url:engine)
+    monkeypatch.setattr(publisher,"run_publisher",run)
+    settings=Settings(_env_file=None,app_env="staging",durable_tasks_enabled=True,
+        database_url="mysql+pymysql://u:p@mysql:3306/property_ai_delivery_check")
+    publisher.serve(seconds=30,settings=settings)
+    assert run.call_args.kwargs["ids_supplier"]() is None
+    assert run.call_args.kwargs["seconds"]==30
+    engine.dispose.assert_called_once_with()
+
+
 def test_committed_delivery_is_reconciled_even_when_all_attempts_spent():
     r = row(operation=DELIVER, execution_attempt=4, publish_attempt=5)
     s = service(r)

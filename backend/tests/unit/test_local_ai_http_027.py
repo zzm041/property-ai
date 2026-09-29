@@ -259,16 +259,19 @@ def continuation_runner(tmp_path,valid_review=True):
         m.save(folder/'reservation.json',{'kind':'asr' if i==22 else 'embedding','unix':float(i),'input_hash':input_hash if i==22 else f'input-{i}'})
         m.save(folder/'result.json',{'status':'FAILED','reason':'RESOURCE_FLOOR'} if i==22 else {'status':'SUCCESS'})
     reservation=private/'call-022/reservation.json';result=private/'call-022/result.json'
+    reservation_hash=hashlib.sha256(reservation.read_bytes()).hexdigest()
+    result_hash=hashlib.sha256(result.read_bytes()).hexdigest()
     resolution=evidence/'resolution.json'
-    m.save(resolution,{'record':'call-022','original':{'status':'FAILED','historical_immediate_exit_confirmed':'UNKNOWN'},
+    m.save(resolution,{'record':'call-022','original':{'status':'FAILED','historical_immediate_exit_confirmed':'UNKNOWN',
+        'reservation_sha256':reservation_hash,'result_sha256':result_hash},
         'current_execution':{'currently_executing':False},'explicit_same_input_replay':{'authorized':True}})
     resolution_hash=hashlib.sha256(resolution.read_bytes()).hexdigest();review=evidence/'review.json'
     m.save(review,{'verdict':'PASS_SCOPED_CALL_RESOLUTION' if valid_review else 'NEEDS_CHANGES','resolution_sha256':resolution_hash})
     config={'private':str(private),'host':'127.0.0.1','port':11436,'evidence_root':str(evidence),
         'continuation':{'task_id':'REAL-AI-INTEGRATION-027','run_id':'ai027-b439223fda','base_count':29,'duration_seconds':900,
             'limits':{'embedding':6,'reranker':6,'qwen':6,'asr':1},'asr_start_ram_mib':11264,'resolutions':[{
-                'record':'call-022','reservation_path':str(reservation),'reservation_sha256':hashlib.sha256(reservation.read_bytes()).hexdigest(),
-                'result_sha256':hashlib.sha256(result.read_bytes()).hexdigest(),'resolution_path':str(resolution),'resolution_sha256':resolution_hash,
+                'record':'call-022','reservation_path':str(reservation),'reservation_sha256':reservation_hash,
+                'result_sha256':result_hash,'resolution_path':str(resolution),'resolution_sha256':resolution_hash,
                 'review_path':str(review),'review_sha256':hashlib.sha256(review.read_bytes()).hexdigest()}]}}
     path=tmp_path/'config.json';path.write_text(json.dumps(config),encoding='utf-8');return m.Runner(path),input_hash
 
@@ -291,12 +294,77 @@ def test_resolution_without_independent_pass_remains_blocked(tmp_path):
     with pytest.raises(RuntimeError,match='COMPLETION_UNKNOWN'):r.reserve('embedding','different')
 
 
+def test_reviewed_unknown_resolution_unblocks_one_exact_replay_without_continuation(tmp_path,monkeypatch):
+    private=tmp_path/'run';evidence=tmp_path/'evidence';private.mkdir();evidence.mkdir()
+    folder=private/'call-001';folder.mkdir();input_hash='same-work-order-input'
+    reservation=folder/'reservation.json';result=folder/'result.json'
+    m.save(reservation,{'kind':'qwen','unix':1.,'input_hash':input_hash})
+    m.save(result,{'status':'UNKNOWN','reason':'RESOURCE_FLOOR','owned_exit_confirmed':True})
+    reservation_hash=hashlib.sha256(reservation.read_bytes()).hexdigest()
+    result_hash=hashlib.sha256(result.read_bytes()).hexdigest()
+    resolution=evidence/'resolution.json'
+    m.save(resolution,{'record':'call-001','original':{'status':'UNKNOWN','historical_immediate_exit_confirmed':'UNKNOWN',
+        'reservation_sha256':reservation_hash,'result_sha256':result_hash},
+        'current_execution':{'currently_executing':False},'explicit_same_input_replay':{'authorized':True}})
+    resolution_hash=hashlib.sha256(resolution.read_bytes()).hexdigest();review=evidence/'review.json'
+    m.save(review,{'verdict':'PASS_SCOPED_CALL_RESOLUTION','resolution_sha256':resolution_hash})
+    config={'private':str(private),'host':'127.0.0.1','port':11436,'evidence_root':str(evidence),
+        'resolutions':[{'record':'call-001','reservation_sha256':reservation_hash,
+            'result_sha256':result_hash,'resolution_path':str(resolution),
+            'resolution_sha256':resolution_hash,'review_path':str(review),
+            'review_sha256':hashlib.sha256(review.read_bytes()).hexdigest()}]}
+    path=tmp_path/'config.json';path.write_text(json.dumps(config),encoding='utf-8')
+    runner=m.Runner(path);monkeypatch.setattr(m.time,'time',lambda:100.)
+    assert runner.gate()=='READY'
+    replay,_=runner.reserve('qwen',input_hash)
+    record=json.loads((replay/'reservation.json').read_text())
+    assert replay.name=='call-002' and record['replay_of']=='call-001'
+    m.save(replay/'result.json',{'status':'FAILED','owned_exit_confirmed':True})
+    with pytest.raises(RuntimeError,match='FAILED_INPUT'):
+        runner.reserve('qwen',input_hash)
+
+
+def test_unknown_resolution_status_drift_remains_blocked(tmp_path):
+    private=tmp_path/'run';evidence=tmp_path/'evidence';private.mkdir();evidence.mkdir()
+    folder=private/'call-001';folder.mkdir();reservation=folder/'reservation.json';result=folder/'result.json'
+    m.save(reservation,{'kind':'qwen','unix':1.,'input_hash':'input'})
+    m.save(result,{'status':'UNKNOWN','owned_exit_confirmed':True})
+    reservation_hash=hashlib.sha256(reservation.read_bytes()).hexdigest()
+    result_hash=hashlib.sha256(result.read_bytes()).hexdigest()
+    resolution=evidence/'resolution.json'
+    m.save(resolution,{'record':'call-001','original':{'status':'FAILED','historical_immediate_exit_confirmed':'UNKNOWN',
+        'reservation_sha256':reservation_hash,'result_sha256':result_hash},
+        'current_execution':{'currently_executing':False},'explicit_same_input_replay':{'authorized':True}})
+    resolution_hash=hashlib.sha256(resolution.read_bytes()).hexdigest();review=evidence/'review.json'
+    m.save(review,{'verdict':'PASS_SCOPED_CALL_RESOLUTION','resolution_sha256':resolution_hash})
+    config={'private':str(private),'host':'127.0.0.1','port':11436,'evidence_root':str(evidence),
+        'resolutions':[{'record':'call-001','reservation_sha256':reservation_hash,
+            'result_sha256':result_hash,'resolution_path':str(resolution),
+            'resolution_sha256':resolution_hash,'review_path':str(review),
+            'review_sha256':hashlib.sha256(review.read_bytes()).hexdigest()}]}
+    path=tmp_path/'config.json';path.write_text(json.dumps(config),encoding='utf-8')
+    assert m.Runner(path).gate()=='BLOCKED_RESOLUTION_INVALID'
+
+
 @pytest.mark.parametrize('drifted',[{'status':'SUCCESS'},{'status':'FAILED','owned_exit_confirmed':True}])
 def test_reviewed_resolution_blocks_original_result_hash_drift(tmp_path,drifted):
     r,_=continuation_runner(tmp_path)
     (r.private/'call-022/result.json').write_text(json.dumps(drifted),encoding='utf-8')
     assert r.gate()=='BLOCKED_RESOLUTION_INVALID'
     with pytest.raises(RuntimeError,match='COMPLETION_UNKNOWN'):r.reserve('embedding','different')
+
+
+def test_reviewed_resolution_cannot_be_rebound_to_same_name_in_another_run(tmp_path):
+    runner,_=continuation_runner(tmp_path)
+    reservation=runner.private/'call-022/reservation.json';result=runner.private/'call-022/result.json'
+    reservation.write_text(json.dumps({'kind':'asr','unix':22.,'input_hash':'different-run-input'}),encoding='utf-8')
+    result.write_text(json.dumps({'status':'FAILED','reason':'RESOURCE_FLOOR','owned_exit_confirmed':True}),encoding='utf-8')
+    config=json.loads(runner.path.read_text())
+    spec=config['continuation']['resolutions'][0]
+    spec['reservation_sha256']=hashlib.sha256(reservation.read_bytes()).hexdigest()
+    spec['result_sha256']=hashlib.sha256(result.read_bytes()).hexdigest()
+    runner.path.write_text(json.dumps(config),encoding='utf-8')
+    assert m.Runner(runner.path).gate()=='BLOCKED_RESOLUTION_INVALID'
 
 
 def test_cpu_guard_waits_without_call_and_keeps_threshold(tmp_path,monkeypatch):

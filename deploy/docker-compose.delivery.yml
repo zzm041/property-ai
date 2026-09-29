@@ -175,6 +175,12 @@ services:
     healthcheck:
       disable: true
 
+  publisher:
+    <<: *application
+    command: ["python", "-m", "app.worker.task_intent_publisher", "--seconds", "3600"]
+    healthcheck:
+      disable: true
+
   beat-volume-init:
     <<: *app-image
     user: "0:0"

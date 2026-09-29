@@ -86,7 +86,7 @@ Copy-Item deploy/.env.delivery.bootstrap.example deploy/.env.delivery.bootstrap
 ./deploy/delivery.ps1 stop   # 保留全部具名卷
 ```
 
-`init` 的固定顺序是：基础设施健康 → 单独执行 `alembic upgrade head` → API/Worker/Beat/Nginx。再次启动用 `up`，不得用 `down -v`。`backup [文件名.sql]` 只在 `deploy/backups/` 内新建不覆盖的 SQL 和 SHA-256 清单；省略文件名时使用 UTC 时间与随机后缀。显式同名并发请求通过原子预约互斥，SQL 与清单先写各自的唯一临时文件，再以不覆盖的文件移动发布。`restore-check <dump>` 只接受该目录内与清单哈希、字节数和源库名一致且不含跨库/全局语句的备份，并以仅获目标库权限的临时账号导入全新的 `<MYSQL_DATABASE>_restore_check`。本次受控验收可显式传入第三参数且只接受 `property_ai_delivery_check_restore_check_029`；其他显式库名拒绝。目标已存在时拒绝覆盖，应用不会连接恢复库。
+`init` 的固定顺序是：基础设施健康 → 单独执行 `alembic upgrade head` → API/Worker/持久任务投递器/Beat/Nginx。再次启动用 `up`，不得用 `down -v`。`backup [文件名.sql]` 只在 `deploy/backups/` 内新建不覆盖的 SQL 和 SHA-256 清单；省略文件名时使用 UTC 时间与随机后缀。显式同名并发请求通过原子预约互斥，SQL 与清单先写各自的唯一临时文件，再以不覆盖的文件移动发布。`restore-check <dump>` 只接受该目录内与清单哈希、字节数和源库名一致且不含跨库/全局语句的备份，并以仅获目标库权限的临时账号导入全新的 `<MYSQL_DATABASE>_restore_check`。本次受控验收可显式传入第三参数且只接受 `property_ai_delivery_check_restore_check_029`；其他显式库名拒绝。目标已存在时拒绝覆盖，应用不会连接恢复库。
 
 实际迁移分为受控的 0012 前置、一次性 SYSTEM_ADMIN 初始化、`alembic_version` 兼容扩宽和 0014。管理员手机号/密码只来自 `.env.delivery.bootstrap`，仅 migrate 服务读取，日志不输出原值；成功后应移入部署方 secret manager 或从主机文件中安全移除。历史迁移的业务 DDL 不变，新增的 delivery guard 只接受 `staging + mysql:3306/property_ai_delivery_check + 显式目标授权`。
 
@@ -96,7 +96,7 @@ Linux 服务器使用相同 Compose 文件和 `.env.delivery`，命令等价为�
 docker compose --env-file deploy/.env.delivery -f deploy/docker-compose.delivery.yml config --quiet
 docker compose --env-file deploy/.env.delivery -f deploy/docker-compose.delivery.yml up -d mysql redis rabbitmq etcd minio milvus
 docker compose --env-file deploy/.env.delivery -f deploy/docker-compose.delivery.yml --profile tools run --rm migrate
-docker compose --env-file deploy/.env.delivery -f deploy/docker-compose.delivery.yml up -d api worker beat nginx
+docker compose --env-file deploy/.env.delivery -f deploy/docker-compose.delivery.yml up -d api worker publisher beat nginx
 docker compose --env-file deploy/.env.delivery -f deploy/docker-compose.delivery.yml ps
 ```
 

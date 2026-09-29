@@ -1,0 +1,46 @@
+{
+  "format": "property-ai-model-call-resolution-v1",
+  "task_id": "REAL-AI-INTEGRATION-027-DELIVERY-AUTO",
+  "run_id": "delivery-auto-702c3db745",
+  "record": "call-001",
+  "created_at": "2026-09-29T04:18:00Z",
+  "original": {
+    "status": "UNKNOWN",
+    "reason": "RESOURCE_FLOOR",
+    "historical_immediate_exit_confirmed": "UNKNOWN",
+    "remote_completion": "UNKNOWN",
+    "owned_exit_confirmed": true,
+    "model": "qwen38-27b-q3km-g55:7af3b8f",
+    "reservation_sha256": "C2DA7C7D75698C01A25451887C72A290B6844A00095073C324B9B5CD52C1855F",
+    "result_sha256": "577F4DB0ACC0D4D94DB4A4B6CB6B2FA5B450E461F37008606F86016667702784",
+    "stdout_sha256": "163A21E9374C5BC360F436878F42DA39A4E7EAB904E8AA6F3FCC308167F26A35",
+    "stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+    "minimum_ram_free_mib": 4365,
+    "minimum_gpu_free_mib": 2997
+  },
+  "current_execution": {
+    "currently_executing": false,
+    "owned_child_pid": 24656,
+    "owned_child_pid_exists": false,
+    "ollama_endpoint": "127.0.0.1:11435",
+    "ollama_loaded_models": 0,
+    "adapter_request_active": false,
+    "adapter_listener_retained": true,
+    "observed_ram_free_mib": 8530,
+    "observed_gpu_free_mib": 14694,
+    "evidence_meaning": "The historical immediate remote completion remains UNKNOWN; current evidence only confirms that the original execution is no longer running."
+  },
+  "explicit_same_input_replay": {
+    "authorized": true,
+    "maximum_replays_for_original_record": 1,
+    "counts_against_existing_qwen_budget": true,
+    "requires_resource_guards": true,
+    "reason": "Retry the unchanged accepted work-order input only after the reviewed immutable resolution is loaded; do not rewrite or count the original UNKNOWN as success."
+  },
+  "resource_action": {
+    "stopped_exact_test_auth_container": "property-ai-delivery-check-test-auth-api",
+    "business_runtime_stopped": false,
+    "resource_floors_changed": false,
+    "unrelated_applications_stopped": false
+  }
+}

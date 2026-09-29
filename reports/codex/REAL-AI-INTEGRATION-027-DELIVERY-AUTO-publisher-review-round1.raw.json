@@ -1,0 +1,49 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-DELIVERY-AUTO",
+  "review_round": "round-1 narrow follow-up",
+  "review_type": "INDEPENDENT_READ_ONLY",
+  "reviewed_sha": "b92f4bed9a68d4d115f44376faca6e9383c78ed3 + scoped WIP",
+  "verdict": "PASS_SCOPED_DELIVERY_DURABILITY_PRE_RUNTIME",
+  "finding_resolution": [
+    {
+      "id": "AUTO-PUBLISHER-R1-01",
+      "status": "CLOSED",
+      "evidence": [
+        "deploy/delivery.ps1 的 init 和 up 均已显式包含 publisher。",
+        "diagnose 日志入口已包含 publisher。",
+        "deploy/README.md 的启动顺序和 Linux 等价命令同步包含持久任务发布器。",
+        "新增直接测试断言覆盖 Compose 发布器入口、示例 durable 开关及 init/up/diagnose 三处接线。"
+      ]
+    }
+  ],
+  "findings": [],
+  "reviewed_files": [
+    {
+      "path": "D:/property-ai/deploy/delivery.ps1",
+      "sha256": "C8E6B1B9ADFA7A3693E202E0CAD04E08FC25AB6D24B2C0EB97281007F22325F5"
+    },
+    {
+      "path": "D:/property-ai/deploy/README.md",
+      "sha256": "40C44BA8E0F131798D27494BA817C145D8B62239462226CB6FB9E24B6C955A45"
+    },
+    {
+      "path": "D:/property-ai/backend/tests/unit/test_delivery_artifact.py",
+      "sha256": "950BFA113932DF254BA87639BC7778A14A0D03E149C79B9AC3DAA83866F413EA"
+    }
+  ],
+  "tests_evidence": {
+    "reported_result": "三个相关测试文件合计 90 passed；compose config valid。",
+    "review_boundary": "上述执行结果来自主实施会话报告。本次实际读取准确差异及新增断言，未自行运行测试或 Compose。"
+  },
+  "verified_boundaries": [
+    "本次修复限于启动服务名单、诊断名单、文档和直接测试，未发现该窄范围新增回归。",
+    "此前 call-001 精确解除记录的 scoped PASS 保持，不重新解释历史 UNKNOWN。",
+    "本次没有修改文件，没有运行模型、页面、业务请求、数据库、队列或环境操作。"
+  ],
+  "unverified": [
+    "尚无本次实际 runtime intent → publisher → Worker 的闭环证据。",
+    "尚未核验运行中的 API、Worker、publisher 均加载同源版本并实际启用 durable 配置。",
+    "没有验收新的真实 AUTO 工单闭环或 Production。"
+  ],
+  "next_action": "保存本次预运行审查结论；按既有批准范围核对实际加载与配置，再采集精确新 run 的持久 intent、发布、Worker 执行及业务结果对应证据，不重跑已通过的模型固定集。"
+}

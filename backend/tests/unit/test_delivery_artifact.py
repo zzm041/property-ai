@@ -198,6 +198,18 @@ def test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded() -> Non
     assert 'work-ai-start' in launcher and 'work-ai-status' in launcher and 'work-ai-stop' in launcher
 
 
+def test_delivery_starts_and_diagnoses_durable_task_publisher() -> None:
+    compose=(ROOT/'deploy/docker-compose.delivery.yml').read_text(encoding='utf-8')
+    launcher=(ROOT/'deploy/delivery.ps1').read_text(encoding='utf-8')
+    example=(ROOT/'deploy/.env.delivery.example').read_text(encoding='utf-8')
+    assert 'publisher:' in compose
+    assert 'app.worker.task_intent_publisher' in compose
+    assert 'DURABLE_TASKS_ENABLED=true' in example
+    assert 'up -d api worker publisher beat nginx' in launcher
+    assert 'milvus api worker publisher beat nginx' in launcher
+    assert 'logs --tail 120 api worker publisher beat nginx' in launcher
+
+
 def test_delivery_backup_uses_binary_safe_compose_copy() -> None:
     script = (ROOT / "deploy" / "delivery.ps1").read_text(encoding="utf-8")
     assert 'Invoke-Compose cp "mysql:$containerTarget" $hostTemp' in script

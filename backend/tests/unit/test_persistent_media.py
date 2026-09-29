@@ -364,5 +364,9 @@ def test_miniprogram_has_authenticated_media_download_and_preview() -> None:
     assert "wx.getImageInfo" in create_source
     assert 'mimeType: "image/png"' in create_source
     assert 'mimeType: "image/webp"' in create_source
+    assert 'MAX_ANALYSIS_IMAGE_DIMENSION = 1024' in create_source
+    assert 'wx.compressImage' in create_source
+    assert 'compressedWidth' in create_source and 'compressedHeight' in create_source
+    assert 'wx.getFileSystemManager().stat' in create_source
     assert "查看图片" in template
     assert "播放语音" in template

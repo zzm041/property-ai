@@ -19,6 +19,8 @@ function imageUploadType(type) {
   }[normalized];
 }
 
+const MAX_ANALYSIS_IMAGE_DIMENSION = 1024;
+
 Page({
   data: {
     houseId: "",
@@ -139,17 +141,69 @@ Page({
               this.setData({ error: "不支持该图片格式" });
               return;
             }
-            this._upload(
-              file.tempFilePath,
-              uploadType.mimeType,
-              file.size,
-              uploadType.originalName
-            );
+            this._prepareImage(file, info, uploadType)
+              .then((prepared) => this._upload(
+                prepared.filePath,
+                prepared.mimeType,
+                prepared.sizeBytes,
+                prepared.originalName
+              ))
+              .catch((error) => this.setData({ error: error.message || "图片处理失败" }));
           },
           fail: () => this.setData({ error: "无法识别图片格式" }),
         });
       },
       fail: (error) => this.setData({ error: error.errMsg || "选择图片失败" }),
+    });
+  },
+  _prepareImage(file, info, uploadType) {
+    const width = Number(info.width || 0);
+    const height = Number(info.height || 0);
+    if (Math.max(width, height) <= MAX_ANALYSIS_IMAGE_DIMENSION) {
+      return Promise.resolve({
+        filePath: file.tempFilePath,
+        mimeType: uploadType.mimeType,
+        sizeBytes: file.size,
+        originalName: uploadType.originalName,
+      });
+    }
+    if (typeof wx.compressImage !== "function") {
+      return Promise.reject(new Error("图片尺寸过大，当前微信版本无法安全压缩，请选择最长边不超过1024像素的图片"));
+    }
+    const scale = MAX_ANALYSIS_IMAGE_DIMENSION / Math.max(width, height);
+    const compressedWidth = Math.max(1, Math.round(width * scale));
+    const compressedHeight = Math.max(1, Math.round(height * scale));
+    return new Promise((resolve, reject) => {
+      wx.compressImage({
+        src: file.tempFilePath,
+        quality: 85,
+        compressedWidth,
+        compressedHeight,
+        success: (result) => {
+          wx.getImageInfo({
+            src: result.tempFilePath,
+            success: (compressedInfo) => {
+              const compressedType = imageUploadType(compressedInfo.type);
+              if (!compressedType || Math.max(Number(compressedInfo.width), Number(compressedInfo.height)) > MAX_ANALYSIS_IMAGE_DIMENSION) {
+                reject(new Error("图片压缩结果不符合分析尺寸限制"));
+                return;
+              }
+              wx.getFileSystemManager().stat({
+                path: result.tempFilePath,
+                success: (statResult) => resolve({
+                  filePath: result.tempFilePath,
+                  mimeType: compressedType.mimeType,
+                  sizeBytes: statResult.stats.size,
+                  originalName: compressedType.originalName,
+                }),
+                fail: () => reject(new Error("无法读取压缩后的图片")),
+              });
+            },
+            fail: () => reject(new Error("无法识别压缩后的图片")),
+          });
+        },
+        fail: () => reject(new Error("图片尺寸过大且压缩失败，请重新选择图片")),
+      });
     });
   },
   _upload(filePath, mimeType, sizeBytes, originalName) {

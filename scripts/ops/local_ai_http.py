@@ -197,6 +197,7 @@ class Runner:
             or (self.scope=='work_order_only' and self.asr_start_ram_mib<11264)
         ):raise ValueError('ASR_ADMISSION_LIMIT')
         self.continuation=self.config.get('continuation')
+        self.resolutions=list(self.config.get('resolutions',[]))
         self.runtime_binding=None
         binding_path=self.config.get('runtime_binding_path')
         if binding_path:
@@ -213,6 +214,7 @@ class Runner:
             if c.get('base_count')!=29 or not 0<c.get('duration_seconds',0)<=900:raise ValueError('CONTINUATION_LIMIT')
             if set(c.get('limits',{}))!=set(CONTINUATION_MAX) or any(not 0<c['limits'][k]<=CONTINUATION_MAX[k] for k in CONTINUATION_MAX):raise ValueError('CONTINUATION_LIMIT')
             if c.get('asr_start_ram_mib')!=11264:raise ValueError('ASR_ADMISSION_LIMIT')
+            self.resolutions.extend(c.get('resolutions',[]))
     def acquire_request(self):
         with self.state_lock:
             if not self.accepting_requests:return False
@@ -234,16 +236,20 @@ class Runner:
             raise RuntimeError('QWEN_RUNTIME_LISTENER_IDENTITY_CHANGED')
         return identity
     def _resolution(self,path,result):
-        if not self.continuation:return None
-        for spec in self.continuation.get('resolutions',[]):
+        if not self.resolutions:return None
+        for spec in self.resolutions:
             if spec.get('record')!=path.parent.name:continue
             report=Path(spec['resolution_path']).resolve();review=Path(spec['review_path']).resolve()
-            allowed=Path(self.config['evidence_root']).resolve()
+            allowed=Path(self.config.get('resolution_root',self.config['evidence_root'])).resolve()
             if not report.is_relative_to(allowed) or not review.is_relative_to(allowed):raise RuntimeError('RESOLUTION_PATH_SCOPE')
-            if self._sha(path)!=spec['reservation_sha256'] or self._sha(path.parent/'result.json')!=spec['result_sha256']:raise RuntimeError('RESOLUTION_ORIGINAL_DRIFT')
+            reservation_hash=self._sha(path);result_hash=self._sha(path.parent/'result.json')
+            if reservation_hash!=spec['reservation_sha256'] or result_hash!=spec['result_sha256']:raise RuntimeError('RESOLUTION_ORIGINAL_DRIFT')
             if self._sha(report)!=spec['resolution_sha256'] or self._sha(review)!=spec['review_sha256']:raise RuntimeError('RESOLUTION_REVIEW_DRIFT')
             data=json.loads(report.read_text(encoding='utf-8'));verdict=json.loads(review.read_text(encoding='utf-8'))
-            if result.get('status')!='FAILED' or data.get('original',{}).get('status')!='FAILED':raise RuntimeError('RESOLUTION_SEMANTICS')
+            if (data.get('original',{}).get('reservation_sha256','').lower()!=reservation_hash.lower()
+                    or data.get('original',{}).get('result_sha256','').lower()!=result_hash.lower()):raise RuntimeError('RESOLUTION_ORIGINAL_DRIFT')
+            original_status=result.get('status')
+            if original_status not in {'FAILED','UNKNOWN'} or data.get('original',{}).get('status')!=original_status:raise RuntimeError('RESOLUTION_SEMANTICS')
             if data.get('record')!=path.parent.name or data.get('original',{}).get('historical_immediate_exit_confirmed')!='UNKNOWN':raise RuntimeError('RESOLUTION_SEMANTICS')
             if data.get('current_execution',{}).get('currently_executing') is not False:raise RuntimeError('RESOLUTION_SEMANTICS')
             if verdict.get('verdict')!='PASS_SCOPED_CALL_RESOLUTION' or verdict.get('resolution_sha256')!=spec['resolution_sha256']:raise RuntimeError('RESOLUTION_REVIEW_REQUIRED')
@@ -292,7 +298,7 @@ class Runner:
         else:
             if records and now-records[0]['unix']>=self.duration_seconds:raise RuntimeError('R2_WINDOW_EXHAUSTED')
             if sum(r['kind']==kind for r in records)>=self.limits[kind]:raise RuntimeError('R2_CALL_LIMIT')
-            deadline=(records[0]['unix'] if records else now)+self.duration_seconds;metadata={}
+            deadline=(records[0]['unix'] if records else now)+self.duration_seconds;metadata={'replay_of':replay_of}
         folder=self.private/f'call-{len(records)+1:03d}';folder.mkdir()
         save(folder/'reservation.json',{'kind':kind,'unix':now,'utc':stamp(),'model':MODELS[kind],'max_calls':self.limits[kind],'input_hash':input_hash,**metadata})
         return folder,deadline

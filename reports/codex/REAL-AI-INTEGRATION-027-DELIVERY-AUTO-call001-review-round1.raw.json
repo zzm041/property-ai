@@ -1,0 +1,79 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-DELIVERY-AUTO",
+  "review_round": "round-1 follow-up",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_sha": "b92f4bed9a68d4d115f44376faca6e9383c78ed3 + scoped WIP",
+  "verdict": "PASS_SCOPED_CALL_RESOLUTION",
+  "resolution_sha256": "1DAEE269FDE7BF1EEB532528A9D12FE905D3F7D4A4FBB64A36FCB7A3B266E05E",
+  "publisher_verdict": "NEEDS_CHANGES",
+  "overall_delivery_verdict": "NOT_READY_FOR_RUNTIME_CLOSEOUT",
+  "prior_finding": {
+    "id": "AUTO-CALL001-R1-01",
+    "prior_status": "OPEN",
+    "status": "CLOSED",
+    "evidence": [
+      "Runner._resolution 继续校验实际 reservation/result 与配置 spec 的哈希，并新增已审 resolution.original 两项哈希与实际文件的直接比较；缺失或不符均拒绝。",
+      "resolution/review 文件哈希、原状态、记录名、当前未执行声明及独立 PASS 仍须同时匹配。",
+      "新增跨运行同名记录负测：更新实际文件及 spec 哈希，但复用旧 resolution/PASS 时仍被拒绝。",
+      "当前 scripts/ops/local_ai_http.py SHA256 为 10B1780A98D57E6F7F0A909090117792A960AC7B08910C00BF92742077AC0DD6。"
+    ]
+  },
+  "checked": [
+    {
+      "scope": "call-001 解除与重试",
+      "result": "解除记录只确认保存观测时已无当前执行，不将历史即时远端完成 UNKNOWN 改成成功。相同输入重试要求显式授权，最多一次；replay_of 防重复，原调用仍计入原首条预约启动的窗口和累计预算。未见本次差异降低资源阈值。"
+    },
+    {
+      "scope": "新增持久任务发布器",
+      "result": "新入口在创建数据库 engine 前要求 durable_tasks_enabled，复用既有 run_publisher、发布租约与任务幂等机制，退出时释放 engine；没有另写业务派单规则。"
+    },
+    {
+      "scope": "Compose 与默认配置",
+      "result": "publisher 继承 API 的镜像、环境、依赖及重启策略，采用有限 3600 秒运行周期；示例环境新增 DURABLE_TASKS_ENABLED=true。但现有正式部署脚本的显式启动名单遗漏 publisher，当前尚不能关闭运行接线缺口。"
+    },
+    {
+      "scope": "业务事务直接调用关系",
+      "result": "WorkOrderService 在业务事务中注册 ANALYZE intent；durable 开启后 _enqueue_analysis 不再直接发送 Celery，因此发布器必须随正常部署入口启动。"
+    },
+    {
+      "scope": "页面接线",
+      "result": "此前已核对的页面 ID 与环境说明仅涉及定位/显示，没有改变事件处理器、权限、认证或 API 地址解析；本轮未重开这些已接受边界。"
+    }
+  ],
+  "findings": [
+    {
+      "id": "AUTO-PUBLISHER-R1-01",
+      "severity": "HIGH",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/deploy/delivery.ps1:136",
+      "related_locations": [
+        "D:/property-ai/deploy/delivery.ps1:141",
+        "D:/property-ai/backend/app/service/work_order.py:621"
+      ],
+      "trigger": "使用现有 delivery.ps1 的 init 或 up 正常启动交付环境，并启用 DURABLE_TASKS_ENABLED=true。",
+      "impact": "两个入口均显式枚举启动服务但遗漏 publisher；业务仅写入 task_intents 后不再直接发 Celery，正常部署可能留下无人发布的持久任务，无法保证自动分析与派单继续。",
+      "evidence": [
+        "init 当前执行 Invoke-Compose up -d api worker beat nginx。",
+        "up 当前执行 Invoke-Compose up -d mysql redis rabbitmq etcd minio milvus api worker beat nginx。",
+        "新增 publisher 未被上述任何服务声明为启动依赖。",
+        "WorkOrderService._enqueue_analysis 在 durable_tasks_enabled 为 true 时直接返回。"
+      ],
+      "recommendation": "将 publisher 纳入 init/up 的明确服务名单，补覆盖两个正常入口的直接断言；可同步纳入 diagnose 日志名单。无需重跑已有模型固定集。"
+    }
+  ],
+  "tests_evidence": {
+    "resolution_focused": "实施方报告 46 passed；本审查读取直接新增断言，未自行运行。",
+    "publisher_focused": "实施方报告 35 passed；已读发布器禁用拒绝、运行参数及 engine 释放测试，未自行运行。",
+    "compose": "compose config valid 为实施方报告；本审查仅静态读取 Compose。",
+    "limitation": "这些结果不能替代真实部署入口、持久 intent 发布及业务闭环运行证据。"
+  },
+  "residual_limits": [
+    "历史 call-001 即时远端完成仍为 UNKNOWN；当前未执行属于保存的观测，本审查没有查询实时进程或服务。",
+    "解除 PASS 仅对应上述精确 resolution 哈希，不授权任意其他 UNKNOWN 或跨运行记录。",
+    "尚未验证适配器重新加载、一次重试或新的 AUTO 业务闭环。",
+    "示例环境配置不是现有运行环境已启用 durable 的证明；后续须核对 API、Worker、publisher 同源且配置一致。",
+    "本审查未修改文件，未运行测试、模型、页面、业务请求、数据库、队列或进程操作。",
+    "真实 AUTO 与 Production 仍未通过；既有候选语义及资源失败历史保持原样。"
+  ],
+  "next_action": "保存本次精确 call-resolution PASS；仅修复 AUTO-PUBLISHER-R1-01 并做直接专项验证，再窄复核启动接线。之后按已批准范围验证实际持久 intent → publisher → Worker 链路及一次受控重试，不把当前源码审查升级为 AUTO 完成。"
+}
