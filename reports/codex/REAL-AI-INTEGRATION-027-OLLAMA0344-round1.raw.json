@@ -1,0 +1,45 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-OLLAMA0344-COMPAT",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "base_sha": "86b38fc3b7abad51d6ccb7a4ba30248bae181985",
+  "reviewed_sha": "ed15c0f70eb7652121b7f1ca163e3a5d8d3da89f",
+  "verdict": "NEEDS_CHANGES",
+  "findings": [
+    {
+      "id": "OLLAMA0344-R1-01",
+      "severity": "MEDIUM",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/deploy/ollama-runtime.ps1：start 的既有监听分支及 status 分支",
+      "trigger": "磁盘上的 Ollama 已更新为批准的 0.34.4，但原有隔离进程仍运行旧版本，随后重复执行 start 或检查 status。",
+      "impact": "新进程启动路径严格检查版本，但复用路径读取版本后直接成功返回，不能保证被接纳的运行实例确为批准版本；旧收据记录的 executable_sha256 也未与本轮固定值核对。",
+      "evidence": [
+        "已有 listener 的 start 分支只执行 Assert-StateProcess、Invoke-Version，随后输出并 break。",
+        "status 同样在 Invoke-Version 后直接输出。",
+        "仅新进程启动分支包含 version.version 与 ExpectedVersion 的比较。",
+        "磁盘文件哈希检查不能证明已经加载的旧进程使用了新二进制。",
+        "适配器 qwen_guard 仍会拒绝错误版本，因此本项不是已发生模型越界的证据。"
+      ],
+      "recommendation": "对接纳或复用实例的入口统一校验实际版本和收据中的固定可执行文件哈希，补无模型负测。保留依照旧收据安全停止旧实例的能力，不把升级接纳条件错误地施加到必要的旧实例停止操作。"
+    }
+  ],
+  "checked": [
+    "实际读取两个提交及五个指定文件的准确差异和必要调用上下文。",
+    "新启动使用固定 SHA256 D571E4CF0AD4456FCCD33D5B985B6D63BA5669C6E5A812391704083952AAE3D5，并要求版本0.34.4。",
+    "候选映射仅将 Qwen38 固定 digest 对应版本改为0.34.4；4B、9B仍保持0.34.3，模型名称和digest未更换。",
+    "实际以内存方式读取19a417f的Git archive内容，适配器SHA256为089CC518CDF13A9F09BFEF01E81C5E506504532FAFF97743D257C8475CB2B011，与work-ai入口一致；没有创建或解压文件到工作区。",
+    "Git blob/工作树与archive字节哈希的差异来自archive行尾转换，未误判为源码漂移。",
+    "11435 loopback、no-cloud、单模型、单并发、冻结运行控制、旧解除记录及预算保护没有被本次差异修改。",
+    "新增测试核对候选版本和固定字符串，但未覆盖既有监听分支拒绝旧版本的行为。"
+  ],
+  "tests_evidence": {
+    "reported": "实施方报告两次相同专项均58 passed、3 warnings，PowerShell parse OK。",
+    "boundary": "本审查读取测试源码，没有执行测试或将实施方结果称为独立运行。"
+  },
+  "unverified": [
+    "未验证0.34.4实际重启、适配器重新加载、模型推理或业务闭环。",
+    "未运行模型、页面、业务请求、数据库、队列或运行进程操作，未修改文件。",
+    "下载、安装、全局配置、11434、模型质量与Production均不在本次审查放行范围。",
+    "历史UNKNOWN、资源失败及已有业务证据保持原状态。"
+  ],
+  "next_action": "仅修复OLLAMA0344-R1-01并补直接无模型回归，再做同一问题窄复核；无需重跑历史固定集或业务。"
+}

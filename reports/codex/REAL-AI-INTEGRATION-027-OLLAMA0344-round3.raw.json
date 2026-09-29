@@ -1,0 +1,45 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-OLLAMA0344-COMPAT",
+  "review_round": 3,
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_sha": "aa77e60647542004e6aca520d6f4006f42f268d7",
+  "verdict": "NEEDS_CHANGES",
+  "findings": [
+    {
+      "id": "OLLAMA0344-R3-01",
+      "severity": "MEDIUM",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "location": "D:/property-ai/deploy/ollama-runtime.ps1:63",
+      "related_location": "D:/property-ai/deploy/ollama-runtime.ps1:Get-ListenerPid",
+      "trigger": "重启收据恢复时，进程查询发生错误，或监听枚举命令失败而未返回有效输出。",
+      "impact": "观测失败可能被解释为进程或监听不存在，允许在缺少当前不存在证明时归档旧收据，不满足本次解除路径的失败关闭要求。",
+      "evidence": [
+        "Retire-RebootedReceipt 对 Win32_Process 使用 -ErrorAction SilentlyContinue；查询失败时 currentPid 可以为空。",
+        "Get-ListenerPid 未检查 netstat 的退出码；失败且无匹配输出时返回 null。",
+        "随后仅以 currentPid/listener 是否为 null 判断当前执行是否不存在。",
+        "现有新增测试仅检查相关字符串存在，未覆盖观测失败必须拒绝的情况。"
+      ],
+      "recommendation": "让进程查询错误直接终止恢复，并核验监听枚举成功后才允许解释空结果；补针对观测错误的直接回归。无需模型、业务或真实停止操作。"
+    }
+  ],
+  "checked": [
+    "实际读取该提交的准确差异、固定解除记录、当前旧收据及必要调用上下文。",
+    "解除记录实际SHA256为128943CB6C1B9CD653E1AB250B7D9D5330C2201184E2DA0B5399E3B4FB788317。",
+    "旧收据实际SHA256为83D93D840ABBB8F3CEC58438C7722C29611232B6DB3D546A5A322F99E63057FC；operation、PID30556、启动时间、路径和旧可执行文件哈希均匹配解除记录。",
+    "保存的系统启动时间晚于旧实例启动时间；代码要求实时boot与保存值匹配，未将历史正常退出改为已确认。",
+    "新解除路径严格绑定固定记录和旧收据，并保留不可覆盖归档；不是任意旧收据的通用豁免。",
+    "当前可执行文件哈希在正常start进入恢复路径前仍接受固定值校验。",
+    "此前OLLAMA0344-R1-01保持关闭，本轮未重开。"
+  ],
+  "tests_evidence": {
+    "reported": "实施方报告相关58 passed、3 warnings，PowerShell parse OK。",
+    "boundary": "本审查读取测试源码，没有执行测试或实际运行入口。"
+  },
+  "residual_limits": [
+    "历史正常退出仍未确认；重启证据只用于证明旧实例不可能跨本次系统启动继续执行。",
+    "本次未查询实时进程、boot或监听；这些实时条件仍必须由修复后的入口在执行时成功核对。",
+    "未修改文件，未运行模型、页面、业务、数据库、队列或进程控制操作。",
+    "不改变原UNKNOWN、失败记录、调用预算或模型质量结论。"
+  ],
+  "next_action": "仅修复OLLAMA0344-R3-01的观测失败处理，再窄复核；在此之前不将该重启解除入口标为可放行。"
+}

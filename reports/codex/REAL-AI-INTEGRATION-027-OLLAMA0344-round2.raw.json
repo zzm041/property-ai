@@ -1,0 +1,42 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-OLLAMA0344-COMPAT",
+  "review_round": 2,
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "base_sha": "ed15c0f70eb7652121b7f1ca163e3a5d8d3da89f",
+  "reviewed_sha": "e3cadc8ced5fe51ba7870be1193fb0abb607ac02",
+  "verdict": "PASS_SCOPED_INCREMENTAL",
+  "findings": [],
+  "closed_findings": [
+    {
+      "id": "OLLAMA0344-R1-01",
+      "status": "CLOSED",
+      "evidence": [
+        "新增 Assert-ReviewedRuntimeState，校验收据可执行路径、收据哈希、磁盘实际哈希及实际报告版本0.34.4。",
+        "同时校验11435端点、no_cloud、单驻留模型和单并发；不符即抛错。",
+        "已有监听的 start 分支及 status 分支均在成功输出之前调用该守卫。",
+        "两处仍先执行 Assert-StateProcess，保留 PID、路径、创建时间及监听所有者校验。",
+        "stop 未套用新版本接纳守卫，仍可依据旧收据身份、RAG监听和模型驻留检查安全停止旧实例。"
+      ]
+    }
+  ],
+  "checked": [
+    "实际读取 ed15c0f..e3cadc8 的准确差异及直接调用上下文。",
+    "新增静态断言覆盖两个接纳入口、固定哈希、实际版本和隔离字段。",
+    "未发现本次窄修复引入的直接回归；此前冻结候选、旧UNKNOWN和预算边界保持。"
+  ],
+  "source_hashes": {
+    "D:/property-ai/deploy/ollama-runtime.ps1": "E1AE81ED24F109A01A5DB1BE92B7BB59CD0CA74259AEBDD8F2307A75055356F2",
+    "D:/property-ai/backend/tests/unit/test_delivery_artifact.py": "4F653D21A7BA548B1E578DE79CBB4866DA1D981FE1121BBD2262D9EC6979BA93"
+  },
+  "tests_evidence": {
+    "reported_final": "58 passed、3 warnings；PowerShell parse OK。",
+    "reported_initial": "首次57 passed、1 failed，随后仅修正新增测试的字符串预期。",
+    "boundary": "均为实施方报告；本审查读取测试源码但未运行。新增检查属于静态断言，不等同实际进程行为验证。"
+  },
+  "residual_limits": [
+    "未验证实际0.34.4重启、复用拒绝路径、适配器加载或模型业务效果。",
+    "本审查未修改文件，未执行模型、页面、业务、数据库、队列或运行进程操作。",
+    "结论仅关闭本次兼容接纳缺口，不扩大11434、下载、安装、全局配置、调用预算或Production授权。"
+  ],
+  "next_action": "保存本轮审查；在既有精确11435授权内核对实际加载身份和无推理健康状态，再按原批准范围继续。保留历史失败，不将兼容预检升级为模型质量或AUTO通过。"
+}
