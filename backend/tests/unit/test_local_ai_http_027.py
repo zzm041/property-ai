@@ -367,7 +367,7 @@ def test_pre_reservation_failure_records_stable_redacted_reason_without_call(tmp
     record=json.loads((scoped.private/'pre-reservation-failures.jsonl').read_text())
     assert reason==expected and record['reason_code']==expected
     assert record['reservation_created'] is False and record['fail_closed'] is True
-    assert set(record)=={'utc','stage','reason_code','scope','kind','model','model_digest',
+    assert set(record)=={'utc','stage','reason_code','detail_code','scope','kind','model','model_digest',
         'runtime_version','context_length','input_sha256','request_binding_sha256',
         'reservation_created','fail_closed'}
     assert not list(scoped.private.glob('call-*'))
@@ -385,6 +385,31 @@ def test_shared_model_lock_serializes_adapters_without_reservation(tmp_path):
             second.acquire_shared_model_lock()
     finally:first.release_shared_model_lock(handle)
     assert not list(first.private.glob('call-*')) and not list(second.private.glob('call-*'))
+
+
+def test_http_decode_failure_can_be_recorded_without_sensitive_body(tmp_path):
+    scoped=runner(tmp_path)
+    body=b'{"phone":"synthetic-secret","prompt":"private text"}'
+    scoped.record_pre_reservation_failure(
+        ValueError('QWEN_SCHEMA_MISMATCH'),stage='HTTP_DECODE',
+        input_hash=hashlib.sha256(body).hexdigest(),request_binding='c'*64,
+    )
+    raw=(scoped.private/'pre-reservation-failures.jsonl').read_text()
+    assert 'synthetic-secret' not in raw and 'private text' not in raw
+    record=json.loads(raw)
+    assert record['reason_code']=='VALIDATION_REJECTED'
+    assert record['detail_code']=='QWEN_SCHEMA_MISMATCH'
+
+
+def test_pre_reservation_detail_does_not_copy_unknown_exception_text(tmp_path):
+    scoped=runner(tmp_path)
+    scoped.record_pre_reservation_failure(
+        RuntimeError('private runtime detail'),stage='UNIT_PRE_RESERVATION',
+    )
+    record=json.loads((scoped.private/'pre-reservation-failures.jsonl').read_text())
+    assert record['reason_code']=='INTERNAL_PRE_RESERVATION_ERROR'
+    assert record['detail_code'] is None
+    assert 'private runtime detail' not in json.dumps(record)
 
 
 def continuation_runner(tmp_path,valid_review=True):

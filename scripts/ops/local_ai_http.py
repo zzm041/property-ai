@@ -59,6 +59,14 @@ MAX_BODY=15*1024*1024
 WORK_ORDER_PROMPT_VERSION=WORK_ORDER_ANALYSIS_PROMPT_VERSION
 WORK_ORDER_RESPONSE_FORMAT=work_order_analysis_response_format()
 VISION_RESPONSE_FORMAT=vision_analysis_response_format()
+SAFE_PRE_RESERVATION_DETAILS=frozenset({
+    'AUDIO_FIELDS','AUDIO_SIZE','BODY_LIMIT','CONTENT_LENGTH_REQUIRED',
+    'EMBEDDING_INPUT','ENDPOINT_NOT_ALLOWED','INCOMPLETE_BODY','JSON_REQUIRED',
+    'MODEL_NOT_ALLOWED','MODEL_OR_FIELDS','MULTIPART_REQUIRED','PCM_REQUIRED',
+    'PROMPT_VERSION_NOT_ALLOWED','QWEN_INPUT','QWEN_SCHEMA_MISMATCH','QWEN_SETTINGS',
+    'RAG_ONLY_NO_AUTO_AUTHORIZATION','RERANK_INPUT','TRUNCATED_AUDIO','VLM_INPUT',
+    'WORK_ORDER_ONLY_ENDPOINT','WORK_ORDER_ONLY_NO_RAG_AUTHORIZATION',
+})
 
 def stamp():return datetime.now(UTC).isoformat()
 def save(path,value):
@@ -284,8 +292,10 @@ class Runner:
         return 'INTERNAL_PRE_RESERVATION_ERROR'
     def record_pre_reservation_failure(self,exc,*,stage,kind=None,input_hash=None,request_binding=None):
         reason=self._failure_code(exc)
+        detail=str(exc) if str(exc) in SAFE_PRE_RESERVATION_DETAILS else None
         record={
             'utc':stamp(),'stage':stage,'reason_code':reason,'scope':self.scope,
+            'detail_code':detail,
             'kind':kind,'model':MODELS.get(kind),'model_digest':DIGEST if kind=='qwen' else None,
             'runtime_version':QWEN_RUNTIME_VERSION if kind=='qwen' else None,
             'context_length':QWEN_CONTEXT_LENGTH if kind=='qwen' else None,
@@ -535,17 +545,23 @@ def serve(config_path):
                     return self.reply(400,{'error':'EMPTY_BODY_REQUIRED'})
                 active=runner.begin_drain()
                 return self.reply(200,{'accepting_requests':False,'request_active':active})
-            if self.headers.get('Transfer-Encoding') or len(self.headers.get_all('Content-Length',[]))!=1:return self.reply(400,{'error':'CONTENT_LENGTH_REQUIRED'})
+            request_id=self.headers.get('X-Request-Id','')
+            request_binding=hashlib.sha256(request_id.encode()).hexdigest() if request_id else None
+            if self.headers.get('Transfer-Encoding') or len(self.headers.get_all('Content-Length',[]))!=1:
+                runner.record_pre_reservation_failure(ValueError('CONTENT_LENGTH_REQUIRED'),stage='HTTP_ENVELOPE',request_binding=request_binding)
+                return self.reply(400,{'error':'CONTENT_LENGTH_REQUIRED'})
             try:
                 size=int(self.headers['Content-Length'])
-                if not 0<size<=MAX_BODY:return self.reply(413,{'error':'BODY_LIMIT'})
+                if not 0<size<=MAX_BODY:
+                    runner.record_pre_reservation_failure(ValueError('BODY_LIMIT'),stage='HTTP_ENVELOPE',request_binding=request_binding)
+                    return self.reply(413,{'error':'BODY_LIMIT'})
                 body=self.rfile.read(size)
                 if len(body)!=size:raise ValueError('INCOMPLETE_BODY')
                 kind,value=decode(self.path,self.headers.get('Content-Type',''),body,self.headers.get('X-Prompt-Version',''),runner.scope)
-            except (ValueError,TypeError,KeyError,UnicodeError):return self.reply(422,{'error':'INVALID_REQUEST'})
+            except (ValueError,TypeError,KeyError,UnicodeError) as exc:
+                runner.record_pre_reservation_failure(exc,stage='HTTP_DECODE',input_hash=hashlib.sha256(body if 'body' in locals() else b'').hexdigest(),request_binding=request_binding)
+                return self.reply(422,{'error':'INVALID_REQUEST'})
             if not runner.acquire_request():return self.reply(503,{'error':'MODEL_DRAINING_OR_BUSY_NO_RETRY'})
-            request_id=self.headers.get('X-Request-Id','')
-            request_binding=hashlib.sha256(request_id.encode()).hexdigest() if request_id else None
             shared=None
             try:
                 shared=runner.acquire_shared_model_lock()
