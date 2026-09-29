@@ -12,8 +12,16 @@ $RepoRoot = Split-Path -Parent $DeployDir
 $RuntimeDir = Join-Path $RepoRoot "tmp\delivery-ollama-runtime"
 $StatePath = Join-Path $RuntimeDir "current.json"
 $StartLockPath = Join-Path $RuntimeDir "start.lock"
-$ControlledStopPath = Join-Path $RepoRoot "tmp\delivery-work-ai-runtime\calls\call-003\result.json"
-$ExpectedControlledStopSha256 = "B725035C11585AF362F6652B7531BDB63DCBC3DF75F75182015EAF513A7603B1"
+$ControlledStops = @(
+    [pscustomobject]@{
+        Path = Join-Path $RepoRoot "tmp\delivery-work-ai-runtime\calls\call-003\result.json"
+        Sha256 = "B725035C11585AF362F6652B7531BDB63DCBC3DF75F75182015EAF513A7603B1"
+    },
+    [pscustomobject]@{
+        Path = Join-Path $RepoRoot "tmp\delivery-work-ai-runtime\calls\call-007\result.json"
+        Sha256 = "C136825C9391FFC8F48395AB1A3E78A4638FC53F181FCAE84FBF47DF284BF85C"
+    }
+)
 $ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models"
 $OllamaExe = if ($env:PROPERTY_AI_OLLAMA_EXE) {
     $env:PROPERTY_AI_OLLAMA_EXE
@@ -41,25 +49,31 @@ function Read-State {
 }
 
 function Retire-ControlledStopReceipt([object]$State) {
-    if (-not (Test-Path -LiteralPath $ControlledStopPath -PathType Leaf)) {
-        throw "stale current receipt exists without controlled-stop evidence"
+    $existing = @($ControlledStops | Where-Object { Test-Path -LiteralPath $_.Path -PathType Leaf })
+    if ($existing.Count -eq 0) { throw "stale current receipt exists without controlled-stop evidence" }
+    $binding = $null
+    foreach ($candidate in $existing) {
+        if ((Get-FileHash -Algorithm SHA256 -LiteralPath $candidate.Path).Hash -ne $candidate.Sha256) {
+            continue
+        }
+        $evidence = Get-Content -Raw -LiteralPath $candidate.Path | ConvertFrom-Json
+        $verified = $evidence.remote_stop.verified_before_stop
+        $stopped = $evidence.remote_stop.stopped
+        if (
+            $evidence.status -eq "FAILED" -and
+            $evidence.reason -eq "RESOURCE_FLOOR" -and
+            $evidence.remote_completion -eq "CONTROLLED_STOP" -and
+            [int]$verified.pid -eq [int]$State.pid -and
+            [IO.Path]::GetFullPath([string]$verified.path) -eq [IO.Path]::GetFullPath([string]$State.executable) -and
+            ([DateTimeOffset]$verified.started_utc).UtcDateTime -eq ([DateTimeOffset]$State.started_at_utc).UtcDateTime -and
+            $stopped.tree_exit_confirmed -eq $true -and
+            $stopped.listener_exit_confirmed -eq $true
+        ) {
+            $binding = $candidate
+            break
+        }
     }
-    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $ControlledStopPath).Hash -ne $ExpectedControlledStopSha256) {
-        throw "controlled-stop evidence hash mismatch"
-    }
-    $evidence = Get-Content -Raw -LiteralPath $ControlledStopPath | ConvertFrom-Json
-    $verified = $evidence.remote_stop.verified_before_stop
-    $stopped = $evidence.remote_stop.stopped
-    if (
-        $evidence.status -ne "FAILED" -or
-        $evidence.reason -ne "RESOURCE_FLOOR" -or
-        $evidence.remote_completion -ne "CONTROLLED_STOP" -or
-        [int]$verified.pid -ne [int]$State.pid -or
-        [IO.Path]::GetFullPath([string]$verified.path) -ne [IO.Path]::GetFullPath([string]$State.executable) -or
-        ([DateTimeOffset]$verified.started_utc).UtcDateTime -ne ([DateTimeOffset]$State.started_at_utc).UtcDateTime -or
-        $stopped.tree_exit_confirmed -ne $true -or
-        $stopped.listener_exit_confirmed -ne $true
-    ) { throw "controlled-stop evidence does not bind the stale receipt" }
+    if ($null -eq $binding) { throw "controlled-stop evidence does not bind the stale receipt" }
     if ($null -ne (Get-Process -Id ([int]$State.pid) -ErrorAction SilentlyContinue) -or $null -ne (Get-ListenerPid)) {
         throw "controlled-stop receipt cannot be retired while execution may still exist"
     }

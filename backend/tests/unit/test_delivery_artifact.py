@@ -239,14 +239,16 @@ def test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded() -> Non
 
 def test_delivery_ollama_restart_requires_exact_controlled_stop_evidence() -> None:
     runtime=(ROOT/'deploy/ollama-runtime.ps1').read_text(encoding='utf-8')
-    assert 'ExpectedControlledStopSha256' in runtime
     assert 'calls\\call-003\\result.json' in runtime
+    assert 'calls\\call-007\\result.json' in runtime
+    assert 'C136825C9391FFC8F48395AB1A3E78A4638FC53F181FCAE84FBF47DF284BF85C' in runtime
     assert 'B725035C11585AF362F6652B7531BDB63DCBC3DF75F75182015EAF513A7603B1' in runtime
-    assert '$evidence.remote_completion -ne "CONTROLLED_STOP"' in runtime
-    assert '$evidence.reason -ne "RESOURCE_FLOOR"' in runtime
-    assert '$stopped.tree_exit_confirmed -ne $true' in runtime
-    assert '$stopped.listener_exit_confirmed -ne $true' in runtime
-    assert '[int]$verified.pid -ne [int]$State.pid' in runtime
+    assert '$evidence.remote_completion -eq "CONTROLLED_STOP"' in runtime
+    assert '$evidence.reason -eq "RESOURCE_FLOOR"' in runtime
+    assert '$stopped.tree_exit_confirmed -eq $true' in runtime
+    assert '$stopped.listener_exit_confirmed -eq $true' in runtime
+    assert '[int]$verified.pid -eq [int]$State.pid' in runtime
+    assert 'if ($null -eq $binding)' in runtime
     assert 'controlled-stop receipt cannot be retired while execution may still exist' in runtime
     assert 'Move-Item -LiteralPath $StatePath -Destination $archive' in runtime
 
