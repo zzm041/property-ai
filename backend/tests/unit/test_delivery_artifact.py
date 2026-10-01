@@ -289,6 +289,7 @@ def test_delivery_ollama_restart_requires_exact_controlled_stop_evidence() -> No
     assert 'ollama-stale-receipt-resolution-20261002.json' in runtime
     assert '$resolution.semantics.historical_exit_mode -ne "UNKNOWN"' in runtime
     assert '$resolution.semantics.current_execution_absent -ne $true' in runtime
+    assert '$ragState.qwen_endpoint -ne "http://127.0.0.1:11438"' in runtime
 
 
 def test_delivery_rag_ollama_restart_requires_exact_stale_receipt_evidence() -> None:

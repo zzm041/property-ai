@@ -12,6 +12,7 @@ $RepoRoot = Split-Path -Parent $DeployDir
 $RuntimeDir = Join-Path $RepoRoot "tmp\delivery-ollama-runtime"
 $StatePath = Join-Path $RuntimeDir "current.json"
 $StartLockPath = Join-Path $RuntimeDir "start.lock"
+$RagAdapterStatePath = Join-Path $RepoRoot "tmp\delivery-rag-runtime\current.json"
 $RestartResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\ollama-0344-restart-resolution.json"
 $ExpectedRestartResolutionSha256 = "128943CB6C1B9CD653E1AB250B7D9D5330C2201184E2DA0B5399E3B4FB788317"
 $AuthorizedStaleResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\ollama-stale-receipt-resolution-20261002.json"
@@ -235,10 +236,14 @@ function Invoke-ResidentModelCount {
 }
 
 function Test-RagListener {
+    $listener = $false
     foreach ($line in (& netstat -ano -p TCP)) {
-        if ($line -match "^\s*TCP\s+127\.0\.0\.1:11436\s+\S+\s+LISTENING\s+\d+\s*$") { return $true }
+        if ($line -match "^\s*TCP\s+127\.0\.0\.1:11436\s+\S+\s+LISTENING\s+\d+\s*$") { $listener = $true; break }
     }
-    return $false
+    if (-not $listener) { return $false }
+    if (-not (Test-Path -LiteralPath $RagAdapterStatePath -PathType Leaf)) { return $true }
+    $ragState = Get-Content -Raw -LiteralPath $RagAdapterStatePath | ConvertFrom-Json
+    return [string]$ragState.qwen_endpoint -ne "http://127.0.0.1:11438"
 }
 
 switch ($Action) {
