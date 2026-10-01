@@ -14,11 +14,11 @@ $SecretPath = Join-Path $RuntimeDir "internal-token.txt"
 $ConfigPath = Join-Path $RuntimeDir "config.json"
 $CurrentPath = Join-Path $RuntimeDir "current.json"
 $OllamaCurrent = Join-Path $RepoRoot "tmp\delivery-ollama-runtime\current.json"
-$SourceCommit = "d9b3040b661eca84299ea2c9a729dc42d34b2724"
+$SourceCommit = "c6b9bef033a9ac29d81f38d4a2775a996b6582cc"
 $CandidateRoot = Join-Path $RuntimeDir "candidate-$SourceCommit"
 $AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
 $RuntimeControlPath = Join-Path $CandidateRoot "scripts\ops\local_ai_runtime_control.py"
-$ExpectedAdapterSha256 = "7CC015E5C96644D4502CD079336DBE9DF9B8EFC81730AD79090B4C28B4767FBF"
+$ExpectedAdapterSha256 = "AD2A56BF0B91382628DCE766F75E3B5FC48BE303E1CB40A75259891B3C037844"
 $ExpectedRuntimeControlSha256 = "CEA1B4AD6A5D2C12F70E233E28C791C86BC6EFDC5F2EA9864FDC022D57D13867"
 $ResolutionRoot = Join-Path $RepoRoot "reports"
 $ResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\call-001-resolution.json"
@@ -33,10 +33,17 @@ $ExpectedReplayResolutionSha256 = "1C7F62B016973A08398215B639094DF5B460D4F35C621
 $ExpectedReplayResolutionReviewSha256 = "51E64C808F978B642D7CD2368D923B82B635A819473F23D6A62B760A6B1A1BFB"
 $ExpectedReplayReservationSha256 = "4C196C2E93D029FF65036D3414BC02804EBEFC2A3AE7A847171C4245D9D76A71"
 $ExpectedReplayResultSha256 = "F34D19C9383FED33DE32535CBB48358D2F4C731AA537B349C767343C388FB5C4"
+$ContextReplayResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\call-013-replay-resolution-20261002.json"
+$ContextReplayResolutionReviewPath = Join-Path $RepoRoot "reports\codex\REAL-AI-INTEGRATION-027-CALL013-REPLAY-RESOLUTION-review.raw.json"
+$ExpectedContextReplayResolutionSha256 = "1666931B1C0F4C1F8FB7CC1F63FFCA810D4502535FAB90998D13DB512C3DB5FB"
+$ExpectedContextReplayResolutionReviewSha256 = "BF8D0AA58CE7D2F38797B0EBB37B61F9A70E00054ADBB40FE618A5CF28DFF5BA"
+$ExpectedContextReplayReservationSha256 = "57304CCA7754612CD7F93B2EAEB4568F69FE14D4675F145F16B64F7A2B1725CD"
+$ExpectedContextReplayResultSha256 = "CF966772B58D8E152211F4054F9F32FBAA8D1342688FFD1A657E5FC50C25D9E4"
 $PythonPath = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\bge-142-cpu\.venv\Scripts\python.exe"
 $AsrPython = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\asr-006-cpu\.venv\Scripts\python.exe"
 $ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models-hf"
 $ModelName = "qwen38-27b-q3km-g55:7af3b8f"
+$RuntimeModelName = "qwen38-27b-q3km-g55-ctx8192:7af3b8f"
 
 function Read-Token {
     if (-not (Test-Path -LiteralPath $SecretPath -PathType Leaf)) { return $null }
@@ -147,6 +154,17 @@ function Assert-Candidate {
             ((Get-FileHash -Algorithm SHA256 -LiteralPath $replayResult).Hash -ne $ExpectedReplayResultSha256)) {
         throw "reviewed call-008 replay binding mismatch"
     }
+    $contextReplayReservation = Join-Path $PrivateDir "call-013\reservation.json"
+    $contextReplayResult = Join-Path $PrivateDir "call-013\result.json"
+    foreach ($asset in @($ContextReplayResolutionPath,$ContextReplayResolutionReviewPath,$contextReplayReservation,$contextReplayResult)) {
+        if (-not (Test-Path -LiteralPath $asset -PathType Leaf)) { throw "reviewed call-013 replay asset is missing" }
+    }
+    if (((Get-FileHash -Algorithm SHA256 -LiteralPath $ContextReplayResolutionPath).Hash -ne $ExpectedContextReplayResolutionSha256) -or
+            ((Get-FileHash -Algorithm SHA256 -LiteralPath $ContextReplayResolutionReviewPath).Hash -ne $ExpectedContextReplayResolutionReviewSha256) -or
+            ((Get-FileHash -Algorithm SHA256 -LiteralPath $contextReplayReservation).Hash -ne $ExpectedContextReplayReservationSha256) -or
+            ((Get-FileHash -Algorithm SHA256 -LiteralPath $contextReplayResult).Hash -ne $ExpectedContextReplayResultSha256)) {
+        throw "reviewed call-013 replay binding mismatch"
+    }
 }
 
 function New-RuntimeBinding {
@@ -238,6 +256,14 @@ switch ($Action) {
                 resolution_sha256=$ExpectedReplayResolutionSha256
                 review_path=$ReplayResolutionReviewPath
                 review_sha256=$ExpectedReplayResolutionReviewSha256
+            },[ordered]@{
+                record="call-013"
+                reservation_sha256=$ExpectedContextReplayReservationSha256.ToLowerInvariant()
+                result_sha256=$ExpectedContextReplayResultSha256.ToLowerInvariant()
+                resolution_path=$ContextReplayResolutionPath
+                resolution_sha256=$ExpectedContextReplayResolutionSha256
+                review_path=$ContextReplayResolutionReviewPath
+                review_sha256=$ExpectedContextReplayResolutionReviewSha256
             })
             runtime_binding_path=$bindingPath
             runtime_binding_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $bindingPath).Hash.ToLowerInvariant()
@@ -246,12 +272,12 @@ switch ($Action) {
         $operationId=[guid]::NewGuid().ToString("N")
         $stdout=Join-Path $RuntimeDir "adapter-$operationId.stdout.log"
         $stderr=Join-Path $RuntimeDir "adapter-$operationId.stderr.log"
-        $oldToken=$env:LOCAL_AI_INTERNAL_TOKEN;$oldModel=$env:PROPERTY_AI_LOCAL_QWEN_MODEL
+        $oldToken=$env:LOCAL_AI_INTERNAL_TOKEN;$oldModel=$env:PROPERTY_AI_LOCAL_QWEN_MODEL;$oldRuntimeModel=$env:PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL
         try {
-            $env:LOCAL_AI_INTERNAL_TOKEN=$token;$env:PROPERTY_AI_LOCAL_QWEN_MODEL=$ModelName
+            $env:LOCAL_AI_INTERNAL_TOKEN=$token;$env:PROPERTY_AI_LOCAL_QWEN_MODEL=$ModelName;$env:PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL=$RuntimeModelName
             $launcher=Start-Process -FilePath $PythonPath -ArgumentList @("-I","-X","utf8",$AdapterPath,"serve","--config",$ConfigPath) -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
         } finally {
-            $env:LOCAL_AI_INTERNAL_TOKEN=$oldToken;$env:PROPERTY_AI_LOCAL_QWEN_MODEL=$oldModel
+            $env:LOCAL_AI_INTERNAL_TOKEN=$oldToken;$env:PROPERTY_AI_LOCAL_QWEN_MODEL=$oldModel;$env:PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL=$oldRuntimeModel
         }
         $deadline=[DateTime]::UtcNow.AddSeconds(15)
         do { Start-Sleep -Milliseconds 250;$listener=@(Get-Listener) } until ($listener.Count -eq 1 -or [DateTime]::UtcNow -ge $deadline)
@@ -270,7 +296,7 @@ switch ($Action) {
             runtime_binding_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $bindingPath).Hash
             token_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $SecretPath).Hash
             stdout=$stdout;stderr=$stderr
-            endpoint="http://127.0.0.1:11437";scope="work_order_only";models=$health.models;inference_on_start=$false
+            endpoint="http://127.0.0.1:11437";scope="work_order_only";models=$health.models;runtime_qwen_model=$RuntimeModelName;inference_on_start=$false
         }
         [IO.File]::WriteAllText($CurrentPath, ($state | ConvertTo-Json -Depth 6), [Text.UTF8Encoding]::new($false))
         $state | ConvertTo-Json -Depth 6
