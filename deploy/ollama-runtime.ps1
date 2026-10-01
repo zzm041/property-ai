@@ -104,7 +104,7 @@ function Retire-AuthorizedStaleReceipt([object]$State) {
     if (-not (Test-Path -LiteralPath $AuthorizedStaleResolutionPath -PathType Leaf)) { return $false }
     if ((Get-FileHash -Algorithm SHA256 -LiteralPath $AuthorizedStaleResolutionPath).Hash -ne $ExpectedAuthorizedStaleResolutionSha256) { return $false }
     $resolution = Get-Content -Raw -LiteralPath $AuthorizedStaleResolutionPath | ConvertFrom-Json
-    $currentPid = Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$State.pid)" -ErrorAction SilentlyContinue
+    $currentPid = Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$State.pid)" -ErrorAction Stop
     if (
         $resolution.format -ne "property-ai-local-runtime-stale-receipt-resolution-v1" -or
         $resolution.task_id -ne "REAL-AI-INTEGRATION-027" -or
