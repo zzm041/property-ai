@@ -275,8 +275,8 @@ Page({
 
   createVersion() {
     const selected = this.data.selected;
-    if (!selected || selected.status === "ARCHIVED") {
-      this.setData({ error: "请先选择未归档的知识文档" });
+    if (!selected) {
+      this.setData({ error: "请先选择知识文档" });
       return;
     }
     withLoading(this, () =>

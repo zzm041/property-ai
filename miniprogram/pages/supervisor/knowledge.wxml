@@ -50,7 +50,7 @@
   </view>
   <block wx:if="{{selected.status != 'ARCHIVED'}}">
     <textarea class="source-box" placeholder="新版本知识正文" value="{{versionSourceText}}" data-field="versionSourceText" bindinput="onField" />
-    <button class="btn" bindtap="createVersion">提交新版本导入</button>
+    <button class="btn" bindtap="createVersion">{{selected.status === 'ARCHIVED' ? '提交新版本并重新激活' : '提交新版本导入'}}</button>
     <button class="btn danger" bindtap="archive">归档文档</button>
   </block>
 </view>

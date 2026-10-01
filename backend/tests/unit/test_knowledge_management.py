@@ -6,7 +6,11 @@ import pytest
 from app.core.errors import AppError, IamErrorCode, KnowledgeErrorCode
 from app.domain.audit import AUDIT_ACTION_POLICIES, AuditAction, AuditResourceType
 from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
-from app.domain.knowledge import KNOWLEDGE_MANAGE
+from app.domain.knowledge import (
+    KNOWLEDGE_MANAGE,
+    KnowledgeDocumentStatus,
+    KnowledgeIngestionStatus,
+)
 from app.model.knowledge import KnowledgeDocument
 from app.repository.knowledge import KnowledgeRepository
 from app.service.knowledge import KnowledgeService
@@ -217,7 +221,7 @@ def test_archived_status_is_checked_only_after_authorization() -> None:
     assert exc_info.value.code == IamErrorCode.FORBIDDEN
 
 
-def test_archived_document_rejects_new_version() -> None:
+def test_archived_document_new_version_enters_reactivation_after_authorization() -> None:
     actor = _principal(OrganizationScope(ScopeType.TENANT, tenant_id=10))
     service, repository, _properties, _audit = _service(actor)
     repository.get_document_for_update.return_value = KnowledgeDocument(
@@ -232,17 +236,26 @@ def test_archived_document_rejects_new_version() -> None:
         created_by_user_id=actor.user_id,
     )
 
-    with pytest.raises(AppError) as exc_info:
-        service._create_version(
-            actor=actor,
-            document_id=71,
-            source_text="Should not be accepted.",
-            request_id="knowledge-version-archived",
-            claimed_tenant_id=10,
-            claimed_property_id=None,
-        )
+    repository.next_version_for_update.return_value = 2
+    repository.add_version.side_effect = lambda item: item
+    repository.add_job.side_effect = lambda item: item
 
-    assert exc_info.value.code == KnowledgeErrorCode.ARCHIVED
+    version, job = service._create_version(
+        actor=actor,
+        document_id=71,
+        source_text="A reviewed replacement version.",
+        request_id="knowledge-version-archived",
+        claimed_tenant_id=10,
+        claimed_property_id=None,
+    )
+
+    document = repository.get_document_for_update.return_value
+    assert document.status == KnowledgeDocumentStatus.DRAFT.value
+    assert document.current_version == 1
+    assert version.version == 2
+    assert job.status == KnowledgeIngestionStatus.PENDING.value
+    audit_details = _audit.append.call_args.kwargs["details"]
+    assert audit_details["reactivating_archived"] is True
 
 
 def test_repository_filters_authorized_targets_before_limit() -> None:

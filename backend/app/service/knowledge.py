@@ -678,12 +678,7 @@ class KnowledgeService:
         )
         scope = self._document_scope(document)
         RbacService.require_permission(current, KNOWLEDGE_MANAGE, scope)
-        if document.status == KnowledgeDocumentStatus.ARCHIVED.value:
-            raise AppError(
-                code=KnowledgeErrorCode.ARCHIVED,
-                message="Archived knowledge document cannot receive a new version",
-                status_code=409,
-            )
+        reactivating_archived = document.status == KnowledgeDocumentStatus.ARCHIVED.value
         try:
             text = self._parser.parse(filename=None, content=source_text)
         except KnowledgeParseError as exc:
@@ -716,6 +711,11 @@ class KnowledgeService:
                 status=KnowledgeIngestionStatus.PENDING.value,
             )
         )
+        if reactivating_archived:
+            # Keep the archived version/history intact while making the new
+            # ingestion eligible. Retrieval still excludes this DRAFT until
+            # the worker atomically activates the new version.
+            document.status = KnowledgeDocumentStatus.DRAFT.value
         if self._settings.durable_tasks_enabled:
             from app.service.task_intent import INGEST, register_intent
             register_intent(self._session, operation=INGEST, resource=job, request_id=request_id)
@@ -732,6 +732,7 @@ class KnowledgeService:
                 "document_id": document.id,
                 "version": version_row.version,
                 "content_hash": version_row.content_hash,
+                "reactivating_archived": reactivating_archived,
             },
         )
         return version_row, job
