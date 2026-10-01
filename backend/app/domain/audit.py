@@ -692,7 +692,9 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
         ),
         AuditAction.KNOWLEDGE_DOCUMENT_VERSION_CREATED: AuditActionPolicy(
             resource_type=AuditResourceType.KNOWLEDGE_DOCUMENT,
-            allowed_detail_keys=frozenset({"document_id", "version", "content_hash"}),
+            allowed_detail_keys=frozenset(
+                {"document_id", "version", "content_hash", "reactivating_archived"}
+            ),
             required_detail_keys=frozenset({"document_id", "version", "content_hash"}),
             allowed_scope_types=frozenset({ScopeType.TENANT, ScopeType.PROPERTY}),
         ),

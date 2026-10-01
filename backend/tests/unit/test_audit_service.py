@@ -76,6 +76,31 @@ def test_wechat_auth_audit_allows_wechat_method() -> None:
     session.commit.assert_not_called()
 
 
+def test_knowledge_version_audit_allows_archived_reactivation_marker() -> None:
+    service, session, repository = _service()
+
+    result = service.append(
+        action=AuditAction.KNOWLEDGE_DOCUMENT_VERSION_CREATED,
+        resource_type=AuditResourceType.KNOWLEDGE_DOCUMENT,
+        actor_user_id=11,
+        resource_id=71,
+        request_id="knowledge-reactivation-audit",
+        scope_type=ScopeType.PROPERTY,
+        tenant_id=1,
+        property_id=2,
+        details={
+            "document_id": 71,
+            "version": 3,
+            "content_hash": "a" * 64,
+            "reactivating_archived": True,
+        },
+    )
+
+    assert result.details_json["reactivating_archived"] is True
+    repository.append.assert_called_once_with(result)
+    session.commit.assert_not_called()
+
+
 @pytest.mark.parametrize("request_id", ["", " ", "\n", "x" * 129])
 def test_request_id_is_required_and_bounded(request_id: str) -> None:
     service, _, repository = _service()
