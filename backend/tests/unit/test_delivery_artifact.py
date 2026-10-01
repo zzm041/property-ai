@@ -231,7 +231,7 @@ def test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded() -> Non
     assert 'adapter-$operationId.stdout.log' in runtime and 'adapter-$operationId.stderr.log' in runtime
     assert '__SOURCE_COMMIT__' not in runtime and '__ADAPTER_SHA256__' not in runtime
     assert 'AD2A56BF0B91382628DCE766F75E3B5FC48BE303E1CB40A75259891B3C037844' in runtime
-    assert 'c6b9bef033a9ac29d81f38d4a2775a996b6582cc' in runtime
+    assert 'c6b9befe36d38300e000a73a86d311af249389f4' in runtime
     assert 'call-001-resolution.json' in runtime
     assert 'call-008-replay-resolution-20261002.json' in runtime
     assert 'REAL-AI-INTEGRATION-027-CALL008-REPLAY-RESOLUTION-review.raw.json' in runtime
