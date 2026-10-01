@@ -1,0 +1,63 @@
+{
+  "format": "property-ai-model-call-resolution-v1",
+  "task_id": "REAL-AI-INTEGRATION-027-DELIVERY-AUTO",
+  "run_id": "delivery-auto-702c3db745",
+  "record": "call-014",
+  "created_at": "2026-10-02T04:56:22+08:00",
+  "authorization": "Owner-approved bounded saved-input replay after an ordinary runtime implementation defect is proven and fixed.",
+  "original": {
+    "status": "FAILED",
+    "reason": "INFERENCE_TIMEOUT",
+    "historical_immediate_exit_confirmed": "UNKNOWN",
+    "remote_completion": "CONTROLLED_STOP",
+    "owned_exit_confirmed": true,
+    "model": "qwen38-27b-q3km-g55:7af3b8f",
+    "input_hash": "ff48437886db364bfb46351239ed04dc263cb779b39c8f9a4b5b0a9c043617cd",
+    "reservation_sha256": "B3E80EDF54F006F2C18A10756151303494885492D9B95978D230E382A1A4C477",
+    "result_sha256": "99CEDBDEBD63523CACB40267B58008AB0B921A8CA6987A8A98AA781EA8165B88",
+    "input_sha256": "66E0FCD7ACD79107918C4C4D0B27F1FAA23BE1022E1EBA3E07BAFDEC070F36EE",
+    "stdout_sha256": "AF17BB0BD0C6A868F58725B53F2A4C526780E9B4BB7CB27E2898ACFEE9D22573",
+    "stderr_sha256": "186E8E0448819E7E7E988471E5025FDCE139D924442EDB93B432F8085A95FA5A",
+    "replay_of": "call-013",
+    "total_seconds": 65.25
+  },
+  "current_execution": {
+    "currently_executing": false,
+    "owned_child_exit_confirmed": true,
+    "remote_tree_exit_confirmed": true,
+    "listener_exit_confirmed": true,
+    "meaning": "The request and its receipt-bound Ollama process are confirmed stopped; no semantic output was accepted."
+  },
+  "diagnosis": {
+    "actual_slot_context": 8192,
+    "prompt_tokens": 4172,
+    "previous_context_mismatch_reproduced": false,
+    "response_completed_before_client_timeout": false,
+    "root_cause": "The adapter imposed a 60-second Qwen client and inference-phase limit although this approved 27B candidate permits up to 180 seconds per request.",
+    "semantic_output_produced": false,
+    "resource_floor_crossed": false
+  },
+  "fixed_runtime": {
+    "source_commit": "2e4c4ba34d67f599c39be95112100a2ce71ffc63",
+    "logical_model": "qwen38-27b-q3km-g55:7af3b8f",
+    "runtime_model": "qwen38-27b-q3km-g55-ctx8192:7af3b8f",
+    "inference_timeout_seconds": 180,
+    "context_length": 8192,
+    "resource_floors_changed": false
+  },
+  "explicit_same_input_replay": {
+    "authorized": true,
+    "maximum_replays_for_original_record": 1,
+    "counts_against_new_qwen_limit": true,
+    "counts_against_new_model_seconds_limit": true,
+    "requires_exact_input_hash": true,
+    "requires_fixed_runtime_identity": true
+  },
+  "boundaries": {
+    "historical_result_rewritten": false,
+    "work_order_recovered_or_modified": false,
+    "new_work_order_created": false,
+    "unknown_barrier_relaxed": false,
+    "model_or_weights_changed": false
+  }
+}

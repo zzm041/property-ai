@@ -1,0 +1,44 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-CALL014-REPLAY-RESOLUTION",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_sha": "2e4c4ba34d67f599c39be95112100a2ce71ffc63",
+  "verdict": "PASS_SCOPED_CALL_RESOLUTION",
+  "resolution_sha256": "4F2648EE0FA0D2371E02D6862C7E7B3D310B1938ED70E751C040C704D624AF34",
+  "source_hashes": {
+    "adapter_workspace_sha256": "D097713C5D5E18668F2E54BD312FEA88FCB9E5B2D82CC4285CDED41DF91997FA",
+    "adapter_git_archive_sha256": "E67FCAD3B8DC8DD542A351562142698129DD86936C644E9178C8978EE0978C3B",
+    "test_local_ai_http_027_sha256": "8E1FF45D54C1DFD3B0E94B9DDC75327C253FFA3AFB90EAB8A232A8DB30E6D8EE"
+  },
+  "findings": [],
+  "closed_findings": [
+    {
+      "id": "CALL014-R1-01",
+      "status": "CLOSED",
+      "evidence": "The resolution now uses literal UNKNOWN as required by the parser; current_execution separately records current non-execution and exit evidence. Original hashes remain unchanged."
+    },
+    {
+      "id": "CALL014-R1-02",
+      "status": "CLOSED",
+      "evidence": "The 180-second limit applies only to the exact g55 logical model plus ctx8192 runtime alias and kind=qwen. Other Qwen combinations and ASR/embedding/reranker remain at 60 seconds."
+    }
+  ],
+  "checked_evidence": [
+    "Read the exact 2e4c4ba source and test diff; no additional uncommitted changes existed in those files.",
+    "Computed the adapter hash from git archive bytes and confirmed E67FCAD3B8DC8DD542A351562142698129DD86936C644E9178C8978EE0978C3B.",
+    "Retained same-round evidence that call-014 replayed the call-013 input at actual context 8192 with 4172 prompt tokens, then hit the old 60-second timeout and produced no semantic result.",
+    "The original result remains FAILED/INFERENCE_TIMEOUT/CONTROLLED_STOP at 65.25 seconds, with saved minimum RAM 5527 MiB and GPU 2076 MiB above the fixed floors.",
+    "The fix did not change the unique-child replay chain, cumulative ledger, exact hashes, or new-UNKNOWN barrier."
+  ],
+  "tests_evidence": {
+    "implementer_report": "88 passed, 1 warning",
+    "reviewer_action": "Read test source only; did not independently run tests."
+  },
+  "boundaries": [
+    "This verdict supersedes the pre-fix snapshot's current blocker while retaining its finding history.",
+    "Reviewer did not modify files or run model, UI, business, database, queue, or process operations.",
+    "No new live process check was performed by the reviewer; the main implementer must repeat identity, idle, resource, and budget checks before replay.",
+    "The 180-second fix has not yet passed a new real inference and does not prove semantic quality.",
+    "No VLM business closure, AUTO, complete local delivery, or Production conclusion is made."
+  ],
+  "next_action": "Bind this review and resolution, load the 2e4c4ba archive with the specified 8192 alias, then execute exactly one approved same-input replay under the existing cumulative ledger. A new UNKNOWN must stop the branch."
+}
