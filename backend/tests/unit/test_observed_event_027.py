@@ -466,6 +466,19 @@ def test_frequency_clause_carries_the_unique_immediately_prior_subject():
     assert trace["effective_observations"][0]["subject"] == "排水接头"
 
 
+def test_valve_operating_resistance_does_not_support_invented_looseness():
+    text = "卫生间阀门开关费力且有少量渗水。"
+    value = payload(text, label="松动", subject="阀门管道")
+    with pytest.raises(ValueError, match="Evidence does not support observable label"):
+        bind(value, report=text)
+
+
+def test_explicit_valve_looseness_remains_supported():
+    text = "卫生间阀门已经松动，并有少量渗水。"
+    _, trace = bind(payload(text, label="松动", subject="阀门管道"), report=text)
+    assert trace["effective_observations"][0]["label"] == "松动"
+
+
 @pytest.mark.parametrize(("text", "label", "subject"), [
     ("插座刚才有一缕烟，现在没有了。", "现象待核实", "插座"),
     ("厨房进水软管裂开，水一直喷出。", "滴渗水", "阀门管道"),

@@ -1,0 +1,34 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "scope": "saved WO7 failure root cause and bounded replay preparation",
+  "source_before": "c4ce563d08d39a957fb85436c31b2126552b0348",
+  "root_causes": [
+    {
+      "stage": "VLM pre-reservation",
+      "code": "FAILED_INPUT_NO_AUTOMATIC_MODEL_RETRY",
+      "evidence": "call-008 remained a controlled FAILED request without an active immutable reviewed replay binding; generations 4 and 5 created no VLM reservation"
+    },
+    {
+      "stage": "aggregate LLM semantic validation",
+      "code": "AI.INVALID_OUTPUT",
+      "evidence": "the saved report said the valve was difficult to operate, while the saved raw model output added an unsupported looseness observation"
+    }
+  ],
+  "fix": {
+    "prompt_version": "wo-analysis-v14-resistance-not-looseness",
+    "policy": "operating resistance does not support looseness unless current evidence explicitly states looseness",
+    "validator_relaxed": false,
+    "historical_result_rewritten": false
+  },
+  "focused_test": {
+    "files": [
+      "backend/tests/unit/test_ai_analysis_input.py",
+      "backend/tests/unit/test_observed_event_027.py",
+      "backend/tests/unit/test_local_ai_http_027.py"
+    ],
+    "result": "176 passed, 1 warning",
+    "warning": "existing pytest-asyncio default fixture loop scope deprecation"
+  },
+  "model_calls": 0,
+  "business_writes": 0
+}

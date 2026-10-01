@@ -1,0 +1,64 @@
+{
+  "format": "property-ai-model-call-resolution-v1",
+  "task_id": "REAL-AI-INTEGRATION-027-DELIVERY-AUTO",
+  "run_id": "delivery-auto-702c3db745",
+  "record": "call-008",
+  "created_at": "2026-10-02T04:20:23.6780846+08:00",
+  "authorization": "Owner-approved bounded replay of the saved failed input in the 2026-10-02 continuation package.",
+  "original": {
+    "status": "FAILED",
+    "reason": "REMOTE_CLIENT_FAILED",
+    "historical_immediate_exit_confirmed": "UNKNOWN",
+    "remote_completion": "CONTROLLED_STOP",
+    "owned_exit_confirmed": true,
+    "model": "qwen38-27b-q3km-g55:7af3b8f",
+    "input_hash": "ff48437886db364bfb46351239ed04dc263cb779b39c8f9a4b5b0a9c043617cd",
+    "reservation_sha256": "4C196C2E93D029FF65036D3414BC02804EBEFC2A3AE7A847171C4245D9D76A71",
+    "result_sha256": "F34D19C9383FED33DE32535CBB48358D2F4C731AA537B349C767343C388FB5C4",
+    "input_sha256": "66E0FCD7ACD79107918C4C4D0B27F1FAA23BE1022E1EBA3E07BAFDEC070F36EE",
+    "stdout_sha256": "6B50A35BEC2397020A91BA39C7E574158173B131FA8E098D0422CF8856A07A2B",
+    "stderr_sha256": "A4DA3605F949C08E31150A542B6C8882CBA1A4B0FBEF90F536249214B8CED917",
+    "minimum_ram_free_mib": 11595,
+    "minimum_gpu_free_mib": 2801
+  },
+  "diagnosis": {
+    "later_failed_generations": [4, 5],
+    "later_intent_ids": [35, 36],
+    "pre_reservation_stage": "BUDGET_AND_LEDGER",
+    "pre_reservation_reason": "BUDGET_REJECTED",
+    "rejected_input_sha256": "ff48437886db364bfb46351239ed04dc263cb779b39c8f9a4b5b0a9c043617cd",
+    "reservation_created": false,
+    "root_cause": "The same VLM input was blocked by FAILED_INPUT_NO_AUTOMATIC_MODEL_RETRY because call-008 had no immutable reviewed same-input replay binding in the active adapter configuration.",
+    "aggregate_llm_boundary": "Calls 011 and 012 returned valid JSON from report-only evidence; they do not repair or replace the missing VLM result."
+  },
+  "current_execution": {
+    "currently_executing": false,
+    "historical_pids_checked_absent": [11896, 13488, 26264, 30432, 30760],
+    "work_adapter_endpoint": "127.0.0.1:11437",
+    "work_adapter_source_commit": "caa2d21594bb7b78f2dc01e6bdfacc408161ec58",
+    "work_adapter_request_active": false,
+    "work_adapter_reservation_gate": "READY",
+    "ollama_endpoint": "127.0.0.1:11435",
+    "ollama_operation_id": "229c584f62d742a6bc6860bbe9e4c367",
+    "ollama_pid": 46624,
+    "ollama_context_length": 8192,
+    "evidence_meaning": "The historical call remains FAILED. Current evidence confirms only that its exact child and stopped runtime tree no longer execute and the replacement runtime is idle/ready."
+  },
+  "explicit_same_input_replay": {
+    "authorized": true,
+    "maximum_replays_for_original_record": 1,
+    "counts_against_new_qwen_limit": true,
+    "counts_against_new_model_seconds_limit": true,
+    "requires_existing_resource_guards": true,
+    "requires_exact_input_hash": true,
+    "reason": "Reproduce the saved VLM input once under the fixed 8192 runtime and preserve the new raw result without rewriting call-008 or WO7."
+  },
+  "boundaries": {
+    "historical_result_rewritten": false,
+    "work_order_recovered_or_modified": false,
+    "new_work_order_created": false,
+    "model_request_executed_by_this_record": false,
+    "unknown_barrier_relaxed": false,
+    "resource_floors_changed": false
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-CALL008-REPLAY-RESOLUTION",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_sha": "c4ce563d08d39a957fb85436c31b2126552b0348",
+  "verdict": "PASS_SCOPED_CALL_RESOLUTION",
+  "resolution_sha256": "1C7F62B016973A08398215B639094DF5B460D4F35C621632F06A407585DE801E",
+  "findings": [],
+  "verified": [
+    {"scope": "原始证据绑定", "evidence": "实际读取call-008的reservation、result、input、stdout和stderr，并核对五项SHA256均与解除记录一致。原结果仍为FAILED / REMOTE_CLIENT_FAILED / CONTROLLED_STOP，owned_exit_confirmed=true；stderr保存HTTP400，stdout没有成功模型答案。"},
+    {"scope": "精确同输入", "evidence": "按适配器相同的JSON规范化方式只读重算输入哈希，结果为ff48437886db364bfb46351239ed04dc263cb779b39c8f9a4b5b0a9c043617cd，与原reservation及解除记录一致。输入为同一模型、repair_photo_insight协议、245字符文本及一张图片，未回显正文或图片数据。"},
+    {"scope": "失败与退出语义", "evidence": "解除记录没有把call-008改为SUCCESS。历史即时退出仍标UNKNOWN，与随后已有证据确认的受控停止分开表达；原结果保留精确远端身份、四进程树、taskkill成功和树/监听退出确认。round6审查只支持该精确停止证据，不是模型成功。"},
+    {"scope": "后续预约前拒绝", "evidence": "实际读取两条pre-reservation-failures记录，均为同一输入哈希、BUDGET_AND_LEDGER / BUDGET_REJECTED，reservation_created=false。当前reserve逻辑在同输入已有失败且缺少有效解除绑定时抛出FAILED_INPUT_NO_AUTOMATIC_MODEL_RETRY，符合这两条记录。"},
+    {"scope": "独立审查与漂移阻断", "evidence": "_resolution同时核对实际reservation/result、配置中的原始哈希、解除记录与独立review文件哈希，并要求review verdict精确为PASS_SCOPED_CALL_RESOLUTION且绑定相同resolution_sha256。原记录、解除记录或审查收据漂移均拒绝。"},
+    {"scope": "一次复验与预算", "evidence": "reserve只对匹配原kind和input_hash的失败记录启用解除；新预约写replay_of=call-008，已有该replay_of后再次同输入请求被拒绝。复验仍经过原调用次数、累计时间及资源守卫，没有免费预约或预算清零分支。"},
+    {"scope": "新增UNKNOWN", "evidence": "共享completion-unknown屏障优先阻断；其他未完成预约或未获精确解除的UNKNOWN仍阻断。call-008解除不会覆盖新请求或其他记录的UNKNOWN。"}
+  ],
+  "unverified": [
+    "当前PID不存在、替代运行实例空闲及request_active=false属于解除记录中的实施方采集声明；本审查没有执行实时进程或HTTP检查。它们不能追认历史即时退出。",
+    "两条预约前拒绝记录没有业务intent或generation标识，且request_binding_sha256为空；将其对应generation4/5、intent35/36仍依赖实施方说明，不能称独立完成了DB绑定核验。",
+    "本次只审解除记录，尚未核对其加入实际启动配置后的加载收据，也未核对新批次具体剩余额度。",
+    "未运行测试、模型、页面、业务、数据库或队列操作，未修改文件；仅进行了文件读取、哈希及规范化输入计算。",
+    "未验证复验结果，未证明图像AUTO、工单恢复、Assignment或完整交付通过。"
+  ],
+  "next_action": "保存本JSON并将其实际文件哈希与本解除记录精确绑定；加载前重新确认运行身份、空闲状态、共享屏障及本批预算。仅按负责人已批准范围执行一次保存输入的只读模型复验，保留新原始结果并计费量入账；不得修改call-008、恢复WO7、创建新工单或自动追加第二次调用。"
+}

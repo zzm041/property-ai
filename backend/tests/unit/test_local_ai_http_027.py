@@ -252,7 +252,7 @@ def test_scoped_runtime_uses_cumulative_execution_not_elapsed_wall_clock(tmp_pat
 def test_scoped_runtime_applies_external_usage_baseline_to_same_total_budget(tmp_path,monkeypatch):
     config={
         'private':str(tmp_path/'run'),'host':'127.0.0.1','port':11436,
-        'limits':{'asr':2,'embedding':12,'reranker':8,'qwen':120},
+        'limits':{'asr':6,'embedding':12,'reranker':8,'qwen':120},
         'call_baseline':{'asr':1,'embedding':6,'reranker':2,'qwen':46},
         'duration_seconds':7200,'duration_baseline_seconds':535.483,
     }
@@ -289,7 +289,7 @@ def test_drain_atomically_blocks_new_admission_without_disturbing_active_request
 
 @pytest.mark.parametrize('bad', [
     {'scope': 'work_order_only'},
-    {'limits': {'asr': 2, 'embedding': 12, 'reranker': 8, 'qwen': 121}},
+    {'limits': {'asr': 6, 'embedding': 12, 'reranker': 8, 'qwen': 121}},
     {'duration_seconds': 7201},
     {'call_baseline': {'asr': 0, 'embedding': 0, 'reranker': 0, 'qwen': 121}},
     {'duration_baseline_seconds': 7200},
@@ -575,9 +575,10 @@ def test_append_only_budget_survives_restart_and_reserves_before_load(tmp_path):
     r=runner(tmp_path);folder,_=r.reserve('asr')
     with pytest.raises(RuntimeError,match='COMPLETION_UNKNOWN'):m.Runner(r.path).reserve('embedding')
     m.save(folder/'result.json',{'status':'FAILED','owned_exit_confirmed':True,'total_seconds':1.0})
-    second,_=m.Runner(r.path).reserve('asr','second')
-    m.save(second/'result.json',{'status':'FAILED','owned_exit_confirmed':True,'total_seconds':1.0})
-    with pytest.raises(RuntimeError,match='CALL_LIMIT'):m.Runner(r.path).reserve('asr','third')
+    for number in range(2, 7):
+        next_call,_=m.Runner(r.path).reserve('asr',f'input-{number}')
+        m.save(next_call/'result.json',{'status':'FAILED','owned_exit_confirmed':True,'total_seconds':1.0})
+    with pytest.raises(RuntimeError,match='CALL_LIMIT'):m.Runner(r.path).reserve('asr','input-7')
 
 def test_total_window_is_not_reset_by_another_model(tmp_path,monkeypatch):
     r=runner(tmp_path);monkeypatch.setattr(m.time,'time',lambda:100.)
