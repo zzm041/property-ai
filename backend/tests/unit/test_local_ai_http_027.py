@@ -2,6 +2,7 @@
 import importlib.util
 import base64
 import hashlib
+import inspect
 import json
 from pathlib import Path
 from types import SimpleNamespace
@@ -51,6 +52,7 @@ def test_only_explicit_reviewed_qwen_candidates_can_configure_adapter(monkeypatc
     assert current.DIGEST=='eb18a122286f7a67d36dc8129f9caa1c0f7bb8449d7669a79e3ecb3d81289e0c'
     assert current.QWEN_RUNTIME_VERSION=='0.34.4'
     assert current.QWEN_CONTEXT_LENGTH==8192
+    assert current.QWEN_INFERENCE_TIMEOUT_SECONDS==180
     bounded=_load_adapter_candidate(
         monkeypatch,'qwen38-27b-q3km-g55:7af3b8f','qwen38-27b-q3km-g55-ctx8192:7af3b8f'
     )
@@ -95,6 +97,29 @@ def test_runtime_alias_keeps_the_stable_api_model_and_binds_actual_8192_residenc
     monkeypatch.setattr(candidate,'gpu',lambda:4000)
     candidate.qwen_guard()
     assert candidate.MODELS['qwen']=='qwen38-27b-q3km-g55:7af3b8f'
+
+
+def test_qwen_child_uses_the_approved_bounded_180_second_runtime_timeout(tmp_path,monkeypatch,capsys):
+    candidate=_load_adapter_candidate(
+        monkeypatch,'qwen38-27b-q3km-g55:7af3b8f','qwen38-27b-q3km-g55-ctx8192:7af3b8f'
+    )
+    config=tmp_path/'config.json';input_path=tmp_path/'input.json';captured={}
+    config.write_text(json.dumps({'private':str(tmp_path)}),encoding='utf-8')
+    input_path.write_text(json.dumps({'kind':'qwen','value':{'model':'qwen38-27b-q3km-g55:7af3b8f'}}),encoding='utf-8')
+    monkeypatch.setattr(candidate,'join_request_job',lambda _name:None)
+    monkeypatch.setattr(candidate,'validate',lambda _kind,_value:None)
+    monkeypatch.setattr(candidate,'offline',lambda _path:None)
+    def direct(path,body=None,timeout=3):
+        captured.update(path=path,body=body,timeout=timeout)
+        return {'choices':[]}
+    monkeypatch.setattr(candidate,'direct',direct)
+    candidate.child(config,input_path,'Local\\bounded-timeout-test')
+    assert captured['path']=='/v1/chat/completions'
+    assert captured['body']['model']=='qwen38-27b-q3km-g55-ctx8192:7af3b8f'
+    assert captured['timeout']==180
+    assert candidate.QWEN_INFERENCE_TIMEOUT_SECONDS==180
+    assert 'QWEN_INFERENCE_TIMEOUT_SECONDS' in inspect.getsource(candidate.Runner.run)
+    capsys.readouterr()
 
 
 def test_qwen38_residency_guard_rejects_old_4096_context(monkeypatch):
