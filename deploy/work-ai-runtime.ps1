@@ -14,11 +14,11 @@ $SecretPath = Join-Path $RuntimeDir "internal-token.txt"
 $ConfigPath = Join-Path $RuntimeDir "config.json"
 $CurrentPath = Join-Path $RuntimeDir "current.json"
 $OllamaCurrent = Join-Path $RepoRoot "tmp\delivery-ollama-runtime\current.json"
-$SourceCommit = "c6b9befe36d38300e000a73a86d311af249389f4"
+$SourceCommit = "2e4c4ba34d67f599c39be95112100a2ce71ffc63"
 $CandidateRoot = Join-Path $RuntimeDir "candidate-$SourceCommit"
 $AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
 $RuntimeControlPath = Join-Path $CandidateRoot "scripts\ops\local_ai_runtime_control.py"
-$ExpectedAdapterSha256 = "AD2A56BF0B91382628DCE766F75E3B5FC48BE303E1CB40A75259891B3C037844"
+$ExpectedAdapterSha256 = "E67FCAD3B8DC8DD542A351562142698129DD86936C644E9178C8978EE0978C3B"
 $ExpectedRuntimeControlSha256 = "CEA1B4AD6A5D2C12F70E233E28C791C86BC6EFDC5F2EA9864FDC022D57D13867"
 $ResolutionRoot = Join-Path $RepoRoot "reports"
 $ResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\call-001-resolution.json"
@@ -39,6 +39,12 @@ $ExpectedContextReplayResolutionSha256 = "1666931B1C0F4C1F8FB7CC1F63FFCA810D4502
 $ExpectedContextReplayResolutionReviewSha256 = "BF8D0AA58CE7D2F38797B0EBB37B61F9A70E00054ADBB40FE618A5CF28DFF5BA"
 $ExpectedContextReplayReservationSha256 = "57304CCA7754612CD7F93B2EAEB4568F69FE14D4675F145F16B64F7A2B1725CD"
 $ExpectedContextReplayResultSha256 = "CF966772B58D8E152211F4054F9F32FBAA8D1342688FFD1A657E5FC50C25D9E4"
+$TimeoutReplayResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\call-014-replay-resolution-20261002.json"
+$TimeoutReplayResolutionReviewPath = Join-Path $RepoRoot "reports\codex\REAL-AI-INTEGRATION-027-CALL014-REPLAY-RESOLUTION-review.raw.json"
+$ExpectedTimeoutReplayResolutionSha256 = "4F2648EE0FA0D2371E02D6862C7E7B3D310B1938ED70E751C040C704D624AF34"
+$ExpectedTimeoutReplayResolutionReviewSha256 = "E774E08E910B772BAD0BA80FF0B6DAA31ED41CED8926090A3F94E9900F8539A6"
+$ExpectedTimeoutReplayReservationSha256 = "B3E80EDF54F006F2C18A10756151303494885492D9B95978D230E382A1A4C477"
+$ExpectedTimeoutReplayResultSha256 = "99CEDBDEBD63523CACB40267B58008AB0B921A8CA6987A8A98AA781EA8165B88"
 $PythonPath = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\bge-142-cpu\.venv\Scripts\python.exe"
 $AsrPython = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\asr-006-cpu\.venv\Scripts\python.exe"
 $ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models-hf"
@@ -165,6 +171,17 @@ function Assert-Candidate {
             ((Get-FileHash -Algorithm SHA256 -LiteralPath $contextReplayResult).Hash -ne $ExpectedContextReplayResultSha256)) {
         throw "reviewed call-013 replay binding mismatch"
     }
+    $timeoutReplayReservation = Join-Path $PrivateDir "call-014\reservation.json"
+    $timeoutReplayResult = Join-Path $PrivateDir "call-014\result.json"
+    foreach ($asset in @($TimeoutReplayResolutionPath,$TimeoutReplayResolutionReviewPath,$timeoutReplayReservation,$timeoutReplayResult)) {
+        if (-not (Test-Path -LiteralPath $asset -PathType Leaf)) { throw "reviewed call-014 replay asset is missing" }
+    }
+    if (((Get-FileHash -Algorithm SHA256 -LiteralPath $TimeoutReplayResolutionPath).Hash -ne $ExpectedTimeoutReplayResolutionSha256) -or
+            ((Get-FileHash -Algorithm SHA256 -LiteralPath $TimeoutReplayResolutionReviewPath).Hash -ne $ExpectedTimeoutReplayResolutionReviewSha256) -or
+            ((Get-FileHash -Algorithm SHA256 -LiteralPath $timeoutReplayReservation).Hash -ne $ExpectedTimeoutReplayReservationSha256) -or
+            ((Get-FileHash -Algorithm SHA256 -LiteralPath $timeoutReplayResult).Hash -ne $ExpectedTimeoutReplayResultSha256)) {
+        throw "reviewed call-014 replay binding mismatch"
+    }
 }
 
 function New-RuntimeBinding {
@@ -264,6 +281,14 @@ switch ($Action) {
                 resolution_sha256=$ExpectedContextReplayResolutionSha256
                 review_path=$ContextReplayResolutionReviewPath
                 review_sha256=$ExpectedContextReplayResolutionReviewSha256
+            },[ordered]@{
+                record="call-014"
+                reservation_sha256=$ExpectedTimeoutReplayReservationSha256.ToLowerInvariant()
+                result_sha256=$ExpectedTimeoutReplayResultSha256.ToLowerInvariant()
+                resolution_path=$TimeoutReplayResolutionPath
+                resolution_sha256=$ExpectedTimeoutReplayResolutionSha256
+                review_path=$TimeoutReplayResolutionReviewPath
+                review_sha256=$ExpectedTimeoutReplayResolutionReviewSha256
             })
             runtime_binding_path=$bindingPath
             runtime_binding_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $bindingPath).Hash.ToLowerInvariant()

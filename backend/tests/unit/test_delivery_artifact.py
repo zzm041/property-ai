@@ -230,13 +230,15 @@ def test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded() -> Non
     assert 'git -C $RepoRoot archive' in runtime
     assert 'adapter-$operationId.stdout.log' in runtime and 'adapter-$operationId.stderr.log' in runtime
     assert '__SOURCE_COMMIT__' not in runtime and '__ADAPTER_SHA256__' not in runtime
-    assert 'AD2A56BF0B91382628DCE766F75E3B5FC48BE303E1CB40A75259891B3C037844' in runtime
-    assert 'c6b9befe36d38300e000a73a86d311af249389f4' in runtime
+    assert 'E67FCAD3B8DC8DD542A351562142698129DD86936C644E9178C8978EE0978C3B' in runtime
+    assert '2e4c4ba34d67f599c39be95112100a2ce71ffc63' in runtime
     assert 'call-001-resolution.json' in runtime
     assert 'call-008-replay-resolution-20261002.json' in runtime
     assert 'REAL-AI-INTEGRATION-027-CALL008-REPLAY-RESOLUTION-review.raw.json' in runtime
     assert 'call-013-replay-resolution-20261002.json' in runtime
     assert 'REAL-AI-INTEGRATION-027-CALL013-REPLAY-RESOLUTION-review.raw.json' in runtime
+    assert 'call-014-replay-resolution-20261002.json' in runtime
+    assert 'REAL-AI-INTEGRATION-027-CALL014-REPLAY-RESOLUTION-review.raw.json' in runtime
     assert 'PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL' in runtime
     assert 'qwen38-27b-q3km-g55-ctx8192:7af3b8f' in runtime
     assert 'resolution_root=$ResolutionRoot' in runtime
@@ -265,6 +267,7 @@ def test_delivery_ollama_restart_requires_exact_controlled_stop_evidence() -> No
     assert 'function Retire-RebootedReceipt' in runtime
     assert 'ollama-0344-restart-resolution.json' in runtime
     assert 'CF966772B58D8E152211F4054F9F32FBAA8D1342688FFD1A657E5FC50C25D9E4' in runtime
+    assert '99CEDBDEBD63523CACB40267B58008AB0B921A8CA6987A8A98AA781EA8165B88' in runtime
     assert '128943CB6C1B9CD653E1AB250B7D9D5330C2201184E2DA0B5399E3B4FB788317' in runtime
     assert '$recordedBoot -le $recordedStart' in runtime
     assert '$null -ne $currentPid' in runtime
