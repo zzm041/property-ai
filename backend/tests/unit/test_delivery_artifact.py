@@ -300,6 +300,13 @@ def test_delivery_rag_ollama_restart_requires_exact_stale_receipt_evidence() -> 
     assert '$null -ne $currentPid -or $null -ne (Get-ListenerPid)' in runtime
     assert '$resolution.semantics.historical_exit_mode -ne "UNKNOWN"' in runtime
     assert 'retired-authorized-stale-{0}.json' in runtime
+    assert '$StartLockPath = Join-Path $RuntimeDir "start.lock"' in runtime
+    assert '[IO.FileMode]::CreateNew' in runtime
+    assert '[IO.FileShare]::None' in runtime
+    assert 'Get-CimInstance Win32_Process -Filter "ProcessId=$ProcessId" -ErrorAction Stop' in runtime
+    assert 'Get-ProcessTreeIds $process.Id' in runtime
+    assert 'RAG Ollama process tree or listener remained after stop' in runtime
+    assert 'if ($LASTEXITCODE -ne 0) { throw "could not inspect loopback listener state" }' in runtime
 
 
 def test_delivery_starts_and_diagnoses_durable_task_publisher() -> None:

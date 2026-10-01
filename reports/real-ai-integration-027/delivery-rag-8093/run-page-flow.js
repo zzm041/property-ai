@@ -18,6 +18,7 @@ const MODE = process.env.DELIVERY_RAG_MODE || "preflight";
 const FULL_APPROVED = process.env.DELIVERY_RAG_FULL_APPROVED === "1";
 const RESUME_DOCUMENT_ID = Number(process.env.DELIVERY_RAG_RESUME_DOCUMENT_ID || 0);
 const RESUME_DOCUMENT_VERSION = Number(process.env.DELIVERY_RAG_RESUME_DOCUMENT_VERSION || 0);
+const REACTIVATION_DOCUMENT_VERSION = Number(process.env.DELIVERY_RAG_REACTIVATION_DOCUMENT_VERSION || 0);
 const RESUME_DOCUMENT_TITLE = process.env.DELIVERY_RAG_RESUME_DOCUMENT_TITLE || "";
 const REACTIVATE_ARCHIVED = process.env.DELIVERY_RAG_REACTIVATE_ARCHIVED === "1";
 const KEEP_ACTIVE = process.env.DELIVERY_RAG_KEEP_ACTIVE === "1";
@@ -282,6 +283,12 @@ async function main() {
   )) {
     throw new Error("resume requires the exact document title and expected version");
   }
+  if (REACTIVATE_ARCHIVED && (
+    !Number.isInteger(REACTIVATION_DOCUMENT_VERSION) ||
+    REACTIVATION_DOCUMENT_VERSION <= RESUME_DOCUMENT_VERSION
+  )) {
+    throw new Error("archived reactivation requires the exact approved successor version");
+  }
   if (MODE === "full" && !FULL_APPROVED) {
     throw new Error("full RAG flow requires explicit approval input");
   }
@@ -435,6 +442,9 @@ async function main() {
       if (resumed.selected.status === "ARCHIVED" && REACTIVATE_ARCHIVED) {
         const sourceText = "本合成小区消防通道必须保持畅通。发现纸箱堆放时，应联系物业服务中心，由工作人员安排清理；住户不要自行搬动带电设备。";
         documentVersion = Math.max(...resumed.selected.versions.map((item) => Number(item.version))) + 1;
+        if (documentVersion !== REACTIVATION_DOCUMENT_VERSION) {
+          throw new Error("next archived reactivation version does not match the approved successor");
+        }
         await fill(page, "textarea", "新版本知识正文", sourceText);
         await tolerateTimeout(() => byText(page, "button", "提交新版本并重新激活").then((item) => item.tap()));
         await waitData(page, (data) => data.notice.includes(`v${documentVersion}`), "archived document reactivation");
@@ -442,13 +452,11 @@ async function main() {
       } else if (REACTIVATE_ARCHIVED) {
         // Resume safely after an interrupted reactivation. Reuse the single
         // already-created successor version instead of creating another one.
-        const successorVersions = (resumed.selected.versions || [])
-          .map((item) => Number(item.version))
-          .filter((version) => version > RESUME_DOCUMENT_VERSION)
-          .sort((left, right) => right - left);
-        if (successorVersions.length > 0) {
-          documentVersion = successorVersions[0];
-        }
+        const successor = (resumed.selected.versions || []).find(
+          (item) => Number(item.version) === REACTIVATION_DOCUMENT_VERSION
+        );
+        if (!successor) throw new Error("approved archived reactivation successor is missing");
+        documentVersion = REACTIVATION_DOCUMENT_VERSION;
       }
       const expectedVersion = (resumed.selected.versions || []).find(
         (item) => Number(item.version) === RESUME_DOCUMENT_VERSION

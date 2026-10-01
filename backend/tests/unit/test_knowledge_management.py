@@ -258,6 +258,33 @@ def test_archived_document_new_version_enters_reactivation_after_authorization()
     assert audit_details["reactivating_archived"] is True
 
 
+def test_older_inflight_version_cannot_activate_after_new_reactivation_target_exists() -> None:
+    actor = _principal(OrganizationScope(ScopeType.TENANT, tenant_id=10))
+    service, repository, _properties, _audit = _service(actor)
+    document = KnowledgeDocument(
+        id=71,
+        tenant_id=10,
+        property_id=None,
+        title="reactivating",
+        document_type="GUIDE",
+        visibility="RESIDENT",
+        status=KnowledgeDocumentStatus.DRAFT.value,
+        current_version=1,
+        created_by_user_id=actor.user_id,
+    )
+    version = SimpleNamespace(version=2, status="PENDING")
+    job = SimpleNamespace(status="PROCESSING", error_code=None, finished_at=None)
+    repository.latest_version_for_update.return_value = 3
+
+    service._activate_version(document, version, job)
+
+    assert document.status == KnowledgeDocumentStatus.DRAFT.value
+    assert document.current_version == 1
+    assert version.status == "PENDING"
+    assert job.status == KnowledgeIngestionStatus.FAILED.value
+    assert job.error_code == KnowledgeErrorCode.CONFLICT
+
+
 def test_repository_filters_authorized_targets_before_limit() -> None:
     session = MagicMock()
     session.scalars.return_value.all.return_value = []

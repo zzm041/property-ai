@@ -230,6 +230,7 @@ class Runner:
             or (self.scope=='work_order_only' and self.asr_start_ram_mib<11264)
         ):raise ValueError('ASR_ADMISSION_LIMIT')
         self.shared_lock_path=Path(self.config.get('shared_model_lock_path',self.private.parent/'shared-model.lock')).resolve()
+        self.shared_completion_barrier_path=self.shared_lock_path.with_name('completion-unknown.json')
         self.shared_lock_wait_seconds=self.config.get('shared_model_lock_wait_seconds',55)
         if (not isinstance(self.shared_lock_wait_seconds,int)
                 or not 1<=self.shared_lock_wait_seconds<=55):raise ValueError('SHARED_MODEL_LOCK_LIMIT')
@@ -321,6 +322,24 @@ class Runner:
     @staticmethod
     def release_shared_model_lock(handle):
         handle.seek(0);msvcrt.locking(handle.fileno(),msvcrt.LK_UNLCK,1);handle.close()
+    def assert_shared_completion_ready(self):
+        if self.shared_completion_barrier_path.exists():
+            raise RuntimeError('SHARED_PREVIOUS_REQUEST_COMPLETION_UNKNOWN')
+    def record_shared_completion_unknown(self,folder,result):
+        record={
+            'format':'property-ai-shared-model-completion-barrier-v1',
+            'utc':stamp(),'scope':self.scope,'record':folder.name,
+            'result_sha256':self._sha(folder/'result.json'),
+            'status':result['status'],'reason':result.get('reason'),
+            'owned_exit_confirmed':result.get('owned_exit_confirmed'),
+            'remote_completion':result.get('remote_completion'),
+        }
+        self.shared_completion_barrier_path.parent.mkdir(parents=True,exist_ok=True)
+        try:
+            with self.shared_completion_barrier_path.open('x',encoding='utf-8') as f:
+                json.dump(record,f,ensure_ascii=False,separators=(',',':'));f.flush();os.fsync(f.fileno())
+        except FileExistsError:
+            raise RuntimeError('SHARED_PREVIOUS_REQUEST_COMPLETION_UNKNOWN')
     def _resolution(self,path,result):
         if not self.resolutions:return None
         for spec in self.resolutions:
@@ -345,6 +364,8 @@ class Runner:
             return data
         return None
     def gate(self):
+        if self.shared_completion_barrier_path.exists():
+            return 'BLOCKED_SHARED_REQUEST_COMPLETION_UNKNOWN_NO_REPLAY'
         prior=sorted(self.private.glob('call-*/reservation.json'))
         if any(not (p.parent/'result.json').exists() for p in prior):return 'BLOCKED_PREVIOUS_REQUEST_COMPLETION_UNKNOWN_NO_REPLAY'
         try:
@@ -510,14 +531,16 @@ class Runner:
             not owned_exit_confirmed
             or (kind=='qwen' and not success and not controlled_remote_stop)
         )
-        save(folder/'result.json',{'status':'SUCCESS' if success else ('UNKNOWN' if unknown else 'FAILED'),'reason':reason,'exit_code':p.returncode,
+        result={'status':'SUCCESS' if success else ('UNKNOWN' if unknown else 'FAILED'),'reason':reason,'exit_code':p.returncode,
             'model':MODELS[kind],'revision':DIGEST if kind=='qwen' else MODEL_DIRS[kind][1],
             'events':events,'samples':samples,'total_seconds':time.monotonic()-start,'child_pid':p.pid,
             'request_job':job.name,'owned_exit_confirmed':owned_exit_confirmed,'cleanup_error':cleanup_error,
             'remote_stop':remote_stop,'remote_stop_error':remote_stop_error,
             'remote_completion':'CONTROLLED_STOP' if controlled_remote_stop else (
                 'UNKNOWN' if kind=='qwen' and not success else 'NOT_UNKNOWN'
-            )})
+            )}
+        save(folder/'result.json',result)
+        if unknown:self.record_shared_completion_unknown(folder,result)
         if not success:raise RuntimeError(reason or 'MODEL_REQUEST_FAILED_NO_RETRY')
         return results[0]
 
@@ -562,13 +585,14 @@ def serve(config_path):
                 runner.record_pre_reservation_failure(exc,stage='HTTP_DECODE',input_hash=hashlib.sha256(body if 'body' in locals() else b'').hexdigest(),request_binding=request_binding)
                 return self.reply(422,{'error':'INVALID_REQUEST'})
             if not runner.acquire_request():return self.reply(503,{'error':'MODEL_DRAINING_OR_BUSY_NO_RETRY'})
-            shared=None
+            shared=None;shared_ready=False
             try:
                 shared=runner.acquire_shared_model_lock()
+                runner.assert_shared_completion_ready();shared_ready=True
                 return self.reply(200,runner.run(kind,value,request_binding=request_binding))
             except Exception as exc:
-                if shared is None:
-                    runner.record_pre_reservation_failure(exc,stage='SHARED_RESOURCE_LOCK',kind=kind,request_binding=request_binding)
+                if not shared_ready:
+                    runner.record_pre_reservation_failure(exc,stage='SHARED_COMPLETION_BARRIER' if shared is not None else 'SHARED_RESOURCE_LOCK',kind=kind,request_binding=request_binding)
                 return self.reply(503,{'error':'MODEL_GUARD_OR_REQUEST_FAILED_NO_RETRY'})
             finally:
                 if shared is not None:runner.release_shared_model_lock(shared)

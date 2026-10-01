@@ -501,6 +501,12 @@ class KnowledgeService:
             job.error_code = KnowledgeErrorCode.ARCHIVED
             job.finished_at = utc_now()
             return
+        latest = self._repository.latest_version_for_update(document.id)
+        if latest != version_row.version:
+            job.status = KnowledgeIngestionStatus.FAILED.value
+            job.error_code = KnowledgeErrorCode.CONFLICT
+            job.finished_at = utc_now()
+            return
         previous = document.current_version
         if previous is not None and previous > version_row.version:
             job.status = KnowledgeIngestionStatus.FAILED.value

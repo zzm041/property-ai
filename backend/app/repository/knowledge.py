@@ -152,6 +152,10 @@ class KnowledgeRepository:
         )
 
     def next_version_for_update(self, document_id: int) -> int:
+        current = self.latest_version_for_update(document_id)
+        return int(current or 0) + 1
+
+    def latest_version_for_update(self, document_id: int) -> int | None:
         current = self._session.scalar(
             select(KnowledgeDocumentVersion.version)
             .where(KnowledgeDocumentVersion.document_id == document_id)
@@ -159,7 +163,7 @@ class KnowledgeRepository:
             .limit(1)
             .with_for_update()
         )
-        return int(current or 0) + 1
+        return int(current) if current is not None else None
 
     def list_versions(
         self,

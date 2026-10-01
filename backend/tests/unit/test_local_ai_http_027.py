@@ -387,6 +387,29 @@ def test_shared_model_lock_serializes_adapters_without_reservation(tmp_path):
     assert not list(first.private.glob('call-*')) and not list(second.private.glob('call-*'))
 
 
+def test_shared_unknown_barrier_blocks_a_second_adapter_without_model_call(tmp_path):
+    (tmp_path/'first').mkdir();(tmp_path/'second').mkdir()
+    first=runner(tmp_path/'first');second=runner(tmp_path/'second')
+    shared=tmp_path/'shared-model.lock'
+    first.shared_lock_path=shared;second.shared_lock_path=shared
+    first.shared_completion_barrier_path=shared.with_name('completion-unknown.json')
+    second.shared_completion_barrier_path=shared.with_name('completion-unknown.json')
+    folder=first.private/'call-001';folder.mkdir()
+    result={'status':'UNKNOWN','reason':'REMOTE_UNAVAILABLE','owned_exit_confirmed':True,
+            'remote_completion':'UNKNOWN'}
+    m.save(folder/'result.json',result)
+    handle=first.acquire_shared_model_lock()
+    try:first.record_shared_completion_unknown(folder,result)
+    finally:first.release_shared_model_lock(handle)
+    second_handle=second.acquire_shared_model_lock()
+    try:
+        with pytest.raises(RuntimeError,match='SHARED_PREVIOUS_REQUEST_COMPLETION_UNKNOWN'):
+            second.assert_shared_completion_ready()
+    finally:second.release_shared_model_lock(second_handle)
+    assert second.gate()=='BLOCKED_SHARED_REQUEST_COMPLETION_UNKNOWN_NO_REPLAY'
+    assert not list(second.private.glob('call-*/reservation.json'))
+
+
 def test_http_decode_failure_can_be_recorded_without_sensitive_body(tmp_path):
     scoped=runner(tmp_path)
     body=b'{"phone":"synthetic-secret","prompt":"private text"}'
