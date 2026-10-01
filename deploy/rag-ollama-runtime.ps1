@@ -10,6 +10,8 @@ $DeployDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = Split-Path -Parent $DeployDir
 $RuntimeDir = Join-Path $RepoRoot "tmp\delivery-rag-ollama-runtime"
 $StatePath = Join-Path $RuntimeDir "current.json"
+$AuthorizedStaleResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-rag-8093\rag-ollama-stale-receipt-resolution-20261002.json"
+$ExpectedAuthorizedStaleResolutionSha256 = "EE8C4294800C65CAA5EC9A34B7581A42072F8409332AC7DCEC13B33F742024B2"
 $ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models"
 $OllamaExe = if ($env:PROPERTY_AI_OLLAMA_EXE) { $env:PROPERTY_AI_OLLAMA_EXE } else { "C:\Users\lmj\AppData\Local\Programs\Ollama\ollama.exe" }
 $ExpectedExeSha256 = "D571E4CF0AD4456FCCD33D5B985B6D63BA5669C6E5A812391704083952AAE3D5"
@@ -46,6 +48,32 @@ function Assert-State([object]$State) {
     if ($version.version -ne $ExpectedVersion) { throw "RAG Ollama version changed" }
     return $process
 }
+function Retire-AuthorizedStaleReceipt([object]$State) {
+    if (-not (Test-Path -LiteralPath $AuthorizedStaleResolutionPath -PathType Leaf)) { return $false }
+    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $AuthorizedStaleResolutionPath).Hash -ne $ExpectedAuthorizedStaleResolutionSha256) { return $false }
+    $resolution=Get-Content -Raw -LiteralPath $AuthorizedStaleResolutionPath | ConvertFrom-Json
+    $currentPid=Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$State.pid)" -ErrorAction SilentlyContinue
+    if ($resolution.format -ne "property-ai-local-runtime-stale-receipt-resolution-v1" -or
+        $resolution.task_id -ne "REAL-AI-INTEGRATION-027" -or
+        [string]$resolution.original.receipt_sha256 -ne (Get-FileHash -Algorithm SHA256 -LiteralPath $StatePath).Hash -or
+        [string]$resolution.original.operation_id -ne [string]$State.operation_id -or
+        [int]$resolution.original.pid -ne [int]$State.pid -or
+        ([DateTimeOffset]$resolution.original.started_at_utc).UtcDateTime -ne ([DateTimeOffset]$State.started_at_utc).UtcDateTime -or
+        [string]$resolution.original.endpoint -ne $Endpoint -or
+        [string]$resolution.original.executable_sha256 -ne $ExpectedExeSha256 -or
+        [string]$resolution.current_evidence.current_executable_sha256 -ne (Get-FileHash -Algorithm SHA256 -LiteralPath $OllamaExe).Hash -or
+        $null -ne $currentPid -or $null -ne (Get-ListenerPid) -or
+        $resolution.current_evidence.recorded_pid_exists -ne $false -or
+        [int]$resolution.current_evidence.listener_count -ne 0 -or
+        $resolution.semantics.historical_exit_mode -ne "UNKNOWN" -or
+        $resolution.semantics.current_execution_absent -ne $true -or
+        $resolution.semantics.model_request_or_budget_effect -ne $false -or
+        $resolution.semantics.history_rewritten -ne $false) { return $false }
+    $archive=Join-Path $RuntimeDir ("retired-authorized-stale-{0}.json" -f $State.operation_id)
+    if(Test-Path -LiteralPath $archive){throw "authorized stale RAG receipt archive already exists"}
+    Move-Item -LiteralPath $StatePath -Destination $archive
+    return $true
+}
 
 switch ($Action) {
     "start" {
@@ -54,7 +82,7 @@ switch ($Action) {
         if((Get-FileHash -Algorithm SHA256 -LiteralPath $OllamaExe).Hash -ne $ExpectedExeSha256){throw "RAG Ollama executable hash changed"}
         $listener=Get-ListenerPid;$state=Read-State
         if($listener){if($null -eq $state){throw "11438 is occupied without a receipt"};$null=Assert-State $state;$state|ConvertTo-Json -Depth 6;break}
-        if($null -ne $state){throw "stale RAG Ollama receipt requires explicit evidence; start refused"}
+        if($null -ne $state){if(-not (Retire-AuthorizedStaleReceipt $state)){throw "stale RAG Ollama receipt requires explicit evidence; start refused"};$state=$null}
         $id=[guid]::NewGuid().ToString("N");$stdout=Join-Path $RuntimeDir "server-$id.stdout.log";$stderr=Join-Path $RuntimeDir "server-$id.stderr.log"
         $saved=@{host=$env:OLLAMA_HOST;models=$env:OLLAMA_MODELS;cloud=$env:OLLAMA_NO_CLOUD;context=$env:OLLAMA_CONTEXT_LENGTH}
         try {

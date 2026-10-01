@@ -1,0 +1,25 @@
+{
+  "format": "property-ai-local-runtime-stale-receipt-resolution-v1",
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "authorized_scope": "resume approved bounded local delivery after interruption",
+  "observed_at_utc": "2026-10-01T18:56:01.1119722Z",
+  "original": {
+    "receipt_sha256": "91E0FA916E5CED5F573C424EF75AFF465B3A2509618AABF612C63486E0A1D721",
+    "operation_id": "ec79f97b36a544a6863e6b32b4edefb6",
+    "pid": 31316,
+    "started_at_utc": "2026-09-29T10:13:23.4267861Z",
+    "endpoint": "127.0.0.1:11435",
+    "executable_sha256": "D571E4CF0AD4456FCCD33D5B985B6D63BA5669C6E5A812391704083952AAE3D5"
+  },
+  "current_evidence": {
+    "recorded_pid_exists": false,
+    "listener_count": 0,
+    "current_executable_sha256": "D571E4CF0AD4456FCCD33D5B985B6D63BA5669C6E5A812391704083952AAE3D5"
+  },
+  "semantics": {
+    "historical_exit_mode": "UNKNOWN",
+    "current_execution_absent": true,
+    "model_request_or_budget_effect": false,
+    "history_rewritten": false
+  }
+}

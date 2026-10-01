@@ -14,6 +14,8 @@ $StatePath = Join-Path $RuntimeDir "current.json"
 $StartLockPath = Join-Path $RuntimeDir "start.lock"
 $RestartResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\ollama-0344-restart-resolution.json"
 $ExpectedRestartResolutionSha256 = "128943CB6C1B9CD653E1AB250B7D9D5330C2201184E2DA0B5399E3B4FB788317"
+$AuthorizedStaleResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\ollama-stale-receipt-resolution-20261002.json"
+$ExpectedAuthorizedStaleResolutionSha256 = "B2080B0EFE0DC10EA7E373843660D5D0347EF06B380EE71B7B5A2255BD39BC05"
 $ControlledStops = @(
     [pscustomobject]@{
         Path = Join-Path $RepoRoot "tmp\delivery-work-ai-runtime\calls\call-003\result.json"
@@ -97,6 +99,35 @@ function Retire-RebootedReceipt([object]$State) {
     return $true
 }
 
+function Retire-AuthorizedStaleReceipt([object]$State) {
+    if (-not (Test-Path -LiteralPath $AuthorizedStaleResolutionPath -PathType Leaf)) { return $false }
+    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $AuthorizedStaleResolutionPath).Hash -ne $ExpectedAuthorizedStaleResolutionSha256) { return $false }
+    $resolution = Get-Content -Raw -LiteralPath $AuthorizedStaleResolutionPath | ConvertFrom-Json
+    $currentPid = Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$State.pid)" -ErrorAction SilentlyContinue
+    if (
+        $resolution.format -ne "property-ai-local-runtime-stale-receipt-resolution-v1" -or
+        $resolution.task_id -ne "REAL-AI-INTEGRATION-027" -or
+        [string]$resolution.original.receipt_sha256 -ne (Get-FileHash -Algorithm SHA256 -LiteralPath $StatePath).Hash -or
+        [string]$resolution.original.operation_id -ne [string]$State.operation_id -or
+        [int]$resolution.original.pid -ne [int]$State.pid -or
+        ([DateTimeOffset]$resolution.original.started_at_utc).UtcDateTime -ne ([DateTimeOffset]$State.started_at_utc).UtcDateTime -or
+        [string]$resolution.original.endpoint -ne $Endpoint -or
+        [string]$resolution.original.executable_sha256 -ne $ExpectedExeSha256 -or
+        [string]$resolution.current_evidence.current_executable_sha256 -ne (Get-FileHash -Algorithm SHA256 -LiteralPath $OllamaExe).Hash -or
+        $null -ne $currentPid -or $null -ne (Get-ListenerPid) -or
+        $resolution.current_evidence.recorded_pid_exists -ne $false -or
+        [int]$resolution.current_evidence.listener_count -ne 0 -or
+        $resolution.semantics.historical_exit_mode -ne "UNKNOWN" -or
+        $resolution.semantics.current_execution_absent -ne $true -or
+        $resolution.semantics.model_request_or_budget_effect -ne $false -or
+        $resolution.semantics.history_rewritten -ne $false
+    ) { return $false }
+    $archive = Join-Path $RuntimeDir ("retired-authorized-stale-{0}.json" -f $State.operation_id)
+    if (Test-Path -LiteralPath $archive) { throw "authorized stale receipt archive already exists" }
+    Move-Item -LiteralPath $StatePath -Destination $archive
+    return $true
+}
+
 function Retire-ControlledStopReceipt([object]$State) {
     $existing = @($ControlledStops | Where-Object { Test-Path -LiteralPath $_.Path -PathType Leaf })
     if ($existing.Count -eq 0) { throw "stale current receipt exists without controlled-stop evidence" }
@@ -123,6 +154,7 @@ function Retire-ControlledStopReceipt([object]$State) {
         }
     }
     if ($null -eq $binding) {
+        if (Retire-AuthorizedStaleReceipt $State) { return }
         if (Retire-RebootedReceipt $State) { return }
         throw "controlled-stop or reviewed restart evidence does not bind the stale receipt"
     }

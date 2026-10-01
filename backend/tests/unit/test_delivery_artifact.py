@@ -230,8 +230,8 @@ def test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded() -> Non
     assert 'git -C $RepoRoot archive' in runtime
     assert 'adapter-$operationId.stdout.log' in runtime and 'adapter-$operationId.stderr.log' in runtime
     assert '__SOURCE_COMMIT__' not in runtime and '__ADAPTER_SHA256__' not in runtime
-    assert '961A295D8CD0BB2548B2573DA4FE63F317945345B65CCEC70361DB7B009ACD44' in runtime
-    assert '767077ec4f0a90351f897a70e91cc9592217dd46' in runtime
+    assert 'BD747BCBAD2BF10DD1810B8C69754CA91F7207C7C16AB24F5588E7091F0BE326' in runtime
+    assert '68d062f4355d837afee1afa377e1d83d7c1dd485' in runtime
     assert 'call-001-resolution.json' in runtime
     assert 'PASS_SCOPED_CALL_RESOLUTION' not in runtime
     assert 'resolution_root=$ResolutionRoot' in runtime
@@ -286,6 +286,19 @@ def test_delivery_ollama_restart_requires_exact_controlled_stop_evidence() -> No
     assert 'if ($sameProcess -or $null -ne (Get-ListenerPid))' in runtime
     assert 'controlled-stop receipt cannot be retired while execution may still exist' in runtime
     assert 'Move-Item -LiteralPath $StatePath -Destination $archive' in runtime
+    assert 'ollama-stale-receipt-resolution-20261002.json' in runtime
+    assert '$resolution.semantics.historical_exit_mode -ne "UNKNOWN"' in runtime
+    assert '$resolution.semantics.current_execution_absent -ne $true' in runtime
+
+
+def test_delivery_rag_ollama_restart_requires_exact_stale_receipt_evidence() -> None:
+    runtime=(ROOT/'deploy/rag-ollama-runtime.ps1').read_text(encoding='utf-8')
+    assert 'rag-ollama-stale-receipt-resolution-20261002.json' in runtime
+    assert 'property-ai-local-runtime-stale-receipt-resolution-v1' in runtime
+    assert '[string]$resolution.original.receipt_sha256 -ne (Get-FileHash' in runtime
+    assert '$null -ne $currentPid -or $null -ne (Get-ListenerPid)' in runtime
+    assert '$resolution.semantics.historical_exit_mode -ne "UNKNOWN"' in runtime
+    assert 'retired-authorized-stale-{0}.json' in runtime
 
 
 def test_delivery_starts_and_diagnoses_durable_task_publisher() -> None:
