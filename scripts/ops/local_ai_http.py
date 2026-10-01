@@ -61,6 +61,9 @@ QWEN_INFERENCE_TIMEOUT_SECONDS=(
         'qwen38-27b-q3km-g55:7af3b8f','qwen38-27b-q3km-g55-ctx8192:7af3b8f'
     ) else 60
 )
+QWEN_RUNNING_RAM_FLOOR_MIB=4500
+QWEN_RUNNING_GPU_FLOOR_MIB=2000
+QWEN_COLD_START_GPU_FLOOR_MIB=6000
 MODELS={'asr':'Qwen3-ASR-0.6B','embedding':'bge-m3','reranker':'bge-reranker-v2-m3','qwen':QWEN_MODEL}
 LIMITS={'asr':6,'embedding':12,'reranker':8,'qwen':120}
 CONTINUATION_MAX={'asr':1,'embedding':6,'reranker':6,'qwen':6}
@@ -108,7 +111,13 @@ def qwen_guard():
     if not any(x['name']==QWEN_RUNTIME_MODEL and x['digest']==DIGEST for x in tags):raise RuntimeError('QWEN_DIGEST_CHANGED')
     loaded=direct('/api/ps')['models']
     if len(loaded)>1 or any(x['name']!=QWEN_RUNTIME_MODEL or x['digest']!=DIGEST or x['context_length']!=QWEN_CONTEXT_LENGTH for x in loaded):raise RuntimeError('QWEN_RESIDENCY_CHANGED')
-    if ram()<4500 or gpu()<(2500 if loaded else 6000):raise RuntimeError('QWEN_RESOURCE_GUARD')
+    # Once the reviewed runtime is already resident, use the same floor that
+    # supervises an in-flight request. Requiring a larger second-call margin
+    # here rejects the LLM stage immediately after a successful VLM stage even
+    # though the first call remained above the approved running floor.
+    gpu_floor=QWEN_RUNNING_GPU_FLOOR_MIB if loaded else QWEN_COLD_START_GPU_FLOOR_MIB
+    if ram()<QWEN_RUNNING_RAM_FLOOR_MIB or gpu()<gpu_floor:
+        raise RuntimeError('QWEN_RESOURCE_GUARD')
 
 def inference_timeout_seconds(kind):
     return QWEN_INFERENCE_TIMEOUT_SECONDS if kind=='qwen' else 60

@@ -104,6 +104,40 @@ def test_runtime_alias_keeps_the_stable_api_model_and_binds_actual_8192_residenc
     assert candidate.MODELS['qwen']=='qwen38-27b-q3km-g55:7af3b8f'
 
 
+def test_resident_qwen_uses_the_same_approved_running_gpu_floor(monkeypatch):
+    candidate=_load_adapter_candidate(
+        monkeypatch,'qwen38-27b-q3km-g55:7af3b8f','qwen38-27b-q3km-g55-ctx8192:7af3b8f'
+    )
+    def direct(path):
+        if path=='/api/version':return {'version':'0.34.4'}
+        if path=='/api/tags':return {'models':[{'name':candidate.QWEN_RUNTIME_MODEL,'digest':candidate.DIGEST}]}
+        if path=='/api/ps':return {'models':[{'name':candidate.QWEN_RUNTIME_MODEL,'digest':candidate.DIGEST,'context_length':8192}]}
+        raise AssertionError(path)
+    monkeypatch.setattr(candidate,'direct',direct)
+    monkeypatch.setattr(candidate,'ram',lambda:candidate.QWEN_RUNNING_RAM_FLOOR_MIB)
+    monkeypatch.setattr(candidate,'gpu',lambda:candidate.QWEN_RUNNING_GPU_FLOOR_MIB)
+    candidate.qwen_guard()
+    monkeypatch.setattr(candidate,'gpu',lambda:candidate.QWEN_RUNNING_GPU_FLOOR_MIB-1)
+    with pytest.raises(RuntimeError,match='QWEN_RESOURCE_GUARD'):
+        candidate.qwen_guard()
+
+
+def test_unloaded_qwen_still_requires_the_cold_start_gpu_floor(monkeypatch):
+    candidate=_load_adapter_candidate(
+        monkeypatch,'qwen38-27b-q3km-g55:7af3b8f','qwen38-27b-q3km-g55-ctx8192:7af3b8f'
+    )
+    def direct(path):
+        if path=='/api/version':return {'version':'0.34.4'}
+        if path=='/api/tags':return {'models':[{'name':candidate.QWEN_RUNTIME_MODEL,'digest':candidate.DIGEST}]}
+        if path=='/api/ps':return {'models':[]}
+        raise AssertionError(path)
+    monkeypatch.setattr(candidate,'direct',direct)
+    monkeypatch.setattr(candidate,'ram',lambda:candidate.QWEN_RUNNING_RAM_FLOOR_MIB)
+    monkeypatch.setattr(candidate,'gpu',lambda:candidate.QWEN_COLD_START_GPU_FLOOR_MIB-1)
+    with pytest.raises(RuntimeError,match='QWEN_RESOURCE_GUARD'):
+        candidate.qwen_guard()
+
+
 def test_qwen_child_uses_the_approved_bounded_180_second_runtime_timeout(tmp_path,monkeypatch,capsys):
     candidate=_load_adapter_candidate(
         monkeypatch,'qwen38-27b-q3km-g55:7af3b8f','qwen38-27b-q3km-g55-ctx8192:7af3b8f'
