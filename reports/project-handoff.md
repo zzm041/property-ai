@@ -1,5 +1,19 @@
 # Project handoff (latest facts only)
 
+## Current checkpoint — runtime guards accepted; real RAG retained; work-order AUTO remains blocked (2026-10-02)
+
+Current tracking HEAD before this evidence-only closeout is `c23837189c51c6bf70fd02b235d6d1b71ad0c3c1`. The reviewed product source is `caa2d21594bb7b78f2dc01e6bdfacc408161ec58`; API, Worker, publisher and Beat run the same `property-ai-delivery:caa2d21` image (`sha256:909f8262f8a2d79a7b242e67bcc4f4ef5fbbe5c9663149b011248fe2c614780e`). The fixed deadline **2026-09-29 22:36:10 Asia/Shanghai was missed** and was not reset.
+
+The work adapter is live at `11437 -> 11435` with Qwen3.8 27B Q3_K_M / context 8192; the RAG adapter is live at `11436 -> 11438` with Qwen3.5 4B / context 4096. Both are bound to the same archived adapter bytes (`EE9F1990...7270`) and shared runtime-control bytes (`CEA1B4AD...3867`), report READY/idle, and use the persistent cross-adapter UNKNOWN barrier. API health is good. The dedicated main queue remains 0 ready / 0 unacknowledged / 1 consumer; the DLQ remains 2 ready / 0 unacknowledged / 0 consumers and was not read, replayed or cleared.
+
+The final narrow fix set closes four independently reviewed defects: stale knowledge versions cannot supersede the exact reactivation target; Ollama start/stop receipts fail closed on observation errors and verify the captured process tree; the page runner resumes only the explicitly approved successor version; and a completion-UNKNOWN on either model endpoint blocks the other endpoint before reservation. Direct tests are `94 passed, 1 warning`; runtime-binding tests are `13 passed, 1 warning`; Node and PowerShell parsing succeeded. These are separate runs and were not added into a fabricated aggregate total.
+
+Independent review `reports/codex/REAL-AI-INTEGRATION-027-LOCAL-FINAL-round1.raw.json` returned `PASS_SCOPED_INCREMENTAL` for those four corrections. It accepted the saved scoped real-RAG page evidence: property 4 received an answered result citing document 1/version 3, while the separately authorized property 5 manager received `insufficient_knowledge` with zero citations. The successful page evidence remains bound to source `14b8dc5`; the new `caa2d21` guard corrections were not followed by another RAG/model/page execution and must not be represented as one.
+
+Work-order AUTO remains blocked. WO7 is `PENDING_ANALYSIS`; its final authorized generation 5 / intent 36 is `FAILED / AI.INVALID_OUTPUT` with no Assignment, and both authorized extra generations are exhausted. WO8–11 remain `PENDING_ANALYSIS` at their generation 2 `AI.UNAVAILABLE` failures with no Assignment and were not continued because their authorization was conditional on WO7 reaching real AUTO. No new work order, model call, page action, database write or queue operation was performed during this closeout. Image AUTO, voice-linked AUTO, five-user queue-to-dispatch completion and a new CLOSED page flow therefore remain unproved. Complete local delivery and Production V1 are **not PASS**.
+
+The exact remaining blocker is authorization, not another ordinary technical checkpoint: proceeding would require a new explicit bounded permission for further existing-object generation/replay or a new business object/model-call budget. The current cap forbids both. Preserve every failed generation, the ten-work-order cap, the old deadline and all raw evidence.
+
 ## Current checkpoint — current 8093 real RAG restored; bounded WO7 recovery exhausted (2026-10-02)
 
 Current product/tracking HEAD is `14b8dc5330cce48bfc79f7342a15e7ffdc8afb54`. API, Worker, publisher and Beat run the same `property-ai-delivery:14b8dc5` image (`sha256:81582eac2bcc07dc485b619e33f2ee47441701a6e721d54f1d23ed642136c164`) against the existing isolated `property_ai_delivery_check@0014`. The fixed deadline **2026-09-29 22:36:10 Asia/Shanghai was missed** and has not been reset.

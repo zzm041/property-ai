@@ -1,0 +1,111 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "review_scope": "最终本地交付增量，同一独立只读审查轮；检查归档知识重新激活、双端点运行保护、保存的RAG页面证据及四项定向修复，不重审全项目。",
+  "review_type": "INDEPENDENT_READ_ONLY",
+  "source_head": "c23837189c51c6bf70fd02b235d6d1b71ad0c3c1",
+  "review_base": "59b3daa79f46b4947796b6eacc536865ccf9d783",
+  "runtime_binding": {
+    "page_evidence_application_source": "14b8dc5330cce48bfc79f7342a15e7ffdc8afb54",
+    "page_evidence_image": "sha256:81582eac2bcc07dc485b619e33f2ee47441701a6e721d54f1d23ed642136c164",
+    "fixed_source": "caa2d21594bb7b78f2dc01e6bdfacc408161ec58",
+    "independently_verified_git_archive": {
+      "adapter_sha256": "EE9F19900F923461AB8AD0A1DC65806FF96065E074C89B2B2456810B533C7270",
+      "runtime_control_sha256": "CEA1B4AD6A5D2C12F70E233E28C791C86BC6EFDC5F2EA9864FDC022D57D13867",
+      "method": "只读读取普通git archive实际导出字节并计算哈希，与两个启动入口绑定一致。"
+    },
+    "latest_runtime_implementer_report": {
+      "image_tag": "property-ai-delivery:caa2d21",
+      "image_digest": "sha256:909f8262f8a2d79a7b242e67bcc4f4ef5fbbe5c9663149b011248fe2c614780e",
+      "services": ["api", "worker", "publisher", "beat"],
+      "status": "实施方报告已同源加载、API健康、两个适配器空闲就绪；本审查未操作环境或独立查询进程。"
+    }
+  },
+  "checks": [
+    {
+      "scope": "知识重新激活",
+      "result": "权限和组织范围检查仍先于修改；新增版本、任务、DRAFT状态和审计处于既有事务内。14b8dc5仅为该审计动作增加可选reactivating_archived字段，没有放宽其他动作。"
+    },
+    {
+      "scope": "实际页面证据",
+      "result": "已通过图像工具查看三张PNG。09-02明确显示answered及文档1的v3引用；10-01显示另一小区insufficient_knowledge且没有引用。09-01只拍到文档标题区域，未显示ACTIVE状态，不能单靠该图证明激活。"
+    },
+    {
+      "scope": "请求与失败保留",
+      "result": "实际读取06/07/09/10 page-error。06为版本提交422；07为版本3入库失败；09保留成功问答请求cc3a3634c5d14baaa9765f91d6cb8ef5后因缺第二授权小区停止；10保留成功查询a93e1ed3e7cd44b88c484c5b0cbc67f3后的截图失败。未将整次脚本错误改称整流程成功。"
+    },
+    {
+      "scope": "页面采集方式",
+      "result": "run-page-flow调用正常页面输入、点击和原始wx.request；拦截器仅记录元数据，并限制8093 API及禁止工单请求，没有模拟成功响应。正向和跨小区截图哈希与结果汇总一致。"
+    },
+    {
+      "scope": "双端点与共享保护",
+      "result": "源码将RAG隔离到11436→11438、4B/4096，将工单隔离到11437→11435、Qwen38/8192；两适配器使用同一共享模型锁。新增持久UNKNOWN屏障在另一端点预约前检查，未放宽模型身份和资源保护。"
+    },
+    {
+      "scope": "测试边界",
+      "result": "已读取直接测试源码。94 passed、1 warning，绑定专项13 passed、1 warning，以及Node/PowerShell解析成功均为实施方报告；本审查未执行测试，也未将分开运行合成一个总通过数字。"
+    }
+  ],
+  "findings": [
+    {
+      "id": "LOCAL-FINAL-R1-01",
+      "severity": "HIGH",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "status": "CLOSED",
+      "location": "D:/property-ai/backend/app/service/knowledge.py:_activate_version；D:/property-ai/backend/app/repository/knowledge.py:latest_version_for_update",
+      "trigger": "归档前的旧版本仍在入库，新版本重新激活已将文档改为DRAFT。",
+      "impact": "原实现可能让旧在途版本抢先重新激活。",
+      "evidence": "caa2d21在激活事务内锁读最新版本，不相等则以CONFLICT结束旧任务；直接负测验证旧v2不能覆盖待激活v3，文档仍为DRAFT。",
+      "recommendation": "保留该问题历史；没有无条件旧任务激活放行。"
+    },
+    {
+      "id": "LOCAL-FINAL-R1-02",
+      "severity": "HIGH",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "status": "CLOSED",
+      "location": "D:/property-ai/deploy/rag-ollama-runtime.ps1；D:/property-ai/deploy/ollama-runtime.ps1:Retire-AuthorizedStaleReceipt",
+      "trigger": "并发启动、收据已存在、停止未完成或进程观测失败。",
+      "impact": "原新增RAG入口存在覆盖收据或过早确认停止的风险，新增work收据恢复分支还可能把观测错误当作进程不存在。",
+      "evidence": "caa2d21增加CreateNew排他启动锁、不覆盖收据、CIM/netstat失败拒绝，以及停止后捕获进程树和监听消失确认；c238371将新增work恢复分支的CIM查询改为ErrorAction Stop并补断言。",
+      "recommendation": "保留精确身份和失败关闭约束；静态检查不替代实际并发启停故障演练。"
+    },
+    {
+      "id": "LOCAL-FINAL-R1-03",
+      "severity": "MEDIUM",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "status": "CLOSED",
+      "location": "D:/property-ai/reports/real-ai-integration-027/delivery-rag-8093/run-page-flow.js",
+      "trigger": "归档文档存在多个后续版本，采集器恢复执行。",
+      "impact": "原实现自动选最高后续版本，可能超出本轮获准对象与版本。",
+      "evidence": "当前要求显式REACTIVATION_DOCUMENT_VERSION；创建前核对下一版本，恢复时只查该精确版本，不再自动选最高successor。",
+      "recommendation": "未来执行继续提供精确文档、标题、原版本和获准后续版本，不重跑本轮成功问答。"
+    },
+    {
+      "id": "LOCAL-FINAL-R1-04",
+      "severity": "HIGH",
+      "classification": "CURRENT_TASK_BLOCKER",
+      "status": "CLOSED",
+      "location": "D:/property-ai/scripts/ops/local_ai_http.py:record_shared_completion_unknown、assert_shared_completion_ready及Handler",
+      "trigger": "一个端点请求终止未确认，另一个端点随后取得共享锁。",
+      "impact": "原实现仅阻断本端账本，另一端点仍可能启动推理。",
+      "evidence": "当前在释放共享锁前保存持久completion-unknown屏障；另一端点取得锁后、预约前拒绝，健康门也显示阻断。新增双Runner无模型测试检查第二端点未产生预约。",
+      "recommendation": "屏障不得自动清除；崩溃或存储故障组合不在本次验证范围。"
+    }
+  ],
+  "verdict": "PASS_SCOPED_INCREMENTAL",
+  "verified": [
+    "上述四项当前源码问题在同一轮定向修复后关闭，未发现本次窄复核中的新增当前阻塞。",
+    "保存的真实RAG页面回答与跨小区负向结果成立，可保留为14b8dc5对应的scoped local证据。",
+    "旧错误记录、原工单失败和错过的固定交付期限没有被本次成功页面结果抹去。",
+    "本审查没有修改文件、运行测试、页面、模型、业务请求、数据库或队列操作，也没有创建子审查者。"
+  ],
+  "unverified": [
+    "文档版本、intent47/48、chunk数量、模型call010–014与镜像同源状态，在本次指定材料中主要是实施方汇总；未独立读取完整原始DB导出、所有Provider收据或实时容器状态。",
+    "跨小区截图后来补拍且未重复查询属于实施方说明；已保存原请求和最终截图可核对，但本审查未观察补拍过程。",
+    "新caa2d21保护补丁后未重跑RAG业务或页面；已保存成功页面运行的是14b8dc5，不能改写其版本绑定。",
+    "WO7 generation4/5均失败、最终intent36、WO8–11未续行及没有新工单属于最新实施方报告。原runtime-8192-attempt只到generation3，不能拿它独立证明后续generation。",
+    "图像AUTO、语音关联AUTO、五用户派单完成、新CLOSED闭环、完整本地交付和Production均未通过。",
+    "本次未演练进程崩溃、共享屏障写入失败或完整并发启停；不能关闭全部生产可靠性缺口。"
+  ],
+  "next_action": "保存本轮唯一最终审查结果和准确版本边界，汇报已完成的真实RAG能力与仍失败的AUTO链路。不得继续恢复WO7、续行WO8–11、创建新工单或重置预算；进一步推理、业务恢复或新对象必须取得新的明确有界批准。"
+}

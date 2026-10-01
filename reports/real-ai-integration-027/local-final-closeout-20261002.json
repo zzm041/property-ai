@@ -1,0 +1,54 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "recorded_at": "2026-10-02",
+  "result": "RAG_PASS_WORK_AUTO_BLOCKED_LOCAL_DELIVERY_NOT_PASS",
+  "deadline": {
+    "fixed": "2026-09-29T22:36:10+08:00",
+    "status": "MISSED_NOT_RESET"
+  },
+  "source": {
+    "reviewed_product_source": "caa2d21594bb7b78f2dc01e6bdfacc408161ec58",
+    "tracking_head_before_closeout": "c23837189c51c6bf70fd02b235d6d1b71ad0c3c1",
+    "image": "property-ai-delivery:caa2d21",
+    "image_digest": "sha256:909f8262f8a2d79a7b242e67bcc4f4ef5fbbe5c9663149b011248fe2c614780e"
+  },
+  "runtime": {
+    "services": ["api", "worker", "publisher", "beat"],
+    "work_ai": "11437 -> 11435, Qwen3.8 27B Q3_K_M, context 8192, READY/idle",
+    "rag": "11436 -> 11438, Qwen3.5 4B, context 4096, READY/idle",
+    "adapter_sha256": "EE9F19900F923461AB8AD0A1DC65806FF96065E074C89B2B2456810B533C7270",
+    "runtime_control_sha256": "CEA1B4AD6A5D2C12F70E233E28C791C86BC6EFDC5F2EA9864FDC022D57D13867",
+    "main_queue": {"ready": 0, "unacked": 0, "consumers": 1},
+    "dlq": {"ready": 2, "unacked": 0, "consumers": 0, "touched": false}
+  },
+  "verification": {
+    "focused_tests": "94 passed, 1 warning",
+    "binding_tests": "13 passed, 1 warning",
+    "parsing": "Node and PowerShell parsing passed",
+    "independent_review": "PASS_SCOPED_INCREMENTAL",
+    "review_path": "reports/codex/REAL-AI-INTEGRATION-027-LOCAL-FINAL-round1.raw.json",
+    "model_page_business_rerun_after_guard_fixes": false
+  },
+  "rag": {
+    "status": "PASS_SCOPED_REAL_RAG",
+    "page_evidence_source": "14b8dc5330cce48bfc79f7342a15e7ffdc8afb54",
+    "positive": "property 4 answered with document 1/version 3 citation",
+    "negative": "property 5 insufficient_knowledge with zero citations",
+    "evidence": "reports/real-ai-integration-027/delivery-rag-8093/delivery-rag-current-20261002-result.json"
+  },
+  "work_orders": {
+    "WO7": "PENDING_ANALYSIS; authorized generation 5/intent 36 FAILED AI.INVALID_OUTPUT; no Assignment; generation cap exhausted",
+    "WO8": "PENDING_ANALYSIS; generation 2 FAILED AI.UNAVAILABLE; no Assignment; not continued",
+    "WO9": "PENDING_ANALYSIS; generation 2 FAILED AI.UNAVAILABLE; no Assignment; not continued",
+    "WO10": "PENDING_ANALYSIS; generation 2 FAILED AI.UNAVAILABLE; no Assignment; not continued",
+    "WO11": "PENDING_ANALYSIS; generation 2 FAILED AI.UNAVAILABLE; no Assignment; not continued"
+  },
+  "capabilities": {
+    "image_auto": false,
+    "voice_linked_auto": false,
+    "five_user_queue_to_dispatch": false,
+    "new_closed_page_flow": false,
+    "complete_local_delivery": false
+  },
+  "blocker": "The exact authorized WO7 recovery-generation limit is exhausted. WO8-11 continuation was conditional on WO7 reaching real AUTO. No new work order, replay, generation, or model budget is authorized."
+}
