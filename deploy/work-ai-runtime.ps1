@@ -14,11 +14,11 @@ $SecretPath = Join-Path $RuntimeDir "internal-token.txt"
 $ConfigPath = Join-Path $RuntimeDir "config.json"
 $CurrentPath = Join-Path $RuntimeDir "current.json"
 $OllamaCurrent = Join-Path $RepoRoot "tmp\delivery-ollama-runtime\current.json"
-$SourceCommit = "caa2d21594bb7b78f2dc01e6bdfacc408161ec58"
+$SourceCommit = "d9b3040b661eca84299ea2c9a729dc42d34b2724"
 $CandidateRoot = Join-Path $RuntimeDir "candidate-$SourceCommit"
 $AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
 $RuntimeControlPath = Join-Path $CandidateRoot "scripts\ops\local_ai_runtime_control.py"
-$ExpectedAdapterSha256 = "EE9F19900F923461AB8AD0A1DC65806FF96065E074C89B2B2456810B533C7270"
+$ExpectedAdapterSha256 = "7CC015E5C96644D4502CD079336DBE9DF9B8EFC81730AD79090B4C28B4767FBF"
 $ExpectedRuntimeControlSha256 = "CEA1B4AD6A5D2C12F70E233E28C791C86BC6EFDC5F2EA9864FDC022D57D13867"
 $ResolutionRoot = Join-Path $RepoRoot "reports"
 $ResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\call-001-resolution.json"
@@ -27,6 +27,12 @@ $ExpectedResolutionSha256 = "1DAEE269FDE7BF1EEB532528A9D12FE905D3F7D4A4FBB64A36F
 $ExpectedResolutionReviewSha256 = "094E801BAA750929793B2FA231EADD272CC052B05A42CC39B20359B61D0F06B0"
 $ExpectedReservationSha256 = "C2DA7C7D75698C01A25451887C72A290B6844A00095073C324B9B5CD52C1855F"
 $ExpectedResultSha256 = "577F4DB0ACC0D4D94DB4A4B6CB6B2FA5B450E461F37008606F86016667702784"
+$ReplayResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\call-008-replay-resolution-20261002.json"
+$ReplayResolutionReviewPath = Join-Path $RepoRoot "reports\codex\REAL-AI-INTEGRATION-027-CALL008-REPLAY-RESOLUTION-review.raw.json"
+$ExpectedReplayResolutionSha256 = "1C7F62B016973A08398215B639094DF5B460D4F35C621632F06A407585DE801E"
+$ExpectedReplayResolutionReviewSha256 = "51E64C808F978B642D7CD2368D923B82B635A819473F23D6A62B760A6B1A1BFB"
+$ExpectedReplayReservationSha256 = "4C196C2E93D029FF65036D3414BC02804EBEFC2A3AE7A847171C4245D9D76A71"
+$ExpectedReplayResultSha256 = "F34D19C9383FED33DE32535CBB48358D2F4C731AA537B349C767343C388FB5C4"
 $PythonPath = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\bge-142-cpu\.venv\Scripts\python.exe"
 $AsrPython = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\asr-006-cpu\.venv\Scripts\python.exe"
 $ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models-hf"
@@ -130,6 +136,17 @@ function Assert-Candidate {
             ($resultHash -ne $ExpectedResultSha256)) {
         throw "reviewed call-001 resolution binding mismatch"
     }
+    $replayReservation = Join-Path $PrivateDir "call-008\reservation.json"
+    $replayResult = Join-Path $PrivateDir "call-008\result.json"
+    foreach ($asset in @($ReplayResolutionPath,$ReplayResolutionReviewPath,$replayReservation,$replayResult)) {
+        if (-not (Test-Path -LiteralPath $asset -PathType Leaf)) { throw "reviewed call-008 replay asset is missing" }
+    }
+    if (((Get-FileHash -Algorithm SHA256 -LiteralPath $ReplayResolutionPath).Hash -ne $ExpectedReplayResolutionSha256) -or
+            ((Get-FileHash -Algorithm SHA256 -LiteralPath $ReplayResolutionReviewPath).Hash -ne $ExpectedReplayResolutionReviewSha256) -or
+            ((Get-FileHash -Algorithm SHA256 -LiteralPath $replayReservation).Hash -ne $ExpectedReplayReservationSha256) -or
+            ((Get-FileHash -Algorithm SHA256 -LiteralPath $replayResult).Hash -ne $ExpectedReplayResultSha256)) {
+        throw "reviewed call-008 replay binding mismatch"
+    }
 }
 
 function New-RuntimeBinding {
@@ -198,9 +215,9 @@ switch ($Action) {
         $config = [ordered]@{
             host="127.0.0.1";port=11437;private=$PrivateDir;model_root=$ModelRoot
             asr_python=$AsrPython;bge_python=$PythonPath;scope="work_order_only"
-            limits=[ordered]@{asr=2;embedding=12;reranker=8;qwen=120}
+            limits=[ordered]@{asr=6;embedding=12;reranker=8;qwen=105}
             call_baseline=[ordered]@{asr=1;embedding=6;reranker=2;qwen=46}
-            duration_seconds=7200;duration_baseline_seconds=535.483
+            duration_seconds=4336;duration_baseline_seconds=535.483
             asr_start_ram_mib=11264;evidence_root=$RuntimeDir
             shared_model_lock_path=(Join-Path $RepoRoot "tmp\delivery-ai-shared\model.lock")
             shared_model_lock_wait_seconds=55
@@ -213,6 +230,14 @@ switch ($Action) {
                 resolution_sha256=$ExpectedResolutionSha256
                 review_path=$ResolutionReviewPath
                 review_sha256=$ExpectedResolutionReviewSha256
+            },[ordered]@{
+                record="call-008"
+                reservation_sha256=$ExpectedReplayReservationSha256.ToLowerInvariant()
+                result_sha256=$ExpectedReplayResultSha256.ToLowerInvariant()
+                resolution_path=$ReplayResolutionPath
+                resolution_sha256=$ExpectedReplayResolutionSha256
+                review_path=$ReplayResolutionReviewPath
+                review_sha256=$ExpectedReplayResolutionReviewSha256
             })
             runtime_binding_path=$bindingPath
             runtime_binding_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $bindingPath).Hash.ToLowerInvariant()
