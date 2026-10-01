@@ -56,7 +56,11 @@ if QWEN_RUNTIME_MODEL!=QWEN_MODEL and (QWEN_MODEL,QWEN_RUNTIME_MODEL)!=(
 DIGEST,QWEN_RUNTIME_VERSION,QWEN_CONTEXT_LENGTH=QWEN_CANDIDATES[QWEN_RUNTIME_MODEL]
 QWEN_ENDPOINT=os.environ.get('PROPERTY_AI_LOCAL_QWEN_ENDPOINT','http://127.0.0.1:11435')
 if QWEN_ENDPOINT not in {'http://127.0.0.1:11435','http://127.0.0.1:11438'}:raise RuntimeError('UNAPPROVED_QWEN_ENDPOINT')
-QWEN_INFERENCE_TIMEOUT_SECONDS=180
+QWEN_INFERENCE_TIMEOUT_SECONDS=(
+    180 if (QWEN_MODEL,QWEN_RUNTIME_MODEL)==(
+        'qwen38-27b-q3km-g55:7af3b8f','qwen38-27b-q3km-g55-ctx8192:7af3b8f'
+    ) else 60
+)
 MODELS={'asr':'Qwen3-ASR-0.6B','embedding':'bge-m3','reranker':'bge-reranker-v2-m3','qwen':QWEN_MODEL}
 LIMITS={'asr':6,'embedding':12,'reranker':8,'qwen':120}
 CONTINUATION_MAX={'asr':1,'embedding':6,'reranker':6,'qwen':6}
@@ -105,6 +109,9 @@ def qwen_guard():
     loaded=direct('/api/ps')['models']
     if len(loaded)>1 or any(x['name']!=QWEN_RUNTIME_MODEL or x['digest']!=DIGEST or x['context_length']!=QWEN_CONTEXT_LENGTH for x in loaded):raise RuntimeError('QWEN_RESIDENCY_CHANGED')
     if ram()<4500 or gpu()<(2500 if loaded else 6000):raise RuntimeError('QWEN_RESOURCE_GUARD')
+
+def inference_timeout_seconds(kind):
+    return QWEN_INFERENCE_TIMEOUT_SECONDS if kind=='qwen' else 60
 
 def validate(kind,value):
     if kind=='asr':
@@ -189,7 +196,7 @@ def child(config_path,input_path,job_name):
     if kind=='qwen':
         emit(phase='inference',load_seconds=None,request_model=MODELS['qwen'],runtime_model=QWEN_RUNTIME_MODEL)
         runtime_value=value if QWEN_RUNTIME_MODEL==MODELS['qwen'] else {**value,'model':QWEN_RUNTIME_MODEL}
-        result=direct('/v1/chat/completions',runtime_value,timeout=QWEN_INFERENCE_TIMEOUT_SECONDS)
+        result=direct('/v1/chat/completions',runtime_value,timeout=inference_timeout_seconds(kind))
         emit(result=result,inference_seconds=time.monotonic()-start)
     else:
         model=load(kind,config['model_root']);emit(phase='inference',load_seconds=time.monotonic()-start)
@@ -500,7 +507,7 @@ class Runner:
                     if any(e.get('phase')=='inference' for e in events) and phase!='inference':phase='inference';phase_start=time.monotonic()
                     if point['ram_free_mib']<4500 or point.get('gpu_free_mib',2001)<2000:reason='RESOURCE_FLOOR'
                     elif time.time()>=deadline:reason='R2_WINDOW_EXHAUSTED'
-                    elif time.monotonic()-phase_start>(120 if phase=='load' else QWEN_INFERENCE_TIMEOUT_SECONDS):reason=phase.upper()+'_TIMEOUT'
+                    elif time.monotonic()-phase_start>(120 if phase=='load' else inference_timeout_seconds(kind)):reason=phase.upper()+'_TIMEOUT'
                     if reason:break
         finally:
             if reason is None and p is not None and p.poll() is not None:

@@ -52,7 +52,7 @@ def test_only_explicit_reviewed_qwen_candidates_can_configure_adapter(monkeypatc
     assert current.DIGEST=='eb18a122286f7a67d36dc8129f9caa1c0f7bb8449d7669a79e3ecb3d81289e0c'
     assert current.QWEN_RUNTIME_VERSION=='0.34.4'
     assert current.QWEN_CONTEXT_LENGTH==8192
-    assert current.QWEN_INFERENCE_TIMEOUT_SECONDS==180
+    assert current.QWEN_INFERENCE_TIMEOUT_SECONDS==60
     bounded=_load_adapter_candidate(
         monkeypatch,'qwen38-27b-q3km-g55:7af3b8f','qwen38-27b-q3km-g55-ctx8192:7af3b8f'
     )
@@ -61,6 +61,11 @@ def test_only_explicit_reviewed_qwen_candidates_can_configure_adapter(monkeypatc
     assert bounded.DIGEST=='06385258e076e9b22102da888a1593daef1dd1d679d863e5cc94c7c674ffed86'
     assert bounded.QWEN_RUNTIME_VERSION=='0.34.4'
     assert bounded.QWEN_CONTEXT_LENGTH==8192
+    assert bounded.QWEN_INFERENCE_TIMEOUT_SECONDS==180
+    assert rag.inference_timeout_seconds('qwen')==60
+    assert bounded.inference_timeout_seconds('asr')==60
+    assert bounded.inference_timeout_seconds('embedding')==60
+    assert bounded.inference_timeout_seconds('reranker')==60
     with pytest.raises(RuntimeError,match='UNAPPROVED_QWEN_CANDIDATE'):
         _load_adapter_candidate(monkeypatch,'qwen3.5:latest')
 
@@ -118,7 +123,7 @@ def test_qwen_child_uses_the_approved_bounded_180_second_runtime_timeout(tmp_pat
     assert captured['body']['model']=='qwen38-27b-q3km-g55-ctx8192:7af3b8f'
     assert captured['timeout']==180
     assert candidate.QWEN_INFERENCE_TIMEOUT_SECONDS==180
-    assert 'QWEN_INFERENCE_TIMEOUT_SECONDS' in inspect.getsource(candidate.Runner.run)
+    assert 'inference_timeout_seconds(kind)' in inspect.getsource(candidate.Runner.run)
     capsys.readouterr()
 
 
