@@ -1,0 +1,35 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-CALL013-REPLAY-RESOLUTION",
+  "review_type": "INDEPENDENT_READ_ONLY_INCREMENTAL",
+  "reviewed_head": "b99a24d5898e3db80f031bb1a9fae70a728f6629",
+  "verdict": "PASS_SCOPED_CALL_RESOLUTION",
+  "resolution_sha256": "1666931B1C0F4C1F8FB7CC1F63FFCA810D4502535FAB90998D13DB512C3DB5FB",
+  "source_sha256": {
+    "scripts/ops/local_ai_http.py": "CB52A2873638E67B3292F02AE8AA12EBBC85C03425D837F501CD5270326F940D",
+    "backend/tests/unit/test_local_ai_http_027.py": "C60841F490D22D39DC20508777360E4031F80265D52259D3A04C45A565B5B2F8"
+  },
+  "findings": [],
+  "closed_findings": [
+    {"id": "CALL013-R1-01", "status": "CLOSED", "evidence": "解除记录已补齐 historical_immediate_exit_confirmed=UNKNOWN 和 current_execution.currently_executing=false，与 _resolution 的强制语义校验一致；原始结果未修改。"},
+    {"id": "CALL013-R1-02", "status": "CLOSED", "evidence": "reserve 现在校验完整失败复验链：每个祖先均须具有哈希绑定的独立审查授权，已消费祖先必须只有一个同 kind/input_hash 的精确后继；只有未消费末端可预约一次。新增测试覆盖合法链、未审末端和末端再次失败后禁止自动追加。"}
+  ],
+  "verified": [
+    {"check": "原始记录与同输入对应", "evidence": "实际读取 call-008/call-013 的 reservation、result、input、stdout、stderr。call-013 五个文件哈希均与解除记录一致；两次 input.json SHA256相同，为66E0FCD7ACD79107918C4C4D0B27F1FAA23BE1022E1EBA3E07BAFDEC070F36EE。call-013 reservation明确replay_of=call-008；当前共有13条预约，同输入仅两条，call-013尚无后继。"},
+    {"check": "失败性质", "evidence": "call-013原始结果仍为FAILED / REMOTE_CLIENT_FAILED / CONTROLLED_STOP，耗时12.391秒；stdout没有语义结果事件，stderr为HTTP400。受绑定的Ollama日志明确记录task.n_tokens=4172、n_ctx_slot=4096，并在生成前拒绝。对应服务器收据虽然声明8192，原模型参数文件实际仍为4096。"},
+    {"check": "退出与资源", "evidence": "call-013保存了精确根进程身份、4个捕获进程、taskkill退出码0、tree_exit_confirmed及listener_exit_confirmed，并确认本请求子进程退出。保存样本最低RAM8514MiB、GPU2457MiB，未触及4500/2000运行底线。解除记录没有将历史即时退出UNKNOWN改写为已确认。"},
+    {"check": "8192别名实际资产", "evidence": "实际读取本地源与别名manifest及参数blob。manifest哈希分别为eb18a122286f7a67d36dc8129f9caa1c0f7bb8449d7669a79e3ecb3d81289e0c、06385258e076e9b22102da888a1593daef1dd1d679d863e5cc94c7c674ffed86；两者model/projector/config层摘要相同，参数仅num_ctx由4096变8192，num_gpu=55及temperature=0保留。别名引用既有权重，不要求新增权重下载。"},
+    {"check": "请求与运行模型隔离", "evidence": "源码保留原逻辑模型与原始输入用于校验、保存及计账，仅允许明确列出的g55到ctx8192别名映射；子进程发送前替换运行模型名。运行守卫核对别名digest、版本及驻留context，不改变原请求正文和schema。"},
+    {"check": "解除与预算边界", "evidence": "原始reservation/result、解除记录和独立review均需精确哈希匹配。新增UNKNOWN、缺失result、共享UNKNOWN屏障仍阻断。一次末端复验建立新预约、标记replay_of=call-013，继续累计原账本调用数与执行时间，不删除或重置历史消费。"},
+    {"check": "补充材料", "evidence": "别名摘要SHA256为F227FDF420E99949E0E166F443B978B9174BDBEF1F1D1DB7CD82304832548D0A；show收据为79BC9DB9F42D7C88B9A63C6F1CCA72EFD1D7F5299F93F4B2D82FE9AC68F2F5EE，均已独立计算核对。"}
+  ],
+  "tests_evidence": {"reviewed": "已读取直接新增测试源码及既有哈希漂移、UNKNOWN、预算守卫上下文。", "implementer_report": "87 passed, 1 warning", "limitation": "本审查未运行测试；该数量为实施方报告，不是本审查执行结果。"},
+  "unverified": [
+    "未运行任何模型、页面、业务请求、数据库、队列或进程操作，未修改文件。",
+    "当前执行不存在依据保存的退出记录及解除声明，未作独立实时进程查询。",
+    "8192别名尚未在本审查中验证实际加载、图片推理或语义质量；资产同源不等于推理通过。",
+    "当前部署入口尚需绑定并加载这份已审源码、精确别名及本次review收据；本结论不证明运行入口已完成换载。",
+    "未独立核对业务数据库是否变化；不把解除记录解释为WO7恢复、创建新工单或任何AUTO成功。",
+    "未审计网络下载历史；已确认本地别名引用相同权重层，不需要新权重资产。"
+  ],
+  "next_action": "保存本审查原文并按精确哈希绑定；固定加载已审适配器和ctx8192别名、核对空闲状态及既有资源和预算门槛后，仅执行已获授权的call-013同输入一次复验。保留call-008/013失败及全部历史UNKNOWN；出现新UNKNOWN立即停止，不自动追加、不恢复WO7，不将结果外推为业务或Production PASS。"
+}

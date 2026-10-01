@@ -260,6 +260,7 @@ def test_delivery_ollama_restart_requires_exact_controlled_stop_evidence() -> No
     assert '$process = Assert-StateProcess $state' in runtime
     assert 'function Retire-RebootedReceipt' in runtime
     assert 'ollama-0344-restart-resolution.json' in runtime
+    assert 'CF966772B58D8E152211F4054F9F32FBAA8D1342688FFD1A657E5FC50C25D9E4' in runtime
     assert '128943CB6C1B9CD653E1AB250B7D9D5330C2201184E2DA0B5399E3B4FB788317' in runtime
     assert '$recordedBoot -le $recordedStart' in runtime
     assert '$null -ne $currentPid' in runtime

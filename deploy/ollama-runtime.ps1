@@ -32,6 +32,11 @@ $ControlledStops = @(
         Path = Join-Path $RepoRoot "tmp\delivery-work-ai-runtime\calls\call-008\result.json"
         Sha256 = "F34D19C9383FED33DE32535CBB48358D2F4C731AA537B349C767343C388FB5C4"
         Reason = "REMOTE_CLIENT_FAILED"
+    },
+    [pscustomobject]@{
+        Path = Join-Path $RepoRoot "tmp\delivery-work-ai-runtime\calls\call-013\result.json"
+        Sha256 = "CF966772B58D8E152211F4054F9F32FBAA8D1342688FFD1A657E5FC50C25D9E4"
+        Reason = "REMOTE_CLIENT_FAILED"
     }
 )
 $ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models"

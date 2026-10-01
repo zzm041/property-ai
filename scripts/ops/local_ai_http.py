@@ -43,10 +43,17 @@ QWEN_CANDIDATES={
     'qwen3.5:4b':('2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd','0.34.4',4096),
     'qwen3.5:9b':('6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7','0.34.3',4096),
     'qwen38-27b-q3km-g55:7af3b8f':('eb18a122286f7a67d36dc8129f9caa1c0f7bb8449d7669a79e3ecb3d81289e0c','0.34.4',8192),
+    'qwen38-27b-q3km-g55-ctx8192:7af3b8f':('06385258e076e9b22102da888a1593daef1dd1d679d863e5cc94c7c674ffed86','0.34.4',8192),
 }
 QWEN_MODEL=os.environ.get('PROPERTY_AI_LOCAL_QWEN_MODEL','qwen3.5:4b')
-if QWEN_MODEL not in QWEN_CANDIDATES:raise RuntimeError('UNAPPROVED_QWEN_CANDIDATE')
-DIGEST,QWEN_RUNTIME_VERSION,QWEN_CONTEXT_LENGTH=QWEN_CANDIDATES[QWEN_MODEL]
+QWEN_RUNTIME_MODEL=os.environ.get('PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL',QWEN_MODEL)
+if QWEN_MODEL not in QWEN_CANDIDATES or QWEN_MODEL.endswith('-ctx8192:7af3b8f'):
+    raise RuntimeError('UNAPPROVED_QWEN_CANDIDATE')
+if QWEN_RUNTIME_MODEL not in QWEN_CANDIDATES:raise RuntimeError('UNAPPROVED_QWEN_RUNTIME_MODEL')
+if QWEN_RUNTIME_MODEL!=QWEN_MODEL and (QWEN_MODEL,QWEN_RUNTIME_MODEL)!=(
+    'qwen38-27b-q3km-g55:7af3b8f','qwen38-27b-q3km-g55-ctx8192:7af3b8f'
+):raise RuntimeError('UNAPPROVED_QWEN_RUNTIME_BINDING')
+DIGEST,QWEN_RUNTIME_VERSION,QWEN_CONTEXT_LENGTH=QWEN_CANDIDATES[QWEN_RUNTIME_MODEL]
 QWEN_ENDPOINT=os.environ.get('PROPERTY_AI_LOCAL_QWEN_ENDPOINT','http://127.0.0.1:11435')
 if QWEN_ENDPOINT not in {'http://127.0.0.1:11435','http://127.0.0.1:11438'}:raise RuntimeError('UNAPPROVED_QWEN_ENDPOINT')
 MODELS={'asr':'Qwen3-ASR-0.6B','embedding':'bge-m3','reranker':'bge-reranker-v2-m3','qwen':QWEN_MODEL}
@@ -93,9 +100,9 @@ def direct(path,body=None,timeout=3):
 def qwen_guard():
     if direct('/api/version').get('version')!=QWEN_RUNTIME_VERSION:raise RuntimeError('QWEN_VERSION_CHANGED')
     tags=direct('/api/tags')['models']
-    if not any(x['name']==MODELS['qwen'] and x['digest']==DIGEST for x in tags):raise RuntimeError('QWEN_DIGEST_CHANGED')
+    if not any(x['name']==QWEN_RUNTIME_MODEL and x['digest']==DIGEST for x in tags):raise RuntimeError('QWEN_DIGEST_CHANGED')
     loaded=direct('/api/ps')['models']
-    if len(loaded)>1 or any(x['name']!=MODELS['qwen'] or x['digest']!=DIGEST or x['context_length']!=QWEN_CONTEXT_LENGTH for x in loaded):raise RuntimeError('QWEN_RESIDENCY_CHANGED')
+    if len(loaded)>1 or any(x['name']!=QWEN_RUNTIME_MODEL or x['digest']!=DIGEST or x['context_length']!=QWEN_CONTEXT_LENGTH for x in loaded):raise RuntimeError('QWEN_RESIDENCY_CHANGED')
     if ram()<4500 or gpu()<(2500 if loaded else 6000):raise RuntimeError('QWEN_RESOURCE_GUARD')
 
 def validate(kind,value):
@@ -179,8 +186,9 @@ def child(config_path,input_path,job_name):
     emit(phase='owned',actual_pid=os.getpid(),request_job=job_name)
     offline(Path(config['private'])/'hf-cache');start=time.monotonic();emit(phase='load')
     if kind=='qwen':
-        emit(phase='inference',load_seconds=None)
-        result=direct('/v1/chat/completions',value,timeout=60)
+        emit(phase='inference',load_seconds=None,request_model=MODELS['qwen'],runtime_model=QWEN_RUNTIME_MODEL)
+        runtime_value=value if QWEN_RUNTIME_MODEL==MODELS['qwen'] else {**value,'model':QWEN_RUNTIME_MODEL}
+        result=direct('/v1/chat/completions',runtime_value,timeout=60)
         emit(result=result,inference_seconds=time.monotonic()-start)
     else:
         model=load(kind,config['model_root']);emit(phase='inference',load_seconds=time.monotonic()-start)
@@ -391,12 +399,21 @@ class Runner:
             for p,r in zip(prior,records):
                 result=json.loads((p.parent/'result.json').read_text(encoding='utf-8'))
                 if r.get('input_hash')==input_hash and r['kind']==kind and result.get('status')!='SUCCESS':failed.append((p,result))
-            for p,result in failed:
+            for index,(p,result) in enumerate(failed):
                 resolution=self._resolution(p,result)
-                used=any(r.get('replay_of')==p.parent.name for r in records)
-                if not resolution or not resolution.get('explicit_same_input_replay',{}).get('authorized') or used:
+                children=[r for r in records if r.get('replay_of')==p.parent.name]
+                if not resolution or not resolution.get('explicit_same_input_replay',{}).get('authorized'):
                     raise RuntimeError('FAILED_INPUT_NO_AUTOMATIC_MODEL_RETRY')
-                replay_of=p.parent.name
+                if index<len(failed)-1:
+                    expected_child=failed[index+1][0].parent.name
+                    if len(children)!=1 or children[0].get('input_hash')!=input_hash or children[0].get('kind')!=kind:
+                        raise RuntimeError('FAILED_INPUT_NO_AUTOMATIC_MODEL_RETRY')
+                    child_path=prior[records.index(children[0])]
+                    if child_path.parent.name!=expected_child:
+                        raise RuntimeError('FAILED_INPUT_NO_AUTOMATIC_MODEL_RETRY')
+                else:
+                    if children:raise RuntimeError('FAILED_INPUT_NO_AUTOMATIC_MODEL_RETRY')
+                    replay_of=p.parent.name
         now=time.time()
         if self.continuation:
             base=self.continuation['base_count'];new=records[base:]

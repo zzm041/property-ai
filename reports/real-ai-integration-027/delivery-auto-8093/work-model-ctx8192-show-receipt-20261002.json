@@ -1,0 +1,26 @@
+{
+  "format": "property-ai-local-ollama-show-receipt-v1",
+  "captured_at": "2026-10-02T04:41:00+08:00",
+  "endpoint": "127.0.0.1:11435",
+  "inference_requests": 0,
+  "models": [
+    {
+      "name": "qwen38-27b-q3km-g55:7af3b8f",
+      "digest": "eb18a122286f7a67d36dc8129f9caa1c0f7bb8449d7669a79e3ecb3d81289e0c",
+      "size": 14839695332,
+      "parameters": "num_ctx                        4096\nnum_gpu                        55\ntemperature                    0",
+      "details": {"parent_model": "qwen38-27b-q3km-g52:7af3b8f", "format": "gguf", "family": "qwen35", "parameter_size": "26.9B", "quantization_level": "Q3_K_M", "context_length": 262144, "embedding_length": 5120},
+      "capabilities": ["tools", "thinking", "completion", "vision"],
+      "modelfile_sha256": "218EC651F3CE84A15614CCDF77DBE46EA5F525E6C26373499580056E43D14DEB"
+    },
+    {
+      "name": "qwen38-27b-q3km-g55-ctx8192:7af3b8f",
+      "digest": "06385258e076e9b22102da888a1593daef1dd1d679d863e5cc94c7c674ffed86",
+      "size": 14839695332,
+      "parameters": "temperature                    0\nnum_ctx                        8192\nnum_gpu                        55",
+      "details": {"parent_model": "qwen38-27b-q3km-g55:7af3b8f", "format": "gguf", "family": "qwen35", "parameter_size": "26.9B", "quantization_level": "Q3_K_M", "context_length": 262144, "embedding_length": 5120},
+      "capabilities": ["tools", "thinking", "completion", "vision"],
+      "modelfile_sha256": "8DD19820DA0E1C4C4952969BB4CD3F4F627721354FF8F9C82AF890D7218743E1"
+    }
+  ]
+}

@@ -24,8 +24,12 @@ spec=importlib.util.spec_from_file_location('local_ai_http_027',ROOT/'scripts/op
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 
 
-def _load_adapter_candidate(monkeypatch, model):
+def _load_adapter_candidate(monkeypatch, model, runtime_model=None):
     monkeypatch.setenv('PROPERTY_AI_LOCAL_QWEN_MODEL',model)
+    if runtime_model is None:
+        monkeypatch.delenv('PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL',raising=False)
+    else:
+        monkeypatch.setenv('PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL',runtime_model)
     candidate_spec=importlib.util.spec_from_file_location(
         f'local_ai_http_{model.replace(":", "_")}',ROOT/'scripts/ops/local_ai_http.py'
     )
@@ -47,6 +51,14 @@ def test_only_explicit_reviewed_qwen_candidates_can_configure_adapter(monkeypatc
     assert current.DIGEST=='eb18a122286f7a67d36dc8129f9caa1c0f7bb8449d7669a79e3ecb3d81289e0c'
     assert current.QWEN_RUNTIME_VERSION=='0.34.4'
     assert current.QWEN_CONTEXT_LENGTH==8192
+    bounded=_load_adapter_candidate(
+        monkeypatch,'qwen38-27b-q3km-g55:7af3b8f','qwen38-27b-q3km-g55-ctx8192:7af3b8f'
+    )
+    assert bounded.MODELS['qwen']=='qwen38-27b-q3km-g55:7af3b8f'
+    assert bounded.QWEN_RUNTIME_MODEL=='qwen38-27b-q3km-g55-ctx8192:7af3b8f'
+    assert bounded.DIGEST=='06385258e076e9b22102da888a1593daef1dd1d679d863e5cc94c7c674ffed86'
+    assert bounded.QWEN_RUNTIME_VERSION=='0.34.4'
+    assert bounded.QWEN_CONTEXT_LENGTH==8192
     with pytest.raises(RuntimeError,match='UNAPPROVED_QWEN_CANDIDATE'):
         _load_adapter_candidate(monkeypatch,'qwen3.5:latest')
 
@@ -60,13 +72,29 @@ def test_qwen_residency_guard_binds_context_to_reviewed_candidate(monkeypatch,mo
     candidate=_load_adapter_candidate(monkeypatch,model)
     def direct(path):
         if path=='/api/version':return {'version':candidate.QWEN_RUNTIME_VERSION}
-        if path=='/api/tags':return {'models':[{'name':model,'digest':candidate.DIGEST}]}
-        if path=='/api/ps':return {'models':[{'name':model,'digest':candidate.DIGEST,'context_length':expected_context}]}
+        if path=='/api/tags':return {'models':[{'name':candidate.QWEN_RUNTIME_MODEL,'digest':candidate.DIGEST}]}
+        if path=='/api/ps':return {'models':[{'name':candidate.QWEN_RUNTIME_MODEL,'digest':candidate.DIGEST,'context_length':expected_context}]}
         raise AssertionError(path)
     monkeypatch.setattr(candidate,'direct',direct)
     monkeypatch.setattr(candidate,'ram',lambda:12000)
     monkeypatch.setattr(candidate,'gpu',lambda:4000)
     candidate.qwen_guard()
+
+
+def test_runtime_alias_keeps_the_stable_api_model_and_binds_actual_8192_residency(monkeypatch):
+    candidate=_load_adapter_candidate(
+        monkeypatch,'qwen38-27b-q3km-g55:7af3b8f','qwen38-27b-q3km-g55-ctx8192:7af3b8f'
+    )
+    def direct(path):
+        if path=='/api/version':return {'version':'0.34.4'}
+        if path=='/api/tags':return {'models':[{'name':candidate.QWEN_RUNTIME_MODEL,'digest':candidate.DIGEST}]}
+        if path=='/api/ps':return {'models':[{'name':candidate.QWEN_RUNTIME_MODEL,'digest':candidate.DIGEST,'context_length':8192}]}
+        raise AssertionError(path)
+    monkeypatch.setattr(candidate,'direct',direct)
+    monkeypatch.setattr(candidate,'ram',lambda:12000)
+    monkeypatch.setattr(candidate,'gpu',lambda:4000)
+    candidate.qwen_guard()
+    assert candidate.MODELS['qwen']=='qwen38-27b-q3km-g55:7af3b8f'
 
 
 def test_qwen38_residency_guard_rejects_old_4096_context(monkeypatch):
@@ -504,6 +532,64 @@ def test_reviewed_unknown_resolution_unblocks_one_exact_replay_without_continuat
     record=json.loads((replay/'reservation.json').read_text())
     assert replay.name=='call-002' and record['replay_of']=='call-001'
     m.save(replay/'result.json',{'status':'FAILED','owned_exit_confirmed':True})
+    with pytest.raises(RuntimeError,match='FAILED_INPUT'):
+        runner.reserve('qwen',input_hash)
+
+
+def test_reviewed_failed_replay_chain_allows_only_the_unconsumed_terminal_once(tmp_path,monkeypatch):
+    private=tmp_path/'run';evidence=tmp_path/'evidence';private.mkdir();evidence.mkdir()
+    input_hash='same-reviewed-chain-input';resolutions=[]
+    parent=None
+    for number in (1,2):
+        folder=private/f'call-{number:03d}';folder.mkdir()
+        reservation=folder/'reservation.json';result=folder/'result.json'
+        record={'kind':'qwen','unix':float(number),'input_hash':input_hash}
+        if parent:record['replay_of']=parent
+        m.save(reservation,record)
+        m.save(result,{'status':'FAILED','reason':'REMOTE_CLIENT_FAILED','owned_exit_confirmed':True,'total_seconds':1.0})
+        reservation_hash=hashlib.sha256(reservation.read_bytes()).hexdigest()
+        result_hash=hashlib.sha256(result.read_bytes()).hexdigest()
+        resolution=evidence/f'resolution-{number}.json'
+        m.save(resolution,{'record':folder.name,'original':{'status':'FAILED','historical_immediate_exit_confirmed':'UNKNOWN',
+            'reservation_sha256':reservation_hash,'result_sha256':result_hash},
+            'current_execution':{'currently_executing':False},'explicit_same_input_replay':{'authorized':True}})
+        resolution_hash=hashlib.sha256(resolution.read_bytes()).hexdigest();review=evidence/f'review-{number}.json'
+        m.save(review,{'verdict':'PASS_SCOPED_CALL_RESOLUTION','resolution_sha256':resolution_hash})
+        resolutions.append({'record':folder.name,'reservation_sha256':reservation_hash,'result_sha256':result_hash,
+            'resolution_path':str(resolution),'resolution_sha256':resolution_hash,'review_path':str(review),
+            'review_sha256':hashlib.sha256(review.read_bytes()).hexdigest()})
+        parent=folder.name
+    config={'private':str(private),'host':'127.0.0.1','port':11436,'evidence_root':str(evidence),'resolutions':resolutions}
+    path=tmp_path/'config.json';path.write_text(json.dumps(config),encoding='utf-8')
+    runner=m.Runner(path);monkeypatch.setattr(m.time,'time',lambda:100.)
+    replay,_=runner.reserve('qwen',input_hash)
+    replay_record=json.loads((replay/'reservation.json').read_text())
+    assert replay.name=='call-003' and replay_record['replay_of']=='call-002'
+    m.save(replay/'result.json',{'status':'FAILED','owned_exit_confirmed':True,'total_seconds':1.0})
+    with pytest.raises(RuntimeError,match='FAILED_INPUT'):
+        runner.reserve('qwen',input_hash)
+
+
+def test_reviewed_replay_chain_rejects_an_unreviewed_terminal(tmp_path,monkeypatch):
+    private=tmp_path/'run';evidence=tmp_path/'evidence';private.mkdir();evidence.mkdir()
+    first=private/'call-001';second=private/'call-002';first.mkdir();second.mkdir();input_hash='chain-with-gap'
+    m.save(first/'reservation.json',{'kind':'qwen','unix':1.,'input_hash':input_hash})
+    m.save(first/'result.json',{'status':'FAILED','owned_exit_confirmed':True,'total_seconds':1.})
+    m.save(second/'reservation.json',{'kind':'qwen','unix':2.,'input_hash':input_hash,'replay_of':'call-001'})
+    m.save(second/'result.json',{'status':'FAILED','owned_exit_confirmed':True,'total_seconds':1.})
+    reservation_hash=hashlib.sha256((first/'reservation.json').read_bytes()).hexdigest()
+    result_hash=hashlib.sha256((first/'result.json').read_bytes()).hexdigest();resolution=evidence/'resolution.json'
+    m.save(resolution,{'record':'call-001','original':{'status':'FAILED','historical_immediate_exit_confirmed':'UNKNOWN',
+        'reservation_sha256':reservation_hash,'result_sha256':result_hash},'current_execution':{'currently_executing':False},
+        'explicit_same_input_replay':{'authorized':True}})
+    resolution_hash=hashlib.sha256(resolution.read_bytes()).hexdigest();review=evidence/'review.json'
+    m.save(review,{'verdict':'PASS_SCOPED_CALL_RESOLUTION','resolution_sha256':resolution_hash})
+    config={'private':str(private),'host':'127.0.0.1','port':11436,'evidence_root':str(evidence),'resolutions':[{
+        'record':'call-001','reservation_sha256':reservation_hash,'result_sha256':result_hash,
+        'resolution_path':str(resolution),'resolution_sha256':resolution_hash,'review_path':str(review),
+        'review_sha256':hashlib.sha256(review.read_bytes()).hexdigest()}]}
+    path=tmp_path/'config.json';path.write_text(json.dumps(config),encoding='utf-8')
+    runner=m.Runner(path);monkeypatch.setattr(m.time,'time',lambda:100.)
     with pytest.raises(RuntimeError,match='FAILED_INPUT'):
         runner.reserve('qwen',input_hash)
 

@@ -1,0 +1,62 @@
+{
+  "format": "property-ai-model-call-resolution-v1",
+  "task_id": "REAL-AI-INTEGRATION-027-DELIVERY-AUTO",
+  "run_id": "delivery-auto-702c3db745",
+  "record": "call-013",
+  "created_at": "2026-10-02T04:35:00+08:00",
+  "authorization": "Owner-approved bounded replay after an ordinary runtime implementation defect is proven and fixed.",
+  "original": {
+    "status": "FAILED",
+    "reason": "REMOTE_CLIENT_FAILED",
+    "historical_immediate_exit_confirmed": "UNKNOWN",
+    "remote_completion": "CONTROLLED_STOP",
+    "owned_exit_confirmed": true,
+    "model": "qwen38-27b-q3km-g55:7af3b8f",
+    "input_hash": "ff48437886db364bfb46351239ed04dc263cb779b39c8f9a4b5b0a9c043617cd",
+    "reservation_sha256": "57304CCA7754612CD7F93B2EAEB4568F69FE14D4675F145F16B64F7A2B1725CD",
+    "result_sha256": "CF966772B58D8E152211F4054F9F32FBAA8D1342688FFD1A657E5FC50C25D9E4",
+    "input_sha256": "66E0FCD7ACD79107918C4C4D0B27F1FAA23BE1022E1EBA3E07BAFDEC070F36EE",
+    "stdout_sha256": "D82BE3833F82091939EB3664C6C84E601486237F712FB7C5A38179E0967C8E12",
+    "stderr_sha256": "397ED6F7CF63A0056A155E2AD9EAF0E57F643651C5239F58206440F344C6B6F1",
+    "replay_of": "call-008",
+    "total_seconds": 12.39100000000326
+  },
+  "current_execution": {
+    "currently_executing": false,
+    "owned_child_exit_confirmed": true,
+    "remote_tree_exit_confirmed": true,
+    "listener_exit_confirmed": true,
+    "meaning": "current absence is confirmed; the historical immediate-exit mode remains unknown"
+  },
+  "diagnosis": {
+    "http_status": 400,
+    "ollama_error": "request token count 4172 exceeded actual slot context 4096 before generation",
+    "server_receipt_context": 8192,
+    "source_model_parameter_num_ctx": 4096,
+    "root_cause": "the model tag parameter overrode the server-level 8192 context setting",
+    "semantic_output_produced": false,
+    "resource_floor_crossed": false
+  },
+  "fixed_runtime": {
+    "model": "qwen38-27b-q3km-g55-ctx8192:7af3b8f",
+    "manifest_digest": "06385258e076e9b22102da888a1593daef1dd1d679d863e5cc94c7c674ffed86",
+    "num_ctx": 8192,
+    "same_parent_weights": true,
+    "new_weight_download": false
+  },
+  "explicit_same_input_replay": {
+    "authorized": true,
+    "maximum_replays_for_original_record": 1,
+    "counts_against_new_qwen_limit": true,
+    "counts_against_new_model_seconds_limit": true,
+    "requires_exact_input_hash": true,
+    "requires_fixed_runtime_identity": true
+  },
+  "boundaries": {
+    "historical_result_rewritten": false,
+    "work_order_recovered_or_modified": false,
+    "new_work_order_created": false,
+    "unknown_barrier_relaxed": false,
+    "resource_floors_changed": false
+  }
+}
