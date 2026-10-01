@@ -1,0 +1,43 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-NEW-CANARY-CLOSED",
+  "work_order_id": 12,
+  "interaction": "WeChat DevTools actual page inputs and button taps",
+  "credentials_saved": false,
+  "direct_database_business_write": false,
+  "manual_assignment": false,
+  "screenshots": [
+    "23-new-canary-auto-assigned-staff.png",
+    "24-new-canary-processing.png",
+    "25-new-canary-wait-confirm.png",
+    "26-new-canary-resident-closed.png"
+  ],
+  "stages": [
+    {
+      "actor": "staffB1",
+      "status": "ASSIGNED",
+      "action": "view_auto_assignment"
+    },
+    {
+      "actor": "staffB1",
+      "status": "ACCEPTED",
+      "action": "tap_accept"
+    },
+    {
+      "actor": "staffB1",
+      "status": "PROCESSING",
+      "action": "tap_start"
+    },
+    {
+      "actor": "staffB1",
+      "status": "WAIT_CONFIRM",
+      "action": "submit_complete_receipt"
+    },
+    {
+      "actor": "residentB1",
+      "status": "CLOSED",
+      "action": "tap_confirm",
+      "auto_dispatched": true,
+      "receipt_present": true
+    }
+  ]
+}

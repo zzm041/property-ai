@@ -1,0 +1,15 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-NEW-CANARY-CLOSED",
+  "work_order_id": 12,
+  "interaction": "WeChat DevTools page inputs and button taps with origin wx.request",
+  "requests": [],
+  "screenshots": [],
+  "boundaries": {
+    "normal_password_page_login": true,
+    "direct_database_business_write": false,
+    "manual_assignment": false,
+    "direct_lifecycle_api_call": false,
+    "credentials_or_tokens_saved": false
+  },
+  "error": "Error: Failed connecting to ws://127.0.0.1:9440, check if target project window is opened with automation enabled\n    at Launcher.connectTool (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\miniprogram-automator\\out\\Launcher.js:1:3020)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async Launcher.connect (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\miniprogram-automator\\out\\Launcher.js:1:2600)\n    at async Automator.connect (C:\\Users\\lmj\\AppData\\Local\\Temp\\mp-automator-npm\\node_modules\\miniprogram-automator\\out\\Automator.js:1:1352)\n    at async main (D:\\property-ai\\reports\\real-ai-integration-027\\delivery-auto-8093\\run-new-canary-closed-page.js:148:17)"
+}

@@ -1,0 +1,15 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-NEW-IMAGE-CANARY",
+  "interaction": "wechatide supported element/page automation",
+  "property_id": 6,
+  "normal_password_page_login": true,
+  "actual_checkin_button": true,
+  "direct_database_write": false,
+  "manual_assignment": false,
+  "credentials_saved": false,
+  "screenshots": [
+    "20-new-canary-staff-checkin.png"
+  ],
+  "business_date": "2026-10-02",
+  "on_duty": ""
+}

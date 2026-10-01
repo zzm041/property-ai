@@ -1,0 +1,21 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-OVERLAP",
+  "property_id": 5,
+  "normal_password_page_login": true,
+  "actual_checkin_button": true,
+  "direct_database_write": false,
+  "manual_assignment": false,
+  "credentials_saved": false,
+  "checkins": [
+    {
+      "key": "staffA1",
+      "business_date": "2026-10-02",
+      "screenshot": "21-overlap-staffA1-checkin.png"
+    },
+    {
+      "key": "staffA2",
+      "business_date": "2026-10-02",
+      "screenshot": "22-overlap-staffA2-checkin.png"
+    }
+  ]
+}

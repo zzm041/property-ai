@@ -1,0 +1,1054 @@
+{
+  "format": "real-ai-integration-027-final-runtime-raw-v1",
+  "captured_at_utc": "2026-10-01T22:10:59.5099700Z",
+  "collection": {
+    "database": "read-only SQL through the running 8093 API container",
+    "rabbitmq": "rabbitmqctl metadata only; message bodies not read",
+    "runtime": "loopback health and immutable local receipts; tokens not persisted",
+    "business_write": false
+  },
+  "database": {
+    "work_orders": [
+      {
+        "id": 12,
+        "tenant_id": 6,
+        "property_id": 6,
+        "reporter_user_id": 11,
+        "status": "CLOSED",
+        "process_reason": "NONE",
+        "current_assignment_id": null,
+        "version": 8
+      },
+      {
+        "id": 13,
+        "tenant_id": 6,
+        "property_id": 6,
+        "reporter_user_id": 12,
+        "status": "ASSIGNED",
+        "process_reason": "NONE",
+        "current_assignment_id": 5,
+        "version": 3
+      },
+      {
+        "id": 14,
+        "tenant_id": 5,
+        "property_id": 5,
+        "reporter_user_id": 6,
+        "status": "ASSIGNED",
+        "process_reason": "NONE",
+        "current_assignment_id": 3,
+        "version": 3
+      },
+      {
+        "id": 15,
+        "tenant_id": 5,
+        "property_id": 5,
+        "reporter_user_id": 8,
+        "status": "ASSIGNED",
+        "process_reason": "NONE",
+        "current_assignment_id": 4,
+        "version": 3
+      },
+      {
+        "id": 16,
+        "tenant_id": 6,
+        "property_id": 6,
+        "reporter_user_id": 11,
+        "status": "PENDING_ASSIGNMENT",
+        "process_reason": "NONE",
+        "current_assignment_id": null,
+        "version": 2
+      },
+      {
+        "id": 17,
+        "tenant_id": 5,
+        "property_id": 5,
+        "reporter_user_id": 7,
+        "status": "PENDING_ASSIGNMENT",
+        "process_reason": "NONE",
+        "current_assignment_id": null,
+        "version": 2
+      }
+    ],
+    "task_intents": [
+      {
+        "id": 50,
+        "operation": "ANALYZE_WORK_ORDER",
+        "resource_id": 12,
+        "resource_version": 1,
+        "generation": 1,
+        "status": "FAILED",
+        "publish_attempt": 3,
+        "execution_attempt": 3,
+        "last_error_code": "AI.UNAVAILABLE"
+      },
+      {
+        "id": 51,
+        "operation": "ANALYZE_WORK_ORDER",
+        "resource_id": 12,
+        "resource_version": 1,
+        "generation": 2,
+        "status": "SUCCEEDED",
+        "publish_attempt": 1,
+        "execution_attempt": 1,
+        "last_error_code": null
+      },
+      {
+        "id": 61,
+        "operation": "ANALYZE_WORK_ORDER",
+        "resource_id": 13,
+        "resource_version": 1,
+        "generation": 1,
+        "status": "SUCCEEDED",
+        "publish_attempt": 1,
+        "execution_attempt": 1,
+        "last_error_code": null
+      },
+      {
+        "id": 57,
+        "operation": "ANALYZE_WORK_ORDER",
+        "resource_id": 14,
+        "resource_version": 1,
+        "generation": 1,
+        "status": "SUCCEEDED",
+        "publish_attempt": 1,
+        "execution_attempt": 1,
+        "last_error_code": null
+      },
+      {
+        "id": 58,
+        "operation": "ANALYZE_WORK_ORDER",
+        "resource_id": 15,
+        "resource_version": 1,
+        "generation": 1,
+        "status": "SUCCEEDED",
+        "publish_attempt": 1,
+        "execution_attempt": 1,
+        "last_error_code": null
+      },
+      {
+        "id": 63,
+        "operation": "ANALYZE_WORK_ORDER",
+        "resource_id": 16,
+        "resource_version": 1,
+        "generation": 1,
+        "status": "SUCCEEDED",
+        "publish_attempt": 2,
+        "execution_attempt": 1,
+        "last_error_code": null
+      },
+      {
+        "id": 60,
+        "operation": "ANALYZE_WORK_ORDER",
+        "resource_id": 17,
+        "resource_version": 1,
+        "generation": 1,
+        "status": "SUCCEEDED",
+        "publish_attempt": 1,
+        "execution_attempt": 1,
+        "last_error_code": null
+      }
+    ],
+    "analyses": [
+      {
+        "work_order_id": 12,
+        "analysis_version": 1,
+        "status": "COMPLETED",
+        "category": "PLUMBING",
+        "subcategory": "evt2:a1453630a10772cadd0a7f78823467c8",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "maintenance",
+        "confidence": "0.850",
+        "prompt_version": "wo-analysis-v14-resistance-not-looseness",
+        "error_code": null
+      },
+      {
+        "work_order_id": 13,
+        "analysis_version": 1,
+        "status": "COMPLETED",
+        "category": "PLUMBING",
+        "subcategory": "evt2:c36f60ab5c53b301db1d2a53c07fe989",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "maintenance",
+        "confidence": "0.950",
+        "prompt_version": "wo-analysis-v14-resistance-not-looseness",
+        "error_code": null
+      },
+      {
+        "work_order_id": 14,
+        "analysis_version": 1,
+        "status": "COMPLETED",
+        "category": "PLUMBING",
+        "subcategory": "evt2:375a220fab6459d0c9413210cca88fff",
+        "severity": "MEDIUM",
+        "priority": "HIGH",
+        "risk": "flooding",
+        "required_role": "STAFF",
+        "required_skill": "maintenance",
+        "confidence": "0.950",
+        "prompt_version": "wo-analysis-v14-resistance-not-looseness",
+        "error_code": null
+      },
+      {
+        "work_order_id": 15,
+        "analysis_version": 1,
+        "status": "COMPLETED",
+        "category": "OTHER",
+        "subcategory": "evt2:8afda6d88c02d96273cf458e351383b0",
+        "severity": "MEDIUM",
+        "priority": "HIGH",
+        "risk": "flooding",
+        "required_role": "STAFF",
+        "required_skill": "maintenance",
+        "confidence": "0.950",
+        "prompt_version": "wo-analysis-v14-resistance-not-looseness",
+        "error_code": null
+      },
+      {
+        "work_order_id": 16,
+        "analysis_version": 1,
+        "status": "COMPLETED",
+        "category": "PLUMBING",
+        "subcategory": "evt2:a1453630a10772cadd0a7f78823467c8",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "maintenance",
+        "confidence": "0.900",
+        "prompt_version": "wo-analysis-v14-resistance-not-looseness",
+        "error_code": null
+      },
+      {
+        "work_order_id": 17,
+        "analysis_version": 1,
+        "status": "COMPLETED",
+        "category": "PLUMBING",
+        "subcategory": "evt2:a1453630a10772cadd0a7f78823467c8",
+        "severity": "LOW",
+        "priority": "MEDIUM",
+        "risk": "none",
+        "required_role": "STAFF",
+        "required_skill": "maintenance",
+        "confidence": "0.950",
+        "prompt_version": "wo-analysis-v14-resistance-not-looseness",
+        "error_code": null
+      }
+    ],
+    "assignments": [
+      {
+        "id": 2,
+        "work_order_id": 12,
+        "employee_id": 3,
+        "status": "ENDED",
+        "assigned_source": "AUTO",
+        "reason": "AUTO_DISPATCH",
+        "tenant_id": 6,
+        "property_id": 6,
+        "employee_tenant_id": 6
+      },
+      {
+        "id": 5,
+        "work_order_id": 13,
+        "employee_id": 3,
+        "status": "ACTIVE",
+        "assigned_source": "AUTO",
+        "reason": "AUTO_DISPATCH",
+        "tenant_id": 6,
+        "property_id": 6,
+        "employee_tenant_id": 6
+      },
+      {
+        "id": 3,
+        "work_order_id": 14,
+        "employee_id": 2,
+        "status": "ACTIVE",
+        "assigned_source": "AUTO",
+        "reason": "AUTO_DISPATCH",
+        "tenant_id": 5,
+        "property_id": 5,
+        "employee_tenant_id": 5
+      },
+      {
+        "id": 4,
+        "work_order_id": 15,
+        "employee_id": 1,
+        "status": "ACTIVE",
+        "assigned_source": "AUTO",
+        "reason": "AUTO_DISPATCH",
+        "tenant_id": 5,
+        "property_id": 5,
+        "employee_tenant_id": 5
+      }
+    ],
+    "daily_statuses": [
+      {
+        "employee_id": 1,
+        "tenant_id": 5,
+        "property_id": 5,
+        "business_date": "2026-10-02",
+        "on_duty": "ON_DUTY",
+        "current_load": 1
+      },
+      {
+        "employee_id": 2,
+        "tenant_id": 5,
+        "property_id": 5,
+        "business_date": "2026-10-02",
+        "on_duty": "ON_DUTY",
+        "current_load": 1
+      },
+      {
+        "employee_id": 3,
+        "tenant_id": 6,
+        "property_id": 6,
+        "business_date": "2026-10-02",
+        "on_duty": "ON_DUTY",
+        "current_load": 1
+      }
+    ],
+    "contents": [
+      {
+        "work_order_id": 12,
+        "asr_characters": 0,
+        "asr_sha256": ""
+      },
+      {
+        "work_order_id": 13,
+        "asr_characters": 26,
+        "asr_sha256": "9e42fe17aa9fbed1123666b7d19b5c98c30f88a629572ee4e055daee30dadf9b"
+      },
+      {
+        "work_order_id": 14,
+        "asr_characters": 0,
+        "asr_sha256": ""
+      },
+      {
+        "work_order_id": 15,
+        "asr_characters": 0,
+        "asr_sha256": ""
+      },
+      {
+        "work_order_id": 16,
+        "asr_characters": 0,
+        "asr_sha256": ""
+      },
+      {
+        "work_order_id": 17,
+        "asr_characters": 0,
+        "asr_sha256": ""
+      }
+    ],
+    "media": [
+      {
+        "work_order_id": 12,
+        "kind": "IMAGE",
+        "file_id": 13,
+        "taken_phase": "REPORT",
+        "uploader_user_id": 11
+      },
+      {
+        "work_order_id": 13,
+        "kind": "IMAGE",
+        "file_id": 11,
+        "taken_phase": "REPORT",
+        "uploader_user_id": 12
+      },
+      {
+        "work_order_id": 13,
+        "kind": "AUDIO",
+        "file_id": 12,
+        "taken_phase": "REPORT",
+        "uploader_user_id": 12
+      },
+      {
+        "work_order_id": 14,
+        "kind": "IMAGE",
+        "file_id": 7,
+        "taken_phase": "REPORT",
+        "uploader_user_id": 6
+      },
+      {
+        "work_order_id": 15,
+        "kind": "IMAGE",
+        "file_id": 9,
+        "taken_phase": "REPORT",
+        "uploader_user_id": 8
+      },
+      {
+        "work_order_id": 16,
+        "kind": "IMAGE",
+        "file_id": 10,
+        "taken_phase": "REPORT",
+        "uploader_user_id": 11
+      },
+      {
+        "work_order_id": 17,
+        "kind": "IMAGE",
+        "file_id": 8,
+        "taken_phase": "REPORT",
+        "uploader_user_id": 7
+      }
+    ],
+    "log_counts": [
+      {
+        "work_order_id": 12,
+        "event_code": "ACCEPT",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 12,
+        "event_code": "AI_TASK_ATTEMPT",
+        "event_count": 4
+      },
+      {
+        "work_order_id": 12,
+        "event_code": "AI_TASK_FAILED",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 12,
+        "event_code": "AI_VLM_CHECKPOINT",
+        "event_count": 2
+      },
+      {
+        "work_order_id": 12,
+        "event_code": "ANALYZE",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 12,
+        "event_code": "ARCHIVE",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 12,
+        "event_code": "ASSIGN",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 12,
+        "event_code": "AUTO_DISPATCH_WAIT",
+        "event_count": 3
+      },
+      {
+        "work_order_id": 12,
+        "event_code": "CONFIRM",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 12,
+        "event_code": "CREATE",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 12,
+        "event_code": "RECEIPT_RESOLVED",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 12,
+        "event_code": "START",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 13,
+        "event_code": "AI_ASR_CHECKPOINT",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 13,
+        "event_code": "AI_TASK_ATTEMPT",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 13,
+        "event_code": "ANALYZE",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 13,
+        "event_code": "ASSIGN",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 13,
+        "event_code": "AUTO_DISPATCH_WAIT",
+        "event_count": 7
+      },
+      {
+        "work_order_id": 13,
+        "event_code": "CREATE",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 14,
+        "event_code": "AI_TASK_ATTEMPT",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 14,
+        "event_code": "AI_VLM_CHECKPOINT",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 14,
+        "event_code": "ANALYZE",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 14,
+        "event_code": "ASSIGN",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 14,
+        "event_code": "CREATE",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 15,
+        "event_code": "AI_TASK_ATTEMPT",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 15,
+        "event_code": "AI_VLM_CHECKPOINT",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 15,
+        "event_code": "ANALYZE",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 15,
+        "event_code": "ASSIGN",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 15,
+        "event_code": "CREATE",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 16,
+        "event_code": "AI_TASK_ATTEMPT",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 16,
+        "event_code": "ANALYZE",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 16,
+        "event_code": "AUTO_DISPATCH_WAIT",
+        "event_count": 21
+      },
+      {
+        "work_order_id": 16,
+        "event_code": "CREATE",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 17,
+        "event_code": "AI_TASK_ATTEMPT",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 17,
+        "event_code": "ANALYZE",
+        "event_count": 1
+      },
+      {
+        "work_order_id": 17,
+        "event_code": "AUTO_DISPATCH_WAIT",
+        "event_count": 22
+      },
+      {
+        "work_order_id": 17,
+        "event_code": "CREATE",
+        "event_count": 1
+      }
+    ],
+    "notification_counts": [
+      {
+        "work_order_id": 12,
+        "user_id": 9,
+        "notification_count": 1,
+        "read_count": "0"
+      },
+      {
+        "work_order_id": 12,
+        "user_id": 10,
+        "notification_count": 1,
+        "read_count": "0"
+      },
+      {
+        "work_order_id": 12,
+        "user_id": 11,
+        "notification_count": 6,
+        "read_count": "0"
+      },
+      {
+        "work_order_id": 13,
+        "user_id": 10,
+        "notification_count": 1,
+        "read_count": "0"
+      },
+      {
+        "work_order_id": 13,
+        "user_id": 12,
+        "notification_count": 2,
+        "read_count": "0"
+      },
+      {
+        "work_order_id": 14,
+        "user_id": 5,
+        "notification_count": 1,
+        "read_count": "0"
+      },
+      {
+        "work_order_id": 14,
+        "user_id": 6,
+        "notification_count": 2,
+        "read_count": "0"
+      },
+      {
+        "work_order_id": 15,
+        "user_id": 4,
+        "notification_count": 1,
+        "read_count": "0"
+      },
+      {
+        "work_order_id": 15,
+        "user_id": 8,
+        "notification_count": 2,
+        "read_count": "0"
+      },
+      {
+        "work_order_id": 16,
+        "user_id": 11,
+        "notification_count": 1,
+        "read_count": "0"
+      },
+      {
+        "work_order_id": 17,
+        "user_id": 7,
+        "notification_count": 1,
+        "read_count": "0"
+      }
+    ],
+    "delivery_counts": [
+      {
+        "work_order_id": 12,
+        "channel": "IN_APP",
+        "status": "SUCCEEDED",
+        "delivery_count": 8,
+        "total_attempts": "8"
+      },
+      {
+        "work_order_id": 13,
+        "channel": "IN_APP",
+        "status": "SUCCEEDED",
+        "delivery_count": 3,
+        "total_attempts": "3"
+      },
+      {
+        "work_order_id": 14,
+        "channel": "IN_APP",
+        "status": "SUCCEEDED",
+        "delivery_count": 3,
+        "total_attempts": "3"
+      },
+      {
+        "work_order_id": 15,
+        "channel": "IN_APP",
+        "status": "SUCCEEDED",
+        "delivery_count": 3,
+        "total_attempts": "3"
+      },
+      {
+        "work_order_id": 16,
+        "channel": "IN_APP",
+        "status": "SUCCEEDED",
+        "delivery_count": 1,
+        "total_attempts": "1"
+      },
+      {
+        "work_order_id": 17,
+        "channel": "IN_APP",
+        "status": "SUCCEEDED",
+        "delivery_count": 1,
+        "total_attempts": "1"
+      }
+    ]
+  },
+  "rabbitmq": {
+    "vhosts": {
+      "name": "property_ai_delivery_check"
+    },
+    "queues": [
+      {
+        "name": "property_ai.delivery_check",
+        "messages_ready": 0,
+        "messages_unacknowledged": 0,
+        "consumers": 1
+      },
+      {
+        "name": "property_ai.delivery_check.dlq",
+        "messages_ready": 2,
+        "messages_unacknowledged": 0,
+        "consumers": 0
+      },
+      {
+        "name": "celery@a69e631a4d08.celery.pidbox",
+        "messages_ready": 0,
+        "messages_unacknowledged": 0,
+        "consumers": 1
+      },
+      {
+        "name": "celeryev.01f6c4b1-08c9-4045-adbe-3e8cb19ea19d",
+        "messages_ready": 0,
+        "messages_unacknowledged": 0,
+        "consumers": 1
+      }
+    ]
+  },
+  "runtime": {
+    "api_health": {
+      "request_id": "457ea242d68f4820ae5b6a749567f04a",
+      "data": {
+        "status": "ok"
+      }
+    },
+    "api_ready": {
+      "request_id": "b4d1416192b54c3db4815c9b9592a069",
+      "data": {
+        "status": "ready",
+        "dependencies": {
+          "mysql": {
+            "status": "up",
+            "critical": true,
+            "latency_ms": 3.59,
+            "checked_at": "2026-10-01T22:10:58.577753Z"
+          },
+          "redis": {
+            "status": "up",
+            "critical": false,
+            "latency_ms": 6.65,
+            "checked_at": "2026-10-01T22:10:58.578063Z"
+          },
+          "rabbitmq": {
+            "status": "up",
+            "critical": false,
+            "latency_ms": 8.53,
+            "checked_at": "2026-10-01T22:10:58.578537Z"
+          },
+          "llm": {
+            "status": "not_checked",
+            "critical": false,
+            "checked_at": null,
+            "reason": "live_vendor_not_probed"
+          },
+          "vlm": {
+            "status": "not_checked",
+            "critical": false,
+            "checked_at": null,
+            "reason": "live_vendor_not_probed"
+          },
+          "asr": {
+            "status": "not_checked",
+            "critical": false,
+            "checked_at": null,
+            "reason": "live_vendor_not_probed"
+          },
+          "embedding": {
+            "status": "not_checked",
+            "critical": false,
+            "checked_at": null,
+            "reason": "live_vendor_not_probed"
+          },
+          "reranker": {
+            "status": "not_checked",
+            "critical": false,
+            "checked_at": null,
+            "reason": "live_vendor_not_probed"
+          },
+          "storage": {
+            "status": "not_checked",
+            "critical": false,
+            "checked_at": null,
+            "reason": "live_vendor_not_probed"
+          },
+          "milvus": {
+            "status": "up",
+            "critical": false,
+            "latency_ms": 211.0,
+            "checked_at": "2026-10-01T22:10:58.582768Z"
+          }
+        }
+      }
+    },
+    "containers": [
+      {
+        "name": "property-ai-delivery-check-api-1",
+        "image_id": "sha256:17556176f3d0165d3bcff0e7aef25e554517a9d6bbd6db393f8040ff92e940c1",
+        "status": "running",
+        "started_at": "2026-10-01T21:07:56.091891042Z"
+      },
+      {
+        "name": "property-ai-delivery-check-worker-1",
+        "image_id": "sha256:17556176f3d0165d3bcff0e7aef25e554517a9d6bbd6db393f8040ff92e940c1",
+        "status": "running",
+        "started_at": "2026-10-01T21:07:55.810161162Z"
+      },
+      {
+        "name": "property-ai-delivery-check-publisher-1",
+        "image_id": "sha256:17556176f3d0165d3bcff0e7aef25e554517a9d6bbd6db393f8040ff92e940c1",
+        "status": "running",
+        "started_at": "2026-10-01T22:07:56.766717393Z"
+      },
+      {
+        "name": "property-ai-delivery-check-beat-1",
+        "image_id": "sha256:17556176f3d0165d3bcff0e7aef25e554517a9d6bbd6db393f8040ff92e940c1",
+        "status": "running",
+        "started_at": "2026-10-01T21:07:55.665800358Z"
+      }
+    ],
+    "work_ai_state": {
+      "format": "property-ai-delivery-work-ai-runtime-v1",
+      "started_at_utc": "2026-10-01T21:38:01.1073662Z",
+      "source_commit": "f234402629d621a26eb1ce9f9077a465d5c0b5eb",
+      "launcher_pid": 47296,
+      "launcher_started_at_utc": "2026-10-01T21:38:01.0732314Z",
+      "listener_pid": 46132,
+      "listener_started_at_utc": "2026-10-01T21:38:01.1073662Z",
+      "adapter_sha256": "542EABD497EDBB04B841EFF98F34592D177D033D28109C7719EF7E47BC9C4F3F",
+      "runtime_control_sha256": "CEA1B4AD6A5D2C12F70E233E28C791C86BC6EFDC5F2EA9864FDC022D57D13867",
+      "config_sha256": "45C51C4E44407EBC0158A5ADF53D701E44227D59B611084B9F0F5F9EE7E5198B",
+      "runtime_binding_sha256": "dc5038a7b21e38e8cc4ff5bcc78eda0484c13cdc4dcfbc8dda6bebc6dd9238d2",
+      "token_sha256": "EC180BCD716B391765D43E79BED8F0B6D61DD10147A78A6BFF4CDC4483E9B2AF",
+      "stdout": "D:\\property-ai\\tmp\\delivery-work-ai-runtime\\adapter-4ff2f68a24b84620be3139918a6985e6.stdout.log",
+      "stderr": "D:\\property-ai\\tmp\\delivery-work-ai-runtime\\adapter-4ff2f68a24b84620be3139918a6985e6.stderr.log",
+      "endpoint": "http://127.0.0.1:11437",
+      "scope": "work_order_only",
+      "models": {
+        "asr": "Qwen3-ASR-0.6B",
+        "embedding": "bge-m3",
+        "reranker": "bge-reranker-v2-m3",
+        "qwen": "qwen38-27b-q3km-g55:7af3b8f"
+      },
+      "runtime_qwen_model": "qwen38-27b-q3km-g55-ctx8192:7af3b8f",
+      "inference_on_start": false
+    },
+    "work_ai_health": {
+      "status": "ready",
+      "inference": false,
+      "scope": "work_order_only",
+      "models": {
+        "asr": "Qwen3-ASR-0.6B",
+        "embedding": "bge-m3",
+        "reranker": "bge-reranker-v2-m3",
+        "qwen": "qwen38-27b-q3km-g55:7af3b8f"
+      },
+      "reservation_gate": "READY",
+      "accepting_requests": true,
+      "request_active": false
+    },
+    "rag_state": {
+      "format": "property-ai-delivery-rag-runtime-v1",
+      "started_at_utc": "2026-10-01T19:51:51.5183426Z",
+      "launcher_pid": 36952,
+      "launcher_started_at_utc": "2026-10-01T19:51:50.9476868Z",
+      "listener_pid": 40596,
+      "listener_started_at_utc": "2026-10-01T19:51:50.9774383Z",
+      "adapter_sha256": "EE9F19900F923461AB8AD0A1DC65806FF96065E074C89B2B2456810B533C7270",
+      "config_sha256": "CA9E4C8ECF96F7BCA3E53467167B5C40C0A0266A7A3667E79EF1522D99444B6A",
+      "token_sha256": "459BE65B2503C101C11C8317AE048498317206841B20FB658602548C5D36B13B",
+      "endpoint": "http://127.0.0.1:11436",
+      "qwen_endpoint": "http://127.0.0.1:11438",
+      "scope": "rag_only",
+      "models": {
+        "asr": "Qwen3-ASR-0.6B",
+        "embedding": "bge-m3",
+        "reranker": "bge-reranker-v2-m3",
+        "qwen": "qwen3.5:4b"
+      },
+      "source_commit": "caa2d21594bb7b78f2dc01e6bdfacc408161ec58",
+      "inference_on_start": false
+    },
+    "rag_health": {
+      "status": "ready",
+      "inference": false,
+      "scope": "rag_only",
+      "models": {
+        "asr": "Qwen3-ASR-0.6B",
+        "embedding": "bge-m3",
+        "reranker": "bge-reranker-v2-m3",
+        "qwen": "qwen3.5:4b"
+      },
+      "reservation_gate": "READY",
+      "accepting_requests": true,
+      "request_active": false
+    },
+    "rag_ollama_state": {
+      "format": "property-ai-delivery-rag-ollama-runtime-v1",
+      "operation_id": "638685fc4e7e4d55ab8ff3be8de45a3d",
+      "started_at_utc": "2026-10-01T18:58:21.8316459Z",
+      "pid": 32368,
+      "executable": "C:\\Users\\lmj\\AppData\\Local\\Programs\\Ollama\\ollama.exe",
+      "executable_sha256": "D571E4CF0AD4456FCCD33D5B985B6D63BA5669C6E5A812391704083952AAE3D5",
+      "host": "127.0.0.1:11438",
+      "models": "D:\\property-ai\\tmp\\selfhost-ai-local\\models",
+      "stdout": "D:\\property-ai\\tmp\\delivery-rag-ollama-runtime\\server-638685fc4e7e4d55ab8ff3be8de45a3d.stdout.log",
+      "stderr": "D:\\property-ai\\tmp\\delivery-rag-ollama-runtime\\server-638685fc4e7e4d55ab8ff3be8de45a3d.stderr.log",
+      "no_cloud": true,
+      "max_loaded_models": 1,
+      "concurrency": 1,
+      "context_length": 4096,
+      "inference_on_start": false
+    }
+  },
+  "calls": [
+    {
+      "call": 16,
+      "kind": "qwen",
+      "status": "SUCCESS",
+      "model": "qwen38-27b-q3km-g55:7af3b8f",
+      "revision": "06385258e076e9b22102da888a1593daef1dd1d679d863e5cc94c7c674ffed86",
+      "total_seconds": 17.937000000005355,
+      "owned_exit_confirmed": true,
+      "cleanup_error": null,
+      "input_sha256": "D0891235B19D6D82ABA9ED87AADBC63740FDBEB6220A25A09237253327901B5D",
+      "result_sha256": "00239ED1401E9CCB2A976FFA7D24924240A48BC1E5CE46B8EEB9AAE31DF68FB3"
+    },
+    {
+      "call": 17,
+      "kind": "qwen",
+      "status": "SUCCESS",
+      "model": "qwen38-27b-q3km-g55:7af3b8f",
+      "revision": "06385258e076e9b22102da888a1593daef1dd1d679d863e5cc94c7c674ffed86",
+      "total_seconds": 17.40700000000652,
+      "owned_exit_confirmed": true,
+      "cleanup_error": null,
+      "input_sha256": "D0891235B19D6D82ABA9ED87AADBC63740FDBEB6220A25A09237253327901B5D",
+      "result_sha256": "F4C83698318DD300674FD00BA19AB62F73E01C2F43C54BC4DACAE038E6747975"
+    },
+    {
+      "call": 18,
+      "kind": "qwen",
+      "status": "SUCCESS",
+      "model": "qwen38-27b-q3km-g55:7af3b8f",
+      "revision": "06385258e076e9b22102da888a1593daef1dd1d679d863e5cc94c7c674ffed86",
+      "total_seconds": 11.578999999997905,
+      "owned_exit_confirmed": true,
+      "cleanup_error": null,
+      "input_sha256": "C80CA1738033AC03104E6B67BB0CEE2A9685D7648E0481C20EDBB3D962D3D44A",
+      "result_sha256": "96A294CDAF320A3823A2FA8D2E4A0A4D3413E044E2E3EFB79C0084F7BB5C9B4A"
+    },
+    {
+      "call": 19,
+      "kind": "qwen",
+      "status": "SUCCESS",
+      "model": "qwen38-27b-q3km-g55:7af3b8f",
+      "revision": "06385258e076e9b22102da888a1593daef1dd1d679d863e5cc94c7c674ffed86",
+      "total_seconds": 17.40700000000652,
+      "owned_exit_confirmed": true,
+      "cleanup_error": null,
+      "input_sha256": "378E1327198DDDEF4F8A2C9356A2827C4E92DEC064D71E057B56A331694BAF83",
+      "result_sha256": "39E57756BA4B887A7A1CD7CB1D42D756C74F35208CAD138B20CBC7B71A99306E"
+    },
+    {
+      "call": 20,
+      "kind": "qwen",
+      "status": "SUCCESS",
+      "model": "qwen38-27b-q3km-g55:7af3b8f",
+      "revision": "06385258e076e9b22102da888a1593daef1dd1d679d863e5cc94c7c674ffed86",
+      "total_seconds": 11.875,
+      "owned_exit_confirmed": true,
+      "cleanup_error": null,
+      "input_sha256": "184B201C8BD1843B098C43CB4252662DDAE9E61509BB1891C7A67129AB6E09B3",
+      "result_sha256": "19455A49A0F65E5CD4E3125B05EBC910DD5452483C154B152ACFB5D098BDBA03"
+    },
+    {
+      "call": 21,
+      "kind": "qwen",
+      "status": "SUCCESS",
+      "model": "qwen38-27b-q3km-g55:7af3b8f",
+      "revision": "06385258e076e9b22102da888a1593daef1dd1d679d863e5cc94c7c674ffed86",
+      "total_seconds": 4.702999999979511,
+      "owned_exit_confirmed": true,
+      "cleanup_error": null,
+      "input_sha256": "378E1327198DDDEF4F8A2C9356A2827C4E92DEC064D71E057B56A331694BAF83",
+      "result_sha256": "939D449CF583D9FE81121658493FE5C029FE3151048B9C03CE3D50C52EB4B00B"
+    },
+    {
+      "call": 22,
+      "kind": "qwen",
+      "status": "SUCCESS",
+      "model": "qwen38-27b-q3km-g55:7af3b8f",
+      "revision": "06385258e076e9b22102da888a1593daef1dd1d679d863e5cc94c7c674ffed86",
+      "total_seconds": 10.0,
+      "owned_exit_confirmed": true,
+      "cleanup_error": null,
+      "input_sha256": "8B800019B34E33F059D51C1CD8D08CA3999AB53FDE3452A4771298EE16DEBECC",
+      "result_sha256": "F7364A36B15B90B6200E88B7D2C1DD65B04C2380822F461E0D4C3F5E91D2F3BA"
+    },
+    {
+      "call": 23,
+      "kind": "qwen",
+      "status": "SUCCESS",
+      "model": "qwen38-27b-q3km-g55:7af3b8f",
+      "revision": "06385258e076e9b22102da888a1593daef1dd1d679d863e5cc94c7c674ffed86",
+      "total_seconds": 7.51500000001397,
+      "owned_exit_confirmed": true,
+      "cleanup_error": null,
+      "input_sha256": "410ED3DAFBE5367D03A180A8FC7411DB56BF34DBFB4868CB4ED3F714B8099344",
+      "result_sha256": "261E24604F38B92D289D76744BB208DF01852FE71DB77480AED563820D2A701A"
+    },
+    {
+      "call": 24,
+      "kind": "asr",
+      "status": "SUCCESS",
+      "model": "Qwen3-ASR-0.6B",
+      "revision": "5eb144179a02acc5e5ba31e748d22b0cf3e303b0",
+      "total_seconds": 28.859000000025844,
+      "owned_exit_confirmed": true,
+      "cleanup_error": null,
+      "input_sha256": "6DBD1EF9491409D53372CA420851B9F8D96F3CAF3F9A4DD03E77717ACE701576",
+      "result_sha256": "71AFBDFACEAE45E14D4D90996A505DDDAC95305382D003E586B101742343915F"
+    },
+    {
+      "call": 25,
+      "kind": "qwen",
+      "status": "SUCCESS",
+      "model": "qwen38-27b-q3km-g55:7af3b8f",
+      "revision": "06385258e076e9b22102da888a1593daef1dd1d679d863e5cc94c7c674ffed86",
+      "total_seconds": 17.062000000005355,
+      "owned_exit_confirmed": true,
+      "cleanup_error": null,
+      "input_sha256": "7311ED541CA4D0444C66E8D82C61D2E229400FB7F398E94341CA23B40CEEF287",
+      "result_sha256": "049EE6A5885252E44C2677D514EBE015F3AE28B82B73E3DAE09544B3DB059358"
+    },
+    {
+      "call": 26,
+      "kind": "qwen",
+      "status": "SUCCESS",
+      "model": "qwen38-27b-q3km-g55:7af3b8f",
+      "revision": "06385258e076e9b22102da888a1593daef1dd1d679d863e5cc94c7c674ffed86",
+      "total_seconds": 7.25,
+      "owned_exit_confirmed": true,
+      "cleanup_error": null,
+      "input_sha256": "0B1E6ABF369932C65A4F50946DB638F546F3987BC1C616ABDE18F1BB27822245",
+      "result_sha256": "678A7EB58675B4EF4DA9E306DD76AB39190D69D103412DDFB1667C3E7BA8BCE6"
+    }
+  ]
+}

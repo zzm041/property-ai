@@ -1,0 +1,163 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "captured_at_utc": "2026-10-01T22:02:47.0411265Z",
+  "deadline_record": {
+    "deadline": "2026-09-29T22:36:10+08:00",
+    "missed": true,
+    "reset": false
+  },
+  "source": {
+    "tracking_head": "6dc653870a72b69dcf30eb8d21e287f86990bfc9",
+    "work_ai_source_commit": "f234402629d621a26eb1ce9f9077a465d5c0b5eb",
+    "application_image_tag": "property-ai-delivery:d9b3040",
+    "application_image_id": "sha256:17556176f3d0165d3bcff0e7aef25e554517a9d6bbd6db393f8040ff92e940c1",
+    "application_services": ["api", "worker", "publisher", "beat"],
+    "application_source_note": "The post-d9b3040 tracked changes are deployment/runtime-control and evidence files; backend application source in the running image is unchanged by f234402."
+  },
+  "historical_failure_boundary": {
+    "wo7_original_ai_invalid_output_exact_cause": "UNKNOWN",
+    "history_rewritten": false,
+    "current_controlled_reproduction": {
+      "work_order_id": 12,
+      "stage": "MODEL_RESIDENCY_AND_RESOURCE",
+      "reason": "RESOURCE_ADMISSION_REJECTED",
+      "reservation_created": false,
+      "cause": "The resident-model branch required 2500 MiB free GPU although the approved in-flight floor is 2000 MiB; about 2103 MiB remained after VLM, so LLM was rejected before reservation."
+    },
+    "fix": {
+      "commit": "f234402629d621a26eb1ce9f9077a465d5c0b5eb",
+      "resident_gpu_floor_mib": 2000,
+      "cold_start_gpu_floor_mib": 6000,
+      "ram_floor_mib": 4500,
+      "scope": "resident model only; cold-start admission remains stricter"
+    }
+  },
+  "tests": {
+    "scope": [
+      "backend/tests/unit/test_local_ai_http_027.py",
+      "backend/tests/unit/test_delivery_artifact.py"
+    ],
+    "result": "90 passed, 1 warning",
+    "seconds": 2.24,
+    "raw_junit": "reports/real-ai-integration-027/delivery-auto-8093/final-targeted-tests.xml",
+    "deployment_entry_result": "13 passed, 1 warning",
+    "deployment_entry_seconds": 0.16,
+    "deployment_entry_junit": "reports/real-ai-integration-027/delivery-auto-8093/final-entry-tests.xml"
+  },
+  "page_image_canary": {
+    "work_order_id": 12,
+    "created_by_actual_page": true,
+    "image_file_id": 13,
+    "initial_failed_generation_preserved": true,
+    "bounded_recovery_generations": 1,
+    "analysis": {
+      "status": "COMPLETED",
+      "category": "PLUMBING",
+      "severity": "LOW",
+      "priority": "MEDIUM",
+      "required_role": "STAFF",
+      "required_skill": "maintenance",
+      "confidence": 0.85
+    },
+    "assignment": {
+      "id": 2,
+      "employee_id": 3,
+      "source": "AUTO",
+      "property_id": 6,
+      "ended_after_close": true
+    },
+    "final_status": "CLOSED",
+    "actual_page_stages": ["ASSIGNED", "ACCEPTED", "PROCESSING", "WAIT_CONFIRM", "CLOSED"],
+    "page_evidence": "reports/real-ai-integration-027/delivery-auto-8093/new-image-canary-12-closed-wechatide.json",
+    "screenshots": [
+      "reports/real-ai-integration-027/delivery-auto-8093/23-new-canary-auto-assigned-staff.png",
+      "reports/real-ai-integration-027/delivery-auto-8093/24-new-canary-processing.png",
+      "reports/real-ai-integration-027/delivery-auto-8093/25-new-canary-wait-confirm.png",
+      "reports/real-ai-integration-027/delivery-auto-8093/26-new-canary-resident-closed.png"
+    ]
+  },
+  "five_user_overlap": {
+    "work_order_ids": [13, 14, 15, 16, 17],
+    "users": 5,
+    "properties": [5, 6],
+    "submission_overlap_ms": 275.995,
+    "all_persisted": true,
+    "all_analysis_intents_succeeded_once": true,
+    "analysis_retry_generations": 0,
+    "status_after_capacity_release": {
+      "12": "CLOSED",
+      "13": "ASSIGNED",
+      "14": "ASSIGNED",
+      "15": "ASSIGNED",
+      "16": "PENDING_ASSIGNMENT",
+      "17": "PENDING_ASSIGNMENT"
+    },
+    "assignments": [
+      {"work_order_id": 13, "employee_id": 3, "property_id": 6, "source": "AUTO", "status": "ACTIVE"},
+      {"work_order_id": 14, "employee_id": 2, "property_id": 5, "source": "AUTO", "status": "ACTIVE"},
+      {"work_order_id": 15, "employee_id": 1, "property_id": 5, "source": "AUTO", "status": "ACTIVE"}
+    ],
+    "capacity_waiting": [16, 17],
+    "capacity_release_auto_dispatch": {
+      "closed_work_order": 12,
+      "newly_assigned_work_order": 13,
+      "manual_dispatch": false
+    },
+    "duplicate_assignment_or_capacity": false,
+    "cross_tenant_or_property_assignment": false,
+    "submission_evidence": "reports/real-ai-integration-027/delivery-auto-8093/five-user-overlap-current-submit.json"
+  },
+  "voice": {
+    "work_order_id": 13,
+    "audio_file_id": 12,
+    "image_file_id": 11,
+    "asr_characters": 26,
+    "asr_sha256": "9e42fe17aa9fbed1123666b7d19b5c98c30f88a629572ee4e055daee30dadf9b",
+    "asr_checkpoint_count": 1,
+    "analysis_status": "COMPLETED",
+    "final_business_status": "ASSIGNED",
+    "auto_assignment_id": 5,
+    "assigned_employee_id": 3,
+    "real_asr_linked_to_same_work_order": true
+  },
+  "notifications": {
+    "work_orders": [12, 13, 14, 15, 16, 17],
+    "channel": "IN_APP",
+    "all_recorded_deliveries_succeeded": true,
+    "delivery_counts": {"12": 8, "13": 3, "14": 3, "15": 3, "16": 1, "17": 1}
+  },
+  "model_usage_this_batch": {
+    "ledger_calls": [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26],
+    "qwen_calls": 10,
+    "asr_calls": 1,
+    "embedding_calls": 0,
+    "reranker_calls": 0,
+    "total_model_seconds": 151.594,
+    "all_success": true,
+    "all_owned_exit_confirmed": true,
+    "cleanup_errors": 0,
+    "authorized_caps": {"qwen": 48, "asr": 4, "embedding": 2, "reranker": 2, "model_seconds": 3600}
+  },
+  "runtime": {
+    "application": "8093/property_ai_delivery_check@0014",
+    "queue": {"vhost": "property_ai_delivery_check", "name": "property_ai.delivery_check", "ready": 0, "unacknowledged": 0, "consumers": 1},
+    "historical_dlq": {"name": "property_ai.delivery_check.dlq", "ready": 2, "unacknowledged": 0, "consumers": 0, "touched": false},
+    "work_ai": {"adapter": "127.0.0.1:11437", "ollama": "127.0.0.1:11435", "model": "qwen38-27b-q3km-g55:7af3b8f", "context": 8192, "status": "READY", "active": false},
+    "rag": {"adapter": "127.0.0.1:11436", "ollama": "127.0.0.1:11438", "model": "qwen3.5:4b", "context": 4096, "status": "READY", "active": false, "prior_scoped_real_rag_pass_reused": true},
+    "api_worker_publisher_beat_same_image": true,
+    "standard_work_ai_start_pinned_to_verified_source": true,
+    "standard_work_ai_start_commit": "6dc653870a72b69dcf30eb8d21e287f86990bfc9"
+  },
+  "boundaries": {
+    "new_work_orders": 6,
+    "new_work_order_cap": 6,
+    "manual_analysis_or_assignment": false,
+    "direct_database_business_write": false,
+    "old_work_orders_7_to_11_replayed_or_modified": false,
+    "migration_or_download_or_paid_call": false,
+    "project_config_modified_by_task": false,
+    "backend_app_model_ai_modified_by_task": false,
+    "unmasked_form_screenshot_18g": "internal-only and excluded from Git/public delivery",
+    "production_release": false
+  }
+}

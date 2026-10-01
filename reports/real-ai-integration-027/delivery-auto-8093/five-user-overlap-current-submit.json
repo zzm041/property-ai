@@ -1,0 +1,120 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-DELIVERY-AUTO-OVERLAP2",
+  "run_id": "delivery-auto-702c3db745",
+  "run_suffix": "overlap2-20261002",
+  "captured_at": "2026-10-01T21:49:22.822Z",
+  "environment": "8093/property_ai_delivery_check@0014",
+  "free_ram_before_submit_mib": 12284,
+  "interaction": "five normal password-authenticated users; concurrent real work-order API submissions using previously persisted same-owner media; not page clicks",
+  "submitted": 5,
+  "overlap_confirmed": true,
+  "overlap_span_ms": 275.995,
+  "items": [
+    {
+      "key": "residentA1",
+      "user_id": 6,
+      "tenant_id": 5,
+      "property_id": 5,
+      "house_id": 1,
+      "marker_sha256": "6afa3f8bbe7672a189e1651ebc2b4914d3cd05ee5a4d8881f6416923541001b5",
+      "file_ids": [
+        7
+      ],
+      "media_types": [
+        "image/jpeg"
+      ],
+      "work_order_id": 14,
+      "status": "PENDING_ANALYSIS",
+      "started_at": "2026-10-01T21:49:22.533Z",
+      "finished_at": "2026-10-01T21:49:22.809Z",
+      "duration_ms": 276.847
+    },
+    {
+      "key": "residentA2",
+      "user_id": 7,
+      "tenant_id": 5,
+      "property_id": 5,
+      "house_id": 2,
+      "marker_sha256": "c4996b44f5b70c74b76bcca3f10bbb0b03f307878405ed943c9e07c88e5c8bca",
+      "file_ids": [
+        8
+      ],
+      "media_types": [
+        "image/jpeg"
+      ],
+      "work_order_id": 17,
+      "status": "PENDING_ANALYSIS",
+      "started_at": "2026-10-01T21:49:22.533Z",
+      "finished_at": "2026-10-01T21:49:22.816Z",
+      "duration_ms": 283.459
+    },
+    {
+      "key": "residentA3",
+      "user_id": 8,
+      "tenant_id": 5,
+      "property_id": 5,
+      "house_id": 3,
+      "marker_sha256": "c2ed77b09bcbe915f7f25cb6bbee8074dca4146b40c1688ed4aaad37e2a7c555",
+      "file_ids": [
+        9
+      ],
+      "media_types": [
+        "image/jpeg"
+      ],
+      "work_order_id": 15,
+      "status": "PENDING_ANALYSIS",
+      "started_at": "2026-10-01T21:49:22.533Z",
+      "finished_at": "2026-10-01T21:49:22.815Z",
+      "duration_ms": 281.549
+    },
+    {
+      "key": "residentB1",
+      "user_id": 11,
+      "tenant_id": 6,
+      "property_id": 6,
+      "house_id": 4,
+      "marker_sha256": "cc0f69bc6d1df360c338157eff3df16fce4f240d034137c9b887d9c3289740e0",
+      "file_ids": [
+        10
+      ],
+      "media_types": [
+        "image/jpeg"
+      ],
+      "work_order_id": 16,
+      "status": "PENDING_ANALYSIS",
+      "started_at": "2026-10-01T21:49:22.533Z",
+      "finished_at": "2026-10-01T21:49:22.822Z",
+      "duration_ms": 288.51
+    },
+    {
+      "key": "residentB2",
+      "user_id": 12,
+      "tenant_id": 6,
+      "property_id": 6,
+      "house_id": 5,
+      "marker_sha256": "8c1c009875e20e675af6b4cd820b676b92f12c3c012b24200b7d821e6e418458",
+      "file_ids": [
+        11,
+        12
+      ],
+      "media_types": [
+        "image/jpeg",
+        "audio/wav"
+      ],
+      "work_order_id": 13,
+      "status": "PENDING_ANALYSIS",
+      "started_at": "2026-10-01T21:49:22.533Z",
+      "finished_at": "2026-10-01T21:49:22.819Z",
+      "duration_ms": 285.277
+    }
+  ],
+  "failures": [],
+  "boundaries": {
+    "page_clicks": 0,
+    "direct_database_business_write": false,
+    "manual_enqueue_or_assign": false,
+    "media_reused_only_for_same_authenticated_owner": true,
+    "work_order_idempotency_keys_are_new_and_stable": true,
+    "credentials_or_tokens_saved": false
+  }
+}

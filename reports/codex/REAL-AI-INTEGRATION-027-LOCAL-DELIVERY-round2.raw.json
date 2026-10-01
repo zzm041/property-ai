@@ -1,0 +1,103 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "round": "FINAL_LOCAL_DELIVERY_INCREMENTAL_SAME_ROUND",
+  "verdict": "PASS_SCOPED_LOCAL_DELIVERY",
+  "source_reviewed": {
+    "head": "6dc653870a72b69dcf30eb8d21e287f86990bfc9",
+    "application_source": "d9b3040",
+    "application_image": "sha256:17556176f3d0165d3bcff0e7aef25e554517a9d6bbd6db393f8040ff92e940c1",
+    "work_adapter_source": "f234402629d621a26eb1ce9f9077a465d5c0b5eb",
+    "work_adapter_archive_sha256": "542EABD497EDBB04B841EFF98F34592D177D033D28109C7719EF7E47BC9C4F3F",
+    "rag_adapter_source": "caa2d21594bb7b78f2dc01e6bdfacc408161ec58",
+    "scope": "实际读取d9b3040至f234402的适配器、直接测试及部署增量，并核对6dc6538的入口修复。该范围没有backend/app产品源码变化；预存model/ai.py及project.config.json未纳入提交差异。",
+    "entry_finding_resolution": "CLOSED：标准启动入口已固定到f234402及实际Git archive字节哈希，不再重新加载2500MiB驻留门槛旧版；新增入口断言排除了旧绑定。"
+  },
+  "evidence_reviewed": {
+    "directory": "D:/property-ai/reports/real-ai-integration-027/delivery-auto-8093",
+    "files": [
+      "final-local-delivery-evidence.json",
+      "final-runtime-raw.json",
+      "final-runtime-raw-attempt1.json",
+      "collect-final-runtime-evidence.ps1",
+      "final-targeted-tests.xml",
+      "final-entry-tests.xml",
+      "five-user-overlap-current-submit.json",
+      "new-image-canary-12-recovery.json",
+      "new-image-canary-12-closed-wechatide.json",
+      "overlap-staffA-checkins.json",
+      "new-image-canary-wechatide-6.json",
+      "run-new-image-canary-wechatide.ps1",
+      "run-new-canary-closed-wechatide.ps1"
+    ],
+    "raw_evidence_sha256": "FE7447F0977F060AC58CE2FFB4A850EC2896B8422A67B1C6D3D9FCDE015389EE",
+    "summary_sha256": "91D50922245B9B1922ABA0F69764C38682C2D04335182A12497EAD5628CCFF93",
+    "images_actually_viewed": [
+      "18g-new-canary-image-form.png",
+      "19g-new-canary-image-submitted.png",
+      "21-overlap-staffA1-checkin.png",
+      "22-overlap-staffA2-checkin.png",
+      "23-new-canary-auto-assigned-staff.png",
+      "24-new-canary-processing.png",
+      "25-new-canary-wait-confirm.png",
+      "26-new-canary-resident-closed.png"
+    ],
+    "additional_original_records": "实际读取工单适配器current.json、call-016至026的reservation/result及预约前拒绝日志；保存采集中的11个result哈希全部与原文件一致。"
+  },
+  "completion_conditions_checked": [
+    {
+      "condition": "资源准入修复与历史解释",
+      "result": "通过限定范围核对。当前重现日志明确为MODEL_RESIDENCY_AND_RESOURCE阶段RESOURCE_ADMISSION_REJECTED，且没有reservation；同输入随后成功。源码现使用驻留GPU2000MiB、冷启动6000MiB、RAM4500MiB，并保留运行监控及退出保护。历史WO7精确失败原因仍为UNKNOWN，没有被本次重现反向覆盖。"
+    },
+    {
+      "condition": "图片报修到页面CLOSED",
+      "result": "delivery_check数据库的本轮工单12，经正常页面选房、输入及图片上传创建，file13与住户11对应。初始失败intent50保留；一次授权恢复生成intent51并成功。真实VLM及LLM结果、完成分析、唯一AUTO Assignment2、员工接单/开始/回执、住户确认和最终CLOSED相互对应。图片选择对话框使用测试替身，上传和业务接口未伪造。"
+    },
+    {
+      "condition": "五用户两小区重叠提交",
+      "result": "保存证据记录5个正常密码会话通过真实API重叠提交，重叠窗口275.995ms，明确不是五路页面点击。工单13至17均已持久化，分别仅有一个成功分析generation；各execution_attempt=1。工单16的publish_attempt=2，不应表述为每项只发布一次。"
+    },
+    {
+      "condition": "语音与同一业务对象",
+      "result": "call024为真实ASR成功，输出26字符；独立计算文本SHA256与数据库工单13的asr_text摘要完全一致。工单13关联audio file12、一个ASR checkpoint、完成分析及AUTO Assignment5。"
+    },
+    {
+      "condition": "具体人员、容量等待与释放补派",
+      "result": "工单12唯一Assignment已ENDED；13/14/15分别只有一个ACTIVE AUTO Assignment，员工3/2/1对应小区6/5/5，租户及当天在岗记录一致，三个current_load均为1。16/17保持PENDING_ASSIGNMENT且无Assignment；13具有等待记录，12关闭后同一员工容量由13占用。保存的页面操作没有人工派单。"
+    },
+    {
+      "condition": "通知与任务记录",
+      "result": "更正后的原始采集仅含7条ANALYZE_WORK_ORDER记录：工单12失败/成功两个generation，以及13至17各一个成功generation。通知通过正确resource_type关联，19条IN_APP投递全部SUCCEEDED；没有将旧的同号通知intent误当成本轮工单intent。"
+    },
+    {
+      "condition": "真实调用与预算",
+      "result": "call016至026为10次Qwen、1次ASR，合计151.594秒，全部SUCCESS、owned_exit_confirmed=true，无cleanup_error。包含此前复验的call013起续接合计14次请求、302.720秒；原账本未清零，历史call001 UNKNOWN保留。没有把本轮成功改写到旧失败记录。"
+    },
+    {
+      "condition": "运行组件与可继续启动",
+      "result": "保存的只读采集显示8093 API/Worker/publisher/Beat使用同一应用镜像；工单11437与RAG11436均READY且无活动请求，分别隔离至11435/8192和11438/4096。队列为专用vhost及队列，0 ready/0 unacked/1 consumer；DLQ为2 ready/0 consumer。标准工单AI入口的已审源码绑定已修复。"
+    },
+    {
+      "condition": "专项证据",
+      "result": "实际读取JUnit：首次专项90项，0失败/错误/跳过；入口修复专项13项，0失败/错误/跳过。这是两次保存的测试结果，不合并冒充一次运行；审查者没有执行测试。"
+    }
+  ],
+  "findings": [],
+  "verified": [
+    "本轮限定本地交付具备新的图片工单AUTO到页面CLOSED证据，以及真实ASR到同工单分析/AUTO证据。",
+    "五用户API重叠提交证明当前样本下的正确派单、容量等待及释放后的自动补派；未见重复Assignment、重复负载或跨本轮租户/小区派单。",
+    "18g含完整合成联系电话，已明确仅供内部原始复审、不提交或公开；其余所查看交付截图为掩码号码或无号码。",
+    "实际Git归档适配器哈希与运行收据及标准入口一致；应用与两类适配器采用各自明确绑定的已审版本，不声称全部来自同一源码提交。",
+    "本审查全程只读，未运行测试、模型、页面、业务、数据库、队列或进程控制，未修改文件或创建审查者。"
+  ],
+  "unverified": [
+    "真实RAG沿用已有版本绑定的scoped PASS；本轮只核对当前在线状态，没有再次运行RAG查询。",
+    "语音证据是正常认证API提交已持久媒体后的真实链路，不是本轮真机录音或完整语音页面验收。",
+    "工单12经过一次明确授权的失败恢复；不能描述为其首次generation无故障完成。",
+    "原始采集提供最终状态及事件计数，未包含完整时间序列的所有中间行；历史7至11未改变的声明未在本轮重新做前后数据库全量比对。",
+    "DLQ计数和无消费者支持隔离状态，不等同于对所有历史消息内容或操作历史的独立取证。",
+    "未独立重跑业务、重启运行链或进行真机、持续负载、生产安全和可靠性发布验收。",
+    "正式外部Provider、真实身份核验、生产部署与发布授权等既有Release边界保留；本结论不是Production V1正式发布通过。"
+  ],
+  "rationale_summary": "源码修复、原始模型收据、保存的只读数据库/队列/运行采集和实际查看的页面截图能够相互对应。启动入口旧绑定已关闭，原始失败与本次成功清楚分开；没有证据支持新增当前任务阻塞。通过范围严格限于本轮合成本地交付场景。",
+  "next_action": "保存本次独立审查并更新现有handoff/matrix，提交准确范围的源码与脱敏证据，排除18g原始截图、私密运行资产及预存脏文件。保留历史失败和发布缺口；不重跑已通过路径，不借本结论追加模型调用、恢复旧工单或执行正式发布。"
+}

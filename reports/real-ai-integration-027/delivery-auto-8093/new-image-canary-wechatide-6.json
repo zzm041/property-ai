@@ -1,0 +1,38 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-NEW-IMAGE-CANARY",
+  "run_id": "delivery-auto-702c3db745",
+  "interaction": "wechatide supported element/page/wx API automation",
+  "marker_sha256": "A0CAB4DA2D73127BD5EFB3811B0AA4FD1954E3F46E78399D826032357CE01B93",
+  "source_image_sha256": "97D55CCE8DD0376A93F69C63120AF06EA3580F73454F42D4E3EB4B7928DBA835",
+  "submit_started": true,
+  "stage": "submitted",
+  "screenshots": [
+    "18g-new-canary-image-form.png",
+    "19g-new-canary-image-submitted.png"
+  ],
+  "boundaries": {
+    "normal_password_page_login": true,
+    "actual_page_controls": true,
+    "choose_media_dialog_only_mocked": true,
+    "direct_database_business_write": false,
+    "manual_enqueue_or_assign": false,
+    "model_call_from_script": false,
+    "credentials_saved": false
+  },
+  "login": {
+    "mode": "normal password page login",
+    "page": "pages/home/home"
+  },
+  "file_ids": [
+    13
+  ],
+  "result": {
+    "work_order_id": 12,
+    "status": "PENDING_ANALYSIS",
+    "version": 1,
+    "house_id": 4,
+    "file_ids": [
+      13
+    ]
+  }
+}
