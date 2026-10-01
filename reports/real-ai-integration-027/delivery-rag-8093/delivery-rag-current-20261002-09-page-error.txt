@@ -1,0 +1,118 @@
+Error: cross-property RAG check needs another authorized property selector
+    at main (D:\property-ai\reports\real-ai-integration-027\delivery-rag-8093\run-page-flow.js:451:33)
+{
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/password/login",
+      "status": 200,
+      "request_id": "98e82dcb78cc41a2bdd010d77f1f2a81",
+      "received_at_utc": "2026-10-01T19:27:40.511Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "a01ce3e2278f485fb6965684e1e4c4d3",
+      "received_at_utc": "2026-10-01T19:27:40.531Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "4cd45ebd67bd4bd5baf7236ee3200517",
+      "received_at_utc": "2026-10-01T19:27:41.190Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "d99b6db4074748338e3436e5ca155d9c",
+      "received_at_utc": "2026-10-01T19:27:41.209Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "200078bf0da84a8c9d4fe0d7686a9d01",
+      "received_at_utc": "2026-10-01T19:27:41.914Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "07d34ce315044302bb6c8f1ef699eba5",
+      "received_at_utc": "2026-10-01T19:27:41.934Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "1579a818679d4a7aaff0d78831cb42de",
+      "received_at_utc": "2026-10-01T19:27:43.021Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "3debfd606cef4a439a3f430dd729f46e",
+      "received_at_utc": "2026-10-01T19:27:43.028Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "cff018e040844edfa2192496909f80e6",
+      "received_at_utc": "2026-10-01T19:27:43.049Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "a2247b00132540f39cc95652722db798",
+      "received_at_utc": "2026-10-01T19:27:43.213Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents/1",
+      "status": 200,
+      "request_id": "ae4cadbe49bb41ec8032a310b88d59aa",
+      "received_at_utc": "2026-10-01T19:27:43.496Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "fc8d119c13c74e0db8c53241cc3cd382",
+      "received_at_utc": "2026-10-01T19:27:45.124Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "075ebd497f984f36adea7595f6e2b5e6",
+      "received_at_utc": "2026-10-01T19:27:45.142Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "3646ebde4f7d4fe88c1505130489c473",
+      "received_at_utc": "2026-10-01T19:27:46.221Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "35a7ca067bea4f4d8c4a906d4ca1fa7d",
+      "received_at_utc": "2026-10-01T19:27:46.224Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/assistant/query",
+      "status": 200,
+      "request_id": "cc3a3634c5d14baaa9765f91d6cb8ef5",
+      "received_at_utc": "2026-10-01T19:28:16.639Z"
+    }
+  ]
+}

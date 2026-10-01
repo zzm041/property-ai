@@ -1,0 +1,82 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "recorded_at_utc": "2026-10-01T19:30:55.2804893Z",
+  "result": "SCOPED_LOCAL_REAL_RAG_CURRENT_CANDIDATE_PASS",
+  "source_head": "14b8dc5330cce48bfc79f7342a15e7ffdc8afb54",
+  "runtime_image": {
+    "tag": "property-ai-delivery:14b8dc5",
+    "digest": "sha256:81582eac2bcc07dc485b619e33f2ee47441701a6e721d54f1d23ed642136c164",
+    "services": ["api", "worker", "publisher", "beat"]
+  },
+  "document": {
+    "id": 1,
+    "tenant_id": 4,
+    "property_id": 4,
+    "status": "ACTIVE",
+    "current_version": 3,
+    "version_history": [[1, "FAILED"], [2, "SUPERSEDED"], [3, "ACTIVE"]],
+    "version_3_ingestion": {
+      "job_id": 4,
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "error_code": null,
+      "chunk_count": 1
+    }
+  },
+  "durable_recovery": {
+    "original_intent": [47, 1, "FAILED", "TASK.PERMANENT_FAILURE"],
+    "recovery_intent": [48, 2, "SUCCEEDED", null],
+    "reason_code": "DEPENDENCY_RECOVERED",
+    "cause": "application containers were recreated without reinjecting the existing private adapter tokens; failure occurred before a provider reservation",
+    "history_rewritten": false
+  },
+  "page_flow": {
+    "positive": {
+      "run_id": "delivery-rag-current-20261002-09",
+      "interaction": "actual WeChat Developer Tools page controls and origin wx.request",
+      "request_id": "cc3a3634c5d14baaa9765f91d6cb8ef5",
+      "status": "answered",
+      "citation": {"document_id": 1, "version": 3},
+      "screenshot": "delivery-rag-current-20261002-09-02-answer-with-citation.png",
+      "screenshot_sha256": "CB15030F9E9F4077FCE4C5A366F0B8F78E5A0A097689173BCB9D0C4102EC7A3C",
+      "visually_inspected": true
+    },
+    "cross_property": {
+      "run_id": "delivery-rag-current-20261002-10",
+      "interaction": "actual WeChat Developer Tools page controls and origin wx.request",
+      "request_id": "a93e1ed3e7cd44b88c484c5b0cbc67f3",
+      "source_property_id": 4,
+      "query_property_id": 5,
+      "status": "insufficient_knowledge",
+      "citation_count": 0,
+      "screenshot": "delivery-rag-current-20261002-10-01-cross-property-no-leak.png",
+      "screenshot_sha256": "78A33474A6D0EE5BBBA2C6ADDC005EF2359BCDB1E367A867551ED7AF28006D38",
+      "visually_inspected": true,
+      "query_not_repeated_for_screenshot": true
+    }
+  },
+  "new_model_calls": [
+    ["call-010", "embedding", "bge-m3", "SUCCESS", 30.579],
+    ["call-011", "embedding", "bge-m3", "SUCCESS", 7.282],
+    ["call-012", "reranker", "bge-reranker-v2-m3", "SUCCESS", 6.282],
+    ["call-013", "qwen", "qwen3.5:4b", "SUCCESS", 15.984],
+    ["call-014", "embedding", "bge-m3", "SUCCESS", 6.765]
+  ],
+  "model_cleanup": {
+    "all_owned_exits_confirmed": true,
+    "cleanup_errors": 0
+  },
+  "preserved_failures": [
+    "delivery-rag-current-20261002-06: audit allowlist rejected the new reactivation marker with HTTP 422; no version or model call was created",
+    "delivery-rag-current-20261002-07: version 3 was created but intent 47 failed before provider reservation because the application runtime token was absent",
+    "delivery-rag-current-20261002-09: positive answer and screenshot succeeded; the runner then stopped because that identity had only one authorized property",
+    "delivery-rag-current-20261002-10: cross-property answer succeeded with zero citations; only the first screenshot attempt failed, and the current page was captured without repeating the query"
+  ],
+  "boundaries": {
+    "real_rag": true,
+    "development_sms_used_only_for_local_synthetic_credential_preparation": true,
+    "real_identity_provider": false,
+    "work_order_auto_retested": false,
+    "production_release": false
+  }
+}

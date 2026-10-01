@@ -1,0 +1,105 @@
+Error: screenshot was not produced: delivery-rag-current-20261002-10-01-cross-property-no-leak.png
+    at captureScreenshot (D:\property-ai\reports\real-ai-integration-027\delivery-rag-8093\run-page-flow.js:48:11)
+    at async main (D:\property-ai\reports\real-ai-integration-027\delivery-rag-8093\run-page-flow.js:389:7)
+{
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/password/login",
+      "status": 200,
+      "request_id": "af9f4c5faad74bf2860d90eb21f258f9",
+      "received_at_utc": "2026-10-01T19:29:04.852Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "4d7282d59ed5417e8d0f3b9b65957d10",
+      "received_at_utc": "2026-10-01T19:29:04.871Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "1564f8c155c8499e9e38f2ee9bd84b80",
+      "received_at_utc": "2026-10-01T19:29:05.627Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "8fa56049669a435ba70c7a2acbba10d0",
+      "received_at_utc": "2026-10-01T19:29:05.643Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "cf73b88685484d30a8171ce0dc4b028e",
+      "received_at_utc": "2026-10-01T19:29:06.562Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "86a26432c19d4e07875f5dc184a80a61",
+      "received_at_utc": "2026-10-01T19:29:06.581Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "a05ae767a6b9479b926b9999edc82d27",
+      "received_at_utc": "2026-10-01T19:29:07.752Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "f69cebda80194d31af86c7411726c42a",
+      "received_at_utc": "2026-10-01T19:29:07.755Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "3b6aaee9e37945f8abe5252dba2ccb91",
+      "received_at_utc": "2026-10-01T19:29:07.776Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "80ed671685174e0986e06112d027e096",
+      "received_at_utc": "2026-10-01T19:29:17.756Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "1c3a8542fcbf462b91d25210731201e3",
+      "received_at_utc": "2026-10-01T19:29:17.775Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "c841048d70d5444893672518668cc2cd",
+      "received_at_utc": "2026-10-01T19:29:18.621Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "58f800a2e38b4280993d64cffd1ebc95",
+      "received_at_utc": "2026-10-01T19:29:18.624Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/assistant/query",
+      "status": 200,
+      "request_id": "a93e1ed3e7cd44b88c484c5b0cbc67f3",
+      "received_at_utc": "2026-10-01T19:29:25.707Z"
+    }
+  ]
+}

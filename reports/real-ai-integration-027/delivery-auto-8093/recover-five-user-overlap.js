@@ -12,11 +12,11 @@ const ONLY = process.argv.find((value) => value.startsWith("--only="));
 const ONLY_WORK_ORDER = ONLY ? Number(ONLY.split("=", 2)[1]) : null;
 const EXPECTED_RUN_ID = "delivery-auto-702c3db745";
 const ITEMS = Object.freeze([
-  { workOrderId: 7, intentId: 29, managerKey: "managerB", propertyId: 6 },
-  { workOrderId: 8, intentId: 30, managerKey: "managerA", propertyId: 5 },
-  { workOrderId: 9, intentId: 31, managerKey: "managerB", propertyId: 6 },
-  { workOrderId: 10, intentId: 32, managerKey: "managerA", propertyId: 5 },
-  { workOrderId: 11, intentId: 33, managerKey: "managerA", propertyId: 5 },
+  { workOrderId: 7, intentId: 36, generation: 5, managerKey: "managerB", propertyId: 6 },
+  { workOrderId: 8, intentId: 30, generation: 2, managerKey: "managerA", propertyId: 5 },
+  { workOrderId: 9, intentId: 31, generation: 2, managerKey: "managerB", propertyId: 6 },
+  { workOrderId: 10, intentId: 32, generation: 2, managerKey: "managerA", propertyId: 5 },
+  { workOrderId: 11, intentId: 33, generation: 2, managerKey: "managerA", propertyId: 5 },
 ]);
 
 async function request(method, pathname, { token, body, requestId, expected = 200 } = {}) {
@@ -54,6 +54,9 @@ async function login(context, key) {
 }
 
 async function main() {
+  if (EXECUTE) {
+    throw new Error("WO7 bounded recovery generations are exhausted; status inspection only");
+  }
   const context = JSON.parse(fs.readFileSync(CONTEXT_PATH, "utf8"));
   if (context.run_id !== EXPECTED_RUN_ID || context.phase !== "PASSWORDS_READY") {
     throw new Error("Private fixture context does not match the fixed overlap run");
@@ -73,7 +76,7 @@ async function main() {
       requestId: `delivery-overlap-recovery-inspect-${item.intentId}`,
     });
     if (before.operation !== "ANALYZE_WORK_ORDER" || before.resource_id !== item.workOrderId
-        || before.generation !== 2 || before.status !== "FAILED") {
+        || before.generation !== item.generation || before.status !== "FAILED") {
       throw new Error(`Intent ${item.intentId} no longer matches the immutable failed generation`);
     }
     checked.push({ ...item, before });
@@ -91,7 +94,7 @@ async function main() {
         body: { reason_code: "DEPENDENCY_RECOVERED" },
       });
       if (successor.operation !== "ANALYZE_WORK_ORDER" || successor.resource_id !== item.workOrderId
-          || successor.generation !== 3) {
+          || successor.generation !== item.generation + 1) {
         throw new Error(`Intent ${item.intentId} returned an unexpected successor`);
       }
       results.push({ work_order_id: item.workOrderId, previous_intent_id: item.intentId,

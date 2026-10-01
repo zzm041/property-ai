@@ -1,0 +1,127 @@
+Error: ingestion failed: [{"version":3,"status":"FAILED","error_code":"TASK.PERMANENT_FAILURE","attempt":1,"started_at":"2026-10-01T19:21:32.929341Z","finished_at":"2026-10-01T19:21:32.982417Z"},{"version":2,"status":"SUCCEEDED","error_code":null,"attempt":2,"started_at":"2026-09-28T07:34:07.407891Z","finished_at":"2026-09-28T07:34:16.776623Z"},{"version":1,"status":"FAILED","error_code":"KB.UNAVAILABLE","attempt":4,"started_at":"2026-09-28T07:29:17.521663Z","finished_at":"2026-09-28T07:29:25.573193Z"}]
+    at waitIngestion (D:\property-ai\reports\real-ai-integration-027\delivery-rag-8093\run-page-flow.js:239:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async main (D:\property-ai\reports\real-ai-integration-027\delivery-rag-8093\run-page-flow.js:393:18)
+{
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/password/login",
+      "status": 200,
+      "request_id": "23a0afdb08d347b38690bc1625d2ac61",
+      "received_at_utc": "2026-10-01T19:21:27.801Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "910dc1f407754074b103aa923b91c07f",
+      "received_at_utc": "2026-10-01T19:21:27.824Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "8714a01dfb5f4e8396b27b1d0a12daf1",
+      "received_at_utc": "2026-10-01T19:21:28.502Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "385c83c7275f4dc4b1e3080eec811ed8",
+      "received_at_utc": "2026-10-01T19:21:28.521Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "d02cdfabc65e4db3aafccbc515cb29ad",
+      "received_at_utc": "2026-10-01T19:21:29.405Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "4226de3bfcd64bc0bcc5edef8c83a27b",
+      "received_at_utc": "2026-10-01T19:21:29.424Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "011a2a7cb6c8445bb9cadab08194e572",
+      "received_at_utc": "2026-10-01T19:21:30.534Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "8f0de73af7f248f08db8009b87e62749",
+      "received_at_utc": "2026-10-01T19:21:30.540Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "418e38cf4b474275bb5c04a5e3c2a800",
+      "received_at_utc": "2026-10-01T19:21:30.561Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "45271290f633442cb4cc428df917eff5",
+      "received_at_utc": "2026-10-01T19:21:30.711Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents/1",
+      "status": 200,
+      "request_id": "42c8430c40dd4b31b9ebe600201d6114",
+      "received_at_utc": "2026-10-01T19:21:30.989Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/knowledge-documents/1/versions",
+      "status": 200,
+      "request_id": "4a3fbc0063ca47dc8e1752c1a48c5bc7",
+      "received_at_utc": "2026-10-01T19:21:31.304Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "63cf1d373bb34da28678c7c633210e67",
+      "received_at_utc": "2026-10-01T19:21:31.325Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents/1",
+      "status": 200,
+      "request_id": "5a17493b332c40d88b76ebeebaa9d6c7",
+      "received_at_utc": "2026-10-01T19:21:31.348Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "42fa0b83c2204574baf483ffcbaf30fc",
+      "received_at_utc": "2026-10-01T19:21:31.600Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "27107e09193541d4bff65682c953fc75",
+      "received_at_utc": "2026-10-01T19:21:32.638Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "0f7c9d8736c74711a2382c5c0fe40189",
+      "received_at_utc": "2026-10-01T19:21:33.669Z"
+    }
+  ]
+}

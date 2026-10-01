@@ -19,6 +19,15 @@ const FULL_APPROVED = process.env.DELIVERY_RAG_FULL_APPROVED === "1";
 const RESUME_DOCUMENT_ID = Number(process.env.DELIVERY_RAG_RESUME_DOCUMENT_ID || 0);
 const RESUME_DOCUMENT_VERSION = Number(process.env.DELIVERY_RAG_RESUME_DOCUMENT_VERSION || 0);
 const RESUME_DOCUMENT_TITLE = process.env.DELIVERY_RAG_RESUME_DOCUMENT_TITLE || "";
+const REACTIVATE_ARCHIVED = process.env.DELIVERY_RAG_REACTIVATE_ARCHIVED === "1";
+const KEEP_ACTIVE = process.env.DELIVERY_RAG_KEEP_ACTIVE === "1";
+const CROSS_PROPERTY_ONLY = process.env.DELIVERY_RAG_CROSS_PROPERTY_ONLY === "1";
+const EXPECTED_EXCLUDED_DOCUMENT_ID = Number(
+  process.env.DELIVERY_RAG_EXPECTED_EXCLUDED_DOCUMENT_ID || 0
+);
+const EXCLUDED_SOURCE_PROPERTY_ID = Number(
+  process.env.DELIVERY_RAG_EXCLUDED_SOURCE_PROPERTY_ID || 0
+);
 const LAUNCH_PROJECT = process.env.MP_AUTOMATOR_LAUNCH === "1";
 const PROJECT_PATH = "D:/property-ai/tmp/delivery-check-miniprogram-20260928";
 const CLI_PATH = "D:/微信web开发者工具/cli.bat";
@@ -361,6 +370,47 @@ async function main() {
       }));
       return;
     }
+    if (CROSS_PROPERTY_ONLY) {
+      if (!EXPECTED_EXCLUDED_DOCUMENT_ID || !EXCLUDED_SOURCE_PROPERTY_ID) {
+        throw new Error("cross-property-only mode requires the excluded document and source property");
+      }
+      if (propertyId === EXCLUDED_SOURCE_PROPERTY_ID) {
+        throw new Error("cross-property-only identity resolved to the protected source property");
+      }
+      const resourceAdmission = assertFullResourceAdmission();
+      const question = "消防通道发现纸箱堆放时应该怎么办？";
+      const crossProperty = await ask(miniProgram, propertyId, question);
+      if ((crossProperty.result.citations || []).some(
+        (item) => Number(item.document_id) === EXPECTED_EXCLUDED_DOCUMENT_ID
+      )) {
+        throw new Error("knowledge document leaked across property scope");
+      }
+      const screenshot = path.join(OUT, `${RUN_ID}-01-cross-property-no-leak.png`);
+      await captureScreenshot(miniProgram, screenshot);
+      const evidence = {
+        task_id: "REAL-AI-INTEGRATION-027",
+        run_id: RUN_ID,
+        received_at_utc: new Date().toISOString(),
+        interaction: "actual WeChat Developer Tools page controls and origin wx.request",
+        api_origin: API_ORIGIN,
+        login: { method: session.method, user_id: session.me.user_id, roles: session.me.roles,
+          phone_sha256_16: crypto.createHash("sha256").update(PHONE).digest("hex").slice(0, 16) },
+        property_id: propertyId,
+        excluded_source_property_id: EXCLUDED_SOURCE_PROPERTY_ID,
+        expected_excluded_document_id: EXPECTED_EXCLUDED_DOCUMENT_ID,
+        answer: { question, status: crossProperty.result.answerStatus,
+          citations: crossProperty.result.citations, latency_ms: crossProperty.latency_ms },
+        screenshot: path.basename(screenshot),
+        requests,
+        boundaries: { normal_page_controls: true, database_business_writes: false,
+          response_mocked: false, work_order_requests_blocked: true },
+        resource_admission: resourceAdmission,
+      };
+      fs.writeFileSync(path.join(OUT, `${RUN_ID}-page-evidence.json`), JSON.stringify(evidence, null, 2), "utf8");
+      process.stdout.write(JSON.stringify({ run_id: RUN_ID, property_id: propertyId,
+        answer_status: evidence.answer.status, citation_count: evidence.answer.citations.length }));
+      return;
+    }
     const resourceAdmission = assertFullResourceAdmission();
     let title;
     let documentId;
@@ -368,24 +418,55 @@ async function main() {
     let active;
     if (RESUME_DOCUMENT_ID > 0) {
       documentId = RESUME_DOCUMENT_ID;
+      if (REACTIVATE_ARCHIVED) {
+        const archivedSwitch = await page.$("switch");
+        if (!archivedSwitch) throw new Error("archived document control is missing");
+        await archivedSwitch.trigger("change", { value: true });
+        await waitData(page, (data) => data.includeArchived && data.items.some(
+          (item) => Number(item.id) === documentId
+        ), "archived document list");
+      }
       const resumed = await selectDocument(page, documentId);
       title = resumed.selected.title;
       if (title !== RESUME_DOCUMENT_TITLE) {
         throw new Error("resume document title does not match the approved object");
       }
       documentVersion = RESUME_DOCUMENT_VERSION;
+      if (resumed.selected.status === "ARCHIVED" && REACTIVATE_ARCHIVED) {
+        const sourceText = "本合成小区消防通道必须保持畅通。发现纸箱堆放时，应联系物业服务中心，由工作人员安排清理；住户不要自行搬动带电设备。";
+        documentVersion = Math.max(...resumed.selected.versions.map((item) => Number(item.version))) + 1;
+        await fill(page, "textarea", "新版本知识正文", sourceText);
+        await tolerateTimeout(() => byText(page, "button", "提交新版本并重新激活").then((item) => item.tap()));
+        await waitData(page, (data) => data.notice.includes(`v${documentVersion}`), "archived document reactivation");
+        active = await waitIngestion(page, documentId, documentVersion);
+      } else if (REACTIVATE_ARCHIVED) {
+        // Resume safely after an interrupted reactivation. Reuse the single
+        // already-created successor version instead of creating another one.
+        const successorVersions = (resumed.selected.versions || [])
+          .map((item) => Number(item.version))
+          .filter((version) => version > RESUME_DOCUMENT_VERSION)
+          .sort((left, right) => right - left);
+        if (successorVersions.length > 0) {
+          documentVersion = successorVersions[0];
+        }
+      }
       const expectedVersion = (resumed.selected.versions || []).find(
-        (item) => Number(item.version) === documentVersion
+        (item) => Number(item.version) === RESUME_DOCUMENT_VERSION
       );
       const expectedJob = (resumed.selected.ingestion_jobs || []).find(
-        (item) => Number(item.version) === documentVersion
+        (item) => Number(item.version) === RESUME_DOCUMENT_VERSION
       );
       if (!expectedVersion || !expectedJob) {
         throw new Error("resume expected version or ingestion job is missing");
       }
-      if (Number(resumed.selected.current_version) === documentVersion) {
+      if (active) {
+        // The approved single demo version reactivated this archived document.
+      } else if (Number(resumed.selected.current_version) === documentVersion) {
         active = resumed;
-      } else if (expectedJob.status === "PENDING" || expectedJob.status === "PROCESSING") {
+      } else if ((resumed.selected.ingestion_jobs || []).some(
+        (item) => Number(item.version) === documentVersion &&
+          (item.status === "PENDING" || item.status === "PROCESSING")
+      )) {
         active = await waitIngestion(page, documentId, documentVersion);
       } else {
         throw new Error(`resume expected version is not active or pending: ${expectedJob.status}`);
@@ -412,6 +493,42 @@ async function main() {
     if (!citation) throw new Error("answer did not cite the created active document version");
     const answerScreenshot = path.join(OUT, `${RUN_ID}-02-answer-with-citation.png`);
     await captureScreenshot(miniProgram, answerScreenshot);
+
+    if (KEEP_ACTIVE) {
+      const otherProperty = scope.properties.find((item) => Number(item.id) !== propertyId);
+      if (!otherProperty) throw new Error("cross-property RAG check needs another authorized property selector");
+      const crossProperty = await ask(miniProgram, Number(otherProperty.id), question);
+      if ((crossProperty.result.citations || []).some((item) => Number(item.document_id) === documentId)) {
+        throw new Error("current knowledge document leaked across property scope");
+      }
+      const evidence = {
+        task_id: "REAL-AI-INTEGRATION-027",
+        run_id: RUN_ID,
+        received_at_utc: new Date().toISOString(),
+        interaction: "actual WeChat Developer Tools page controls and origin wx.request",
+        api_origin: API_ORIGIN,
+        login: { method: session.method, user_id: session.me.user_id, roles: session.me.roles,
+          phone_sha256_16: crypto.createHash("sha256").update(PHONE).digest("hex").slice(0, 16) },
+        property_id: propertyId,
+        document: { id: documentId, version: documentVersion, title, resumed_existing: true,
+          reactivated_from_archived: REACTIVATE_ARCHIVED, status: active.selected.status },
+        answer: { question, status: answered.result.answerStatus, text: answered.result.answer,
+          citations: answered.result.citations, latency_ms: answered.latency_ms },
+        cross_property: { property_id: Number(otherProperty.id), status: crossProperty.result.answerStatus,
+          citations: crossProperty.result.citations, latency_ms: crossProperty.latency_ms },
+        screenshots: [path.basename(activeScreenshot), path.basename(answerScreenshot)],
+        requests,
+        boundaries: { normal_page_controls: true, database_business_writes: false,
+          response_mocked: false, work_order_requests_blocked: true, kept_active_for_delivery: true },
+        resource_admission: resourceAdmission,
+      };
+      fs.writeFileSync(path.join(OUT, `${RUN_ID}-page-evidence.json`), JSON.stringify(evidence, null, 2), "utf8");
+      process.stdout.write(JSON.stringify({ run_id: RUN_ID, document_id: documentId,
+        version: documentVersion, answer_status: evidence.answer.status,
+        citation_count: evidence.answer.citations.length,
+        cross_property_citation_count: evidence.cross_property.citations.length }));
+      return;
+    }
 
     page = await navigateFromHome(miniProgram, "知识库维护", "pages/supervisor/knowledge");
     await waitData(page, (data) => data.items.some((item) => Number(item.id) === documentId), "document list before archive");

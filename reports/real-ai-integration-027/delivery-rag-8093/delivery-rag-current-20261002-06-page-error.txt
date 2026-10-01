@@ -1,0 +1,92 @@
+Error: archived document reactivation: details contains fields not allowed for action
+    at waitData (D:\property-ai\reports\real-ai-integration-027\delivery-rag-8093\run-page-flow.js:109:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async main (D:\property-ai\reports\real-ai-integration-027\delivery-rag-8093\run-page-flow.js:392:9)
+{
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/password/login",
+      "status": 200,
+      "request_id": "a60123c807fb4e9892766e09b97115c2",
+      "received_at_utc": "2026-10-01T19:16:59.194Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "139390d905c74b3d8ef2bff066377a82",
+      "received_at_utc": "2026-10-01T19:16:59.209Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "19cc42f2879248bf8f78a9300384c1d4",
+      "received_at_utc": "2026-10-01T19:16:59.880Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "6072e8ee63f14632b679e798e0e7ec23",
+      "received_at_utc": "2026-10-01T19:16:59.899Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "e463e473b6f0444dbca7ec1a2c55ad98",
+      "received_at_utc": "2026-10-01T19:17:00.789Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "40e1f8491b6d4735aad713486f9d4c45",
+      "received_at_utc": "2026-10-01T19:17:00.809Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "c00ca4198bf3419880482957af782d8d",
+      "received_at_utc": "2026-10-01T19:17:01.918Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id": "a74bbc6212954565ba4b1a8598239f02",
+      "received_at_utc": "2026-10-01T19:17:01.924Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "a6b25a24daf54821a7f6a2c1e35ec049",
+      "received_at_utc": "2026-10-01T19:17:01.943Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents",
+      "status": 200,
+      "request_id": "0c14c16f9dcb4fad82432390dc80399d",
+      "received_at_utc": "2026-10-01T19:17:02.280Z"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/knowledge-documents/1",
+      "status": 200,
+      "request_id": "5eb20f8ace354ad7b9021837846de2c2",
+      "received_at_utc": "2026-10-01T19:17:02.563Z"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/knowledge-documents/1/versions",
+      "status": 422,
+      "request_id": "b4f783a9d7674e7d8bf5f49ffb8c85d1",
+      "received_at_utc": "2026-10-01T19:17:02.864Z"
+    }
+  ]
+}
