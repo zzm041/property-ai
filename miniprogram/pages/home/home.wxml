@@ -35,7 +35,7 @@
   <button class="btn" data-url="/pages/supervisor/knowledge" bindtap="go">知识库维护</button>
 </view>
 <view class="card" wx:if="{{canManageSla}}">
-  <button class="btn" data-url="/pages/supervisor/sla" bindtap="go">SLA 策略管理</button>
+  <button id="sla-manage" class="btn" data-url="/pages/supervisor/sla" bindtap="go">SLA 策略管理</button>
 </view>
 <view class="card" wx:if="{{canReviewIdentity}}">
   <button class="btn" data-url="/pages/supervisor/identity-recovery" bindtap="go">身份恢复审核</button>
@@ -51,6 +51,6 @@
 </view>
 <button class="btn" data-url="/pages/notifications/list" bindtap="go">通知</button>
 <button class="btn" wx:if="{{lastWorkOrderId}}" bindtap="openLast">最近工单</button>
-<button class="btn" bindtap="logout">退出登录</button>
+<button id="logout-button" class="btn" bindtap="logout">退出登录</button>
 <button class="btn" bindtap="retry">重试</button>
 <view class="error" wx:if="{{error}}">{{error}}</view>

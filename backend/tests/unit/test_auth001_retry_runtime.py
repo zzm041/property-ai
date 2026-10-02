@@ -151,9 +151,19 @@ def test_bounded_beat_requires_exact_ids_and_uses_the_isolated_acceptance_queue(
     assert "not 1 <= len(ids) <= 4" in launcher
     assert '"task": "app.worker.tasks.sweep_sla_task"' in launcher
     assert '"args": (work_order_id,)' in launcher
-    assert "SLA_ACCEPTANCE_QUEUE if args.component != \"api\" else QUEUE" in launcher
+    assert "queue_name=SLA_ACCEPTANCE_QUEUE" in launcher
+    assert "else QUEUE" not in launcher
     assert '"worker", "-Q", settings.resolved_celery_queue' in launcher
     assert '"options": {"queue": settings.resolved_celery_queue}' in launcher
+
+
+def test_acceptance_api_routes_notifications_away_from_the_protected_queue() -> None:
+    launcher = (ROOT / "scripts" / "ops" / "serve_auth001_retry.py").read_text(
+        encoding="utf-8"
+    )
+    assert 'enable_enqueue=args.component != "api"' in launcher
+    assert "queue_name=SLA_ACCEPTANCE_QUEUE" in launcher
+    assert "The API may enqueue notification-delivery work" in launcher
 
 
 def test_retry_runtime_queue_allowlist_is_closed(monkeypatch) -> None:

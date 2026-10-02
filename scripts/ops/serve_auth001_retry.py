@@ -17,7 +17,6 @@ os.chdir(FIXED_BACKEND)
 
 from auth001_retry_runtime import (
     API_PORT,
-    QUEUE,
     SLA_ACCEPTANCE_QUEUE,
     apply_environ,
     build_settings,
@@ -74,9 +73,10 @@ def main() -> int:
     settings = build_settings(
         enable_enqueue=args.component != "api",
         enable_test_proof=True,
-        queue_name=(
-            SLA_ACCEPTANCE_QUEUE if args.component != "api" else QUEUE
-        ),
+        # The API may enqueue notification-delivery work even when AI analysis
+        # enqueueing is disabled.  Keep every acceptance-run message off the
+        # protected imported queue, not only Worker/Beat traffic.
+        queue_name=SLA_ACCEPTANCE_QUEUE,
     )
     apply_environ(settings)
     print(json.dumps({"component": args.component, **safe_description(settings)}, ensure_ascii=False), flush=True)

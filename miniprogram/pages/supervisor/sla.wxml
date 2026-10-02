@@ -15,10 +15,10 @@
   <picker range="{{scopeOptions}}" range-key="label" value="{{scopeIndex}}" bindchange="onScopeChange">
     <view class="picker">作用范围：{{scopeOptions[scopeIndex].label}}</view>
   </picker>
-  <picker range="{{categoryOptions}}" range-key="label" value="{{categoryIndex}}" bindchange="onCategoryChange">
+  <picker id="sla-category" range="{{categoryOptions}}" range-key="label" value="{{categoryIndex}}" bindchange="onCategoryChange">
     <view class="picker">工单类型：{{categoryOptions[categoryIndex].label}}</view>
   </picker>
-  <picker range="{{priorityOptions}}" range-key="label" value="{{priorityIndex}}" bindchange="onPriorityChange">
+  <picker id="sla-priority" range="{{priorityOptions}}" range-key="label" value="{{priorityIndex}}" bindchange="onPriorityChange">
     <view class="picker">优先级：{{priorityOptions[priorityIndex].label}}</view>
   </picker>
   <picker range="{{visibleStatusOptions}}" range-key="label" value="{{statusIndex}}" bindchange="onStatusChange">
@@ -43,7 +43,7 @@
   <view class="hint" wx:if="{{editingId}}">正在编辑策略 #{{editingId}}</view>
   <view class="hint" wx:else>该层尚无策略，保存后建立。字段初值来自当前生效策略。</view>
   <view class="hint" wx:if="{{scopeOptions[scopeIndex].value == 'TENANT'}}">企业默认必须保持启用；禁用只适用于小区覆盖。</view>
-  <button class="btn" disabled="{{loading}}" bindtap="save">保存并重新读取</button>
+  <button id="sla-save" class="btn" disabled="{{loading}}" bindtap="save">保存并重新读取</button>
 </view>
 
 <view class="card warning-card">

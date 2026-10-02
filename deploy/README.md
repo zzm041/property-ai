@@ -63,6 +63,8 @@ LIVE TLS = BLOCKED_BY_DOMAIN_CERT
 
 `docker-compose.delivery.yml` 是单机交付制品，不依赖开发机绝对路径、旧容器 ID、PID 或历史数据库快照。它使用独立 Compose 项目和具名持久卷；API、Worker、Beat 不会自动执行迁移。
 
+正常本地成品入口始终是本节的 `delivery.ps1` 与 8093 环境；它不依赖 Codex 常驻、逐单测试 ID 或 3317 验收数据。`scripts/ops/serve_auth001_retry.py` 仅用于已批准的 3317 隔离验收：测试 Proof、注入时钟和精确工单 ID Beat 均受目标守卫约束，且该入口把 API/Worker/Beat/投递器的所有消息统一路由到 `property_ai.auth001.persist.v2.sla.acceptance`，不得连接或消费导入快照携带的原队列。该验收入口不是部署或生产启动方式。
+
 Windows 本地验证：
 
 ```powershell
