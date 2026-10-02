@@ -14,12 +14,14 @@ $SecretPath = Join-Path $RuntimeDir "internal-token.txt"
 $ConfigPath = Join-Path $RuntimeDir "config.json"
 $CurrentPath = Join-Path $RuntimeDir "current.json"
 $OllamaCurrent = Join-Path $RepoRoot "tmp\delivery-ollama-runtime\current.json"
-$SourceCommit = "f234402629d621a26eb1ce9f9077a465d5c0b5eb"
+$SourceCommit = "61b762d9775845c47cf0b43f3003a3f4d1cb5519"
 $CandidateRoot = Join-Path $RuntimeDir "candidate-$SourceCommit"
 $AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
+$ModelAdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_models.py"
 $RuntimeControlPath = Join-Path $CandidateRoot "scripts\ops\local_ai_runtime_control.py"
-$ExpectedAdapterSha256 = "542EABD497EDBB04B841EFF98F34592D177D033D28109C7719EF7E47BC9C4F3F"
-$ExpectedRuntimeControlSha256 = "CEA1B4AD6A5D2C12F70E233E28C791C86BC6EFDC5F2EA9864FDC022D57D13867"
+$ExpectedAdapterSha256 = "1503C527B77EDEF0EA71CE2B0A1BF9414508E0D082FF4E66B114313C92F6EA32"
+$ExpectedModelAdapterSha256 = "FAF70CF69B8D7058026881D47B90CB20E3B03F6A99E693F16BD06CDA87AC0BB2"
+$ExpectedRuntimeControlSha256 = "B0DE6D3544D8875E0A57CED1A1946744736FC9074AF1ECEA5228A79468C60CFF"
 $ResolutionRoot = Join-Path $RepoRoot "reports"
 $ResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\call-001-resolution.json"
 $ResolutionReviewPath = Join-Path $RepoRoot "reports\codex\REAL-AI-INTEGRATION-027-DELIVERY-AUTO-call001-review-round1.raw.json"
@@ -112,7 +114,7 @@ function Invoke-Drain([string]$Token) {
 }
 
 function Assert-Candidate {
-    if ($SourceCommit -match "^__" -or $ExpectedAdapterSha256 -match "^__" -or $ExpectedRuntimeControlSha256 -match "^__") {
+    if ($SourceCommit -match "^__" -or $ExpectedAdapterSha256 -match "^__" -or $ExpectedModelAdapterSha256 -match "^__" -or $ExpectedRuntimeControlSha256 -match "^__") {
         throw "work AI candidate is not frozen"
     }
     if (-not (Test-Path -LiteralPath $CandidateRoot -PathType Container)) {
@@ -130,6 +132,9 @@ function Assert-Candidate {
     }
     if ((Get-FileHash -Algorithm SHA256 -LiteralPath $AdapterPath).Hash -ne $ExpectedAdapterSha256) {
         throw "frozen work AI adapter hash mismatch"
+    }
+    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $ModelAdapterPath).Hash -ne $ExpectedModelAdapterSha256) {
+        throw "frozen work AI model adapter hash mismatch"
     }
     if ((Get-FileHash -Algorithm SHA256 -LiteralPath $RuntimeControlPath).Hash -ne $ExpectedRuntimeControlSha256) {
         throw "frozen runtime control hash mismatch"
@@ -316,7 +321,7 @@ switch ($Action) {
             format="property-ai-delivery-work-ai-runtime-v1";started_at_utc=[DateTime]::UtcNow.ToString("o")
             source_commit=$SourceCommit;launcher_pid=$launcher.Id;launcher_started_at_utc=$launcher.StartTime.ToUniversalTime().ToString("o")
             listener_pid=$listenerProcess.Id;listener_started_at_utc=$listenerProcess.StartTime.ToUniversalTime().ToString("o")
-            adapter_sha256=$ExpectedAdapterSha256;runtime_control_sha256=$ExpectedRuntimeControlSha256
+            adapter_sha256=$ExpectedAdapterSha256;model_adapter_sha256=$ExpectedModelAdapterSha256;runtime_control_sha256=$ExpectedRuntimeControlSha256
             config_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $ConfigPath).Hash
             runtime_binding_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $bindingPath).Hash
             token_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $SecretPath).Hash
