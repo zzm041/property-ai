@@ -77,6 +77,10 @@ def main() -> int:
         # enqueueing is disabled.  Keep every acceptance-run message off the
         # protected imported queue, not only Worker/Beat traffic.
         queue_name=SLA_ACCEPTANCE_QUEUE,
+        # API notifications still use Celery even when work-order analysis
+        # enqueueing is disabled, so Rabbit identity is mandatory for every
+        # acceptance runtime component.
+        require_rabbit_identity=True,
     )
     apply_environ(settings)
     print(json.dumps({"component": args.component, **safe_description(settings)}, ensure_ascii=False), flush=True)

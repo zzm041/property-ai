@@ -360,10 +360,13 @@ def build_settings(
     enable_enqueue: bool = True,
     enable_test_proof: bool = True,
     queue_name: str = QUEUE,
+    require_rabbit_identity: bool | None = None,
 ) -> Settings:
     if queue_name not in {QUEUE, SLA_ACCEPTANCE_QUEUE}:
         raise RuntimeError("retry runtime queue is outside the fixed allowlist")
-    validate_runtime_assets(include_rabbit=enable_enqueue)
+    if require_rabbit_identity is None:
+        require_rabbit_identity = enable_enqueue
+    validate_runtime_assets(include_rabbit=require_rabbit_identity)
     source = _source_settings()
     target_url = database_url(source)
     if enable_test_proof and not PROOF_SECRET.is_file():

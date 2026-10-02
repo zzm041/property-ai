@@ -102,11 +102,12 @@ def test_rabbit_id_drift_requires_matching_immutable_resolution(tmp_path, monkey
     assert module._rabbit_current_id(dependencies, actual) == "current"
 
 
-def test_api_can_disable_enqueue_without_accepting_rabbit_resolution() -> None:
+def test_api_can_disable_ai_enqueue_but_still_requires_rabbit_resolution() -> None:
     source = SCRIPT.read_text(encoding="utf-8")
     launcher = (ROOT / "scripts" / "ops" / "serve_auth001_retry.py").read_text(encoding="utf-8")
-    assert "validate_runtime_assets(include_rabbit=enable_enqueue)" in source
+    assert "validate_runtime_assets(include_rabbit=require_rabbit_identity)" in source
     assert 'enable_enqueue=args.component != "api"' in launcher
+    assert "require_rabbit_identity=True" in launcher
     assert '"rabbitmq_boundary": "BLOCKED_CONTAINER_ID_UNKNOWN_NOT_ACCEPTED"' in source
 
 
