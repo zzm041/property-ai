@@ -173,7 +173,9 @@ Page({
     this._recorder = wx.getRecorderManager();
     this._onRecorderStart = () => {
       this._recordAuthorizationPending = false;
+      this._recordStartPending = false;
       if (this.unloaded || this.hidden || this._discardRecording) {
+        this._recordStopPending = true;
         if (this._recorder) this._recorder.stop();
         return;
       }
@@ -182,10 +184,13 @@ Page({
     };
     this._onRecorderStop = (result) => {
       const discard = this._discardRecording || this.unloaded || this.hidden;
+      const attempt = this._activeRecordingAttempt;
       this._recording = false;
+      this._recordStartPending = false;
       this._recordStopPending = false;
       if (!this.unloaded) this.setData({ recording: false });
       if (discard) {
+        this._discardRecording = false;
         if (!this.unloaded) this.setData({ recordingBusy: false, recordingHint: "" });
         return;
       }
@@ -206,7 +211,7 @@ Page({
         () => {
           if (!this.unloaded && !this.hidden) this.setData({ recordingHint: "录音已添加" });
         },
-        () => !this._discardRecording && !this.unloaded && !this.hidden
+        () => attempt === this._activeRecordingAttempt && !this._discardRecording && !this.unloaded && !this.hidden
       )).finally(() => {
         this._recordUploadPending = false;
         this._discardRecording = false;
@@ -216,8 +221,10 @@ Page({
     this._onRecorderError = (error) => {
       this._recording = false;
       this._recordAuthorizationPending = false;
+      this._recordStartPending = false;
       this._recordStopPending = false;
       this._recordUploadPending = false;
+      this._discardRecording = false;
       if (!this.unloaded) {
         this.setData({
           recording: false,
@@ -245,12 +252,17 @@ Page({
     }
     this._discardRecording = false;
     this._recordAuthorizationPending = true;
+    const attempt = (this._recordingAttempt || 0) + 1;
+    this._recordingAttempt = attempt;
+    this._activeRecordingAttempt = attempt;
     this.setData({ recordingBusy: true, recordingHint: "正在请求录音权限", error: "" });
     wx.authorize({
       scope: "scope.record",
       success: () => {
+        if (attempt !== this._activeRecordingAttempt) return;
         this._recordAuthorizationPending = false;
         if (this.unloaded || this.hidden || this._discardRecording) return;
+        this._recordStartPending = true;
         this._recorder.start({
           duration: 30000,
           sampleRate: 16000,
@@ -260,6 +272,7 @@ Page({
         });
       },
       fail: () => {
+        if (attempt !== this._activeRecordingAttempt) return;
         this._recordAuthorizationPending = false;
         if (!this.unloaded && !this.hidden) {
           this.setData({ recordingBusy: false, recordingHint: "", error: "未获得麦克风权限，请在小程序设置中允许录音后重试" });
@@ -275,11 +288,17 @@ Page({
   },
   _cancelRecording() {
     this._discardRecording = true;
+    this._activeRecordingAttempt = (this._recordingAttempt || 0) + 1;
+    this._recordingAttempt = this._activeRecordingAttempt;
     this._recordAuthorizationPending = false;
-    this._recordStopPending = false;
-    if (this._recording && this._recorder) this._recorder.stop();
+    const waitForStop = this._recording && this._recorder;
+    if (waitForStop) {
+      this._recordStopPending = true;
+      this._recorder.stop();
+    }
     this._recording = false;
-    if (!this.unloaded) this.setData({ recording: false, recordingBusy: false, recordingHint: "" });
+    const waitForSettlement = Boolean(waitForStop || this._recordStartPending || this._recordUploadPending);
+    if (!this.unloaded) this.setData({ recording: false, recordingBusy: waitForSettlement, recordingHint: waitForSettlement ? "正在取消未完成录音" : "" });
   },
   _prepareImage(file, info, uploadType) {
     const width = Number(info.width || 0);

@@ -9,6 +9,7 @@ let authorizeOptions;
 let startOptions;
 let startCount = 0;
 let stopCount = 0;
+let startImmediately = true;
 
 const recorder = {
   onStart(handler) { startHandler = handler; },
@@ -17,7 +18,7 @@ const recorder = {
   offStart() {},
   offStop() {},
   offError() {},
-  start(options) { startCount += 1; startOptions = options; startHandler(); },
+  start(options) { startCount += 1; startOptions = options; if (startImmediately) startHandler(); },
   stop() { stopCount += 1; },
 };
 
@@ -114,9 +115,13 @@ async function main() {
   current.page.startRecording();
   const lateAuthorization = authorizeOptions;
   current.page.onHide();
+  current.page.hidden = false;
+  current.page.startRecording();
+  const currentAuthorization = authorizeOptions;
   lateAuthorization.success();
   assert.strictEqual(startCount, startsBeforeLateAuthorization, "late authorization after page hide must not start recording");
-  assert.strictEqual(current.state.recordingBusy, false);
+  currentAuthorization.success();
+  assert.strictEqual(startCount, startsBeforeLateAuthorization + 1, "current authorization must still start its own recording");
 
   current = createPage();
   let discardedUpload = false;
@@ -126,9 +131,33 @@ async function main() {
   const stopsBeforeHide = stopCount;
   current.page.onHide();
   assert.strictEqual(stopCount, stopsBeforeHide + 1, "page hide must stop active recording");
+  current.page.hidden = false;
+  const startsBeforeOldStop = startCount;
+  current.page.startRecording();
+  assert.strictEqual(startCount, startsBeforeOldStop, "a new recording must wait for the cancelled stop callback");
+  assert.strictEqual(current.state.recordingBusy, true);
   stopHandler({ tempFilePath: "wxfile://discard.mp3", fileSize: 1234, duration: 2400 });
   assert.strictEqual(discardedUpload, false, "recording completed after page exit must be discarded");
   assert.strictEqual(current.state.recordingBusy, false);
+  current.page.startRecording();
+  authorizeOptions.success();
+  assert.strictEqual(startCount, startsBeforeOldStop + 1, "recording may restart after the old stop callback settles");
+
+  current = createPage();
+  startImmediately = false;
+  current.page.startRecording();
+  authorizeOptions.success();
+  current.page.onHide();
+  current.page.hidden = false;
+  const startsBeforeLateStart = startCount;
+  current.page.startRecording();
+  assert.strictEqual(startCount, startsBeforeLateStart, "a new recording must wait for a requested start callback");
+  const stopsBeforeLateStart = stopCount;
+  startHandler();
+  assert.strictEqual(stopCount, stopsBeforeLateStart + 1, "a late start after page exit must be stopped");
+  stopHandler({ tempFilePath: "wxfile://late-start.mp3", fileSize: 1234, duration: 2400 });
+  assert.strictEqual(current.state.recordingBusy, false);
+  startImmediately = true;
 
   console.log("work-order create native recorder focused tests passed");
 }
