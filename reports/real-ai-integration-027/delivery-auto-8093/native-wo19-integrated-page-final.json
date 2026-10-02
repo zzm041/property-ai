@@ -1,0 +1,37 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-NATIVE-MEDIA-ATTACHMENT-COMPLETION",
+  "work_order_id": 19,
+  "interaction": "WeChat DevTools actual resident login and read-only work-order detail after attachment completion",
+  "credentials_saved": false,
+  "direct_database_business_write": false,
+  "manual_analysis_or_assignment": false,
+  "model_call_from_script": false,
+  "page_result": {
+    "status": "PENDING_ASSIGNMENT",
+    "status_label": "待安排人员",
+    "media": [
+      {
+        "id": 20,
+        "file_id": 16,
+        "kind": "IMAGE"
+      },
+      {
+        "id": 21,
+        "file_id": 17,
+        "kind": "AUDIO"
+      },
+      {
+        "id": 22,
+        "file_id": 18,
+        "kind": "AUDIO"
+      }
+    ],
+    "attachment_completed_event": true,
+    "legal_wait_event": true,
+    "assignment_count": 0,
+    "auto_dispatched": false,
+    "can_append": true,
+    "can_cancel": true
+  },
+  "screenshot": "28-native-wo19-integrated-waiting.png"
+}

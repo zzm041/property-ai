@@ -1,0 +1,139 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-NATIVE-MEDIA-ATTACHMENT-COMPLETION",
+  "captured_at": "2026-10-02T21:31:00+08:00",
+  "runtime": {
+    "source_commit": "3d7c6df7e5549d2790a095e785f70c0754fb3330",
+    "image": "property-ai-delivery:3d7c6df",
+    "image_id": "sha256:a2a9f4f96624c918d7b2be50e8d8f56d539d27e9e91a410c3d0063f644e5d8f1",
+    "components": [
+      "property-ai-delivery-check-api-1",
+      "property-ai-delivery-check-worker-1",
+      "property-ai-delivery-check-publisher-1",
+      "property-ai-delivery-check-beat-1"
+    ],
+    "api_health": "ok"
+  },
+  "work_order": {
+    "id": 19,
+    "status": "PENDING_ASSIGNMENT",
+    "process_reason": "NONE",
+    "version": 3,
+    "current_assignment_id": null,
+    "assignment_count": 0,
+    "dispatch_result": "WAITING_ELIGIBLE"
+  },
+  "recovery": {
+    "intent_id": 190,
+    "generation": 7,
+    "status": "SUCCEEDED",
+    "publish_attempt": 1,
+    "execution_attempt": 1,
+    "finished_at_utc": "2026-10-02T13:19:57.116125Z",
+    "source_intent_id": 187,
+    "source_analysis_id": 18,
+    "new_work_order_created": false,
+    "direct_database_business_write": false,
+    "manual_analysis_or_assignment": false
+  },
+  "attachments": [
+    {
+      "media_id": 20,
+      "file_id": 16,
+      "kind": "IMAGE",
+      "content_hash": "4b93ac69fc65885b92805979bfc1d63d91e308a12422d426ed62fe1d462ec78e",
+      "checkpoint": "AI_VLM_CHECKPOINT",
+      "checkpoint_source": "provider",
+      "checkpoint_reused_by_generation_7": true,
+      "provider_call_repeated_by_generation_7": false,
+      "result": "图像显示狭窄储物空间或凹槽、杂物，以及右侧白色门框边缘多处漆面剥落和破损。"
+    },
+    {
+      "media_id": 21,
+      "file_id": 17,
+      "kind": "AUDIO",
+      "content_hash": "9476250136041ff7864ff8953a6408dedc3c68cb0c198ebf80b278b9bb7e0fad",
+      "checkpoint": "AI_ASR_CHECKPOINT",
+      "checkpoint_source": "legacy_checkpoint",
+      "checkpoint_reused_by_generation_7": true,
+      "provider_call_repeated_by_generation_7": false,
+      "result": "嗯。"
+    },
+    {
+      "media_id": 22,
+      "file_id": 18,
+      "kind": "AUDIO",
+      "content_hash": "18c4f2cf5c9464925ce4c797fb38f4d62ba55aa04af214546ec585704cb26f6d",
+      "checkpoint": "AI_ASR_CHECKPOINT",
+      "checkpoint_source": "provider",
+      "checkpoint_reused_by_generation_7": false,
+      "provider_call_repeated_by_generation_7": false,
+      "result": "管道井内有垃圾堆放，请速来查看。"
+    }
+  ],
+  "integrated_analysis": {
+    "analysis_id": 19,
+    "analysis_version": 2,
+    "status": "COMPLETED",
+    "category": "CLEANING",
+    "severity": "LOW",
+    "priority": "MEDIUM",
+    "risk": "none",
+    "required_role": "STAFF",
+    "required_skill": "cleaning",
+    "confidence": "0.950",
+    "summary": "管道井内有垃圾杂物堆积堵塞，需进行清扫；图像显示右侧白色门框边缘可见多处漆面剥落和破损。",
+    "attachment_completed_event": true,
+    "attachment_count": 3
+  },
+  "aggregate_input_binding": {
+    "call": "call-032",
+    "input_sha256": "6DC01D361AF711EFAE4C2329EE577C0B8CFD848D633EDDE697FE5EB81AAEFA7C",
+    "file16_observation_present": true,
+    "file17_transcript_present": true,
+    "file18_transcript_present": true,
+    "raw_input_not_copied_to_report": true
+  },
+  "new_provider_calls": [
+    {
+      "call_log_id": 156,
+      "provider_type": "ASR",
+      "operation": "transcribe",
+      "status": "SUCCESS",
+      "latency_ms": 12934,
+      "input_hash": "354f31c5fa63fd21cf01c884f9a5bce6b3de6c3df382b0cae95f9bca680b7f3d"
+    },
+    {
+      "call_log_id": 157,
+      "provider_type": "LLM",
+      "operation": "structured_completion",
+      "status": "SUCCESS",
+      "latency_ms": 20060,
+      "input_hash": "5b92cf8abffe47a63539818db9b723a073b060acd1c91761ce292a58b590c852"
+    }
+  ],
+  "dispatch": {
+    "policy_version": "maintenance-group-v1",
+    "reason_code": "WAITING_ELIGIBLE",
+    "recommendation_count": 2,
+    "eligible_count": 0,
+    "filter_reason": "DUTY_MISMATCH",
+    "assignment_created": false,
+    "interpretation": "All three attachments were understood and integrated; the work order legally remains waiting because no employee in the scoped property has the required CLEANING duty."
+  },
+  "page": {
+    "evidence": "native-wo19-integrated-page-final.json",
+    "screenshot": "28-native-wo19-integrated-waiting.png",
+    "normal_resident_login": true,
+    "status_label": "待安排人员",
+    "three_media_visible": true,
+    "attachment_completed_event_visible": true,
+    "legal_wait_event_visible": true,
+    "credentials_saved": false
+  },
+  "budget_delta": {
+    "qwen_or_vlm_calls": 2,
+    "asr_calls": 4,
+    "model_execution_seconds": 155.957,
+    "scope": "generation 4 through generation 7 attachment-completion package; failed and successful provider executions all counted"
+  }
+}

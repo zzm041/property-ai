@@ -1,5 +1,11 @@
 # REAL-AI-INTEGRATION-027 — bounded closeout, not full PASS
 
+## Latest increment — WO19 all accepted native attachments completed (2026-10-02)
+
+Fixed source `3d7c6df7e5549d2790a095e785f70c0754fb3330` is loaded consistently in the 8093 API, Worker, publisher and Beat as image `sha256:a2a9f4f96624c918d7b2be50e8d8f56d539d27e9e91a410c3d0063f644e5d8f1`. The general fix replaces the old first-audio-only behavior with ordered per-file ASR/VLM checkpoints and fences the explicitly authorized completion/recovery chain to the original source analysis and claim. It does not allow cancelled ordinary tasks or changed work orders to inherit that path.
+
+WO19 generation 7 succeeded without creating a new work order. File16 VLM and file17 ASR results were reused by exact immutable binding; only file18 ASR and the final aggregate LLM executed in generation 7. The aggregate input contains all three attachment results. Analysis 19/version 2 is completed; the mini-program page shows all three attachments and `待安排人员`. There is no Assignment because both in-scope employees fail the CLEANING duty check, so `WAITING_ELIGIBLE` is a legal product result rather than an AUTO claim. Exact results are in `delivery-auto-8093/native-wo19-attachment-completion-final.json`; the independent review `reports/codex/REAL-AI-INTEGRATION-027-NATIVE-MEDIA-ALL-ATTACHMENTS-review.raw.json` is `PASS_SCOPED_INCREMENTAL` with no findings. Historical failures remain unchanged, and this is not generalized model-quality or Production release acceptance.
+
 Base `ad7d100ba16fa8b11e61526cfd11978a5820a040`; exact WIP files are bound by `review-source-manifest.json`. Main is sole writer. Original inference windows and reservations remain unchanged; no further inference authorized by this closeout.
 
 ## Evidence index and actual outcomes

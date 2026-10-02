@@ -1,0 +1,66 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-NATIVE-MEDIA-ATTACHMENT-COMPLETION",
+  "reviewed_source_sha": "3d7c6df7e5549d2790a095e785f70c0754fb3330",
+  "scope": "Independent read-only incremental review of git diff 350d9ff..3d7c6df for WO19 accepted-attachment completion, focused on commits 06e28ab, eb3eaca, 1451e55, 17581e4, eb19113, a61d285, 0cbc5f9, 0113620 and 3d7c6df; no tests, page operations, model calls, business requests, database or queue operations were performed.",
+  "evidence_read": [
+    "backend/app/service/analysis.py",
+    "backend/app/service/analysis_attempt.py",
+    "backend/app/service/task_intent.py",
+    "backend/app/worker/task_intents.py",
+    "backend/app/repository/work_order.py",
+    "backend/app/api/v1/task_intents.py",
+    "backend/app/domain/audit.py",
+    "backend/app/service/audit.py",
+    "backend/tests/unit/test_ai_analysis_input.py",
+    "backend/tests/unit/test_database_recovery_025.py",
+    "backend/tests/unit/test_task_intents_026.py",
+    "reports/real-ai-integration-027/delivery-auto-8093/native-wo19-attachment-completion-generation4-partial.json",
+    "reports/real-ai-integration-027/delivery-auto-8093/native-wo19-attachment-completion-generation5.json",
+    "reports/real-ai-integration-027/delivery-auto-8093/native-wo19-attachment-completion-generation6.json",
+    "reports/real-ai-integration-027/delivery-auto-8093/native-wo19-attachment-completion-generation7.json",
+    "reports/real-ai-integration-027/delivery-auto-8093/native-wo19-attachment-completion-final.json",
+    "reports/real-ai-integration-027/delivery-auto-8093/native-wo19-attachment-completion-tests.json",
+    "reports/real-ai-integration-027/delivery-auto-8093/native-wo19-integrated-page-final.json",
+    "reports/real-ai-integration-027/delivery-auto-8093/28-native-wo19-integrated-waiting.png",
+    "reports/real-ai-integration-027/delivery-auto-8093/ollama-stale-receipt-resolution-20261002-wo19.json"
+  ],
+  "screenshot_inspection": {
+    "actually_viewed": true,
+    "file": "reports/real-ai-integration-027/delivery-auto-8093/28-native-wo19-integrated-waiting.png",
+    "observed": [
+      "工单 19",
+      "当前状态为待安排人员",
+      "页面按顺序显示一项图片附件和两项语音附件",
+      "三项附件均提供对应的查看或播放入口",
+      "联系手机号显示为138****5192"
+    ],
+    "result": "PASS"
+  },
+  "completion_checks": [
+    {"id":"SOURCE_SCOPE","status":"PASS","basis":"Reviewed the exact committed range 350d9ff..3d7c6df at HEAD 3d7c6df7e5549d2790a095e785f70c0754fb3330; the implementation remains within the frozen modular-monolith and durable-task design."},
+    {"id":"NO_NEW_WORK_ORDER","status":"PASS","basis":"Generation and final evidence consistently identify work_order_id 19 and state new_work_order_created=false; the code creates only a fenced successor TaskIntent and analysis continuation."},
+    {"id":"MEDIA_ORDER_AND_CHECKPOINT_BINDING","status":"PASS","basis":"Media are loaded in WorkOrderMedia.id order. File16 image hash 4b93ac69fc65885b92805979bfc1d63d91e308a12422d426ed62fe1d462ec78e uses provider VLM checkpoint; file17 audio hash 9476250136041ff7864ff8953a6408dedc3c68cb0c198ebf80b278b9bb7e0fad uses an exact legacy_checkpoint; file18 audio hash 18c4f2cf5c9464925ce4c797fb38f4d62ba55aa04af214546ec585704cb26f6d uses a provider ASR checkpoint. Version-2 checkpoints bind media/file identity, content hash, storage key, MIME type, provider model, protocol and result hash."},
+    {"id":"GENERATION7_PROVIDER_DELTA","status":"PASS","basis":"Final evidence records only ASR call log 156 for file18 and aggregate LLM call log 157. File16 and file17 are marked reused without generation-7 provider repetition. aggregate_input_binding identifies call-032 and confirms file16 observation plus both audio transcripts were present."},
+    {"id":"FINAL_ANALYSIS_AND_INTENT","status":"PASS","basis":"Intent 190 generation 7 is SUCCEEDED and analysis 19 version 2 is COMPLETED with attachment_count=3 and AI_ATTACHMENT_COMPLETED evidence."},
+    {"id":"UNASSIGNED_LEGAL_WAIT","status":"PASS","basis":"WO19 remains PENDING_ASSIGNMENT with current_assignment_id=null and assignment_count=0. Dispatch evidence records WAITING_ELIGIBLE, zero eligible recommendations and DUTY_MISMATCH for required skill cleaning; no employee, manual assignment or SQL override was introduced."},
+    {"id":"HISTORY_RETENTION","status":"PASS","basis":"Generation evidence preserves intent187 as FAILED with AI.UNAVAILABLE and generations 188 and 189 as CANCELLED; final recovery remains bound to source_intent_id 187 and source_analysis_id 18 while analysis 19 contains the completed integrated result."},
+    {"id":"RECOVERY_FENCING","status":"PASS","basis":"Claim handoff requires an authenticated completion request, exact retry-source task and source-analysis match, attachment_completion=true and exact latest predecessor payload. Ordinary tasks cannot use the handoff path; cancelled non-analysis recovery is rejected. Work-order status, version, current/active assignment, analysis identity and lease ownership are rechecked before apply and dispatch."},
+    {"id":"AUDIT_AND_PERMISSION","status":"PASS","basis":"The formal complete-analysis endpoint accepts only ATTACHMENT_COMPLETION, reuses scoped manager authorization, writes append-only request/result events, and validates bounded audit metadata including source_analysis_id and attachment_count."},
+    {"id":"PAGE_ACCEPTANCE","status":"PASS","basis":"The inspected PNG visibly shows WO19, status 待安排人员, and all three attachments in image/audio/audio order; the saved page evidence independently records the same media IDs 20/21/22, no assignment and no auto-dispatch."},
+    {"id":"BUDGET","status":"PASS","basis":"The accepted completion package records Qwen/VLM calls=2, ASR calls=4 and model execution=155.957 seconds, within limits of 12, 4 and 900 seconds respectively."},
+    {"id":"STALE_RUNTIME_RECEIPT","status":"PASS","basis":"The saved stale-receipt resolution binds the exact receipt and executable hashes, records no current process or listener, preserves historical exit mode as UNKNOWN and states no model-request or budget effect."},
+    {"id":"SENSITIVE_DATA","status":"PASS","basis":"The reviewed JSON evidence contains no full phone number, password, API key, bearer token or credential; the screenshot masks the phone number."},
+    {"id":"TEST_EVIDENCE_BOUNDARY","status":"PASS","basis":"Direct test source was reviewed for checkpoint binding, ordered multi-attachment processing, LLM stop-on-incomplete behavior, recovery fencing, idempotency, version handling and audit validation. The 126 PASS result is treated only as implementer-saved evidence and not as an independently executed test run."}
+  ],
+  "findings": [],
+  "unverified": [
+    "No tests were independently run; the reported 126 PASS result is an implementation artifact only.",
+    "No live database, queue, provider, runtime-process or business API state was queried.",
+    "The inspected screenshot proves the current status and three attachment rows, but its viewport does not itself show the completion-event or legal-wait-event history; those event-presence claims come from the saved JSON evidence.",
+    "The aggregate raw model input was intentionally not copied into the report; inclusion of all three attachment results is evidenced by the saved aggregate_input_binding booleans and hash rather than independent raw-prompt inspection.",
+    "This verdict is limited to the WO19 accepted-attachment completion increment and is not Production V1 release approval."
+  ],
+  "verdict": "PASS_SCOPED_INCREMENTAL",
+  "rationale": "The committed implementation and accepted evidence form a consistent, fenced recovery chain: all three existing WO19 attachments are bound to exact checkpoints, generation 7 avoids repeating file16/file17 model stages, performs only the missing file18 ASR plus aggregate LLM, completes analysis 19, preserves the failed/cancelled intent history, and leaves the unassigned order in a legal DUTY_MISMATCH waiting state. No blocking security, authorization, consistency or evidence-leakage defect was found within the stated scope.",
+  "next_action": "Accept the WO19 attachment-completion increment as scoped. Keep the 126-test result labeled as implementer evidence and retain the stated distinction from full Production V1 release acceptance."
+}

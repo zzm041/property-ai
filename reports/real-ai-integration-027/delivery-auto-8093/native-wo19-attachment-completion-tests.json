@@ -1,0 +1,17 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-NATIVE-MEDIA-ATTACHMENT-COMPLETION",
+  "source_commit": "3d7c6df7e5549d2790a095e785f70c0754fb3330",
+  "result": "PASS",
+  "tests": {
+    "passed": 126,
+    "failed": 0,
+    "scope": [
+      "task intent recovery context and exact cancelled-successor eligibility",
+      "analysis-attempt claim handoff fencing",
+      "multi-attachment ASR/VLM checkpoint reuse",
+      "database recovery boundaries",
+      "audit allowlist and delivery artifact guards"
+    ]
+  },
+  "note": "This is the already-completed focused run bound to the final product commit. It was not rerun after page/evidence-only additions."
+}
