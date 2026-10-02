@@ -35,6 +35,7 @@ Page({
     fileIds: [],
     mediaHint: "",
     recording: false,
+    recordingBusy: false,
     recordingHint: "",
     loading: false,
     error: "",
@@ -43,9 +44,11 @@ Page({
     const auth = require("../../services/auth");
     this.preferredHouseId = Number(query.houseId || auth.getSelectedHouseId() || 0);
     this.unloaded = false;
+    this.hidden = false;
     this._bindRecorder();
   },
   onShow() {
+    this.hidden = false;
     if (!this.contactDefaultLoaded && !this.contactEdited) {
       this.contactDefaultLoaded = true;
       require('../../services/api').contactDefault().then(result => {
@@ -53,6 +56,10 @@ Page({
       }).catch(() => { if (!this.unloaded) this.setData({ error: '联系电话默认值读取失败，请手动填写并确认' }); });
     }
     return this.loadHouses(false);
+  },
+  onHide() {
+    this.hidden = true;
+    this._cancelRecording();
   },
   onContact(e) {
     this.contactEdited = true;
@@ -64,8 +71,7 @@ Page({
   onUnload() {
     this.unloaded = true;
     this.houseRequest = (this.houseRequest || 0) + 1;
-    this._discardRecording = true;
-    if (this._recording && this._recorder) this._recorder.stop();
+    this._cancelRecording();
     this._unbindRecorder();
   },
   reloadHouses() {
@@ -105,18 +111,18 @@ Page({
     this.setData({ houseId: String(id), selectedHouseLabel: item.addressLabel, error: "" });
   },
   manageHouses() {
-    if (this.data.loading || this.data.houseLoading) return;
+    if (this.data.loading || this.data.houseLoading || this.data.recordingBusy) return;
     wx.navigateTo({ url: "/pages/houses/houses" });
   },
   onText(e) {
     this.setData({ text: e.detail.value });
   },
   chooseImage() {
-    if (this.data.loading || this.data.houseLoading) return;
+    if (this.data.loading || this.data.houseLoading || this.data.recordingBusy) return;
     this._pick("image");
   },
   chooseAudio() {
-    if (this.data.loading || this.data.houseLoading) return;
+    if (this.data.loading || this.data.houseLoading || this.data.recordingBusy) return;
     wx.chooseMessageFile({
       count: 1,
       type: "file",
@@ -166,33 +172,56 @@ Page({
     if (typeof wx.getRecorderManager !== "function") return;
     this._recorder = wx.getRecorderManager();
     this._onRecorderStart = () => {
-      if (this.unloaded) return;
+      this._recordAuthorizationPending = false;
+      if (this.unloaded || this.hidden || this._discardRecording) {
+        if (this._recorder) this._recorder.stop();
+        return;
+      }
       this._recording = true;
-      this.setData({ recording: true, recordingHint: "正在录音，最长30秒", error: "" });
+      this.setData({ recording: true, recordingBusy: true, recordingHint: "正在录音，最长30秒", error: "" });
     };
     this._onRecorderStop = (result) => {
-      const discard = this._discardRecording || this.unloaded;
+      const discard = this._discardRecording || this.unloaded || this.hidden;
       this._recording = false;
-      this._discardRecording = false;
+      this._recordStopPending = false;
       if (!this.unloaded) this.setData({ recording: false });
-      if (discard) return;
+      if (discard) {
+        if (!this.unloaded) this.setData({ recordingBusy: false, recordingHint: "" });
+        return;
+      }
       const filePath = result && result.tempFilePath;
       const sizeBytes = Number(result && result.fileSize);
       const duration = Number(result && result.duration);
       if (!filePath || !Number.isSafeInteger(sizeBytes) || sizeBytes <= 0 || !Number.isFinite(duration) || duration < 500) {
-        this.setData({ recordingHint: "", error: "录音过短或录音文件无效，请重新录制" });
+        this.setData({ recordingBusy: false, recordingHint: "", error: "录音过短或录音文件无效，请重新录制" });
         return;
       }
       this.setData({ recordingHint: `录音完成（${Math.ceil(duration / 1000)}秒），正在上传` });
-      this._upload(filePath, "audio/mpeg", sizeBytes, "repair-recording.mp3", () => {
-        if (!this.unloaded) this.setData({ recordingHint: "录音已添加" });
+      this._recordUploadPending = true;
+      Promise.resolve(this._upload(
+        filePath,
+        "audio/mpeg",
+        sizeBytes,
+        "repair-recording.mp3",
+        () => {
+          if (!this.unloaded && !this.hidden) this.setData({ recordingHint: "录音已添加" });
+        },
+        () => !this._discardRecording && !this.unloaded && !this.hidden
+      )).finally(() => {
+        this._recordUploadPending = false;
+        this._discardRecording = false;
+        if (!this.unloaded) this.setData({ recordingBusy: false });
       });
     };
     this._onRecorderError = (error) => {
       this._recording = false;
+      this._recordAuthorizationPending = false;
+      this._recordStopPending = false;
+      this._recordUploadPending = false;
       if (!this.unloaded) {
         this.setData({
           recording: false,
+          recordingBusy: false,
           recordingHint: "",
           error: (error && error.errMsg) || "录音失败，请检查麦克风权限后重试",
         });
@@ -209,27 +238,48 @@ Page({
     if (typeof this._recorder.offError === "function") this._recorder.offError(this._onRecorderError);
   },
   startRecording() {
-    if (this.data.loading || this.data.houseLoading || this.data.recording) return;
+    if (this.data.loading || this.data.houseLoading || this.data.recordingBusy) return;
     if (!this._recorder) {
       this.setData({ error: "当前微信版本不支持录音，请升级微信后重试" });
       return;
     }
     this._discardRecording = false;
+    this._recordAuthorizationPending = true;
+    this.setData({ recordingBusy: true, recordingHint: "正在请求录音权限", error: "" });
     wx.authorize({
       scope: "scope.record",
-      success: () => this._recorder.start({
-        duration: 30000,
-        sampleRate: 16000,
-        numberOfChannels: 1,
-        encodeBitRate: 48000,
-        format: "mp3",
-      }),
-      fail: () => this.setData({ error: "未获得麦克风权限，请在小程序设置中允许录音后重试" }),
+      success: () => {
+        this._recordAuthorizationPending = false;
+        if (this.unloaded || this.hidden || this._discardRecording) return;
+        this._recorder.start({
+          duration: 30000,
+          sampleRate: 16000,
+          numberOfChannels: 1,
+          encodeBitRate: 48000,
+          format: "mp3",
+        });
+      },
+      fail: () => {
+        this._recordAuthorizationPending = false;
+        if (!this.unloaded && !this.hidden) {
+          this.setData({ recordingBusy: false, recordingHint: "", error: "未获得麦克风权限，请在小程序设置中允许录音后重试" });
+        }
+      },
     });
   },
   stopRecording() {
     if (!this.data.recording || !this._recorder) return;
+    this._recordStopPending = true;
+    this.setData({ recordingHint: "正在结束录音" });
     this._recorder.stop();
+  },
+  _cancelRecording() {
+    this._discardRecording = true;
+    this._recordAuthorizationPending = false;
+    this._recordStopPending = false;
+    if (this._recording && this._recorder) this._recorder.stop();
+    this._recording = false;
+    if (!this.unloaded) this.setData({ recording: false, recordingBusy: false, recordingHint: "" });
   },
   _prepareImage(file, info, uploadType) {
     const width = Number(info.width || 0);
@@ -281,10 +331,10 @@ Page({
       });
     });
   },
-  _upload(filePath, mimeType, sizeBytes, originalName, onUploaded) {
+  _upload(filePath, mimeType, sizeBytes, originalName, onUploaded, shouldApply) {
     const api = require("../../services/api");
     const { withLoading } = require("../../utils/ui");
-    withLoading(this, () =>
+    return withLoading(this, () =>
       api
         .registerAndUpload({
           filePath,
@@ -293,6 +343,7 @@ Page({
           originalName,
         })
         .then((file) => {
+          if (shouldApply && !shouldApply(file)) return;
           const fileIds = this.data.fileIds.concat(file.id);
           this.setData({
             fileIds,
@@ -303,7 +354,7 @@ Page({
     ).catch(() => {});
   },
   async submit() {
-    if (this.data.loading || this.data.houseLoading || this.unloaded) return;
+    if (this.data.loading || this.data.houseLoading || this.data.recording || this.data.recordingBusy || this.unloaded) return;
     const { withLoading } = require("../../utils/ui");
     return withLoading(this, async () => {
       const api = require("../../services/api");
