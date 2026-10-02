@@ -114,7 +114,8 @@ const raw={work_order:{id:31,status:'PROCESSING',process_reason:'EXTERNAL_COORDI
  assignments:[{id:8,employee_id:9}],processes:[{id:11,cycle_no:1,assignee_id:9,started_at:'2026-09-23T18:30:00Z'},{id:12,cycle_no:2,assignee_id:10}],
  receipts:[{id:21,process_id:11,problem_type:'ELECTRICAL'},{id:22,process_id:12,problem_type:'__proto__'}],
  feedbacks:[{id:40,process_id:11,unresolved_flag:true,created_at:'2026-09-23T18:30:00Z'}],
- media:[{id:1,file_id:2,kind:'IMAGE',taken_phase:'REPORT',created_at:'2026-09-23T18:30:00Z'}],
+ media:[{id:1,file_id:2,kind:'IMAGE',taken_phase:'REPORT',process_id:null,receipt_id:null,created_at:'2026-09-23T18:30:00Z'},
+        {id:2,file_id:3,kind:'IMAGE',taken_phase:'AFTER',process_id:11,receipt_id:21,created_at:'2026-09-23T18:30:00Z'}],
  logs:[{id:1,from_status:null,to_status:'PENDING_ANALYSIS',event_code:'CREATE',actor_type:'RESIDENT',created_at:'2026-09-23T18:30:00Z'}]};
 const saved=JSON.stringify(raw),view=p.presentDetail(raw);
 assert.equal(JSON.stringify(raw),saved,'projection must not mutate business data');
@@ -142,7 +143,7 @@ vm.runInNewContext(fs.readFileSync(path.join(root,'miniprogram/pages/work-orders
  require:n=>n==='../../services/api'?api:n==='../../services/auth'?{setLastWorkOrderId(){}}:require(path.join(root,'miniprogram/pages/work-orders',n))
 });page.setData=x=>Object.assign(page.data,x);page.id=31;
 (async()=>{await page.reload();assert.equal(calls,1);assert.equal(page.data.workOrder.version,7);assert.equal(page.data.workOrder.status,'PROCESSING');assert.equal(page.data.statusLabel,'处理中');
- assert.equal(page.data.processHistory[0].receipt.id,21);assert.equal(page.data.processHistory[1].receipt.id,22);assert.equal(page.data.processHistory[0].feedbacks[0].id,40);assert.equal(page.data.processHistory[1].feedbacks.length,0);
+ assert.equal(page.data.processHistory[0].receipt.id,21);assert.equal(page.data.processHistory[1].receipt.id,22);assert.equal(page.data.processHistory[0].media[0].receipt_id,21);assert.equal(page.data.media.length,1);assert.equal(page.data.processHistory[0].feedbacks[0].id,40);assert.equal(page.data.processHistory[1].feedbacks.length,0);
  assert(page.data.canAppend&&!page.data.canCancel&&!page.data.canReopen);assert.equal(JSON.stringify(raw),saved);
  raw.work_order.status='WAIT_CONFIRM';await page.reload();assert(page.data.canConfirm&&page.data.canReopen);assert.equal(page.data.statusLabel,'待住户确认');
  raw.work_order.status='CLOSED';await page.reload();assert(!page.data.canConfirm&&!page.data.canAppend&&page.data.canRate);assert.equal(page.data.statusLabel,'已归档');
@@ -163,3 +164,12 @@ def test_readable_page_projection_preserves_business_state(scenario):
         timeout=15,
     )
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_resident_detail_renders_cycle_bound_media_separately() -> None:
+    template = (ROOT / "miniprogram" / "pages" / "work-orders" / "detail.wxml").read_text(
+        encoding="utf-8"
+    )
+    assert 'wx:if="{{cycle.media.length}}"' in template
+    assert 'wx:for="{{cycle.media}}"' in template
+    assert 'data-file-id="{{mediaItem.file_id}}"' in template

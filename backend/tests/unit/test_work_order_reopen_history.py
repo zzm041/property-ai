@@ -224,7 +224,7 @@ def test_detail_serializes_all_receipts_and_feedback_by_actual_process_id():
     )
     media = SimpleNamespace(
         id=12, file_id=70, kind="IMAGE", taken_phase="AFTER",
-        uploader_user_id=46, created_at=NOW,
+        process_id=None, receipt_id=None, uploader_user_id=46, created_at=NOW,
     )
     service.get_work_order_detail.return_value = (
         record(), None, (media,), (), processes, receipts, (feedback,), (), {},
@@ -237,4 +237,5 @@ def test_detail_serializes_all_receipts_and_feedback_by_actual_process_id():
     assert [(r["cycle_no"], r["assignee_id"]) for r in data["receipts"]] == [(1, 46), (2, 47)]
     assert data["feedbacks"][0]["process_id"] == 11
     assert data["media"][0]["created_at"] == "2026-09-23T02:00:00Z"
-    assert "process_id" not in data["media"][0]  # Never invent a media/cycle relationship.
+    assert data["media"][0]["process_id"] is None
+    assert data["media"][0]["receipt_id"] is None

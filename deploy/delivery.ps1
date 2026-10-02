@@ -1,6 +1,6 @@
 param(
     [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateSet("config", "init", "up", "stop", "status", "backup", "restore-check", "diagnose", "ollama-start", "ollama-stop", "ollama-status", "rag-ollama-start", "rag-ollama-stop", "rag-ollama-status", "rag-start", "rag-stop", "rag-status", "work-ai-start", "work-ai-stop", "work-ai-status")]
+    [ValidateSet("config", "init", "up", "stop", "status", "backup", "restore-check", "media-cycle-migrate", "diagnose", "ollama-start", "ollama-stop", "ollama-status", "rag-ollama-start", "rag-ollama-stop", "rag-ollama-status", "rag-start", "rag-stop", "rag-status", "work-ai-start", "work-ai-stop", "work-ai-status")]
     [string]$Action,
     [Parameter(Position = 1)]
     [string]$Argument,
@@ -136,7 +136,10 @@ switch ($Action) {
         Assert-NoPlaceholders
         Invoke-Compose up -d mysql redis rabbitmq etcd minio milvus
         Invoke-Compose --profile tools build migrate
-        Invoke-Compose --profile tools run --rm migrate
+        Invoke-Compose --profile tools run --rm `
+            -e "PROPERTY_AI_MEDIA_CYCLE_MIGRATION=approved" `
+            -e "PROPERTY_AI_APPROVE_DELIVERY_TARGET=mysql:3306/property_ai_delivery_check" `
+            migrate
         Invoke-Compose --profile tools run --rm storage-init
         Invoke-Compose up -d api worker publisher beat nginx
         Invoke-Compose ps
@@ -234,16 +237,23 @@ switch ($Action) {
         $null = Read-BackupManifest $dump $database
         $restore = if ($RestoreDatabase) { $RestoreDatabase } else { "${database}_restore_check" }
         $approvedRestore = "${database}_restore_check_029"
-        if ($RestoreDatabase -and $restore -ne $approvedRestore) {
+        $approvedMediaCycleDrill = "property_ai_delivery_media_cycle_check"
+        if ($RestoreDatabase -and $restore -notin @($approvedRestore, $approvedMediaCycleDrill)) {
             throw "explicit restore database is not the approved delivery target"
         }
-        if ($restore -notmatch "^[A-Za-z0-9_]+_restore_check(?:_029)?$") { throw "unsafe restore database" }
+        if (
+            $restore -notmatch "^[A-Za-z0-9_]+_restore_check(?:_029)?$" -and
+            $restore -ne $approvedMediaCycleDrill
+        ) { throw "unsafe restore database" }
         $existsCommand = 'mysql -N -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=''{0}''"' -f $restore
         $exists = (& docker compose --env-file $EnvFile -f $ComposeFile exec -T mysql sh -c $existsCommand | Out-String).Trim()
         if ($LASTEXITCODE -ne 0 -or $exists -notin @("0", "1")) {
             throw "restore target exists or could not be verified; it will not be overwritten"
         }
         if ($exists -eq "1") {
+            if ($restore -eq $approvedMediaCycleDrill) {
+                throw "media-cycle drill target already exists; it will not be overwritten"
+            }
             if (-not $RestoreDatabase -or $restore -ne $approvedRestore) {
                 throw "restore target exists or could not be verified; it will not be overwritten"
             }
@@ -271,6 +281,43 @@ switch ($Action) {
             Invoke-Compose exec -T mysql rm -f $containerDump
         }
         Write-Output "restored to isolated database $restore with a target-only temporary account; primary database was not changed"
+    }
+    "media-cycle-migrate" {
+        Assert-NoPlaceholders
+        $database = if ($Argument) { $Argument } else { Read-DeliveryValue "MYSQL_DATABASE" }
+        $liveDatabase = "property_ai_delivery_check"
+        $drillDatabase = "property_ai_delivery_media_cycle_check"
+        if ($database -notin @($liveDatabase, $drillDatabase)) {
+            throw "media-cycle migration target is not approved"
+        }
+        $target = "mysql:3306/$database"
+        if ($database -eq $drillDatabase) {
+            $existsCommand = 'mysql -N -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name=''{0}''"' -f $drillDatabase
+            $exists = (& docker compose --env-file $EnvFile -f $ComposeFile exec -T mysql sh -c $existsCommand | Out-String).Trim()
+            if ($LASTEXITCODE -ne 0 -or $exists -ne "1") {
+                throw "media-cycle drill target does not exist or could not be verified"
+            }
+            $migrationUser = "delivery_migrate_$([guid]::NewGuid().ToString('N').Substring(0,12))"
+            $migrationPassword = [guid]::NewGuid().ToString("N")
+            $createMigrationUserCommand = 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "CREATE USER ''{0}''@''%'' IDENTIFIED BY ''{1}''; GRANT ALL PRIVILEGES ON {2}.* TO ''{0}''@''%'';"' -f $migrationUser,$migrationPassword,$drillDatabase
+            $dropMigrationUserCommand = 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "DROP USER IF EXISTS ''{0}''@''%''"' -f $migrationUser
+            try {
+                Invoke-Compose exec -T mysql sh -c $createMigrationUserCommand
+                $drillUrl = "mysql+pymysql://${migrationUser}:${migrationPassword}@mysql:3306/${drillDatabase}?charset=utf8mb4"
+                Invoke-Compose --profile tools run --rm `
+                    -e "DATABASE_URL=$drillUrl" `
+                    -e "PROPERTY_AI_MEDIA_CYCLE_DRILL=approved" `
+                    -e "PROPERTY_AI_APPROVE_DELIVERY_TARGET=$target" `
+                    migrate
+            } finally {
+                Invoke-Compose exec -T mysql sh -c $dropMigrationUserCommand
+            }
+        } else {
+            Invoke-Compose --profile tools run --rm `
+                -e "PROPERTY_AI_MEDIA_CYCLE_MIGRATION=approved" `
+                -e "PROPERTY_AI_APPROVE_DELIVERY_TARGET=$target" `
+                migrate
+        }
     }
     "diagnose" {
         Invoke-Compose ps

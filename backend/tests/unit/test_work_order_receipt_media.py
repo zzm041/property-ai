@@ -74,7 +74,13 @@ def test_receipt_attaches_both_media_phases_for_every_outcome(
         process_reason="NONE",
         resolved_at=None,
     )
-    process = SimpleNamespace(id=9, ended_at=None)
+    process = SimpleNamespace(
+        id=9,
+        work_order_id=41,
+        tenant_id=2,
+        property_id=3,
+        ended_at=None,
+    )
     service._clock = MagicMock(return_value=datetime(2026, 9, 20, tzinfo=UTC))
     service._lock_assignee_action = MagicMock(
         return_value=(current, record, MagicMock(), MagicMock())
@@ -82,7 +88,17 @@ def test_receipt_attaches_both_media_phases_for_every_outcome(
     service._property_scope = MagicMock()
     service._repository = MagicMock()
     service._repository.get_current_process.return_value = process
-    service._repository.get_receipt_for_process.return_value = None
+    saved_receipt: dict[str, object] = {}
+    service._repository.get_receipt_for_process.side_effect = (
+        lambda _process_id: saved_receipt.get("receipt")
+    )
+
+    def add_receipt(receipt):
+        receipt.id = 77
+        saved_receipt["receipt"] = receipt
+        return receipt
+
+    service._repository.add_receipt.side_effect = add_receipt
     service._attach_media = MagicMock()
     service._apply_transition = MagicMock()
     service._append_audit = MagicMock()
@@ -114,15 +130,138 @@ def test_receipt_attaches_both_media_phases_for_every_outcome(
             actor=current,
             file_ids=(11,),
             taken_phase=MediaTakenPhase.BEFORE,
+            process_id=process.id,
+            receipt_id=77,
         ),
         call(
             record,
             actor=current,
             file_ids=(12,),
             taken_phase=MediaTakenPhase.AFTER,
+            process_id=process.id,
+            receipt_id=77,
         ),
     ]
     service._repository.add_receipt.assert_called_once()
     receipt = service._repository.add_receipt.call_args.args[0]
     assert bool(receipt.resolved) is resolved
     assert process.ended_at == datetime(2026, 9, 20, tzinfo=UTC)
+
+
+def test_staff_on_site_media_is_bound_to_current_process(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    service = WorkOrderService.__new__(WorkOrderService)
+    current = SimpleNamespace(user_id=7)
+    record = SimpleNamespace(
+        id=41,
+        tenant_id=2,
+        property_id=3,
+        reporter_user_id=8,
+        status="PROCESSING",
+        process_reason="NONE",
+    )
+    process = SimpleNamespace(
+        id=9,
+        work_order_id=41,
+        tenant_id=2,
+        property_id=3,
+    )
+    service._lock_assignee_action = MagicMock(
+        return_value=(current, record, MagicMock(), MagicMock())
+    )
+    service._repository = MagicMock()
+    service._repository.get_current_process.return_value = process
+    service._attach_media = MagicMock()
+    service._apply_transition = MagicMock()
+    service._append_audit = MagicMock()
+    service._actor_type = MagicMock(return_value="STAFF")
+    monkeypatch.setattr(RbacService, "require_permission", lambda *_args: None)
+
+    result = service._feedback(
+        actor=MagicMock(),
+        work_order_id=record.id,
+        request_id="on-site-cycle",
+        text=None,
+        process_reason=None,
+        file_ids=(13,),
+        taken_phase="ON_SITE",
+        version=1,
+    )
+
+    assert result is record
+    service._attach_media.assert_called_once_with(
+        record,
+        actor=current,
+        file_ids=(13,),
+        taken_phase=MediaTakenPhase.ON_SITE,
+        process_id=process.id,
+    )
+
+
+def test_staff_on_site_media_fails_closed_without_current_process() -> None:
+    service = WorkOrderService.__new__(WorkOrderService)
+    current = SimpleNamespace(user_id=7)
+    record = SimpleNamespace(
+        id=41,
+        tenant_id=2,
+        property_id=3,
+        reporter_user_id=8,
+        status="PROCESSING",
+        process_reason="NONE",
+    )
+    service._lock_assignee_action = MagicMock(
+        return_value=(current, record, MagicMock(), MagicMock())
+    )
+    service._repository = MagicMock()
+    service._repository.get_current_process.return_value = None
+
+    with pytest.raises(AppError) as captured:
+        service._feedback(
+            actor=MagicMock(),
+            work_order_id=record.id,
+            request_id="on-site-no-cycle",
+            text=None,
+            process_reason=None,
+            file_ids=(13,),
+            taken_phase="ON_SITE",
+            version=1,
+        )
+
+    assert captured.value.code == WorkOrderErrorCode.INVALID_TRANSITION
+    service._repository.add_media.assert_not_called()
+
+
+def test_receipt_media_scope_is_verified_before_file_attachment() -> None:
+    service = WorkOrderService.__new__(WorkOrderService)
+    record = SimpleNamespace(id=41, tenant_id=2, property_id=3)
+    process = SimpleNamespace(
+        id=9,
+        work_order_id=41,
+        tenant_id=2,
+        property_id=3,
+    )
+    wrong_receipt = SimpleNamespace(
+        id=77,
+        process_id=9,
+        work_order_id=41,
+        tenant_id=2,
+        property_id=4,
+    )
+    service._repository = MagicMock()
+    service._repository.get_current_process.return_value = process
+    service._repository.get_receipt_for_process.return_value = wrong_receipt
+
+    with pytest.raises(AppError) as captured:
+        service._attach_media(
+            record,
+            actor=SimpleNamespace(user_id=7),
+            file_ids=(11,),
+            taken_phase=MediaTakenPhase.AFTER,
+            process_id=9,
+            receipt_id=77,
+        )
+
+    assert captured.value.code == WorkOrderErrorCode.INVALID_TRANSITION
+    service._repository.get_file.assert_not_called()
+    service._repository.add_media.assert_not_called()

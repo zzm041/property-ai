@@ -226,6 +226,8 @@ def get_work_order(
                 file_id=item.file_id,
                 kind=item.kind,
                 taken_phase=item.taken_phase,
+                process_id=item.process_id,
+                receipt_id=item.receipt_id,
                 uploader_user_id=item.uploader_user_id,
                 created_at=item.created_at,
             )

@@ -34,6 +34,7 @@ def _delivery_settings(host: str = "mysql") -> SimpleNamespace:
 
 def _approve_delivery(monkeypatch: pytest.MonkeyPatch, host: str = "mysql") -> None:
     monkeypatch.setenv("PROPERTY_AI_DELIVERY_MIGRATION", "approved")
+    monkeypatch.setenv("PROPERTY_AI_MEDIA_CYCLE_MIGRATION", "approved")
     monkeypatch.setenv(
         "PROPERTY_AI_APPROVE_DELIVERY_TARGET",
         f"{host}:3306/property_ai_delivery_check",
@@ -49,6 +50,30 @@ def test_delivery_cli_guards_accept_only_exact_internal_target(
     assert delivery_migrate._target()[1] == "mysql:3306/property_ai_delivery_check"
 
     monkeypatch.setattr(delivery_migrate, "get_settings", lambda: _delivery_settings("db"))
+    with pytest.raises(RuntimeError, match="exact configured target"):
+        delivery_migrate._target()
+
+
+def test_delivery_cli_accepts_only_the_explicit_media_cycle_drill(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = "property_ai_delivery_media_cycle_check"
+    settings = SimpleNamespace(
+        app_env="staging",
+        active_database_url=(
+            "mysql+pymysql://delivery_migrate:secret@mysql:3306/"
+            f"{database}?charset=utf8mb4"
+        ),
+    )
+    monkeypatch.setenv("PROPERTY_AI_DELIVERY_MIGRATION", "approved")
+    monkeypatch.setenv("PROPERTY_AI_MEDIA_CYCLE_DRILL", "approved")
+    monkeypatch.setenv(
+        "PROPERTY_AI_APPROVE_DELIVERY_TARGET", f"mysql:3306/{database}"
+    )
+    monkeypatch.setattr(delivery_migrate, "get_settings", lambda: settings)
+    assert delivery_migrate._target()[1] == f"mysql:3306/{database}"
+
+    monkeypatch.setenv("PROPERTY_AI_APPROVE_DELIVERY_TARGET", "mysql:3306/other")
     with pytest.raises(RuntimeError, match="exact configured target"):
         delivery_migrate._target()
 
@@ -91,6 +116,12 @@ class _Bind:
 
     def execute(self, statement, _parameters=None):
         sql = str(statement)
+        if "information_schema.TABLES" in sql:
+            return _ScalarResult([
+                "work_order_media",
+                "work_order_processes",
+                "work_order_receipts",
+            ])
         if "CONSTRAINT_NAME" in sql:
             return _ScalarResult([
                 "uq_user_phones_active_e164",
@@ -142,6 +173,32 @@ def test_0014_guard_accepts_exact_delivery_and_rejects_wrong_revision(
 
     bind.result = "wrong_revision"
     with pytest.raises(RuntimeError, match="requires actual 0012"):
+        module._execution_guard()
+
+
+def test_0015_guard_accepts_only_exact_live_or_drill_targets(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_migration(
+        "20261003_0015_work_order_media_cycle_links.py",
+        "migration_0015_delivery_test",
+    )
+    monkeypatch.setenv("APP_ENV", "staging")
+    monkeypatch.setenv("PROPERTY_AI_DELIVERY_MIGRATION", "approved")
+    monkeypatch.setenv("PROPERTY_AI_MEDIA_CYCLE_MIGRATION", "approved")
+    monkeypatch.setenv("PROPERTY_AI_APPROVE_0015_DATABASE", "property_ai_delivery_check")
+    monkeypatch.setenv(
+        "PROPERTY_AI_APPROVE_0015_TARGET", "mysql:3306/property_ai_delivery_check"
+    )
+    bind = _Bind(
+        "mysql+pymysql://u:p@mysql:3306/property_ai_delivery_check",
+        module.down_revision,
+    )
+    monkeypatch.setattr(module.op, "get_bind", lambda: bind)
+    module._execution_guard()
+
+    monkeypatch.setenv("PROPERTY_AI_APPROVE_0015_DATABASE", "other")
+    with pytest.raises(RuntimeError, match="exact delivery target"):
         module._execution_guard()
 
 
@@ -346,8 +403,16 @@ def test_delivery_backup_uses_binary_safe_compose_copy() -> None:
     assert "Invoke-Compose cp $dump \"mysql:$containerDump\"" in script
     assert "restore target exists or could not be verified" in script
     assert '"${database}_restore_check_029"' in script
+    assert '"property_ai_delivery_media_cycle_check"' in script
+    assert "media-cycle drill target already exists" in script
     assert "explicit restore database is not the approved delivery target" in script
     assert "approved restore continuation target is not empty" in script
+    assert '"media-cycle-migrate"' in script
+    assert "GRANT ALL PRIVILEGES ON {2}.* TO ''{0}''@''%''" in script
+    assert '"DATABASE_URL=$drillUrl"' in script
+    assert "DROP USER IF EXISTS ''{0}''@''%''" in script
+    assert "$migrationUserCreated" not in script
+    assert '"PROPERTY_AI_MEDIA_CYCLE_MIGRATION=approved"' in script
     assert "backup path must stay inside deploy/backups" in script
     assert "backup target or manifest already exists" in script
     assert "backup target is already reserved by another operation" in script

@@ -74,6 +74,7 @@ Page({
           const processHistory = display.processes.map((process) => ({
             ...process,
             receipt: receipts.find((receipt) => receipt.process_id === process.id) || null,
+            media: display.media.filter((media) => media.process_id === process.id),
             feedbacks: feedbacks.filter((feedback) => feedback.process_id === process.id),
           }));
           const ratings = feedbacks.filter((feedback) => feedback.rating != null);
@@ -99,7 +100,7 @@ Page({
               currentAssignment.assigned_by_user_id == null,
             latestReceipt: receipts.length ? receipts[receipts.length - 1] : null,
             processHistory,
-            media: display.media,
+            media: display.media.filter((media) => media.process_id == null),
             logs: display.logs,
             feedbacks,
             latestRating,

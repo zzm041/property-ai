@@ -57,6 +57,15 @@
     <view>完成时间 {{cycle.receipt.finishedAtLabel}}</view>
   </view>
   <view class="empty" wx:else>{{cycle.ended_at ? '本轮处理已结束，未提交回执' : '本轮处理中，尚未提交回执'}}</view>
+  <view wx:if="{{cycle.media.length}}">
+    <view>本轮处理附件</view>
+    <view wx:for="{{cycle.media}}" wx:for-item="mediaItem" wx:key="id">
+      <view>{{mediaItem.phaseLabel}} · {{mediaItem.kindLabel}}</view>
+      <view class="empty">上传时间 {{mediaItem.createdAtLabel}}</view>
+      <button class="btn" wx:if="{{mediaItem.kind === 'IMAGE'}}" data-file-id="{{mediaItem.file_id}}" bindtap="previewMedia">查看图片</button>
+      <button class="btn" wx:if="{{mediaItem.kind === 'AUDIO'}}" data-file-id="{{mediaItem.file_id}}" bindtap="playMedia">播放语音</button>
+    </view>
+  </view>
   <view wx:for="{{cycle.feedbacks}}" wx:for-item="feedback" wx:key="id">
     <view wx:if="{{feedback.unresolved_flag}}">住户反馈未解决：{{feedback.comment}}</view>
     <view wx:elif="{{feedback.confirmed}}">住户已确认解决</view>

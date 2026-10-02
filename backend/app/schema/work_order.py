@@ -174,6 +174,8 @@ class WorkOrderMediaData(BaseModel):
     file_id: int
     kind: str
     taken_phase: str
+    process_id: int | None = None
+    receipt_id: int | None = None
     uploader_user_id: int
     created_at: datetime
 

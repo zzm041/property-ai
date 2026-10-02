@@ -287,7 +287,7 @@ def test_registered_metadata_without_content_cannot_be_attached() -> None:
             work_order,
             actor=_actor(),
             file_ids=(record.id,),
-            taken_phase=MediaTakenPhase.BEFORE,
+            taken_phase=MediaTakenPhase.REPORT,
         )
 
     assert caught.value.code == FileErrorCode.NOT_FOUND
@@ -316,7 +316,7 @@ def test_other_uploader_or_property_file_cannot_be_attached(
             work_order,
             actor=_actor(),
             file_ids=(record.id,),
-            taken_phase=MediaTakenPhase.BEFORE,
+            taken_phase=MediaTakenPhase.REPORT,
         )
 
     assert caught.value.code == FileErrorCode.NOT_FOUND
@@ -337,7 +337,7 @@ def test_integrity_checked_content_can_be_attached() -> None:
         work_order,
         actor=_actor(),
         file_ids=(record.id,),
-        taken_phase=MediaTakenPhase.BEFORE,
+        taken_phase=MediaTakenPhase.REPORT,
     )
 
     service._repository.add_media.assert_called_once()

@@ -2261,7 +2261,23 @@ class WorkOrderService:
                 MediaTakenPhase.ON_SITE,
                 "taken_phase",
             )
-        self._attach_media(record, actor=current, file_ids=file_ids, taken_phase=phase)
+        process_id: int | None = None
+        if file_ids:
+            process = self._repository.get_current_process(record.id)
+            if process is None:
+                raise AppError(
+                    code=WorkOrderErrorCode.INVALID_TRANSITION,
+                    message="Processing cycle has not started",
+                    status_code=409,
+                )
+            process_id = process.id
+        self._attach_media(
+            record,
+            actor=current,
+            file_ids=file_ids,
+            taken_phase=phase,
+            process_id=process_id,
+        )
         target_reason = ProcessReason(record.process_reason)
         if process_reason is not None:
             target_reason = self._parse_enum(
@@ -2360,19 +2376,7 @@ class WorkOrderService:
                     message="Unresolved process reason cannot be completed",
                     status_code=409,
                 )
-            self._attach_media(
-                record,
-                actor=current,
-                file_ids=before_file_ids,
-                taken_phase=MediaTakenPhase.BEFORE,
-            )
-            self._attach_media(
-                record,
-                actor=current,
-                file_ids=after_file_ids,
-                taken_phase=MediaTakenPhase.AFTER,
-            )
-            self._repository.add_receipt(
+            receipt = self._repository.add_receipt(
                 WorkOrderReceipt(
                     tenant_id=record.tenant_id,
                     property_id=record.property_id,
@@ -2387,6 +2391,22 @@ class WorkOrderService:
                     follow_up=follow_up,
                     finished_at=now,
                 )
+            )
+            self._attach_media(
+                record,
+                actor=current,
+                file_ids=before_file_ids,
+                taken_phase=MediaTakenPhase.BEFORE,
+                process_id=process.id,
+                receipt_id=receipt.id,
+            )
+            self._attach_media(
+                record,
+                actor=current,
+                file_ids=after_file_ids,
+                taken_phase=MediaTakenPhase.AFTER,
+                process_id=process.id,
+                receipt_id=receipt.id,
             )
             process.ended_at = now
             record.resolved_at = now
@@ -2427,19 +2447,7 @@ class WorkOrderService:
                     status_code=422,
                 )
             target_reason = ProcessReason.INTERNAL_UNRESOLVED
-            self._attach_media(
-                record,
-                actor=current,
-                file_ids=before_file_ids,
-                taken_phase=MediaTakenPhase.BEFORE,
-            )
-            self._attach_media(
-                record,
-                actor=current,
-                file_ids=after_file_ids,
-                taken_phase=MediaTakenPhase.AFTER,
-            )
-            self._repository.add_receipt(
+            receipt = self._repository.add_receipt(
                 WorkOrderReceipt(
                     tenant_id=record.tenant_id,
                     property_id=record.property_id,
@@ -2455,6 +2463,22 @@ class WorkOrderService:
                     follow_up=follow_up,
                     finished_at=now,
                 )
+            )
+            self._attach_media(
+                record,
+                actor=current,
+                file_ids=before_file_ids,
+                taken_phase=MediaTakenPhase.BEFORE,
+                process_id=process.id,
+                receipt_id=receipt.id,
+            )
+            self._attach_media(
+                record,
+                actor=current,
+                file_ids=after_file_ids,
+                taken_phase=MediaTakenPhase.AFTER,
+                process_id=process.id,
+                receipt_id=receipt.id,
             )
             process.ended_at = now
             self._apply_transition(
@@ -2868,7 +2892,61 @@ class WorkOrderService:
         actor: Principal,
         file_ids: tuple[int, ...],
         taken_phase: MediaTakenPhase,
+        process_id: int | None = None,
+        receipt_id: int | None = None,
     ) -> None:
+        if not file_ids:
+            return
+        if taken_phase is MediaTakenPhase.REPORT:
+            if process_id is not None or receipt_id is not None:
+                raise AppError(
+                    code=WorkOrderErrorCode.INVALID_INPUT,
+                    message="Report media cannot be linked to a processing cycle",
+                    status_code=422,
+                )
+        elif taken_phase is MediaTakenPhase.ON_SITE:
+            if process_id is None or receipt_id is not None:
+                raise AppError(
+                    code=WorkOrderErrorCode.INVALID_INPUT,
+                    message="On-site media requires its processing cycle",
+                    status_code=422,
+                )
+        elif process_id is None or receipt_id is None:
+            raise AppError(
+                code=WorkOrderErrorCode.INVALID_INPUT,
+                message="Receipt media requires its process and receipt",
+                status_code=422,
+            )
+
+        if process_id is not None:
+            process = self._repository.get_current_process(record.id)
+            if (
+                process is None
+                or process.id != process_id
+                or process.work_order_id != record.id
+                or process.tenant_id != record.tenant_id
+                or process.property_id != record.property_id
+            ):
+                raise AppError(
+                    code=WorkOrderErrorCode.INVALID_TRANSITION,
+                    message="Media process cycle is not current for this work order",
+                    status_code=409,
+                )
+        if receipt_id is not None:
+            receipt = self._repository.get_receipt_for_process(process_id)
+            if (
+                receipt is None
+                or receipt.id != receipt_id
+                or receipt.process_id != process_id
+                or receipt.work_order_id != record.id
+                or receipt.tenant_id != record.tenant_id
+                or receipt.property_id != record.property_id
+            ):
+                raise AppError(
+                    code=WorkOrderErrorCode.INVALID_TRANSITION,
+                    message="Media receipt does not belong to this processing cycle",
+                    status_code=409,
+                )
         seen: set[int] = set()
         for file_id in file_ids:
             self._require_positive_id(file_id, "file_ids")
@@ -2903,6 +2981,8 @@ class WorkOrderService:
                     kind=kind.value,
                     file_id=file_object.id,
                     taken_phase=taken_phase.value,
+                    process_id=process_id,
+                    receipt_id=receipt_id,
                     uploader_user_id=actor.user_id,
                 )
             )

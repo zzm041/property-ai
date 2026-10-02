@@ -396,7 +396,45 @@ class WorkOrderMedia(BigIntPrimaryKeyMixin, TimestampMixin, Base):
             ondelete="RESTRICT",
             onupdate="RESTRICT",
         ),
+        ForeignKeyConstraint(
+            ["process_id", "work_order_id", "tenant_id", "property_id"],
+            [
+                "work_order_processes.id",
+                "work_order_processes.work_order_id",
+                "work_order_processes.tenant_id",
+                "work_order_processes.property_id",
+            ],
+            name="fk_work_order_media_process_scope_work_order_processes",
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+        ),
+        ForeignKeyConstraint(
+            [
+                "receipt_id",
+                "process_id",
+                "work_order_id",
+                "tenant_id",
+                "property_id",
+            ],
+            [
+                "work_order_receipts.id",
+                "work_order_receipts.process_id",
+                "work_order_receipts.work_order_id",
+                "work_order_receipts.tenant_id",
+                "work_order_receipts.property_id",
+            ],
+            name="fk_work_order_media_receipt_process_scope_work_order_receipts",
+            ondelete="RESTRICT",
+            onupdate="RESTRICT",
+        ),
         Index("ix_work_order_media_work_order_id", "work_order_id", "id"),
+        Index(
+            "ix_work_order_media_work_order_process_id",
+            "work_order_id",
+            "process_id",
+            "id",
+        ),
+        Index("ix_work_order_media_receipt_id", "receipt_id", "id"),
         MYSQL_TABLE_OPTIONS,
     )
 
@@ -406,6 +444,8 @@ class WorkOrderMedia(BigIntPrimaryKeyMixin, TimestampMixin, Base):
     kind: Mapped[str] = mapped_column(String(16), nullable=False)
     file_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     taken_phase: Mapped[str] = mapped_column(String(16), nullable=False)
+    process_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    receipt_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     uploader_user_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey(
@@ -599,6 +639,14 @@ class WorkOrderReceipt(BigIntPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "work_order_receipts"
     __table_args__ = (
         UniqueConstraint("process_id", name="uq_work_order_receipts_process_id"),
+        UniqueConstraint(
+            "id",
+            "process_id",
+            "work_order_id",
+            "tenant_id",
+            "property_id",
+            name="uq_work_order_receipts_id_process_scope",
+        ),
         CheckConstraint("resolved IN (0, 1)", name="resolved_boolean"),
         ForeignKeyConstraint(
             ["process_id", "work_order_id", "tenant_id", "property_id"],
