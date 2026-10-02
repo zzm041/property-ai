@@ -1,0 +1,122 @@
+{
+  "format": "property-ai-cross-module-idor-runtime-v1",
+  "task": "LOCAL-DELIVERY-GAPS-20261002",
+  "observed_at": "2026-10-02T23:30:35+08:00",
+  "source_commit": "ede660ffa4bbc89faf4c3240bcd8aac09b8c920d",
+  "runtime": {
+    "gateway": "http://127.0.0.1:8093",
+    "application_image": "property-ai-delivery:ede660f",
+    "application_image_id": "sha256:762be96dab60062d29d1f23fd1aea04dedd5ef34f62115056b843caefb1df4be",
+    "components": [
+      "api",
+      "worker",
+      "publisher",
+      "beat"
+    ],
+    "database_revision": "20260926_0014_identity_merge_sla_versions",
+    "health": "ready"
+  },
+  "fixed_finding": {
+    "id": "LOCAL-IDOR-01",
+    "before": {
+      "cross_tenant_work_order_detail": "403 IAM.FORBIDDEN",
+      "cross_tenant_append_with_deliberately_stale_version": "409 WO.CONFLICT"
+    },
+    "impact": "Optimistic-version validation preceded ownership and scope authorization for mutations, exposing a resource/version distinction to an unauthorized caller.",
+    "fix": "Work-order mutation paths now enforce ownership or RBAC scope before optimistic-version and state validation.",
+    "after": {
+      "cross_tenant_work_order_detail": "403 IAM.FORBIDDEN",
+      "cross_tenant_append_with_deliberately_stale_version": "403 IAM.FORBIDDEN",
+      "business_mutation": false
+    }
+  },
+  "runtime_checks": [
+    {
+      "actor": "tenant-5 manager",
+      "operation": "list work orders in property 5",
+      "result": "200; 10 items"
+    },
+    {
+      "actor": "tenant-5 manager",
+      "operation": "list work orders in tenant 6/property 6",
+      "result": "403 IAM.FORBIDDEN"
+    },
+    {
+      "actor": "tenant-6 resident",
+      "operation": "list owned work orders",
+      "result": "200; 3 items"
+    },
+    {
+      "actor": "tenant-5 resident",
+      "operation": "read tenant-6 work order 7",
+      "result": "403 IAM.FORBIDDEN"
+    },
+    {
+      "actor": "tenant-5 resident",
+      "operation": "append to tenant-6 work order 7 with stale version",
+      "result": "403 IAM.FORBIDDEN; no mutation"
+    },
+    {
+      "actor": "tenant-5 staff",
+      "operation": "read tenant-6 work order 7",
+      "result": "403 IAM.FORBIDDEN"
+    },
+    {
+      "actor": "tenant-5 staff",
+      "operation": "accept tenant-6 work order 7 with stale version",
+      "result": "403 IAM.FORBIDDEN; no mutation"
+    },
+    {
+      "actor": "tenant-5 manager",
+      "operation": "assign tenant-6 work order 7 with stale version",
+      "result": "403 IAM.FORBIDDEN; no mutation"
+    },
+    {
+      "actor": "tenant-5 manager",
+      "operation": "list own-property incidents / tenant-6 incidents",
+      "result": "200 / 403 IAM.FORBIDDEN"
+    },
+    {
+      "actor": "tenant-5 manager",
+      "operation": "list own-property knowledge / tenant-6 knowledge",
+      "result": "200 / 403 IAM.FORBIDDEN"
+    },
+    {
+      "actor": "tenant-5 manager",
+      "operation": "list own-property announcements / tenant-6 announcements",
+      "result": "200 / 403 IAM.FORBIDDEN"
+    },
+    {
+      "actor": "tenant-5 manager",
+      "operation": "read own-property stats / tenant-6 stats",
+      "result": "200 / 403 IAM.FORBIDDEN"
+    },
+    {
+      "actor": "tenant-5 resident",
+      "operation": "read tenant-6 file 10",
+      "result": "404 FILE.NOT_FOUND"
+    }
+  ],
+  "focused_regression": {
+    "work_order_authorization_ordering": "73 passed, 1 warning",
+    "cross_module_authorization": "166 passed, 1 warning",
+    "coverage": [
+      "work-order list/detail/write and stale-version ordering",
+      "resident and employee ownership",
+      "file content anti-IDOR",
+      "knowledge scope and citation access",
+      "incident scope and disposition authorization",
+      "announcement scope",
+      "SLA and stats scope",
+      "notification ownership",
+      "identity recovery and merge authorization"
+    ]
+  },
+  "boundaries": {
+    "model_calls": 0,
+    "database_direct_writes": 0,
+    "knowledge_detail_runtime_object_in_tenant_6": "not available; direct negative paths remain covered by focused tests",
+    "incident_write_runtime_object_in_tenant_6": "not available; direct negative paths remain covered by focused tests",
+    "production_penetration_test": "not performed"
+  }
+}

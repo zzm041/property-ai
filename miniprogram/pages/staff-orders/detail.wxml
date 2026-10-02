@@ -44,11 +44,20 @@
     <view class="field-label">处理前/后照片</view>
     <button class="btn" bindtap="chooseBeforeImage">添加处理前照片（可选）</button>
     <view class="empty" wx:if="{{beforeMediaHint}}">{{beforeMediaHint}}</view>
+    <view class="pending-media" wx:if="{{beforeMedia.length}}">
+      <image wx:for="{{beforeMedia}}" wx:key="fileId" class="pending-media-image" mode="aspectFill" src="{{item.tempFilePath}}" data-group="beforeMedia" data-src="{{item.tempFilePath}}" bindtap="previewPendingMedia" />
+    </view>
     <button class="btn" bindtap="chooseAfterImage">添加处理后照片（可选）</button>
     <view class="empty" wx:if="{{afterMediaHint}}">{{afterMediaHint}}</view>
+    <view class="pending-media" wx:if="{{afterMedia.length}}">
+      <image wx:for="{{afterMedia}}" wx:key="fileId" class="pending-media-image" mode="aspectFill" src="{{item.tempFilePath}}" data-group="afterMedia" data-src="{{item.tempFilePath}}" bindtap="previewPendingMedia" />
+    </view>
     <view class="field-label">过程反馈</view>
     <button class="btn" bindtap="chooseOnSiteImage">添加现场照片（可选）</button>
     <view class="empty" wx:if="{{onSiteMediaHint}}">{{onSiteMediaHint}}</view>
+    <view class="pending-media" wx:if="{{onSiteMedia.length}}">
+      <image wx:for="{{onSiteMedia}}" wx:key="fileId" class="pending-media-image" mode="aspectFill" src="{{item.tempFilePath}}" data-group="onSiteMedia" data-src="{{item.tempFilePath}}" bindtap="previewPendingMedia" />
+    </view>
     <textarea placeholder="处理反馈（可选）" value="{{feedback}}" bindinput="onFeedback"></textarea>
     <button class="btn" bindtap="feedback">提交反馈</button>
     <button class="btn" bindtap="resolve" disabled="{{loading}}">{{receiptResolved ? "提交完整回执并完成" : "提交未解决回执并上报"}}</button>

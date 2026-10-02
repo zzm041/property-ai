@@ -31,6 +31,9 @@
   <textarea class="field" data-field="appendText" placeholder="补充现场情况或新的问题信息" value="{{appendText}}" bindinput="onAppendText" maxlength="4000"></textarea>
   <button class="btn btn-secondary" bindtap="chooseAppendImage" disabled="{{loading}}">添加补充图片</button>
   <view class="empty" wx:if="{{appendMediaHint}}">{{appendMediaHint}}</view>
+  <view class="pending-media" wx:if="{{appendMedia.length}}">
+    <image wx:for="{{appendMedia}}" wx:key="fileId" class="pending-media-image" mode="aspectFill" src="{{item.tempFilePath}}" data-src="{{item.tempFilePath}}" bindtap="previewPendingMedia" />
+  </view>
   <button class="btn" data-action="append" bindtap="appendContent" disabled="{{loading}}">提交补充</button>
 </view>
 <view class="card" wx:if="{{canCancel}}">

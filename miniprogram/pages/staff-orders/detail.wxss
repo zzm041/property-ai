@@ -27,3 +27,16 @@ textarea.field {
   justify-content: space-between;
   margin-top: 20rpx;
 }
+
+.pending-media {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin: 12rpx 0;
+}
+
+.pending-media-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 8rpx;
+}

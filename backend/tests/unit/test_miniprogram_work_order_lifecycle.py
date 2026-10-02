@@ -97,6 +97,12 @@ def test_staff_page_submits_complete_receipt_and_versions_mutations() -> None:
     assert "file_ids: this.data.onSiteFileIds" in source
     assert "before_file_ids: this.data.beforeFileIds" in source
     assert "after_file_ids: this.data.afterFileIds" in source
+    assert 'data-group="beforeMedia"' in template
+    assert 'data-group="afterMedia"' in template
+    assert 'data-group="onSiteMedia"' in template
+    assert "wx.previewImage({ current, urls })" in source
+    assert "beforeMedia: []" in source
+    assert "afterMedia: []" in source
 
 
 def test_resident_page_shows_receipt_and_versions_confirmation() -> None:
@@ -113,3 +119,6 @@ def test_resident_page_shows_receipt_and_versions_confirmation() -> None:
     assert "cycle.receipt.method" in template
     assert "cycle.receipt.fee_amount" in template
     assert 'wx:for="{{processHistory}}"' in template
+    assert 'wx:for="{{appendMedia}}"' in template
+    assert "wx.previewImage({ current, urls })" in source
+    assert "appendMedia: []" in source

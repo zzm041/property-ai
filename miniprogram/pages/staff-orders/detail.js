@@ -44,6 +44,9 @@ Page({
     onSiteFileIds: [],
     beforeFileIds: [],
     afterFileIds: [],
+    onSiteMedia: [],
+    beforeMedia: [],
+    afterMedia: [],
   },
   onLoad(query) {
     this.id = Number(query.id);
@@ -164,15 +167,33 @@ Page({
     ).catch(() => {});
   },
   chooseOnSiteImage() {
-    this._chooseImage("onSiteFileIds", "onSiteMediaHint", "现场", "on-site");
+    this._chooseImage(
+      "onSiteFileIds",
+      "onSiteMedia",
+      "onSiteMediaHint",
+      "现场",
+      "on-site"
+    );
   },
   chooseBeforeImage() {
-    this._chooseImage("beforeFileIds", "beforeMediaHint", "处理前", "before");
+    this._chooseImage(
+      "beforeFileIds",
+      "beforeMedia",
+      "beforeMediaHint",
+      "处理前",
+      "before"
+    );
   },
   chooseAfterImage() {
-    this._chooseImage("afterFileIds", "afterMediaHint", "处理后", "after");
+    this._chooseImage(
+      "afterFileIds",
+      "afterMedia",
+      "afterMediaHint",
+      "处理后",
+      "after"
+    );
   },
-  _chooseImage(fileIdsKey, hintKey, label, namePrefix) {
+  _chooseImage(fileIdsKey, mediaKey, hintKey, label, namePrefix) {
     wx.chooseMedia({
       count: 1,
       mediaType: ["image"],
@@ -198,8 +219,13 @@ Page({
                 })
                 .then((record) => {
                   const fileIds = this.data[fileIdsKey].concat(record.id);
+                  const media = this.data[mediaKey].concat({
+                    fileId: record.id,
+                    tempFilePath: file.tempFilePath,
+                  });
                   this.setData({
                     [fileIdsKey]: fileIds,
+                    [mediaKey]: media,
                     [hintKey]: `已添加 ${fileIds.length} 张${label}照片`,
                   });
                 })
@@ -210,6 +236,16 @@ Page({
       },
       fail: (error) => this.setData({ error: error.errMsg || "选择图片失败" }),
     });
+  },
+  previewPendingMedia(event) {
+    const group = event.currentTarget.dataset.group;
+    const current = event.currentTarget.dataset.src;
+    const media = Array.isArray(this.data[group]) ? this.data[group] : [];
+    const urls = media.map((item) => item.tempFilePath);
+    if (!current || !urls.length) {
+      return;
+    }
+    wx.previewImage({ current, urls });
   },
   feedback() {
     const { withLoading } = require("../../utils/ui");
@@ -222,7 +258,12 @@ Page({
           version: this.data.workOrder.version,
         })
         .then(() => {
-          this.setData({ feedback: "", onSiteFileIds: [], onSiteMediaHint: "" });
+          this.setData({
+            feedback: "",
+            onSiteFileIds: [],
+            onSiteMedia: [],
+            onSiteMediaHint: "",
+          });
           return this.reload();
         })
     ).catch(() => {});
@@ -266,7 +307,17 @@ Page({
           after_file_ids: this.data.afterFileIds,
           version: this.data.workOrder.version,
         })
-        .then(() => this.reload())
+        .then(() => {
+          this.setData({
+            beforeFileIds: [],
+            afterFileIds: [],
+            beforeMedia: [],
+            afterMedia: [],
+            beforeMediaHint: "",
+            afterMediaHint: "",
+          });
+          return this.reload();
+        })
     ).catch(() => {});
   },
   _act(name) {

@@ -270,6 +270,40 @@ def test_manager_resolves_and_reopens_without_mutating_member_work_orders() -> N
     assert service._audit.append.call_args.kwargs["details"]["from_status"] == "RESOLVED"
 
 
+def test_manager_can_traverse_every_frozen_disposition_transition() -> None:
+    manager = _manager()
+    service = _service(principal_loader=lambda _user_id: manager)
+    incident = _incident()
+    service._ai.get_incident_for_update.return_value = incident
+    transitions = (
+        ("MONITORING", "开始观察公共故障是否继续出现"),
+        ("OPEN", "监控期间再次收到有效住户反馈"),
+        ("RESOLVED", "公共故障已经处理并完成现场复核"),
+        ("CLOSED", "观察期结束且没有新的关联故障"),
+        ("OPEN", "关闭后出现新的有效故障证据"),
+    )
+
+    for target, reason in transitions:
+        previous = incident.status
+        service._audit.reset_mock()
+        result = service.update_status(
+            actor=manager,
+            incident_id=incident.id,
+            target_status=target,
+            reason=reason,
+            expected_updated_at=NOW,
+            request_id=f"incident-transition-{previous.lower()}-{target.lower()}",
+        )
+
+        assert result.status == target
+        details = service._audit.append.call_args.kwargs["details"]
+        assert details["from_status"] == previous
+        assert details["to_status"] == target
+        assert details["reason"] == reason
+
+    assert not any("work_order" in str(call).lower() for call in service._work_orders.mock_calls)
+
+
 def test_incident_status_update_rejects_staff_stale_and_illegal_transition() -> None:
     staff = _staff()
     service = _service(principal_loader=lambda _user_id: staff)

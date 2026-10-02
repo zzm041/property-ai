@@ -35,6 +35,7 @@ Page({
     canRate: false,
     appendText: "",
     appendFileIds: [],
+    appendMedia: [],
     appendMediaHint: "",
     cancelReason: "",
     ratingOptions: [1, 2, 3, 4, 5],
@@ -166,8 +167,13 @@ Page({
                 })
                 .then((record) => {
                   const fileIds = this.data.appendFileIds.concat(record.id);
+                  const appendMedia = this.data.appendMedia.concat({
+                    fileId: record.id,
+                    tempFilePath: file.tempFilePath,
+                  });
                   this.setData({
                     appendFileIds: fileIds,
+                    appendMedia,
                     appendMediaHint: `已添加 ${fileIds.length} 张补充图片`,
                   });
                 })
@@ -178,6 +184,14 @@ Page({
       },
       fail: (error) => this.setData({ error: error.errMsg || "选择图片失败" }),
     });
+  },
+  previewPendingMedia(event) {
+    const current = event.currentTarget.dataset.src;
+    const urls = this.data.appendMedia.map((item) => item.tempFilePath);
+    if (!current || !urls.length) {
+      return;
+    }
+    wx.previewImage({ current, urls });
   },
   appendContent() {
     if (this.data.loading) {
@@ -202,6 +216,7 @@ Page({
           this.setData({
             appendText: "",
             appendFileIds: [],
+            appendMedia: [],
             appendMediaHint: "",
             actionNotice: "补充内容已保存",
           });

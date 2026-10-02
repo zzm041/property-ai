@@ -2347,13 +2347,38 @@
       {"id":"V1-GOVERNANCE-OPS","implementation_status":"A reproducible local delivery package now pins application dependencies and infrastructure images and provides guarded environment preparation, migration, bootstrap, start/stop/status, backup/restore and diagnostic entry points.","verification_status":"PASS_SCOPED_LOCAL_DELIVERY_ARTIFACT","evidence_version":"7dd193b; property-ai-delivery-check clean initialization, restart persistence and same-image runtime","remaining_gap":"Production host/domain/TLS/storage, provider secrets, hardening, capacity/security and formal release acceptance.","next_action":"Activate and validate on an owner-approved target without treating Development providers as Production."}
     ]
   },
+  "local_delivery_gaps_20261002": {
+    "task_id": "LOCAL-DELIVERY-GAPS-20261002",
+    "status": "IN_PROGRESS",
+    "product_source": "ede660ffa4bbc89faf4c3240bcd8aac09b8c920d",
+    "runtime_image": "property-ai-delivery:ede660f@sha256:762be96dab60062d29d1f23fd1aea04dedd5ef34f62115056b843caefb1df4be",
+    "evidence_index": "reports/local-delivery-gaps-20261002/cross-module-idor-runtime.json",
+    "current_status_overlays": [
+      {
+        "id": "V1-GOVERNANCE-IDOR",
+        "implementation_status": "Cross-module RBAC, tenant/property scope and resource ownership checks cover work-order list/detail/write, staff actions, files, knowledge and citations, Incidents, announcements, SLA/stats, notifications and identity operations. Work-order mutations now authorize before optimistic-version/state checks, closing a verified cross-tenant version side channel.",
+        "verification_status": "PASS_SCOPED_LOCAL_CROSS_MODULE_RUNTIME_AND_FOCUSED_TESTS",
+        "evidence_version": "ede660f; reports/local-delivery-gaps-20261002/cross-module-idor-runtime.json; 73 affected work-order tests and 166 cross-module focused tests",
+        "remaining_gap": "Production penetration testing, target identity/provider configuration, production media scanning and formal release acceptance remain open.",
+        "next_action": "Preserve the local runtime and focused authorization evidence; perform target-environment penetration and provider acceptance without weakening fail-closed behavior."
+      },
+      {
+        "id": "V1-INCIDENT-AGGREGATE",
+        "implementation_status": "Existing scoped aggregation and runtime disposition evidence remain. The full frozen disposition graph OPEN/MONITORING/RESOLVED/CLOSED is wired and now covered as one audited transition sequence; Incident disposition never mutates member work-order, receipt, assignment or feedback history.",
+        "verification_status": "AGGREGATION_PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE;DISPOSITION_PASS_SCOPED_LOCAL_RUNTIME_AND_COMPLETE_TRANSITION_TEST",
+        "evidence_version": "prior 005/009 and fe90913 runtime retained; ede660f working tree transition regression; 15 incident-management tests",
+        "remaining_gap": "A fresh page-runtime traversal of every transition and generalized real-model aggregation are not claimed; production runtime and formal Production V1 acceptance remain open.",
+        "next_action": "Preserve the complete transition implementation/test and prior resolve/reopen runtime proof; do not mutate historical Incidents only to expand screenshots."
+      }
+    ]
+  },
   "current_effective_view": {
     "generated_at": "2026-10-02",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
     "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs), then notification_events_inbox_013.current_status_overlays (2 IDs)",
     "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs), then manager_wo_cancel_017 (1 composite ID, remains PARTIAL), then house_csv_roundtrip_018 (1 existing ID), then ai_analysis_input_019 (3 existing IDs; real-model statuses remain BLOCKED), then resident_wo_presentation_020 (1 existing ID; release gaps retained), then notification_presentation_021 (1 existing ID; explicitUTC not Property-local/outbound acceptance), then ai_fallback_runtime_022 (1 existing ID; Development injected failure only)",
     "latest_additional_overlay_source": "resident_house_select_023, evaluation_calibration_20260924, maintenance_contact_dispatch_024, db_task_recovery_025, reliable_task_delivery_026 includingnormalintegration (4 existing IDs, boundedDevelopment only), preservedselfhost_supplement_024_rubric_01 then crossfield_diagnostic_01 (SELFHOST-AI remainsNOT_READY; no percentage/extra_v1 double count)",
-    "final_overlay_source": "real_ai_integration_027.current_status_overlays plus persistent3317/0014 scoped runtime checkpoint, delivery_organization_onboarding_028, restore029, the 8093 scoped real-provider RAG continuation, preserved Qwen3.8 fixed-set NOT_READY history, the f234402/6dc6538 bounded local image/voice AUTO delivery evidence independently accepted in REAL-AI-INTEGRATION-027-LOCAL-DELIVERY-round2, and the 2026-10-02 local-final-gaps identity-page/SLA-Beat continuation; scoped business PASS does not promote native-device, generalized quality, trusted-provider, target deployment or Production release acceptance; rows and historical IDs retained",
+    "final_overlay_source": "real_ai_integration_027.current_status_overlays plus persistent3317/0014 scoped runtime checkpoint, delivery_organization_onboarding_028, restore029, the 8093 scoped real-provider RAG continuation, preserved Qwen3.8 fixed-set NOT_READY history, the f234402/6dc6538 bounded local image/voice AUTO delivery evidence independently accepted in REAL-AI-INTEGRATION-027-LOCAL-DELIVERY-round2, the 2026-10-02 local-final-gaps identity-page/SLA-Beat continuation, and local_delivery_gaps_20261002 cross-module authorization plus Incident-transition evidence; scoped business PASS does not promote generalized quality, trusted-provider, target deployment or Production release acceptance; rows and historical IDs retained",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced. Old AUTH001 objects were lost on the 2026-09-23 tmpfs stop; historical evidence remains version-bound, not current-object proof.",
     "row_count": 83,
     "rows": [
@@ -2887,11 +2912,11 @@
       },
       {
         "requirement_id": "V1-INCIDENT-AGGREGATE",
-        "current_implementation": "current_schema_rule_aggregation_shared_auto_dispatch_transferable_capacity_scope_filtered_management_and_reasoned_audited_disposition_reopen_wired",
-        "verification_mode_status": "AGGREGATION_PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE;DISPOSITION_PASS_SCOPED_LOCAL_DEVELOPMENT_RUNTIME",
-        "evidence_version": "prior 005/009 retained; fe90913; incident-closeout-d020aa7150; 027 review-incremental-round4 plus final-hash binding",
-        "remaining_gap": "other disposition transitions and real-model aggregation lack new runtime proof; production runtime and Production V1 acceptance",
-        "next_action": "preserve the scoped evidence; do not replay aggregation or mutate member work orders solely to expand screenshots"
+        "current_implementation": "current_schema_rule_aggregation_shared_auto_dispatch_transferable_capacity_scope_filtered_management_and_complete_reasoned_audited_disposition_graph_wired_without_member_work_order_mutation",
+        "verification_mode_status": "AGGREGATION_PASS_SCOPED_LOCAL_DEVELOPMENT_FAKE;DISPOSITION_PASS_SCOPED_LOCAL_RUNTIME_AND_COMPLETE_TRANSITION_TEST",
+        "evidence_version": "prior 005/009 and fe90913 runtime retained; ede660f working tree; 15 incident-management tests",
+        "remaining_gap": "fresh page-runtime traversal of every transition and generalized real-model aggregation are not claimed; production runtime and Production V1 acceptance remain open",
+        "next_action": "preserve complete transition implementation/test and prior resolve/reopen runtime evidence; do not mutate historical Incidents solely to expand screenshots"
       },
       {
         "requirement_id": "V1-ANN-TARGET",
@@ -2927,11 +2952,11 @@
       },
       {
         "requirement_id": "V1-GOVERNANCE-IDOR",
-        "current_implementation": "scoped_checks_and_tests_present",
-        "verification_mode_status": "PARTIAL",
-        "evidence_version": "f5a7b62d83303ab2c742bbd3baef27cf48f99999",
-        "remaining_gap": "complete cross-module IDOR/security acceptance",
-        "next_action": "仅针对所列剩余缺口补实现或证据"
+        "current_implementation": "cross_module_rbac_tenant_property_ownership_and_anti_idor_checks_with_authorization_before_work_order_version_validation",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_CROSS_MODULE_RUNTIME_AND_FOCUSED_TESTS",
+        "evidence_version": "ede660ffa4bbc89faf4c3240bcd8aac09b8c920d; reports/local-delivery-gaps-20261002/cross-module-idor-runtime.json; 73 affected and 166 focused tests",
+        "remaining_gap": "production penetration testing, target identity/provider configuration, production media scanning and formal release acceptance",
+        "next_action": "preserve scoped local evidence; perform target-environment penetration and provider acceptance without weakening fail-closed behavior"
       },
       {
         "requirement_id": "V1-WORKER-ASYNC",
