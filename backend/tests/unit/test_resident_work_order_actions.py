@@ -216,7 +216,7 @@ def test_resident_append_rejects_stale_version_before_mutation() -> None:
         )
 
     assert captured.value.code == WorkOrderErrorCode.CONFLICT
-    service._authorize_read.assert_not_called()
+    service._authorize_read.assert_called_once_with(current, record)
     service._repository.get_content.assert_not_called()
     service._attach_media.assert_not_called()
 

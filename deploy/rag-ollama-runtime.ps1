@@ -11,8 +11,16 @@ $RepoRoot = Split-Path -Parent $DeployDir
 $RuntimeDir = Join-Path $RepoRoot "tmp\delivery-rag-ollama-runtime"
 $StatePath = Join-Path $RuntimeDir "current.json"
 $StartLockPath = Join-Path $RuntimeDir "start.lock"
-$AuthorizedStaleResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-rag-8093\rag-ollama-stale-receipt-resolution-20261002.json"
-$ExpectedAuthorizedStaleResolutionSha256 = "EE8C4294800C65CAA5EC9A34B7581A42072F8409332AC7DCEC13B33F742024B2"
+$AuthorizedStaleResolutions = @(
+    @{
+        Path = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-rag-8093\rag-ollama-stale-receipt-resolution-20261002.json"
+        Sha256 = "EE8C4294800C65CAA5EC9A34B7581A42072F8409332AC7DCEC13B33F742024B2"
+    },
+    @{
+        Path = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-rag-8093\rag-ollama-stale-receipt-resolution-20261002-handoff.json"
+        Sha256 = "A163FD8570FF586EF55F67F0C25F54D5219AC155339953F7A7D988CC11ACD304"
+    }
+)
 $ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models"
 $OllamaExe = if ($env:PROPERTY_AI_OLLAMA_EXE) { $env:PROPERTY_AI_OLLAMA_EXE } else { "C:\Users\lmj\AppData\Local\Programs\Ollama\ollama.exe" }
 $ExpectedExeSha256 = "D571E4CF0AD4456FCCD33D5B985B6D63BA5669C6E5A812391704083952AAE3D5"
@@ -90,32 +98,35 @@ function Assert-State([object]$State) {
 }
 
 function Retire-AuthorizedStaleReceipt([object]$State) {
-    if (-not (Test-Path -LiteralPath $AuthorizedStaleResolutionPath -PathType Leaf)) { return $false }
-    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $AuthorizedStaleResolutionPath).Hash -ne $ExpectedAuthorizedStaleResolutionSha256) { return $false }
-    $resolution = Get-Content -Raw -LiteralPath $AuthorizedStaleResolutionPath | ConvertFrom-Json
-    $currentPid = Get-CimProcessOrNull ([int]$State.pid)
-    if (
-        $resolution.format -ne "property-ai-local-runtime-stale-receipt-resolution-v1" -or
-        $resolution.task_id -ne "REAL-AI-INTEGRATION-027" -or
-        [string]$resolution.original.receipt_sha256 -ne (Get-FileHash -Algorithm SHA256 -LiteralPath $StatePath).Hash -or
-        [string]$resolution.original.operation_id -ne [string]$State.operation_id -or
-        [int]$resolution.original.pid -ne [int]$State.pid -or
-        ([DateTimeOffset]$resolution.original.started_at_utc).UtcDateTime -ne ([DateTimeOffset]$State.started_at_utc).UtcDateTime -or
-        [string]$resolution.original.endpoint -ne $Endpoint -or
-        [string]$resolution.original.executable_sha256 -ne $ExpectedExeSha256 -or
-        [string]$resolution.current_evidence.current_executable_sha256 -ne (Get-FileHash -Algorithm SHA256 -LiteralPath $OllamaExe).Hash -or
-        $null -ne $currentPid -or $null -ne (Get-ListenerPid) -or
-        $resolution.current_evidence.recorded_pid_exists -ne $false -or
-        [int]$resolution.current_evidence.listener_count -ne 0 -or
-        $resolution.semantics.historical_exit_mode -ne "UNKNOWN" -or
-        $resolution.semantics.current_execution_absent -ne $true -or
-        $resolution.semantics.model_request_or_budget_effect -ne $false -or
-        $resolution.semantics.history_rewritten -ne $false
-    ) { return $false }
-    $archive = Join-Path $RuntimeDir ("retired-authorized-stale-{0}.json" -f $State.operation_id)
-    if (Test-Path -LiteralPath $archive) { throw "authorized stale RAG receipt archive already exists" }
-    Move-Item -LiteralPath $StatePath -Destination $archive
-    return $true
+    foreach ($binding in $AuthorizedStaleResolutions) {
+        if (-not (Test-Path -LiteralPath $binding.Path -PathType Leaf)) { continue }
+        if ((Get-FileHash -Algorithm SHA256 -LiteralPath $binding.Path).Hash -ne $binding.Sha256) { continue }
+        $resolution = Get-Content -Raw -LiteralPath $binding.Path | ConvertFrom-Json
+        $currentPid = Get-CimProcessOrNull ([int]$State.pid)
+        if (
+            $resolution.format -ne "property-ai-local-runtime-stale-receipt-resolution-v1" -or
+            $resolution.task_id -ne "REAL-AI-INTEGRATION-027" -or
+            [string]$resolution.original.receipt_sha256 -ne (Get-FileHash -Algorithm SHA256 -LiteralPath $StatePath).Hash -or
+            [string]$resolution.original.operation_id -ne [string]$State.operation_id -or
+            [int]$resolution.original.pid -ne [int]$State.pid -or
+            ([DateTimeOffset]$resolution.original.started_at_utc).UtcDateTime -ne ([DateTimeOffset]$State.started_at_utc).UtcDateTime -or
+            [string]$resolution.original.endpoint -ne $Endpoint -or
+            [string]$resolution.original.executable_sha256 -ne $ExpectedExeSha256 -or
+            [string]$resolution.current_evidence.current_executable_sha256 -ne (Get-FileHash -Algorithm SHA256 -LiteralPath $OllamaExe).Hash -or
+            $null -ne $currentPid -or $null -ne (Get-ListenerPid) -or
+            $resolution.current_evidence.recorded_pid_exists -ne $false -or
+            [int]$resolution.current_evidence.listener_count -ne 0 -or
+            $resolution.semantics.historical_exit_mode -ne "UNKNOWN" -or
+            $resolution.semantics.current_execution_absent -ne $true -or
+            $resolution.semantics.model_request_or_budget_effect -ne $false -or
+            $resolution.semantics.history_rewritten -ne $false
+        ) { continue }
+        $archive = Join-Path $RuntimeDir ("retired-authorized-stale-{0}.json" -f $State.operation_id)
+        if (Test-Path -LiteralPath $archive) { throw "authorized stale RAG receipt archive already exists" }
+        Move-Item -LiteralPath $StatePath -Destination $archive
+        return $true
+    }
+    return $false
 }
 
 switch ($Action) {

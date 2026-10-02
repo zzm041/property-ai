@@ -1383,7 +1383,6 @@ class WorkOrderService:
     ) -> WorkOrder:
         current = self._reload_actor(actor)
         record = self._lock_work_order(work_order_id)
-        self._assert_version(record, version)
         self._authorize_read(current, record)
         if record.reporter_user_id != current.user_id:
             raise AppError(
@@ -1391,6 +1390,7 @@ class WorkOrderService:
                 message="Permission denied",
                 status_code=403,
             )
+        self._assert_version(record, version)
         if record.status in {
             WorkOrderStatus.COMPLETED.value,
             WorkOrderStatus.CANCELLED.value,
@@ -1453,7 +1453,6 @@ class WorkOrderService:
     ) -> WorkOrder:
         current = self._reload_actor(actor)
         record = self._lock_work_order(work_order_id)
-        self._assert_version(record, version)
         scope = self._property_scope(record)
         is_reporter = record.reporter_user_id == current.user_id
         active_assignee_user_id = None
@@ -1490,6 +1489,7 @@ class WorkOrderService:
             active_assignee_user_id = self._repository.get_active_assignee_user_id(
                 record.id
             )
+        self._assert_version(record, version)
         self._apply_transition(
             record,
             event=WorkOrderEvent.CANCEL,
@@ -1535,8 +1535,8 @@ class WorkOrderService:
     ) -> WorkOrder:
         current = self._reload_actor(actor)
         record = self._lock_work_order(work_order_id)
-        self._assert_version(record, version)
         self._require_reporter(current, record)
+        self._assert_version(record, version)
         process = self._repository.get_current_process(record.id)
         self._repository.add_feedback(
             WorkOrderFeedback(
@@ -1609,8 +1609,8 @@ class WorkOrderService:
     ) -> WorkOrder:
         current = self._reload_actor(actor)
         record = self._lock_work_order(work_order_id)
-        self._assert_version(record, version)
         self._require_reporter(current, record)
+        self._assert_version(record, version)
         assignment = self._repository.get_active_assignment_for_update(record.id)
         employee = None
         if assignment is not None:
@@ -1775,7 +1775,11 @@ class WorkOrderService:
     ) -> WorkOrder:
         current = self._reload_actor(actor)
         record = self._lock_work_order(work_order_id)
-        self._assert_version(record, version)
+        RbacService.require_permission(
+            current,
+            WORK_ORDER_DISPATCH,
+            self._property_scope(record),
+        )
         if (
             claimed_tenant_id is not None
             and claimed_tenant_id != record.tenant_id
@@ -1788,11 +1792,7 @@ class WorkOrderService:
                 message="Declared scope does not match the work order",
                 status_code=422,
             )
-        RbacService.require_permission(
-            current,
-            WORK_ORDER_DISPATCH,
-            self._property_scope(record),
-        )
+        self._assert_version(record, version)
         # Share the global assignment mutex with AUTO, even for authorized
         # manual intervention. No business scope is inferred from this lock.
         employee = self._employees.get_employee_for_update(employee_id)
@@ -1946,12 +1946,12 @@ class WorkOrderService:
     ) -> WorkOrder:
         current = self._reload_actor(actor)
         record = self._lock_work_order(work_order_id)
-        self._assert_version(record, version)
         RbacService.require_permission(
             current,
             WORK_ORDER_DECIDE,
             self._property_scope(record),
         )
+        self._assert_version(record, version)
         try:
             code = SupervisorDecision(decision)
         except ValueError as exc:
@@ -2565,22 +2565,11 @@ class WorkOrderService:
     ) -> tuple[Principal, WorkOrder, WorkOrderAssignment, Employee]:
         current = self._reload_actor(actor)
         record = self._lock_work_order(work_order_id)
-        self._assert_version(record, version)
         RbacService.require_permission(
             current,
             WORK_ORDER_PROCESS,
             self._property_scope(record),
         )
-        if record.status in {
-            WorkOrderStatus.CLOSED.value,
-            WorkOrderStatus.CANCELLED.value,
-            WorkOrderStatus.COMPLETED.value,
-        }:
-            raise AppError(
-                code=WorkOrderErrorCode.ALREADY_PROCESSED,
-                message="Work order is already finished",
-                status_code=409,
-            )
         assignment = self._repository.get_active_assignment_for_update(record.id)
         if assignment is None:
             raise AppError(
@@ -2611,6 +2600,17 @@ class WorkOrderService:
                     status_code=403,
                 )
             employee = assigned
+        self._assert_version(record, version)
+        if record.status in {
+            WorkOrderStatus.CLOSED.value,
+            WorkOrderStatus.CANCELLED.value,
+            WorkOrderStatus.COMPLETED.value,
+        }:
+            raise AppError(
+                code=WorkOrderErrorCode.ALREADY_PROCESSED,
+                message="Work order is already finished",
+                status_code=409,
+            )
         return current, record, assignment, employee
 
     def _lock_work_order(self, work_order_id: int) -> WorkOrder:
