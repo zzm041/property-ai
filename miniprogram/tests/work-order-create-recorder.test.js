@@ -132,6 +132,10 @@ async function main() {
   current.page.onHide();
   assert.strictEqual(stopCount, stopsBeforeHide + 1, "page hide must stop active recording");
   current.page.hidden = false;
+  current.page.onHide();
+  assert.strictEqual(stopCount, stopsBeforeHide + 1, "repeated cancellation must not issue another stop");
+  assert.strictEqual(current.state.recordingBusy, true, "repeated cancellation must preserve the old stop barrier");
+  current.page.hidden = false;
   const startsBeforeOldStop = startCount;
   current.page.startRecording();
   assert.strictEqual(startCount, startsBeforeOldStop, "a new recording must wait for the cancelled stop callback");

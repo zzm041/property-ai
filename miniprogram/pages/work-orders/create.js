@@ -297,7 +297,7 @@ Page({
       this._recorder.stop();
     }
     this._recording = false;
-    const waitForSettlement = Boolean(waitForStop || this._recordStartPending || this._recordUploadPending);
+    const waitForSettlement = Boolean(waitForStop || this._recordStartPending || this._recordStopPending || this._recordUploadPending);
     if (!this.unloaded) this.setData({ recording: false, recordingBusy: waitForSettlement, recordingHint: waitForSettlement ? "正在取消未完成录音" : "" });
   },
   _prepareImage(file, info, uploadType) {
