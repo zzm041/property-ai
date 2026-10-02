@@ -229,6 +229,7 @@ def test_retry_preserves_failure_and_creates_only_one_generation_with_audit(monk
     s._authorize_manager=lambda *a:(NS(user_id=4),OrganizationScope(ScopeType.PROPERTY,tenant_id=7,property_id=9))
     s.session.scalar.return_value=None
     monkeypatch.setattr(WorkOrderRepository,'get_work_order_for_update',lambda *a:NS(version=1,status='PENDING_ANALYSIS',current_assignment_id=None,id=r.resource_id))
+    monkeypatch.setattr(WorkOrderRepository,'attachment_completion_request',lambda *a:None)
     audit=MagicMock();monkeypatch.setattr(AuditService,'append',audit)
     added=[]
     def add(new):new.id=21;added.append(new);return new
@@ -241,6 +242,74 @@ def test_retry_preserves_failure_and_creates_only_one_generation_with_audit(monk
     again=s.retry_managed(r.id,actor=NS(user_id=4),reason_code='DEPENDENCY_RECOVERED',request_id='026-recovery-duplicate')
     assert again==result and len(added)==1 and audit.call_count==1
     assert not any('token' in key or 'phone' in key for key in result)
+
+
+def test_attachment_completion_recovery_carries_exact_predecessor_claim(monkeypatch):
+    from app.domain.iam import OrganizationScope, ScopeType
+    from app.repository.work_order import WorkOrderRepository
+    from app.service.audit import AuditService
+    from app.worker.task_intents import _analysis_claim_for_lease
+
+    failed = row(status='FAILED', generation=4, resource_version=5,
+                 task_id='completion-generation-4')
+    s = service(failed)
+    s._authorize_manager = lambda *a: (
+        NS(user_id=4),
+        OrganizationScope(ScopeType.PROPERTY, tenant_id=7, property_id=9),
+    )
+    work = NS(id=22, tenant_id=7, property_id=9, status='PENDING_ASSIGNMENT',
+              process_reason=None, current_assignment_id=None, version=5)
+    prior_request = NS(payload_json={
+        'task_id': failed.task_id,
+        'source_analysis_id': 61,
+        'attachment_count': 3,
+    })
+    monkeypatch.setattr(WorkOrderRepository, 'get_work_order_for_update', lambda *a: work)
+    monkeypatch.setattr(WorkOrderRepository, 'attachment_completion_request',
+                        lambda *a: prior_request)
+    add_log = MagicMock()
+    monkeypatch.setattr(WorkOrderRepository, 'add_log', add_log)
+    audit = MagicMock()
+    monkeypatch.setattr(AuditService, 'append', audit)
+    s.session.scalar.return_value = None
+
+    created = []
+    def add(new):
+        new.id = 91
+        created.append(new)
+        return new
+    s.repo.add = add
+
+    result = s.retry_managed(
+        failed.id,
+        actor=NS(user_id=4),
+        reason_code='DEPENDENCY_RECOVERED',
+        request_id='027-completion-recovery',
+    )
+    assert result['generation'] == 5
+    recovery_request = add_log.call_args.args[0]
+    assert recovery_request.event_code == 'AI_ATTACHMENT_COMPLETION_REQUESTED'
+    assert recovery_request.payload_json['task_id'] == created[0].task_id
+    assert recovery_request.payload_json['retry_source_task_id'] == failed.task_id
+    assert recovery_request.payload_json['source_analysis_id'] == 61
+    assert recovery_request.payload_json['attachment_count'] == 3
+
+    predecessor_claim = {
+        'task_id': failed.task_id,
+        'analysis_id': 72,
+        'source_analysis_id': 61,
+        'attachment_completion': True,
+    }
+    assert _analysis_claim_for_lease(
+        NS(payload_json=predecessor_claim),
+        recovery_request,
+        created[0].task_id,
+    ) == predecessor_claim
+    assert _analysis_claim_for_lease(
+        NS(payload_json={**predecessor_claim, 'source_analysis_id': 99}),
+        recovery_request,
+        created[0].task_id,
+    ) is None
 
 
 def test_succeeded_analysis_can_create_only_one_audited_attachment_completion(monkeypatch):

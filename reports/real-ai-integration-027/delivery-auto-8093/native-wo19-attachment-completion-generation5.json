@@ -1,0 +1,40 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-NATIVE-MEDIA-ATTACHMENT-COMPLETION",
+  "approval_scope": "WO19 all accepted attachments; Qwen/VLM <= 12, ASR <= 4, model execution <= 900 seconds",
+  "work_order_id": 19,
+  "source_intent": {
+    "id": 187,
+    "generation": 4,
+    "status": "FAILED",
+    "error_code": "AI.UNAVAILABLE"
+  },
+  "successor_intent": {
+    "id": 188,
+    "generation": 5,
+    "status": "PENDING"
+  },
+  "reason_code": "DEPENDENCY_RECOVERED",
+  "preflight": {
+    "available_ram_mib": 12757.0,
+    "asr_start_ram_floor_mib": 11264,
+    "adapter_scope": "work_order_only",
+    "adapter_idle": true,
+    "adapter_accepting": true,
+    "reservation_gate": "READY",
+    "no_assignment_before_retry": true
+  },
+  "required_checkpoint_behavior": {
+    "file16_vlm": "REUSE",
+    "file17_asr": "REUSE",
+    "file18_asr": "EXECUTE_ONCE",
+    "final_aggregate_llm": "ONLY_AFTER_ALL_ATTACHMENTS_BOUND"
+  },
+  "normal_password_manager_session": true,
+  "new_work_order_created": false,
+  "old_analysis_or_task_rewritten": false,
+  "direct_database_write": false,
+  "manual_analysis_or_assignment": false,
+  "credentials_or_tokens_saved": false,
+  "runtime_source_commit": "17581e4e6a8534e55c181084ec4d201b2025ea92",
+  "runtime_recovery_commit": "eb19113"
+}

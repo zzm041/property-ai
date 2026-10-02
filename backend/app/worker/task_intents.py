@@ -62,6 +62,28 @@ def _heartbeat(engine, lease, timing, stop):
             return
 
 
+def _analysis_claim_for_lease(latest, completion_request, task_id):
+    """Reuse only the exact predecessor claim named by a trusted completion retry."""
+    claim = latest.payload_json if latest and isinstance(latest.payload_json, dict) else None
+    if claim is None:
+        return None
+    if claim.get("task_id") == task_id:
+        return claim
+    request_payload = (
+        completion_request.payload_json
+        if completion_request and isinstance(completion_request.payload_json, dict)
+        else None
+    )
+    if (
+        request_payload is not None
+        and claim.get("attachment_completion") is True
+        and claim.get("task_id") == request_payload.get("retry_source_task_id")
+        and claim.get("source_analysis_id") == request_payload.get("source_analysis_id")
+    ):
+        return claim
+    return None
+
+
 def _run_domain(session, settings, lease):
     session.info[LEASE_KEY] = lease
     if lease["operation"] == ANALYZE:
@@ -75,11 +97,16 @@ def _run_domain(session, settings, lease):
             if work is None or (work.tenant_id, work.property_id) != (lease["tenant_id"], lease["property_id"]):
                 return "CANCELLED", None, False
             latest = repo.latest_analysis_attempt(work.id)
-            previous = latest.payload_json if latest and latest.payload_json.get("task_id") == lease["task_id"] else None
-            attachment_completion = repo.attachment_completion_request(
+            completion_request = repo.attachment_completion_request(
                 work.id,
                 lease["task_id"],
-            ) is not None
+            )
+            previous = _analysis_claim_for_lease(
+                latest,
+                completion_request,
+                lease["task_id"],
+            )
+            attachment_completion = completion_request is not None
         context = {"task_id": lease["task_id"], "attempt": lease["attempt"],
                    "execution_token": lease["token"], "expected_version": lease["resource_version"],
                    "claim": previous, "attachment_completion": attachment_completion}

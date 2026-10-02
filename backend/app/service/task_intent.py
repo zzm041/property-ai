@@ -340,6 +340,7 @@ class TaskIntentService:
             if successor is not None:
                 return self.metadata(successor)
             version = row.resource_version
+            attachment_completion_request = None
             if row.operation == ANALYZE:
                 from app.repository.work_order import WorkOrderRepository
                 work = WorkOrderRepository(self.session).get_work_order_for_update(row.resource_id)
@@ -352,6 +353,9 @@ class TaskIntentService:
                     TaskIntent.resource_id == work.id, TaskIntent.id > row.id).limit(1).with_for_update())
                 if newer is not None:
                     raise AppError(code="TASK.CONFLICT", message="A newer task already owns this work order", status_code=409)
+                attachment_completion_request = WorkOrderRepository(
+                    self.session
+                ).attachment_completion_request(work.id, row.task_id)
             elif row.operation == INGEST:
                 job = self.session.get(KnowledgeIngestionJob, row.resource_id, with_for_update=True, populate_existing=True)
                 document = self.session.get(KnowledgeDocument, job.document_id, with_for_update=True) if job else None
@@ -368,6 +372,54 @@ class TaskIntentService:
                 operation=row.operation, resource_id=row.resource_id, resource_version=version,
                 generation=row.generation + 1, request_id=request_id, task_id=str(uuid4()),
                 status="PENDING", publish_attempt=0, execution_attempt=0, available_at=self.clock()))
+            if attachment_completion_request is not None:
+                from app.model.work_order import WorkOrderLog
+                from app.repository.work_order import WorkOrderRepository
+
+                completion_payload = attachment_completion_request.payload_json
+                source_analysis_id = (
+                    completion_payload.get("source_analysis_id")
+                    if isinstance(completion_payload, dict)
+                    else None
+                )
+                attachment_count = (
+                    completion_payload.get("attachment_count")
+                    if isinstance(completion_payload, dict)
+                    else None
+                )
+                if (
+                    not isinstance(source_analysis_id, int)
+                    or isinstance(attachment_count, bool)
+                    or not isinstance(attachment_count, int)
+                    or not 1 <= attachment_count <= 20
+                ):
+                    raise AppError(
+                        code="TASK.CONFLICT",
+                        message="Attachment completion recovery metadata is invalid",
+                        status_code=409,
+                    )
+                WorkOrderRepository(self.session).add_log(WorkOrderLog(
+                    tenant_id=work.tenant_id,
+                    property_id=work.property_id,
+                    work_order_id=work.id,
+                    actor_user_id=current.user_id,
+                    actor_type="PROPERTY",
+                    from_status=work.status,
+                    to_status=work.status,
+                    process_reason=work.process_reason,
+                    event_code="AI_ATTACHMENT_COMPLETION_REQUESTED",
+                    request_id=request_id,
+                    payload_json={
+                        "task_id": new.task_id,
+                        "intent_id": new.id,
+                        "source_intent_id": row.id,
+                        "source_analysis_id": source_analysis_id,
+                        "generation": new.generation,
+                        "attachment_count": attachment_count,
+                        "reason_code": "ATTACHMENT_COMPLETION",
+                        "retry_source_task_id": row.task_id,
+                    },
+                ))
             AuditService(self.session).append(action=AuditAction.TASK_INTENT_RETRIED,
                 resource_type=AuditResourceType.TASK_INTENT, resource_id=new.id,
                 actor_user_id=current.user_id, scope_type=scope.scope_type, tenant_id=row.tenant_id,
