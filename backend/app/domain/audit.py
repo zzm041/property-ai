@@ -762,7 +762,13 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
         ),
         AuditAction.TASK_INTENT_RETRIED: AuditActionPolicy(
             resource_type=AuditResourceType.TASK_INTENT,
-            allowed_detail_keys=frozenset({"previous_id", "generation", "reason_code"}),
+            allowed_detail_keys=frozenset({
+                "previous_id",
+                "generation",
+                "reason_code",
+                "source_analysis_id",
+                "attachment_count",
+            }),
             required_detail_keys=frozenset({"previous_id", "generation", "reason_code"}),
             allowed_scope_types=frozenset({ScopeType.TENANT, ScopeType.PROPERTY}),
         ),

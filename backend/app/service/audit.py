@@ -278,6 +278,7 @@ class AuditService:
                 "unit_id",
                 "work_order_id",
                 "analysis_id",
+                "source_analysis_id",
                 "incident_id",
                 "announcement_id",
                 "document_id",
@@ -409,6 +410,14 @@ class AuditService:
             elif key == "work_order_count":
                 if not isinstance(value, int) or value < 0:
                     cls._raise_invalid_details("work_order_count is invalid")
+            elif key == "attachment_count":
+                if (
+                    not isinstance(value, int)
+                    or isinstance(value, bool)
+                    or value < 1
+                    or value > 20
+                ):
+                    cls._raise_invalid_details("attachment_count is invalid")
             elif key == "replaced_binding_count":
                 if not isinstance(value, int) or isinstance(value, bool) or value < 1:
                     cls._raise_invalid_details("replaced_binding_count is invalid")

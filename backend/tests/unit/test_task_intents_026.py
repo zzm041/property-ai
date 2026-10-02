@@ -348,6 +348,62 @@ def test_recovery_audit_uses_existing_validated_append_only_contract():
     repo.append.assert_called_once()
 
 
+def test_attachment_completion_audit_accepts_bounded_source_and_attachment_metadata():
+    from app.service.audit import AuditService
+    from app.domain.audit import AuditAction, AuditResourceType
+    from app.domain.iam import ScopeType
+
+    repo = MagicMock()
+    AuditService(session(), repository=repo).append(
+        action=AuditAction.TASK_INTENT_RETRIED,
+        resource_type=AuditResourceType.TASK_INTENT,
+        resource_id=90,
+        actor_user_id=4,
+        scope_type=ScopeType.PROPERTY,
+        tenant_id=7,
+        property_id=9,
+        request_id='027-attachment-completion',
+        details={
+            'previous_id': 170,
+            'generation': 4,
+            'reason_code': 'ATTACHMENT_COMPLETION',
+            'source_analysis_id': 18,
+            'attachment_count': 3,
+        },
+    )
+    saved = repo.append.call_args.args[0]
+    assert saved.details_json['source_analysis_id'] == 18
+    assert saved.details_json['attachment_count'] == 3
+
+
+@pytest.mark.parametrize('attachment_count', [0, -1, True, 21])
+def test_attachment_completion_audit_rejects_invalid_attachment_count(attachment_count):
+    from app.core.errors import AppError
+    from app.service.audit import AuditService
+    from app.domain.audit import AuditAction, AuditResourceType
+    from app.domain.iam import ScopeType
+
+    with pytest.raises(AppError) as error:
+        AuditService(session(), repository=MagicMock()).append(
+            action=AuditAction.TASK_INTENT_RETRIED,
+            resource_type=AuditResourceType.TASK_INTENT,
+            resource_id=90,
+            actor_user_id=4,
+            scope_type=ScopeType.PROPERTY,
+            tenant_id=7,
+            property_id=9,
+            request_id='027-attachment-completion-invalid',
+            details={
+                'previous_id': 170,
+                'generation': 4,
+                'reason_code': 'ATTACHMENT_COMPLETION',
+                'source_analysis_id': 18,
+                'attachment_count': attachment_count,
+            },
+        )
+    assert error.value.code == 'IAM.AUDIT_INVALID_DETAILS'
+
+
 @pytest.mark.parametrize('operation,attempt',[(DELIVER,4),(INGEST,3)])
 def test_final_commit_ack_failure_reconciles_committed_domain_in_finish(operation,attempt):
     r=row(operation=operation,status='PROCESSING',execution_attempt=attempt,
