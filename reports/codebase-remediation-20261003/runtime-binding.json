@@ -1,0 +1,36 @@
+{
+  "recorded_at": "2026-10-03T03:46:32+08:00",
+  "environment": "property-ai-delivery-check",
+  "entrypoint": "http://127.0.0.1:8093",
+  "product_commit": "a14f5db143940ab3427f7ae5d4381e9cc95906ac",
+  "image": "property-ai-delivery:a14f5db",
+  "image_id": "sha256:eb6f12cd6f20b0542b21b85ab4612014b27555c20a406159ff589d8c31c53949",
+  "base_image": "property-ai-delivery:ede660f",
+  "source_archive_sha256": "A239276E85D6483CE6141FF5E55A3834C0FE32A662664095CA1269FC418DE310",
+  "components": {
+    "api": "running_healthy",
+    "worker": "running",
+    "publisher": "running",
+    "beat": "running"
+  },
+  "healthz": "ok",
+  "readyz": "ready",
+  "source_binding": {
+    "file": "backend/app/main.py",
+    "archive_sha256": "0238297ba70dc5e3aedc0ce647937c0633a3ea434555c351fa42ef9d72ee6d91",
+    "container_sha256": "0238297ba70dc5e3aedc0ce647937c0633a3ea434555c351fa42ef9d72ee6d91"
+  },
+  "queue": {
+    "name": "property_ai.delivery_check",
+    "ready": 0,
+    "unacknowledged": 0,
+    "consumers": 1
+  },
+  "historical_dlq": {
+    "ready": 2,
+    "unacknowledged": 0,
+    "action": "untouched"
+  },
+  "model_calls": 0,
+  "business_writes": 0
+}
