@@ -74,7 +74,7 @@ def test_delivery_cli_accepts_only_the_explicit_media_cycle_drill(
     assert delivery_migrate._target()[1] == f"mysql:3306/{database}"
 
     monkeypatch.setenv("PROPERTY_AI_APPROVE_DELIVERY_TARGET", "mysql:3306/other")
-    with pytest.raises(RuntimeError, match="exact configured target"):
+    with pytest.raises(RuntimeError, match="TARGET_APPROVAL"):
         delivery_migrate._target()
 
 

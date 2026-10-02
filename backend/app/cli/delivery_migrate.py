@@ -29,16 +29,30 @@ def _target() -> tuple[str, str]:
         url.database == DRILL_DATABASE
         and os.environ.get("PROPERTY_AI_MEDIA_CYCLE_DRILL") == "approved"
     )
-    if (
-        os.environ.get("PROPERTY_AI_DELIVERY_MIGRATION") != "approved"
-        or os.environ.get("PROPERTY_AI_APPROVE_DELIVERY_TARGET") != actual
-        or settings.app_env != "staging"
-        or url.drivername != "mysql+pymysql"
-        or url.host != "mysql"
-        or url.port != 3306
-        or not allowed_database
-    ):
-        raise RuntimeError("delivery migration refused outside the exact configured target")
+    failures = [
+        name
+        for name, valid in (
+            (
+                "MASTER_APPROVAL",
+                os.environ.get("PROPERTY_AI_DELIVERY_MIGRATION") == "approved",
+            ),
+            (
+                "TARGET_APPROVAL",
+                os.environ.get("PROPERTY_AI_APPROVE_DELIVERY_TARGET") == actual,
+            ),
+            ("APP_ENV", settings.app_env == "staging"),
+            ("DRIVER", url.drivername == "mysql+pymysql"),
+            ("HOST", url.host == "mysql"),
+            ("PORT", url.port == 3306),
+            ("DATABASE_APPROVAL", allowed_database),
+        )
+        if not valid
+    ]
+    if failures:
+        raise RuntimeError(
+            "delivery migration refused outside the exact configured target: "
+            + ",".join(failures)
+        )
     return url.render_as_string(hide_password=False), actual
 
 
