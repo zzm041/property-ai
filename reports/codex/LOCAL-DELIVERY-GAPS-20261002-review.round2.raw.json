@@ -1,0 +1,29 @@
+{
+  "verdict": "PASS_SCOPED_INCREMENTAL",
+  "reviewed_head": "79db52d31a12ace1acc241eb4c265397a539b3e8",
+  "findings": [
+    {
+      "id": "LDG-EVIDENCE-R2-01",
+      "severity": "NON_BLOCKING",
+      "location": "reports/local-delivery-gaps-20261002/wechat-current-candidate-page.json:42",
+      "trigger": "Treat the bind screenshot observed text as a literal visual transcription.",
+      "impact": "The screenshot clearly shows 当前微信已绑定, but it does not visibly show a masked resident phone. The masked phone is visible in the final relogin-home screenshot instead. This wording mismatch does not invalidate the scoped bind/logout/relogin result because the redacted request sequence and final identity fields provide the same-run linkage.",
+      "evidence": "wechat-current-bind-notice.png shows the account page and 当前微信已绑定 notice; wechat-current-relogin-home.png shows masked phone 138****5195 and resident-only navigation."
+    }
+  ],
+  "checked_conditions": [
+    "LDG-EVIDENCE-01 is closed: runtime-and-gap-classification.json now records 2026-10-03T00:41:22.6141180+08:00, after commit 79db52d at 00:19:28+08:00 and image creation at 00:21:56+08:00.",
+    "LDG-EVIDENCE-02 is materially closed: the candidate evidence records wechatide 0.3.9 actual control interaction and a redacted request chain for password login, WeChat bind, logout, WeChat login, final /me and final logout, each with method/path/status/request_id.",
+    "The evidence explicitly explains why the token-bearing raw Developer Tools network buffer was not retained and records successful final-session revocation, preserving the privacy boundary.",
+    "wechat-current-bind-notice.png was visually inspected and shows the account page with 当前微信已绑定 after bind.",
+    "wechat-current-relogin-home.png was visually inspected and shows the home page, masked phone 138****5195, resident functions and no staff/manager functions.",
+    "Actual SHA-256 hashes exactly match the JSON: bind screenshot 680AE2AEB046FB5A05CE36E1AE58907EA5EB3843FCD05AC95A470095CECF9615; relogin screenshot E8256E8A0643CD8C8E1D56E9F80F22D1B149A242A7E19B6E35A3E0A529BD862E.",
+    "The result remains correctly scoped to the local Development provider and does not claim Production jscode2session or release acceptance."
+  ],
+  "unverified": [
+    "Production jscode2session, real credentials, target-domain allowlisting and formal release acceptance remain outside this round.",
+    "The token-bearing raw Developer Tools network buffer was intentionally not retained; this review relies on the redacted request facts, request IDs and screenshots recorded in the evidence artifact.",
+    "No tests, page actions, HTTP requests, database, queue or model operations were run during round 2."
+  ],
+  "next_action": "Accept the two prior blockers as closed and proceed with the scoped incremental handoff. Before saving the evidence-only increment, change line 42 to say that the bind screenshot shows the account page and 当前微信已绑定; leave the masked-phone observation attached only to the final relogin screenshot."
+}

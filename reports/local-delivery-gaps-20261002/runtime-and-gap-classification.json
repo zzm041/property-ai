@@ -1,0 +1,115 @@
+{
+  "task_id": "LOCAL-DELIVERY-GAPS-20261002",
+  "recorded_at": "2026-10-03T00:54:47.6628154+08:00",
+  "repository_head": "79db52d31a12ace1acc241eb4c265397a539b3e8",
+  "runtime": {
+    "application_source": "79db52d31a12ace1acc241eb4c265397a539b3e8",
+    "miniprogram_source": "79db52d31a12ace1acc241eb4c265397a539b3e8",
+    "application_image": "property-ai-delivery:79db52d",
+    "application_image_id": "sha256:1d90ae2753955541dd74509644258449860043f11103c7e904bd836410bcfcd6",
+    "api_origin": "http://127.0.0.1:8093",
+    "api_health": "ok",
+    "api_readiness": "ready",
+    "application_components": [
+      "api",
+      "worker",
+      "publisher",
+      "beat"
+    ]
+  },
+  "work_ai": {
+    "adapter_endpoint": "http://127.0.0.1:11437",
+    "model_endpoint": "http://127.0.0.1:11435",
+    "adapter_source": "61b762d9775845c47cf0b43f3003a3f4d1cb5519",
+    "model": "Qwen3.8 27B Q3_K_M",
+    "context_length": 8192,
+    "status": "READY_IDLE",
+    "new_inference_calls": 0
+  },
+  "rag": {
+    "adapter_endpoint": "http://127.0.0.1:11436",
+    "model_endpoint": "http://127.0.0.1:11438",
+    "adapter_source": "caa2d21594bb7b78f2dc01e6bdfacc408161ec58",
+    "model": "Qwen3.5 4B",
+    "context_length": 4096,
+    "ollama_version": "0.34.4",
+    "status": "READY_IDLE",
+    "resident_models": 0,
+    "startup_or_status_inference": false,
+    "historical_business_result": "SCOPED_LOCAL_REAL_RAG_CURRENT_CANDIDATE_PASS",
+    "historical_business_evidence": "reports/real-ai-integration-027/delivery-rag-8093/delivery-rag-current-20261002-result.json",
+    "boundary": "Current online identity and readiness were checked separately from the preserved page/query PASS; no query was repeated merely to prove service startup."
+  },
+  "wechat_auth": {
+    "runtime_environment": "staging",
+    "dev_auth_enabled": false,
+    "wechat_login_enabled": true,
+    "wechat_provider": "development",
+    "appid_configured": true,
+    "current_negative_probe": {
+      "status": 401,
+      "error_code": "AUTH.WECHAT_BIND_REQUIRED",
+      "request_id": "5a6a2c4aaab84962adb301a9d48578a9"
+    },
+    "existing_scoped_page_evidence": "reports/wechat-rebind-001/page-evidence.json",
+    "current_candidate_page_evidence": "reports/local-delivery-gaps-20261002/wechat-current-candidate-page.json",
+    "classification": "PASS_SCOPED_LOCAL_DEVELOPMENT_WECHAT_PAGE. The current candidate bound a synthetic resident through the mini-program page, logged out, and returned to the same user and organization scope through a second wx.login. Production jscode2session remains unverified."
+  },
+  "independent_review": {
+    "path": "reports/codex/LOCAL-DELIVERY-GAPS-20261002-review.round2.raw.json",
+    "verdict": "PASS_SCOPED_INCREMENTAL",
+    "round1_findings_closed": [
+      "LDG-EVIDENCE-01",
+      "LDG-EVIDENCE-02"
+    ],
+    "boundary": "The reviewer did not rerun tests, page actions, HTTP requests, database, queue or model operations."
+  },
+  "closed_or_reclassified": [
+    {
+      "requirement": "cross_module_authorization",
+      "classification": "PASS_SCOPED_LOCAL_CROSS_MODULE_RUNTIME_AND_FOCUSED_TESTS",
+      "evidence": "reports/local-delivery-gaps-20261002/cross-module-idor-runtime.json"
+    },
+    {
+      "requirement": "incident_disposition",
+      "classification": "IMPLEMENTED_WITH_COMPLETE_TRANSITION_TEST_AND_PRIOR_RUNTIME_EVIDENCE",
+      "boundary": "A fresh page traversal of every transition was not manufactured because the current environment has no suitable Incident object."
+    },
+    {
+      "requirement": "current_operations_statistics",
+      "classification": "V1_SCOPED_CURRENT_SNAPSHOT_IMPLEMENTED",
+      "boundary": "SLA report export is explicitly listed in docs/BACKLOG.md as V1.1. Historical KPI periods and stored report semantics are not frozen V1 requirements and were not invented."
+    },
+    {
+      "requirement": "supplement_and_receipt_media_preview",
+      "classification": "IMPLEMENTED_AND_COMPILED_PENDING_NATIVE_DEVICE_SUBMISSION",
+      "source": "37cdd336f1529f49a96abe0124c825c62034b2ff"
+    }
+  ],
+  "remaining_local_gaps": [
+    {
+      "requirement": "native_supplement_and_receipt_media_submission",
+      "kind": "verification",
+      "blocker": "The phone IPv4 address is required to create the already-authorized exact-device temporary loopback gateway."
+    },
+    {
+      "requirement": "receipt_media_cycle_association",
+      "kind": "schema",
+      "blocker": "work_order_media has no process_id or receipt_id, so BEFORE/AFTER files cannot be authoritatively assigned to a specific reopened processing cycle. A migration is required; timestamp or audit-JSON inference is not accepted."
+    }
+  ],
+  "model_budget_used_in_this_checkpoint": {
+    "qwen": 0,
+    "asr": 0,
+    "embedding": 0,
+    "reranker": 0,
+    "seconds": 0
+  },
+  "protected_state": {
+    "historical_work_orders_modified": false,
+    "dlq_touched": false,
+    "migration_executed": false,
+    "project_config_modified": false,
+    "private_credentials_recorded": false
+  }
+}

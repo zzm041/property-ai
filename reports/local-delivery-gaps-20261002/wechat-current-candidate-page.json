@@ -1,0 +1,93 @@
+{
+  "task_id": "LOCAL-DELIVERY-GAPS-20261002",
+  "recorded_at": "2026-10-03T00:51:43.8108736+08:00",
+  "result": "PASS_SCOPED_LOCAL_DEVELOPMENT_WECHAT_PAGE",
+  "source_commit": "79db52d31a12ace1acc241eb4c265397a539b3e8",
+  "application_image": "property-ai-delivery:79db52d",
+  "application_image_id": "sha256:1d90ae2753955541dd74509644258449860043f11103c7e904bd836410bcfcd6",
+  "environment": "8093/property_ai_delivery_check@0014",
+  "provider": "development",
+  "dev_auth_enabled": false,
+  "initial_failure_retained": {
+    "account_user_id": 6,
+    "bind_page_notice": "当前微信已绑定",
+    "subsequent_login_page_error": "WeChat identity must be bound to a verified account",
+    "root_cause": "The Development provider derived openid directly from each ephemeral wx.login code, so the same simulator received a different local identity on its next login."
+  },
+  "fix": {
+    "protocol": "wx-dev-device-v1",
+    "scope": "Only develop mini-program builds talking to the Development WeChat provider use a locally persisted random synthetic device identifier. Production builds still submit the original ephemeral code to jscode2session.",
+    "sensitive_values_recorded": false
+  },
+  "page_verification": {
+    "driver": "wechatide 0.3.9 supported automation against actual page controls",
+    "password_login_user_id": 11,
+    "password_login": {
+      "method": "POST",
+      "path": "/api/v1/auth/password/login",
+      "status": 200,
+      "request_id": "c048914552a544ce903a954162bc789a"
+    },
+    "bind_notice": "当前微信已绑定",
+    "bind_request": {
+      "method": "POST",
+      "path": "/api/v1/auth/wechat/bind",
+      "status": 200,
+      "request_id": "1b4d3b87a77746e88b9dcfdc47db9fdc"
+    },
+    "bind_screenshot": {
+      "path": "reports/local-delivery-gaps-20261002/wechat-current-bind-notice.png",
+      "sha256": "680AE2AEB046FB5A05CE36E1AE58907EA5EB3843FCD05AC95A470095CECF9615",
+      "inspected": true,
+      "observed": "Account page shows 当前微信已绑定 after the actual bind button was tapped."
+    },
+    "logout_completed": true,
+    "logout_request": {
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "status": 200,
+      "request_id": "936eb4e368df49a59a4c290bb695ee16"
+    },
+    "wechat_login_completed": true,
+    "wechat_login_request": {
+      "method": "POST",
+      "path": "/api/v1/auth/wechat/login",
+      "status": 200,
+      "request_id": "b7a1d63689e240648c96d65298bacd20"
+    },
+    "final_me_request": {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id": "e9cb9a7f277848cf87c09663cc2d924b"
+    },
+    "final_page": "pages/home/home",
+    "final_user_id": 11,
+    "final_roles": ["RESIDENT"],
+    "final_tenant_id": 6,
+    "final_property_id": 6,
+    "password_or_sms_used_for_wechat_relogin": false,
+    "final_screenshot": {
+      "path": "reports/local-delivery-gaps-20261002/wechat-current-relogin-home.png",
+      "sha256": "E8256E8A0643CD8C8E1D56E9F80F22D1B149A242A7E19B6E35A3E0A529BD862E",
+      "inspected": true,
+      "observed": "Home page shows the same masked resident identity and resident-only navigation after the actual WeChat login button was tapped."
+    },
+    "final_session_revoked_after_evidence": {
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "status": 200,
+      "request_id": "968a930d27d949b5bb055d1db66d8e27"
+    },
+    "raw_network_buffer_saved": false,
+    "raw_network_buffer_reason": "The supported Developer Tools buffer contains authorization headers and token bodies. Only redacted method/path/status/request_id facts from the API structured log were retained."
+  },
+  "tests": {
+    "command_scope": [
+      "backend/tests/unit/test_day2_providers.py",
+      "backend/tests/unit/test_wechat_rebind.py"
+    ],
+    "result": "29 passed, 1 warning"
+  },
+  "boundary": "This proves the current local Development provider and mini-program page flow only. Production jscode2session, real credentials, target-domain allowlisting and formal release acceptance remain unverified."
+}

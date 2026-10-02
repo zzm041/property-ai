@@ -65,11 +65,15 @@ LIVE TLS = BLOCKED_BY_DOMAIN_CERT
 
 ### 当前本地接收版本（2026-10-02）
 
-- 产品/运行源码：`3d7c6df7e5549d2790a095e785f70c0754fb3330`；WO19 三附件限定验收与证据提交：`9f2f16dc7cf19a0f3f155fff27446910c7a4cea5`。
-- API、Worker、publisher 与 Beat：同一镜像 `property-ai-delivery:3d7c6df`（`sha256:a2a9f4f96624c918d7b2be50e8d8f56d539d27e9e91a410c3d0063f644e5d8f1`），本地入口 `http://127.0.0.1:8093`。2026-10-02 接收核对时四个组件均运行，API healthy，`healthz`/`readyz` 正常。
+- 后端与小程序本地候选：`79db52d31a12ace1acc241eb4c265397a539b3e8`，均来自已提交源码。应用镜像是在保留的 `property-ai-delivery:ede660f` 依赖层上用该提交的 Git 归档离线覆盖构建，没有同步或改变依赖。
+- API、Worker、publisher 与 Beat：同一镜像 `property-ai-delivery:79db52d`（`sha256:1d90ae2753955541dd74509644258449860043f11103c7e904bd836410bcfcd6`），本地入口 `http://127.0.0.1:8093`。2026-10-03 接收核对时四个组件均运行，API healthy，`healthz`/`readyz` 正常。
 - 工单 AI：`11437 -> 11435`，Qwen3.8 27B Q3_K_M，context 8192；当前适配器源码 `61b762d9775845c47cf0b43f3003a3f4d1cb5519`，范围 `work_order_only`，状态核对为 READY/idle。
-- 知识 AI：`11436 -> 11438`，Qwen3.5 4B，context 4096，配合 bge-m3、bge-reranker-v2-m3 与 `knowledge_chunks_delivery_real_1024`。真实 RAG 的版本绑定验收保留；接收核对时 11438 的旧收据指向已退出进程，因此实际使用前必须按下方顺序重新启动并以两个 status 命令为准。本次遵守“不重启”边界，没有为文档整理启动或推理。
+- 知识 AI：`11436 -> 11438`，Qwen3.5 4B，context 4096，配合 bge-m3、bge-reranker-v2-m3 与 `knowledge_chunks_delivery_real_1024`。旧退出收据已通过不可变精确绑定解决；当前 11438 为 Ollama `0.34.4`、no-cloud、单模型单并发且无驻留模型，11436 为 READY/idle。启动和状态核对未执行推理；历史真实 RAG PASS 仍按原版本保存，不能把“当前在线”写成一次新的问答验收。
 - WO19 已完成一张图片和两段录音的理解与合并分析，但因当前小区没有具备 CLEANING 职责的合法在岗人员而处于 `WAITING_ELIGIBLE`；这是合法等待，不得人工改职责或派单来制造 CLOSED。
+
+当前 V1 本地边界按正式规格而不是旧矩阵文字判断：管理员的 Property/Tenant 当前运营快照已经实现；`docs/BACKLOG.md` 明确把 SLA 报表导出放在 V1.1，不能为了“收口”临时发明历史区间、分母、文件格式或存储语义。补充资料与回执的选图缩略图/提交前预览已进入小程序候选，当前仍需一次受限真机提交验收。现有 `work_order_media` 只保存工单与 `taken_phase`，没有 `process_id`/`receipt_id`；因此重开多周期中的 BEFORE/AFTER 文件不能被权威归入某一处理周期，关闭该缺口需要另行批准最小迁移，禁止靠时间戳或审计 JSON 猜测关联。
+
+本地 Development 微信路径在当前候选上已经完成页面闭环：住户通过普通密码会话绑定当前开发设备，退出后再次执行小程序 `wx.login` 回到同一用户、租户和小区。该实现只在 `develop` 版本使用稳定的合成设备标识；体验版/正式版继续向 Production Provider 发送原始临时登录码。真实 `jscode2session`、正式凭据和目标域名仍是上线前条件，不能由 Development 结果替代。
 
 正常本地成品入口始终是本节的 `delivery.ps1` 与 8093 环境；它不依赖 Codex 常驻、逐单测试 ID 或 3317 验收数据。`scripts/ops/serve_auth001_retry.py` 仅用于已批准的 3317 隔离验收：测试 Proof、注入时钟和精确工单 ID Beat 均受目标守卫约束，且该入口把 API/Worker/Beat/投递器的所有消息统一路由到 `property_ai.auth001.persist.v2.sla.acceptance`，不得连接或消费导入快照携带的原队列。该验收入口不是部署或生产启动方式。
 
@@ -102,7 +106,7 @@ Copy-Item deploy/.env.delivery.bootstrap.example deploy/.env.delivery.bootstrap
 
 本机私密账号不进入 Git：初始化 SYSTEM_ADMIN 只存于忽略的 `deploy/.env.delivery.bootstrap`；当前隔离演示账号由授权 fixture 生成后存于忽略的 `tmp/delivery-auto-8093/fixture-context.json`，只能在本机合成环境使用，不得复制到报告、日志或部署镜像。部署到企业主机时应改由部署方 secret manager 保存，不得依赖这个 `tmp` 文件。正常操作从小程序密码/短信登录开始：管理员在首页进入“账号合并 / 高风险恢复”“身份恢复审核”或“SLA 策略管理”，住户从“提交报修”选择已授权房屋并确认本次联系电话；测试 Proof 只允许 3317 隔离入口，8093 正常配置不得开启该开关。
 
-小程序唯一源码入口是 `D:\property-ai\miniprogram`。在微信开发者工具中使用本机 `project.config.json` 的 AppID 打开该目录；私有 `config/env.local.js` 的 Development 地址应为 `http://127.0.0.1:8093/api/v1`。该地址只适用于本机模拟器：手机不能把自己的 `127.0.0.1` 当作电脑。既有真机媒体验收使用的是一次性、仅同网本人可访问且已经撤销的临时入口；再次做真机操作必须重新建立受控入口，不能开放公网、数据库、队列或模型管理端口。原生选图、录音、上传、预览和三附件理解的既有验收无需重复。
+小程序唯一源码入口是 `D:\property-ai\miniprogram`。在微信开发者工具中使用本机 `project.config.json` 的 AppID 打开该目录；私有 `config/env.local.js` 的 Development 地址应为 `http://127.0.0.1:8093/api/v1`。该地址只适用于本机模拟器：手机不能把自己的 `127.0.0.1` 当作电脑。真机验收只能临时改为绑定本机 WLAN 地址、限制到负责人手机的受控入口，结束后恢复 loopback 并撤销入口；禁止开放公网、数据库、队列或模型管理端口。既有原生报修选图、录音、上传及三附件理解无需重复；补充资料和回执选图的提交前预览由小程序候选 `37cdd33` 提供，是否完成真机提交以当前交接证据为准。
 
 正常新工单由业务提交同事务保存任务意图，再由 publisher/Worker 处理，不要求 Codex 常驻，也不要求逐单加入测试 ID 白名单。受保护历史失败、特定恢复 generation 和模型诊断使用追加式账本与显式授权；这些记录是安全/证据边界，不能清空，也不能当作正常业务吞吐配额。正常运行仍受 Provider 请求预算、单模型单并发、共享资源锁、超时、RAM/VRAM floor、幂等和持久任务恢复约束；测试账本用尽不等于可以绕过运行配额，运行配额也不能改写历史测试结论。
 

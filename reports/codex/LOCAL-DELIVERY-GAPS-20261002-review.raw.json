@@ -1,0 +1,42 @@
+{
+  "verdict": "NEEDS_CHANGES",
+  "reviewed_head": "79db52d31a12ace1acc241eb4c265397a539b3e8",
+  "findings": [
+    {
+      "id": "LDG-EVIDENCE-01",
+      "severity": "CURRENT_TASK_BLOCKER",
+      "location": "reports/local-delivery-gaps-20261002/runtime-and-gap-classification.json:3",
+      "trigger": "Use this file as time-bound proof that repository/application/miniprogram source and runtime image were already 79db52d.",
+      "impact": "The chronology is impossible as written, so the file cannot independently bind the claimed checkpoint: recorded_at is 2026-10-02T23:57:40+08:00, while commit 79db52d was created at 2026-10-03T00:19:28+08:00 and Docker reports the image created at 2026-10-03T00:21:56+08:00.",
+      "evidence": "Lines 4-9 name 79db52d and image 1d90ae... despite line 3 predating both. Current read-only Docker inspection confirms all four delivery components now run that image, but does not repair the stale provenance timestamp."
+    },
+    {
+      "id": "LDG-EVIDENCE-02",
+      "severity": "CURRENT_TASK_BLOCKER",
+      "location": "reports/local-delivery-gaps-20261002/wechat-current-candidate-page.json:22",
+      "trigger": "Promote AUTH-WECHAT to PASS_SCOPED_LOCAL_DEVELOPMENT_WECHAT_PAGE in the matrix and handoff.",
+      "impact": "The new stable-device relogin PASS is represented only by a summary object. It has no screenshot path/hash, raw Developer Tools action/request trace, or captured page-state artifact tying bind, logout, second wx.login and final identity to the same run. Older rebind evidence does not prove the new 79db52d behavior.",
+      "evidence": "Lines 22-32 assert booleans and IDs and line 41 says the file proves the page flow, but the directory contains no referenced current WeChat screenshot or raw page/request artifact."
+    }
+  ],
+  "checked_conditions": [
+    "79db52d has parent 37cdd336f1529f49a96abe0124c825c62034b2ff and changes exactly six files.",
+    "Stable synthetic identity is gated client-side by ENV_VERSION === develop and interpreted only by DevelopmentWeChatAuthProvider; trial/release returns the original wx.login code, while ProductionWeChatAuthProvider still forwards it unchanged to jscode2session.",
+    "Development payload validation requires an ASCII device identifier of 16-96 characters and a nonempty ephemeral code; the request schema caps code at 128 characters. Only a SHA-256-derived synthetic openid is persisted, not the raw device identifier or session_key.",
+    "No new ID-based authorization path was introduced. Existing login, bind and rebind retain binding ownership, authenticated-user, phone verification, collision, locking and session-revocation controls.",
+    "API, Worker, publisher and Beat currently run property-ai-delivery:79db52d with image sha256:1d90ae2753955541dd74509644258449860043f11103c7e904bd836410bcfcd6; API is healthy.",
+    "RAG wording correctly separates current online/status inspection from the preserved historical page/query PASS. The historical result remains bound to source 14b8dc5 and is not presented as a new inference run.",
+    "Incident disposition and statistics classifications match the inspected specifications: current operations statistics are V1, while SLA report export is V1.1; prior Incident runtime is not relabelled as a fresh full traversal.",
+    "Supplement/receipt documentation correctly distinguishes implementation/compile coverage from pending native-device submission and correctly identifies the missing process_id/receipt_id media association.",
+    "backend/app/model/ai.py and miniprogram/project.config.json have identical committed blobs in 37cdd33 and 79db52d and are absent from the commit diff. The current project.config.json remains separate dirty local state; backend/app/model/ai.py has a dirty stat marker but content equals HEAD. No other WIP entered 79db52d."
+  ],
+  "unverified": [
+    "Production jscode2session with real credentials, target-domain allowlisting and formal release acceptance.",
+    "Current-device native supplement and BEFORE/AFTER receipt submission.",
+    "A separately approved migration for process_id/receipt_id media association.",
+    "Focused test totals were not rerun during this read-only review.",
+    "11436/11438 readiness was not re-probed because model requests were prohibited; only receipts and bound process identities were inspected.",
+    "The claimed exact Git-archive overlay build procedure was not independently reconstructed; image tag, image ID and running component binding were verified."
+  ],
+  "next_action": "Do not change product code for these findings. Reissue runtime-and-gap-classification.json with a truthful post-commit/post-image recorded_at, or split prebuild and postbuild observations. Then add redacted current-run Developer Tools request/page-state evidence plus an inspected screenshot hash/path for the 79db52d bind-logout-WeChat-relogin flow; otherwise downgrade AUTH-WECHAT from page PASS to implementation/focused-test coverage. Re-run this same read-only evidence review afterward."
+}
