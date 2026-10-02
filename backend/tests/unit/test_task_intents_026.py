@@ -243,6 +243,81 @@ def test_retry_preserves_failure_and_creates_only_one_generation_with_audit(monk
     assert not any('token' in key or 'phone' in key for key in result)
 
 
+def test_succeeded_analysis_can_create_only_one_audited_attachment_completion(monkeypatch):
+    from app.domain.iam import OrganizationScope, ScopeType
+    from app.repository.ai import AiRepository
+    from app.repository.work_order import WorkOrderRepository
+    from app.service.audit import AuditService
+
+    source = row(status='SUCCEEDED', generation=3, resource_version=4)
+    s = service(source)
+    s._authorize_manager = lambda *a: (
+        NS(user_id=4),
+        OrganizationScope(ScopeType.PROPERTY, tenant_id=7, property_id=9),
+    )
+    work = NS(
+        id=22,
+        tenant_id=7,
+        property_id=9,
+        status='PENDING_ASSIGNMENT',
+        process_reason=None,
+        current_assignment_id=None,
+        version=5,
+    )
+    analysis = NS(id=61, status='COMPLETED')
+    monkeypatch.setattr(WorkOrderRepository, 'get_work_order_for_update', lambda *a: work)
+    monkeypatch.setattr(WorkOrderRepository, 'get_active_assignment', lambda *a: None)
+    monkeypatch.setattr(WorkOrderRepository, 'attachment_completion_result', lambda *a: None)
+    add_log = MagicMock()
+    monkeypatch.setattr(WorkOrderRepository, 'add_log', add_log)
+    monkeypatch.setattr(AiRepository, 'get_current_analysis_for_update', lambda *a: analysis)
+    monkeypatch.setattr(AiRepository, 'list_recommendations', lambda *a: ())
+    monkeypatch.setattr(
+        AiRepository,
+        'list_media_with_files',
+        lambda *a: (
+            (NS(taken_phase='REPORT', kind='IMAGE'), NS()),
+            (NS(taken_phase='REPORT', kind='AUDIO'), NS()),
+        ),
+    )
+    audit = MagicMock()
+    monkeypatch.setattr(AuditService, 'append', audit)
+    created = []
+    def add(new):
+        new.id = 90
+        created.append(new)
+        return new
+    s.repo.add = add
+    s.session.scalar.side_effect = [None, None]
+    result = s.complete_analysis_managed(
+        source.id,
+        actor=NS(user_id=4),
+        reason_code='ATTACHMENT_COMPLETION',
+        request_id='027-complete',
+    )
+    assert result['generation'] == 4
+    assert result['resource_version'] == 5
+    assert result['status'] == 'PENDING'
+    assert len(created) == 1
+    log = add_log.call_args.args[0]
+    assert log.event_code == 'AI_ATTACHMENT_COMPLETION_REQUESTED'
+    assert log.payload_json['source_analysis_id'] == 61
+    assert log.payload_json['attachment_count'] == 2
+    audit.assert_called_once()
+
+    s.session.scalar.side_effect = [created[0]]
+    again = s.complete_analysis_managed(
+        source.id,
+        actor=NS(user_id=4),
+        reason_code='ATTACHMENT_COMPLETION',
+        request_id='027-complete-again',
+    )
+    assert again == result
+    assert len(created) == 1
+    assert add_log.call_count == 1
+    assert audit.call_count == 1
+
+
 def test_recovery_rejects_new_business_version_and_nonfailed_state(monkeypatch):
     from app.repository.work_order import WorkOrderRepository
     from app.core.errors import AppError

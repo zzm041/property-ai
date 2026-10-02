@@ -11,13 +11,14 @@ import pytest
 from app.core.config import Settings
 from app.domain.ai import AiCallStatus, ProviderType, WORK_ORDER_ANALYSIS_PROMPT_VERSION
 from app.model.work_order import WorkOrder
-from app.provider.asr import HttpASRProvider
+from app.provider.asr import HttpASRProvider, Transcript
 from app.provider.errors import ProviderInvalidOutputError, ProviderTimeoutError
 from app.provider.llm import DevelopmentLLMProvider, QwenLLMProvider, SUCCESS_ANALYSIS
 from app.provider.usage import StructuredCompletion, response_token_usage
 from app.provider.vision import VisionInsight, QwenVLMProvider
 from app.repository.ai import AiRepository
 from app.service.analysis import AnalysisService, AnalysisSnapshot, MediaRef
+from app.service.analysis_attempt import media_checkpoint_payload, read_media_checkpoint
 
 NOW = datetime(2026, 9, 23, tzinfo=UTC)
 
@@ -58,9 +59,17 @@ def test_adapter_preserves_usage_without_polluting_structured_output(kind):
 
 
 def snapshot(**kw):
+    images = kw.pop(
+        'images',
+        tuple(
+            MediaRef(f'key-{i}', 'image/png', 'IMAGE', i + 1, i + 11, f'{i + 1:064x}')
+            for i in range(3)
+        ),
+    )
+    audio = kw.pop('audio', ())
     return AnalysisSnapshot(work_order_id=30, tenant_id=2, property_id=3, house_id=4, building_id=5,
         analysis_id=6, analysis_version=1, work_order_version=1, input_hash='a'*64, text='lamp',
-        existing_asr_text=None, images=tuple(MediaRef(f'key-{i}', 'image/png', 'IMAGE') for i in range(3)), audio=(), **kw)
+        existing_asr_text=None, images=images, audio=audio, **kw)
 
 
 def service():
@@ -99,34 +108,98 @@ def test_all_images_fail_text_still_reaches_existing_llm_fallback():
     assert s._vlm.inspect_image.call_count == 3
 
 
-def test_durable_retry_reuses_exact_vlm_checkpoint_without_another_image_call():
+def test_durable_retry_reuses_each_exact_vlm_checkpoint_without_another_image_call():
     s = service()
     s._task_context = {'task_id':'task-1', 'attempt':2}
-    s._load_provider_checkpoint = MagicMock(return_value='saved visual evidence')
-    s._save_provider_checkpoint = MagicMock()
-    s._run_vlm = MagicMock()
-    s._llm = DevelopmentLLMProvider()
-    bundle = s._call_providers(snapshot=snapshot(), request_id='retry', attempt=2)
-    assert bundle.vision_text == 'saved visual evidence'
-    s._run_vlm.assert_not_called()
-    s._save_provider_checkpoint.assert_not_called()
+    s._load_media_checkpoint = MagicMock(side_effect=['first', 'second', 'third'])
+    s._save_media_checkpoint = MagicMock()
+    s._vlm = MagicMock(model_version='unit-vlm')
+    text, error = s._run_vlm(snapshot(), 'retry', 2)
+    assert error is None
+    assert [item['description'] for item in json.loads(text)] == ['first', 'second', 'third']
+    s._vlm.inspect_image.assert_not_called()
+    s._save_media_checkpoint.assert_not_called()
 
 
-def test_successful_vlm_is_checkpointed_but_partial_failure_is_not():
+def test_attachment_completion_stops_before_llm_when_any_media_is_incomplete():
     s = service()
-    s._task_context = {'task_id':'task-1', 'attempt':1}
-    s._load_provider_checkpoint = MagicMock(return_value=None)
-    s._save_provider_checkpoint = MagicMock()
-    s._run_vlm = MagicMock(return_value=('all images', None))
-    s._llm = DevelopmentLLMProvider()
-    s._call_providers(snapshot=snapshot(), request_id='first', attempt=1)
-    s._save_provider_checkpoint.assert_called_once_with(
-        snapshot(), 'VLM', 'all images', 'first')
+    s._run_vlm = MagicMock(return_value=('partial images', 'AI.TIMEOUT'))
+    s._run_llm = MagicMock()
+    bundle = s._call_providers(
+        snapshot=snapshot(attachment_completion=True),
+        request_id='partial',
+        attempt=1,
+    )
+    assert bundle.llm_payload is None
+    assert bundle.error_code == 'AI.TIMEOUT'
+    s._run_llm.assert_not_called()
 
-    s._save_provider_checkpoint.reset_mock()
-    s._run_vlm.return_value = ('partial images', 'AI.TIMEOUT')
-    s._call_providers(snapshot=snapshot(), request_id='partial', attempt=1)
-    s._save_provider_checkpoint.assert_not_called()
+
+def test_all_audio_is_processed_in_order_and_exact_checkpoint_is_reused():
+    s = service()
+    s._task_context = {'task_id':'task-1', 'attempt':2}
+    audio = (
+        MediaRef('audio-1', 'audio/mpeg', 'AUDIO', 10, 20, 'a' * 64),
+        MediaRef('audio-2', 'audio/mpeg', 'AUDIO', 11, 21, 'b' * 64),
+    )
+    current = snapshot(images=(), audio=audio)
+    s._asr = MagicMock(model_version='unit-asr')
+    s._asr.transcribe.return_value = Transcript('second transcript', .9, 'unit-asr', 5)
+    s._load_media_checkpoint = MagicMock(side_effect=['first transcript', None])
+    s._load_legacy_first_audio_checkpoint = MagicMock(return_value=None)
+    s._save_media_checkpoint = MagicMock()
+    text, error = s._run_all_asr(current, 'req', 2)
+    assert error is None
+    values = json.loads(text)
+    assert [item['text'] for item in values] == ['first transcript', 'second transcript']
+    assert [item['source'] for item in values] == ['checkpoint', 'provider']
+    s._asr.transcribe.assert_called_once_with(storage_key='audio-2', mime_type='audio/mpeg')
+    s._save_media_checkpoint.assert_called_once_with(
+        current,
+        'ASR',
+        audio[1],
+        'second transcript',
+        'req',
+    )
+
+
+def test_media_checkpoint_is_bound_to_file_content_model_and_protocol():
+    current = snapshot(
+        images=(),
+        audio=(MediaRef('audio-1', 'audio/mpeg', 'AUDIO', 10, 20, 'a' * 64),),
+    )
+    context = {'task_id': 'task-1', 'attempt': 2}
+    payload = media_checkpoint_payload(
+        current,
+        context,
+        'ASR',
+        'unit-asr',
+        'wo-media-checkpoint-v2',
+        current.audio[0],
+        'exact transcript',
+    )
+    assert read_media_checkpoint(
+        payload,
+        'ASR',
+        'unit-asr',
+        'wo-media-checkpoint-v2',
+        current.audio[0],
+    ) == 'exact transcript'
+    changed = MediaRef('audio-1', 'audio/mpeg', 'AUDIO', 10, 20, 'b' * 64)
+    assert read_media_checkpoint(
+        payload,
+        'ASR',
+        'unit-asr',
+        'wo-media-checkpoint-v2',
+        changed,
+    ) is None
+    assert read_media_checkpoint(
+        payload,
+        'ASR',
+        'other-model',
+        'wo-media-checkpoint-v2',
+        current.audio[0],
+    ) is None
 
 
 @pytest.mark.parametrize('body', [

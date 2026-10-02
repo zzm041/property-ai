@@ -89,8 +89,10 @@ from app.service.audit import AuditService
 from app.service.analysis_attempt import (
     accepts_attempt,
     claim_attempt,
+    media_checkpoint_payload,
     owns_attempt,
     provider_checkpoint_payload,
+    read_media_checkpoint,
     read_provider_checkpoint,
 )
 from app.service.task_intent import IntentLeaseLost, require_execution_lease
@@ -98,6 +100,8 @@ from app.service.auth import AuthService
 from app.service.rbac import RbacService
 
 logger = get_logger(__name__)
+
+MEDIA_CHECKPOINT_PROTOCOL_VERSION = "wo-media-checkpoint-v2"
 
 # Keep recommendation eligibility aligned with docs/05: STAFF or a higher
 # scoped property-management role, in addition to all live employee filters.
@@ -109,6 +113,9 @@ class MediaRef:
     storage_key: str
     mime_type: str
     kind: str
+    media_id: int | None = None
+    file_id: int | None = None
+    content_hash: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -127,6 +134,11 @@ class AnalysisSnapshot:
     images: tuple[MediaRef, ...]
     audio: tuple[MediaRef, ...]
     context: Mapping[str, object] = field(default_factory=dict)
+    attachment_completion: bool = False
+    source_analysis_id: int | None = None
+    source_analysis_version: int | None = None
+    source_input_hash: str | None = None
+    original_input_hash: str | None = None
     skipped: bool = False
     skip_reason: str | None = None
 
@@ -259,7 +271,10 @@ class AnalysisService:
                 return "STALE_ATTEMPT"
             if context:
                 claim = context["claim"]
-                expected = claim["work_order_version"] + (claim["from_status"] == "PENDING_ANALYSIS")
+                expected = claim["work_order_version"] + (
+                    claim["from_status"] == "PENDING_ANALYSIS"
+                    or claim.get("attachment_completion") is True
+                )
                 if record.version != expected:
                     return "STALE_VERSION"
             mapped = self._mapped_from_stored_analysis(current)
@@ -377,13 +392,27 @@ class AnalysisService:
                 content = self._work_orders.get_content(record.id)
                 media_files = self._ai.list_media_with_files(record.id)
                 images = tuple(
-                    MediaRef(file_object.storage_key, file_object.mime_type, media.kind)
+                    MediaRef(
+                        file_object.storage_key,
+                        file_object.mime_type,
+                        media.kind,
+                        media.id,
+                        file_object.id,
+                        file_object.content_hash,
+                    )
                     for media, file_object in media_files
                     if media.kind == MediaKind.IMAGE.value
                     and media.taken_phase == "REPORT"
                 )
                 audio = tuple(
-                    MediaRef(file_object.storage_key, file_object.mime_type, media.kind)
+                    MediaRef(
+                        file_object.storage_key,
+                        file_object.mime_type,
+                        media.kind,
+                        media.id,
+                        file_object.id,
+                        file_object.content_hash,
+                    )
                     for media, file_object in media_files
                     if media.kind == MediaKind.AUDIO.value
                     and media.taken_phase == "REPORT"
@@ -414,6 +443,9 @@ class AnalysisService:
                 ).hexdigest()
                 current = self._ai.get_current_analysis_for_update(record.id)
                 prior_claim = context_token.get("claim") if context_token else None
+                attachment_completion = bool(
+                    context_token and context_token.get("attachment_completion")
+                )
                 if prior_claim and current is not None and (
                     current.id != prior_claim["analysis_id"]
                     or current.input_hash != prior_claim["input_hash"]
@@ -433,6 +465,97 @@ class AnalysisService:
                     "work_order_id": record.id, "text": text, "asr": "",
                     "media": media_identity, "context": context,
                 }, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+                if attachment_completion:
+                    # A retry of the same durable completion owns the newer
+                    # analysis row, while the accepted source analysis remains
+                    # immutable one version behind it. Resume that row and let
+                    # exact per-file checkpoints skip successful providers.
+                    if prior_claim:
+                        source_analysis_id = prior_claim.get("source_analysis_id")
+                        source_analysis = (
+                            self._ai.get_analysis(source_analysis_id)
+                            if isinstance(source_analysis_id, int)
+                            else None
+                        )
+                        if (
+                            current is not None
+                            and current.status == AnalysisStatus.FAILED.value
+                            and source_analysis is not None
+                            and source_analysis.status in {
+                                AnalysisStatus.COMPLETED.value,
+                                AnalysisStatus.LOW_CONFIDENCE.value,
+                            }
+                            and source_analysis.work_order_id == record.id
+                            and source_analysis.analysis_version + 1 == current.analysis_version
+                        ):
+                            current.status = AnalysisStatus.PROCESSING.value
+                            current.error_code = None
+                            return claim_attempt(self._work_orders, record, AnalysisSnapshot(
+                                work_order_id=record.id,
+                                tenant_id=record.tenant_id,
+                                property_id=record.property_id,
+                                house_id=record.house_id,
+                                building_id=self._ai.get_building_id(record.house_id),
+                                analysis_id=current.id,
+                                analysis_version=current.analysis_version,
+                                work_order_version=record.version,
+                                input_hash=current.input_hash,
+                                text=text,
+                                existing_asr_text=existing_asr,
+                                images=images,
+                                audio=audio,
+                                context=context,
+                                attachment_completion=True,
+                                source_analysis_id=source_analysis.id,
+                                source_analysis_version=source_analysis.analysis_version,
+                                source_input_hash=source_analysis.input_hash,
+                                original_input_hash=source_analysis.input_hash,
+                            ), context_token, request_id)
+                    if (
+                        current is None
+                        or current.status not in {
+                            AnalysisStatus.COMPLETED.value,
+                            AnalysisStatus.LOW_CONFIDENCE.value,
+                        }
+                        or record.status != WorkOrderStatus.PENDING_ASSIGNMENT.value
+                        or record.current_assignment_id is not None
+                        or self._work_orders.get_active_assignment(record.id) is not None
+                        or current.input_hash not in {input_hash, original_input_hash}
+                    ):
+                        return None
+                    source_analysis = current
+                    analysis = self._ai.add_analysis(
+                        WorkOrderAnalysis(
+                            tenant_id=record.tenant_id,
+                            property_id=record.property_id,
+                            work_order_id=record.id,
+                            analysis_version=current.analysis_version + 1,
+                            status=AnalysisStatus.PROCESSING.value,
+                            input_hash=input_hash,
+                            prompt_version=WORK_ORDER_ANALYSIS_PROMPT_VERSION,
+                        )
+                    )
+                    return claim_attempt(self._work_orders, record, AnalysisSnapshot(
+                        work_order_id=record.id,
+                        tenant_id=record.tenant_id,
+                        property_id=record.property_id,
+                        house_id=record.house_id,
+                        building_id=self._ai.get_building_id(record.house_id),
+                        analysis_id=analysis.id,
+                        analysis_version=analysis.analysis_version,
+                        work_order_version=record.version,
+                        input_hash=input_hash,
+                        text=text,
+                        existing_asr_text=existing_asr,
+                        images=images,
+                        audio=audio,
+                        context=context,
+                        attachment_completion=True,
+                        source_analysis_id=source_analysis.id,
+                        source_analysis_version=source_analysis.analysis_version,
+                        source_input_hash=source_analysis.input_hash,
+                        original_input_hash=original_input_hash,
+                    ), context_token, request_id)
                 if current is not None and current.status in {
                     AnalysisStatus.COMPLETED.value,
                     AnalysisStatus.LOW_CONFIDENCE.value,
@@ -572,27 +695,23 @@ class AnalysisService:
             raise TransactionContractError(
                 "Provider calls must not hold a business transaction"
             )
-        asr_text = snapshot.existing_asr_text
+        asr_text = None
         vision_text = None
         error_code = None
-        if snapshot.audio and asr_text is None:
-            asr_text = self._load_provider_checkpoint(snapshot, "ASR")
-            if asr_text is None:
-                asr_text, asr_error = self._run_asr(snapshot, request_id, attempt)
-                if asr_text is not None and asr_error is None:
-                    self._save_provider_checkpoint(snapshot, "ASR", asr_text, request_id)
-            else:
-                asr_error = None
+        if snapshot.audio:
+            asr_text, asr_error = self._run_all_asr(snapshot, request_id, attempt)
             error_code = asr_error or error_code
         if snapshot.images:
-            vision_text = self._load_provider_checkpoint(snapshot, "VLM")
-            if vision_text is None:
-                vision_text, vlm_error = self._run_vlm(snapshot, request_id, attempt)
-                if vision_text is not None and vlm_error is None:
-                    self._save_provider_checkpoint(snapshot, "VLM", vision_text, request_id)
-            else:
-                vlm_error = None
+            vision_text, vlm_error = self._run_vlm(snapshot, request_id, attempt)
             error_code = vlm_error or error_code
+        if snapshot.attachment_completion and error_code is not None:
+            return ProviderBundle(
+                asr_text=asr_text,
+                vision_text=vision_text,
+                llm_payload=None,
+                error_code=error_code,
+                call_status=AiCallStatus.FAILED.value,
+            )
         payload, llm_error, call_status = self._run_llm(
             snapshot,
             asr_text=asr_text,
@@ -694,13 +813,216 @@ class AnalysisService:
                 payload_json=payload,
             ))
 
+    def _load_media_checkpoint(
+        self,
+        snapshot: AnalysisSnapshot,
+        provider_type: str,
+        media: MediaRef,
+    ) -> str | None:
+        context = getattr(self, "_task_context", None)
+        if not context:
+            return None
+        model_version = self._provider_model_version(provider_type)
+        with begin_owned_transaction(self._session):
+            record = self._work_orders.get_work_order_for_update(snapshot.work_order_id)
+            require_execution_lease(self._session)
+            analysis = self._ai.get_current_analysis_for_update(snapshot.work_order_id)
+            if record is None or not owns_attempt(self._work_orders, record, analysis, context):
+                raise IntentLeaseLost()
+            for checkpoint in self._work_orders.analysis_provider_checkpoints(
+                snapshot.work_order_id,
+                provider_type,
+            ):
+                value = read_media_checkpoint(
+                    checkpoint.payload_json,
+                    provider_type,
+                    model_version,
+                    MEDIA_CHECKPOINT_PROTOCOL_VERSION,
+                    media,
+                )
+                if value is not None:
+                    return value
+        return None
+
+    def _load_legacy_first_audio_checkpoint(
+        self,
+        snapshot: AnalysisSnapshot,
+        media: MediaRef,
+    ) -> str | None:
+        """Upgrade the exact legacy first-audio result without retranscribing it."""
+        context = getattr(self, "_task_context", None)
+        if (
+            not context
+            or not snapshot.attachment_completion
+            or not snapshot.audio
+            or media != snapshot.audio[0]
+            or snapshot.source_analysis_id is None
+            or snapshot.source_analysis_version is None
+            or snapshot.source_input_hash is None
+            or snapshot.source_input_hash != snapshot.original_input_hash
+            or not snapshot.existing_asr_text
+        ):
+            return None
+        model_version = self._provider_model_version("ASR")
+        with begin_owned_transaction(self._session):
+            record = self._work_orders.get_work_order_for_update(snapshot.work_order_id)
+            require_execution_lease(self._session)
+            analysis = self._ai.get_current_analysis_for_update(snapshot.work_order_id)
+            if record is None or not owns_attempt(self._work_orders, record, analysis, context):
+                raise IntentLeaseLost()
+            for checkpoint in self._work_orders.analysis_provider_checkpoints(
+                snapshot.work_order_id,
+                "ASR",
+            ):
+                payload = checkpoint.payload_json
+                if not isinstance(payload, dict) or payload.get("schema_version") != 1:
+                    continue
+                expected = {
+                    "analysis_id": snapshot.source_analysis_id,
+                    "analysis_version": snapshot.source_analysis_version,
+                    "input_hash": snapshot.source_input_hash,
+                    "provider_type": "ASR",
+                    "model_version": model_version,
+                }
+                if any(payload.get(key) != value for key, value in expected.items()):
+                    continue
+                value = payload.get("value")
+                digest = payload.get("value_sha256")
+                if (
+                    isinstance(value, str)
+                    and value == snapshot.existing_asr_text
+                    and isinstance(digest, str)
+                    and sha256(value.encode("utf-8")).hexdigest() == digest
+                ):
+                    return value
+        return None
+
+    def _save_media_checkpoint(
+        self,
+        snapshot: AnalysisSnapshot,
+        provider_type: str,
+        media: MediaRef,
+        value: str,
+        request_id: str,
+        *,
+        source: str = "provider",
+    ) -> None:
+        context = getattr(self, "_task_context", None)
+        if not context:
+            return
+        model_version = self._provider_model_version(provider_type)
+        payload = media_checkpoint_payload(
+            snapshot,
+            context,
+            provider_type,
+            model_version,
+            MEDIA_CHECKPOINT_PROTOCOL_VERSION,
+            media,
+            value,
+            source=source,
+        )
+        with begin_owned_transaction(self._session):
+            record = self._work_orders.get_work_order_for_update(snapshot.work_order_id)
+            require_execution_lease(self._session)
+            analysis = self._ai.get_current_analysis_for_update(snapshot.work_order_id)
+            if record is None or not owns_attempt(self._work_orders, record, analysis, context):
+                raise IntentLeaseLost()
+            for checkpoint in self._work_orders.analysis_provider_checkpoints(
+                snapshot.work_order_id,
+                provider_type,
+            ):
+                if read_media_checkpoint(
+                    checkpoint.payload_json,
+                    provider_type,
+                    model_version,
+                    MEDIA_CHECKPOINT_PROTOCOL_VERSION,
+                    media,
+                ) is not None:
+                    return
+            self._work_orders.add_log(WorkOrderLog(
+                tenant_id=record.tenant_id,
+                property_id=record.property_id,
+                work_order_id=record.id,
+                actor_user_id=None,
+                actor_type="SYSTEM",
+                from_status=record.status,
+                to_status=record.status,
+                process_reason=record.process_reason,
+                event_code=f"AI_{provider_type}_CHECKPOINT",
+                request_id=request_id,
+                payload_json=payload,
+            ))
+
+    def _run_all_asr(
+        self,
+        snapshot: AnalysisSnapshot,
+        request_id: str,
+        attempt: int,
+    ) -> tuple[str | None, str | None]:
+        transcripts: list[dict[str, object]] = []
+        first_error = None
+        for index, media in enumerate(snapshot.audio, start=1):
+            text = self._load_media_checkpoint(snapshot, "ASR", media)
+            source = "checkpoint"
+            error = None
+            if text is None:
+                text = self._load_legacy_first_audio_checkpoint(snapshot, media)
+                if text is not None:
+                    source = "legacy_checkpoint"
+                    self._save_media_checkpoint(
+                        snapshot,
+                        "ASR",
+                        media,
+                        text,
+                        request_id,
+                        source=source,
+                    )
+            if text is None:
+                source = "provider"
+                text, error = self._transcribe_audio(
+                    snapshot,
+                    media,
+                    request_id,
+                    attempt,
+                )
+                if text is not None and error is None:
+                    self._save_media_checkpoint(
+                        snapshot,
+                        "ASR",
+                        media,
+                        text,
+                        request_id,
+                    )
+            transcripts.append({
+                "audio_index": index,
+                "text": text,
+                "error_code": error,
+                "source": source,
+            })
+            first_error = first_error or error
+        if not any(item["text"] for item in transcripts):
+            return None, first_error
+        return json.dumps(transcripts, ensure_ascii=False), first_error
+
     def _run_asr(
         self,
         snapshot: AnalysisSnapshot,
         request_id: str,
         attempt: int,
     ) -> tuple[str | None, str | None]:
-        media = snapshot.audio[0]
+        return self._transcribe_audio(snapshot, snapshot.audio[0], request_id, attempt)
+
+    def _transcribe_audio(
+        self,
+        snapshot: AnalysisSnapshot,
+        media: MediaRef,
+        request_id: str,
+        attempt: int,
+    ) -> tuple[str | None, str | None]:
+        audio_hash = sha256(
+            f"{MEDIA_CHECKPOINT_PROTOCOL_VERSION}|{media.kind}|{media.mime_type}|"
+            f"{media.file_id}|{media.content_hash}".encode("utf-8")
+        ).hexdigest()
         started = perf_counter()
         started_at = self._clock()
         try:
@@ -719,6 +1041,7 @@ class AnalysisService:
                 attempt=attempt,
                 model_version=transcript.model_version,
                 token_usage=getattr(transcript, "token_usage", None),
+                input_hash=audio_hash,
             )
             return transcript.text, None
         except ProviderError as exc:
@@ -733,6 +1056,7 @@ class AnalysisService:
                 attempt=attempt,
                 model_version=getattr(self._asr, "model_version", "unknown"),
                 error_code=exc.error_code,
+                input_hash=audio_hash,
             )
             return None, exc.error_code
 
@@ -745,8 +1069,26 @@ class AnalysisService:
         descriptions: list[dict[str, object]] = []
         first_error = None
         for index, media in enumerate(snapshot.images, start=1):
-            description, error = self._inspect_image(snapshot, media, request_id, attempt)
-            descriptions.append({"image_index": index, "description": description, "error_code": error})
+            description = self._load_media_checkpoint(snapshot, "VLM", media)
+            source = "checkpoint"
+            error = None
+            if description is None:
+                source = "provider"
+                description, error = self._inspect_image(snapshot, media, request_id, attempt)
+                if description is not None and error is None:
+                    self._save_media_checkpoint(
+                        snapshot,
+                        "VLM",
+                        media,
+                        description,
+                        request_id,
+                    )
+            descriptions.append({
+                "image_index": index,
+                "description": description,
+                "error_code": error,
+                "source": source,
+            })
             first_error = first_error or error
         if not any(item["description"] for item in descriptions):
             return None, first_error
@@ -756,7 +1098,8 @@ class AnalysisService:
         self, snapshot: AnalysisSnapshot, media: MediaRef, request_id: str, attempt: int
     ) -> tuple[str | None, str | None]:
         image_hash = sha256(
-            f"{snapshot.input_hash}|{media.kind}|{media.mime_type}|{media.storage_key}".encode("utf-8")
+            f"{MEDIA_CHECKPOINT_PROTOCOL_VERSION}|{media.kind}|{media.mime_type}|"
+            f"{media.file_id}|{media.content_hash}".encode("utf-8")
         ).hexdigest()
         started = perf_counter()
         started_at = self._clock()
@@ -1009,11 +1352,20 @@ class AnalysisService:
                 # this content lookup can establish a stale consistent snapshot
                 # that later cluster/link reads retain after waiting on the lock.
                 content = self._work_orders.get_content_for_update(record.id)
-                stale = (
-                    record.status != WorkOrderStatus.PENDING_ANALYSIS.value
-                    or record.version != snapshot.work_order_version
-                    or analysis.input_hash != snapshot.input_hash
-                )
+                if snapshot.attachment_completion:
+                    stale = (
+                        record.status != WorkOrderStatus.PENDING_ASSIGNMENT.value
+                        or record.version != snapshot.work_order_version
+                        or record.current_assignment_id is not None
+                        or self._work_orders.get_active_assignment(record.id) is not None
+                        or analysis.input_hash != snapshot.input_hash
+                    )
+                else:
+                    stale = (
+                        record.status != WorkOrderStatus.PENDING_ANALYSIS.value
+                        or record.version != snapshot.work_order_version
+                        or analysis.input_hash != snapshot.input_hash
+                    )
                 mapped, mapped_error = self._validate_payload(
                     bundle.llm_payload,
                     evidence_catalog=build_evidence_catalog(
@@ -1037,6 +1389,25 @@ class AnalysisService:
                 if mapped is None:
                     analysis.status = AnalysisStatus.FAILED.value
                     analysis.error_code = mapped_error or bundle.error_code or AiErrorCode.PROVIDER_FAILED
+                    if snapshot.attachment_completion:
+                        self._work_orders.add_log(WorkOrderLog(
+                            tenant_id=record.tenant_id,
+                            property_id=record.property_id,
+                            work_order_id=record.id,
+                            actor_user_id=None,
+                            actor_type=WorkOrderActorType.SYSTEM.value,
+                            from_status=record.status,
+                            to_status=record.status,
+                            process_reason=record.process_reason,
+                            event_code="AI_ATTACHMENT_INCOMPLETE",
+                            request_id=request_id,
+                            payload_json={
+                                "source_analysis_id": snapshot.source_analysis_id,
+                                "analysis_id": analysis.id,
+                                "analysis_version": analysis.analysis_version,
+                                "reason_code": analysis.error_code,
+                            },
+                        ))
                     self._append_failure_audit(
                         record,
                         analysis,
@@ -1048,13 +1419,53 @@ class AnalysisService:
                 if mapped.low_confidence:
                     analysis.status = AnalysisStatus.LOW_CONFIDENCE.value
                     analysis.error_code = AiErrorCode.LOW_CONFIDENCE
+                    if snapshot.attachment_completion:
+                        self._work_orders.add_log(WorkOrderLog(
+                            tenant_id=record.tenant_id,
+                            property_id=record.property_id,
+                            work_order_id=record.id,
+                            actor_user_id=None,
+                            actor_type=WorkOrderActorType.SYSTEM.value,
+                            from_status=record.status,
+                            to_status=record.status,
+                            process_reason=record.process_reason,
+                            event_code="AI_ATTACHMENT_INCOMPLETE",
+                            request_id=request_id,
+                            payload_json={
+                                "source_analysis_id": snapshot.source_analysis_id,
+                                "analysis_id": analysis.id,
+                                "analysis_version": analysis.analysis_version,
+                                "reason_code": AiErrorCode.LOW_CONFIDENCE,
+                            },
+                        ))
                 else:
                     analysis.status = AnalysisStatus.COMPLETED.value
                     analysis.error_code = None
                     record.category = mapped.category.value
                     record.severity = mapped.severity.value
                     record.priority = mapped.priority.value
-                    self._transition_analyzed(record, request_id)
+                    if snapshot.attachment_completion:
+                        record.version += 1
+                        self._work_orders.add_log(WorkOrderLog(
+                            tenant_id=record.tenant_id,
+                            property_id=record.property_id,
+                            work_order_id=record.id,
+                            actor_user_id=None,
+                            actor_type=WorkOrderActorType.SYSTEM.value,
+                            from_status=record.status,
+                            to_status=record.status,
+                            process_reason=record.process_reason,
+                            event_code="AI_ATTACHMENT_COMPLETED",
+                            request_id=request_id,
+                            payload_json={
+                                "source_analysis_id": snapshot.source_analysis_id,
+                                "analysis_id": analysis.id,
+                                "analysis_version": analysis.analysis_version,
+                                "attachment_count": len(snapshot.images) + len(snapshot.audio),
+                            },
+                        ))
+                    else:
+                        self._transition_analyzed(record, request_id)
                     from app.service.incident import IncidentService
 
                     IncidentService(self._session, settings=self._settings).aggregate_locked(
@@ -1098,7 +1509,10 @@ class AnalysisService:
                 if payload["attempt"] == context["attempt"] and payload.get("execution_token") != context["execution_token"]:
                     return False
                 expected = payload["work_order_version"]
-                if record.status == "PENDING_ASSIGNMENT" and payload["from_status"] == "PENDING_ANALYSIS":
+                if record.status == "PENDING_ASSIGNMENT" and (
+                    payload["from_status"] == "PENDING_ANALYSIS"
+                    or payload.get("attachment_completion") is True
+                ):
                     expected += 1
                 if record.version != expected or current is None or current.id != payload["analysis_id"] or current.input_hash != payload["input_hash"]:
                     return False

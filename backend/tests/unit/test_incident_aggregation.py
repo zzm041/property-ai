@@ -116,6 +116,7 @@ def test_analysis_apply_uses_locking_content_read_before_aggregation() -> None:
             work_order_version=7,
             input_hash="analysis-input",
             text="synthetic report",
+            attachment_completion=False,
         ),
         bundle=SimpleNamespace(asr_text=None, vision_text=None, llm_payload=None),
         request_id="analysis-current-read",

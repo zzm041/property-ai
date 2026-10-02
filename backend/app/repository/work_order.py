@@ -103,6 +103,54 @@ class WorkOrderRepository:
         ).order_by(WorkOrderLog.id.desc()).limit(1).with_for_update()
             .execution_options(populate_existing=True))
 
+    def attachment_completion_request(
+        self,
+        work_order_id: int,
+        task_id: str,
+    ) -> WorkOrderLog | None:
+        rows = self._session.scalars(
+            select(WorkOrderLog)
+            .where(
+                WorkOrderLog.work_order_id == work_order_id,
+                WorkOrderLog.event_code == "AI_ATTACHMENT_COMPLETION_REQUESTED",
+            )
+            .order_by(WorkOrderLog.id.desc())
+            .limit(100)
+        ).all()
+        return next(
+            (
+                row
+                for row in rows
+                if isinstance(row.payload_json, dict)
+                and row.payload_json.get("task_id") == task_id
+            ),
+            None,
+        )
+
+    def attachment_completion_result(
+        self,
+        work_order_id: int,
+        analysis_id: int,
+    ) -> WorkOrderLog | None:
+        rows = self._session.scalars(
+            select(WorkOrderLog)
+            .where(
+                WorkOrderLog.work_order_id == work_order_id,
+                WorkOrderLog.event_code == "AI_ATTACHMENT_COMPLETED",
+            )
+            .order_by(WorkOrderLog.id.desc())
+            .limit(100)
+        ).all()
+        return next(
+            (
+                row
+                for row in rows
+                if isinstance(row.payload_json, dict)
+                and row.payload_json.get("analysis_id") == analysis_id
+            ),
+            None,
+        )
+
     def latest_analysis_provider_checkpoint(
         self,
         work_order_id: int,
@@ -118,6 +166,28 @@ class WorkOrderRepository:
             )
             .order_by(WorkOrderLog.id.desc())
             .limit(1)
+        )
+
+    def analysis_provider_checkpoints(
+        self,
+        work_order_id: int,
+        provider_type: str,
+        *,
+        limit: int = 100,
+    ) -> tuple[WorkOrderLog, ...]:
+        """Newest first; callers validate immutable payload bindings."""
+        if provider_type not in {"ASR", "VLM"}:
+            raise ValueError("Unsupported provider checkpoint")
+        return tuple(
+            self._session.scalars(
+                select(WorkOrderLog)
+                .where(
+                    WorkOrderLog.work_order_id == work_order_id,
+                    WorkOrderLog.event_code == f"AI_{provider_type}_CHECKPOINT",
+                )
+                .order_by(WorkOrderLog.id.desc())
+                .limit(min(max(limit, 1), 100))
+            ).all()
         )
 
     def get_property_for_update(self, property_id: int) -> Property | None:

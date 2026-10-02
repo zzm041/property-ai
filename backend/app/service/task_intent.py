@@ -226,7 +226,10 @@ class TaskIntentService:
                 or analysis.input_hash != claim["input_hash"]):
             end(row, "CANCELLED", now)
             return True
-        expected = claim["work_order_version"] + (claim["from_status"] == "PENDING_ANALYSIS")
+        expected = claim["work_order_version"] + (
+            claim["from_status"] == "PENDING_ANALYSIS"
+            or claim.get("attachment_completion") is True
+        )
         if (analysis.status == "LOW_CONFIDENCE" and work.version == claim["work_order_version"]
                 and work.status == claim["from_status"]):
             end(row, "SUCCEEDED", now)
@@ -254,7 +257,13 @@ class TaskIntentService:
                 claim = latest.payload_json if latest else None
                 expected = row.resource_version
                 if claim and claim.get("task_id") == row.task_id:
-                    expected = claim["work_order_version"] + (work.status == "PENDING_ASSIGNMENT" and claim["from_status"] == "PENDING_ANALYSIS")
+                    expected = claim["work_order_version"] + (
+                        work.status == "PENDING_ASSIGNMENT"
+                        and (
+                            claim["from_status"] == "PENDING_ANALYSIS"
+                            or claim.get("attachment_completion") is True
+                        )
+                    )
                 if work.version == expected and (claim is None or claim.get("task_id") == row.task_id):
                     self.session.add(WorkOrderLog(tenant_id=work.tenant_id, property_id=work.property_id,
                         work_order_id=work.id, actor_type="SYSTEM", from_status=work.status, to_status=work.status,
@@ -355,4 +364,157 @@ class TaskIntentService:
                 actor_user_id=current.user_id, scope_type=scope.scope_type, tenant_id=row.tenant_id,
                 property_id=row.property_id, request_id=request_id,
                 details={"previous_id":row.id,"generation":new.generation,"reason_code":reason_code})
+            return self.metadata(new)
+
+    def complete_analysis_managed(self, intent_id, *, actor, reason_code, request_id):
+        """Create one audited successor for a completed but attachment-incomplete analysis."""
+        from app.core.errors import AppError
+        from app.model.work_order import WorkOrderLog
+        from app.repository.ai import AiRepository
+        from app.repository.work_order import WorkOrderRepository
+        from app.service.audit import AuditService
+        from app.domain.audit import AuditAction, AuditResourceType
+
+        if reason_code != "ATTACHMENT_COMPLETION":
+            raise AppError(
+                code="TASK.INVALID_INPUT",
+                message="Use the attachment completion reason",
+                status_code=422,
+        )
+        with begin_owned_transaction(self.session):
+            row = self._locked(intent_id)
+            if row is None or row.operation != ANALYZE or row.status != "SUCCEEDED":
+                raise AppError(
+                    code="TASK.CONFLICT",
+                    message="Only a succeeded analysis task can be completed",
+                    status_code=409,
+                )
+            current, scope = self._authorize_manager(row, actor)
+            work_repo = WorkOrderRepository(self.session)
+            work = work_repo.get_work_order_for_update(row.resource_id)
+            if (
+                work is None
+                or work.status != "PENDING_ASSIGNMENT"
+                or work.current_assignment_id is not None
+                or work_repo.get_active_assignment(work.id) is not None
+                or work.version not in {row.resource_version, row.resource_version + 1}
+            ):
+                raise AppError(
+                    code="TASK.CONFLICT",
+                    message="Work order changed; attachment completion is no longer safe",
+                    status_code=409,
+                )
+            ai_repo = AiRepository(self.session)
+            analysis = ai_repo.get_current_analysis_for_update(work.id)
+            if analysis is None or analysis.status not in {"COMPLETED", "LOW_CONFIDENCE"}:
+                raise AppError(
+                    code="TASK.CONFLICT",
+                    message="The current analysis is not eligible for completion",
+                    status_code=409,
+                )
+            if work_repo.attachment_completion_result(work.id, analysis.id) is not None:
+                raise AppError(
+                    code="TASK.CONFLICT",
+                    message="The accepted attachments are already complete",
+                    status_code=409,
+                )
+            if ai_repo.list_recommendations(work.id):
+                raise AppError(
+                    code="TASK.CONFLICT",
+                    message="Existing recommendations must be resolved before attachment completion",
+                    status_code=409,
+                )
+            media = ai_repo.list_media_with_files(work.id)
+            accepted = tuple(
+                (item, file_object)
+                for item, file_object in media
+                if item.taken_phase == "REPORT" and item.kind in {"IMAGE", "AUDIO"}
+            )
+            if not accepted:
+                raise AppError(
+                    code="TASK.CONFLICT",
+                    message="No accepted report attachments require completion",
+                    status_code=409,
+                )
+            successor = self.session.scalar(
+                select(TaskIntent)
+                .where(
+                    TaskIntent.operation == ANALYZE,
+                    TaskIntent.resource_id == work.id,
+                    TaskIntent.generation == row.generation + 1,
+                )
+                .order_by(TaskIntent.id)
+                .with_for_update()
+                .execution_options(populate_existing=True)
+            )
+            if successor is not None:
+                return self.metadata(successor)
+            newer = self.session.scalar(
+                select(TaskIntent.id)
+                .where(
+                    TaskIntent.operation == ANALYZE,
+                    TaskIntent.resource_id == work.id,
+                    TaskIntent.id > row.id,
+                )
+                .limit(1)
+                .with_for_update()
+            )
+            if newer is not None:
+                raise AppError(
+                    code="TASK.CONFLICT",
+                    message="A newer task already owns this work order",
+                    status_code=409,
+                )
+            new = self.repo.add(TaskIntent(
+                tenant_id=row.tenant_id,
+                property_id=row.property_id,
+                operation=ANALYZE,
+                resource_id=work.id,
+                resource_version=work.version,
+                generation=row.generation + 1,
+                request_id=request_id,
+                task_id=str(uuid4()),
+                status="PENDING",
+                publish_attempt=0,
+                execution_attempt=0,
+                available_at=self.clock(),
+            ))
+            work_repo.add_log(WorkOrderLog(
+                tenant_id=work.tenant_id,
+                property_id=work.property_id,
+                work_order_id=work.id,
+                actor_user_id=current.user_id,
+                actor_type="PROPERTY",
+                from_status=work.status,
+                to_status=work.status,
+                process_reason=work.process_reason,
+                event_code="AI_ATTACHMENT_COMPLETION_REQUESTED",
+                request_id=request_id,
+                payload_json={
+                    "task_id": new.task_id,
+                    "intent_id": new.id,
+                    "source_intent_id": row.id,
+                    "source_analysis_id": analysis.id,
+                    "generation": new.generation,
+                    "attachment_count": len(accepted),
+                    "reason_code": reason_code,
+                },
+            ))
+            AuditService(self.session).append(
+                action=AuditAction.TASK_INTENT_RETRIED,
+                resource_type=AuditResourceType.TASK_INTENT,
+                resource_id=new.id,
+                actor_user_id=current.user_id,
+                scope_type=scope.scope_type,
+                tenant_id=row.tenant_id,
+                property_id=row.property_id,
+                request_id=request_id,
+                details={
+                    "previous_id": row.id,
+                    "generation": new.generation,
+                    "reason_code": reason_code,
+                    "source_analysis_id": analysis.id,
+                    "attachment_count": len(accepted),
+                },
+            )
             return self.metadata(new)
