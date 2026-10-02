@@ -1,7 +1,9 @@
 """WeChat Mini Program code exchange. Services never call WeChat HTTP directly."""
 
 from dataclasses import dataclass
+from hashlib import sha256
 import logging
+import re
 
 import httpx
 
@@ -27,6 +29,9 @@ class WeChatAuthProvider:
 class DevelopmentWeChatAuthProvider(WeChatAuthProvider):
     """Maps deterministic fake codes. Never stores or returns session_key."""
 
+    _DEVICE_CODE_PREFIX = "wx-dev-device-v1:"
+    _DEVICE_ID = re.compile(r"^[A-Za-z0-9_-]{16,96}$")
+
     def __init__(self, *, appid: str = "wx-dev-app") -> None:
         self.appid = appid
 
@@ -35,6 +40,21 @@ class DevelopmentWeChatAuthProvider(WeChatAuthProvider):
             raise ProviderInvalidOutputError("WeChat code is invalid")
         if code in {"wx-unavailable"}:
             raise ProviderUnavailableError("WeChat auth is unavailable")
+        if code.startswith(self._DEVICE_CODE_PREFIX):
+            payload = code.removeprefix(self._DEVICE_CODE_PREFIX)
+            device_id, separator, ephemeral_code = payload.partition(":")
+            if (
+                not separator
+                or not self._DEVICE_ID.fullmatch(device_id)
+                or not ephemeral_code
+            ):
+                raise ProviderInvalidOutputError("WeChat code is invalid")
+            digest = sha256(device_id.encode("utf-8")).hexdigest()[:32]
+            return WeChatSession(
+                openid=f"openid-dev-device-{digest}",
+                unionid=None,
+                appid=self.appid,
+            )
         if code.startswith("wx-new-"):
             suffix = code.removeprefix("wx-new-") or "anon"
             return WeChatSession(

@@ -345,3 +345,22 @@ def test_miniprogram_wires_verified_wechat_rebind_and_replacement_session() -> N
         "确认更换为当前微信",
     ):
         assert label in template
+
+
+def test_wechat_bind_and_login_buttons_have_stable_page_ids() -> None:
+    profile = (REPO_ROOT / "miniprogram/pages/profile/profile.wxml").read_text(
+        encoding="utf-8"
+    )
+    login = (REPO_ROOT / "miniprogram/pages/login/login.wxml").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'id="wechat-bind-button"' in profile
+    assert 'id="wechat-login-button"' in login
+
+    auth = (REPO_ROOT / "miniprogram/services/auth.js").read_text(
+        encoding="utf-8"
+    )
+    assert 'ENV_VERSION === "develop"' in auth
+    assert "wx-dev-device-v1:" in auth
+    assert "development_wechat_device_id" in auth

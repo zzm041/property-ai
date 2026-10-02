@@ -1,6 +1,7 @@
 const TOKEN_KEY = "access_token";
 const HOUSE_KEY = "selected_house_id";
 const WORK_ORDER_KEY = "last_work_order_id";
+const DEVELOPMENT_WECHAT_DEVICE_KEY = "development_wechat_device_id";
 
 function getToken() {
   return wx.getStorageSync(TOKEN_KEY) || "";
@@ -51,10 +52,30 @@ function getLastWorkOrderId() {
   return wx.getStorageSync(WORK_ORDER_KEY) || "";
 }
 
+function developmentWechatDeviceId() {
+  let value = wx.getStorageSync(DEVELOPMENT_WECHAT_DEVICE_KEY) || "";
+  if (value) {
+    return value;
+  }
+  const randomPart = () => Math.random().toString(36).slice(2, 13);
+  value = `dev_${Date.now().toString(36)}_${randomPart()}_${randomPart()}`;
+  wx.setStorageSync(DEVELOPMENT_WECHAT_DEVICE_KEY, value);
+  return value;
+}
+
 function login() {
   return new Promise((resolve, reject) => {
     wx.login({
-      success: (result) => resolve(result.code),
+      success: (result) => {
+        const env = require("../config/env");
+        if (env.ENV_VERSION === "develop") {
+          resolve(
+            `wx-dev-device-v1:${developmentWechatDeviceId()}:${result.code}`
+          );
+          return;
+        }
+        resolve(result.code);
+      },
       fail: reject,
     });
   });

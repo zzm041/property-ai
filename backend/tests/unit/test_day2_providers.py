@@ -61,6 +61,39 @@ def test_factory_keeps_development_fakes_by_default() -> None:
     )
 
 
+def test_development_wechat_device_code_is_stable_across_ephemeral_codes() -> None:
+    provider = DevelopmentWeChatAuthProvider(appid="wx-dev-app")
+
+    first = provider.exchange_code(
+        "wx-dev-device-v1:dev_0123456789abcdef:first-ephemeral"
+    )
+    second = provider.exchange_code(
+        "wx-dev-device-v1:dev_0123456789abcdef:second-ephemeral"
+    )
+    other = provider.exchange_code(
+        "wx-dev-device-v1:dev_fedcba9876543210:first-ephemeral"
+    )
+
+    assert first.openid == second.openid
+    assert first.openid != other.openid
+    assert first.appid == "wx-dev-app"
+
+
+@pytest.mark.parametrize(
+    "code",
+    (
+        "wx-dev-device-v1:short:ephemeral",
+        "wx-dev-device-v1:dev_0123456789abcdef:",
+        "wx-dev-device-v1:dev invalid identifier:ephemeral",
+    ),
+)
+def test_development_wechat_rejects_malformed_device_codes(code: str) -> None:
+    provider = DevelopmentWeChatAuthProvider(appid="wx-dev-app")
+
+    with pytest.raises(ProviderInvalidOutputError):
+        provider.exchange_code(code)
+
+
 def test_development_file_scanner_is_explicit_and_rejected_in_production() -> None:
     settings = _settings(file_scanner_provider="development")
     assert isinstance(
