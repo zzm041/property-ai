@@ -271,7 +271,11 @@ def test_succeeded_analysis_can_create_only_one_audited_attachment_completion(mo
     add_log = MagicMock()
     monkeypatch.setattr(WorkOrderRepository, 'add_log', add_log)
     monkeypatch.setattr(AiRepository, 'get_current_analysis_for_update', lambda *a: analysis)
-    monkeypatch.setattr(AiRepository, 'list_recommendations', lambda *a: ())
+    monkeypatch.setattr(
+        AiRepository,
+        'list_recommendations',
+        lambda *a: (NS(eligible=False),),
+    )
     monkeypatch.setattr(
         AiRepository,
         'list_media_with_files',
@@ -305,6 +309,8 @@ def test_succeeded_analysis_can_create_only_one_audited_attachment_completion(mo
     assert log.payload_json['attachment_count'] == 2
     audit.assert_called_once()
 
+    work.status = 'ASSIGNED'
+    work.current_assignment_id = 101
     s.session.scalar.side_effect = [created[0]]
     again = s.complete_analysis_managed(
         source.id,

@@ -390,6 +390,22 @@ class TaskIntentService:
                     status_code=409,
                 )
             current, scope = self._authorize_manager(row, actor)
+            # A repeated authenticated request for the same immutable source
+            # returns its one successor even if that successor has already
+            # started or completed the business operation.
+            successor = self.session.scalar(
+                select(TaskIntent)
+                .where(
+                    TaskIntent.operation == ANALYZE,
+                    TaskIntent.resource_id == row.resource_id,
+                    TaskIntent.generation == row.generation + 1,
+                )
+                .order_by(TaskIntent.id)
+                .with_for_update()
+                .execution_options(populate_existing=True)
+            )
+            if successor is not None:
+                return self.metadata(successor)
             work_repo = WorkOrderRepository(self.session)
             work = work_repo.get_work_order_for_update(row.resource_id)
             if (
@@ -418,10 +434,10 @@ class TaskIntentService:
                     message="The accepted attachments are already complete",
                     status_code=409,
                 )
-            if ai_repo.list_recommendations(work.id):
+            if any(item.eligible for item in ai_repo.list_recommendations(work.id)):
                 raise AppError(
                     code="TASK.CONFLICT",
-                    message="Existing recommendations must be resolved before attachment completion",
+                    message="An eligible recommendation must be resolved before attachment completion",
                     status_code=409,
                 )
             media = ai_repo.list_media_with_files(work.id)
@@ -436,19 +452,6 @@ class TaskIntentService:
                     message="No accepted report attachments require completion",
                     status_code=409,
                 )
-            successor = self.session.scalar(
-                select(TaskIntent)
-                .where(
-                    TaskIntent.operation == ANALYZE,
-                    TaskIntent.resource_id == work.id,
-                    TaskIntent.generation == row.generation + 1,
-                )
-                .order_by(TaskIntent.id)
-                .with_for_update()
-                .execution_options(populate_existing=True)
-            )
-            if successor is not None:
-                return self.metadata(successor)
             newer = self.session.scalar(
                 select(TaskIntent.id)
                 .where(
