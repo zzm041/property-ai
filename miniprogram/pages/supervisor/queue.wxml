@@ -1,4 +1,6 @@
-<input placeholder="小区 ID" value="{{propertyId}}" bindinput="onProperty" disabled="{{loading}}" />
+<picker range="{{properties}}" range-key="name" value="{{propertyIndex}}" bindchange="onPropertyChange" disabled="{{loading}}">
+  <view class="picker">{{properties[propertyIndex].name || '请选择小区'}}</view>
+</picker>
 <button class="btn btn-secondary" data-view="dispatch" bindtap="changeView" disabled="{{loading}}">待派 / 异常</button>
 <button class="btn btn-secondary" data-view="unstarted" bindtap="changeView" disabled="{{loading}}">未开工工单</button>
 <view>{{queueView == 'unstarted' ? '未开工工单，可按权限撤销' : '待派与异常处理队列'}}</view>
@@ -7,11 +9,12 @@
 <view class="loading" wx:if="{{loading}}">加载中...</view>
 <view class="empty" wx:if="{{!loading && !items.length}}">当前队列暂无工单</view>
 <view class="card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="select">
-  {{item.id}} {{item.status}} {{item.process_reason}} {{selectedId == item.id ? "已选" : ""}}
+  <view class="section-title">工单 {{item.id}} {{selectedId == item.id ? "· 已选" : ""}}</view>
+  <view>{{item.statusLabel}}<text wx:if="{{item.process_reason != 'NONE'}}"> · {{item.reasonLabel}}</text></view>
 </view>
 <work-order-contact id="order-contact" wx:if="{{selectedId}}" work-order-id="{{selectedId}}" />
 <view class="card" wx:if="{{selectedId && canCancel}}">
-  <view>撤销未开工工单 {{selectedId}}（{{selectedStatus}}）</view>
+  <view>撤销未开工工单 {{selectedId}}（{{selectedStatusLabel}}）</view>
   <textarea placeholder="撤销原因（可选，保留在工单历史）" value="{{cancelReason}}" bindinput="onCancelReason" maxlength="255" disabled="{{loading}}"></textarea>
   <button class="btn btn-secondary" bindtap="askCancel" disabled="{{loading}}">撤销此工单</button>
   <view wx:if="{{cancelConfirm}}">
@@ -22,7 +25,7 @@
 </view>
 <view class="card" wx:if="{{success}}">{{success}}</view>
 <view class="card">
-  <view>点选在岗员工（employee_id，不是 user_id）</view>
+  <view>选择当前在岗人员</view>
   <view class="empty" wx:if="{{!staff.length}}">今日暂无员工日报。请先让员工签到。</view>
   <view
     class="empty"
@@ -30,13 +33,13 @@
     wx:key="employee_id"
     data-id="{{item.employee_id}}"
     bindtap="selectEmployee"
-  >员工 {{item.employee_id}} {{item.on_duty}} 负荷 {{item.current_load}} {{employeeId == item.employee_id ? "已选" : ""}}</view>
+  >{{item.employeeLabel}} · {{item.dutyLabel}} · 当前任务 {{item.current_load}} {{employeeId == item.employee_id ? "· 已选" : ""}}</view>
 </view>
-<button class="btn" bindtap="recommend">AI 建议（Fake Provider）</button>
+<button class="btn btn-secondary" wx:if="{{selectedStatus == 'PENDING_ANALYSIS' || selectedStatus == 'PENDING_ASSIGNMENT'}}" bindtap="recommend">重新分析并查看建议</button>
 <button class="btn" wx:if="{{selectedStatus == 'PENDING_ANALYSIS' || selectedStatus == 'PENDING_ASSIGNMENT'}}" bindtap="assign">人工后备派单</button>
 <block wx:if="{{selectedStatus == 'PROCESSING'}}">
   <view class="card">
-    <view>异常决策 {{selectedProcessReason}}</view>
+    <view>异常决策 · {{selectedProcessReasonLabel}}</view>
     <textarea placeholder="处理方案说明；继续处理时必填" value="{{decisionReason}}" bindinput="onDecisionReason" maxlength="255"></textarea>
     <button class="btn" bindtap="reassign">改派给已选在岗员工</button>
     <button class="btn btn-secondary" data-decision="WAIT_PARTS" bindtap="decide">等待配件</button>
@@ -46,6 +49,6 @@
   </view>
 </block>
 <view class="card" wx:for="{{recommendations}}" wx:key="employee_id">
-  员工 {{item.employee_id}} 分 {{item.score}} {{item.eligible ? "可派" : item.filter_reason}}
+  {{item.employeeLabel}} · 评分 {{item.score}} · {{item.filterReasonText}}
 </view>
 <view class="error" wx:if="{{error}}">{{error}}</view>

@@ -289,7 +289,7 @@ Page({
         this.setData({
           selected,
           items: replaceItem(this.data.items, selected),
-          notice: "运营摘要已更新；本地开发模型结果不代表真实 Qwen 验收。",
+          notice: "运营摘要已更新，请核对内容后再用于后续处置。",
         });
       })
     ).catch(() => {});
@@ -351,8 +351,7 @@ Page({
         .then((announcement) => {
           this.setData({
             lastDraftId: String(announcement.id),
-            notice:
-              "公告草稿已建立，仍须人工编辑、审核和发布；本地开发模型不代表真实 Qwen 验收。",
+            notice: "公告草稿已建立，仍须人工编辑、审核后发布。",
           });
         })
     ).catch(() => {});

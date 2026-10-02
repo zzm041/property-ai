@@ -331,8 +331,8 @@ def main(argv: list[str] | None = None) -> int:
         ("file_before", before.status_code == 200),
         ("file_after", after.status_code == 200),
         (
-            "storage_key",
-            not str(before.json().get("data", {}).get("storage_key", "/")).startswith("/"),
+            "storage_key_not_exposed",
+            "storage_key" not in before.json().get("data", {}),
         ),
         ("feedback", feedback.status_code == 200),
         ("resolve", resolved.status_code == 200),

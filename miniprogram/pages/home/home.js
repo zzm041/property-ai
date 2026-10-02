@@ -18,15 +18,11 @@ Page({
     tenantId: "",
     loading: false,
     error: "",
-    providerNote: "",
-    envNote: "",
     lastWorkOrderId: "",
   },
   onShow() {
-    const env = require("../../config/env");
     const auth = require("../../services/auth");
     this.setData({
-      envNote: env.ENV_NOTE,
       lastWorkOrderId: auth.getLastWorkOrderId(),
     });
     const api = require("../../services/api");
@@ -73,9 +69,6 @@ Page({
   },
   retry() {
     this.onShow();
-  },
-  switchIdentity() {
-    this.logout();
   },
   logout() {
     const auth = require("../../services/auth");

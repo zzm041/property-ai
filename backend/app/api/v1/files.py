@@ -1,6 +1,6 @@
 """File metadata registration and authorized content upload."""
 
-from typing import Annotated
+from typing import Annotated, BinaryIO
 
 from fastapi import APIRouter, Depends, File, Request, Response, UploadFile
 
@@ -15,6 +15,19 @@ from app.service.work_order import WorkOrderService
 router = APIRouter(tags=["files"])
 
 
+def _read_upload_content(file: BinaryIO, *, max_bytes: int) -> bytes:
+    """Read one byte beyond the limit so oversized bodies never fill memory."""
+
+    content = file.read(max_bytes + 1)
+    if len(content) > max_bytes:
+        raise AppError(
+            code=FileErrorCode.TOO_LARGE,
+            message="File exceeds the upload size limit",
+            status_code=422,
+        )
+    return content
+
+
 def _file_data(record) -> FileObjectData:
     return FileObjectData(
         id=record.id,
@@ -23,11 +36,7 @@ def _file_data(record) -> FileObjectData:
         uploader_user_id=record.uploader_user_id,
         mime_type=record.mime_type,
         size_bytes=record.size_bytes,
-        storage_key=record.storage_key,
-        scanner_status=record.scanner_status,
         created_at=record.created_at,
-        upload_url=getattr(record, "upload_url", None),
-        upload_expires_in=getattr(record, "upload_expires_in", None),
     )
 
 
@@ -58,7 +67,10 @@ def upload_file_content(
     service: Annotated[WorkOrderService, Depends(get_work_order_service)],
     file: Annotated[UploadFile, File()],
 ) -> dict[str, object]:
-    content = file.file.read()
+    content = _read_upload_content(
+        file.file,
+        max_bytes=service.max_upload_bytes,
+    )
     if content is None:
         raise AppError(
             code=FileErrorCode.INVALID_INPUT,

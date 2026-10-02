@@ -59,13 +59,16 @@ Page({
         .workOrder(this.id)
         .then((item) => {
           const workOrder = workOrderOf(item);
+          const display = require("../../utils/work-order-display").presentDetail(item);
           const status = workOrder ? workOrder.status : "";
           const processReason = workOrder ? workOrder.process_reason : "NONE";
           require("../../services/auth").setLastWorkOrderId(this.id);
           this.setData({
             item,
             workOrder,
-            logs: (item && item.logs) || [],
+            statusLabel: display.statusLabel,
+            reasonLabel: display.reasonLabel,
+            logs: display.logs,
             canAccept: status === "ASSIGNED",
             canReject: status === "ASSIGNED",
             canStart: status === "ACCEPTED",

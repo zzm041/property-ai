@@ -166,11 +166,7 @@ class FileObjectData(BaseModel):
     uploader_user_id: int
     mime_type: str
     size_bytes: int
-    storage_key: str
-    scanner_status: str
     created_at: datetime
-    upload_url: str | None = None
-    upload_expires_in: int | None = None
 
 
 class WorkOrderMediaData(BaseModel):

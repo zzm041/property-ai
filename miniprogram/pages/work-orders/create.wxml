@@ -8,9 +8,9 @@
   <view class="empty" wx:if="{{!houseLoading && !houseError && !houses.length}}">暂无有效绑定房屋，请先申请绑定并等待物业审核。</view>
   <view class="error" wx:if="{{houseError}}">{{houseError}}</view>
   <view class="loading" wx:if="{{houseLoading}}">正在加载本人房屋...</view>
-  <button wx:if="{{houseCursor}}" bindtap="loadMoreHouses" disabled="{{loading || houseLoading}}">加载更多房屋</button>
-  <button bindtap="reloadHouses" disabled="{{loading || houseLoading}}">刷新房屋</button>
-  <button bindtap="manageHouses" disabled="{{loading || houseLoading || recordingBusy}}">我的房屋 / 申请绑定</button>
+  <button class="btn btn-secondary btn-compact" wx:if="{{houseCursor}}" bindtap="loadMoreHouses" disabled="{{loading || houseLoading}}">加载更多房屋</button>
+  <button class="btn btn-secondary btn-compact" bindtap="reloadHouses" disabled="{{loading || houseLoading}}">刷新房屋</button>
+  <button class="btn btn-secondary btn-compact" bindtap="manageHouses" disabled="{{loading || houseLoading || recordingBusy}}">我的房屋 / 申请绑定</button>
   <view wx:if="{{selectedHouseLabel}}">报修地址：{{selectedHouseLabel}}</view>
   <textarea id="work-order-description" placeholder="报修说明" value="{{text}}" bindinput="onText" disabled="{{loading}}"></textarea>
   <view>本次联系电话（必填）</view>

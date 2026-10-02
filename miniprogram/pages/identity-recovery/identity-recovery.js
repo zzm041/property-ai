@@ -28,7 +28,13 @@ Page({
       api.identityRecoveryCapabilities(),
       api.myIdentityRecoveryCases(),
     ]).then(([capabilities, result]) => {
-      this.setData({ capabilities, cases: result.items || [], error: "" });
+      const labels = require("../../utils/business-labels");
+      const cases = (result.items || []).map((item) => ({
+        ...item,
+        purposeText: labels.identityPurpose(item.purpose),
+        statusText: labels.identityStatus(item.status),
+      }));
+      this.setData({ capabilities, cases, error: "" });
     })).catch(() => {});
   },
   onPurpose(event) {
@@ -82,7 +88,11 @@ Page({
       confirm_replace_phone: item.purpose === "PHONE_REUSE" && this.data.confirmReplacePhone === true,
     }).then((completed) => {
       this.setData({
-        cases: this.data.cases.map((entry) => entry.id === completed.id ? completed : entry),
+        cases: this.data.cases.map((entry) => entry.id === completed.id ? {
+          ...completed,
+          purposeText: require("../../utils/business-labels").identityPurpose(completed.purpose),
+          statusText: require("../../utils/business-labels").identityStatus(completed.status),
+        } : entry),
         currentPassword: "",
         targetReauthAssertion: "",
         newPassword: "",

@@ -4,8 +4,8 @@
   <view>工单 {{workOrder.id}}</view>
   <view>本次报修全部事项：{{item.text || item.asr_text}}</view>
   <view wx:if="{{item.extra_notes}}">补充问题：{{item.extra_notes}}</view>
-  <view>状态 {{workOrder.status}}</view>
-  <view wx:if="{{workOrder.process_reason != 'NONE'}}">处理原因 {{workOrder.process_reason}}</view>
+  <view>状态 {{statusLabel}}</view>
+  <view wx:if="{{workOrder.process_reason != 'NONE'}}">处理原因 {{reasonLabel}}</view>
   <button class="btn" wx:if="{{workOrder.incident_id}}" bindtap="openIncident">查看本人参与的集中事件</button>
   <button class="btn" wx:if="{{canAccept}}" bindtap="accept">接单</button>
   <block wx:if="{{canReject}}">
@@ -65,7 +65,10 @@
 </view>
 <view class="card" wx:if="{{logs.length}}">
   <view>历史</view>
-  <view wx:for="{{logs}}" wx:key="id">{{item.from_status}} → {{item.to_status}} {{item.event_code}}</view>
+  <view wx:for="{{logs}}" wx:key="id">
+    <view>{{item.fromStatusLabel}} → {{item.toStatusLabel}} · {{item.eventLabel}}</view>
+    <view class="empty">{{item.actorLabel}} · {{item.createdAtLabel}}</view>
+  </view>
 </view>
 <button class="btn" bindtap="reload">刷新</button>
 <view class="error" wx:if="{{error}}">{{error}}</view>

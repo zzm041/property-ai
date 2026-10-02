@@ -41,7 +41,7 @@ def _reject_direct_user_id(*, user_id: int | None, settings: Settings) -> None:
     if user_id is not None and settings.app_env not in {"development", "test"}:
         raise AppError(
             code=EmployeeErrorCode.INVALID_INPUT,
-            message="Direct user_id attach is not allowed",
+            message="Employee identity must be claimed through an invitation",
             status_code=400,
         )
 

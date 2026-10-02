@@ -42,7 +42,7 @@
     <view class="section-title">批量导入 / 导出</view>
     <view class="hint">CSV 列：building_code,building_name,unit_code,unit_name,room_no,floor,status。导入整批校验并提交；冲突时不会只写入一部分。</view>
     <view class="hint">每批最多 500 条记录；名称中的逗号、双引号或换行按 CSV 引号格式填写，可原样导回本页导出的内容。</view>
-    <textarea class="csv-box" value="{{importText}}" data-field="importText" bindinput="onTextInput" maxlength="-1" auto-height />
+    <textarea class="csv-box" placeholder="粘贴带表头的 CSV 内容" value="{{importText}}" data-field="importText" bindinput="onTextInput" maxlength="-1" auto-height />
     <button class="btn" bindtap="importHouses">导入 CSV 内容</button>
     <button class="btn secondary" bindtap="exportHouses">导出并复制 CSV</button>
   </view>
@@ -79,15 +79,15 @@
 <view class="card house-card archive-card {{selectedHouseId == item.id ? 'selected' : ''}}" wx:for="{{houses}}" wx:key="id" data-id="{{item.id}}" bindtap="selectHouse">
   <view class="house-title">{{item.label}}</view>
   <view>楼层：{{item.floor === null ? '未设置' : item.floor}}</view>
-  <view>状态：{{item.status}}</view>
+  <view>状态：{{item.statusText}}</view>
 </view>
 
 <view class="card" wx:if="{{selectedHouse && canEdit}}">
   <view class="section-title">维护房屋 · {{selectedHouse.label}}</view>
   <input placeholder="房号" value="{{editRoomNo}}" data-field="editRoomNo" bindinput="onTextInput" />
   <input type="number" placeholder="楼层（留空表示未设置）" value="{{editFloor}}" data-field="editFloor" bindinput="onTextInput" />
-  <picker range="{{houseStatusOptions}}" value="{{selectedHouseStatusIndex}}" bindchange="onHouseStatusChange">
-    <view class="picker">状态：{{houseStatusOptions[selectedHouseStatusIndex]}}</view>
+  <picker range="{{houseStatusOptions}}" range-key="label" value="{{selectedHouseStatusIndex}}" bindchange="onHouseStatusChange">
+    <view class="picker">状态：{{houseStatusOptions[selectedHouseStatusIndex].label}}</view>
   </picker>
   <button class="btn" bindtap="updateHouse">保存房屋档案</button>
 </view>
@@ -96,8 +96,7 @@
 <view class="empty" wx:if="{{!loading && !relations.length}}">当前小区暂无住户关系记录</view>
 <view class="card" wx:for="{{relations}}" wx:key="id">
   <view class="house-title">{{item.houseLabel}} · {{item.user_display_name}}</view>
-  <view class="hint">用户编号：{{item.user_id}}</view>
-  <view>关系：{{item.relation_type}} · {{item.status}}</view>
+  <view>关系：{{item.relationText}} · {{item.statusText}}</view>
   <view class="hint">生效：{{item.valid_from}}</view>
   <view class="hint" wx:if="{{item.valid_to}}">结束：{{item.valid_to}}</view>
   <button wx:if="{{canEdit && item.status == 'ACTIVE'}}" class="btn danger" data-id="{{item.id}}" bindtap="endRelation">结束关系并保留历史</button>

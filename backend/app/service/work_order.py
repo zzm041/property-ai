@@ -211,6 +211,12 @@ class WorkOrderService:
         )
         self._clock = clock
 
+    @property
+    def max_upload_bytes(self) -> int:
+        """Maximum accepted upload payload, shared by registration and streaming."""
+
+        return self._settings.upload_max_mb * 1024 * 1024
+
     def register_file(
         self,
         *,
@@ -238,7 +244,7 @@ class WorkOrderService:
                 message="File extension does not match the declared type",
                 status_code=422,
             )
-        max_bytes = self._settings.upload_max_mb * 1024 * 1024
+        max_bytes = self.max_upload_bytes
         if size_bytes <= 0 or size_bytes > max_bytes:
             raise AppError(
                 code=FileErrorCode.TOO_LARGE,
@@ -361,7 +367,7 @@ class WorkOrderService:
                 message="Permission denied",
                 status_code=403,
             )
-        max_bytes = self._settings.upload_max_mb * 1024 * 1024
+        max_bytes = self.max_upload_bytes
         if len(content) > max_bytes:
             raise AppError(
                 code=FileErrorCode.TOO_LARGE,

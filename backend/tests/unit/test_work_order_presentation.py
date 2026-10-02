@@ -119,10 +119,10 @@ const raw={work_order:{id:31,status:'PROCESSING',process_reason:'EXTERNAL_COORDI
 const saved=JSON.stringify(raw),view=p.presentDetail(raw);
 assert.equal(JSON.stringify(raw),saved,'projection must not mutate business data');
 if(scenario==='projection'){
- assert.equal(view.reasonLabel,'物业继续处理中');assert.equal(view.timezoneLabel,'Asia/Shanghai');assert.equal(view.createdAtLabel,'2026-09-24 02:30:00 UTC+08:00');
+ assert.equal(view.reasonLabel,'物业协调处理中');assert.equal(view.timezoneLabel,'Asia/Shanghai');assert.equal(view.createdAtLabel,'2026-09-24 02:30:00 UTC+08:00');
  assert(!view.needsClarification);assert.equal(view.analysisMessage,'');
- assert.equal(view.processes[0].assigneeLabel,'合成员工（员工 #9）');assert.match(view.processes[1].assigneeLabel,/未提供展示名/);
- assert.equal(view.receipts[1].problemTypeLabel,'__proto__');assert.equal(view.logs[0].eventLabel,'提交报修');assert.equal(view.logs[0].actorLabel,'住户');assert.equal(view.media[0].phaseLabel,'报修附件');process.exit(0);
+ assert.equal(view.processes[0].assigneeLabel,'合成员工');assert.equal(view.processes[1].assigneeLabel,'员工编号 10');
+ assert.equal(view.receipts[1].problemTypeLabel,'其他问题');assert.equal(view.logs[0].eventLabel,'提交报修');assert.equal(view.logs[0].actorLabel,'住户');assert.equal(view.media[0].phaseLabel,'报修附件');process.exit(0);
 }
 if(scenario==='clarification'){
  raw.work_order.status='PENDING_ANALYSIS';raw.work_order.process_reason='NONE';
@@ -133,7 +133,7 @@ if(scenario==='clarification'){
 if(scenario==='unknown'){
  assert.match(p.statusLabel('__proto__'),/未知状态/);assert.equal(p.utcLabel(null),'未记录');assert.equal(p.utcLabel('invalid'),'时间不可用');
  assert.equal(p.utcLabel('2026-09-23T18:30:00Z'),'2026-09-23 18:30:00 UTC');
- const x=p.presentDetail({work_order:{status:'FUTURE'},logs:[{to_status:'FUTURE',event_code:'FUTURE',actor_type:'FUTURE'}]});assert.match(x.logs[0].eventLabel,/FUTURE/);assert.equal(x.timezoneLabel,'UTC');process.exit(0);
+ const x=p.presentDetail({work_order:{status:'FUTURE'},logs:[{to_status:'FUTURE',event_code:'FUTURE',actor_type:'FUTURE'}]});assert.equal(x.logs[0].eventLabel,'工单事件');assert.equal(x.logs[0].actorLabel,'操作方');assert.equal(x.timezoneLabel,'UTC');process.exit(0);
 }
 let page,calls=0;
 const api={workOrder:()=>{calls++;return Promise.resolve(raw);}};
@@ -155,5 +155,11 @@ vm.runInNewContext(fs.readFileSync(path.join(root,'miniprogram/pages/work-orders
     'WAIT_CONFIRM', 'COMPLETED', 'CANCELLED', 'CLOSED', 'projection', 'clarification', 'unknown', 'page',
 ])
 def test_readable_page_projection_preserves_business_state(scenario):
-    result = subprocess.run(['node', '-e', SCRIPT, str(ROOT), scenario], capture_output=True, text=True, timeout=15)
+    result = subprocess.run(
+        ['node', '-e', SCRIPT, str(ROOT), scenario],
+        capture_output=True,
+        text=True,
+        encoding='utf-8',
+        timeout=15,
+    )
     assert result.returncode == 0, result.stdout + result.stderr

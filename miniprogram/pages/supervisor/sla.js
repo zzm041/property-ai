@@ -68,7 +68,12 @@ function sourceLabel(source) {
   if (source === "TENANT") {
     return "企业默认";
   }
-  return "异常代码兜底（需修复）";
+  return "系统默认策略";
+}
+
+function optionLabel(options, value, fallback) {
+  const item = options.find((option) => option.value === value);
+  return item ? item.label : fallback;
 }
 
 function optionValue(options, index) {
@@ -208,11 +213,16 @@ Page({
       const items = (payload.items || []).map((item) => ({
         ...item,
         scopeText: item.property_id ? "当前小区覆盖" : "企业默认",
+        categoryText: optionLabel(CATEGORY_OPTIONS, item.category, "其他"),
+        priorityText: optionLabel(PRIORITY_OPTIONS, item.priority, "待确认"),
+        statusText: optionLabel(STATUS_OPTIONS, item.status, "待确认"),
       }));
       const effective = (payload.effective || []).map((item) => ({
         ...item,
         key: `${item.category}-${item.priority}`,
         sourceText: sourceLabel(item.source),
+        categoryText: optionLabel(CATEGORY_OPTIONS, item.category, "其他"),
+        priorityText: optionLabel(PRIORITY_OPTIONS, item.priority, "待确认"),
       }));
       this.setData({ items, effective, versioningAvailable: !!payload.versioning_available, error: "" });
       this.syncEditor();

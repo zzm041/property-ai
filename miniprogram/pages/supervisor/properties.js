@@ -1,5 +1,10 @@
 const api = require("../../services/api");
 const { withLoading } = require("../../utils/ui");
+const labels = require("../../utils/business-labels");
+const HOUSE_STATUS_OPTIONS = ["ACTIVE", "INACTIVE"].map((value) => ({
+  value,
+  label: labels.houseStatus(value),
+}));
 
 const IMPORT_COLUMNS = [
   "building_code",
@@ -174,7 +179,7 @@ Page({
     selectedHouse: null,
     selectedHouseId: "",
     selectedHouseStatusIndex: 0,
-    houseStatusOptions: ["ACTIVE", "INACTIVE"],
+    houseStatusOptions: HOUSE_STATUS_OPTIONS,
     buildingCode: "",
     buildingName: "",
     unitCode: "",
@@ -286,6 +291,7 @@ Page({
         const building = unit ? buildingById[unit.building_id] : null;
         return {
           ...item,
+          statusText: labels.houseStatus(item.status),
           buildingCode: building ? building.code : "?",
           unitCode: unit ? unit.code : "?",
           label: `${building ? building.code : "?"} / ${unit ? unit.code : "?"} / ${item.room_no}`,
@@ -297,6 +303,8 @@ Page({
       });
       const relations = relationItems.map((item) => ({
         ...item,
+        relationText: labels.relationType(item.relation_type),
+        statusText: labels.relationStatus(item.status),
         houseLabel: houseById[item.house_id]
           ? houseById[item.house_id].label
           : `房屋 ${item.house_id}`,
@@ -527,7 +535,9 @@ Page({
       this.setData({ selectedHouse: null, selectedHouseId: "" });
       return;
     }
-    let statusIndex = this.data.houseStatusOptions.indexOf(house.status);
+    let statusIndex = this.data.houseStatusOptions.findIndex(
+      (item) => item.value === house.status
+    );
     if (statusIndex < 0) {
       statusIndex = 0;
     }
@@ -554,7 +564,7 @@ Page({
         .updateHouse(this.data.selectedHouse.id, {
           room_no: this.data.editRoomNo.trim(),
           floor,
-          status: this.data.houseStatusOptions[this.data.selectedHouseStatusIndex],
+          status: this.data.houseStatusOptions[this.data.selectedHouseStatusIndex].value,
         })
         .then(() => {
           this.setData({ notice: "房屋档案已更新" });

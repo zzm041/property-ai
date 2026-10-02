@@ -1,5 +1,3 @@
-const env = require("../../config/env");
-
 function applySession(tokenPayload) {
   const auth = require("../../services/auth");
   auth.setToken(tokenPayload.access_token);
@@ -12,7 +10,6 @@ Page({
   data: {
     error: "",
     loading: false,
-    envNote: "",
     phone: "",
     mode: "password",
     password: "",
@@ -29,7 +26,6 @@ Page({
       wx.reLaunch({ url: "/pages/home/home" });
       return;
     }
-    this.setData({ envNote: env.ENV_NOTE || "" });
   },
   onUnload() {
     if (this._timer) {
@@ -131,7 +127,7 @@ Page({
         challengeAnswer: "",
         error:
           data && data.delivery_channel === "development"
-            ? "验证码已由开发短信替身发送，非正式短信验收。"
+            ? "验证码已生成，请按当前可用方式获取。"
             : "验证码已发送",
       });
       this.startCooldown(data && data.expires_in ? Math.min(60, data.expires_in) : 60);

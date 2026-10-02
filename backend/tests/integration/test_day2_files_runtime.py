@@ -61,8 +61,10 @@ def test_resident_lists_own_work_orders_and_uploads_media(
             headers=_auth(token, "d2-file-reg"),
         )
         assert registered.status_code == 200
-        file_id = registered.json()["data"]["id"]
-        assert registered.json()["data"]["storage_key"]
+        registered_data = registered.json()["data"]
+        file_id = registered_data["id"]
+        assert "storage_key" not in registered_data
+        assert "scanner_status" not in registered_data
         uploaded = client.post(
             f"/api/v1/files/{file_id}/content",
             files={"file": ("spark.jpg", b"\xff\xd8\xff\xe0", "image/jpeg")},

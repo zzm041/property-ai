@@ -293,7 +293,8 @@ def test_manual_dispatch_and_staff_loop(identity_session: Session) -> None:
     assert wrong_staff.json()["error"]["code"] == WorkOrderErrorCode.NOT_ASSIGNEE
     assert accepted.json()["data"]["status"] == "ACCEPTED"
     assert started.json()["data"]["status"] == "PROCESSING"
-    assert file_resp.json()["data"]["storage_key"].startswith("dev-object:")
+    assert "storage_key" not in file_resp.json()["data"]
+    assert "scanner_status" not in file_resp.json()["data"]
     assert feedback.status_code == 200
     assert waiting.json()["data"]["process_reason"] == "WAITING_PARTS"
     assert blocked.status_code == 409

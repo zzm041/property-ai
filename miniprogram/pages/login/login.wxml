@@ -1,6 +1,5 @@
 <view class="card">
   <view>登录</view>
-  <view class="empty" wx:if="{{envNote}}">{{envNote}}</view>
 </view>
 <view class="card">
   <input placeholder="手机号" value="{{phone}}" bindinput="onPhone" type="number" />

@@ -167,7 +167,27 @@ class KnowledgeService:
             after_id=after_id,
             limit=limit,
         )
-        return tuple(self._detail(record) for record in records)
+        document_ids = tuple(record.id for record in records)
+        if not document_ids:
+            return ()
+        versions_by_document: dict[int, list[KnowledgeDocumentVersion]] = {
+            document_id: [] for document_id in document_ids
+        }
+        for version in self._repository.list_versions_for_documents(document_ids):
+            versions_by_document[version.document_id].append(version)
+        jobs_by_document: dict[int, list[KnowledgeIngestionJob]] = {
+            document_id: [] for document_id in document_ids
+        }
+        for job in self._repository.list_ingestion_jobs_for_documents(document_ids):
+            jobs_by_document[job.document_id].append(job)
+        return tuple(
+            (
+                record,
+                tuple(versions_by_document[record.id]),
+                tuple(jobs_by_document[record.id]),
+            )
+            for record in records
+        )
 
     def get_managed(
         self,

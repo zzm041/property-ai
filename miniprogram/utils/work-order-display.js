@@ -1,14 +1,5 @@
 // Presentation only. Raw codes/IDs/UTC values still drive existing business actions.
-const STATUS = {
-  PENDING_ANALYSIS: "待分析", PENDING_ASSIGNMENT: "待安排人员", ASSIGNED: "已派单",
-  ACCEPTED: "已接单", PROCESSING: "处理中", WAIT_CONFIRM: "待住户确认",
-  COMPLETED: "已完成", CANCELLED: "已撤销", CLOSED: "已归档",
-};
-const REASON = {
-  NONE: "正常处理", WAITING_OWNER: "等待住户配合", WAITING_PARTS: "等待配件",
-  INTERNAL_UNRESOLVED: "已上报，等待物业处理", ESCALATED: "已升级主管",
-  EXTERNAL_COORDINATION: "物业继续处理中", REASSIGN_REQUIRED: "等待重新安排人员",
-};
+const businessLabels = require("./business-labels");
 const EVENT = {
   AI_TASK_ATTEMPT: "系统自动分析/恢复尝试",
   AI_TASK_FAILED: "自动处理暂时失败，请等待物业处理",
@@ -27,9 +18,9 @@ const KIND = { IMAGE: "图片", AUDIO: "语音" };
 const CATEGORY = { PLUMBING: "供排水", ELECTRICAL: "电气", HVAC: "暖通", CLEANING: "保洁", SECURITY: "安保", OTHER: "其他" };
 
 function label(values, code, fallback) {
-  return Object.prototype.hasOwnProperty.call(values, code) ? values[code] : `${fallback}（${code || "未提供"}）`;
+  return Object.prototype.hasOwnProperty.call(values, code) ? values[code] : fallback;
 }
-function statusLabel(code) { return label(STATUS, code, "未知状态"); }
+function statusLabel(code) { return businessLabels.workOrderStatus(code); }
 function utcLabel(value) {
   if (!value) return "未记录";
   const date = new Date(value);
@@ -43,7 +34,7 @@ function presentDetail(item) {
   const employee = id => {
     if (id == null) return "未记录处理人员";
     const name = Object.prototype.hasOwnProperty.call(names, id) ? names[id] : "";
-    return name && name.trim() ? `${name}（员工 #${id}）` : `员工 #${id}（未提供展示名）`;
+    return name && name.trim() ? name : `员工编号 ${id}`;
   };
   const needsClarification =
     item.work_order && item.work_order.status === "PENDING_ANALYSIS" &&
@@ -55,11 +46,11 @@ function presentDetail(item) {
       (item.logs || []).filter(x => ["AI_TASK_ATTEMPT", "AI_TASK_FAILED"].includes(x.event_code)).sort((a, b) => b.id - a.id)[0]?.event_code === "AI_TASK_FAILED",
     timezoneLabel: display.property_timezone || "UTC",
     statusLabel: statusLabel(item.work_order && item.work_order.status),
-    reasonLabel: label(REASON, item.work_order && item.work_order.process_reason, "处理原因"),
+    reasonLabel: businessLabels.workOrderReason(item.work_order && item.work_order.process_reason),
     createdAtLabel: at(item.work_order && item.work_order.created_at),
     assignments: (item.assignments || []).map(x => ({ ...x, assigneeLabel: employee(x.employee_id) })),
     processes: (item.processes || []).map(x => ({ ...x, assigneeLabel: employee(x.assignee_id), startedAtLabel: at(x.started_at) })),
-    receipts: (item.receipts || []).map(x => ({ ...x, problemTypeLabel: Object.prototype.hasOwnProperty.call(CATEGORY, x.problem_type) ? CATEGORY[x.problem_type] : x.problem_type, finishedAtLabel: at(x.finished_at) })),
+    receipts: (item.receipts || []).map(x => ({ ...x, problemTypeLabel: label(CATEGORY, x.problem_type, "其他问题"), finishedAtLabel: at(x.finished_at) })),
     feedbacks: (item.feedbacks || []).map(x => ({ ...x, createdAtLabel: at(x.created_at) })),
     media: (item.media || []).map(x => ({ ...x, phaseLabel: label(PHASE, x.taken_phase, "附件阶段"), kindLabel: label(KIND, x.kind, "附件类型"), createdAtLabel: at(x.created_at) })),
     logs: (item.logs || []).map(x => ({ ...x,

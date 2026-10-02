@@ -146,6 +146,35 @@ def test_management_list_passes_exact_target_permissions_to_repository() -> None
     assert call["property_id"] == 20
 
 
+def test_management_list_batches_versions_and_jobs_instead_of_querying_per_document() -> None:
+    actor = _principal(
+        OrganizationScope(ScopeType.PROPERTY, tenant_id=10, property_id=20)
+    )
+    service, repository, properties, _audit = _service(actor)
+    properties.get_property_by_id.return_value = SimpleNamespace(id=20, tenant_id=10)
+    documents = (
+        SimpleNamespace(id=71, tenant_id=10, property_id=20),
+        SimpleNamespace(id=72, tenant_id=10, property_id=20),
+    )
+    version_71 = SimpleNamespace(document_id=71, version=2)
+    version_72 = SimpleNamespace(document_id=72, version=1)
+    job_71 = SimpleNamespace(document_id=71, version=2)
+    repository.list_documents_for_management.return_value = documents
+    repository.list_versions_for_documents.return_value = (version_71, version_72)
+    repository.list_ingestion_jobs_for_documents.return_value = (job_71,)
+
+    details = service.list_managed(actor=actor, property_id=20)
+
+    assert details == (
+        (documents[0], (version_71,), (job_71,)),
+        (documents[1], (version_72,), ()),
+    )
+    repository.list_versions_for_documents.assert_called_once_with((71, 72))
+    repository.list_ingestion_jobs_for_documents.assert_called_once_with((71, 72))
+    repository.list_versions.assert_not_called()
+    repository.list_ingestion_jobs.assert_not_called()
+
+
 def test_create_version_locks_document_and_records_pending_job() -> None:
     actor = _principal(
         OrganizationScope(

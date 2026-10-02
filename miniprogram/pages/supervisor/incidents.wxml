@@ -29,13 +29,13 @@
   <view class="section-title">事件详情 · #{{selected.id}}</view>
   <view>状态：{{selected.statusText}}</view>
   <view>类型：{{selected.categoryText}} {{selected.subcategory || ''}}</view>
-  <view>楼栋 ID：{{selected.building_id || '未定位到楼栋'}}</view>
+  <view>楼栋范围：{{selected.building_id ? '已定位' : '未定位到楼栋'}}</view>
   <view>首单时间：{{selected.firstSeenText}}</view>
   <view>最近发现：{{selected.lastSeenText}}</view>
   <view>最近更新：{{selected.updatedText}}</view>
   <view>关联工单：{{selected.work_order_count}} 条</view>
   <view>主工单：{{selected.primary_work_order_id || '待确定'}}</view>
-  <view>主处理员工：{{selected.primary_employee_id || '待确定'}}</view>
+  <view>主处理人员：{{selected.primary_employee_id ? '已指定' : '待确定'}}</view>
   <view wx:if="{{selected.summary}}">事件摘要：{{selected.summary}}</view>
   <view wx:if="{{selected.ai_summary}}">AI 运营摘要：{{selected.ai_summary}}</view>
   <view wx:if="{{selected.affected_scope}}">影响范围：{{selected.affected_scope}}</view>

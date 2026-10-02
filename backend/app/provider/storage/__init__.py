@@ -17,6 +17,7 @@ from app.provider.errors import (
     ProviderTimeoutError,
     ProviderUnavailableError,
 )
+from app.provider.http import build_http_client
 
 logger = get_logger(__name__)
 
@@ -265,7 +266,7 @@ class ProductionStorageProvider(StorageProvider):
             ),
         }
         own_client = self._client is None
-        http = self._client or httpx.Client(timeout=10.0)
+        http = self._client or build_http_client(url=url, timeout_seconds=10.0)
         started_at = time.perf_counter()
         operation = "ensure_bucket" if not storage_key else method.lower()
         try:

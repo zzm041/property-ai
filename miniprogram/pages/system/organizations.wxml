@@ -15,8 +15,8 @@
 
 <view class="card" wx:if="{{created}}">
   <view class="section-title">建立结果</view>
-  <view>租户：{{created.tenant_name}}（{{created.tenant_id}}）</view>
-  <view>小区：{{created.property_name}}（{{created.property_id}}）</view>
-  <view>首位管理员账号：{{created.initial_admin_user_id}}</view>
-  <view>角色：{{created.initial_admin_role}}</view>
+  <view>物业企业：{{created.tenant_name}}</view>
+  <view>小区：{{created.property_name}}</view>
+  <view>首位管理员：已完成授权</view>
+  <view>管理范围：租户管理员</view>
 </view>

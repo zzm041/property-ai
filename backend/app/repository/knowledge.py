@@ -177,6 +177,23 @@ class KnowledgeRepository:
             ).all()
         )
 
+    def list_versions_for_documents(
+        self,
+        document_ids: tuple[int, ...],
+    ) -> tuple[KnowledgeDocumentVersion, ...]:
+        if not document_ids:
+            return ()
+        return tuple(
+            self._session.scalars(
+                select(KnowledgeDocumentVersion)
+                .where(KnowledgeDocumentVersion.document_id.in_(document_ids))
+                .order_by(
+                    KnowledgeDocumentVersion.document_id,
+                    KnowledgeDocumentVersion.version.desc(),
+                )
+            ).all()
+        )
+
     def list_ingestion_jobs(
         self,
         document_id: int,
@@ -186,6 +203,23 @@ class KnowledgeRepository:
                 select(KnowledgeIngestionJob)
                 .where(KnowledgeIngestionJob.document_id == document_id)
                 .order_by(KnowledgeIngestionJob.version.desc())
+            ).all()
+        )
+
+    def list_ingestion_jobs_for_documents(
+        self,
+        document_ids: tuple[int, ...],
+    ) -> tuple[KnowledgeIngestionJob, ...]:
+        if not document_ids:
+            return ()
+        return tuple(
+            self._session.scalars(
+                select(KnowledgeIngestionJob)
+                .where(KnowledgeIngestionJob.document_id.in_(document_ids))
+                .order_by(
+                    KnowledgeIngestionJob.document_id,
+                    KnowledgeIngestionJob.version.desc(),
+                )
             ).all()
         )
 

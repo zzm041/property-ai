@@ -1,5 +1,10 @@
 const api = require("../../services/api");
 const { withLoading } = require("../../utils/ui");
+const labels = require("../../utils/business-labels");
+const EMPLOYEE_STATUS_OPTIONS = ["ACTIVE", "DISABLED"].map((value) => ({
+  value,
+  label: labels.employeeStatus(value),
+}));
 
 function numericIds(values) {
   return (values || []).map((value) => Number(value)).filter((value) => value > 0);
@@ -101,7 +106,7 @@ Page({
     editCapacity: "1",
     editDepartmentIndex: 0,
     editStatusIndex: 0,
-    statusOptions: ["ACTIVE", "DISABLED"],
+    statusOptions: EMPLOYEE_STATUS_OPTIONS,
     addDutyIds: [],
     addSkillIds: [],
     invitePhone: "",
@@ -214,6 +219,18 @@ Page({
           );
           return {
             ...detail,
+            employee: {
+              ...employee,
+              statusText: labels.employeeStatus(employee.status),
+            },
+            assignments: (detail.assignments || []).map((assignment) => ({
+              ...assignment,
+              statusText: labels.relationStatus(assignment.status),
+              propertyName:
+                (this.data.properties.find(
+                  (property) => Number(property.id) === Number(assignment.property_id)
+                ) || {}).name || "已授权小区",
+            })),
             id: employee.id,
             departmentName: department ? department.name : "未设置",
             dutyNames: (detail.duties || []).map((item) => item.name).join("、") || "无",
@@ -221,7 +238,7 @@ Page({
             daily,
             hasCurrentAssignment,
             assignmentText: hasCurrentAssignment ? "当前有效" : "历史任职，可重新建立",
-            dutyText: daily ? `${daily.on_duty} / 负载 ${daily.current_load}` : "今日未签到",
+            dutyText: daily ? `${labels.onDutyStatus(daily.on_duty)} / 当前任务 ${daily.current_load}` : "今日未签到",
           };
         }
       );
@@ -260,7 +277,9 @@ Page({
     if (editDepartmentIndex < 0) {
       editDepartmentIndex = 0;
     }
-    let editStatusIndex = this.data.statusOptions.indexOf(detail.employee.status);
+    let editStatusIndex = this.data.statusOptions.findIndex(
+      (item) => item.value === detail.employee.status
+    );
     if (editStatusIndex < 0) {
       editStatusIndex = 0;
     }
@@ -377,7 +396,7 @@ Page({
     }
     const department = this.data.departmentOptions[this.data.editDepartmentIndex];
     const body = {
-      status: this.data.statusOptions[this.data.editStatusIndex],
+      status: this.data.statusOptions[this.data.editStatusIndex].value,
       max_capacity: maxCapacity,
       add_duty_ids: this.data.addDutyIds,
       add_skill_ids: this.data.addSkillIds,

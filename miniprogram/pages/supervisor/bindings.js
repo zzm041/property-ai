@@ -1,21 +1,34 @@
 Page({
-  data: { items: [], error: "", propertyId: "", tenantId: "", loading: false, rejectReason: "", nextCursor: 0 },
+  data: { items: [], properties: [], propertyIndex: 0, error: "", propertyId: "", tenantId: "", loading: false, rejectReason: "", nextCursor: 0 },
   onLoad(query) {
-    if (query.propertyId) {
-      this.setData({ propertyId: query.propertyId });
-    }
-    if (query.tenantId) {
-      this.setData({ tenantId: query.tenantId });
-    }
+    this.requestedPropertyId = query.propertyId || "";
+    this.requestedTenantId = query.tenantId || "";
+    this.setData({ propertyId: this.requestedPropertyId, tenantId: this.requestedTenantId });
   },
   onShow() {
-    if (this.data.propertyId) {
-      this.load();
-    }
+    const api = require("../../services/api");
+    const scope = require("../../utils/property-scope");
+    return require("../../utils/ui").withLoading(this, () =>
+      scope.authorizedProperties(api, "resident_binding:review").then((properties) => {
+        if (!properties.length) throw new Error("当前身份没有绑定审核范围");
+        const propertyIndex = scope.preferredIndex(properties, this.requestedPropertyId);
+        const property = properties[propertyIndex];
+        this.setData({ properties, propertyIndex, propertyId: String(property.id), tenantId: String(property.tenant_id) });
+        return this.loadItems();
+      })
+    ).catch(() => {});
   },
   onProperty(e) {
     if (this.data.loading) return;
     this.setData({ propertyId: e.detail.value, items: [], nextCursor: 0, rejectReason: "" });
+  },
+  onPropertyChange(e) {
+    if (this.data.loading) return;
+    const propertyIndex = Number(e.detail.value);
+    const property = this.data.properties[propertyIndex];
+    if (!property) return;
+    this.setData({ propertyIndex, propertyId: String(property.id), tenantId: String(property.tenant_id), items: [], nextCursor: 0, rejectReason: "" });
+    return this.load();
   },
   onRejectReason(e) {
     if (!this.data.loading) this.setData({ rejectReason: e.detail.value });
@@ -24,7 +37,16 @@ Page({
     return require("../../services/api")
       .bindRequests(this.data.propertyId, this.data.tenantId, afterId, 50)
       .then((data) => {
-        const result = require("../../utils/paging").appendPage(afterId ? this.data.items : [], data, afterId, 50);
+        const labels = require("../../utils/business-labels");
+        const decorated = {
+          ...data,
+          items: ((data && data.items) || []).map((item) => ({
+            ...item,
+            statusText: item.status === "PENDING" ? "待审核" : item.status === "APPROVED" ? "已通过" : item.status === "REJECTED" ? "已拒绝" : "状态待确认",
+            relationText: labels.relationType(item.relation_type),
+          })),
+        };
+        const result = require("../../utils/paging").appendPage(afterId ? this.data.items : [], decorated, afterId, 50);
         this.setData({ items: result.items, nextCursor: result.nextCursor });
       });
   },

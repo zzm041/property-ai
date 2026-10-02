@@ -407,12 +407,20 @@ class IdentityRecoveryService:
 
     def _require_schema(self) -> None:
         if not self._schema_available():
-            raise AppError(code=IdentityRecoveryErrorCode.UNAVAILABLE, message="Identity recovery awaits approved schema migration", status_code=503)
+            raise AppError(
+                code=IdentityRecoveryErrorCode.UNAVAILABLE,
+                message="Identity recovery is temporarily unavailable",
+                status_code=503,
+            )
 
     def _require_enabled(self) -> None:
         self._require_schema()
         if self._provider.available is not True:
-            raise AppError(code=IdentityRecoveryErrorCode.UNAVAILABLE, message="No approved identity proof channel is configured", status_code=503)
+            raise AppError(
+                code=IdentityRecoveryErrorCode.UNAVAILABLE,
+                message="Identity recovery is temporarily unavailable",
+                status_code=503,
+            )
 
     @staticmethod
     def _require_reviewer(actor: Principal) -> None:
@@ -423,7 +431,11 @@ class IdentityRecoveryService:
 
     def _reload_active(self, user_id: int) -> Principal:
         if self._principal_loader is None:
-            raise AppError(code=IdentityRecoveryErrorCode.UNAVAILABLE, message="Identity principal loader is unavailable", status_code=503)
+            raise AppError(
+                code=IdentityRecoveryErrorCode.UNAVAILABLE,
+                message="Identity recovery is temporarily unavailable",
+                status_code=503,
+            )
         principal = self._principal_loader(user_id)
         if principal.status != "ACTIVE":
             raise AppError(code=IamErrorCode.FORBIDDEN, message="Permission denied", status_code=403)

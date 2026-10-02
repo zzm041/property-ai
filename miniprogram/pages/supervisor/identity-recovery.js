@@ -6,7 +6,13 @@ Page({
   onShow() { this.load(); },
   load() {
     return withLoading(this, () => api.identityRecoveryCases().then((payload) => {
-      this.setData({ items: payload.items || [], error: "" });
+      const labels = require("../../utils/business-labels");
+      const items = (payload.items || []).map((item) => ({
+        ...item,
+        purposeText: labels.identityPurpose(item.purpose),
+        statusText: labels.identityStatus(item.status),
+      }));
+      this.setData({ items, error: "" });
     })).catch(() => {});
   },
   onReason(event) {

@@ -9,8 +9,8 @@ import pytest
 
 from app.core.config import Settings
 from app.provider.factory import build_llm_provider, build_vlm_provider
-from app.provider.http import _loopback_target, request_json
-from app.provider.storage import DevelopmentStorageProvider
+from app.provider.http import _private_target, build_http_client, request_json
+from app.provider.storage import DevelopmentStorageProvider, ProductionStorageProvider
 
 
 @pytest.mark.parametrize('url,expected', [
@@ -21,11 +21,13 @@ from app.provider.storage import DevelopmentStorageProvider
     ('https://provider.example/v1?target=127.0.0.1', False),
     ('http://127.0.0.1.example/v1', False),
     ('http://127.0.0.1@provider.example/v1', False),
-    ('http://192.168.1.2/v1', False),
+    ('http://localhost:9000/v1', True),
+    ('http://minio:9000/v1', True),
+    ('http://192.168.1.2/v1', True),
     ('http://localhost.example/v1', False),
 ])
-def test_literal_loopback_classification(url, expected):
-    assert _loopback_target(url) is expected
+def test_private_provider_target_classification(url, expected):
+    assert _private_target(url) is expected
 
 
 @contextmanager
@@ -42,6 +44,12 @@ def server():
             self.send_header('Content-Length', str(len(output)))
             self.end_headers()
             self.wfile.write(output)
+        def do_PUT(self):
+            length = int(self.headers.get('Content-Length') or 0)
+            received.append({'path': self.path, 'body': self.rfile.read(length)})
+            self.send_response(200)
+            self.send_header('Content-Length', '0')
+            self.end_headers()
         def log_message(self, *args):
             pass
     owned = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
@@ -88,6 +96,28 @@ def test_non_loopback_provider_keeps_explicit_environment_proxy_support(monkeypa
                      json_body={'synthetic': True})
         assert len(proxy_requests) == 1
         assert proxy_requests[0]['path'] == 'http://provider.example.invalid/v1/chat/completions'
+
+
+def test_loopback_object_storage_does_not_send_media_to_environment_proxy(monkeypatch):
+    with server() as (storage_port, storage_requests), server() as (proxy_port, proxy_requests):
+        proxy_environment(monkeypatch, proxy_port)
+        provider = ProductionStorageProvider(
+            endpoint=f'http://127.0.0.1:{storage_port}',
+            bucket='synthetic-media',
+            access_key='synthetic-access',
+            secret_key='synthetic-secret',
+        )
+        provider.put_object('t1/p2/object', b'private-media-bytes', 'image/jpeg')
+        assert len(storage_requests) == 1
+        assert storage_requests[0]['body'] == b'private-media-bytes'
+        assert proxy_requests == []
+
+
+@pytest.mark.parametrize('endpoint', ['http://localhost:9000', 'http://minio:9000', 'http://192.168.1.2:9000'])
+def test_private_storage_targets_disable_environment_proxy(monkeypatch, endpoint):
+    proxy_environment(monkeypatch, 9)
+    with build_http_client(url=endpoint, timeout_seconds=1) as client:
+        assert client._trust_env is False
 
 
 def test_caller_supplied_client_is_not_replaced_or_closed():

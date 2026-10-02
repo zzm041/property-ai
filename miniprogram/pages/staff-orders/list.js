@@ -5,7 +5,14 @@ Page({
     withLoading(this, () =>
       require("../../services/api")
         .staffWorkOrders()
-        .then((data) => this.setData({ items: (data && data.items) || [] }))
+        .then((data) => {
+          const { workOrderStatus } = require("../../utils/business-labels");
+          const items = ((data && data.items) || []).map((item) => ({
+            ...item,
+            statusLabel: workOrderStatus(item.status),
+          }));
+          this.setData({ items });
+        })
     ).catch(() => {});
   },
   open(e) {

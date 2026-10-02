@@ -1,8 +1,15 @@
 const api = require("../../services/api");
 const { withLoading } = require("../../utils/ui");
 
-const TYPE_OPTIONS = ["FAQ", "GUIDE", "RULE", "SOP", "NOTICE"];
-const VISIBILITY_OPTIONS = ["RESIDENT", "STAFF_ONLY", "PROPERTY", "TENANT"];
+const labels = require("../../utils/business-labels");
+const TYPE_OPTIONS = ["FAQ", "GUIDE", "RULE", "SOP", "NOTICE"].map((value) => ({
+  value,
+  label: labels.knowledgeType(value),
+}));
+const VISIBILITY_OPTIONS = ["RESIDENT", "STAFF_ONLY", "PROPERTY", "TENANT"].map((value) => ({
+  value,
+  label: labels.knowledgeVisibility(value),
+}));
 
 function scopeAllows(scope, permission, property) {
   if ((scope.permissions || []).indexOf(permission) < 0) {
@@ -69,12 +76,24 @@ function loadAllDocuments(propertyId, includeArchived, afterId, collected) {
 function decorate(item) {
   const jobs = item.ingestion_jobs || [];
   const latestJob = jobs[0];
+  const statusLabel = labels.knowledgeStatus;
   return {
     ...item,
+    statusText: statusLabel(item.status),
+    typeText: labels.knowledgeType(item.document_type),
+    visibilityText: labels.knowledgeVisibility(item.visibility),
+    versions: (item.versions || []).map((version) => ({
+      ...version,
+      statusText: statusLabel(version.status),
+    })),
+    ingestion_jobs: jobs.map((job) => ({
+      ...job,
+      statusText: statusLabel(job.status),
+    })),
     targetText: item.property_id ? "当前小区" : "企业全部小区",
     jobText: latestJob
-      ? `v${latestJob.version} ${latestJob.status}${
-          latestJob.error_code ? ` · ${latestJob.error_code}` : ""
+      ? `v${latestJob.version} ${statusLabel(latestJob.status)}${
+          latestJob.error_code ? " · 请检查正文后重试" : ""
         }`
       : "暂无导入任务",
   };
@@ -240,8 +259,8 @@ Page({
       property_id:
         scope.value === "PROPERTY" ? Number(this.data.propertyId) : null,
       title: this.data.title,
-      document_type: TYPE_OPTIONS[this.data.typeIndex],
-      visibility: VISIBILITY_OPTIONS[this.data.visibilityIndex],
+      document_type: TYPE_OPTIONS[this.data.typeIndex].value,
+      visibility: VISIBILITY_OPTIONS[this.data.visibilityIndex].value,
       source_text: this.data.sourceText,
     };
     withLoading(this, () =>

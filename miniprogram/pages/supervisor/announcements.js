@@ -22,11 +22,22 @@ function indexOfValue(items, value) {
 }
 
 function decorate(item) {
+  const labels = require("../../utils/business-labels");
   const scope = (item.scopes || [])[0] || {};
   const audience = AUDIENCE_OPTIONS.find((row) => row.value === scope.audience);
   const target = SCOPE_OPTIONS.find((row) => row.value === scope.scope_type);
   return {
     ...item,
+    statusText: labels.announcementStatus(item.status),
+    reviews: (item.reviews || []).map((review) => ({
+      ...review,
+      decisionText: labels.announcementReviewDecision(review.decision),
+    })),
+    history: (item.history || []).map((history) => ({
+      ...history,
+      actionText: labels.announcementHistoryAction(history.action),
+      statusText: labels.announcementStatus(history.details && history.details.status),
+    })),
     scope,
     targetText: `${target ? target.label : scope.scope_type || "未配置"} · ${
       audience ? audience.label : scope.audience || "未配置"

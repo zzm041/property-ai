@@ -26,20 +26,19 @@
   </picker>
   <view class="field-label">接单 / 响应共用时限（分钟）</view>
   <view wx:if="{{versioningAvailable}}" class="field-label">接单时限（分钟）</view>
-  <input wx:if="{{versioningAvailable}}" type="number" value="{{acceptMinutes}}" data-field="acceptMinutes" bindinput="onField" />
+  <input wx:if="{{versioningAvailable}}" type="number" placeholder="请输入接单时限" value="{{acceptMinutes}}" data-field="acceptMinutes" bindinput="onField" />
   <view class="field-label">响应时限（分钟）</view>
-  <input type="number" value="{{respondMinutes}}" data-field="respondMinutes" bindinput="onField" />
+  <input type="number" placeholder="请输入响应时限" value="{{respondMinutes}}" data-field="respondMinutes" bindinput="onField" />
   <view class="field-label">完成时限（分钟）</view>
-  <input type="number" value="{{completeMinutes}}" data-field="completeMinutes" bindinput="onField" />
+  <input type="number" placeholder="请输入完成时限" value="{{completeMinutes}}" data-field="completeMinutes" bindinput="onField" />
   <block wx:if="{{versioningAvailable}}">
     <view class="field-label">完成前预警提前量（分钟）</view>
-    <input type="number" value="{{warningLeadMinutes}}" data-field="warningLeadMinutes" bindinput="onField" />
+    <input type="number" placeholder="请输入预警提前量" value="{{warningLeadMinutes}}" data-field="warningLeadMinutes" bindinput="onField" />
     <view class="field-label">超时后升级间隔（分钟，0 表示立即）</view>
-    <input type="number" value="{{escalationMinutes}}" data-field="escalationMinutes" bindinput="onField" />
+    <input type="number" placeholder="请输入升级间隔" value="{{escalationMinutes}}" data-field="escalationMinutes" bindinput="onField" />
     <view class="field-label">变更原因</view>
     <input value="{{changeReason}}" data-field="changeReason" bindinput="onField" placeholder="说明本次策略调整依据" maxlength="255" />
   </block>
-  <view class="hint" wx:else>不可变版本结构尚未获准迁移；当前页面保持既有 SLA 功能，不伪造版本记录。</view>
   <view class="hint" wx:if="{{editingId}}">正在编辑策略 #{{editingId}}</view>
   <view class="hint" wx:else>该层尚无策略，保存后建立。字段初值来自当前生效策略。</view>
   <view class="hint" wx:if="{{scopeOptions[scopeIndex].value == 'TENANT'}}">企业默认必须保持启用；禁用只适用于小区覆盖。</view>
@@ -51,7 +50,7 @@
   <view wx:if="{{versioningAvailable}}">每次保存生成不可变策略版本；新工单记录实际采用版本和时限快照。</view>
   <view wx:else>当前结构中接单和响应共用一个时限；完成时限独立。</view>
   <view>禁用小区覆盖会回退企业默认；企业默认不能通过本页禁用。</view>
-  <view>若企业默认因异常数据缺失或禁用，后端会使用代码兜底值保障工单创建；这不是可交付的正常配置，必须修复企业默认。</view>
+  <view>企业默认策略应保持完整且启用；发现配置异常时请及时修复。</view>
   <view>策略变更影响后续新工单；既有完成截止时间不会批量重算，后续重新派单/接单会按当时有效的接单/响应时限重置。</view>
 </view>
 
@@ -64,15 +63,15 @@
 
 <view class="section-heading">当前最终生效值</view>
 <view class="card policy-row" wx:for="{{effective}}" wx:key="key">
-  <view>{{item.category}} / {{item.priority}}</view>
+  <view>{{item.categoryText}} / {{item.priorityText}}</view>
   <view>{{item.sourceText}} · 接单/响应 {{item.respond_minutes}} 分钟 · 完成 {{item.complete_minutes}} 分钟</view>
 </view>
 
 <view class="section-heading">已保存策略层</view>
 <view class="empty" wx:if="{{!loading && !items.length}}">当前小区没有已保存策略</view>
 <view class="card policy-row" wx:for="{{items}}" wx:key="id">
-  <view>#{{item.id}} · {{item.scopeText}} · {{item.status}}</view>
-  <view>{{item.category}} / {{item.priority}} · 接单/响应 {{item.respond_minutes}} 分钟 · 完成 {{item.complete_minutes}} 分钟</view>
+  <view>#{{item.id}} · {{item.scopeText}} · {{item.statusText}}</view>
+  <view>{{item.categoryText}} / {{item.priorityText}} · 接单/响应 {{item.respond_minutes}} 分钟 · 完成 {{item.complete_minutes}} 分钟</view>
   <view class="hint" wx:if="{{item.version_no}}">版本 {{item.version_no}} · 接单 {{item.accept_minutes}} · 预警 {{item.warning_lead_minutes}} · 升级 {{item.escalation_minutes}} 分钟</view>
   <view class="hint">最后更新：{{item.updated_at}}</view>
 </view>

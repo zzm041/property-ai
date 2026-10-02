@@ -1,6 +1,18 @@
+function decorateWorkOrder(item, labels) {
+  return item
+    ? {
+        ...item,
+        statusLabel: labels.workOrderStatus(item.status),
+        reasonLabel: labels.workOrderReason(item.process_reason),
+      }
+    : null;
+}
+
 Page({
   data: {
     items: [],
+    properties: [],
+    propertyIndex: 0,
     staff: [],
     error: "",
     propertyId: "",
@@ -8,7 +20,9 @@ Page({
     employeeId: "",
     selectedId: "",
     selectedStatus: "",
+    selectedStatusLabel: "",
     selectedProcessReason: "",
+    selectedProcessReasonLabel: "",
     selectedVersion: "",
     targetWorkOrderId: 0,
     decisionReason: "",
@@ -22,27 +36,42 @@ Page({
     success: "",
   },
   onLoad(query) {
-    if (query.propertyId) {
-      this.setData({ propertyId: query.propertyId });
-    }
-    if (query.tenantId) {
-      this.setData({ tenantId: query.tenantId });
-    }
+    this.requestedPropertyId = query.propertyId || "";
+    this.requestedTenantId = query.tenantId || "";
+    this.setData({ propertyId: this.requestedPropertyId, tenantId: this.requestedTenantId });
     const workOrderId = Number(query.workOrderId || 0);
     if (Number.isInteger(workOrderId) && workOrderId > 0) {
       this.setData({ targetWorkOrderId: workOrderId });
     }
   },
   onShow() {
-    if (this.data.propertyId) {
-      this.load();
-    }
+    const api = require("../../services/api");
+    const scope = require("../../utils/property-scope");
+    return require("../../utils/ui").withLoading(this, () =>
+      scope.authorizedProperties(api, "work_order:dispatch").then((properties) => {
+        if (!properties.length) throw new Error("当前身份没有工单调度范围");
+        const propertyIndex = scope.preferredIndex(properties, this.requestedPropertyId);
+        const property = properties[propertyIndex];
+        this.setData({ properties, propertyIndex, propertyId: String(property.id), tenantId: String(property.tenant_id) });
+        return this._loadQueue({ reset: true });
+      })
+    ).catch(() => {});
   },
   onProperty(e) {
     if (this._cancelBusy) return;
     this._queueGeneration = (this._queueGeneration || 0) + 1;
     this._clearSelection();
     this.setData({ propertyId: e.detail.value, items: [], staff: [], nextCursor: "", targetWorkOrderId: 0, loading: false, success: "" });
+  },
+  onPropertyChange(e) {
+    if (this.data.loading || this._cancelBusy) return;
+    const propertyIndex = Number(e.detail.value);
+    const property = this.data.properties[propertyIndex];
+    if (!property) return;
+    this._queueGeneration = (this._queueGeneration || 0) + 1;
+    this._clearSelection();
+    this.setData({ propertyIndex, propertyId: String(property.id), tenantId: String(property.tenant_id), items: [], staff: [], nextCursor: "", targetWorkOrderId: 0, loading: false, success: "" });
+    return this.load();
   },
   changeView(e) {
     if (this.data.loading || this._cancelBusy) return;
@@ -76,13 +105,27 @@ Page({
     return Promise.all([
         api.supervisorQueue(propertyId, afterId, this.data.queueView),
         api.staffDaily(propertyId, this.data.tenantId),
+        typeof api.employees === "function"
+          ? api
+              .employees(propertyId, this.data.tenantId, 0, false)
+              .catch(() => ({ items: [] }))
+          : Promise.resolve({ items: [] }),
         targetPromise,
-      ]).then(([queue, daily, targetDetail]) => {
+      ]).then(([queue, daily, employees, targetDetail]) => {
         if (generation !== this._queueGeneration) return;
-        const incoming = (queue && queue.items) || [];
+        const labels = require("../../utils/business-labels");
+        const employeeNumbers = {};
+        ((employees && employees.items) || []).forEach((detail) => {
+          if (detail && detail.employee) {
+            employeeNumbers[detail.employee.id] = detail.employee.employee_no;
+          }
+        });
+        const incoming = ((queue && queue.items) || []).map((item) =>
+          decorateWorkOrder(item, labels)
+        );
         let items = reset ? incoming : this.data.items.concat(incoming);
         const target = targetDetail
-          ? require("../../utils/ui").workOrderOf(targetDetail)
+          ? decorateWorkOrder(require("../../utils/ui").workOrderOf(targetDetail), labels)
           : null;
         if (target) {
           if (
@@ -98,14 +141,22 @@ Page({
         }
         const updates = {
           items,
-          staff: (daily && daily.items) || [],
+          staff: ((daily && daily.items) || []).map((item, index) => ({
+            ...item,
+            dutyLabel: labels.onDutyStatus(item.on_duty),
+            employeeLabel: employeeNumbers[item.employee_id]
+              ? `员工编号 ${employeeNumbers[item.employee_id]}`
+              : `处理人员 ${index + 1}`,
+          })),
           nextCursor: (queue && queue.next_cursor) || "",
         };
         if (target) {
           Object.assign(updates, {
             selectedId: target.id,
             selectedStatus: target.status,
+            selectedStatusLabel: labels.workOrderStatus(target.status),
             selectedProcessReason: target.process_reason,
+            selectedProcessReasonLabel: labels.workOrderReason(target.process_reason),
             selectedVersion: target.version,
             recommendations: [],
             decisionReason: "",
@@ -126,7 +177,9 @@ Page({
     this.setData({
       selectedId,
       selectedStatus: selected ? selected.status : "",
+      selectedStatusLabel: selected ? selected.statusLabel : "",
       selectedProcessReason: selected ? selected.process_reason : "",
+      selectedProcessReasonLabel: selected ? selected.reasonLabel : "",
       selectedVersion: selected ? selected.version : "",
       recommendations: [],
       decisionReason: "",
@@ -183,7 +236,18 @@ Page({
     withLoading(this, () =>
       api.analyzeWorkOrder(this.data.selectedId).then(() =>
         api.workOrderRecommendations(this.data.selectedId).then((data) =>
-          this.setData({ recommendations: (data && data.items) || [] })
+          this.setData({
+            recommendations: ((data && data.items) || []).map((item) => ({
+              ...item,
+              employeeLabel:
+                (this.data.staff.find(
+                  (staff) => Number(staff.employee_id) === Number(item.employee_id)
+                ) || {}).employeeLabel || "处理人员",
+              filterReasonText: item.eligible
+                ? "符合派单条件"
+                : require("../../utils/business-labels").dispatchFilterReason(item.filter_reason),
+            })),
+          })
         )
       )
     ).catch(() => {});

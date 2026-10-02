@@ -32,13 +32,13 @@
 <view class="empty" wx:if="{{!loading && !items.length}}">当前范围暂无公告</view>
 <view class="card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="select">
   <view class="section-title">#{{item.id}} {{item.title}}</view>
-  <view>状态：{{item.status}}</view>
+  <view>状态：{{item.statusText}}</view>
   <view>定向：{{item.targetText}}</view>
 </view>
 
 <view class="card" wx:if="{{selected}}">
   <view class="section-title">审核与历史 · #{{selected.id}}</view>
-  <view>当前状态：{{selected.status}}</view>
+  <view>当前状态：{{selected.statusText}}</view>
   <block wx:if="{{canPublish && selected.status == 'PENDING_REVIEW'}}">
     <textarea placeholder="驳回时必须填写原因" value="{{reviewReason}}" data-field="reviewReason" bindinput="onField"></textarea>
     <button class="btn" bindtap="approve">人工审核通过并发布</button>
@@ -46,11 +46,11 @@
   </block>
   <view class="field-title">审核记录</view>
   <view wx:for="{{selected.reviews}}" wx:key="id">
-    {{item.created_at}} · {{item.decision}} · {{item.reason || '无原因'}}
+    {{item.created_at}} · {{item.decisionText}} · {{item.reason || '无原因'}}
   </view>
   <view class="field-title">编辑 / 提交 / 发布历史</view>
   <view wx:for="{{selected.history}}" wx:key="id">
-    {{item.created_at}} · {{item.action}} · {{item.details.status}}
+    {{item.created_at}} · {{item.actionText}} · {{item.statusText}}
   </view>
 </view>
 

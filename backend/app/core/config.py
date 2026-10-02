@@ -213,6 +213,8 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_security_configuration(self) -> "Settings":
+        if self.app_env == "production" and self.app_debug:
+            raise ValueError("Production debug mode must be disabled")
         if self.dev_auth_enabled and self.app_env not in {"development", "test"}:
             raise ValueError(
                 "Development Auth is allowed only in development or test"

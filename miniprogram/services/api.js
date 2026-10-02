@@ -68,7 +68,7 @@ function refreshSessionOnce() {
 
 function request({ path, method, data, headers, retried, unauthorizedBusinessCodes }) {
   if (!BASE_URL) {
-    return Promise.reject(new Error("未配置 API 地址"));
+    return Promise.reject(new Error("当前服务未配置，请联系管理员"));
   }
   const token = auth.getToken();
   const verb = method || "GET";
@@ -141,7 +141,7 @@ function request({ path, method, data, headers, retried, unauthorizedBusinessCod
 
 function uploadFile({ fileId, filePath, retried }) {
   if (!BASE_URL) {
-    return Promise.reject(new Error("未配置 API 地址"));
+    return Promise.reject(new Error("当前服务未配置，请联系管理员"));
   }
   const token = auth.getToken();
   return new Promise((resolve, reject) => {
@@ -193,7 +193,7 @@ function uploadFile({ fileId, filePath, retried }) {
 
 function downloadFile({ fileId, retried }) {
   if (!BASE_URL) {
-    return Promise.reject(new Error("未配置 API 地址"));
+    return Promise.reject(new Error("当前服务未配置，请联系管理员"));
   }
   const token = auth.getToken();
   return new Promise((resolve, reject) => {

@@ -36,6 +36,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application = FastAPI(
         title=resolved_settings.app_name,
         debug=resolved_settings.app_debug,
+        openapi_url=(
+            None
+            if resolved_settings.app_env == "production"
+            else f"{resolved_settings.api_v1_prefix}/openapi.json"
+        ),
+        docs_url=(
+            None
+            if resolved_settings.app_env == "production"
+            else f"{resolved_settings.api_v1_prefix}/docs"
+        ),
+        redoc_url=None,
         default_response_class=ORJSONResponse,
         lifespan=lifespan,
     )

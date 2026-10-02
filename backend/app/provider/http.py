@@ -23,13 +23,36 @@ logging.getLogger("httpcore").setLevel(logging.WARNING)
 logger = get_logger(__name__)
 
 
-def _loopback_target(url: str) -> bool:
-    """Classify literal loopback targets without DNS or substring matching."""
+def _private_target(url: str) -> bool:
+    """Classify local/private provider targets without performing DNS lookups.
+
+    Compose service names are deliberately single-label (for example
+    ``minio``).  They must not inherit a workstation's outbound proxy because
+    storage requests contain private media and signed authorization headers.
+    """
     try:
         host = urlsplit(url).hostname
-        return host is not None and ip_address(host).is_loopback
+        if host is None:
+            return False
+        normalized = host.rstrip(".").casefold()
+        if normalized == "localhost" or normalized.endswith((".localhost", ".local", ".internal")):
+            return True
+        try:
+            address = ip_address(normalized)
+            return address.is_loopback or address.is_private or address.is_link_local
+        except ValueError:
+            return "." not in normalized
     except ValueError:
         return False
+
+
+def build_http_client(*, url: str, timeout_seconds: float) -> httpx.Client:
+    """Create a provider client without leaking loopback traffic to env proxies."""
+
+    return httpx.Client(
+        timeout=timeout_seconds,
+        trust_env=not _private_target(url),
+    )
 
 
 def request_json(
@@ -50,9 +73,7 @@ def request_json(
     # Local inference must never inherit a workstation's external proxy.
     # Explicitly injected clients remain caller-owned (e.g. test transports).
     # Non-loopback providers retain their existing environment/TLS behavior.
-    http = client or httpx.Client(
-        timeout=timeout_seconds, trust_env=not _loopback_target(url)
-    )
+    http = client or build_http_client(url=url, timeout_seconds=timeout_seconds)
     started_at = time.perf_counter()
     try:
         response = http.request(

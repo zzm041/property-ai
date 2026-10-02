@@ -4,14 +4,14 @@
 </view>
 <block wx:for="{{items}}" wx:key="id">
   <view class="card">
-    <view>#{{item.id}} · {{item.purpose}} · {{item.status}}</view>
+    <view>申请 {{item.id}} · {{item.purposeText}} · {{item.statusText}}</view>
     <view>号码：{{item.masked_phone}} · 已批准：{{item.approval_count}}/2</view>
     <view>隔离截止：{{item.quarantine_ends_at}}</view>
     <input placeholder="审核原因" value="{{reasonById[item.id]}}" data-id="{{item.id}}" bindinput="onReason" maxlength="255" />
     <view class="action-row" wx:if="{{item.status === 'PENDING_REVIEW'}}">
-      <button size="mini" data-id="{{item.id}}" data-decision="APPROVE" bindtap="review">批准</button>
-      <button size="mini" data-id="{{item.id}}" data-decision="REJECT" bindtap="review">拒绝</button>
-      <button size="mini" data-id="{{item.id}}" bindtap="finalize">确认审核完成</button>
+      <button class="btn btn-compact" size="mini" data-id="{{item.id}}" data-decision="APPROVE" bindtap="review">批准</button>
+      <button class="btn danger btn-compact" size="mini" data-id="{{item.id}}" data-decision="REJECT" bindtap="review">拒绝</button>
+      <button class="btn btn-secondary btn-compact" size="mini" data-id="{{item.id}}" bindtap="finalize">确认审核完成</button>
     </view>
   </view>
 </block>

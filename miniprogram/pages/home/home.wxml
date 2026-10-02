@@ -1,4 +1,3 @@
-<view class="card" wx:if="{{envNote}}">{{envNote}}</view>
 <view class="loading" wx:if="{{loading}}">加载中...</view>
 <view class="card" wx:if="{{me}}">
   <view>{{me.display_name}}</view>
