@@ -325,6 +325,156 @@ def test_attachment_completion_retry_reuses_failed_version_and_immutable_source(
     assert s._work_orders.add_log.call_args.args[0].payload_json['attempt'] == 2
 
 
+@pytest.mark.parametrize('status', ['PROCESSING', 'FAILED'])
+def test_attachment_completion_retry_resumes_same_incomplete_analysis(monkeypatch, status):
+    from app.core.config import Settings
+    from app.core.time import utc_now
+
+    monkeypatch.setattr('app.service.analysis.begin_owned_transaction', lambda _: nullcontext())
+    previous = {
+        **claim(attempt=1, version=5),
+        'analysis_id': 72,
+        'analysis_version': 2,
+        'from_status': 'PENDING_ASSIGNMENT',
+        'attachment_completion': True,
+        'source_analysis_id': 71,
+    }
+    task_context = {
+        'task_id': 'task-025', 'attempt': 2, 'execution_token': 'next-execution',
+        'expected_version': 5, 'claim': previous, 'attachment_completion': True,
+    }
+    s = AnalysisService.__new__(AnalysisService)
+    s._session = MagicMock(); s._session.info = {}
+    s._settings = Settings(_env_file=None); s._clock = utc_now
+    s._task_context = task_context; s._work_orders = repo(previous); s._ai = MagicMock()
+    work = record('PENDING_ASSIGNMENT', 5); work.house_id = 3; work.created_at = utc_now()
+    s._work_orders.get_work_order_for_update.return_value = work
+    s._work_orders.get_active_assignment.return_value = None
+    s._work_orders.get_content.return_value = NS(text='报修', extra_notes='', asr_text=None)
+    s._ai.list_media_with_files.return_value = ()
+    s._ai.get_analysis_context.return_value = {}; s._ai.get_building_id.return_value = 4
+    current = NS(id=72, work_order_id=30, analysis_version=2, status=status,
+                 input_hash='hash', prompt_version='current', error_code='AI.UNAVAILABLE')
+    source = NS(id=71, work_order_id=30, analysis_version=1,
+                status='COMPLETED', input_hash='source-hash')
+    s._ai.get_current_analysis_for_update.return_value = current
+    s._ai.get_analysis.return_value = source
+
+    snap = s._prepare(work_order_id=30, request_id='completion-resume')
+
+    assert snap.analysis_id == 72 and snap.skipped is False
+    assert current.status == 'PROCESSING' and current.error_code is None
+    s._ai.add_analysis.assert_not_called()
+
+
+@pytest.mark.parametrize('status,work_version', [('COMPLETED', 6), ('LOW_CONFIDENCE', 5)])
+def test_attachment_completion_retry_reuses_final_result_without_new_claim(
+    monkeypatch, status, work_version,
+):
+    from app.core.config import Settings
+    from app.core.time import utc_now
+
+    monkeypatch.setattr('app.service.analysis.begin_owned_transaction', lambda _: nullcontext())
+    previous = {
+        **claim(attempt=1, version=5),
+        'analysis_id': 72, 'analysis_version': 2,
+        'from_status': 'PENDING_ASSIGNMENT', 'attachment_completion': True,
+        'source_analysis_id': 71,
+    }
+    task_context = {
+        'task_id': 'task-025', 'attempt': 2, 'execution_token': 'next-execution',
+        'expected_version': 5, 'claim': previous, 'attachment_completion': True,
+    }
+    s = AnalysisService.__new__(AnalysisService)
+    s._session = MagicMock(); s._session.info = {}
+    s._settings = Settings(_env_file=None); s._clock = utc_now
+    s._task_context = task_context; s._work_orders = repo(previous); s._ai = MagicMock()
+    work = record('PENDING_ASSIGNMENT', work_version); work.house_id = 3; work.created_at = utc_now()
+    s._work_orders.get_work_order_for_update.return_value = work
+    s._work_orders.get_content.return_value = NS(text='报修', extra_notes='', asr_text=None)
+    s._ai.list_media_with_files.return_value = ()
+    s._ai.get_analysis_context.return_value = {}; s._ai.get_building_id.return_value = 4
+    current = NS(id=72, work_order_id=30, analysis_version=2, status=status,
+                 input_hash='hash', prompt_version='current', error_code=None)
+    source = NS(id=71, work_order_id=30, analysis_version=1,
+                status='COMPLETED', input_hash='source-hash')
+    s._ai.get_current_analysis_for_update.return_value = current
+    s._ai.get_analysis.return_value = source
+
+    snap = s._prepare(work_order_id=30, request_id='completion-final')
+
+    assert snap.analysis_id == 72 and snap.skipped is True
+    assert snap.skip_reason == 'attachment_completion_already_final'
+    assert task_context['claim'] is previous
+    s._work_orders.add_log.assert_not_called()
+    s._ai.add_analysis.assert_not_called()
+
+
+def test_committed_attachment_completion_redispatch_uses_original_version_fence(monkeypatch):
+    from app.core.config import Settings
+
+    monkeypatch.setattr('app.service.analysis.begin_owned_transaction', lambda _: nullcontext())
+    previous = {
+        **claim(attempt=1, version=5),
+        'analysis_id': 72, 'analysis_version': 2,
+        'from_status': 'PENDING_ASSIGNMENT', 'attachment_completion': True,
+        'source_analysis_id': 71,
+    }
+    service = AnalysisService.__new__(AnalysisService)
+    service._session = MagicMock(); service._session.info = {}
+    service._settings = Settings(_env_file=None, ai_auto_assign=True)
+    service._task_context = {
+        'task_id': 'task-025', 'attempt': 2, 'execution_token': 'next-execution',
+        'expected_version': 5, 'claim': previous, 'attachment_completion': True,
+    }
+    service._work_orders = repo(previous); service._ai = MagicMock()
+    work = record('PENDING_ASSIGNMENT', 6); work.current_assignment_id = None
+    current = NS(id=72, analysis_version=2, status='COMPLETED', input_hash='hash')
+    service._work_orders.get_work_order_for_update.return_value = work
+    service._ai.get_current_analysis_for_update.return_value = current
+    service._mapped_from_stored_analysis = MagicMock(return_value=NS())
+    service._work_orders.latest_analysis_attempt.return_value = NS(payload_json=previous)
+    maybe_assign = MagicMock(return_value='ASSIGNED')
+    monkeypatch.setattr('app.service.auto_dispatch.AutoDispatchService.maybe_assign', maybe_assign)
+
+    assert service._retry_auto_dispatch_from_existing(
+        work_order_id=30, analysis_id=72, request_id='completion-redispatch',
+    ) == 'ASSIGNED'
+    maybe_assign.assert_called_once()
+
+
+@pytest.mark.parametrize('analysis_status,work_version', [('FAILED', 5), ('COMPLETED', 6)])
+def test_attachment_completion_database_exhaustion_uses_actual_committed_version(
+    monkeypatch, analysis_status, work_version,
+):
+    monkeypatch.setattr('app.service.analysis.begin_owned_transaction', lambda _: nullcontext())
+    payload = {
+        **claim(attempt=3, version=5),
+        'analysis_id': 72, 'analysis_version': 2,
+        'from_status': 'PENDING_ASSIGNMENT', 'attachment_completion': True,
+        'source_analysis_id': 71,
+    }
+    task_context = {
+        'task_id': 'task-025', 'attempt': 3, 'execution_token': 'execution-025',
+        'expected_version': 5, 'claim': payload, 'attachment_completion': True,
+    }
+    service = AnalysisService.__new__(AnalysisService)
+    service._session = MagicMock(); service._session.info = {}
+    service._work_orders = repo(payload); service._ai = MagicMock()
+    service._work_orders.get_work_order_for_update.return_value = record(
+        'PENDING_ASSIGNMENT', work_version,
+    )
+    service._work_orders.get_active_assignment.return_value = None
+    analysis = NS(id=72, input_hash='hash', status=analysis_status, error_code=None)
+    service._ai.get_current_analysis_for_update.return_value = analysis
+    service._append_failure_audit = MagicMock()
+
+    assert service.record_database_exhaustion(
+        work_order_id=30, request_id='completion-db-exhaustion', context=task_context,
+    ) is True
+    assert service._work_orders.add_log.call_args.args[0].event_code == 'AI_TASK_FAILED'
+
+
 def test_stale_task_completes_existing_tracking_as_ignored_without_replay(monkeypatch):
     from app.worker.tasks import _record_analysis_attempt_outcome
     complete=MagicMock();monkeypatch.setattr('app.worker.failed_tasks.complete_attempt',complete)

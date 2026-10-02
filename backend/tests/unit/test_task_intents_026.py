@@ -375,6 +375,36 @@ def test_final_analysis_commit_ack_failure_keeps_single_committed_assignment(mon
     s._fail.assert_not_called()
 
 
+@pytest.mark.parametrize('analysis_status,work_version', [('FAILED', 5), ('COMPLETED', 6)])
+def test_attachment_completion_exhaustion_records_failure_at_actual_committed_version(
+    monkeypatch, analysis_status, work_version,
+):
+    from app.repository.work_order import WorkOrderRepository
+    from app.repository.ai import AiRepository
+
+    r = row(status='PROCESSING', execution_attempt=3, lease_token='owner',
+            lease_until=NOW + timedelta(seconds=120), available_at=NOW + timedelta(seconds=900),
+            resource_id=22, resource_version=5)
+    s = TaskIntentService(session(), clock=lambda: NOW)
+    s._locked = lambda _: r
+    work = NS(id=22, tenant_id=7, property_id=9, status='PENDING_ASSIGNMENT',
+              version=work_version, current_assignment_id=None, process_reason=None)
+    claim = dict(task_id=r.task_id, analysis_id=72, input_hash='abc',
+                 work_order_version=5, from_status='PENDING_ASSIGNMENT',
+                 attachment_completion=True)
+    monkeypatch.setattr(WorkOrderRepository, 'get_work_order_for_update', lambda *a: work)
+    monkeypatch.setattr(WorkOrderRepository, 'latest_analysis_attempt', lambda *a: NS(payload_json=claim))
+    monkeypatch.setattr(WorkOrderRepository, 'has_dispatch_wait_attempt', lambda *a, **kw: False)
+    monkeypatch.setattr(AiRepository, 'get_current_analysis_for_update',
+                        lambda *a: NS(id=72, input_hash='abc', status=analysis_status))
+
+    assert s.finish({'id': r.id, 'token': 'owner'}, 'FAILED',
+                    error='TASK.DATABASE_TRANSIENT', retryable=True)
+
+    assert r.status == 'FAILED'
+    assert s.session.add.call_args.args[0].event_code == 'AI_TASK_FAILED'
+
+
 @pytest.mark.parametrize('operation,attempt',[(DELIVER,4),(INGEST,3)])
 def test_real_uncommitted_final_failure_remains_terminal_not_false_success(operation,attempt):
     r=row(operation=operation,status='PROCESSING',execution_attempt=attempt,lease_token='owner',

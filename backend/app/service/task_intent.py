@@ -250,6 +250,7 @@ class TaskIntentService:
         end(row, "FAILED", now, code)
         if row.operation == ANALYZE:
             from app.repository.work_order import WorkOrderRepository
+            from app.repository.ai import AiRepository
             work = WorkOrderRepository(self.session).get_work_order_for_update(row.resource_id)
             if work and work.status in {"PENDING_ANALYSIS", "PENDING_ASSIGNMENT"} and work.current_assignment_id is None:
                 from app.repository.work_order import WorkOrderRepository
@@ -257,11 +258,19 @@ class TaskIntentService:
                 claim = latest.payload_json if latest else None
                 expected = row.resource_version
                 if claim and claim.get("task_id") == row.task_id:
+                    current = AiRepository(self.session).get_current_analysis_for_update(work.id)
+                    completion_committed = (
+                        claim.get("attachment_completion") is True
+                        and current is not None
+                        and current.id == claim.get("analysis_id")
+                        and current.input_hash == claim.get("input_hash")
+                        and current.status == "COMPLETED"
+                    )
                     expected = claim["work_order_version"] + (
                         work.status == "PENDING_ASSIGNMENT"
                         and (
                             claim["from_status"] == "PENDING_ANALYSIS"
-                            or claim.get("attachment_completion") is True
+                            or completion_committed
                         )
                     )
                 if work.version == expected and (claim is None or claim.get("task_id") == row.task_id):

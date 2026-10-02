@@ -479,7 +479,10 @@ class AnalysisService:
                         )
                         if (
                             current is not None
-                            and current.status == AnalysisStatus.FAILED.value
+                            and current.status in {
+                                AnalysisStatus.PROCESSING.value,
+                                AnalysisStatus.FAILED.value,
+                            }
                             and source_analysis is not None
                             and source_analysis.status in {
                                 AnalysisStatus.COMPLETED.value,
@@ -488,7 +491,8 @@ class AnalysisService:
                             and source_analysis.work_order_id == record.id
                             and source_analysis.analysis_version + 1 == current.analysis_version
                         ):
-                            current.status = AnalysisStatus.PROCESSING.value
+                            if current.status == AnalysisStatus.FAILED.value:
+                                current.status = AnalysisStatus.PROCESSING.value
                             current.error_code = None
                             return claim_attempt(self._work_orders, record, AnalysisSnapshot(
                                 work_order_id=record.id,
@@ -511,6 +515,49 @@ class AnalysisService:
                                 source_input_hash=source_analysis.input_hash,
                                 original_input_hash=source_analysis.input_hash,
                             ), context_token, request_id)
+                        if (
+                            current is not None
+                            and current.status in {
+                                AnalysisStatus.COMPLETED.value,
+                                AnalysisStatus.LOW_CONFIDENCE.value,
+                            }
+                            and source_analysis is not None
+                            and source_analysis.status in {
+                                AnalysisStatus.COMPLETED.value,
+                                AnalysisStatus.LOW_CONFIDENCE.value,
+                            }
+                            and source_analysis.work_order_id == record.id
+                            and source_analysis.analysis_version + 1
+                            == current.analysis_version
+                        ):
+                            # The provider/apply transaction committed but a
+                            # later dispatch or acknowledgement failed. Keep
+                            # the original claim in task_context: replacing it
+                            # with the already-incremented work-order version
+                            # would move the dispatch fence one version ahead.
+                            return AnalysisSnapshot(
+                                work_order_id=record.id,
+                                tenant_id=record.tenant_id,
+                                property_id=record.property_id,
+                                house_id=record.house_id,
+                                building_id=self._ai.get_building_id(record.house_id),
+                                analysis_id=current.id,
+                                analysis_version=current.analysis_version,
+                                work_order_version=prior_claim["work_order_version"],
+                                input_hash=current.input_hash,
+                                text=text,
+                                existing_asr_text=existing_asr,
+                                images=images,
+                                audio=audio,
+                                context=context,
+                                skipped=True,
+                                skip_reason="attachment_completion_already_final",
+                                attachment_completion=True,
+                                source_analysis_id=source_analysis.id,
+                                source_analysis_version=source_analysis.analysis_version,
+                                source_input_hash=source_analysis.input_hash,
+                                original_input_hash=source_analysis.input_hash,
+                            )
                     if (
                         current is None
                         or current.status not in {
@@ -1511,7 +1558,11 @@ class AnalysisService:
                 expected = payload["work_order_version"]
                 if record.status == "PENDING_ASSIGNMENT" and (
                     payload["from_status"] == "PENDING_ANALYSIS"
-                    or payload.get("attachment_completion") is True
+                    or (
+                        payload.get("attachment_completion") is True
+                        and current is not None
+                        and current.status == AnalysisStatus.COMPLETED.value
+                    )
                 ):
                     expected += 1
                 if record.version != expected or current is None or current.id != payload["analysis_id"] or current.input_hash != payload["input_hash"]:
