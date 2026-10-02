@@ -47,6 +47,12 @@ $ExpectedTimeoutReplayResolutionSha256 = "4F2648EE0FA0D2371E02D6862C7E7B3D310B19
 $ExpectedTimeoutReplayResolutionReviewSha256 = "E774E08E910B772BAD0BA80FF0B6DAA31ED41CED8926090A3F94E9900F8539A6"
 $ExpectedTimeoutReplayReservationSha256 = "B3E80EDF54F006F2C18A10756151303494885492D9B95978D230E382A1A4C477"
 $ExpectedTimeoutReplayResultSha256 = "99CEDBDEBD63523CACB40267B58008AB0B921A8CA6987A8A98AA781EA8165B88"
+$NativeMediaReplayResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\call-027-replay-resolution-20261002.json"
+$NativeMediaReplayResolutionReviewPath = Join-Path $RepoRoot "reports\codex\REAL-AI-INTEGRATION-027-NATIVE-MEDIA-ATTACHMENT-COMPLETION-review.raw.json"
+$ExpectedNativeMediaReplayResolutionSha256 = "13B959C1A7FD5CF86B3304D5EB5C1FF3B19472A9509787F12EE6A4F269932AB9"
+$ExpectedNativeMediaReplayResolutionReviewSha256 = "2EFADFFB440FBD88A1FD604ED86ED89ADA80DC4D71635293D03615DFFE641332"
+$ExpectedNativeMediaReplayReservationSha256 = "FDAEADEAE1F83160C0EB21FA0495F8DFD89515543D6D0F1E01EF3E435FF04CC2"
+$ExpectedNativeMediaReplayResultSha256 = "95F9A3B51A6447796D6318321390562B424A90A96277CA2595EAC4C8CE90CE4B"
 $PythonPath = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\bge-142-cpu\.venv\Scripts\python.exe"
 $AsrPython = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\asr-006-cpu\.venv\Scripts\python.exe"
 $ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models-hf"
@@ -187,6 +193,17 @@ function Assert-Candidate {
             ((Get-FileHash -Algorithm SHA256 -LiteralPath $timeoutReplayResult).Hash -ne $ExpectedTimeoutReplayResultSha256)) {
         throw "reviewed call-014 replay binding mismatch"
     }
+    $nativeMediaReplayReservation = Join-Path $PrivateDir "call-027\reservation.json"
+    $nativeMediaReplayResult = Join-Path $PrivateDir "call-027\result.json"
+    foreach ($asset in @($NativeMediaReplayResolutionPath,$NativeMediaReplayResolutionReviewPath,$nativeMediaReplayReservation,$nativeMediaReplayResult)) {
+        if (-not (Test-Path -LiteralPath $asset -PathType Leaf)) { throw "reviewed call-027 replay asset is missing" }
+    }
+    if (((Get-FileHash -Algorithm SHA256 -LiteralPath $NativeMediaReplayResolutionPath).Hash -ne $ExpectedNativeMediaReplayResolutionSha256) -or
+            ((Get-FileHash -Algorithm SHA256 -LiteralPath $NativeMediaReplayResolutionReviewPath).Hash -ne $ExpectedNativeMediaReplayResolutionReviewSha256) -or
+            ((Get-FileHash -Algorithm SHA256 -LiteralPath $nativeMediaReplayReservation).Hash -ne $ExpectedNativeMediaReplayReservationSha256) -or
+            ((Get-FileHash -Algorithm SHA256 -LiteralPath $nativeMediaReplayResult).Hash -ne $ExpectedNativeMediaReplayResultSha256)) {
+        throw "reviewed call-027 replay binding mismatch"
+    }
 }
 
 function New-RuntimeBinding {
@@ -294,6 +311,14 @@ switch ($Action) {
                 resolution_sha256=$ExpectedTimeoutReplayResolutionSha256
                 review_path=$TimeoutReplayResolutionReviewPath
                 review_sha256=$ExpectedTimeoutReplayResolutionReviewSha256
+            },[ordered]@{
+                record="call-027"
+                reservation_sha256=$ExpectedNativeMediaReplayReservationSha256.ToLowerInvariant()
+                result_sha256=$ExpectedNativeMediaReplayResultSha256.ToLowerInvariant()
+                resolution_path=$NativeMediaReplayResolutionPath
+                resolution_sha256=$ExpectedNativeMediaReplayResolutionSha256
+                review_path=$NativeMediaReplayResolutionReviewPath
+                review_sha256=$ExpectedNativeMediaReplayResolutionReviewSha256
             })
             runtime_binding_path=$bindingPath
             runtime_binding_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $bindingPath).Hash.ToLowerInvariant()

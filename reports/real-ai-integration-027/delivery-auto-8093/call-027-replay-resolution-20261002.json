@@ -1,0 +1,63 @@
+{
+  "format": "property-ai-model-call-resolution-v1",
+  "task_id": "REAL-AI-INTEGRATION-027-NATIVE-MEDIA-ATTACHMENT-COMPLETION",
+  "run_id": "native-media-wo19",
+  "record": "call-027",
+  "created_at": "2026-10-02T19:25:06+08:00",
+  "authorization": "Owner-approved exact saved-image replay for WO19 attachment completion after confirming the original controlled stop and preserving its failure.",
+  "original": {
+    "status": "FAILED",
+    "reason": "RESOURCE_FLOOR",
+    "historical_immediate_exit_confirmed": "UNKNOWN",
+    "remote_completion": "CONTROLLED_STOP",
+    "owned_exit_confirmed": true,
+    "model": "qwen38-27b-q3km-g55:7af3b8f",
+    "input_hash": "1d49ae98a28d008718aa3e500b129f03b5c9e424fb3414ad2c327d2efe389d79",
+    "reservation_sha256": "FDAEADEAE1F83160C0EB21FA0495F8DFD89515543D6D0F1E01EF3E435FF04CC2",
+    "result_sha256": "95F9A3B51A6447796D6318321390562B424A90A96277CA2595EAC4C8CE90CE4B",
+    "input_sha256": "95451C6EE9983338B24B232D2B6E7876D9E29C1578689D6469C322A284DD868E",
+    "stdout_sha256": "6503926C460A632065574C77FDB494CD003FAD6EF7C1154604250D24BC2BF2A9",
+    "stderr_sha256": "DC456356FE067114A80147DE4BC12ED1BFE47C3519916075552B76F07A277FC8",
+    "replay_of": null,
+    "total_seconds": 13.812000000005355
+  },
+  "current_execution": {
+    "currently_executing": false,
+    "owned_child_exit_confirmed": true,
+    "remote_tree_exit_confirmed": true,
+    "listener_exit_confirmed": true,
+    "meaning": "The original request-owned process and its receipt-bound Ollama tree are confirmed stopped; no VLM semantic output or checkpoint was accepted."
+  },
+  "diagnosis": {
+    "stage": "inference",
+    "root_cause": "The original request crossed the fixed 4500 MiB free-RAM runtime floor while loading the approved model and was stopped before producing a semantic result.",
+    "semantic_output_produced": false,
+    "checkpoint_persisted": false,
+    "historical_failure_preserved": true,
+    "current_precondition": "A new resource reading and the unchanged runtime guards must pass before the exact replay can reserve."
+  },
+  "fixed_application": {
+    "source_commit": "1451e5572932ca7d4261e743110c7b27aeb743e6",
+    "analysis_service_sha256": "2862FB264F472A6FF770E90790307E92C59A6200F9CDEA46494F69B85279EE48",
+    "task_intent_service_sha256": "2EA13EF89AF04093F87C29DA75426CD032DEB68AFC72510C7EDFF6E8E59D3F82",
+    "scope": "WO19 formal attachment completion processes every accepted file, binds successful provider checkpoints to immutable file content/model/protocol versions, and resumes PROCESSING/FAILED/finalized completion attempts without repeating a successful provider stage or moving the dispatch version fence.",
+    "model_or_runtime_changed": false,
+    "resource_floors_changed": false
+  },
+  "explicit_same_input_replay": {
+    "authorized": true,
+    "maximum_replays_for_original_record": 1,
+    "counts_against_new_qwen_limit": true,
+    "counts_against_new_model_seconds_limit": true,
+    "requires_exact_input_hash": true,
+    "requires_fixed_runtime_identity": true
+  },
+  "boundaries": {
+    "historical_result_rewritten": false,
+    "old_analysis_or_task_rewritten": false,
+    "new_work_order_created": false,
+    "unknown_barrier_relaxed": false,
+    "model_or_weights_changed": false,
+    "manual_assignment_allowed": false
+  }
+}

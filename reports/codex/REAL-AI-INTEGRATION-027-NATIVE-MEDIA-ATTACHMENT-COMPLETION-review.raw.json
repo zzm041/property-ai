@@ -1,0 +1,99 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-NATIVE-MEDIA-ATTACHMENT-COMPLETION",
+  "review_type": "INDEPENDENT_READ_ONLY",
+  "review_stage": "PRE_RUNTIME_SAFETY_GATE",
+  "reviewed_head": "1451e5572932ca7d4261e743110c7b27aeb743e6",
+  "verdict": "PASS_SCOPED_CALL_RESOLUTION",
+  "resolution_sha256": "13B959C1A7FD5CF86B3304D5EB5C1FF3B19472A9509787F12EE6A4F269932AB9",
+  "findings": [],
+  "closed_findings": [
+    {
+      "id": "WO19-ATTACH-R1-01",
+      "status": "CLOSED",
+      "location": "backend/app/service/task_intent.py::complete_analysis_managed",
+      "evidence": "已改为仅有效候选 eligible=true 阻断；eligible=false 的历史排除记录不再阻止附件补全，直接测试覆盖该情况。"
+    },
+    {
+      "id": "WO19-ATTACH-R1-02",
+      "status": "CLOSED",
+      "location": "backend/app/service/task_intent.py::complete_analysis_managed",
+      "evidence": "重新认证并校验管理权限后，先查询唯一后继，再检查首次创建条件；后继执行或工单已派发后，同一来源请求仍返回既有后继，测试覆盖状态已变为 ASSIGNED 的重入。"
+    },
+    {
+      "id": "WO19-ATTACH-R1-03",
+      "status": "CLOSED",
+      "location": "backend/app/service/analysis.py::_prepare/_retry_auto_dispatch_from_existing/record_database_exhaustion; backend/app/service/task_intent.py::_fail",
+      "evidence": "PROCESSING/FAILED 恢复原分析；COMPLETED/LOW_CONFIDENCE 跳过 Provider 且保留原 claim。派单测试覆盖基准版本5、结果提交后版本6的正确栅栏；耗尽提示根据结果是否实际提交决定版本增量，避免漏记失败。"
+    }
+  ],
+  "checked_evidence": {
+    "source": [
+      "06e28ab5455174e8b219cb3f90637c4d120f85ec：逐附件处理、持久检查点、正式补全入口及直接测试",
+      "eb3eacad5faa4e0c5cf0d8c891f46e55bf5486a5：推荐资格与入口幂等修复",
+      "1451e5572932ca7d4261e743110c7b27aeb743e6：同任务恢复、已提交结果复用和耗尽版本修复",
+      "scripts/ops/local_ai_http.py::_resolution/gate/reserve",
+      "deploy/work-ai-runtime.ps1 当前未提交的精确解除绑定"
+    ],
+    "source_hashes": {
+      "backend/app/service/analysis.py": "2862FB264F472A6FF770E90790307E92C59A6200F9CDEA46494F69B85279EE48",
+      "backend/app/service/task_intent.py": "2EA13EF89AF04093F87C29DA75426CD032DEB68AFC72510C7EDFF6E8E59D3F82",
+      "deploy/work-ai-runtime.ps1": "4E188B18DC3E4A71B9CE8235025680003900D82971F544FD31945849A3674C6F"
+    },
+    "records": [
+      "reports/real-ai-integration-027/delivery-auto-8093/call-027-replay-resolution-20261002.json",
+      "reports/real-ai-integration-027/delivery-auto-8093/native-media-wo19-generation3-closeout.json",
+      "tmp/delivery-work-ai-runtime/calls/call-027/reservation.json",
+      "tmp/delivery-work-ai-runtime/calls/call-027/result.json",
+      "call-027/input.json、stdout.jsonl、stderr.txt 的实际文件哈希",
+      "现有调用目录的预约/结果元数据：共29条，最新call-029，同输入目前仅原call-027"
+    ],
+    "original_hashes_verified": {
+      "reservation_sha256": "FDAEADEAE1F83160C0EB21FA0495F8DFD89515543D6D0F1E01EF3E435FF04CC2",
+      "result_sha256": "95F9A3B51A6447796D6318321390562B424A90A96277CA2595EAC4C8CE90CE4B",
+      "input_sha256": "95451C6EE9983338B24B232D2B6E7876D9E29C1578689D6469C322A284DD868E",
+      "stdout_sha256": "6503926C460A632065574C77FDB494CD003FAD6EF7C1154604250D24BC2BF2A9",
+      "stderr_sha256": "DC456356FE067114A80147DE4BC12ED1BFE47C3519916075552B76F07A277FC8"
+    }
+  },
+  "verified": [
+    "REPORT附件按持久媒体ID排序，音频与图片分别逐项顺序处理，保存各项索引、结果来源和错误状态；补全模式任一附件失败时不进入最终LLM。",
+    "检查点按工单、文件及媒体身份、内容哈希、模型、协议和结果哈希匹配；读写检查当前任务租约和分析所有权。",
+    "旧首段音频仅在来源分析、输入哈希、模型和已保存转写文本精确匹配时复用；第二段仍进入独立处理循环。",
+    "补全入口复用现有权限与事务机制，保留来源任务和分析，以新后继任务及新分析版本完成；状态、版本及Assignment检查防止覆盖竞争操作。",
+    "原call-027仍为FAILED/RESOURCE_FLOOR/CONTROLLED_STOP，最低记录RAM为4286MiB；未改判成功，没有语义输出。",
+    "解除记录将历史即时退出保留为UNKNOWN，并单独记录当前原请求不再执行。原结果包含所属进程及远端进程树、监听退出确认；本审查未进行实时进程查询。",
+    "解除依赖原预约/结果哈希、解除文件哈希、独立PASS及其精确解除哈希；同输入失败链只允许未消费末端一次重放，仍计原账本次数与耗时，新UNKNOWN继续阻断。",
+    "启动脚本已绑定最终解除哈希；独立审查文件哈希仍为占位符，因此保存并绑定本审查前会失败关闭，不会提前启动。"
+  ],
+  "tests_evidence": {
+    "source_tests_read": [
+      "backend/tests/unit/test_ai_analysis_input.py",
+      "backend/tests/unit/test_database_recovery_025.py",
+      "backend/tests/unit/test_task_intents_026.py"
+    ],
+    "implementer_reported_final_results": [
+      "恢复专项：80 passed，1 warning",
+      "扩展直接影响单元集：293 passed，1 warning"
+    ],
+    "boundary": "实际读取测试源码与断言；上述运行数字来自主实施会话报告，本审查未执行测试，也未独立读取这些运行的原始输出文件。"
+  },
+  "unverified": [
+    "新产品版本尚未由本轮运行证据证明已加载到API/Worker。",
+    "首段检查点实际复用、第二段真实ASR、图片真实VLM以及完整补全后LLM尚待本轮运行验收。",
+    "实际并发派单竞争、故障续跑、最终等待或AUTO结果尚未在本轮业务环境验证。",
+    "本结论不将WO19写成AUTO或CLOSED，不扩大原generation3的首段音频验证范围，不代表Production通过。"
+  ],
+  "next_action": [
+    "原样保存本JSON并计算其哈希，将启动入口的review哈希占位符替换为该准确值；保留原call-027文件不变。",
+    "核对API/Worker加载1451e557对应源码及现有隔离配置，在既有授权调用、资源和时间预算内，通过正式补全入口执行本轮任务。",
+    "保存每项附件与检查点、后继任务、分析、派单或合法等待的对应证据；同输入call-027仅允许这一次已绑定重放，不绕过新UNKNOWN或失败屏障。",
+    "将运行证据交回同一独立只读上下文，完成本轮最终增量核对。"
+  ],
+  "reviewer_actions": {
+    "modified_files": false,
+    "ran_tests": false,
+    "ran_model_or_business_requests": false,
+    "operated_database_queue_or_page": false,
+    "created_subreviewer": false
+  }
+}
