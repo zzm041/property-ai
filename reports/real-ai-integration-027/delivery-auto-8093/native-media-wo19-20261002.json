@@ -6,7 +6,7 @@
   "native_recorder_commit": "9829977fbb889873ddbae74156365659a2c99ff9",
   "runtime_fix_commit": "61b762d9775845c47cf0b43f3003a3f4d1cb5519",
   "environment": {
-    "gateway": "8093 through the temporary loopback-upstream LAN gateway",
+    "gateway": "8093 was reached through the temporary loopback-upstream LAN gateway; the listener is now stopped and the private mini-program API origin is restored to loopback",
     "pinned_phone_ip": "192.168.1.4",
     "database": "property_ai_delivery_check@0014",
     "work_ai_endpoint": "127.0.0.1:11437",
