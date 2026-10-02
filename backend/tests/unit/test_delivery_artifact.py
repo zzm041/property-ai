@@ -230,9 +230,9 @@ def test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded() -> Non
     assert 'git -C $RepoRoot archive' in runtime
     assert 'adapter-$operationId.stdout.log' in runtime and 'adapter-$operationId.stderr.log' in runtime
     assert '__SOURCE_COMMIT__' not in runtime and '__ADAPTER_SHA256__' not in runtime
-    assert '1503C527B77EDEF0EA71CE2B0A1BF9414508E0D082FF4E66B114313C92F6EA32' in runtime
-    assert 'FAF70CF69B8D7058026881D47B90CB20E3B03F6A99E693F16BD06CDA87AC0BB2' in runtime
-    assert 'B0DE6D3544D8875E0A57CED1A1946744736FC9074AF1ECEA5228A79468C60CFF' in runtime
+    assert '70BB10C801D695830FCC33630773DB82986427B86962432354A0726AF3A3C676' in runtime
+    assert 'AD89639C05C18BF6D78FF28F32A62A105EE5B5ECFC9837EB5700B75DFCAAF320' in runtime
+    assert '567B325C7130E6AA7047AB957E5C19B442B66C8DBA29F8FAEDA50EE60830C876' in runtime
     assert '61b762d9775845c47cf0b43f3003a3f4d1cb5519' in runtime
     assert 'E67FCAD3B8DC8DD542A351562142698129DD86936C644E9178C8978EE0978C3B' not in runtime
     assert '2e4c4ba34d67f599c39be95112100a2ce71ffc63' not in runtime
