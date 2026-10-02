@@ -125,11 +125,15 @@ def inference_timeout_seconds(kind):
 def validate(kind,value):
     if kind=='asr':
         if not isinstance(value,bytes) or len(value)>1_000_000:raise ValueError('AUDIO_SIZE')
-        try:
-            with wave.open(io.BytesIO(value),'rb') as w:
-                if w.getnchannels()!=1 or w.getsampwidth()!=2 or w.getframerate()!=16000 or not 0<w.getnframes()<=480000 or w.getcomptype()!='NONE':raise ValueError('PCM_REQUIRED')
-                if len(w.readframes(w.getnframes()))!=w.getnframes()*2:raise ValueError('TRUNCATED_AUDIO')
-        except (wave.Error,EOFError) as exc:raise ValueError('PCM_REQUIRED') from exc
+        is_mp3=(value.startswith(b'ID3') or (
+            len(value)>=2 and value[0]==0xff and value[1]&0xe0==0xe0
+        ))
+        if not is_mp3:
+            try:
+                with wave.open(io.BytesIO(value),'rb') as w:
+                    if w.getnchannels()!=1 or w.getsampwidth()!=2 or w.getframerate()!=16000 or not 0<w.getnframes()<=480000 or w.getcomptype()!='NONE':raise ValueError('PCM_REQUIRED')
+                    if len(w.readframes(w.getnframes()))!=w.getnframes()*2:raise ValueError('TRUNCATED_AUDIO')
+            except (wave.Error,EOFError) as exc:raise ValueError('PCM_OR_MP3_REQUIRED') from exc
     elif kind=='embedding':
         if not isinstance(value,list) or not 1<=len(value)<=16 or any(not isinstance(v,str) or not 0<len(v)<=4000 for v in value):raise ValueError('EMBEDDING_INPUT')
     elif kind=='reranker':

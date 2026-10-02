@@ -14,6 +14,16 @@ spec=importlib.util.spec_from_file_location(
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 
 
+def test_windows_identity_commands_decode_with_the_oem_code_page(monkeypatch):
+    calls=[]
+    def check_output(*args,**kwargs):
+        calls.append(kwargs)
+        return '{"pid":12,"path":"C:/fixed/python.exe","started_utc":"2026-09-29T00:00:00+00:00"}'
+    monkeypatch.setattr(m.subprocess,'check_output',check_output)
+    assert m._process_identity(12)['pid']==12
+    assert calls==[{'text':True,'encoding':'oem','stderr':m.subprocess.DEVNULL}]
+
+
 def test_termination_rejects_listener_owned_by_another_process(monkeypatch):
     receipt={'pid':12,'executable':'C:/fixed/python.exe','launched_at_utc':'2026-09-29T00:00:00+00:00'}
     monkeypatch.setattr(m,'bound_runtime_identity',lambda value:{'pid':12})

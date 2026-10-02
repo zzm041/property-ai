@@ -28,6 +28,7 @@ def _process_identity(pid: int) -> dict[str, object]:
         subprocess.check_output(
             ["powershell", "-NoProfile", "-Command", command],
             text=True,
+            encoding="oem",
             stderr=subprocess.DEVNULL,
         )
     )
@@ -61,6 +62,7 @@ def _child_pids(parent_pid: int) -> list[int]:
     raw = subprocess.check_output(
         ["powershell", "-NoProfile", "-Command", command],
         text=True,
+        encoding="oem",
         stderr=subprocess.DEVNULL,
     ).strip()
     if not raw:
@@ -113,7 +115,7 @@ def loopback_listener_pid(port: int) -> int | None:
     )
     matches: set[int] = set()
     output = subprocess.check_output(
-        ["netstat", "-ano", "-p", "TCP"], text=True, errors="replace"
+        ["netstat", "-ano", "-p", "TCP"], text=True, encoding="oem", errors="strict"
     )
     for line in output.splitlines():
         match = pattern.match(line)
@@ -146,6 +148,7 @@ def terminate_bound_runtime(
         ["taskkill", "/PID", str(pid), "/T", "/F"],
         capture_output=True,
         text=True,
+        encoding="oem",
         timeout=15,
     )
     if stopped.returncode != 0:

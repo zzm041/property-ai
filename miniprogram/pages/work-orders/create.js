@@ -168,7 +168,7 @@ Page({
     this._onRecorderStart = () => {
       if (this.unloaded) return;
       this._recording = true;
-      this.setData({ recording: true, recordingHint: "正在录音，最长60秒", error: "" });
+      this.setData({ recording: true, recordingHint: "正在录音，最长30秒", error: "" });
     };
     this._onRecorderStop = (result) => {
       const discard = this._discardRecording || this.unloaded;
@@ -218,7 +218,7 @@ Page({
     wx.authorize({
       scope: "scope.record",
       success: () => this._recorder.start({
-        duration: 60000,
+        duration: 30000,
         sampleRate: 16000,
         numberOfChannels: 1,
         encodeBitRate: 48000,

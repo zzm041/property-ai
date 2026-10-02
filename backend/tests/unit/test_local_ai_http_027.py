@@ -184,11 +184,13 @@ def test_qwen38_residency_guard_rejects_old_4096_context(monkeypatch):
 def test_strict_http_limits_and_no_arbitrary_model_path_url(path,obj):
     with pytest.raises(ValueError):m.decode(path,'application/json',json.dumps(obj).encode(),'')
 
-def test_audio_is_bytes_and_bounded_pcm_not_url():
+def test_audio_is_bytes_and_bounded_pcm_or_mp3_not_url():
     with pytest.raises(ValueError):m.validate('asr',b'http://example.com/audio')
     b=io.BytesIO()
     with wave.open(b,'wb') as w:w.setparams((1,2,16000,0,'NONE','not compressed'));w.writeframes(b'\0'*320)
     m.validate('asr',b.getvalue())
+    m.validate('asr',b'ID3'+b'\0'*128)
+    m.validate('asr',b'\xff\xf3'+b'\0'*128)
     with pytest.raises(ValueError):m.validate('asr','D:/private.wav')
 
 def test_only_reviewed_rag_or_exact_work_order_schema_can_reach_qwen():

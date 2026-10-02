@@ -42,7 +42,7 @@ page._bindRecorder();
 page.startRecording();
 assert.strictEqual(authorizeOptions.scope, "scope.record");
 assert.deepStrictEqual(startOptions, {
-  duration: 60000,
+  duration: 30000,
   sampleRate: 16000,
   numberOfChannels: 1,
   encodeBitRate: 48000,

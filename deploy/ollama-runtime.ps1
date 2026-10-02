@@ -43,6 +43,11 @@ $ControlledStops = @(
         Sha256 = "99CEDBDEBD63523CACB40267B58008AB0B921A8CA6987A8A98AA781EA8165B88"
         Reason = "INFERENCE_TIMEOUT"
     }
+    [pscustomobject]@{
+        Path = Join-Path $RepoRoot "tmp\delivery-work-ai-runtime\calls\call-027\result.json"
+        Sha256 = "95F9A3B51A6447796D6318321390562B424A90A96277CA2595EAC4C8CE90CE4B"
+        Reason = "RESOURCE_FLOOR"
+    }
 )
 $ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models"
 $OllamaExe = if ($env:PROPERTY_AI_OLLAMA_EXE) {

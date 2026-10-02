@@ -43,13 +43,15 @@ def infer(kind, loaded, value):
     import torch
     if kind=='asr':
         import numpy as np
-        import wave
         import io
-        # Caller passes bytes, never an arbitrary path or URL to the loader.
-        with wave.open(io.BytesIO(value),'rb') as audio:
-            assert audio.getnchannels()==1 and audio.getsampwidth()==2 and audio.getframerate()==16000
-            assert 0<audio.getnframes()<=30*16000
-            samples=np.frombuffer(audio.readframes(audio.getnframes()),dtype='<i2').astype('float32')/32768
+        import soundfile as sf
+        # Caller passes bounded bytes, never an arbitrary path or URL.  The
+        # decoder handles the recorder's MP3 output and the existing PCM WAV
+        # fixture through the same in-memory, offline path.
+        samples,sample_rate=sf.read(io.BytesIO(value),dtype='float32',always_2d=True)
+        assert sample_rate==16000 and samples.shape[1]==1
+        assert 0<samples.shape[0]<=30*16000 and np.isfinite(samples).all()
+        samples=samples[:,0]
         result=loaded.transcribe(audio=(samples,16000),language='Chinese',return_time_stamps=False)
         assert len(result)==1 and isinstance(result[0].text,str) and result[0].text.strip()
         return {'text':result[0].text,'language':result[0].language,'model':'Qwen3-ASR-0.6B'}
