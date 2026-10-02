@@ -1,0 +1,23 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-NATIVE-MEDIA-ATTACHMENT-COMPLETION",
+  "work_order_id": 19,
+  "source_intent": {
+    "id": 170,
+    "generation": 3,
+    "status": "SUCCEEDED"
+  },
+  "successor_intent": {
+    "id": 187,
+    "generation": 4,
+    "status": "PENDING"
+  },
+  "reason_code": "ATTACHMENT_COMPLETION",
+  "normal_password_manager_session": true,
+  "attachment_logic_source_commit": "1451e5572932ca7d4261e743110c7b27aeb743e6",
+  "runtime_source_commit": "17581e4e6a8534e55c181084ec4d201b2025ea92",
+  "new_work_order_created": false,
+  "old_analysis_or_task_rewritten": false,
+  "direct_database_write": false,
+  "manual_analysis_or_assignment": false,
+  "credentials_or_tokens_saved": false
+}

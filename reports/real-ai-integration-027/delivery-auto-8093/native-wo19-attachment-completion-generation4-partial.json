@@ -1,0 +1,102 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-NATIVE-MEDIA-ATTACHMENT-COMPLETION",
+  "captured_at": "2026-10-02T20:25:23.4830229+08:00",
+  "conclusion": "PARTIAL_RESOURCE_BLOCKED",
+  "product_head": "17581e4e6a8534e55c181084ec4d201b2025ea92",
+  "runtime": {
+    "image": "property-ai-delivery:17581e4",
+    "image_digest": "sha256:8ae5433c7ded84741ccdafa61ff6d17d2d57641da833074ae0418fbd31f22155",
+    "same_image_components": [
+      "api",
+      "worker",
+      "publisher",
+      "beat"
+    ]
+  },
+  "work_order": {
+    "id": 19,
+    "status": "PENDING_ASSIGNMENT",
+    "version": 2,
+    "assignment_count": 0,
+    "media": [
+      {"media_id": 20, "file_id": 16, "kind": "image"},
+      {"media_id": 21, "file_id": 17, "kind": "audio"},
+      {"media_id": 22, "file_id": 18, "kind": "audio"}
+    ]
+  },
+  "source": {
+    "intent_id": 170,
+    "generation": 3,
+    "status": "SUCCEEDED"
+  },
+  "completion_attempt": {
+    "intent_id": 187,
+    "generation": 4,
+    "status": "FAILED",
+    "error_code": "AI.UNAVAILABLE",
+    "analysis_id": 19,
+    "analysis_version": 2,
+    "analysis_status": "FAILED",
+    "attempts": 3,
+    "final_aggregate_llm_called": false,
+    "assignment_written": false
+  },
+  "attachment_results": [
+    {
+      "file_id": 16,
+      "kind": "image",
+      "result": "VLM_SUCCESS",
+      "provider_call": "call-030",
+      "input_hash": "1d49ae98a28d008718aa3e500b129f03b5c9e424fb3414ad2c327d2efe389d79",
+      "model": "qwen38-27b-q3km-g55:7af3b8f",
+      "model_seconds": 17.234,
+      "owned_exit_confirmed": true,
+      "cleanup_error": null,
+      "reservation_sha256": "2BA74208F09DC14CFE814626AD530039EE8FAFC81BD18C8633599226CB9D781B",
+      "result_sha256": "2BDF242BE2934501AE7A970DAFEDECEC68CC7C88834356DC6BA1F139CD970894",
+      "replay_authorization_consumed": true
+    },
+    {
+      "file_id": 17,
+      "kind": "audio",
+      "result": "EXACT_CHECKPOINT_REUSED",
+      "new_provider_call": false
+    },
+    {
+      "file_id": 18,
+      "kind": "audio",
+      "result": "RESOURCE_ADMISSION_REJECTED",
+      "input_sha256": "18c4f2cf5c9464925ce4c797fb38f4d62ba55aa04af214546ec585704cb26f6d",
+      "pre_reservation_rejections": 3,
+      "reservation_created": false,
+      "failure_stage": "RESOURCE_ADMISSION",
+      "reason_code": "RESOURCE_ADMISSION_REJECTED"
+    }
+  ],
+  "resource_boundary": {
+    "asr_start_ram_floor_mib": 11264,
+    "observed_available_ram_mib": 10098,
+    "deficit_mib": 1166,
+    "gpu_free_mib": 14543,
+    "guard_lowered": false
+  },
+  "new_model_usage": {
+    "qwen_or_vlm_calls": 1,
+    "asr_calls_reserved": 0,
+    "model_execution_seconds": 17.234,
+    "approved_max_qwen_or_vlm_calls": 12,
+    "approved_max_asr_calls": 4,
+    "approved_max_model_seconds": 900
+  },
+  "integrity": {
+    "new_work_order_created": false,
+    "old_success_rewritten": false,
+    "direct_database_business_write": false,
+    "manual_analysis_or_assignment": false,
+    "historical_call_027_rewritten": false,
+    "dlq_touched": false,
+    "credentials_or_tokens_saved": false,
+    "pre_reservation_failure_log_sha256": "A28A94330969575AA6157F4E04F8D2456F22CFD932DB586F9FA5A930E94253DC"
+  },
+  "next_safe_action": "After available RAM reaches at least 11264 MiB, confirm the adapter is idle and has no unresolved request, then use the authenticated managed DEPENDENCY_RECOVERED retry for failed intent 187. The successor must reuse the successful file16 VLM and file17 ASR checkpoints, execute file18 ASR once, and call the final aggregate LLM only after all three attachments have a bound result."
+}
