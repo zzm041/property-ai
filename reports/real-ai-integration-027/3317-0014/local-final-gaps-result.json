@@ -1,0 +1,92 @@
+{
+  "task_id": "PRODUCTION-V1-LOCAL-FINAL-GAPS",
+  "observed_utc": "2026-10-02T07:19:00.3797063Z",
+  "environment": {
+    "api": "127.0.0.1:8083",
+    "database": "127.0.0.1:3317/property_ai_auth001_test",
+    "revision": "20260926_0014_identity_merge_sla_versions",
+    "rabbit_vhost": "property_ai_auth001_persist_v2",
+    "acceptance_queue": "property_ai.auth001.persist.v2.sla.acceptance",
+    "analysis_provider": "development",
+    "identity_proof": "isolated-test"
+  },
+  "identity_recovery": {
+    "run_id": "id-sla-page2-1914ef482f",
+    "case_id": 3,
+    "result": "PASS_SCOPED_LOCAL_TEST_PROOF_PAGE_RUNTIME",
+    "page_flow": [
+      "target_application",
+      "two_distinct_authorized_reviews",
+      "target_reauthentication",
+      "identity_transaction_completion",
+      "source_old_password_rejected",
+      "target_fresh_password_login"
+    ],
+    "database_result": {
+      "case_status": "COMPLETED",
+      "case_version": 5,
+      "source_status": "MERGED",
+      "target_status": "ACTIVE",
+      "source_active_sessions": 0,
+      "source_password_credentials": 0,
+      "approval_count": 2,
+      "account_merge_rows": 1,
+      "audit_rows": 5
+    },
+    "boundary": "Synthetic isolated Proof and injected test clock only; trusted production identity verification remains unaccepted."
+  },
+  "sla": {
+    "run_id": "sla-final-e034e9980f",
+    "work_orders": [45, 46],
+    "result": "PASS_SCOPED_LOCAL_PAGE_BEAT_WORKER",
+    "page_result": "An authorized manager created immutable policy versions and a normal resident submitted two new work orders through the mini-program.",
+    "scheduler_result": {
+      "work_order_45_final_clock": "OVERDUE",
+      "work_order_46_transitions": ["WARNING", "OVERDUE"],
+      "warning_notifications_delivered": 2,
+      "overdue_notifications_delivered": 4,
+      "sla_notifications_delivered_total": 6,
+      "work_order_46_sla_notifications_delivered": 4,
+      "repeat_exact_sweeps_created": 0
+    },
+    "snapshot_result": "Work order 46 retained policy version 3 values 1/1/3/2/1 after the earlier order retained version 2 values 1/1/2/1/1.",
+    "protected_imported_work_orders": [42, 43, 44],
+    "protected_imported_work_orders_unchanged": true,
+    "model_calls": 0
+  },
+  "queue_boundary": {
+    "protected_queue": "property_ai.auth001.persist.v2",
+    "protected_queue_ready_at_final_read": 6,
+    "protected_queue_consumed_or_cleared": false,
+    "acceptance_queue_ready_at_final_read": 0,
+    "acceptance_queue_unacknowledged_at_final_read": 0,
+    "acceptance_queue_consumers_at_final_read": 1,
+    "finding": "The page API could enqueue ordinary notification delivery on the protected queue even while AI enqueueing was disabled.",
+    "fix": "All 3317 acceptance components now use the dedicated acceptance queue, and all components require the immutable RabbitMQ identity resolution even when API work-order AI enqueue is disabled; the six protected messages remain untouched.",
+    "fixed_source_head": "15977bfe",
+    "fixed_source_archive_sha256": "B278BEA641518003262F8D3AC317C6E24C93D32B388B4C23A63023AC27ACFDC1",
+    "fixed_source_startup_health": "PASS"
+  },
+  "tests": {
+    "focused": "95 passed, 3 warnings",
+    "junit": "local-final-gap-focused-queuefix.junit.xml"
+  },
+  "current_delivery_candidate": {
+    "checked_utc": "2026-10-02T07:30:54Z",
+    "entry": "deploy/delivery.ps1",
+    "url": "http://127.0.0.1:8093",
+    "application_image": "property-ai-delivery:d9b3040",
+    "application_services": ["api", "worker", "publisher", "beat", "nginx"],
+    "application_health": "ready",
+    "work_ai": "READY 127.0.0.1:11437 -> 11435, qwen38 27B, context 8192",
+    "rag": "READY 127.0.0.1:11436 -> 11438, qwen3.5 4B, context 4096",
+    "status_checks_started_inference": false,
+    "acceptance_3317_api_worker_stopped_after_startup_proof": true
+  },
+  "native_media": {
+    "status": "BLOCKED_PERSON_ACTION",
+    "reason": "Developer Tools automation cannot operate the operating-system image chooser or microphone as a native user action.",
+    "not_claimed": ["native_image_picker", "native_microphone", "physical_device"]
+  },
+  "release_boundary": "Scoped local acceptance only. Trusted identity/SMS/WeChat providers, native-device media capture, target-host security/performance/durability and formal Production release remain open."
+}

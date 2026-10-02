@@ -1,0 +1,82 @@
+{
+  "task_id": "PRODUCTION-V1-3317-IDENTITY-SLA-PAGE-SUBMIT",
+  "run_id": "id-sla-page2-1914ef482f",
+  "collected_utc": "2026-09-27T21:23:01.733803+00:00",
+  "mode": "read-only SQL after normal page submissions",
+  "environment": "127.0.0.1:3317/property_ai_auth001_test",
+  "revision": "20260926_0014_identity_merge_sla_versions",
+  "identity": {
+    "case_id": 3,
+    "status": "COMPLETED",
+    "version": 5,
+    "source_user_id": 33,
+    "target_user_id": 34,
+    "approve_review_count": 2,
+    "merge_rows": 1,
+    "merge_status": "COMPLETED",
+    "source_active_sessions": 0,
+    "source_password_rows": 0,
+    "audit_rows": 5,
+    "user_statuses": [
+      {
+        "user_id": 33,
+        "status": "MERGED"
+      },
+      {
+        "user_id": 34,
+        "status": "ACTIVE"
+      }
+    ]
+  },
+  "sla": {
+    "policy_id": 1,
+    "versions": [
+      {
+        "version_no": 1,
+        "accept_minutes": 7,
+        "respond_minutes": 17,
+        "complete_minutes": 47,
+        "warning_lead_minutes": 5,
+        "escalation_minutes": 9,
+        "status": "ACTIVE"
+      },
+      {
+        "version_no": 2,
+        "accept_minutes": 11,
+        "respond_minutes": 23,
+        "complete_minutes": 59,
+        "warning_lead_minutes": 6,
+        "escalation_minutes": 12,
+        "status": "ACTIVE"
+      },
+      {
+        "version_no": 3,
+        "accept_minutes": 13,
+        "respond_minutes": 29,
+        "complete_minutes": 61,
+        "warning_lead_minutes": 7,
+        "escalation_minutes": 13,
+        "status": "ACTIVE"
+      }
+    ],
+    "work_order_id": 43,
+    "application": {
+      "policy_version_id": null,
+      "source": "CODE_DEFAULT",
+      "accept_minutes": 120,
+      "respond_minutes": 120,
+      "complete_minutes": 1440,
+      "warning_lead_minutes": 360,
+      "escalation_minutes": 0
+    },
+    "work_order_status": "PENDING_ANALYSIS",
+    "contact_phone_present": true,
+    "clock": {
+      "state": "OPEN",
+      "all_deadlines_present": true
+    },
+    "task_intent_count": 0
+  },
+  "sensitive_values_in_output": false,
+  "business_sql_writes": 0
+}

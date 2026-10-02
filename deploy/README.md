@@ -88,6 +88,8 @@ Copy-Item deploy/.env.delivery.bootstrap.example deploy/.env.delivery.bootstrap
 ./deploy/delivery.ps1 stop   # 保留全部具名卷
 ```
 
+本机私密账号不进入 Git：初始化 SYSTEM_ADMIN 只存于忽略的 `deploy/.env.delivery.bootstrap`；当前隔离演示账号由授权 fixture 生成后存于忽略的 `tmp/delivery-auto-8093/fixture-context.json`，只能在本机合成环境使用，不得复制到报告、日志或部署镜像。部署到企业主机时应改由部署方 secret manager 保存，不得依赖这个 `tmp` 文件。正常操作从小程序密码/短信登录开始：管理员在首页进入“账号合并 / 高风险恢复”“身份恢复审核”或“SLA 策略管理”，住户从“提交报修”选择已授权房屋并确认本次联系电话；测试 Proof 只允许 3317 隔离入口，8093 正常配置不得开启该开关。
+
 `init` 的固定顺序是：基础设施健康 → 单独执行 `alembic upgrade head` → 精确守卫的一次性对象存储 bucket 初始化 → API/Worker/持久任务投递器/Beat/Nginx。再次启动用 `up`；`up` 也会幂等核对并确保同一个 delivery bucket 存在。不得用 `down -v`。`backup [文件名.sql]` 只在 `deploy/backups/` 内新建不覆盖的 SQL 和 SHA-256 清单；省略文件名时使用 UTC 时间与随机后缀。显式同名并发请求通过原子预约互斥，SQL 与清单先写各自的唯一临时文件，再以不覆盖的文件移动发布。`restore-check <dump>` 只接受该目录内与清单哈希、字节数和源库名一致且不含跨库/全局语句的备份，并以仅获目标库权限的临时账号导入全新的 `<MYSQL_DATABASE>_restore_check`。本次受控验收可显式传入第三参数且只接受 `property_ai_delivery_check_restore_check_029`；其他显式库名拒绝。目标已存在时拒绝覆盖，应用不会连接恢复库。
 
 实际迁移分为受控的 0012 前置、一次性 SYSTEM_ADMIN 初始化、`alembic_version` 兼容扩宽和 0014。管理员手机号/密码只来自 `.env.delivery.bootstrap`，仅 migrate 服务读取，日志不输出原值；成功后应移入部署方 secret manager 或从主机文件中安全移除。历史迁移的业务 DDL 不变，新增的 delivery guard 只接受 `staging + mysql:3306/property_ai_delivery_check + 显式目标授权`。

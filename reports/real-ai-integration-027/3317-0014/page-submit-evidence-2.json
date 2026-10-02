@@ -1,0 +1,481 @@
+{
+  "task_id": "PRODUCTION-V1-3317-IDENTITY-SLA-PAGE-SUBMIT",
+  "run_id": "id-sla-page2-1914ef482f",
+  "environment": {
+    "api": "127.0.0.1:8083",
+    "database": "127.0.0.1:3317/property_ai_auth001_test@0014",
+    "automator": "ws://127.0.0.1:9440"
+  },
+  "phases": {
+    "past_clock_submit_and_reviews": {
+      "case_id": 3,
+      "status": "PENDING_REVIEW",
+      "approval_count": 2,
+      "version": 3,
+      "clock": "2026-08-27T21:11:11.686412+00:00"
+    },
+    "current_clock_finalize_and_complete": {
+      "case_id": 3,
+      "final_status": "COMPLETED",
+      "source_old_password_rejected": true,
+      "target_fresh_password_login": true
+    },
+    "sla_policy_and_work_order_submit": {
+      "policy_id": 1,
+      "policy_version": 3,
+      "work_order_id": 43,
+      "work_order_status": "PENDING_ANALYSIS",
+      "enqueue_expected": false
+    }
+  },
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/password/login",
+      "status": 200,
+      "request_id_hash": "abb97ddc5e4ea191"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id_hash": "02e5d5d064293128"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id_hash": "8b1ec06c8556b66e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/recovery/capabilities",
+      "status": 200,
+      "request_id_hash": "3e1c91a213904996"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/recovery/cases/mine",
+      "status": 200,
+      "request_id_hash": "ad83ffaec27f1438"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/identity/recovery/cases",
+      "status": 200,
+      "request_id_hash": "261ef2cbf48139be"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "status": 200,
+      "request_id_hash": "8a10b8e9c72c2565"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "status": 200,
+      "request_id_hash": "5726594c17b2c420"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/test-inbox",
+      "status": 200,
+      "request_id_hash": "ef96c215c07e420a"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "status": 200,
+      "request_id_hash": "296fdfa772a002b6"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id_hash": "17d71fa0046b9b57"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id_hash": "e01cfd51ed5d009b"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/identity-recovery/cases",
+      "status": 200,
+      "request_id_hash": "2b406f31e277db67"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/identity-recovery/cases/3/reviews",
+      "status": 200,
+      "request_id_hash": "fc835bf4307e582a"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/identity-recovery/cases",
+      "status": 200,
+      "request_id_hash": "ba32167eaa89c692"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "status": 200,
+      "request_id_hash": "a3c772d9430462d7"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "status": 200,
+      "request_id_hash": "ef2e1044e48adcf8"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/test-inbox",
+      "status": 200,
+      "request_id_hash": "d3fe4af7ba2a0ce2"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "status": 200,
+      "request_id_hash": "e931597de65eb6e9"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id_hash": "9863aa6bbfe9ec01"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id_hash": "c51045acf6c2ef33"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/identity-recovery/cases",
+      "status": 200,
+      "request_id_hash": "de8f751aa1a31f24"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/identity-recovery/cases/3/reviews",
+      "status": 200,
+      "request_id_hash": "e8dab3a0ecca1db5"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/identity-recovery/cases",
+      "status": 200,
+      "request_id_hash": "c83c018e62983fab"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "status": 200,
+      "request_id_hash": "95d89f3d71fccafd"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "status": 200,
+      "request_id_hash": "c6982218af12b0b6"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/test-inbox",
+      "status": 200,
+      "request_id_hash": "6496c7dc571f6c9f"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "status": 200,
+      "request_id_hash": "d2383c2b68fce38f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id_hash": "490b7e702426aeb4"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id_hash": "9b36bb5cb023d56e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/identity-recovery/cases",
+      "status": 200,
+      "request_id_hash": "de7e52754f4c6330"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/admin/identity-recovery/cases/3/finalize",
+      "status": 200,
+      "request_id_hash": "61e3b23e501b30bc"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/identity-recovery/cases",
+      "status": 200,
+      "request_id_hash": "d59e0e9e464ca9db"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/recovery/capabilities",
+      "status": 200,
+      "request_id_hash": "17175fd9c95dbc87"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/identity/recovery/cases/mine",
+      "status": 200,
+      "request_id_hash": "d1693363abd594ca"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/identity/recovery/cases/3/complete",
+      "status": 200,
+      "request_id_hash": "bb0f35c2c32a630b"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/password/login",
+      "status": 401,
+      "request_id_hash": "6ba8d44db7d2a7c8"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/password/login",
+      "status": 200,
+      "request_id_hash": "e5197f6b33ad958e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id_hash": "acea08729aa0c649"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id_hash": "31f400d5595f75da"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "status": 200,
+      "request_id_hash": "6293204e61289d00"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "status": 200,
+      "request_id_hash": "ed10de797f2a9a6f"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/test-inbox",
+      "status": 200,
+      "request_id_hash": "24c2c148be898098"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "status": 200,
+      "request_id_hash": "4b9bdb7791f9fc53"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id_hash": "c10eed2f2ddd172c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id_hash": "156ca667afd6d056"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id_hash": "f2aef520c6d9c069"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id_hash": "dffd20b53e88bc3d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/properties",
+      "status": 200,
+      "request_id_hash": "06ac0cf6af466c2e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/sla-policies",
+      "status": 200,
+      "request_id_hash": "431f443ca3665da3"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/admin/sla-policies",
+      "status": 200,
+      "request_id_hash": "7e98222cfed3ef56"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/sla-policies",
+      "status": 200,
+      "request_id_hash": "9f8024125786ba39"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/challenge",
+      "status": 200,
+      "request_id_hash": "b04129942b5225c2"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/send",
+      "status": 200,
+      "request_id_hash": "b3e3aab458130739"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/test-inbox",
+      "status": 200,
+      "request_id_hash": "c0770ee31a0687ca"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/sms/login",
+      "status": 200,
+      "request_id_hash": "d92427ce8a165c88"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id_hash": "8eb89d70e1546980"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "request_id_hash": "b95f1675bd1af952"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me/contact-phone",
+      "status": 200,
+      "request_id_hash": "13d495b4dc1f1557"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/me/houses",
+      "status": 200,
+      "request_id_hash": "32d47087185e3409"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/work-orders",
+      "status": 200,
+      "request_id_hash": "95bab13bab9e0998"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/43",
+      "status": 200,
+      "request_id_hash": "964d0682a2ee5a64"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/43/contact",
+      "status": 200,
+      "request_id_hash": "314d07d2eec4d3b6"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/43",
+      "status": 200,
+      "request_id_hash": "8da93e697ec41310"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/43",
+      "status": 200,
+      "request_id_hash": "f193c16108309629"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/43",
+      "status": 200,
+      "request_id_hash": "77ca03b4ac85e34d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/43",
+      "status": 200,
+      "request_id_hash": "d0095aa1ed5204cc"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/43",
+      "status": 200,
+      "request_id_hash": "9d89e9d7fb668e3a"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/43",
+      "status": 200,
+      "request_id_hash": "a52ddf7fbef48f05"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/43",
+      "status": 200,
+      "request_id_hash": "4098d829d2189247"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/43",
+      "status": 200,
+      "request_id_hash": "16e5fcd615b57009"
+    }
+  ],
+  "screenshots": [
+    "id-sla-page2-1914ef482f-04-identity-page-submitted.png",
+    "id-sla-page2-1914ef482f-07-identity-page-completion-ready.png",
+    "id-sla-page2-1914ef482f-08-merged-source-password-rejected.png",
+    "id-sla-page2-1914ef482f-09-target-fresh-login.png",
+    "id-sla-page2-1914ef482f-11-sla-work-order-page-submitted.png"
+  ],
+  "boundaries": {
+    "development_sms": true,
+    "isolated_test_proof": true,
+    "seed_login": false,
+    "dev_auth": false,
+    "page_state_faked": false,
+    "business_sql": false,
+    "model_requests": 0
+  },
+  "screenshot_capture_failures": [
+    "id-sla-page2-1914ef482f-05-identity-two-page-reviews.png",
+    "id-sla-page2-1914ef482f-06-identity-page-finalized.png",
+    "id-sla-page2-1914ef482f-10-sla-page-submitted.png"
+  ],
+  "last_updated_utc": "2026-09-27T21:20:32.151Z"
+}

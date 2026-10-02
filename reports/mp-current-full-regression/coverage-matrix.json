@@ -2353,7 +2353,7 @@
     "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs), then notification_events_inbox_013.current_status_overlays (2 IDs)",
     "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs), then manager_wo_cancel_017 (1 composite ID, remains PARTIAL), then house_csv_roundtrip_018 (1 existing ID), then ai_analysis_input_019 (3 existing IDs; real-model statuses remain BLOCKED), then resident_wo_presentation_020 (1 existing ID; release gaps retained), then notification_presentation_021 (1 existing ID; explicitUTC not Property-local/outbound acceptance), then ai_fallback_runtime_022 (1 existing ID; Development injected failure only)",
     "latest_additional_overlay_source": "resident_house_select_023, evaluation_calibration_20260924, maintenance_contact_dispatch_024, db_task_recovery_025, reliable_task_delivery_026 includingnormalintegration (4 existing IDs, boundedDevelopment only), preservedselfhost_supplement_024_rubric_01 then crossfield_diagnostic_01 (SELFHOST-AI remainsNOT_READY; no percentage/extra_v1 double count)",
-    "final_overlay_source": "real_ai_integration_027.current_status_overlays plus persistent3317/0014 scoped runtime checkpoint, delivery_organization_onboarding_028, restore029, the 8093 scoped real-provider RAG continuation, preserved Qwen3.8 fixed-set NOT_READY history, and the f234402/6dc6538 bounded local image/voice AUTO delivery evidence independently accepted in REAL-AI-INTEGRATION-027-LOCAL-DELIVERY-round2; scoped business PASS does not promote native-device, generalized quality, trusted-provider, target deployment or Production release acceptance; rows and historical IDs retained",
+    "final_overlay_source": "real_ai_integration_027.current_status_overlays plus persistent3317/0014 scoped runtime checkpoint, delivery_organization_onboarding_028, restore029, the 8093 scoped real-provider RAG continuation, preserved Qwen3.8 fixed-set NOT_READY history, the f234402/6dc6538 bounded local image/voice AUTO delivery evidence independently accepted in REAL-AI-INTEGRATION-027-LOCAL-DELIVERY-round2, and the 2026-10-02 local-final-gaps identity-page/SLA-Beat continuation; scoped business PASS does not promote native-device, generalized quality, trusted-provider, target deployment or Production release acceptance; rows and historical IDs retained",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced. Old AUTH001 objects were lost on the 2026-09-23 tmpfs stop; historical evidence remains version-bound, not current-object proof.",
     "row_count": 83,
     "rows": [
@@ -2543,11 +2543,11 @@
       },
       {
         "requirement_id": "WO-MEDIA-NATIVE",
-        "current_implementation": "缺环境或权限",
-        "verification_mode_status": "UI:BLOCKED_ENV",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "automator 无法操作系统文件选择器/摄像头/麦克风",
-        "next_action": "在受控环境或获批资源具备后验收；继续不依赖工作"
+        "current_implementation": "Persistent media selection/upload/preview wiring and real image plus synthetic-audio-to-AUTO business linkage are implemented and scoped-local accepted. Native operating-system picker and microphone interaction remain device evidence, not a software stub.",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_MEDIA_PIPELINE;NATIVE_DEVICE_BLOCKED_PERSON_ACTION",
+        "evidence_version": "f234402/6dc6538 delivery-auto-8093 real image/voice AUTO; current native boundary reconfirmed 2026-10-02",
+        "remaining_gap": "Actual native image chooser, microphone recording and physical-device acceptance require a person operating the system picker/microphone; simulator/API evidence is not promoted to native-device PASS.",
+        "next_action": "Run one controlled physical-device image choice and microphone recording with a normal account; preserve current software and real-provider evidence without regenerating business objects merely for screenshots."
       },
       {
         "requirement_id": "WO-QUEUE-ASSIGN",
@@ -2663,19 +2663,19 @@
       },
       {
         "requirement_id": "AUTH-MERGE",
-        "current_implementation": "0014 is active on persistent isolated3317; guarded ownership transfer, credential/session/ticket revocation, reviewed-impact stability, shared ACTIVE identity write serialization and mini-program completion display are loaded in the fixed candidate.",
-        "verification_mode_status": "PASS_SCOPED_LOCAL_TEST_PROOF_RUNTIME",
-        "evidence_version": "product e62f53c from4cc9fa0 baseline; 3317-0014 identity/API/MySQL/page/concurrency evidence; independent PASS_SCOPED_RUNTIME",
-        "remaining_gap": "trusted identity Proof, actual30-day wait, first-completion race/non-empty asset conflict coverage and production acceptance absent",
-        "next_action": "preserve scoped evidence; configure an approved trusted Proof provider and run target acceptance without SMS/time inheritance"
+        "current_implementation": "0014 is active on persistent isolated3317; guarded ownership transfer, two distinct current reviewers, target reauthentication, credential/session/ticket revocation, immutable history and mini-program completion are implemented. The actual page run completed case3 and invalidated the merged source password/session state.",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_TEST_PROOF_PAGE_RUNTIME",
+        "evidence_version": "b1ffe66/4fb805d; id-sla-page2-1914ef482f; page-submit-evidence-2.json and page-submit-db-evidence-2.json",
+        "remaining_gap": "Trusted identity Proof, actual30-day passage, real production accounts and target privacy/provider acceptance remain open; synthetic test Proof is not real identity verification.",
+        "next_action": "Preserve the completed page/runtime evidence; configure an owner-approved trusted Proof provider before any real account takeover acceptance."
       },
       {
         "requirement_id": "AUTH-RECOVERY",
-        "current_implementation": "The persistent3317 candidate supports no-ACTIVE-phone recovery and new-holder/merge completion with case-bound Proof,30-day quarantine, two current reviewers and ended-phone SMS fail-closed behavior.",
-        "verification_mode_status": "PASS_SCOPED_LOCAL_TEST_PROOF_RUNTIME",
-        "evidence_version": "id-sla3317-0f26435219; real MySQL/API plus three inspected mini-program screenshots; independent PASS_SCOPED_RUNTIME",
-        "remaining_gap": "trusted Proof channel, actual30-day passage, page-submitted completion and production privacy/provider acceptance absent",
-        "next_action": "keep formal capability fail-closed until an approved trusted provider and target environment exist"
+        "current_implementation": "The persistent3317 candidate supports no-ACTIVE-phone recovery and new-holder/merge completion with case-bound Proof, 30-day quarantine, two current reviewers and ended-phone SMS fail-closed behavior. A normal mini-program target session submitted, was independently reviewed, reauthenticated and completed the transaction; fresh target login succeeded and old source credentials failed.",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_TEST_PROOF_PAGE_RUNTIME",
+        "evidence_version": "b1ffe66/4fb805d; id-sla-page2-1914ef482f; inspected page screenshots plus page-submit-db-evidence-2.json",
+        "remaining_gap": "Trusted Proof channel, actual30-day passage, real-account privacy/provider acceptance and Production release remain open.",
+        "next_action": "Keep formal capability fail-closed until an approved trusted provider and target environment exist; do not repeat the synthetic completion solely for evidence."
       },
       {
         "requirement_id": "AUTH-PASSWORD-CHANGE",
@@ -2703,11 +2703,11 @@
       },
       {
         "requirement_id": "KNOWLEDGE-INGEST-UI",
-        "current_implementation": "008 scopedDevelopment retained;027 pages created3documents/4versions and independentWorker activated real1024vectors; staff knowledge entry corrected",
-        "verification_mode_status": "008_PASS_RETAINED;027_PARTIAL_REAL_LOCAL_REVIEWED_NOT_FULL_PASS",
-        "evidence_version": "Prior008 versions unchanged;027 pages/runtime-final/review-source-manifest",
-        "remaining_gap": "027 visibility/archive negatives and production acceptance",
-        "next_action": "Save original focused review; no repeated ingestion or expired-window model calls"
+        "current_implementation": "008 scoped Development evidence is retained. The 8093 delivery candidate additionally used the actual management page to add a real-provider version, independent Worker ingestion into the 1024-dimensional collection, ACTIVE retrieval/re-ranking/cited answer and archive exclusion; a separately authorized property received insufficient knowledge with no citation.",
+        "verification_mode_status": "008_PASS_RETAINED;027_8093_PASS_SCOPED_REAL_RAG_PAGE_NOT_PRODUCTION",
+        "evidence_version": "14b8dc5 plus delivery-rag-current-20261002 result; independent REAL-AI-INTEGRATION-027-LOCAL-FINAL-round1 acceptance",
+        "remaining_gap": "Generalized quality, production capacity/security/durability, native-device management UX and formal release acceptance remain open; successful-run ACTIVE/ARCHIVED management screenshots were not regenerated.",
+        "next_action": "Preserve the current real ingestion/citation/archive and cross-property evidence; do not repeat ingestion or model calls solely to expand screenshots."
       },
       {
         "requirement_id": "HOUSE-IMPORT-EXPORT",
@@ -2807,11 +2807,11 @@
       },
       {
         "requirement_id": "AUTH-PASSWORD-POLICY",
-        "current_implementation": "已实现可测试",
-        "verification_mode_status": "UI:PARTIAL",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "不强制大写；最少 8 字符；禁止纯数字/纯小写字母",
-        "next_action": "补齐缺失接线及范围证据"
+        "current_implementation": "The frozen minimum-eight/no-uppercase-required policy is shared by password reset and authenticated password change. ASCII all-digits and all-lowercase values are rejected, exact-case hashing is preserved, and the normal profile page proves weak/mismatch rejection plus successful lowercase+digit/symbol change and relogin.",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_PAGE_API_DB",
+        "evidence_version": "0f86f59/87b6279 AUTH-PASSWORD-CHANGE; independent AUTH-PASSWORD-CHANGE review PASS",
+        "remaining_gap": "Production security/provider/device and formal release acceptance remain open; existing hashes are not retroactively rejected on login.",
+        "next_action": "Preserve the accepted password-policy evidence and revalidate only after a related credential-policy change."
       },
       {
         "requirement_id": "V1-RES-RELATION-HISTORY",
@@ -2911,11 +2911,11 @@
       },
       {
         "requirement_id": "V1-SLA-CONFIG",
-        "current_implementation": "0014 immutable SLA versions and per-new-order accept/respond/warning/escalation snapshots are active on persistent3317; pre-0014 orders retain authoritative legacy clocks.",
-        "verification_mode_status": "PASS_SCOPED_LOCAL_MYSQL_API_PAGE_READ",
-        "evidence_version": "3317-0014 migration/runtime/page evidence: WO42 v1 snapshot7/17/47/5/9 unchanged after v2 11/23/59/6/12; independent PASS_SCOPED_RUNTIME",
-        "remaining_gap": "baseline had no non-empty historical policy; Worker timeout/escalation scheduling and production RBAC/provider/release remain open",
-        "next_action": "after Rabbit identity resolution, validate only pending Worker scheduling on new scoped objects; never reconstruct legacy clocks"
+        "current_implementation": "0014 immutable SLA versions and per-new-order snapshots are active on persistent3317. Actual manager-page policy updates produced versions2/3; resident-page WO45/46 retained their respective snapshots. Exact-ID real Beat/Worker execution created warning/overdue logs and delivered six SLA notifications once: four for WO46 warning/overdue plus two for WO45 overdue. Repeat sweeps created none. Imported WO42-44 remained unchanged.",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_PAGE_BEAT_WORKER",
+        "evidence_version": "b1ffe66/15977bf; sla-final-e034e9980f before/after evidence; 95 focused tests",
+        "remaining_gap": "Production-scale scheduler supervision, external notification Provider, target RBAC/security/performance and formal release acceptance remain open. The imported queue messages were preserved, not replayed.",
+        "next_action": "Preserve this bounded scheduler evidence; use the normal deployment Beat for target acceptance and never scan/reconstruct protected imported objects merely to expand evidence."
       },
       {
         "requirement_id": "V1-NTF-RETRY",
@@ -2967,11 +2967,11 @@
       },
       {
         "requirement_id": "V1-REAL-ASR-VLM",
-        "current_implementation": "019 multi-image provenance/Development wiring retained; prior actual4B repair-photo diagnostics remain incomplete. R2 continuation produced one exact real local synthetic-audio ASR transcript with guarded cleanup, but it was not associated with a work order.",
-        "verification_mode_status": "REAL_ASR_SINGLE_SYNTHETIC_SCOPED_PASS;REAL_VLM_FIXED_SET_AND_BUSINESS_UNVERIFIED",
-        "evidence_version": "027 call046/review-r2-continuation; prior019 and fixed28 image originals retained; latest R3fix2 stopped before images",
-        "remaining_gap": "Complete fact-faithful repair-image protocol and real text/image/voice work-order association; native picker/microphone/device, production media/security/runtime/release. No internal-fault perfection requirement.",
-        "next_action": "Preserve ASR and image histories. R3fix2 stopped at2/2 candidates, so no image fallback or business association may be inferred; future model work needs a new explicit decision."
+        "current_implementation": "The 8093 bounded local candidate has a page-created persisted repair image processed by real VLM/LLM through AUTO to CLOSED, and a separate work order with persisted image plus real ASR transcript processed through the same real analysis/AUTO path. Historical fixed-set failures remain version-bound rather than rewritten.",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_REAL_IMAGE_AND_SYNTHETIC_AUDIO_AUTO;NATIVE_DEVICE_UNVERIFIED",
+        "evidence_version": "f234402/6dc6538; delivery-auto-8093 final evidence; independent REAL-AI-INTEGRATION-027-LOCAL-DELIVERY-round2",
+        "remaining_gap": "Native device picker/microphone, generalized model quality, sustained target latency/capacity, production media security and formal release acceptance remain open.",
+        "next_action": "Preserve scoped real-provider business evidence and historical failures; perform native device capture and target-scale acceptance only in their approved environments."
       },
       {
         "requirement_id": "V1-AUTH-LOCKOUT",

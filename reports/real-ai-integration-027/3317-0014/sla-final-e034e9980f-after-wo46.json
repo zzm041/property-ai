@@ -1,0 +1,241 @@
+{
+  "task_id": "PRODUCTION-V1-LOCAL-FINAL-GAPS",
+  "run_id": "sla-final-e034e9980f",
+  "phase": "after",
+  "observed_utc": "2026-10-02T07:17:38.475708+00:00",
+  "source_head": "b1ffe66064e96e30562e363db0006109f6ff6970",
+  "runtime": {
+    "database": "127.0.0.1:3317/property_ai_auth001_test",
+    "api": "127.0.0.1:8083",
+    "vhost": "property_ai_auth001_persist_v2",
+    "queue": "property_ai.auth001.persist.v2.sla.acceptance",
+    "redis": "127.0.0.1:6382/0",
+    "storage": "127.0.0.1:9002/property-ai-auth001-persist-v2",
+    "analysis_provider": "development",
+    "identity_proof": "isolated-test"
+  },
+  "revision": "20260926_0014_identity_merge_sla_versions",
+  "work_order": {
+    "id": 46,
+    "tenant_id": 1,
+    "property_id": 1,
+    "reporter_user_id": 27,
+    "status": "PENDING_ANALYSIS",
+    "process_reason": "NONE",
+    "category": "OTHER",
+    "priority": "MEDIUM",
+    "version": 1,
+    "current_assignment_id": null,
+    "sla_due_at": "2026-10-02T07:10:05.093438",
+    "created_at": "2026-10-02T07:07:05.110017",
+    "updated_at": "2026-10-02T07:07:05.110017"
+  },
+  "sla_application": [
+    {
+      "id": 5,
+      "work_order_id": 46,
+      "policy_version_id": 6,
+      "source": "PROPERTY",
+      "accept_minutes": 1,
+      "respond_minutes": 1,
+      "complete_minutes": 3,
+      "warning_lead_minutes": 2,
+      "escalation_minutes": 1,
+      "applied_at": "2026-10-02T07:07:05.093438",
+      "policy_id": 2,
+      "version_no": 3,
+      "change_reason": "sla-final-e034e9980f 预警到超时真实Beat验收"
+    }
+  ],
+  "sla_clock": [
+    {
+      "id": 46,
+      "work_order_id": 46,
+      "accept_due_at": "2026-10-02T07:08:05.093438",
+      "respond_due_at": "2026-10-02T07:08:05.093438",
+      "complete_due_at": "2026-10-02T07:10:05.093438",
+      "warning_at": "2026-10-02T07:08:05.093438",
+      "state": "OVERDUE",
+      "created_at": "2026-10-02T07:07:05.114204",
+      "updated_at": "2026-10-02T07:10:14.087042"
+    }
+  ],
+  "logs": [
+    {
+      "id": 353,
+      "work_order_id": 46,
+      "actor_type": "RESIDENT",
+      "from_status": null,
+      "to_status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "event_code": "CREATE",
+      "request_id": "c851395bc61d483594392e94d0e1f5d7",
+      "created_at": "2026-10-02T07:07:05.117881"
+    },
+    {
+      "id": 355,
+      "work_order_id": 46,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "event_code": "SLA_WARNING",
+      "request_id": "sla-clock:46:warning",
+      "created_at": "2026-10-02T07:09:14.181391"
+    },
+    {
+      "id": 356,
+      "work_order_id": 46,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "event_code": "SLA_OVERDUE",
+      "request_id": "sla-clock:46:overdue",
+      "created_at": "2026-10-02T07:10:14.088662"
+    }
+  ],
+  "notifications": [
+    {
+      "id": 337,
+      "tenant_id": 1,
+      "property_id": 1,
+      "user_id": 27,
+      "title": "工单已创建",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 46,
+      "created_at": "2026-10-02T07:07:05.125674"
+    },
+    {
+      "id": 340,
+      "tenant_id": 1,
+      "property_id": 1,
+      "user_id": 5,
+      "title": "工单 SLA 即将超时",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 46,
+      "created_at": "2026-10-02T07:09:14.188270"
+    },
+    {
+      "id": 341,
+      "tenant_id": 1,
+      "property_id": 1,
+      "user_id": 28,
+      "title": "工单 SLA 即将超时",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 46,
+      "created_at": "2026-10-02T07:09:14.194078"
+    },
+    {
+      "id": 342,
+      "tenant_id": 1,
+      "property_id": 1,
+      "user_id": 5,
+      "title": "工单 SLA 已超时",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 46,
+      "created_at": "2026-10-02T07:10:14.100872"
+    },
+    {
+      "id": 343,
+      "tenant_id": 1,
+      "property_id": 1,
+      "user_id": 28,
+      "title": "工单 SLA 已超时",
+      "resource_type": "WORK_ORDER",
+      "resource_id": 46,
+      "created_at": "2026-10-02T07:10:14.107918"
+    }
+  ],
+  "notification_deliveries": [
+    {
+      "id": 337,
+      "notification_id": 337,
+      "notification_title": "工单已创建",
+      "channel": "IN_APP",
+      "status": "PENDING",
+      "attempt": 0,
+      "last_error_code": null,
+      "next_retry_at": null,
+      "delivered_at": null,
+      "created_at": "2026-10-02T07:07:05.127242",
+      "updated_at": "2026-10-02T07:07:05.127242"
+    },
+    {
+      "id": 340,
+      "notification_id": 340,
+      "notification_title": "工单 SLA 即将超时",
+      "channel": "IN_APP",
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "last_error_code": null,
+      "next_retry_at": null,
+      "delivered_at": "2026-10-02T07:09:14.520249",
+      "created_at": "2026-10-02T07:09:14.190553",
+      "updated_at": "2026-10-02T07:09:14.524360"
+    },
+    {
+      "id": 341,
+      "notification_id": 341,
+      "notification_title": "工单 SLA 即将超时",
+      "channel": "IN_APP",
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "last_error_code": null,
+      "next_retry_at": null,
+      "delivered_at": "2026-10-02T07:09:14.610100",
+      "created_at": "2026-10-02T07:09:14.195839",
+      "updated_at": "2026-10-02T07:09:14.615235"
+    },
+    {
+      "id": 342,
+      "notification_id": 342,
+      "notification_title": "工单 SLA 已超时",
+      "channel": "IN_APP",
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "last_error_code": null,
+      "next_retry_at": null,
+      "delivered_at": "2026-10-02T07:10:14.218081",
+      "created_at": "2026-10-02T07:10:14.103689",
+      "updated_at": "2026-10-02T07:10:14.221397"
+    },
+    {
+      "id": 343,
+      "notification_id": 343,
+      "notification_title": "工单 SLA 已超时",
+      "channel": "IN_APP",
+      "status": "SUCCEEDED",
+      "attempt": 1,
+      "last_error_code": null,
+      "next_retry_at": null,
+      "delivered_at": "2026-10-02T07:10:14.320098",
+      "created_at": "2026-10-02T07:10:14.110113",
+      "updated_at": "2026-10-02T07:10:14.324731"
+    }
+  ],
+  "delivery_intents": [],
+  "protected_imported_work_orders": [
+    {
+      "id": 42,
+      "status": "PENDING_ANALYSIS",
+      "version": 1,
+      "updated_at": "2026-09-27T19:20:08.286679",
+      "log_count": 1
+    },
+    {
+      "id": 43,
+      "status": "PENDING_ANALYSIS",
+      "version": 1,
+      "updated_at": "2026-09-27T21:20:21.607441",
+      "log_count": 1
+    },
+    {
+      "id": 44,
+      "status": "PENDING_ANALYSIS",
+      "version": 1,
+      "updated_at": "2026-09-27T21:24:40.736045",
+      "log_count": 1
+    }
+  ]
+}
