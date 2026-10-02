@@ -1,0 +1,41 @@
+{
+  "task_id": "AUTH-SMS-EXPIRE-PAGE-20261002",
+  "result": "PASS_SCOPED_LOCAL_DEVELOPMENT_PAGE_REAL_WAIT",
+  "resolution_kind": "immutable_follow_up",
+  "original_failure_record": {
+    "path": "reports/auth-sms-expire-20261002/page-expiry-failure.json",
+    "sha256": "A7A1BFB239B492AA091425A1D06193213C5DE44C3E26DDFB11C9FEF9BC9340DF",
+    "preserved": true,
+    "original_conclusion": "NOT_PASS_INCONCLUSIVE_PAGE_ASSERTION"
+  },
+  "page_runner": {
+    "path": "reports/auth-sms-expire-20261002/run-page-expiry.ps1",
+    "sha256": "026C8F36AC6359572B564AE4BF398245B2CD5851C0580C149163EA33F343FB30",
+    "actual_wait_seconds": 302,
+    "actions": "actual mini-program page send and expired-code login submission",
+    "system_clock_changed": false,
+    "database_ttl_changed": false
+  },
+  "server_corroboration": {
+    "runtime": "127.0.0.1:8083 -> 127.0.0.1:3317/property_ai_auth001_test@0014",
+    "fixed_api_source": "15977bfe5729d8581b713fac1435886f295e7efc",
+    "source_log_path": "tmp/auth001-retry-3317/runtime/api-sms-expire.stdout.log",
+    "source_log_sha256": "1D187B7FDA1D670FF806D8760FCE953A86FC2FD4C300B7E792A9649B4C60F59E",
+    "request_id": "1a206fd4fc6c4bc4bead752f640e4ef6",
+    "request_started_at_utc": "2026-10-02T08:50:22.769018Z",
+    "path": "/api/v1/auth/sms/login",
+    "error_code": "AUTH.INVALID_CODE",
+    "status_code": 401,
+    "latency_ms": 27.32
+  },
+  "page_outcome": {
+    "remained_on": "pages/login/login",
+    "authenticated_navigation": false,
+    "later_sensitive_fields_present": false
+  },
+  "basis": "The original runner's strict assertion required an error string to remain in page data and therefore reported an inconclusive failure. The preserved API log independently binds the real post-wait page submission to a 401 AUTH.INVALID_CODE response, while the preserved page observation remained on the login page. Together they establish rejection without rerunning the page or changing the 300-second TTL.",
+  "model_calls": 0,
+  "paid_sms_calls": 0,
+  "sensitive_values_in_evidence": false,
+  "boundary": "This is one isolated Development SMS test-inbox page acceptance. It is not paid SMS delivery, Production provider, abuse, device-fleet or release acceptance."
+}

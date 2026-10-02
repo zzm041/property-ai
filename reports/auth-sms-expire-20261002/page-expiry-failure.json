@@ -1,0 +1,24 @@
+{
+  "task_id": "AUTH-SMS-EXPIRE-PAGE-20261002",
+  "result": "NOT_PASS_INCONCLUSIVE_PAGE_ASSERTION",
+  "source_head_at_run": "38befd00f7c5673e48ca0a3ae6f43284ba023974",
+  "fixed_api_source": "15977bfe5729d8581b713fac1435886f295e7efc",
+  "environment": "127.0.0.1:8083 -> 127.0.0.1:3317/property_ai_auth001_test@0014",
+  "runner_exit_code": 1,
+  "configured_ttl_seconds": 300,
+  "real_wait_seconds": 302,
+  "failure": "expired OTP was not rejected on the login page",
+  "later_safe_observation": {
+    "page": "pages/login/login",
+    "error": "",
+    "phone_present": false,
+    "sms_code_present": false,
+    "password_present": false
+  },
+  "conclusion": "The run did not preserve enough state to distinguish an accepted OTP from a page-state or assertion issue. It is not PASS and was not rerun.",
+  "model_calls": 0,
+  "paid_sms_calls": 0,
+  "system_clock_changed": false,
+  "database_ttl_changed": false,
+  "sensitive_values_in_evidence": false
+}

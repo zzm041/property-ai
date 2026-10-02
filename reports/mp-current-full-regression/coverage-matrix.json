@@ -2768,10 +2768,10 @@
       {
         "requirement_id": "AUTH-SMS-EXPIRE",
         "current_implementation": "已实现可测试",
-        "verification_mode_status": "UI:PARTIAL",
-        "evidence_version": "ab0b8822b34ab26c4c2960dde00c157c3b141725",
-        "remaining_gap": "OTP TTL 300s；页面等待过长则 NOT_RUN 并引用 isolated API",
-        "next_action": "补齐缺失接线及范围证据"
+        "verification_mode_status": "UI:PASS_SCOPED_LOCAL_DEVELOPMENT_PAGE_REAL_WAIT",
+        "evidence_version": "15977bfe5729d8581b713fac1435886f295e7efc; reports/auth-sms-expire-20261002/page-expiry-resolution.json",
+        "remaining_gap": "真实短信投递、Production provider/abuse与正式发布验收",
+        "next_action": "保留302秒页面与401/AUTH.INVALID_CODE绑定证据；仅在真实短信Provider和目标环境获批后补发布验收"
       },
       {
         "requirement_id": "AUTH-SMS-REUSE",
