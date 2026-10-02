@@ -35,6 +35,49 @@ def test_celery_task_is_registered() -> None:
     assert callable(run_ingest_knowledge)
     assert analyze_work_order_task.max_retries == 2
     assert ingest_knowledge_task.max_retries == 2
+
+
+def test_scoped_sla_task_does_not_scan_unrelated_dispatch(monkeypatch) -> None:
+    engine = MagicMock()
+    session = MagicMock()
+    completion = MagicMock()
+    completion.as_dict.return_value = {
+        "scanned": 1,
+        "warnings": 1,
+        "overdue": 0,
+        "stopped": 0,
+        "notifications": 2,
+    }
+    assignment = MagicMock()
+    assignment.as_dict.return_value = {
+        "scanned": 0,
+        "accept_timeouts": 0,
+        "response_timeouts": 0,
+        "notifications": 0,
+        "redispatch_enqueued": 0,
+    }
+    service = MagicMock()
+    service.sweep_due.return_value = completion
+    service.sweep_assignment_deadlines.return_value = assignment
+    settings = SimpleNamespace(active_database_url="mysql+pymysql://ignored")
+
+    monkeypatch.setattr("app.worker.tasks.get_settings", lambda: settings)
+    monkeypatch.setattr("app.worker.tasks.create_database_engine", lambda _url: engine)
+    monkeypatch.setattr("app.worker.tasks.Session", lambda **_kwargs: session)
+    monkeypatch.setattr("app.service.sla.SlaService", lambda *_args, **_kwargs: service)
+    analysis = MagicMock()
+    monkeypatch.setattr("app.worker.tasks.AnalysisService", analysis)
+
+    result = sweep_sla_task.run(501)
+
+    service.sweep_due.assert_called_once_with(work_order_id=501)
+    service.sweep_assignment_deadlines.assert_called_once_with(work_order_id=501)
+    service.sweep_unavailable_assignments.assert_not_called()
+    analysis.assert_not_called()
+    assert result["completion_warnings"] == 1
+    assert result["dispatch_scanned"] == 0
+    session.close.assert_called_once_with()
+    engine.dispose.assert_called_once_with()
     assert analyze_work_order_task.max_retries == 2
     assert ingest_knowledge_task.max_retries == 2
 

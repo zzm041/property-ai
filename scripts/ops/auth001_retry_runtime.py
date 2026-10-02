@@ -44,11 +44,40 @@ REDIS_PORT = 6382
 MINIO_PORT = 9002
 RABBIT_VHOST = "property_ai_auth001_persist_v2"
 QUEUE = "property_ai.auth001.persist.v2"
+SLA_ACCEPTANCE_QUEUE = f"{QUEUE}.sla.acceptance"
 BUCKET = "property-ai-auth001-persist-v2"
 RUNTIME_STATE = DB_STATE / "runtime"
 PROOF_SECRET = RUNTIME_STATE / "identity-proof-secret.txt"
 ASSET_EVIDENCE = RUNTIME_STATE / "assets.json"
 DEPENDENCY_RESOLUTION = RUNTIME_STATE / "rabbit-container-id-resolution.json"
+
+
+def parse_identity_test_clock(settings: Settings, raw_value: str | None) -> datetime | None:
+    """Accept a fixed clock only for the exact isolated 3317 proof runtime.
+
+    This is intentionally a host-side test-runner control.  It is never read by
+    the product Settings model and cannot be supplied by an HTTP client.
+    """
+    if raw_value is None or not raw_value.strip():
+        return None
+    expected_target = f"{HOST}:{DB_PORT}/{DATABASE}"
+    parsed = make_url(settings.active_database_url)
+    if (
+        settings.app_env != "test"
+        or settings.identity_test_proof_enabled is not True
+        or settings.identity_test_proof_target != expected_target
+        or parsed.host != HOST
+        or parsed.port != DB_PORT
+        or parsed.database != DATABASE
+    ):
+        raise RuntimeError("identity test clock refused outside the exact isolated 3317 proof runtime")
+    try:
+        value = datetime.fromisoformat(raw_value.strip().replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise RuntimeError("identity test clock must be an ISO-8601 timestamp") from exc
+    if value.tzinfo is None or value.utcoffset() is None:
+        raise RuntimeError("identity test clock must include an explicit timezone")
+    return value.astimezone(UTC)
 
 
 def _docker_inspect(name: str) -> dict[str, object]:
@@ -97,12 +126,18 @@ def _rabbit_current_id(dependencies: dict[str, object], actual: dict[str, object
     if not DEPENDENCY_RESOLUTION.is_file():
         raise RuntimeError("RabbitMQ container id differs without an immutable resolution record")
     resolution = json.loads(DEPENDENCY_RESOLUTION.read_text(encoding="utf-8"))
+    legacy_idle_acceptance = resolution.get("identity_and_idle_checks_passed") is True
+    preserved_queue_acceptance = (
+        resolution.get("identity_checks_passed") is True
+        and resolution.get("existing_messages_preserved") is True
+        and resolution.get("existing_queue_consumption_forbidden") is True
+    )
     if (
         resolution.get("manifest_sha256") != _hash(DEPENDENCY_MANIFEST)
         or resolution.get("recorded_container_id") != recorded_id
         or resolution.get("current_container_id") != current_id
         or resolution.get("cause") != "UNKNOWN"
-        or resolution.get("identity_and_idle_checks_passed") is not True
+        or not (legacy_idle_acceptance or preserved_queue_acceptance)
     ):
         raise RuntimeError("RabbitMQ container id resolution does not match current assets")
     return current_id
@@ -226,8 +261,27 @@ def record_rabbit_resolution() -> dict[str, object]:
     if queue_check.returncode:
         raise RuntimeError("RabbitMQ resolution queue inspection failed")
     queues = json.loads(queue_check.stdout or b"[]")
-    if queues:
-        raise RuntimeError("RabbitMQ resolution refused a vhost with queues or consumers")
+    if any(
+        item.get("name") != QUEUE
+        or int(item.get("messages_unacknowledged") or 0) != 0
+        or int(item.get("consumers") or 0) != 0
+        for item in queues
+    ):
+        raise RuntimeError("RabbitMQ resolution refused unknown queues or active consumption")
+    connection_check = subprocess.run(
+        [
+            "docker", "exec", RABBIT, "rabbitmqctl", "list_connections",
+            "--formatter=json", "name", "user", "vhost", "channels",
+        ],
+        capture_output=True,
+        check=False,
+        timeout=30,
+    )
+    if connection_check.returncode:
+        raise RuntimeError("RabbitMQ resolution connection inspection failed")
+    connections = json.loads(connection_check.stdout or b"[]")
+    if connections:
+        raise RuntimeError("RabbitMQ resolution refused active connections")
     created = str(actual.get("Created") or "")
     if not created or created >= str(dependencies.get("created_utc") or ""):
         raise RuntimeError("RabbitMQ resolution creation time does not precede the manifest")
@@ -241,15 +295,27 @@ def record_rabbit_resolution() -> dict[str, object]:
         "recorded_container_id": recorded_id,
         "current_container_id": current_id,
         "cause": "UNKNOWN",
-        "identity_and_idle_checks_passed": True,
+        "identity_checks_passed": True,
+        "existing_messages_preserved": True,
+        "existing_queue_consumption_forbidden": True,
         "checks": {
             "image": RABBIT_IMAGE,
             "volume": "property-ai-auth001-persist-v2-rabbitmq-data",
             "network": dependencies["network"],
             "loopback_port": RABBIT_PORT,
             "vhost": RABBIT_VHOST,
-            "queues": 0,
+            "queues": [
+                {
+                    "name": item["name"],
+                    "messages_ready": int(item.get("messages_ready") or 0),
+                    "messages_unacknowledged": 0,
+                    "consumers": 0,
+                }
+                for item in queues
+            ],
             "consumers": 0,
+            "connections": 0,
+            "acceptance_queue": SLA_ACCEPTANCE_QUEUE,
         },
     }
     DEPENDENCY_RESOLUTION.write_text(
@@ -289,7 +355,14 @@ def database_url(source: Settings) -> str:
     return parsed.render_as_string(hide_password=False)
 
 
-def build_settings(*, enable_enqueue: bool = True, enable_test_proof: bool = True) -> Settings:
+def build_settings(
+    *,
+    enable_enqueue: bool = True,
+    enable_test_proof: bool = True,
+    queue_name: str = QUEUE,
+) -> Settings:
+    if queue_name not in {QUEUE, SLA_ACCEPTANCE_QUEUE}:
+        raise RuntimeError("retry runtime queue is outside the fixed allowlist")
     validate_runtime_assets(include_rabbit=enable_enqueue)
     source = _source_settings()
     target_url = database_url(source)
@@ -328,7 +401,7 @@ def build_settings(*, enable_enqueue: bool = True, enable_test_proof: bool = Tru
         celery_broker_url=(
             f"amqp://auth001_persist_v2:{rabbit_password}@{HOST}:{RABBIT_PORT}/{RABBIT_VHOST}"
         ),
-        celery_task_queue=QUEUE,
+        celery_task_queue=queue_name,
         redis_url=f"redis://:{redis_password}@{HOST}:{REDIS_PORT}/0",
         identity_test_proof_enabled=enable_test_proof,
         identity_test_proof_secret=proof_secret,
@@ -414,7 +487,7 @@ def safe_description(settings: Settings) -> dict[str, object]:
         "database": f"{HOST}:{DB_PORT}/{DATABASE}",
         "api": f"{HOST}:{API_PORT}",
         "vhost": RABBIT_VHOST,
-        "queue": QUEUE,
+        "queue": settings.resolved_celery_queue,
         "redis": f"{HOST}:{REDIS_PORT}/0",
         "storage": f"{HOST}:{MINIO_PORT}/{BUCKET}",
         "analysis_provider": settings.llm_provider,

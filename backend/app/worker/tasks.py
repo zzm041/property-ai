@@ -283,7 +283,14 @@ def deliver_notification_task(self, delivery_id: int) -> None:
 
 
 @celery_app.task(name="app.worker.tasks.sweep_sla_task", acks_late=True)
-def sweep_sla_task() -> dict[str, int]:
+def sweep_sla_task(work_order_id: int | None = None) -> dict[str, int]:
+    """Run the normal SLA sweep, optionally scoped for an isolated drill.
+
+    Production Beat does not pass an id and retains the existing bounded global
+    sweep.  The exact-id form exists so a restored test database can exercise a
+    real Beat/Worker pair without mutating imported historical work orders.
+    """
+
     settings = get_settings()
     engine = create_database_engine(settings.active_database_url)
     session = Session(bind=engine, autoflush=False, expire_on_commit=False)
@@ -291,11 +298,21 @@ def sweep_sla_task() -> dict[str, int]:
         from app.service.sla import SlaService
 
         service = SlaService(session, settings=settings)
-        completion = service.sweep_due().as_dict()
-        assignment = service.sweep_assignment_deadlines().as_dict()
-        unavailable = service.sweep_unavailable_assignments()
-        # Existing bounded beat cadence; use stored analysis, never invoke LLM.
-        dispatch = AnalysisService(session, settings=settings).sweep_waiting_dispatch()
+        completion = service.sweep_due(work_order_id=work_order_id).as_dict()
+        assignment = service.sweep_assignment_deadlines(
+            work_order_id=work_order_id
+        ).as_dict()
+        if work_order_id is None:
+            unavailable = service.sweep_unavailable_assignments()
+            # Existing bounded beat cadence; use stored analysis, never invoke LLM.
+            dispatch = AnalysisService(
+                session, settings=settings
+            ).sweep_waiting_dispatch()
+        else:
+            # The exact-id acceptance path must not scan imported assignments or
+            # waiting-dispatch rows outside the approved synthetic object.
+            unavailable = 0
+            dispatch = {"scanned": 0, "assigned": 0, "waiting": 0}
         return {
             **{f"completion_{key}": value for key, value in completion.items()},
             **{f"assignment_{key}": value for key, value in assignment.items()},
