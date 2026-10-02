@@ -1,0 +1,70 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "approval_scope": "WO19 generation 3; at most one ASR and two Qwen calls",
+  "work_order_id": 19,
+  "intent": {
+    "id": 170,
+    "generation": 3,
+    "status": "SUCCEEDED",
+    "execution_attempt": 1,
+    "last_error_code": ""
+  },
+  "work_order": {
+    "status": "PENDING_ASSIGNMENT",
+    "process_reason": "NONE",
+    "media_count": 3,
+    "media_kinds": [
+      "IMAGE",
+      "AUDIO",
+      "AUDIO"
+    ],
+    "assignment_count": 0,
+    "assignments": [],
+    "asr_text_present": true,
+    "asr_text_sha256": "5C7A9F97ADB5BED9D4C6ACA666DFFD0E37FDA970EBCFC2C8C0060523A483E295"
+  },
+  "analysis": {
+    "id": 18,
+    "version": 1,
+    "status": "COMPLETED",
+    "category": "CLEANING",
+    "severity": "LOW",
+    "priority": "MEDIUM",
+    "risk": "none",
+    "required_role": "STAFF",
+    "required_skill": "cleaning",
+    "confidence": 0.95,
+    "error_code": ""
+  },
+  "model_calls": [
+    {
+      "call": "call-028",
+      "kind": "asr",
+      "status": "SUCCESS",
+      "reason": "",
+      "model": "Qwen3-ASR-0.6B",
+      "total_seconds": 28.32799999997951,
+      "owned_exit_confirmed": true,
+      "cleanup_error": null,
+      "remote_completion": "NOT_UNKNOWN"
+    },
+    {
+      "call": "call-029",
+      "kind": "qwen",
+      "status": "SUCCESS",
+      "reason": "",
+      "model": "qwen38-27b-q3km-g55:7af3b8f",
+      "total_seconds": 17.07799999997951,
+      "owned_exit_confirmed": true,
+      "cleanup_error": null,
+      "remote_completion": "NOT_UNKNOWN"
+    }
+  ],
+  "model_call_counts": {
+    "asr": 1,
+    "qwen": 1
+  },
+  "direct_database_write": false,
+  "manual_analysis_or_assignment": false,
+  "sensitive_text_saved": false
+}

@@ -1,0 +1,23 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "approval_scope": "WO19 generation 3; at most one ASR and two Qwen calls",
+  "work_order_id": 19,
+  "source_intent": {
+    "id": 154,
+    "generation": 2,
+    "status": "FAILED",
+    "error_code": "AI.UNAVAILABLE"
+  },
+  "successor_intent": {
+    "id": 170,
+    "generation": 3,
+    "status": "PENDING"
+  },
+  "reason_code": "DEPENDENCY_RECOVERED",
+  "normal_password_manager_session": true,
+  "new_work_order_created": false,
+  "direct_database_write": false,
+  "manual_analysis_or_assignment": false,
+  "credentials_or_tokens_saved": false,
+  "adapter_source_commit": "61b762d9775845c47cf0b43f3003a3f4d1cb5519"
+}

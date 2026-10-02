@@ -1,0 +1,178 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "work_order_id": 19,
+  "logs": [
+    {
+      "id": 1578,
+      "actor_type": "RESIDENT",
+      "from_status": "",
+      "to_status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "event_code": "CREATE",
+      "reason": "",
+      "created_at": "10/02/2026 09:29:24"
+    },
+    {
+      "id": 1579,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "event_code": "AI_TASK_ATTEMPT",
+      "reason": "",
+      "created_at": "10/02/2026 09:29:25"
+    },
+    {
+      "id": 1580,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "event_code": "AI_TASK_ATTEMPT",
+      "reason": "",
+      "created_at": "10/02/2026 09:29:27"
+    },
+    {
+      "id": 1581,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "event_code": "AI_TASK_ATTEMPT",
+      "reason": "",
+      "created_at": "10/02/2026 09:29:31"
+    },
+    {
+      "id": 1582,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "event_code": "AI_TASK_FAILED",
+      "reason": "",
+      "created_at": "10/02/2026 09:29:31"
+    },
+    {
+      "id": 1601,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "event_code": "AI_TASK_ATTEMPT",
+      "reason": "",
+      "created_at": "10/02/2026 09:38:20"
+    },
+    {
+      "id": 1602,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "event_code": "AI_TASK_ATTEMPT",
+      "reason": "",
+      "created_at": "10/02/2026 09:38:22"
+    },
+    {
+      "id": 1603,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "event_code": "AI_TASK_ATTEMPT",
+      "reason": "",
+      "created_at": "10/02/2026 09:38:26"
+    },
+    {
+      "id": 1604,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "event_code": "AI_TASK_FAILED",
+      "reason": "",
+      "created_at": "10/02/2026 09:38:26"
+    },
+    {
+      "id": 1693,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "event_code": "AI_TASK_ATTEMPT",
+      "reason": "",
+      "created_at": "10/02/2026 10:19:19"
+    },
+    {
+      "id": 1694,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ANALYSIS",
+      "process_reason": "NONE",
+      "event_code": "AI_ASR_CHECKPOINT",
+      "reason": "",
+      "created_at": "10/02/2026 10:19:47"
+    },
+    {
+      "id": 1695,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ANALYSIS",
+      "to_status": "PENDING_ASSIGNMENT",
+      "process_reason": "NONE",
+      "event_code": "ANALYZE",
+      "reason": "",
+      "created_at": "10/02/2026 10:20:05"
+    },
+    {
+      "id": 1696,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "PENDING_ASSIGNMENT",
+      "process_reason": "NONE",
+      "event_code": "AUTO_DISPATCH_WAIT",
+      "reason": "",
+      "created_at": "10/02/2026 10:20:05"
+    },
+    {
+      "id": 1699,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "PENDING_ASSIGNMENT",
+      "process_reason": "NONE",
+      "event_code": "AUTO_DISPATCH_WAIT",
+      "reason": "",
+      "created_at": "10/02/2026 10:20:40"
+    },
+    {
+      "id": 1702,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "PENDING_ASSIGNMENT",
+      "process_reason": "NONE",
+      "event_code": "AUTO_DISPATCH_WAIT",
+      "reason": "",
+      "created_at": "10/02/2026 10:21:40"
+    },
+    {
+      "id": 1705,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "PENDING_ASSIGNMENT",
+      "process_reason": "NONE",
+      "event_code": "AUTO_DISPATCH_WAIT",
+      "reason": "",
+      "created_at": "10/02/2026 10:22:40"
+    },
+    {
+      "id": 1708,
+      "actor_type": "SYSTEM",
+      "from_status": "PENDING_ASSIGNMENT",
+      "to_status": "PENDING_ASSIGNMENT",
+      "process_reason": "NONE",
+      "event_code": "AUTO_DISPATCH_WAIT",
+      "reason": "",
+      "created_at": "10/02/2026 10:23:40"
+    }
+  ],
+  "sensitive_text_saved": false,
+  "credentials_or_tokens_saved": false
+}

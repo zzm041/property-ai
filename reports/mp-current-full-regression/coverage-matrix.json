@@ -2543,11 +2543,11 @@
       },
       {
         "requirement_id": "WO-MEDIA-NATIVE",
-        "current_implementation": "Persistent media selection/upload/preview wiring and real image plus synthetic-audio-to-AUTO business linkage are implemented and scoped-local accepted. Native operating-system picker and microphone interaction remain device evidence, not a software stub.",
-        "verification_mode_status": "PASS_SCOPED_LOCAL_MEDIA_PIPELINE;NATIVE_DEVICE_BLOCKED_PERSON_ACTION",
-        "evidence_version": "f234402/6dc6538 delivery-auto-8093 real image/voice AUTO; current native boundary reconfirmed 2026-10-02",
-        "remaining_gap": "Actual native image chooser, microphone recording and physical-device acceptance require a person operating the system picker/microphone; simulator/API evidence is not promoted to native-device PASS.",
-        "next_action": "Run one controlled physical-device image choice and microphone recording with a normal account; preserve current software and real-provider evidence without regenerating business objects merely for screenshots."
+        "current_implementation": "Persistent media selection/upload/preview wiring and prior scoped real image-VLM/AUTO plus audio-ASR/AUTO business linkage remain accepted. A person used the native image chooser and microphone to create WO19 with one JPEG and two MP3 files; the first MP3 completed real ASR and text analysis, after which the order entered a legitimate no-candidate wait.",
+        "verification_mode_status": "PASS_SCOPED_NATIVE_PICKER_MIC_FIRST_AUDIO_REAL_ANALYSIS_LEGAL_WAIT;NOT_ALL_ATTACHMENTS_UNDERSTOOD;NOT_PRODUCTION",
+        "evidence_version": "d95991f; delivery-auto-8093/native-media-wo19-generation3-closeout.json; independent REAL-AI-INTEGRATION-027-NATIVE-MEDIA-GEN3 review; prior f234402/6dc6538 image/voice AUTO retained",
+        "remaining_gap": "WO19's image was rejected before VLM reservation by the preserved failed-input replay barrier, and only the first of two native audio files was transcribed. Generalized model quality, all-attachment interpretation, production media/security/runtime and formal release remain open.",
+        "next_action": "Preserve WO19 at legal waiting with all failed generations and attachments. Do not create generation4 or replay the image without a new bounded approval; rely on the separately accepted image-VLM/AUTO and voice-AUTO runs for those scoped software capabilities."
       },
       {
         "requirement_id": "WO-QUEUE-ASSIGN",

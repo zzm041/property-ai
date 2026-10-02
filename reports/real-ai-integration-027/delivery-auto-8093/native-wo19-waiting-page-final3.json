@@ -1,0 +1,44 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-NATIVE-MEDIA",
+  "work_order_id": 19,
+  "interaction": "WeChat DevTools normal resident page login and read-only work-order detail using the original wx.request implementation",
+  "requests": [],
+  "screenshots": [
+    "27-native-wo19-waiting-page.png"
+  ],
+  "boundaries": {
+    "direct_database_business_write": false,
+    "manual_analysis_or_assignment": false,
+    "page_business_mutation": false,
+    "model_call_from_script": false,
+    "credentials_or_tokens_saved": false
+  },
+  "page_result": {
+    "status": "PENDING_ASSIGNMENT",
+    "status_label": "待安排人员",
+    "media": [
+      {
+        "id": 20,
+        "file_id": 16,
+        "kind": "IMAGE"
+      },
+      {
+        "id": 21,
+        "file_id": 17,
+        "kind": "AUDIO"
+      },
+      {
+        "id": 22,
+        "file_id": 18,
+        "kind": "AUDIO"
+      }
+    ],
+    "asr_text_present": true,
+    "asr_text_sha256": "5c7a9f97adb5bed9d4c6aca666dffd0e37fda970ebcfc2c8c0060523a483e295",
+    "assignment_count": 0,
+    "auto_dispatched": false,
+    "wait_event_present": true,
+    "can_append": true,
+    "can_cancel": true
+  }
+}

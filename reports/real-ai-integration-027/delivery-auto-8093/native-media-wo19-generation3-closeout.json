@@ -1,0 +1,108 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-NATIVE-MEDIA",
+  "captured_at_utc": "2026-10-02T10:33:16.7771770Z",
+  "approval_scope": "existing WO19 generation 3; at most one ASR and two Qwen calls",
+  "source_versions": {
+    "tracking_head_before_closeout": "d95991f3adc32f3882d2039a5154884d9e8364be",
+    "application_image": "property-ai-delivery:d9b3040",
+    "worker_analysis_source_sha256": "7e8de92829422367e47e7480c9c229bd09136f3c383654fa7a5b88d55db7fa07",
+    "work_ai_source": "61b762d9775845c47cf0b43f3003a3f4d1cb5519",
+    "mini_program_lifecycle_source": "c46b2214ddd7d2bf6fcd21615c3d50f70d0466e7"
+  },
+  "recovery": {
+    "source_intent_id": 154,
+    "source_generation": 2,
+    "source_status_preserved": "FAILED",
+    "successor_intent_id": 170,
+    "successor_generation": 3,
+    "successor_status": "SUCCEEDED",
+    "execution_attempts": 1,
+    "new_work_order_created": false
+  },
+  "model_calls": {
+    "asr": 1,
+    "qwen": 1,
+    "authorized_maximum": {"asr": 1, "qwen": 2},
+    "calls": [
+      {"id": "call-028", "kind": "asr", "status": "SUCCESS", "owned_exit_confirmed": true, "cleanup_error": null, "remote_completion": "NOT_UNKNOWN"},
+      {"id": "call-029", "kind": "qwen", "status": "SUCCESS", "owned_exit_confirmed": true, "cleanup_error": null, "remote_completion": "NOT_UNKNOWN"}
+    ]
+  },
+  "media_processing_boundaries": {
+    "native_image_persisted_and_page_visible": true,
+    "generation3_vlm_completed": false,
+    "generation3_vlm_reservation_created": false,
+    "generation3_vlm_checkpoint_saved": false,
+    "vlm_pre_reservation_failure": {
+      "utc": "2026-10-02T18:19:47.938904+08:00",
+      "stage": "BUDGET_AND_LEDGER",
+      "reason_code": "BUDGET_REJECTED",
+      "fail_closed": true,
+      "input_sha256": "1d49ae98a28d008718aa3e500b129f03b5c9e424fb3414ad2c327d2efe389d79",
+      "matches_historical_failed_call": "call-027",
+      "interpretation": "the failed-input replay barrier rejected the identical image request before reservation; this is not VLM success"
+    },
+    "native_audio_files_persisted_and_page_visible": 2,
+    "audio_files_transcribed_in_generation3": 1,
+    "audio_selection_rule": "the current analysis service transcribes snapshot.audio[0] only",
+    "second_audio_asr_proven": false,
+    "generation3_effective_path": "first native audio -> real ASR -> real text analysis -> legal wait"
+  },
+  "business_result": {
+    "work_order_id": 19,
+    "status": "PENDING_ASSIGNMENT",
+    "analysis_status": "COMPLETED",
+    "analysis_category": "CLEANING",
+    "analysis_confidence": 0.95,
+    "asr_text_present": true,
+    "asr_text_sha256": "5C7A9F97ADB5BED9D4C6ACA666DFFD0E37FDA970EBCFC2C8C0060523A483E295",
+    "assignment_count": 0,
+    "recommendation_count": 0,
+    "wait_event": "AUTO_DISPATCH_WAIT",
+    "result_class": "LEGAL_WAIT_NO_ELIGIBLE_CANDIDATE"
+  },
+  "page_evidence": {
+    "interaction": "normal resident password login and read-only mini-program detail page",
+    "status_label": "待安排人员",
+    "media": [
+      {"media_id": 20, "file_id": 16, "kind": "IMAGE"},
+      {"media_id": 21, "file_id": 17, "kind": "AUDIO"},
+      {"media_id": 22, "file_id": 18, "kind": "AUDIO"}
+    ],
+    "wait_event_present": true,
+    "screenshot": "27-native-wo19-waiting-page.png",
+    "visual_inspection": "status shows waiting for staff; masked contact only; one image and two audio controls are visible"
+  },
+  "queue_evidence": {
+    "queue": "property_ai.delivery_check",
+    "ready": 0,
+    "unacknowledged": 0,
+    "consumers": 1,
+    "historical_dlq_ready": 2,
+    "historical_dlq_touched": false
+  },
+  "boundaries": {
+    "manual_analysis": false,
+    "manual_employee_selection": false,
+    "manual_assignment": false,
+    "direct_database_business_write": false,
+    "new_work_order": false,
+    "historical_generations_rewritten": false,
+    "complete_auto_assignment_for_wo19": false,
+    "native_image_understanding_for_wo19": false,
+    "all_native_audio_understanding_for_wo19": false,
+    "reason_auto_not_created": "no eligible CLEANING candidate in the authorized property scope"
+  },
+  "evidence_index": [
+    "native-wo19-generation3.json",
+    "native-wo19-generation3-result.json",
+    "native-wo19-dispatch-result.json",
+    "native-wo19-log-result.json",
+    "native-wo19-waiting-page-final3.json",
+    "27-native-wo19-waiting-page.png",
+    "tmp/delivery-work-ai-runtime/calls/pre-reservation-failures.jsonl",
+    "tmp/delivery-work-ai-runtime/calls/call-027/reservation.json",
+    "tmp/delivery-work-ai-runtime/calls/call-028/result.json",
+    "tmp/delivery-work-ai-runtime/calls/call-029/result.json"
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-NATIVE-MEDIA",
+  "review_type": "INDEPENDENT_READ_ONLY",
+  "reviewed_head": "d95991f3adc32f3882d2039a5154884d9e8364be",
+  "verdict": "PASS_SCOPED_NATIVE_MEDIA_REAL_ANALYSIS_LEGAL_WAIT",
+  "scope": "仅审查既有WO19获批generation3：最多ASR1/Qwen2；保留generation1/2失败，不创建新工单。",
+  "evidence_read": [
+    "native-wo19-generation3.json",
+    "native-wo19-generation3-result.json",
+    "native-wo19-dispatch-result.json",
+    "native-wo19-log-result.json",
+    "native-wo19-waiting-page-final3.json",
+    "native-media-wo19-generation3-closeout.json",
+    "实际查看27-native-wo19-waiting-page.png",
+    "recover-native-wo19-generation3.ps1及对应generation3、dispatch、log采集脚本",
+    "run-native-wo19-waiting-page.js",
+    "tmp/delivery-work-ai-runtime/calls/call-028及call-029的input、reservation、result",
+    "pre-reservation-failures.jsonl中的本次拒绝记录及call-027/reservation.json",
+    "analysis.py、analysis_attempt.py、auto_dispatch.py、task_intent.py的必要调用上下文"
+  ],
+  "evidence_hashes": {
+    "closeout": "B33F5E577577EED79B2DD918CA6CED2E8C0C49ED48216DD85A8B4170247628B2",
+    "generation3_result": "915F002A4401721E4414D5F9B46D00AE6809E24A9428E368E0D92697B8EFF949",
+    "page_result": "72239CE23BCE3A550E62926067FA6DAAF30B411073B95C18C7C547FB8CBC0D43",
+    "call028_result": "4B9DE0EBE5953BB75384F6A4AE82C395B220CFDED4AFCA256D38E878E5D38DF6",
+    "call029_result": "1DAB091A276B7F113E6512DD0832B646BD581650CEE5D11AB6F083B17CC7FA8F"
+  },
+  "completion_checks": [
+    {
+      "condition": "单次获批管理恢复",
+      "result": "PASS_SCOPED",
+      "evidence": "恢复脚本限定WO19、FAILED intent154/generation2，经正常管理会话调用既有retry API。保存结果为intent170/generation3、SUCCEEDED、execution_attempt=1。Service锁定来源并复用唯一后继，不改写来源失败代。"
+    },
+    {
+      "condition": "真实调用及配额",
+      "result": "PASS_SCOPED",
+      "evidence": "原始收据确认call028为一次Qwen3-ASR-0.6B，call029为一次Qwen文本分析；均SUCCESS、exit_code=0、单个结果、owned_exit_confirmed=true、cleanup_error=null、NOT_UNKNOWN。实际目录不存在call030。共45.406秒，未超过本次ASR1/Qwen2上限。"
+    },
+    {
+      "condition": "同一工单转写与分析绑定",
+      "result": "PASS_SCOPED",
+      "evidence": "call028转写原文计算的SHA256为5C7A9F97ADB5BED9D4C6ACA666DFFD0E37FDA970EBCFC2C8C0060523A483E295，与WO19 API及页面数据一致；该原始转写实际包含在call029输入中。call029使用work_order_analysis schema，返回cleaning，与保存的analysis18/version1 COMPLETED、CLEANING一致。"
+    },
+    {
+      "condition": "资源及失败屏障",
+      "result": "PASS_SCOPED",
+      "evidence": "原始采样中ASR最低可用RAM6955MiB，Qwen最低RAM8490MiB/GPU2658MiB，未触既有运行底线。图片请求在BUDGET_AND_LEDGER被拒绝且无reservation，其输入哈希与历史失败call027完全一致；没有绕过失败输入重放屏障。"
+    },
+    {
+      "condition": "无候选时合法等待",
+      "result": "PASS_SCOPED",
+      "evidence": "保存的授权recommendations响应为0项，Assignment为0；工单进入PENDING_ASSIGNMENT并持续记录SYSTEM AUTO_DISPATCH_WAIT。直接调度代码在实时职责、组织、任职、签到及容量过滤无合格候选时持久记录等待，不要求人工分析或选择员工。"
+    },
+    {
+      "condition": "页面对象与附件",
+      "result": "PASS_SCOPED",
+      "evidence": "实际查看截图：工单19、待安排人员、遮蔽联系电话、一张图片和两个语音入口。页面采集结果对应media20/21/22及file16/17/18，零Assignment，并包含相同ASR哈希及等待事件。"
+    },
+    {
+      "condition": "历史与队列边界",
+      "result": "PRESERVED_WITH_EVIDENCE_LIMIT",
+      "evidence": "旧两代AI_TASK_FAILED日志保留，来源generation2仍标FAILED；未发现新工单或人工派单操作。closeout报告主队列0/0/1、历史DLQ2未触碰；队列状态属于实施方保存汇总，本复审未访问Broker。"
+    }
+  ],
+  "findings": [],
+  "verified": [
+    "可关闭限定的‘真机附件持久化与展示＋首段真实ASR→真实文本分析→合法等待’本地验收缺口。",
+    "WO19本次没有AUTO Assignment，也没有CLOSED；合法等待不能改写为已完成派单。",
+    "更新后的closeout准确披露图片VLM前置拒绝、仅首段音频转写及全部媒体理解未证明。",
+    "恢复和采集脚本未包含直接业务SQL、人工分析、员工选择或派单调用。",
+    "本复审未修改文件、运行测试、页面、模型、业务请求或操作数据库/队列。"
+  ],
+  "unverified": [
+    "本代没有完成真实图片VLM，也没有保存VLM checkpoint；call029是文本分析，不是图像推理。",
+    "仅首个音频进入ASR；第二段音频保留且可见，但未证明被理解。",
+    "最终详情截图来自开发者工具，不能冒充本复审亲自操作真机。原真机创建事实沿用已有保存证据。",
+    "页面证据requests为空，没有独立逐请求网络轨迹；对象一致性依据实际截图、原页面数据、API采集结果和原始模型收据。",
+    "未重新查询数据库、员工实时资格或消息队列；未对所有历史字段做完整哈希比较。",
+    "WO19后续自动获得人员、处理回执和关闭尚未验证。",
+    "该结论不覆盖全部附件理解、通用模型质量、正式Provider或完整Production发布。"
+  ],
+  "conclusion_basis": "实际原始模型收据、转写哈希、分析结构、同对象API/页面数据及查看过的截图形成一致证据链。结果是一次真实ASR和文本分析成功后合法等待；已明确排除图片理解、第二段音频理解及AUTO/CLOSED的错误升级。",
+  "next_action": "保存本轮原始复审与已校准closeout，保持WO19合法待派并保留全部失败历史。不得为补成AUTO或图片成功而自行重放旧输入、创建generation4或新增工单；相关追加操作须按原授权边界另行批准。"
+}
