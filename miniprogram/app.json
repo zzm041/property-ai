@@ -36,6 +36,11 @@
     "navigationBarTextStyle": "white",
     "backgroundTextStyle": "light"
   },
+  "permission": {
+    "scope.record": {
+      "desc": "用于住户录制本次报修的语音说明"
+    }
+  },
   "style": "v2",
   "sitemapLocation": "sitemap.json"
 }

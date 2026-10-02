@@ -34,6 +34,8 @@ Page({
     contactConfirmed: false,
     fileIds: [],
     mediaHint: "",
+    recording: false,
+    recordingHint: "",
     loading: false,
     error: "",
   },
@@ -41,6 +43,7 @@ Page({
     const auth = require("../../services/auth");
     this.preferredHouseId = Number(query.houseId || auth.getSelectedHouseId() || 0);
     this.unloaded = false;
+    this._bindRecorder();
   },
   onShow() {
     if (!this.contactDefaultLoaded && !this.contactEdited) {
@@ -61,6 +64,9 @@ Page({
   onUnload() {
     this.unloaded = true;
     this.houseRequest = (this.houseRequest || 0) + 1;
+    this._discardRecording = true;
+    if (this._recording && this._recorder) this._recorder.stop();
+    this._unbindRecorder();
   },
   reloadHouses() {
     return this.loadHouses(false);
@@ -156,6 +162,75 @@ Page({
       fail: (error) => this.setData({ error: error.errMsg || "选择图片失败" }),
     });
   },
+  _bindRecorder() {
+    if (typeof wx.getRecorderManager !== "function") return;
+    this._recorder = wx.getRecorderManager();
+    this._onRecorderStart = () => {
+      if (this.unloaded) return;
+      this._recording = true;
+      this.setData({ recording: true, recordingHint: "正在录音，最长60秒", error: "" });
+    };
+    this._onRecorderStop = (result) => {
+      const discard = this._discardRecording || this.unloaded;
+      this._recording = false;
+      this._discardRecording = false;
+      if (!this.unloaded) this.setData({ recording: false });
+      if (discard) return;
+      const filePath = result && result.tempFilePath;
+      const sizeBytes = Number(result && result.fileSize);
+      const duration = Number(result && result.duration);
+      if (!filePath || !Number.isSafeInteger(sizeBytes) || sizeBytes <= 0 || !Number.isFinite(duration) || duration < 500) {
+        this.setData({ recordingHint: "", error: "录音过短或录音文件无效，请重新录制" });
+        return;
+      }
+      this.setData({ recordingHint: `录音完成（${Math.ceil(duration / 1000)}秒），正在上传` });
+      this._upload(filePath, "audio/mpeg", sizeBytes, "repair-recording.mp3", () => {
+        if (!this.unloaded) this.setData({ recordingHint: "录音已添加" });
+      });
+    };
+    this._onRecorderError = (error) => {
+      this._recording = false;
+      if (!this.unloaded) {
+        this.setData({
+          recording: false,
+          recordingHint: "",
+          error: (error && error.errMsg) || "录音失败，请检查麦克风权限后重试",
+        });
+      }
+    };
+    this._recorder.onStart(this._onRecorderStart);
+    this._recorder.onStop(this._onRecorderStop);
+    this._recorder.onError(this._onRecorderError);
+  },
+  _unbindRecorder() {
+    if (!this._recorder) return;
+    if (typeof this._recorder.offStart === "function") this._recorder.offStart(this._onRecorderStart);
+    if (typeof this._recorder.offStop === "function") this._recorder.offStop(this._onRecorderStop);
+    if (typeof this._recorder.offError === "function") this._recorder.offError(this._onRecorderError);
+  },
+  startRecording() {
+    if (this.data.loading || this.data.houseLoading || this.data.recording) return;
+    if (!this._recorder) {
+      this.setData({ error: "当前微信版本不支持录音，请升级微信后重试" });
+      return;
+    }
+    this._discardRecording = false;
+    wx.authorize({
+      scope: "scope.record",
+      success: () => this._recorder.start({
+        duration: 60000,
+        sampleRate: 16000,
+        numberOfChannels: 1,
+        encodeBitRate: 48000,
+        format: "mp3",
+      }),
+      fail: () => this.setData({ error: "未获得麦克风权限，请在小程序设置中允许录音后重试" }),
+    });
+  },
+  stopRecording() {
+    if (!this.data.recording || !this._recorder) return;
+    this._recorder.stop();
+  },
   _prepareImage(file, info, uploadType) {
     const width = Number(info.width || 0);
     const height = Number(info.height || 0);
@@ -206,7 +281,7 @@ Page({
       });
     });
   },
-  _upload(filePath, mimeType, sizeBytes, originalName) {
+  _upload(filePath, mimeType, sizeBytes, originalName, onUploaded) {
     const api = require("../../services/api");
     const { withLoading } = require("../../utils/ui");
     withLoading(this, () =>
@@ -223,6 +298,7 @@ Page({
             fileIds,
             mediaHint: `已添加 ${fileIds.length} 个附件`,
           });
+          if (onUploaded) onUploaded(file);
         })
     ).catch(() => {});
   },

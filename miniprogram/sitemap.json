@@ -1,3 +1,9 @@
-module.exports = {
-  description: "allow all pages",
-};
+{
+  "desc": "Allow all pages in the local acceptance build.",
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
+}
