@@ -303,6 +303,9 @@ def test_delivery_ollama_restart_requires_exact_controlled_stop_evidence() -> No
     assert 'controlled-stop receipt cannot be retired while execution may still exist' in runtime
     assert 'Move-Item -LiteralPath $StatePath -Destination $archive' in runtime
     assert 'ollama-stale-receipt-resolution-20261002.json' in runtime
+    assert 'ollama-stale-receipt-resolution-20261002-wo19.json' in runtime
+    assert '40210B4BC093BDC22554B7C64CAAB0D7EA29B7293FDD41A555EDBD5CCE3DEEF0' in runtime
+    assert 'foreach ($candidate in $AuthorizedStaleResolutions)' in runtime
     assert '$resolution.semantics.historical_exit_mode -ne "UNKNOWN"' in runtime
     assert '$resolution.semantics.current_execution_absent -ne $true' in runtime
     assert '$ragState.qwen_endpoint -ne "http://127.0.0.1:11438"' in runtime

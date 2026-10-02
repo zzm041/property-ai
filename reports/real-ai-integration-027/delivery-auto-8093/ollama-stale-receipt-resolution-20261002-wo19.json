@@ -1,0 +1,29 @@
+{
+  "format": "property-ai-local-runtime-stale-receipt-resolution-v1",
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "scope": "WO19_ATTACHMENT_COMPLETION_RUNTIME_RECOVERY",
+  "authorization": "The approved WO19 completion package permits necessary same-source runtime loading and ordinary runtime binding repair after the user released memory.",
+  "original": {
+    "receipt_path": "tmp/delivery-ollama-runtime/current.json",
+    "receipt_sha256": "6AEDEA6C8B547B874F4748E6B7EA48754A1164482601BFB7FCE9DEAD5D3F189A",
+    "operation_id": "4a2938c84ecd400fa33bc56ef96b03e8",
+    "pid": 32764,
+    "started_at_utc": "2026-10-02T09:34:38.6006239Z",
+    "endpoint": "127.0.0.1:11435",
+    "executable_sha256": "D571E4CF0AD4456FCCD33D5B985B6D63BA5669C6E5A812391704083952AAE3D5"
+  },
+  "current_evidence": {
+    "checked_at_utc": "2026-10-02T12:45:23.4843653Z",
+    "recorded_pid_exists": false,
+    "listener_count": 0,
+    "current_executable_sha256": "D571E4CF0AD4456FCCD33D5B985B6D63BA5669C6E5A812391704083952AAE3D5",
+    "system_boot_time_utc": "2026-09-29T08:45:38.5000000Z"
+  },
+  "semantics": {
+    "historical_exit_mode": "UNKNOWN",
+    "current_execution_absent": true,
+    "model_request_or_budget_effect": false,
+    "history_rewritten": false,
+    "reason": "The listener and recorded process are currently absent after the user freed memory. The exact historical exit mechanism is not inferred. This record authorizes only retirement of the exact stale receipt so the same reviewed isolated runtime can start again."
+  }
+}
