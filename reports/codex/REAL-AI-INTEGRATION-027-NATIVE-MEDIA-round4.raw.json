@@ -1,0 +1,67 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027-NATIVE-MEDIA",
+  "review_round": 4,
+  "review_type": "INDEPENDENT_READ_ONLY",
+  "verdict": "PASS_SCOPED_UI_LOGIC",
+  "reviewed_head": "c46b2214ddd7d2bf6fcd21615c3d50f70d0466e7",
+  "scope": "仅复核NATIVE-MEDIA-R1-01及fa45645、b09be01、c46b221的直接生命周期修复；问题历史和轮次不重置。",
+  "evidence_read": [
+    "miniprogram/pages/work-orders/create.js",
+    "miniprogram/pages/work-orders/create.wxml",
+    "miniprogram/tests/work-order-create-recorder.test.js",
+    "b09be01..c46b221精确差异及前轮已读取的合并上下文"
+  ],
+  "source_hashes": {
+    "create.js": "4A88F958A187AE1B74AAF21A0CDC98C267F3A2358083B18DD87DB2FCDB0B6F58",
+    "create.wxml": "986F5565FF3DAF6C074F488C215963867F8B1AA8EBAEEFE42EED1C9F4FF25D32",
+    "work-order-create-recorder.test.js": "62FB9A71081CF9838E68803C240BFCFEDA2A4441C6117CEA04A74D4E90955562"
+  },
+  "completion_checks": [
+    {
+      "condition": "授权、录音、停止回调、上传期间阻止提交",
+      "result": "PASS_SCOPED_STATIC",
+      "evidence": "recordingBusy覆盖这些阶段；提交按钮与submit方法同时检查，正常上传结束后才解除屏障。"
+    },
+    {
+      "condition": "迟到授权回调隔离",
+      "result": "PASS_SCOPED_STATIC",
+      "evidence": "授权回调绑定attempt；取消会推进有效代次，旧授权success/fail不能启动录音或修改新操作状态。直接测试覆盖隐藏、返回、新attempt、旧授权才返回。"
+    },
+    {
+      "condition": "迟到start/stop与重复取消",
+      "result": "PASS_SCOPED_STATIC",
+      "evidence": "取消后保留start/stop/upload settlement屏障，旧stop结束前不得启动新录音；迟到onStart会被停止。c46b221将已有_recordStopPending纳入屏障，重复取消不再提前清除busy。新增断言验证不重复stop、屏障持续及旧stop结束后方可重新录音。"
+    },
+    {
+      "condition": "取消录音及上传结果不应用到新操作",
+      "result": "PASS_SCOPED_STATIC",
+      "evidence": "隐藏/卸载执行取消；旧stop丢弃录音，上传应用前检查attempt及页面有效性。"
+    },
+    {
+      "condition": "专项测试证据",
+      "result": "IMPLEMENTER_REPORTED_PASS",
+      "evidence": "实施方报告Recorder Node专项PASS；本复审实际读取测试源码及断言，未执行测试。"
+    }
+  ],
+  "findings": [],
+  "closed_findings": [
+    {
+      "id": "NATIVE-MEDIA-R1-01",
+      "status": "CLOSED",
+      "evidence": "原录音中提交、退出后迟到授权、旧stop污染新attempt及重复取消提前解除屏障的具体问题，均有对应源码修复和直接回归断言；本次未发现新的直接阻塞。"
+    }
+  ],
+  "verified": [
+    "通过范围仅为录音页面逻辑及已检查的直接回归。",
+    "本轮未修改业务API、数据库、模型预算或WO19恢复规则。",
+    "本复审未修改文件、运行测试、页面、模型、业务请求或操作数据库/队列。"
+  ],
+  "unverified": [
+    "修复后的真机生命周期行为未重新操作验证。",
+    "未重新验证音频解码、ASR、VLM、LLM、AUTO或完整工单闭环；上一轮证据边界保持。",
+    "WO19两代失败仍保留，不能因UI逻辑通过升级为业务成功。",
+    "Production及正式发布未通过。"
+  ],
+  "business_result": "BLOCKED_PENDING_ONE_ADDITIONAL_MANAGED_GENERATION",
+  "next_action": "保存本轮原始复审结果，关闭NATIVE-MEDIA-R1-01。WO19 generation3仍需负责人单独明确批准；获得批准前不得创建第三代、追加模型调用或以新工单绕过恢复上限。"
+}

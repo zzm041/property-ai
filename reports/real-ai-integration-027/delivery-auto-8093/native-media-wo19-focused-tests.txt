@@ -1,0 +1,13 @@
+Native media closeout focused verification
+
+- local AI HTTP, runtime control, delivery artifact: 94 passed, 1 warning
+- delivery artifact after frozen-candidate rebinding: 13 passed, 1 warning
+- mini-program native recorder focused test: passed after lifecycle and delayed-callback regression coverage
+- actual WO19 MP3 decode-only check: two files, 16 kHz mono, passed
+
+The warning is the existing Starlette TestClient deprecation warning.
+The first pytest invocation could not create its default user Temp directory;
+the same selected tests were rerun with a new workspace-local basetemp and passed.
+No model inference was used by these checks.
+Independent read-only review round 4 closed NATIVE-MEDIA-R1-01 as
+PASS_SCOPED_UI_LOGIC at c46b221; it did not rerun tests or business operations.

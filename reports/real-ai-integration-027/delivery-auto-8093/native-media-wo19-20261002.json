@@ -1,0 +1,92 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "scope": "native-device media acceptance and delivery closeout",
+  "captured_at_utc": "2026-10-02T09:51:26.0386538Z",
+  "product_head": "c46b2214ddd7d2bf6fcd21615c3d50f70d0466e7",
+  "native_recorder_commit": "9829977fbb889873ddbae74156365659a2c99ff9",
+  "runtime_fix_commit": "61b762d9775845c47cf0b43f3003a3f4d1cb5519",
+  "environment": {
+    "gateway": "8093 through the temporary loopback-upstream LAN gateway",
+    "pinned_phone_ip": "192.168.1.4",
+    "database": "property_ai_delivery_check@0014",
+    "work_ai_endpoint": "127.0.0.1:11437",
+    "ollama_endpoint": "127.0.0.1:11435"
+  },
+  "native_submission": {
+    "work_order_id": 19,
+    "actual_phone_page_submission": true,
+    "api_only_creation": false,
+    "database_business_state_write": false,
+    "media": [
+      {"media_id": 20, "file_id": 16, "kind": "IMAGE", "mime_type": "image/jpeg", "size_bytes": 40777},
+      {"media_id": 21, "file_id": 17, "kind": "AUDIO", "mime_type": "audio/mpeg", "size_bytes": 22896},
+      {"media_id": 22, "file_id": 18, "kind": "AUDIO", "mime_type": "audio/mpeg", "size_bytes": 55080}
+    ],
+    "audio_probe": {
+      "mode": "decode-only; no model inference",
+      "file_17": {"sample_rate": 16000, "channels": 1, "frames": 61056, "format": "MP3"},
+      "file_18": {"sample_rate": 16000, "channels": 1, "frames": 146880, "format": "MP3"}
+    }
+  },
+  "business_state": {
+    "work_order_status": "PENDING_ANALYSIS",
+    "assignment_count": 0,
+    "source_intent": {"id": 153, "generation": 1, "status": "FAILED", "error_code": "AI.UNAVAILABLE"},
+    "managed_successor": {"id": 154, "generation": 2, "status": "FAILED", "error_code": "AI.UNAVAILABLE"},
+    "generation_3_created": false,
+    "provider_attempts": {
+      "ASR": {"count": 6, "status": "INVALID", "error_code": "AI.INVALID_OUTPUT"},
+      "VLM": {"count": 6, "status": "FAILED", "error_code": "AI.UNAVAILABLE"},
+      "LLM": {"count": 6, "status": "FAILED", "error_code": "AI.UNAVAILABLE"}
+    },
+    "actual_model_reservations_for_work_order": 0
+  },
+  "root_causes": [
+    {
+      "code": "ASR_INPUT_FORMAT_MISMATCH",
+      "evidence": "native recorder produced 16 kHz mono MP3 while the local ASR adapter accepted only PCM WAV before reservation"
+    },
+    {
+      "code": "STALE_RUNTIME_BINDING",
+      "evidence": "the work adapter retained the pre-restart Ollama receipt; qwen requests failed at RUNTIME_IDENTITY before reservation"
+    },
+    {
+      "code": "WINDOWS_EXTERNAL_OUTPUT_DECODING",
+      "evidence": "the UTF-8 Python process attempted to decode Windows-native process-control output as UTF-8"
+    }
+  ],
+  "fixes": {
+    "audio": "bounded in-memory MP3 or PCM WAV acceptance; isolated ASR child decodes with the existing soundfile dependency and enforces 16 kHz mono <=30 seconds",
+    "recorder": "native recorder duration and UI hint aligned to 30 seconds; lifecycle barriers prevent submission or new recording while authorization, stop or upload callbacks remain unsettled",
+    "runtime_identity": "Windows process-control output uses the OEM code page without replacement",
+    "receipt": "call-027 RESOURCE_FLOOR controlled-stop evidence is bound by exact path and SHA256"
+  },
+  "verification": {
+    "focused_pytest": "94 passed, 1 warning",
+    "delivery_artifact_pytest": "13 passed, 1 warning",
+    "native_recorder_node": "passed, including delayed authorization/start/stop and repeated-cancellation interleavings",
+    "independent_review": "PASS_SCOPED_UI_LOGIC at c46b221; NATIVE-MEDIA-R1-01 closed",
+    "actual_mp3_decode": "both WO19 audio files decoded successfully without inference",
+    "current_runtime": {
+      "source_commit": "61b762d9775845c47cf0b43f3003a3f4d1cb5519",
+      "listener_pid": 3544,
+      "ollama_bound_pid": 32764,
+      "runtime_identity_match": true,
+      "reservation_gate": "READY",
+      "accepting_requests": true,
+      "request_active": false,
+      "adapter_sha256": "70BB10C801D695830FCC33630773DB82986427B86962432354A0726AF3A3C676",
+      "model_adapter_sha256": "AD89639C05C18BF6D78FF28F32A62A105EE5B5ECFC9837EB5700B75DFCAAF320",
+      "runtime_control_sha256": "567B325C7130E6AA7047AB957E5C19B442B66C8DBA29F8FAEDA50EE60830C876"
+    }
+  },
+  "result": "BLOCKED_PENDING_ONE_ADDITIONAL_MANAGED_GENERATION",
+  "blocker": "WO19 already consumed the previously allowed single managed recovery generation before the two implementation defects were corrected. No generation 3 was created.",
+  "preserved_boundaries": {
+    "no_new_work_order": true,
+    "no_manual_analysis_or_assignment": true,
+    "no_direct_database_business_write": true,
+    "no_sensitive_body_or_credentials_in_evidence": true,
+    "historical_failures_preserved": true
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "task_id": "REAL-AI-INTEGRATION-027",
+  "work_order_id": 19,
+  "source_intent": {
+    "id": 153,
+    "generation": 1,
+    "status": "FAILED",
+    "error_code": "AI.UNAVAILABLE"
+  },
+  "successor_intent": {
+    "id": 154,
+    "generation": 2,
+    "status": "PENDING"
+  },
+  "reason_code": "DEPENDENCY_RECOVERED",
+  "normal_password_manager_session": true,
+  "direct_database_write": false,
+  "manual_analysis_or_assignment": false,
+  "credentials_or_tokens_saved": false,
+  "adapter_source_commit": "f234402629d621a26eb1ce9f9077a465d5c0b5eb"
+}
