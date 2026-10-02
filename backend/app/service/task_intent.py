@@ -331,7 +331,7 @@ class TaskIntentService:
         with begin_owned_transaction(self.session):
             row = self._locked(intent_id)
             current, scope = self._authorize_manager(row, actor)
-            if row.status != "FAILED":
+            if row.status not in {"FAILED", "CANCELLED"}:
                 raise AppError(code="TASK.CONFLICT", message="Only a failed task can be explicitly recovered", status_code=409)
             # Lock source generation first: concurrent/repeated requests create one successor.
             successor = self.session.scalar(select(TaskIntent).where(TaskIntent.operation == row.operation,
@@ -341,9 +341,11 @@ class TaskIntentService:
                 return self.metadata(successor)
             version = row.resource_version
             attachment_completion_request = None
+            attachment_completion_source = row
             if row.operation == ANALYZE:
                 from app.repository.work_order import WorkOrderRepository
-                work = WorkOrderRepository(self.session).get_work_order_for_update(row.resource_id)
+                work_repo = WorkOrderRepository(self.session)
+                work = work_repo.get_work_order_for_update(row.resource_id)
                 if (work is None or work.status not in {"PENDING_ANALYSIS", "PENDING_ASSIGNMENT"}
                         or work.current_assignment_id is not None or work.version not in {version, version + 1}):
                     raise AppError(code="TASK.CONFLICT", message="Work order changed; use its current business action", status_code=409)
@@ -353,9 +355,41 @@ class TaskIntentService:
                     TaskIntent.resource_id == work.id, TaskIntent.id > row.id).limit(1).with_for_update())
                 if newer is not None:
                     raise AppError(code="TASK.CONFLICT", message="A newer task already owns this work order", status_code=409)
-                attachment_completion_request = WorkOrderRepository(
-                    self.session
-                ).attachment_completion_request(work.id, row.task_id)
+                attachment_completion_request = work_repo.attachment_completion_request(
+                    work.id,
+                    row.task_id,
+                )
+                if row.status == "CANCELLED" and attachment_completion_request is None:
+                    predecessor = self.session.scalar(
+                        select(TaskIntent)
+                        .where(
+                            TaskIntent.operation == ANALYZE,
+                            TaskIntent.resource_id == row.resource_id,
+                            TaskIntent.generation == row.generation - 1,
+                        )
+                        .order_by(TaskIntent.id.desc())
+                        .limit(1)
+                        .with_for_update()
+                        .execution_options(populate_existing=True)
+                    )
+                    if predecessor is not None:
+                        attachment_completion_request = work_repo.attachment_completion_request(
+                            work.id,
+                            predecessor.task_id,
+                        )
+                        attachment_completion_source = predecessor
+                if row.status == "CANCELLED" and attachment_completion_request is None:
+                    raise AppError(
+                        code="TASK.CONFLICT",
+                        message="Only a cancelled attachment-completion task can be recovered",
+                        status_code=409,
+                    )
+            elif row.status == "CANCELLED":
+                raise AppError(
+                    code="TASK.CONFLICT",
+                    message="Cancelled non-analysis tasks cannot be recovered",
+                    status_code=409,
+                )
             elif row.operation == INGEST:
                 job = self.session.get(KnowledgeIngestionJob, row.resource_id, with_for_update=True, populate_existing=True)
                 document = self.session.get(KnowledgeDocument, job.document_id, with_for_update=True) if job else None
@@ -412,12 +446,12 @@ class TaskIntentService:
                     payload_json={
                         "task_id": new.task_id,
                         "intent_id": new.id,
-                        "source_intent_id": row.id,
+                        "source_intent_id": attachment_completion_source.id,
                         "source_analysis_id": source_analysis_id,
                         "generation": new.generation,
                         "attachment_count": attachment_count,
                         "reason_code": "ATTACHMENT_COMPLETION",
-                        "retry_source_task_id": row.task_id,
+                        "retry_source_task_id": attachment_completion_source.task_id,
                     },
                 ))
             AuditService(self.session).append(action=AuditAction.TASK_INTENT_RETRIED,

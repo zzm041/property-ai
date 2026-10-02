@@ -312,6 +312,66 @@ def test_attachment_completion_recovery_carries_exact_predecessor_claim(monkeypa
     ) is None
 
 
+def test_cancelled_completion_retry_uses_only_trusted_direct_predecessor(monkeypatch):
+    from app.core.errors import AppError
+    from app.domain.iam import OrganizationScope, ScopeType
+    from app.repository.work_order import WorkOrderRepository
+    from app.service.audit import AuditService
+
+    cancelled = row(status='CANCELLED', generation=5, resource_version=5,
+                    task_id='cancelled-generation-5')
+    predecessor = row(id=187, status='FAILED', generation=4, resource_version=5,
+                      task_id='completion-generation-4')
+    s = service(cancelled)
+    s._authorize_manager = lambda *a: (
+        NS(user_id=4),
+        OrganizationScope(ScopeType.PROPERTY, tenant_id=7, property_id=9),
+    )
+    work = NS(id=22, tenant_id=7, property_id=9, status='PENDING_ASSIGNMENT',
+              process_reason=None, current_assignment_id=None, version=5)
+    predecessor_request = NS(payload_json={
+        'task_id': predecessor.task_id,
+        'source_analysis_id': 61,
+        'attachment_count': 3,
+    })
+    monkeypatch.setattr(WorkOrderRepository, 'get_work_order_for_update', lambda *a: work)
+    def completion_request(_repo, _work_id, task_id):
+        return predecessor_request if task_id == predecessor.task_id else None
+    monkeypatch.setattr(WorkOrderRepository, 'attachment_completion_request', completion_request)
+    add_log = MagicMock()
+    monkeypatch.setattr(WorkOrderRepository, 'add_log', add_log)
+    monkeypatch.setattr(AuditService, 'append', MagicMock())
+    s.session.scalar.side_effect = [None, None, predecessor]
+    created = []
+    def add(new):
+        new.id = 92
+        created.append(new)
+        return new
+    s.repo.add = add
+
+    result = s.retry_managed(
+        cancelled.id,
+        actor=NS(user_id=4),
+        reason_code='DEPENDENCY_RECOVERED',
+        request_id='027-cancelled-completion-recovery',
+    )
+    assert result['generation'] == 6
+    payload = add_log.call_args.args[0].payload_json
+    assert payload['source_intent_id'] == predecessor.id
+    assert payload['retry_source_task_id'] == predecessor.task_id
+
+    cancelled.operation = DELIVER
+    s.session.scalar.side_effect = [None]
+    with pytest.raises(AppError) as error:
+        s.retry_managed(
+            cancelled.id,
+            actor=NS(user_id=4),
+            reason_code='DEPENDENCY_RECOVERED',
+            request_id='027-cancelled-non-analysis',
+        )
+    assert error.value.status_code == 409
+
+
 def test_succeeded_analysis_can_create_only_one_audited_attachment_completion(monkeypatch):
     from app.domain.iam import OrganizationScope, ScopeType
     from app.repository.ai import AiRepository
