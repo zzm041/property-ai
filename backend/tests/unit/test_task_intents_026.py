@@ -372,6 +372,48 @@ def test_cancelled_completion_retry_uses_only_trusted_direct_predecessor(monkeyp
     assert error.value.status_code == 409
 
 
+def test_cancelled_completion_retry_preserves_original_claim_across_cancelled_chain(monkeypatch):
+    from app.domain.iam import OrganizationScope, ScopeType
+    from app.repository.work_order import WorkOrderRepository
+    from app.service.audit import AuditService
+
+    cancelled = row(status='CANCELLED', generation=6, resource_version=5,
+                    task_id='cancelled-generation-6')
+    s = service(cancelled)
+    s._authorize_manager = lambda *a: (
+        NS(user_id=4),
+        OrganizationScope(ScopeType.PROPERTY, tenant_id=7, property_id=9),
+    )
+    work = NS(id=22, tenant_id=7, property_id=9, status='PENDING_ASSIGNMENT',
+              process_reason=None, current_assignment_id=None, version=5)
+    chained_request = NS(payload_json={
+        'task_id': cancelled.task_id,
+        'source_intent_id': 187,
+        'source_analysis_id': 61,
+        'attachment_count': 3,
+        'retry_source_task_id': 'completion-generation-4',
+    })
+    monkeypatch.setattr(WorkOrderRepository, 'get_work_order_for_update', lambda *a: work)
+    monkeypatch.setattr(WorkOrderRepository, 'attachment_completion_request',
+                        lambda *a: chained_request)
+    add_log = MagicMock()
+    monkeypatch.setattr(WorkOrderRepository, 'add_log', add_log)
+    monkeypatch.setattr(AuditService, 'append', MagicMock())
+    s.session.scalar.side_effect = [None, None]
+    s.repo.add = lambda new: (setattr(new, 'id', 93) or new)
+
+    result = s.retry_managed(
+        cancelled.id,
+        actor=NS(user_id=4),
+        reason_code='DEPENDENCY_RECOVERED',
+        request_id='027-cancelled-chain-recovery',
+    )
+    assert result['generation'] == 7
+    payload = add_log.call_args.args[0].payload_json
+    assert payload['source_intent_id'] == 187
+    assert payload['retry_source_task_id'] == 'completion-generation-4'
+
+
 def test_succeeded_analysis_can_create_only_one_audited_attachment_completion(monkeypatch):
     from app.domain.iam import OrganizationScope, ScopeType
     from app.repository.ai import AiRepository

@@ -341,7 +341,8 @@ class TaskIntentService:
                 return self.metadata(successor)
             version = row.resource_version
             attachment_completion_request = None
-            attachment_completion_source = row
+            attachment_completion_source_intent_id = row.id
+            attachment_completion_source_task_id = row.task_id
             if row.operation == ANALYZE:
                 from app.repository.work_order import WorkOrderRepository
                 work_repo = WorkOrderRepository(self.session)
@@ -359,6 +360,31 @@ class TaskIntentService:
                     work.id,
                     row.task_id,
                 )
+                if row.status == "CANCELLED" and attachment_completion_request is not None:
+                    cancelled_payload = attachment_completion_request.payload_json
+                    inherited_source_intent_id = (
+                        cancelled_payload.get("source_intent_id")
+                        if isinstance(cancelled_payload, dict)
+                        else None
+                    )
+                    inherited_source_task_id = (
+                        cancelled_payload.get("retry_source_task_id")
+                        if isinstance(cancelled_payload, dict)
+                        else None
+                    )
+                    if (
+                        isinstance(inherited_source_intent_id, bool)
+                        or not isinstance(inherited_source_intent_id, int)
+                        or not isinstance(inherited_source_task_id, str)
+                        or not inherited_source_task_id
+                    ):
+                        raise AppError(
+                            code="TASK.CONFLICT",
+                            message="Cancelled attachment-completion recovery chain is invalid",
+                            status_code=409,
+                        )
+                    attachment_completion_source_intent_id = inherited_source_intent_id
+                    attachment_completion_source_task_id = inherited_source_task_id
                 if row.status == "CANCELLED" and attachment_completion_request is None:
                     predecessor = self.session.scalar(
                         select(TaskIntent)
@@ -377,7 +403,8 @@ class TaskIntentService:
                             work.id,
                             predecessor.task_id,
                         )
-                        attachment_completion_source = predecessor
+                        attachment_completion_source_intent_id = predecessor.id
+                        attachment_completion_source_task_id = predecessor.task_id
                 if row.status == "CANCELLED" and attachment_completion_request is None:
                     raise AppError(
                         code="TASK.CONFLICT",
@@ -446,12 +473,12 @@ class TaskIntentService:
                     payload_json={
                         "task_id": new.task_id,
                         "intent_id": new.id,
-                        "source_intent_id": attachment_completion_source.id,
+                        "source_intent_id": attachment_completion_source_intent_id,
                         "source_analysis_id": source_analysis_id,
                         "generation": new.generation,
                         "attachment_count": attachment_count,
                         "reason_code": "ATTACHMENT_COMPLETION",
-                        "retry_source_task_id": attachment_completion_source.task_id,
+                        "retry_source_task_id": attachment_completion_source_task_id,
                     },
                 ))
             AuditService(self.session).append(action=AuditAction.TASK_INTENT_RETRIED,
