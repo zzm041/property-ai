@@ -109,7 +109,12 @@ def _run_domain(session, settings, lease):
             attachment_completion = completion_request is not None
         context = {"task_id": lease["task_id"], "attempt": lease["attempt"],
                    "execution_token": lease["token"], "expected_version": lease["resource_version"],
-                   "claim": previous, "attachment_completion": attachment_completion}
+                   "claim": previous,
+                   "claim_handoff": bool(
+                       previous
+                       and previous.get("task_id") != lease["task_id"]
+                   ),
+                   "attachment_completion": attachment_completion}
         analysis = AnalysisService(session, settings=settings).analyze_work_order(
             work_order_id=lease["resource_id"], request_id=lease["request_id"],
             attempt=lease["attempt"], task_context=context)

@@ -21,7 +21,12 @@ def accepts_attempt(repository, record, context: dict | None) -> bool:
         if payload["task_id"] == context["task_id"]:
             if int(payload["attempt"]) > context["attempt"]:
                 return False
-        elif previous:
+        elif previous and not (
+            context.get("claim_handoff") is True
+            and payload == previous
+            and previous.get("attachment_completion") is True
+            and previous.get("task_id") != context.get("task_id")
+        ):
             return False
     if previous:
         # prepare COMMIT may have succeeded without an acknowledgement. A new

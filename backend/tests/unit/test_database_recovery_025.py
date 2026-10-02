@@ -83,6 +83,39 @@ def test_newer_owner_or_attempt_fences_delayed_delivery():
     assert not accepts_attempt(repo(claim(attempt=3)), record(), context(attempt=2))
 
 
+def test_trusted_attachment_completion_handoff_accepts_only_exact_predecessor():
+    predecessor = {
+        **claim(task_id='completion-generation-4'),
+        'from_status': 'PENDING_ASSIGNMENT',
+        'attachment_completion': True,
+        'source_analysis_id': 18,
+    }
+    handoff = {
+        'task_id': 'completion-generation-6',
+        'attempt': 1,
+        'execution_token': 'execution-generation-6',
+        'expected_version': 1,
+        'claim': predecessor,
+        'claim_handoff': True,
+        'attachment_completion': True,
+    }
+    assert accepts_attempt(
+        repo(predecessor),
+        record(status='PENDING_ASSIGNMENT', version=1),
+        handoff,
+    )
+    assert not accepts_attempt(
+        repo({**predecessor, 'source_analysis_id': 99}),
+        record(status='PENDING_ASSIGNMENT', version=1),
+        handoff,
+    )
+    assert not accepts_attempt(
+        repo(predecessor),
+        record(status='PENDING_ASSIGNMENT', version=1),
+        {**handoff, 'claim_handoff': False},
+    )
+
+
 def test_unacknowledged_prepare_commit_is_read_from_journal():
     assert accepts_attempt(repo(claim()), record(), context())
     # Rolled-back first prepare has no journal; original version can be claimed.
