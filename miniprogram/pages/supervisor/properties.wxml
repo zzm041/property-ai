@@ -44,7 +44,7 @@
     <view class="hint">每批最多 500 条记录；名称中的逗号、双引号或换行按 CSV 引号格式填写，可原样导回本页导出的内容。</view>
     <textarea class="csv-box" placeholder="粘贴带表头的 CSV 内容" value="{{importText}}" data-field="importText" bindinput="onTextInput" maxlength="-1" auto-height />
     <button class="btn" bindtap="importHouses">导入 CSV 内容</button>
-    <button class="btn secondary" bindtap="exportHouses">导出并复制 CSV</button>
+    <button class="btn btn-secondary" bindtap="exportHouses">导出并复制 CSV</button>
   </view>
 </block>
 

@@ -8,14 +8,6 @@
   margin: 24rpx;
 }
 
-.picker,
-input {
-  border: 1rpx solid #d0d5dd;
-  border-radius: 8rpx;
-  margin: 12rpx 0;
-  padding: 18rpx;
-}
-
 .field-label {
   color: #344054;
   margin-top: 16rpx;

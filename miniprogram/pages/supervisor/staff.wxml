@@ -40,12 +40,12 @@
     <input class="grow input-box" placeholder="职责编码" value="{{dutyCode}}" data-field="dutyCode" bindinput="onTextInput" />
     <input class="grow input-box" placeholder="职责名称" value="{{dutyName}}" data-field="dutyName" bindinput="onTextInput" />
   </view>
-  <button class="btn compact" bindtap="createDuty">新增职责</button>
+  <button class="btn btn-compact" bindtap="createDuty">新增职责</button>
   <view class="inline-row">
     <input class="grow input-box" placeholder="技能编码" value="{{skillCode}}" data-field="skillCode" bindinput="onTextInput" />
     <input class="grow input-box" placeholder="技能名称" value="{{skillName}}" data-field="skillName" bindinput="onTextInput" />
   </view>
-  <button class="btn compact" bindtap="createSkill">新增技能</button>
+  <button class="btn btn-compact" bindtap="createSkill">新增技能</button>
 </view>
 
 <view class="empty" wx:if="{{!loading && !items.length}}">当前小区暂无任职或历史任职员工</view>
@@ -95,7 +95,7 @@
     <input type="number" placeholder="员工本人手机号" value="{{invitePhone}}" data-field="invitePhone" bindinput="onTextInput" />
     <button class="btn" bindtap="issueInvite">发出邀请</button>
     <view class="token" wx:if="{{inviteToken}}">邀请凭证仅显示一次，请安全交给员工本人：{{inviteToken}}</view>
-    <button class="btn compact" wx:if="{{inviteToken}}" bindtap="copyInviteToken">复制给员工本人</button>
+    <button class="btn btn-compact" wx:if="{{inviteToken}}" bindtap="copyInviteToken">复制给员工本人</button>
 
     <block wx:if="{{assignmentProperties.length}}">
       <view class="field-title">增加服务小区</view>

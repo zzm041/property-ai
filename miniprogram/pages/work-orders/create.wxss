@@ -1,0 +1,26 @@
+.house-choice {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  min-height: 96rpx;
+  margin: 12rpx 0;
+  padding: 18rpx 22rpx;
+  border: 1rpx solid #cfd8e6;
+  border-radius: 12rpx;
+  background: #f8faff;
+  color: #172033;
+  font-size: 28rpx;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.house-choice::after {
+  border: 0;
+}
+
+.house-choice[disabled] {
+  background: #f2f4f7;
+  color: #667085;
+}

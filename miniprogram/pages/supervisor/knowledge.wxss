@@ -4,17 +4,6 @@
   margin-bottom: 20rpx;
 }
 
-.picker,
-input,
-.source-box {
-  border: 1rpx solid #d0d5dd;
-  border-radius: 8rpx;
-  box-sizing: border-box;
-  margin: 12rpx 0;
-  padding: 18rpx;
-  width: 100%;
-}
-
 .source-box {
   min-height: 220rpx;
 }

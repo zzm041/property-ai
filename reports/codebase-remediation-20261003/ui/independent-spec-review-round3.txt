@@ -1,0 +1,24 @@
+review_context=/root/codebase_remediation_spec_review
+review_mode=independent_read_only_incremental
+verdict=PASS
+
+Finding 1=CLOSED
+公告草稿、身份审核卡、住户关系、撤销区及两个原生弹窗均有与源码条件一致的布局截图，无裁切或操作区溢出。
+
+Finding 2=CLOSED
+设备不可得项已准确降级为 UNVERIFIED，未声称全机型通过。
+
+Finding 3=CLOSED
+
+Evidence boundary:
+- conditional-layout-evidence.json 均标明 UI 合成状态、无业务请求，两个弹窗均未点击确认。
+- summary.md 明确不把这些截图冒充授权、API 或事务成功。
+
+UNVERIFIED:
+- 正向授权公告及身份审核事务
+- 两个弹窗确认后的业务写入
+- 软键盘实际高度、收起及 IME 变体
+- 放大系统字体
+- 刘海屏及物理设备 safe-area
+
+Reviewer actions: 未修改文件，未运行页面、测试或业务操作。

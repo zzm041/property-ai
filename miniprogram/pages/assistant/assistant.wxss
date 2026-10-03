@@ -5,16 +5,6 @@
   margin-bottom: 12rpx;
 }
 
-.picker,
-input {
-  border: 1rpx solid #d0d5dd;
-  border-radius: 8rpx;
-  box-sizing: border-box;
-  margin: 12rpx 0;
-  padding: 18rpx;
-  width: 100%;
-}
-
 .hint,
 .locator,
 .status {

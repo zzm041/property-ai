@@ -10,14 +10,6 @@
   margin-bottom: 10rpx;
 }
 
-.picker,
-input {
-  border: 1rpx solid #d0d5dd;
-  border-radius: 8rpx;
-  margin: 12rpx 0;
-  padding: 18rpx;
-}
-
 .choice {
   display: inline-block;
   margin: 8rpx 22rpx 8rpx 0;
@@ -51,11 +43,6 @@ input {
 
 .inline-button {
   margin: 0;
-}
-
-.compact {
-  margin-left: 0;
-  margin-right: 0;
 }
 
 .hint,

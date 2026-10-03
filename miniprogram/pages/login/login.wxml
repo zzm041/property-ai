@@ -1,5 +1,5 @@
 <view class="card">
-  <view>登录</view>
+  <view class="section-title">登录</view>
 </view>
 <view class="card">
   <input placeholder="手机号" value="{{phone}}" bindinput="onPhone" type="number" />
@@ -30,7 +30,7 @@
   </view>
   <button id="login-submit" class="btn" bindtap="submit" disabled="{{loading}}">登录</button>
   <view class="secondary">
-    <text class="link-text" bindtap="goReset">忘记密码</text>
+    <text id="forgot-password-link" class="link-text" bindtap="goReset">忘记密码</text>
     <text id="login-mode-toggle" class="link-text" bindtap="toggleMode">{{mode === "password" ? "验证码登录" : "密码登录"}}</text>
   </view>
   <view class="empty">已绑定微信的账号可用微信作为次级登录方式。</view>

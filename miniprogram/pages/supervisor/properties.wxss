@@ -9,17 +9,6 @@
   margin: 28rpx 24rpx 12rpx;
 }
 
-.picker,
-input,
-.csv-box {
-  border: 1rpx solid #d0d5dd;
-  border-radius: 8rpx;
-  box-sizing: border-box;
-  margin: 12rpx 0;
-  padding: 18rpx;
-  width: 100%;
-}
-
 .csv-box {
   font-family: monospace;
   min-height: 190rpx;
@@ -45,11 +34,6 @@ input,
   font-size: 30rpx;
   font-weight: 600;
   margin-bottom: 12rpx;
-}
-
-.secondary {
-  background: #eaf0ff;
-  color: #1f4b99;
 }
 
 .danger {

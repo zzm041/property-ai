@@ -1,5 +1,5 @@
 <view class="card">
-  <view>选择报修房屋</view>
+  <view class="section-title">选择报修房屋</view>
   <view class="empty">仅显示本人当前有效绑定的房屋。请选择完整地址，无需填写房屋编号。</view>
   <button id="house-choice-{{item.house_id}}" class="house-choice" wx:for="{{houses}}" wx:key="relation_id" data-id="{{item.house_id}}" bindtap="selectHouse" disabled="{{loading || houseLoading}}">
     {{houseId == item.house_id ? '✓ 已选：' : ''}}{{item.addressLabel}}

@@ -1,22 +1,3 @@
-.password-row {
-  display: flex;
-  align-items: center;
-}
-.grow {
-  flex: 1;
-}
-.link {
-  margin: 0 8rpx;
-  font-size: 24rpx;
-  background: transparent;
-  color: #1f4b99;
-}
 .secondary {
-  display: flex;
-  justify-content: space-between;
   margin: 16rpx 8rpx 0;
-}
-.link-text {
-  color: #1f4b99;
-  font-size: 26rpx;
 }

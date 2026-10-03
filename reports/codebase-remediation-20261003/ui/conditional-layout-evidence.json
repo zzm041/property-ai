@@ -1,0 +1,60 @@
+{
+  "task": "MINIPROGRAM-FULL-USABILITY-20261003-CONDITIONALS",
+  "generated_at": "2026-10-03T18:48:05.2353495+08:00",
+  "source_head": "b5f88353a8868a13d9650c23e22d8d16c6b5a3c5",
+  "credentials_in_output": false,
+  "business_object_writes": 0,
+  "model_calls": 0,
+  "sms_calls": 0,
+  "checks": [
+    {
+      "check": "announcement-draft-conditional-layout",
+      "evidence_mode": "UI_ONLY_SYNTHETIC_STATE",
+      "capture_state": "REUSED_FROM_CURRENT_RUN_BEFORE_NATIVE_MODAL_RESET",
+      "screenshot": "audit-conditional-announcement-form.png",
+      "business_request_sent": false,
+      "confirm_clicked": null
+    },
+    {
+      "check": "identity-review-card-conditional-layout",
+      "evidence_mode": "UI_ONLY_SYNTHETIC_STATE",
+      "capture_state": "REUSED_FROM_CURRENT_RUN_BEFORE_NATIVE_MODAL_RESET",
+      "screenshot": "audit-conditional-identity-review-card.png",
+      "business_request_sent": false,
+      "confirm_clicked": null
+    },
+    {
+      "check": "property-relation-conditional-layout",
+      "evidence_mode": "UI_ONLY_SYNTHETIC_STATE",
+      "capture_state": "REUSED_FROM_CURRENT_RUN_BEFORE_NATIVE_MODAL_RESET",
+      "screenshot": "audit-conditional-property-relation.png",
+      "business_request_sent": false,
+      "confirm_clicked": null
+    },
+    {
+      "check": "property-end-native-modal",
+      "evidence_mode": "UI_ONLY_SYNTHETIC_STATE_NO_CONFIRM",
+      "capture_state": "REUSED_FROM_CURRENT_RUN_BEFORE_NATIVE_MODAL_RESET",
+      "screenshot": "audit-native-property-end-modal.png",
+      "business_request_sent": false,
+      "confirm_clicked": false
+    },
+    {
+      "check": "resident-work-order-cancel-native-modal",
+      "evidence_mode": "UI_ONLY_SYNTHETIC_STATE_NO_CONFIRM",
+      "route": "pages/work-orders/detail",
+      "has_real_loaded_work_order": false,
+      "conditional_layout_screenshot": "audit-conditional-work-order-cancel.png",
+      "modal_screenshot": "audit-native-work-order-cancel-modal.png",
+      "confirm_clicked": false,
+      "business_request_sent": false,
+      "width": 184,
+      "height": 405
+    }
+  ],
+  "boundary": [
+    "Synthetic page state proves conditional layout and native modal rendering only.",
+    "It is not authorization, API, or business-transaction evidence.",
+    "No native modal confirm action was selected."
+  ]
+}

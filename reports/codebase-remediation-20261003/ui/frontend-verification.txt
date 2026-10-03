@@ -1,0 +1,37 @@
+verified_at=2026-10-03T18:35:45.8366573+08:00
+node_check=PASS
+test business-labels.test.js: business presentation label tests passed
+test error-presentation.test.js: user-facing error presentation tests passed
+test property-scope.test.js: property scope picker PASS
+test ui-layout-contract.test.js: mini program UI layout contract passed for 29 registered pages
+test work-order-create-recorder.test.js: work-order create native recorder focused tests passed
+compile app.wxss: PASS
+compile pages/login/login.wxml: PASS
+role_routes=40/40 CONFIRMED; unexpected_redirects=0
+state_evidence=masked_contact,long_error_disabled,password_focus_tap
+compile_wxml components/work-order-contact/index.wxml=PASS
+compile_wxml pages/login/login.wxml=PASS
+compile_wxml pages/password-reset/password-reset.wxml=PASS
+compile_wxml pages/supervisor/properties.wxml=PASS
+compile_wxml pages/supervisor/staff.wxml=PASS
+compile_wxml pages/work-orders/create.wxml=PASS
+compile_wxss app.wxss=PASS
+compile_wxss pages/assistant/assistant.wxss=PASS
+compile_wxss pages/login/login.wxss=PASS
+compile_wxss pages/password-reset/password-reset.wxss=PASS
+compile_wxss pages/supervisor/knowledge.wxss=PASS
+compile_wxss pages/supervisor/properties.wxss=PASS
+compile_wxss pages/supervisor/sla.wxss=PASS
+compile_wxss pages/supervisor/staff.wxss=PASS
+compile_wxss pages/system/organizations.wxss=PASS
+compile_wxss pages/work-orders/create.wxss=PASS
+conditional announcement draft layout=PASS (UI_ONLY_SYNTHETIC_STATE)
+conditional identity review card layout=PASS (UI_ONLY_SYNTHETIC_STATE)
+conditional resident relation layout=PASS (UI_ONLY_SYNTHETIC_STATE)
+native relationship-end modal=PASS (NO_CONFIRM, business writes 0)
+native work-order-cancel modal=PASS (NO_CONFIRM, business writes 0)
+final node_check=PASS
+final focused tests=5/5 PASS
+final git_diff_check=PASS (line-ending warnings only)
+protected project.config.json hash=UNCHANGED
+protected backend/app/model/ai.py hash=UNCHANGED

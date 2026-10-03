@@ -1,0 +1,42 @@
+{
+  "task": "MINIPROGRAM-FULL-USABILITY-20261003-STATES",
+  "generated_at": "2026-10-03T18:33:17.6826680+08:00",
+  "source_head": "b5f88353a8868a13d9650c23e22d8d16c6b5a3c5",
+  "credentials_in_output": false,
+  "business_object_writes": 0,
+  "authentication_side_effects": "normal manager session creation only",
+  "model_calls": 0,
+  "checks": [
+    {
+      "check": "work-order-contact-positive-render",
+      "route": "pages/supervisor/queue",
+      "selected_work_order": true,
+      "rendered_result": "MASKED_CONTACT_AND_ACTIONS_VISIBLE_IN_SCREENSHOT",
+      "screenshot": "audit-manager-queue-contact.png",
+      "screenshot_width": 299,
+      "screenshot_height": 659
+    },
+    {
+      "check": "long-error-and-disabled-login",
+      "route": "pages/login/login",
+      "loading": true,
+      "long_error_length": 48,
+      "screenshot": "audit-common-long-error-disabled.png",
+      "screenshot_width": 299,
+      "screenshot_height": 659
+    },
+    {
+      "check": "password-input-focus",
+      "tap_succeeded": true,
+      "keyboard_visible": "UNKNOWN_NOT_EXPOSED_BY_AUTOMATOR_SCREENSHOT",
+      "screenshot": "audit-login-password-focus.png",
+      "screenshot_width": 299,
+      "screenshot_height": 659
+    }
+  ],
+  "unverified": [
+    "soft keyboard height and dismissal are not exposed by the automator screenshot",
+    "physical-device enlarged system font",
+    "notched-device bottom safe area"
+  ]
+}
