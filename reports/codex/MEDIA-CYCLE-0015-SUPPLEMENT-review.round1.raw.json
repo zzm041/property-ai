@@ -1,0 +1,71 @@
+{
+  "review": "incremental_read_only",
+  "range": "2f926b3a622d9b6f95ceba18e46e861ad109f3e5...97803b7ebd4adb1437f3055a930dc7dfd4e9a463",
+  "status": "BLOCKED_SCOPED_INCREMENTAL",
+  "blocking_defects": 1,
+  "standards": {
+    "findings": [
+      {
+        "severity": "P2",
+        "blocking": false,
+        "location": [
+          "backend/app/api/v1/staff_work_orders.py:147",
+          "docs/06-API-CONTRACT.md:151"
+        ],
+        "trigger": "使用正式 API 合同查找员工回执能力。",
+        "impact": "新增 POST /staff/work-orders/{id}/receipts/{receipt_id}/media 未写入正式 API 合同，形成实现与 Production V1 文档漂移。",
+        "evidence": "差异新增路由，但固定差异未修改 docs；API 合同的员工工单端点列表仍只列正式回执和上报。"
+      }
+    ],
+    "verified": [
+      "同步 FastAPI endpoint 与同步 SQLAlchemy 约定一致。",
+      "事务由 WorkOrderService._execute/run_owned_transaction 持有；媒体、version、WorkOrderLog、AuditLog 原子提交或回滚。",
+      "无迁移、依赖、技术栈或模型主键策略变更。",
+      "git diff --check 与 git show --check 无错误。"
+    ]
+  },
+  "spec": {
+    "findings": [
+      {
+        "severity": "P2",
+        "blocking": true,
+        "location": [
+          "reports/media-cycle-0015/wo20-cycle2-supplement-evidence.json:1",
+          "reports/media-cycle-0015/wo20-cycle2-supplement-preview-20261004.png"
+        ],
+        "trigger": "独立验收需求 6 的原生小程序补传交互。",
+        "impact": "现有证据能证明最终数据库状态、日志/审计和历史保留，但不能独立证明页面仅展示缺失相位、实际 wx.request 携带 current receipt_id 与 version，或请求后页面刷新到同一 WO20。",
+        "evidence": "JSON 只有环境与最终业务快照；目录内所谓 supplement preview 图片实际是预览二维码，没有补传页面截图、页面状态或请求/响应记录。因此交互验收不可判定通过。"
+      },
+      {
+        "severity": "P2",
+        "blocking": false,
+        "location": [
+          "backend/tests/unit/test_miniprogram_work_order_lifecycle.py:108",
+          "backend/tests/unit/test_work_order_receipt_media.py:313"
+        ],
+        "trigger": "回归把 UI 门控改成非 WAIT_CONFIRM、显示已有相位、遗漏 version，或把服务调用改成 takeover=True。",
+        "impact": "新增测试仍可能通过，关键权限、状态和乐观锁要求缺少针对性回归保护。",
+        "evidence": "小程序测试只搜索若干字符串，未断言 WAIT_CONFIRM、missingBefore/missingAfter、当前 receipt 或 version；服务成功测试 mock 了 _lock_assignee_action/RBAC 且未断言 takeover=False，失败测试仅覆盖非当前 receipt。"
+      }
+    ],
+    "verified": [
+      "实现使用 takeover=False 锁定当前派单人，并要求 WORK_ORDER_RESOLVE。",
+      "仅 WAIT_CONFIRM，且 receipt_id 必须属于最新 process 的唯一 receipt。",
+      "复用 _attach_media 校验 process/receipt scope、上传者、tenant/property、MIME 与实际存储内容。",
+      "仅新增 WorkOrderMedia；未创建或改派 process/receipt。",
+      "写 RECEIPT_MEDIA_APPENDED WorkOrderLog 与 WORK_ORDER_RECEIPT_MEDIA_APPENDED AuditLog。",
+      "源码中 UI 仅在 WAIT_CONFIRM 且当前 receipt 缺 BEFORE 或 AFTER 时展示，并传递 workOrder.version。",
+      "最终证据声明 WO20 CLOSED v18、两周期/两回执、周期 1 媒体 24/25 未变、周期 2 媒体 26/27 绑定 process 4/receipt 4、确认和归档日志存在、无活动派单。"
+    ]
+  },
+  "reported_test_result": "54 passed, 1 deprecation warning; supplied by main session, not independently rerun",
+  "not_executed": [
+    "pytest or other test suites",
+    "business HTTP requests",
+    "database, queue, cache, or service operations",
+    "Docker/runtime inspection",
+    "native mini-program interaction"
+  ],
+  "next_action": "补充同一业务对象的原生页面截图、页面状态和实际 wx.request 请求/响应证据，并将新端点写入 docs/06-API-CONTRACT.md；随后可做只读增量复核。"
+}

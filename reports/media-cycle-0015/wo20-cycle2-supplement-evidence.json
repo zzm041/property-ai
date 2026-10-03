@@ -1,0 +1,85 @@
+{
+  "captured_at": "2026-10-04T01:18:43.9941970+08:00",
+  "environment": {
+    "endpoint": "http://127.0.0.1:8093",
+    "database": "property_ai_delivery_check",
+    "revision": "20261003_0015_work_order_media_cycle_links",
+    "product_commit": "97803b7ebd4adb1437f3055a930dc7dfd4e9a463",
+    "image": "property-ai-delivery:97803b7",
+    "image_digest": "sha256:cb17cbc4e2fb0e9a86844159f072f7587764c2be561b172aff5e2386157d6668"
+  },
+  "final_candidate": {
+    "product_commit": "7a5d40c871a802b978a62bbb32cd69df51a88ee6",
+    "image": "property-ai-delivery:7a5d40c",
+    "image_digest": "sha256:6ed27f5e057dd837bcb44486dcea8de941accb60b5914caf9820ed23be3b7f6b",
+    "components": ["api", "worker", "publisher", "beat"],
+    "health": "ready",
+    "receipt_media_version_required": true,
+    "business_flow_replayed_after_contract_only_fix": false
+  },
+  "work_order": {
+    "id": 20,
+    "status": "CLOSED",
+    "version": 18
+  },
+  "cycles": [
+    {
+      "cycle_no": 1,
+      "process_id": 3,
+      "receipt_id": 3,
+      "resolved": true,
+      "media": [
+        {"media_id": 24, "file_id": 20, "taken_phase": "BEFORE"},
+        {"media_id": 25, "file_id": 21, "taken_phase": "AFTER"}
+      ]
+    },
+    {
+      "cycle_no": 2,
+      "process_id": 4,
+      "receipt_id": 4,
+      "resolved": true,
+      "media": [
+        {"media_id": 26, "file_id": 22, "taken_phase": "BEFORE", "mime_type": "image/jpeg", "size_bytes": 509752},
+        {"media_id": 27, "file_id": 23, "taken_phase": "AFTER", "mime_type": "image/jpeg", "size_bytes": 539510}
+      ]
+    }
+  ],
+  "supplement_event": {
+    "work_order_log_id": 9740,
+    "event_code": "RECEIPT_MEDIA_APPENDED",
+    "from_status": "WAIT_CONFIRM",
+    "to_status": "WAIT_CONFIRM",
+    "actor_type": "STAFF",
+    "actor_user_id": 14,
+    "audit_log_id": 679,
+    "action": "WORK_ORDER_RECEIPT_MEDIA_APPENDED",
+    "process_id": 4,
+    "receipt_id": 4,
+    "before_count": 1,
+    "after_count": 1
+  },
+  "resident_confirmation": {
+    "feedback_id": 4,
+    "process_id": 4,
+    "actor_user_id": 15,
+    "confirmed": true,
+    "unresolved_flag": false,
+    "confirm_log_id": 9831,
+    "archive_log_id": 9832,
+    "closed_audit_log_id": 684,
+    "final_assignment_id": 55,
+    "final_assignment_status": "ENDED",
+    "active_assignment_key": null
+  },
+  "verification": {
+    "cycle_1_unchanged": true,
+    "cycle_2_before_and_after_each_exactly_one": true,
+    "cycle_2_media_bound_to_current_process_and_receipt": true,
+    "no_new_process_or_receipt_created": true,
+    "cycle_count": 2,
+    "receipt_count": 2,
+    "resident_confirmation_pending": false,
+    "final_status_closed": true,
+    "no_active_assignment_remains": true
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "review": "round2_incremental_read_only",
+  "basis": {
+    "head": "97803b7ebd4adb1437f3055a930dc7dfd4e9a463",
+    "reported_tests": "55 passed, 1 Starlette deprecation warning",
+    "tests_independently_rerun": false
+  },
+  "status": "PASS_SCOPED_INCREMENTAL",
+  "blocking_findings": 0,
+  "standards": {
+    "findings": [
+      {
+        "severity": "P2",
+        "blocking": false,
+        "location": [
+          "docs/06-API-CONTRACT.md:171",
+          "backend/app/schema/work_order.py:149"
+        ],
+        "trigger": "非小程序客户端省略 version 调用补传端点。",
+        "impact": "正式合同写明请求须携带当前 version，但请求模型仍允许 version=null，服务端仅在提供时校验；文档与可接受输入存在偏差，非官方客户端可绕过乐观版本冲突检测。",
+        "evidence": "StaffReceiptMediaRequest.version 仍为可选字段；本轮测试只证明官方小程序会传 version。",
+        "next_action": "后续将 version 改为必填，或把合同表述收窄为‘官方小程序必须携带’；本次官方页面交付不受阻。"
+      }
+    ],
+    "resolved": [
+      "新端点及权限、状态、当前回执、事务、日志审计和历史保留规则已写入正式 API 合同。",
+      "新增测试明确锁定 WAIT_CONFIRM、最新 receipt、缺失相位控件、receipt_id、optimistic version、takeover=False，并覆盖非 WAIT_CONFIRM 拒绝。",
+      "增量 diff --check 无错误。"
+    ]
+  },
+  "spec": {
+    "findings": [],
+    "resolved": [
+      "当前派单人、WORK_ORDER_RESOLVE、WAIT_CONFIRM、当前 process/receipt、附件 scope/storage、原子追加、日志审计、历史保留均由实现与专项测试覆盖。",
+      "最终证据保持 WO20 CLOSED v18、周期 1 媒体 24/25、周期 2 媒体 26/27、两个 process/receipt、确认/归档日志和无活动派单。"
+    ],
+    "interaction_evidence_decision": {
+      "prior_blocker_closed": true,
+      "reason": "证据链将同一原生页面目标和操作者动作，与 GET WO20、两次文件上传、POST WO20/receipt4/media、随后 GET WO20 的连续服务器请求绑定；再由 version 15→16、file 22/23、media 26/27、process4/receipt4、log9740/audit679 闭合到同一业务对象。结合固定产品提交中的确定性页面逻辑及新增断言，足以证明本次原生补传路径实际执行，无需为已完成动作强制重放。",
+      "residual_limitation": "没有保留补传表单像素截图或原始请求体；QR 已正确标注为入口二维码。该限制不再阻断，因为缺相位渲染和 version/receipt 请求构造由固定源码与测试证明，实际执行由请求链和持久化结果交叉证明。"
+    }
+  },
+  "not_executed": [
+    "测试套件",
+    "业务 HTTP 请求",
+    "数据库、队列、缓存或服务操作",
+    "原生小程序重放",
+    "文件修改"
+  ]
+}

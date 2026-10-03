@@ -1,0 +1,81 @@
+{
+  "captured_at": "2026-10-04T01:30:00+08:00",
+  "evidence_scope": "native mini-program receipt-media supplement for existing work order 20",
+  "source": {
+    "product_commit": "97803b7ebd4adb1437f3055a930dc7dfd4e9a463",
+    "runtime_image": "property-ai-delivery:97803b7",
+    "preview_qr": "reports/media-cycle-0015/wo20-cycle2-supplement-preview-20261004.png",
+    "preview_page": "pages/staff-orders/detail?id=20",
+    "operator_report": "The owner scanned the refreshed preview, selected both missing second-cycle photos, submitted the supplement action, and reported: 第二周期照片已补传."
+  },
+  "redacted_api_sequence": [
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/20",
+      "status": 200,
+      "request_id": "979c97c3057a4c2cac9cb8255f0f888c",
+      "timestamp_utc": "2026-10-03T17:02:51.277220Z",
+      "purpose": "load current work order and receipt/media state"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/files/22/content",
+      "status": 200,
+      "request_id": "aa0e1632547b44e491c07c43ad39d105",
+      "timestamp_utc": "2026-10-03T17:03:10.340885Z",
+      "purpose": "persist first selected image"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/files/23/content",
+      "status": 200,
+      "request_id": "7bc6598fddc148f5902b99bc6627b511",
+      "timestamp_utc": "2026-10-03T17:03:17.715003Z",
+      "purpose": "persist second selected image"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/staff/work-orders/20/receipts/4/media",
+      "status": 200,
+      "request_id": "6e4e4c086ba740f795097ceefaa557fc",
+      "timestamp_utc": "2026-10-03T17:03:25.594985Z",
+      "latency_ms": 66.16,
+      "purpose": "append the two selected files to the current receipt"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/work-orders/20",
+      "status": 200,
+      "request_id": "15fcfc2d2ee54f4e8b709ca3bfeacfab",
+      "timestamp_utc": "2026-10-03T17:03:25.774762Z",
+      "purpose": "same-page refresh after successful supplement"
+    }
+  ],
+  "request_result_binding": {
+    "work_order_id": 20,
+    "receipt_id": 4,
+    "process_id": 4,
+    "version_before": 15,
+    "version_after": 16,
+    "before_file_id": 22,
+    "after_file_id": 23,
+    "before_media_id": 26,
+    "after_media_id": 27,
+    "work_order_log_id": 9740,
+    "audit_log_id": 679,
+    "audit_before_count": 1,
+    "audit_after_count": 1
+  },
+  "ui_contract": {
+    "display_condition": "WAIT_CONFIRM with a current receipt missing BEFORE or AFTER media",
+    "missing_phase_controls": "Only missingBeforeMedia and missingAfterMedia controls render",
+    "request_receipt_source": "latest receipt belonging to the latest process",
+    "optimistic_version_source": "current workOrder.version",
+    "success_behavior": "clear local selections, show success toast, then reload the same work order"
+  },
+  "limitations": [
+    "The retained QR image is the preview entry, not a screenshot of the supplement form.",
+    "The API deliberately does not log request bodies or authentication tokens; file-to-phase binding is verified from scoped database rows, log and audit records.",
+    "The owner performed the native picker actions; no mock or direct API business submission was used by Codex."
+  ]
+}

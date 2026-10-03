@@ -2422,13 +2422,22 @@
     "remaining_local": "native supplement and BEFORE/AFTER receipt submission; authoritative process/receipt media-cycle linkage requires separately approved post-0014 migration",
     "release_boundary": "trusted providers, malware scanning, target host/domain/TLS, target-scale security/performance/durability, media-byte recovery and formal release remain open"
   },
+  "media_cycle_0015_native_closeout_20261004": {
+    "task_id": "MEDIA-CYCLE-0015-NATIVE-CLOSEOUT",
+    "product_commit": "7a5d40c871a802b978a62bbb32cd69df51a88ee6",
+    "runtime_image": "property-ai-delivery:7a5d40c@sha256:6ed27f5e057dd837bcb44486dcea8de941accb60b5914caf9820ed23be3b7f6b",
+    "verification": "WO20 native resident supplement; real AUTO retained; cycle1 process3/receipt3 BEFORE/AFTER; normal reopen; cycle2 process4/receipt4 receipt plus scoped native BEFORE/AFTER supplement; resident confirmation to CLOSED; 56 directly affected tests; independent review PASS_SCOPED_INCREMENTAL",
+    "closed_scope": "native resident supplement, native staff receipt picker, authoritative 0015 reopened-cycle media linkage, current-receipt supplement, two-cycle history preservation and resident confirmation",
+    "evidence": "reports/media-cycle-0015/wo20-cycle2-native-request-evidence.json; reports/media-cycle-0015/wo20-cycle2-supplement-evidence.json; reports/codex/MEDIA-CYCLE-0015-SUPPLEMENT-review.round3.raw.json",
+    "release_boundary": "production object-storage scanning, target host/domain/TLS, external-network device coverage, target-scale durability/performance and formal release remain open"
+  },
   "current_effective_view": {
-    "generated_at": "2026-10-03",
+    "generated_at": "2026-10-04",
     "source_items": "items (83 unique IDs; extra_v1_from_prd_acceptance is not counted again)",
     "overlay_source": "preapproval_audit_20260920.current_status_overlays (17 IDs), then staff_mgmt_auto_dispatch_001.current_status_overlays (7 IDs), then wo_receipt_reassign_002.current_status_overlays (3 IDs), then sla_notification_retry_003.current_status_overlays (5 IDs), then sla_accept_respond_reassign_004.current_status_overlays (3 IDs), then incident_aggregation_005.current_status_overlays (1 ID), then property_house_relation_006.current_status_overlays (3 IDs), then announcement_governance_007.current_status_overlays (4 IDs), then knowledge_mgmt_rag_008.current_status_overlays (3 IDs), then auth_password_change.current_status_overlays (1 ID), then incident_management_009.current_status_overlays (2 IDs), then sla_policy_management_010.current_status_overlays (1 ID), then stats_config_ui_011.current_status_overlays (1 ID), then resident_wo_paging_actions_012.current_status_overlays (4 IDs), then notification_events_inbox_013.current_status_overlays (2 IDs)",
     "latest_overlay_source": "wo_reopen_receipt_history_014 (2 IDs), then resident_binding_complete_015 (4 existing IDs), then auth_failure_policy_20260923 (1 original ID, owner change not PASS), then house_catalog_paging_016 (5 existing IDs), then manager_wo_cancel_017 (1 composite ID, remains PARTIAL), then house_csv_roundtrip_018 (1 existing ID), then ai_analysis_input_019 (3 existing IDs; real-model statuses remain BLOCKED), then resident_wo_presentation_020 (1 existing ID; release gaps retained), then notification_presentation_021 (1 existing ID; explicitUTC not Property-local/outbound acceptance), then ai_fallback_runtime_022 (1 existing ID; Development injected failure only)",
     "latest_additional_overlay_source": "resident_house_select_023, evaluation_calibration_20260924, maintenance_contact_dispatch_024, db_task_recovery_025, reliable_task_delivery_026 includingnormalintegration (4 existing IDs, boundedDevelopment only), preservedselfhost_supplement_024_rubric_01 then crossfield_diagnostic_01 (SELFHOST-AI remainsNOT_READY; no percentage/extra_v1 double count)",
-    "final_overlay_source": "real_ai_integration_027.current_status_overlays plus persistent3317/0014 scoped runtime checkpoint, delivery_organization_onboarding_028, restore029, the 8093 scoped real-provider RAG continuation, preserved Qwen3.8 fixed-set NOT_READY history, the f234402/6dc6538 bounded local image/voice AUTO delivery evidence independently accepted in REAL-AI-INTEGRATION-027-LOCAL-DELIVERY-round2, the 2026-10-02 local-final-gaps identity-page/SLA-Beat continuation, local_delivery_gaps_20261002, and codebase_remediation_20261003 on committed/running a14f5db; scoped business PASS does not promote generalized quality, trusted-provider, target deployment or Production release acceptance; rows and historical IDs retained",
+    "final_overlay_source": "real_ai_integration_027.current_status_overlays plus persistent3317/0014 scoped runtime checkpoint, delivery_organization_onboarding_028, restore029, the 8093 scoped real-provider RAG continuation, preserved Qwen3.8 fixed-set NOT_READY history, the f234402/6dc6538 bounded local image/voice AUTO delivery evidence independently accepted in REAL-AI-INTEGRATION-027-LOCAL-DELIVERY-round2, the 2026-10-02 local-final-gaps identity-page/SLA-Beat continuation, local_delivery_gaps_20261002, codebase_remediation_20261003, and media_cycle_0015_native_closeout_20261004 on committed/running 7a5d40c; scoped business PASS does not promote trusted-provider, target deployment or Production release acceptance; rows and historical IDs retained",
     "rule": "Current view only. Historical item results remain unchanged. No completion percentage is produced. Old AUTH001 objects were lost on the 2026-09-23 tmpfs stop; historical evidence remains version-bound, not current-object proof.",
     "row_count": 83,
     "rows": [
@@ -2899,10 +2908,10 @@
       {
         "requirement_id": "V1-RES-APPEND",
         "current_implementation": "owner_only_report_phase_nonterminal_append_with_analysis_input_persistence_optimistic_concurrency_selected_thumbnail_native_preview_clear_after_success_and_shared_responsive_form_feedback",
-        "verification_mode_status": "PASS_SCOPED_LOCAL_IMPLEMENTATION_AND_COMPILE;NATIVE_SUPPLEMENT_SUBMISSION_PENDING",
-        "evidence_version": "prior 012 evidence retained; 37cdd336f1529f49a96abe0124c825c62034b2ff; a14f5db143940ab3427f7ae5d4381e9cc95906ac; 69 focused tests and WeChat compilation",
-        "remaining_gap": "One current-device native supplemental image submission and resulting analysis remain pending; production storage/scanning and formal release acceptance remain open.",
-        "next_action": "run the approved single native supplement flow after the phone IPv4 is supplied; do not substitute Mock/API submission"
+        "verification_mode_status": "PASS_SCOPED_LOCAL_NATIVE_DEVICE_AND_RUNTIME",
+        "evidence_version": "prior 012 evidence retained; 37cdd336f1529f49a96abe0124c825c62034b2ff; a14f5db143940ab3427f7ae5d4381e9cc95906ac; WO20/report file19 on 0015; 7a5d40c final candidate",
+        "remaining_gap": "Production object-storage scanning, target/external-network device coverage and formal release acceptance remain open.",
+        "next_action": "Preserve the scoped native evidence; revalidate only after related media/storage/client changes or in the approved target environment."
       },
       {
         "requirement_id": "V1-RES-CANCEL",
@@ -2938,19 +2947,19 @@
       },
       {
         "requirement_id": "V1-RECEIPT-COMPLETE",
-        "current_implementation": "complete_fields_explicit_before_after_media_selected_thumbnail_native_preview_group_specific_clear_after_success_and_shared_responsive_form_feedback_wired",
-        "verification_mode_status": "PASS_SCOPED_LOCAL_IMPLEMENTATION_AND_COMPILE;NATIVE_RECEIPT_SUBMISSION_PENDING",
-        "evidence_version": "prior 002 evidence retained; 37cdd336f1529f49a96abe0124c825c62034b2ff; a14f5db143940ab3427f7ae5d4381e9cc95906ac; 69 focused tests and WeChat compilation",
-        "remaining_gap": "Current-device BEFORE/AFTER picker submission remains pending; production object storage/scanning remains open.",
-        "next_action": "complete the same approved native page flow after exact-device LAN access is established"
+        "current_implementation": "complete_fields_explicit_before_after_media_selected_thumbnail_native_preview_group_specific_clear_after_success_plus_current_receipt_missing_phase_supplement_with_required_optimistic_version",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_NATIVE_DEVICE_AND_RUNTIME",
+        "evidence_version": "prior 002 evidence retained; 37cdd336f1529f49a96abe0124c825c62034b2ff; a14f5db143940ab3427f7ae5d4381e9cc95906ac; WO20 cycles1/2 native receipt and supplement evidence; 7a5d40c; 56 affected tests; independent PASS_SCOPED_INCREMENTAL",
+        "remaining_gap": "Production object-storage scanning, target/external-network device coverage and formal release acceptance remain open.",
+        "next_action": "Preserve the scoped native receipt evidence; revalidate only after related receipt/media/client changes or in the approved target environment."
       },
       {
         "requirement_id": "V1-RECEIPT-HISTORY",
-        "current_implementation": "Retained all-cycle receipts/process-linked feedback and rawUTC/IDs;020 adds authorized current employee names, Property-timezone/offset labels and readable Chinese states/reasons/events/media; no historical-name-snapshot claim.",
-        "verification_mode_status": "PASS_SCOPED_LOCAL_DEVELOPMENT_CURRENT_SCHEMA",
-        "evidence_version": "014 65f20c5 / wo014-745f67277104;020 b75fa97112b3144f9d4702e4782b231bb775c19c / view020-1b7b00de4872",
-        "remaining_gap": "Current-device receipt picker submission is pending. WorkOrderMedia has no process_id or receipt_id, so BEFORE/AFTER files still lack authoritative reopened-cycle association; closing that requires an approved migration. Production/device performance and historical-name snapshots remain open.",
-        "next_action": "Preserve 014/020 evidence; complete the approved native picker run, and request a separate minimal schema approval before adding authoritative per-cycle media association."
+        "current_implementation": "Retained all-cycle receipts/process-linked feedback and rawUTC/IDs; 0015 authoritatively links new ON_SITE media to process and new BEFORE/AFTER media to process plus receipt while leaving ambiguous legacy rows unassigned; authorized employee names, Property-timezone labels and readable Chinese states/reasons/events/media remain.",
+        "verification_mode_status": "PASS_SCOPED_LOCAL_NATIVE_DEVICE_MEDIA_CYCLE",
+        "evidence_version": "014/020 evidence retained; 0015 migration and drill retained; WO20 cycle1 process3/receipt3 media24/25 plus cycle2 process4/receipt4 media26/27 and final feedback4; 7a5d40c",
+        "remaining_gap": "No historical-name snapshot is claimed. Production storage scanning, target-scale/device performance and formal release acceptance remain open.",
+        "next_action": "Preserve the accepted two-cycle evidence and legacy semantics; revalidate only after related schema/history/presentation changes or in the approved target environment."
       },
       {
         "requirement_id": "V1-MGR-EXCEPTION",

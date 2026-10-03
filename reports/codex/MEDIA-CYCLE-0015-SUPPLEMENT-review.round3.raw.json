@@ -1,0 +1,7 @@
+{
+  "remaining_finding": "CLOSED",
+  "verdict": "PASS_SCOPED_INCREMENTAL",
+  "blockers": [],
+  "basis": "StaffReceiptMediaRequest.version is now required and constrained to >=1; the regression test covers missing-version rejection and valid parsing; docs wording matches the schema. No unrelated request schema changed.",
+  "verification": "Read-only delta inspection and diff check only; reported 56 passed was not independently rerun."
+}
