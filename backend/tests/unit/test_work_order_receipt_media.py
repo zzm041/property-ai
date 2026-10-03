@@ -5,6 +5,7 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, call
 
 import pytest
+from pydantic import ValidationError
 
 from app.core.errors import AppError, WorkOrderErrorCode
 from app.domain.audit import AuditAction, AuditResourceType
@@ -14,6 +15,7 @@ from app.domain.work_order import (
     WorkOrderEvent,
     WorkOrderStatus,
 )
+from app.schema.work_order import StaffReceiptMediaRequest
 from app.service.rbac import RbacService
 from app.service.work_order import WorkOrderService
 
@@ -99,6 +101,18 @@ def test_public_receipt_media_supplement_requires_files_and_normalizes_ids() -> 
             version=5,
         )
     assert captured.value.code == WorkOrderErrorCode.CONTENT_REQUIRED
+
+
+def test_receipt_media_supplement_schema_requires_optimistic_version() -> None:
+    """Omitting version must not bypass the documented conflict guard."""
+
+    with pytest.raises(ValidationError):
+        StaffReceiptMediaRequest.model_validate({"before_file_ids": [11]})
+
+    parsed = StaffReceiptMediaRequest.model_validate(
+        {"before_file_ids": [11], "version": 5}
+    )
+    assert parsed.version == 5
 
 
 @pytest.mark.parametrize("resolved", [True, False])
@@ -351,8 +365,9 @@ def test_staff_can_supplement_media_for_current_receipt_after_submission(
     service._session = MagicMock()
     monkeypatch.setattr(RbacService, "require_permission", lambda *_args: None)
 
+    actor = MagicMock()
     result = service._append_receipt_media(
-        actor=MagicMock(),
+        actor=actor,
         work_order_id=record.id,
         receipt_id=receipt.id,
         request_id="receipt-media-supplement",
@@ -363,6 +378,12 @@ def test_staff_can_supplement_media_for_current_receipt_after_submission(
 
     assert result is record
     assert record.version == 6
+    service._lock_assignee_action.assert_called_once_with(
+        actor,
+        record.id,
+        5,
+        takeover=False,
+    )
     assert service._attach_media.call_args_list == [
         call(
             record,
@@ -408,6 +429,44 @@ def test_staff_can_supplement_media_for_current_receipt_after_submission(
         },
     )
     service._session.flush.assert_called_once()
+
+
+def test_receipt_media_supplement_rejects_non_wait_confirm_state(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A completed receipt is not enough unless the order awaits confirmation."""
+
+    service = WorkOrderService.__new__(WorkOrderService)
+    record = SimpleNamespace(
+        id=41,
+        tenant_id=2,
+        property_id=3,
+        status="PROCESSING",
+        process_reason="NONE",
+        version=5,
+    )
+    service._lock_assignee_action = MagicMock(
+        return_value=(SimpleNamespace(user_id=7), record, MagicMock(), MagicMock())
+    )
+    service._property_scope = MagicMock()
+    service._repository = MagicMock()
+    service._attach_media = MagicMock()
+    monkeypatch.setattr(RbacService, "require_permission", lambda *_args: None)
+
+    with pytest.raises(AppError) as captured:
+        service._append_receipt_media(
+            actor=MagicMock(),
+            work_order_id=record.id,
+            receipt_id=77,
+            request_id="receipt-media-wrong-state",
+            before_file_ids=(11,),
+            after_file_ids=(),
+            version=5,
+        )
+
+    assert captured.value.code == WorkOrderErrorCode.INVALID_TRANSITION
+    service._repository.get_current_process.assert_not_called()
+    service._attach_media.assert_not_called()
 
 
 def test_receipt_media_supplement_rejects_non_current_receipt(

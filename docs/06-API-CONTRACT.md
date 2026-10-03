@@ -154,6 +154,7 @@
 | POST | `/staff/work-orders/{id}/start` | 开始处理 |
 | POST | `/staff/work-orders/{id}/feedback` | 过程反馈 |
 | POST | `/staff/work-orders/{id}/receipts` | 正式回执 |
+| POST | `/staff/work-orders/{id}/receipts/{receipt_id}/media` | 待住户确认时补传当前周期回执缺失的处理前/后媒体 |
 | POST | `/staff/work-orders/{id}/escalate` | 无法解决上报 |
 | POST | `/supervisor/work-orders/{id}/assign` | 人工派单/改派 |
 | POST | `/supervisor/work-orders/{id}/decide` | 异常后续方案 |
@@ -166,6 +167,8 @@
 创建成功响应即含 `id` 与 `status=PENDING_ANALYSIS`，不等待 AI。
 
 工单详情中的 assignment 若来自系统自动派单，则 `assigned_by_user_id=null`；人工派单仍返回实际操作者。自动来源必须由服务端持久化的 `assigned_source=AUTO` 与审计/状态日志共同判定，不能由客户端伪造。
+
+回执媒体补传仅允许当前负责员工在 `WAIT_CONFIRM` 状态使用，并须携带当前工单 `version`。服务端必须重新锁定当前派单关系，校验 `work-order:resolve` 权限，并确认 `receipt_id` 属于当前处理周期；客户端传入的周期、回执、上传者或组织归属均不得直接信任。补传只新增明确的 `BEFORE` / `AFTER` 关联媒体，不创建新处理周期或回执；媒体关联、工单版本、`WorkOrderLog` 和 `AuditLog` 必须在同一事务内完成。旧周期和历史回执不得改写。
 
 工单详情可附加只读 `display`：`property_timezone`、`timestamp_labels`（以原始 UTC 时间字符串为键，给出该小区时区及实际偏移的展示文字）、`assignee_names`（仅该已授权工单的派单/处理员工当前展示名）。原始 ID、UTC 时间、状态和历史关联不替换；展示名不是历史姓名快照，不返回手机号或凭证。缺少姓名时页面标明员工编号；无合法时区时明确回退 UTC。必须先通过原工单读取授权，不提供人员枚举接口，也不改变状态机和操作权限。
 

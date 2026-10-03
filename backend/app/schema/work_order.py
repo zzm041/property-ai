@@ -146,7 +146,7 @@ class StaffReceiptMediaRequest(BaseModel):
 
     before_file_ids: tuple[int, ...] = ()
     after_file_ids: tuple[int, ...] = ()
-    version: int | None = Field(default=None, ge=1)
+    version: int = Field(ge=1)
 
     @model_validator(mode="after")
     def validate_media(self) -> Self:

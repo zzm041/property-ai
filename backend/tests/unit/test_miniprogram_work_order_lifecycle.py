@@ -118,11 +118,21 @@ def test_staff_page_can_supplement_missing_media_for_submitted_receipt() -> None
 
     assert "canSupplementReceiptMedia" in source
     assert "supplementReceiptMedia" in source
+    assert 'status === "WAIT_CONFIRM"' in source
+    assert "entry.receipt_id === latestReceipt.id" in source
+    assert "(missingBeforeMedia || missingAfterMedia)" in source
+    assert "supplementReceiptId: latestReceipt ? latestReceipt.id : null" in source
+    assert "this.data.missingBeforeMedia && !this.data.beforeFileIds.length" in source
+    assert "this.data.missingAfterMedia && !this.data.afterFileIds.length" in source
+    assert "this.id, this.data.supplementReceiptId" in source
     assert "before_file_ids: this.data.beforeFileIds" in source
     assert "after_file_ids: this.data.afterFileIds" in source
+    assert "version: this.data.workOrder.version" in source
     assert "补传本周期处理照片" in template
+    assert 'wx:if="{{missingBeforeMedia}}"' in template
+    assert 'wx:if="{{missingAfterMedia}}"' in template
     assert "补传照片" in template
-    assert "/media`" in api
+    assert "/receipts/${receiptId}/media`" in api
 
 
 def test_resident_page_shows_receipt_and_versions_confirmation() -> None:
