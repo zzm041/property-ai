@@ -12,6 +12,7 @@ from app.schema.work_order import (
     RejectWorkOrderRequest,
     StaffEscalateRequest,
     StaffFeedbackRequest,
+    StaffReceiptMediaRequest,
     StaffReceiptRequest,
     StaffVersionRequest,
     WorkOrderListData,
@@ -138,6 +139,27 @@ def submit_receipt(
         before_file_ids=body.before_file_ids,
         after_file_ids=body.after_file_ids,
         file_ids=body.file_ids,
+        version=body.version,
+    )
+    return success_envelope(request, work_order_data(record).model_dump(mode="json"))
+
+
+@router.post("/work-orders/{work_order_id}/receipts/{receipt_id}/media")
+def append_receipt_media(
+    work_order_id: int,
+    receipt_id: int,
+    body: StaffReceiptMediaRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[WorkOrderService, Depends(get_work_order_service)],
+) -> dict[str, object]:
+    record = service.append_receipt_media(
+        actor=actor,
+        work_order_id=work_order_id,
+        receipt_id=receipt_id,
+        request_id=request_id_for(request),
+        before_file_ids=body.before_file_ids,
+        after_file_ids=body.after_file_ids,
         version=body.version,
     )
     return success_envelope(request, work_order_data(record).model_dump(mode="json"))

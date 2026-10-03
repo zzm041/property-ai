@@ -448,6 +448,12 @@ module.exports = {
     request({ path: `/staff/work-orders/${id}/feedback`, method: "POST", data: body }),
   resolveWorkOrder: (id, body) =>
     request({ path: `/staff/work-orders/${id}/receipts`, method: "POST", data: body }),
+  supplementReceiptMedia: (id, receiptId, body) =>
+    request({
+      path: `/staff/work-orders/${id}/receipts/${receiptId}/media`,
+      method: "POST",
+      data: body,
+    }),
   escalateWorkOrder: (id, body) =>
     request({ path: `/staff/work-orders/${id}/escalate`, method: "POST", data: body }),
   supervisorQueue: (propertyId, afterId, view = "dispatch") =>

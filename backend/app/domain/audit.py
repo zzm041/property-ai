@@ -59,6 +59,7 @@ class AuditAction(StrEnum):
     WORK_ORDER_REASSIGNED = "WORK_ORDER_REASSIGNED"
     WORK_ORDER_PROCESS_STARTED = "WORK_ORDER_PROCESS_STARTED"
     WORK_ORDER_PROCESS_UPDATED = "WORK_ORDER_PROCESS_UPDATED"
+    WORK_ORDER_RECEIPT_MEDIA_APPENDED = "WORK_ORDER_RECEIPT_MEDIA_APPENDED"
     WORK_ORDER_RESOLVED = "WORK_ORDER_RESOLVED"
     WORK_ORDER_CLOSED = "WORK_ORDER_CLOSED"
     WORK_ORDER_REOPENED = "WORK_ORDER_REOPENED"
@@ -216,6 +217,9 @@ _WORK_ORDER_STATUS_DETAIL_KEYS = frozenset(
 )
 _WORK_ORDER_PROCESS_DETAIL_KEYS = frozenset(
     {"work_order_id", "status", "process_reason"}
+)
+_WORK_ORDER_RECEIPT_MEDIA_DETAIL_KEYS = frozenset(
+    {"work_order_id", "receipt_id", "process_id", "before_count", "after_count"}
 )
 _WORK_ORDER_DECIDED_DETAIL_KEYS = frozenset(
     {"work_order_id", "status", "process_reason", "reason_code"}
@@ -652,6 +656,12 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             | frozenset({"ai_draft"}),
             required_detail_keys=_ANNOUNCEMENT_SNAPSHOT_DETAIL_KEYS
             | frozenset({"ai_draft"}),
+            allowed_scope_types=frozenset({ScopeType.PROPERTY}),
+        ),
+        AuditAction.WORK_ORDER_RECEIPT_MEDIA_APPENDED: AuditActionPolicy(
+            resource_type=AuditResourceType.WORK_ORDER,
+            allowed_detail_keys=_WORK_ORDER_RECEIPT_MEDIA_DETAIL_KEYS,
+            required_detail_keys=_WORK_ORDER_RECEIPT_MEDIA_DETAIL_KEYS,
             allowed_scope_types=frozenset({ScopeType.PROPERTY}),
         ),
         AuditAction.ANNOUNCEMENT_UPDATED: AuditActionPolicy(

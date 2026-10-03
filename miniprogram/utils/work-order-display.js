@@ -6,6 +6,7 @@ const EVENT = {
   CREATE: "提交报修", ANALYZE: "完成分析", ASSIGN: "安排处理人员", REASSIGN: "重新派单",
   ACCEPT: "员工接单", REJECT: "员工拒单", START: "开始处理", PROCESS_UPDATE: "更新处理进展",
   RECEIPT_RESOLVED: "提交处理回执", RECEIPT_UNRESOLVED: "提交未解决回执",
+  RECEIPT_MEDIA_APPENDED: "补传回执照片",
   ESCALATE: "上报主管", DECIDE: "主管处理决定", CONFIRM: "住户确认解决",
   REOPEN: "反馈未解决，继续处理", CANCEL: "撤销工单", ARCHIVE: "归档",
   RATE: "服务评价", APPEND: "补充问题", SLA_WARNING: "时限预警",

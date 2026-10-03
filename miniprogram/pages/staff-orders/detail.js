@@ -18,6 +18,10 @@ Page({
     canStart: false,
     canEscalate: false,
     canFinish: false,
+    canSupplementReceiptMedia: false,
+    supplementReceiptId: null,
+    missingBeforeMedia: false,
+    missingAfterMedia: false,
     rejectReason: "",
     escalationReason: "",
     escalationIndex: 0,
@@ -62,6 +66,22 @@ Page({
           const display = require("../../utils/work-order-display").presentDetail(item);
           const status = workOrder ? workOrder.status : "";
           const processReason = workOrder ? workOrder.process_reason : "NONE";
+          const processes = Array.isArray(item.processes) ? item.processes : [];
+          const receipts = Array.isArray(item.receipts) ? item.receipts : [];
+          const media = Array.isArray(item.media) ? item.media : [];
+          const latestProcess = processes.length ? processes[processes.length - 1] : null;
+          const latestReceipt = latestProcess
+            ? receipts.find((receipt) => receipt.process_id === latestProcess.id)
+            : null;
+          const receiptMedia = latestReceipt
+            ? media.filter((entry) => entry.receipt_id === latestReceipt.id)
+            : [];
+          const missingBeforeMedia =
+            Boolean(latestReceipt) &&
+            !receiptMedia.some((entry) => entry.taken_phase === "BEFORE");
+          const missingAfterMedia =
+            Boolean(latestReceipt) &&
+            !receiptMedia.some((entry) => entry.taken_phase === "AFTER");
           require("../../services/auth").setLastWorkOrderId(this.id);
           this.setData({
             item,
@@ -74,6 +94,13 @@ Page({
             canStart: status === "ACCEPTED",
             canEscalate: status === "PROCESSING" && processReason === "NONE",
             canFinish: status === "PROCESSING" && processReason === "NONE",
+            canSupplementReceiptMedia:
+              status === "WAIT_CONFIRM" &&
+              Boolean(latestReceipt) &&
+              (missingBeforeMedia || missingAfterMedia),
+            supplementReceiptId: latestReceipt ? latestReceipt.id : null,
+            missingBeforeMedia,
+            missingAfterMedia,
           });
         })
     ).catch(() => {});
@@ -319,6 +346,40 @@ Page({
             beforeMediaHint: "",
             afterMediaHint: "",
           });
+          return this.reload();
+        })
+    ).catch(() => {});
+  },
+  supplementReceiptMedia() {
+    if (this.data.loading || !this.data.supplementReceiptId) {
+      return;
+    }
+    if (this.data.missingBeforeMedia && !this.data.beforeFileIds.length) {
+      this.setData({ error: "请添加本周期处理前照片" });
+      return;
+    }
+    if (this.data.missingAfterMedia && !this.data.afterFileIds.length) {
+      this.setData({ error: "请添加本周期处理后照片" });
+      return;
+    }
+    const { withLoading } = require("../../utils/ui");
+    withLoading(this, () =>
+      require("../../services/api")
+        .supplementReceiptMedia(this.id, this.data.supplementReceiptId, {
+          before_file_ids: this.data.beforeFileIds,
+          after_file_ids: this.data.afterFileIds,
+          version: this.data.workOrder.version,
+        })
+        .then(() => {
+          this.setData({
+            beforeFileIds: [],
+            afterFileIds: [],
+            beforeMedia: [],
+            afterMedia: [],
+            beforeMediaHint: "",
+            afterMediaHint: "",
+          });
+          wx.showToast({ title: "照片已补传", icon: "success" });
           return this.reload();
         })
     ).catch(() => {});

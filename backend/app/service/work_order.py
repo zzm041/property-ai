@@ -1102,6 +1102,44 @@ class WorkOrderService:
             )
         )
 
+    def append_receipt_media(
+        self,
+        *,
+        actor: Principal,
+        work_order_id: int,
+        receipt_id: int,
+        request_id: str,
+        before_file_ids: tuple[int, ...] = (),
+        after_file_ids: tuple[int, ...] = (),
+        version: int | None = None,
+    ) -> WorkOrder:
+        self._validate_request_id(request_id)
+        normalized_before_ids = tuple(dict.fromkeys(before_file_ids))
+        normalized_after_ids = tuple(dict.fromkeys(after_file_ids))
+        if not normalized_before_ids and not normalized_after_ids:
+            raise AppError(
+                code=WorkOrderErrorCode.CONTENT_REQUIRED,
+                message="Receipt media is required",
+                status_code=422,
+            )
+        if set(normalized_before_ids).intersection(normalized_after_ids):
+            raise AppError(
+                code=WorkOrderErrorCode.INVALID_INPUT,
+                message="Receipt media cannot be both before and after",
+                status_code=422,
+            )
+        return self._execute(
+            lambda: self._append_receipt_media(
+                actor=actor,
+                work_order_id=work_order_id,
+                receipt_id=receipt_id,
+                request_id=request_id,
+                before_file_ids=normalized_before_ids,
+                after_file_ids=normalized_after_ids,
+                version=version,
+            )
+        )
+
     def escalate(
         self,
         *,
@@ -2518,6 +2556,89 @@ class WorkOrderService:
                 title="工单异常待处理",
                 body="工单未解决并已上报，请查看详情",
             )
+        return record
+
+    def _append_receipt_media(
+        self,
+        *,
+        actor: Principal,
+        work_order_id: int,
+        receipt_id: int,
+        request_id: str,
+        before_file_ids: tuple[int, ...],
+        after_file_ids: tuple[int, ...],
+        version: int | None,
+    ) -> WorkOrder:
+        current, record, _assignment, _employee = self._lock_assignee_action(
+            actor, work_order_id, version, takeover=False
+        )
+        RbacService.require_permission(
+            current,
+            WORK_ORDER_RESOLVE,
+            self._property_scope(record),
+        )
+        if record.status != WorkOrderStatus.WAIT_CONFIRM.value:
+            raise AppError(
+                code=WorkOrderErrorCode.INVALID_TRANSITION,
+                message="Receipt media can only be supplemented while awaiting confirmation",
+                status_code=409,
+            )
+        process = self._repository.get_current_process(record.id)
+        receipt = (
+            None
+            if process is None
+            else self._repository.get_receipt_for_process(process.id)
+        )
+        if receipt is None or receipt.id != receipt_id:
+            raise AppError(
+                code=WorkOrderErrorCode.INVALID_TRANSITION,
+                message="Receipt is not current for this processing cycle",
+                status_code=409,
+            )
+        self._attach_media(
+            record,
+            actor=current,
+            file_ids=before_file_ids,
+            taken_phase=MediaTakenPhase.BEFORE,
+            process_id=process.id,
+            receipt_id=receipt.id,
+        )
+        self._attach_media(
+            record,
+            actor=current,
+            file_ids=after_file_ids,
+            taken_phase=MediaTakenPhase.AFTER,
+            process_id=process.id,
+            receipt_id=receipt.id,
+        )
+        record.version += 1
+        self._write_log(
+            record,
+            actor=current,
+            actor_type=WorkOrderActorType.STAFF,
+            from_status=WorkOrderStatus.WAIT_CONFIRM,
+            to_status=WorkOrderStatus.WAIT_CONFIRM,
+            event=WorkOrderEvent.RECEIPT_MEDIA_APPENDED,
+            request_id=request_id,
+            reason_code="RECEIPT_MEDIA_APPENDED",
+        )
+        self._append_audit(
+            action=AuditAction.WORK_ORDER_RECEIPT_MEDIA_APPENDED,
+            resource_type=AuditResourceType.WORK_ORDER,
+            actor_user_id=current.user_id,
+            resource_id=record.id,
+            request_id=request_id,
+            tenant_id=record.tenant_id,
+            property_id=record.property_id,
+            details={
+                "work_order_id": record.id,
+                "receipt_id": receipt.id,
+                "process_id": process.id,
+                "before_count": len(before_file_ids),
+                "after_count": len(after_file_ids),
+            },
+        )
+        self._session.flush()
         return record
 
     def _escalate(

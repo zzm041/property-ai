@@ -141,6 +141,22 @@ class StaffReceiptRequest(BaseModel):
         return self
 
 
+class StaffReceiptMediaRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    before_file_ids: tuple[int, ...] = ()
+    after_file_ids: tuple[int, ...] = ()
+    version: int | None = Field(default=None, ge=1)
+
+    @model_validator(mode="after")
+    def validate_media(self) -> Self:
+        if not self.before_file_ids and not self.after_file_ids:
+            raise ValueError("at least one receipt media file is required")
+        if set(self.before_file_ids).intersection(self.after_file_ids):
+            raise ValueError("receipt media cannot be both before and after")
+        return self
+
+
 class StaffEscalateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 

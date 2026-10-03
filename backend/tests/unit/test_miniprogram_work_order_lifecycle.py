@@ -105,6 +105,26 @@ def test_staff_page_submits_complete_receipt_and_versions_mutations() -> None:
     assert "afterMedia: []" in source
 
 
+def test_staff_page_can_supplement_missing_media_for_submitted_receipt() -> None:
+    """Removing the post-receipt native supplement UI must make this fail."""
+
+    source = (
+        REPO_ROOT / "miniprogram/pages/staff-orders/detail.js"
+    ).read_text(encoding="utf-8")
+    template = (
+        REPO_ROOT / "miniprogram/pages/staff-orders/detail.wxml"
+    ).read_text(encoding="utf-8")
+    api = (REPO_ROOT / "miniprogram/services/api.js").read_text(encoding="utf-8")
+
+    assert "canSupplementReceiptMedia" in source
+    assert "supplementReceiptMedia" in source
+    assert "before_file_ids: this.data.beforeFileIds" in source
+    assert "after_file_ids: this.data.afterFileIds" in source
+    assert "补传本周期处理照片" in template
+    assert "补传照片" in template
+    assert "/media`" in api
+
+
 def test_resident_page_shows_receipt_and_versions_confirmation() -> None:
     source = (
         REPO_ROOT / "miniprogram/pages/work-orders/detail.js"
