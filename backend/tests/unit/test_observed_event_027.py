@@ -466,6 +466,12 @@ def test_frequency_clause_carries_the_unique_immediately_prior_subject():
     assert trace["effective_observations"][0]["subject"] == "排水接头"
 
 
+def test_kitchen_sink_location_supports_drain_connection_for_current_leak():
+    text = "厨房水槽下方持续滴水，地柜内有明显水渍，请安排普通维修处理。"
+    _, trace = bind(payload(text, subject="排水接头"), report=text)
+    assert trace["effective_observations"][0]["subject"] == "排水接头"
+
+
 def test_valve_operating_resistance_does_not_support_invented_looseness():
     text = "卫生间阀门开关费力且有少量渗水。"
     value = payload(text, label="松动", subject="阀门管道")
