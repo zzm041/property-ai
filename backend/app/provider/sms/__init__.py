@@ -13,7 +13,9 @@ class SmsProvider:
     delivery_channel: str
     provider_mode: str
 
-    def send(self, *, phone_e164: str, purpose: str, code: str) -> SmsSendResult:
+    def send(
+        self, *, phone_e164: str, purpose: str, code: str, request_id: str = ""
+    ) -> SmsSendResult:
         raise NotImplementedError
 
 
@@ -26,7 +28,10 @@ class DevelopmentSmsProvider(SmsProvider):
     def __init__(self) -> None:
         self.captured: list[dict[str, str]] = []
 
-    def send(self, *, phone_e164: str, purpose: str, code: str) -> SmsSendResult:
+    def send(
+        self, *, phone_e164: str, purpose: str, code: str, request_id: str = ""
+    ) -> SmsSendResult:
+        del request_id
         self.captured.append(
             {"phone_e164": phone_e164, "purpose": purpose, "code": code}
         )

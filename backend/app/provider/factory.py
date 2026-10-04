@@ -161,7 +161,25 @@ def build_reranker_provider(settings: Settings) -> RerankerProvider:
 def build_sms_provider(settings: Settings) -> SmsProvider:
     if settings.sms_provider == "development":
         return development_sms_inbox()
-    raise RuntimeError("Production SMS provider is not implemented")
+    if settings.app_env != "staging":
+        raise RuntimeError("Real SMS is limited to the approved staging run")
+    from redis import Redis
+
+    from app.provider.sms.aliyun import AliyunSmsProvider
+    from app.provider.sms.budget import RedisSmsBudget
+
+    budget = RedisSmsBudget(
+        client=Redis.from_url(
+            settings.redis_url,
+            decode_responses=True,
+            socket_connect_timeout=2,
+            socket_timeout=2,
+            retry_on_timeout=False,
+        ),
+        allowed_phone_e164=settings.sms_live_allowed_phone_e164.get_secret_value(),
+        app_secret=settings.app_secret_key.get_secret_value(),
+    )
+    return AliyunSmsProvider(settings=settings, budget=budget)
 
 
 def build_wechat_auth_provider(settings: Settings) -> WeChatAuthProvider:

@@ -22,7 +22,7 @@
 | `RABBITMQ_PASSWORD` | RabbitMQ 持久用户、`CELERY_BROKER_URL`、API/worker/publisher/beat；须实际改用户密码。 |
 | `MINIO_ROOT_PASSWORD` | MinIO root、Milvus MinIO 连接、应用的 `STORAGE_SECRET_KEY`；`STORAGE_ACCESS_KEY` 与 `MINIO_ROOT_USER` 当前为同一非空身份。须成组更新并核对原桶可读写。 |
 
-`DATABASE_URL`、`REDIS_URL`、`CELERY_BROKER_URL`、`STORAGE_ACCESS_KEY` 与 `STORAGE_SECRET_KEY` 是上述服务凭据在消费者侧的有效副本，不应单独只改文件值。阿里云 SMS 凭据目前为空，尚未在容器生效；本轮短信变量不在此次旧值轮换范围。其他非空键为环境模式、端口、模型地址或功能参数，不按凭据处理。
+`DATABASE_URL`、`REDIS_URL`、`CELERY_BROKER_URL`、`STORAGE_ACCESS_KEY` 与 `STORAGE_SECRET_KEY` 是上述服务凭据在消费者侧的有效副本，不应单独只改文件值。首次核查时阿里云 SMS 凭据为空且尚未在容器生效；此后本机填写状态可能变化，须在启用前重新按键名核对，不能将新填值写入报告或日志。其他非空键为环境模式、端口、模型地址或功能参数，不按凭据处理。
 
 轮换顺序：先准备未写入日志/证据的新本地凭据和连接串；再在各持久服务中变更账号或认证配置；随后原子更新忽略文件中的服务端与消费者字段、受控重启 8093、验证健康及授权访问。不得清库、丢弃卷或只改 `.env.delivery`。轮换前保持手机入口关闭；发生任一步失败时停止实发并按同一成组配置回滚或修复。
 

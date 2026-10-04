@@ -234,9 +234,9 @@ def test_expired_challenge_does_not_send_sms(
     assert _error(rejected) == "AUTH.CHALLENGE_INVALID"
 
 
-def test_sms_login_otp_reuse_and_password_reset_session_revoke(
+def run_full_sms_auth_flow(
     isolated_client: TestClient,
-) -> None:
+) -> tuple[str, dict]:
     phone = _phone()
     challenge_id, answer = _issue(isolated_client, phone, "login")
     sent = _send(isolated_client, phone, "login", challenge_id, answer)
@@ -361,6 +361,67 @@ def test_sms_login_otp_reuse_and_password_reset_session_revoke(
     )
     assert stale.status_code == 401
     assert _error(stale) == "AUTH.INVALID_PASSWORD"
+
+    # This is a separate forgotten-password action after the first password
+    # has been used, not a re-labeling of the initial-password setup.
+    active = password_login.json()["data"]
+    assert active["user_id"] == tokens["user_id"]
+    forgot_id, forgot_answer = _issue(isolated_client, phone, "reset")
+    forgot_send = _send(isolated_client, phone, "reset", forgot_id, forgot_answer)
+    assert forgot_send.status_code == 200, forgot_send.text
+    forgot_code = _inbox(isolated_client, phone, "reset")
+    forgot_verify = isolated_client.post(
+        "/api/v1/auth/password/reset/verify",
+        json={"phone": phone, "code": forgot_code},
+        headers={"X-Request-Id": "forgot-verify"},
+    )
+    assert forgot_verify.status_code == 200, forgot_verify.text
+    forgot_ticket = forgot_verify.json()["data"]["reset_token"]
+    forgot_confirm = isolated_client.post(
+        "/api/v1/auth/password/reset/confirm",
+        json={
+            "reset_token": forgot_ticket,
+            "new_password": "NewPass2Strong",
+            "confirm_password": "NewPass2Strong",
+        },
+        headers={"X-Request-Id": "forgot-confirm"},
+    )
+    assert forgot_confirm.status_code == 200, forgot_confirm.text
+    old_password = isolated_client.post(
+        "/api/v1/auth/password/login",
+        json={"phone": phone, "password": "GoodPass1"},
+        headers={"X-Request-Id": "forgot-old-password"},
+    )
+    assert old_password.status_code == 401
+    assert _error(old_password) == "AUTH.INVALID_PASSWORD"
+    old_session = isolated_client.get(
+        "/api/v1/me",
+        headers={
+            "Authorization": f"Bearer {active['access_token']}",
+            "X-Request-Id": "forgot-old-access",
+        },
+    )
+    assert old_session.status_code == 401
+    old_refresh_after_forgot = isolated_client.post(
+        "/api/v1/auth/token/refresh",
+        json={"refresh_token": active["refresh_token"]},
+        headers={"X-Request-Id": "forgot-old-refresh"},
+    )
+    assert old_refresh_after_forgot.status_code == 401
+    new_login = isolated_client.post(
+        "/api/v1/auth/password/login",
+        json={"phone": phone, "password": "NewPass2Strong"},
+        headers={"X-Request-Id": "forgot-new-password"},
+    )
+    assert new_login.status_code == 200, new_login.text
+    assert new_login.json()["data"]["user_id"] == tokens["user_id"]
+    return phone, new_login.json()["data"]
+
+
+def test_sms_login_otp_reuse_and_password_reset_session_revoke(
+    isolated_client: TestClient,
+) -> None:
+    run_full_sms_auth_flow(isolated_client)
 
 
 def test_expired_otp_is_rejected(

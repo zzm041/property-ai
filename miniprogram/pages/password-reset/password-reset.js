@@ -64,7 +64,7 @@ Page({
         });
         return;
       }
-      await api.sendSms(
+      const result = await api.sendSms(
         this.data.phone,
         "reset",
         this.data.challengeId,
@@ -74,7 +74,9 @@ Page({
         challengeId: "",
         challengePrompt: "",
         challengeAnswer: "",
-        error: "验证码已发送（开发短信替身不是真实短信验收）",
+        error: result && result.delivery_channel === "development"
+          ? "开发短信验证码已生成，请按当前可用方式获取。"
+          : "短信发送请求已受理，请查收验证码；未收到请勿反复提交。",
       });
     }).catch(() => {});
   },
@@ -104,6 +106,7 @@ Page({
         this.data.newPassword,
         this.data.confirmPassword
       );
+      require("../../services/auth").clearSession();
       wx.showToast({ title: "请重新登录" });
       wx.redirectTo({ url: "/pages/login/login" });
     }).catch(() => {});

@@ -127,8 +127,8 @@ Page({
         challengeAnswer: "",
         error:
           data && data.delivery_channel === "development"
-            ? "验证码已生成，请按当前可用方式获取。"
-            : "验证码已发送",
+            ? "开发短信验证码已生成，请按当前可用方式获取。"
+            : "短信发送请求已受理，请查收验证码；未收到请勿反复提交。",
       });
       this.startCooldown(data && data.expires_in ? Math.min(60, data.expires_in) : 60);
     }).catch(() => {});

@@ -13,6 +13,7 @@
   <input placeholder="确认新密码" value="{{confirmPassword}}" data-field="confirmPassword" bindinput="onPasswordField" password="{{!showPassword}}" />
   <view class="empty">强度：{{passwordStrength}}（至少 8 个字符，不强制大写；不能是纯数字或纯小写字母）</view>
   <button class="btn" bindtap="changePassword" disabled="{{loading}}">确认修改密码</button>
+  <button class="link" bindtap="goPasswordSetup">首次设置密码或忘记密码？使用手机号验证</button>
   <view class="empty" wx:if="{{passwordNotice}}">{{passwordNotice}}</view>
 </view>
 <view class="card">

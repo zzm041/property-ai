@@ -1,6 +1,7 @@
 """Environment-backed application configuration."""
 
 from functools import lru_cache
+import re
 from typing import Literal
 from urllib.parse import urlsplit
 
@@ -36,6 +37,14 @@ class Settings(BaseSettings):
     sms_otp_max_attempts: int = Field(default=5, ge=1, le=10)
     sms_send_limit_per_hour: int = Field(default=5, ge=1, le=20)
     sms_login_limit_per_hour: int = Field(default=10, ge=1, le=30)
+    sms_aliyun_access_key_id: SecretStr = SecretStr("")
+    sms_aliyun_access_key_secret: SecretStr = SecretStr("")
+    sms_aliyun_sign_name: str = ""
+    sms_aliyun_template_code: str = ""
+    sms_aliyun_password_reset_template_code: str = ""
+    sms_aliyun_phone_change_template_code: str = ""
+    sms_live_allowed_phone_e164: SecretStr = SecretStr("")
+    sms_aliyun_timeout_seconds: float = Field(default=5.0, ge=1.0, le=15.0)
     dev_seed_lock_timeout_seconds: int = Field(default=5, ge=0, le=30)
     identity_test_proof_enabled: bool = False
     identity_test_proof_secret: SecretStr = SecretStr("")
@@ -213,6 +222,22 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_security_configuration(self) -> "Settings":
+        if self.sms_provider == "production":
+            required = (
+                self.sms_aliyun_access_key_id.get_secret_value(),
+                self.sms_aliyun_access_key_secret.get_secret_value(),
+                self.sms_aliyun_sign_name,
+                self.sms_aliyun_template_code,
+                self.sms_aliyun_password_reset_template_code,
+                self.sms_aliyun_phone_change_template_code,
+            )
+            if not all(required):
+                raise ValueError("Production SMS configuration is incomplete")
+            if self.app_env == "staging" and not re.fullmatch(
+                r"\+861[3-9]\d{9}",
+                self.sms_live_allowed_phone_e164.get_secret_value(),
+            ):
+                raise ValueError("Staging production SMS requires one allowed phone")
         if self.app_env == "production" and self.app_debug:
             raise ValueError("Production debug mode must be disabled")
         if self.dev_auth_enabled and self.app_env not in {"development", "test"}:

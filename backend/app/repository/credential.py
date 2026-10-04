@@ -142,6 +142,26 @@ class CredentialRepository:
             .with_for_update()
         )
 
+    def get_challenge_by_id_for_update(self, challenge_id: int) -> SmsChallenge | None:
+        return self._session.scalar(
+            select(SmsChallenge)
+            .where(SmsChallenge.id == challenge_id)
+            .execution_options(populate_existing=True)
+            .with_for_update()
+        )
+
+    def get_latest_challenge_for_update(
+        self, phone_e164: str, purpose: str
+    ) -> SmsChallenge | None:
+        return self._session.scalar(
+            select(SmsChallenge)
+            .where(SmsChallenge.phone_e164 == phone_e164, SmsChallenge.purpose == purpose)
+            .order_by(SmsChallenge.id.desc())
+            .limit(1)
+            .execution_options(populate_existing=True)
+            .with_for_update()
+        )
+
     def get_reset_ticket(self, token_hash: str) -> PasswordResetTicket | None:
         return self._session.scalar(
             select(PasswordResetTicket).where(PasswordResetTicket.token_hash == token_hash)

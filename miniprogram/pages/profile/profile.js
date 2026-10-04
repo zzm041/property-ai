@@ -59,6 +59,9 @@ Page({
   togglePassword() {
     this.setData({ showPassword: !this.data.showPassword });
   },
+  goPasswordSetup() {
+    wx.navigateTo({ url: "/pages/password-reset/password-reset" });
+  },
   changePassword() {
     if (this.data.loading) {
       return;
@@ -138,7 +141,7 @@ Page({
       if (!challengeAnswer) {
         throw new Error("请填写安全挑战答案");
       }
-      await api.sendSms(
+      const result = await api.sendSms(
         phone,
         "change_phone",
         challengeId,
@@ -148,7 +151,9 @@ Page({
         [`${prefix}ChallengeId`]: "",
         [`${prefix}ChallengePrompt`]: "",
         [`${prefix}ChallengeAnswer`]: "",
-        phoneNotice: `${kind === "old" ? "旧" : "新"}手机号验证码已发送`,
+        phoneNotice: result && result.delivery_channel === "development"
+          ? "开发短信验证码已生成，请按当前可用方式获取。"
+          : `${kind === "old" ? "旧" : "新"}手机号短信发送请求已受理`,
       });
     }).catch(() => {});
   },
@@ -238,7 +243,7 @@ Page({
       if (!this.data.wechatChallengeAnswer) {
         throw new Error("请填写安全挑战答案");
       }
-      await api.sendSms(
+      const result = await api.sendSms(
         this.data.wechatPhone,
         "login",
         this.data.wechatChallengeId,
@@ -248,7 +253,9 @@ Page({
         wechatChallengeId: "",
         wechatChallengePrompt: "",
         wechatChallengeAnswer: "",
-        wechatNotice: "当前手机号验证码已发送",
+        wechatNotice: result && result.delivery_channel === "development"
+          ? "开发短信验证码已生成，请按当前可用方式获取。"
+          : "当前手机号短信发送请求已受理",
       });
     }).catch(() => {});
   },

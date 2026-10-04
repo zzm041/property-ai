@@ -179,6 +179,7 @@ class CredentialAuthService:
         expires = now + timedelta(seconds=self._settings.sms_otp_ttl_seconds)
         secret = self._settings.app_secret_key.get_secret_value()
         challenge_status = {"value": "ok"}
+        pending_id: dict[str, int | None] = {"value": None}
 
         def _persist() -> None:
             challenge_status["value"] = self._consume_visual_challenge(
@@ -200,8 +201,10 @@ class CredentialAuthService:
                 expires_at=expires,
                 attempts=0,
                 max_attempts=self._settings.sms_otp_max_attempts,
+                consumed_at=now,
             )
             self._repository.add_challenge(challenge)
+            pending_id["value"] = challenge.id
 
         try:
             run_owned_transaction(self._session, _persist)
@@ -213,13 +216,49 @@ class CredentialAuthService:
             ) from exc
         self._raise_challenge(challenge_status["value"])
         try:
-            sent = self._sms.send(phone_e164=phone_e164, purpose=purpose, code=code)
+            sent = self._sms.send(
+                phone_e164=phone_e164, purpose=purpose, code=code, request_id=request_id
+            )
         except Exception as exc:
             raise AppError(
                 code=AuthErrorCode.SMS_PROVIDER_DOWN,
                 message="SMS provider is unavailable",
                 status_code=503,
             ) from exc
+
+        activation = {"value": False}
+
+        def _activate() -> None:
+            challenge_id = pending_id["value"]
+            if challenge_id is None:
+                return
+            latest = self._repository.get_latest_challenge_for_update(phone_e164, purpose)
+            if latest is None or latest.id != challenge_id:
+                return
+            pending = self._repository.get_challenge_by_id_for_update(challenge_id)
+            if pending is None or pending.consumed_at is None or pending.expires_at <= self._clock():
+                return
+            previous = self._repository.get_open_challenge(phone_e164, purpose)
+            if previous is not None and previous.id != challenge_id:
+                previous.consumed_at = self._clock()
+                self._session.flush()
+            pending.consumed_at = None
+            activation["value"] = True
+
+        try:
+            run_owned_transaction(self._session, _activate)
+        except SQLAlchemyError as exc:
+            raise AppError(
+                code=AuthErrorCode.SMS_PROVIDER_DOWN,
+                message="SMS challenge could not be activated",
+                status_code=503,
+            ) from exc
+        if not activation["value"]:
+            raise AppError(
+                code=AuthErrorCode.SMS_PROVIDER_DOWN,
+                message="SMS challenge could not be activated",
+                status_code=503,
+            )
         return SmsSendData(
             delivery_channel=sent.delivery_channel,
             provider_mode=sent.provider_mode,

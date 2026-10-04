@@ -37,7 +37,7 @@ services:
     image: redis:7.4.2-alpine@sha256:02419de7eddf55aa5bcf49efb74e88fa8d931b4d77c07eff8a6b2144472b6952
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD:?set REDIS_PASSWORD}
-    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD:?set REDIS_PASSWORD}"]
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "always", "--requirepass", "${REDIS_PASSWORD:?set REDIS_PASSWORD}"]
     ports:
       - "127.0.0.1:${REDIS_HOST_PORT:-6392}:6379"
     volumes:

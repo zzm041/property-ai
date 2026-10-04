@@ -37,20 +37,20 @@
 
 - [x] Run a read-only Docker bind-mount probe against `deploy/.env.delivery` using the effective root `build.context`; observe that the old rules allowed access.
 - [x] Add `deploy/.env.delivery` and `deploy/.env.delivery.*` to the root `.dockerignore`; verify there is no `deploy/Dockerfile.dockerignore` and rerun the probe until the target is `not found`.
-- [ ] Compare non-empty sensitive key names with actual Compose service environments and backing stores without outputting values; mark effective, unused, or unknown.
-- [ ] Write the minimum coherent rotation order, including each server credential and consumer URL; do not rotate a server and leave consumers on old values.
-- [ ] Verify the public report contains no secret, value, hash, full phone, or raw Compose configuration.
+- [x] Compare non-empty sensitive key names with actual Compose service environments and backing stores without outputting values; mark effective, unused, or unknown.
+- [x] Write the minimum coherent rotation order, including each server credential and consumer URL; do not rotate a server and leave consumers on old values. Rotation itself remains gated before phone-entry restore.
+- [x] Verify the public report contains no secret, value, hash, full phone, or raw Compose configuration.
 
 ### Task 2: Persistent pre-send budget
 
 **Files:** Create `backend/app/provider/sms/budget.py`, `backend/app/cli/arm_sms_budget.py`, `backend/tests/unit/test_sms_budget.py`; modify `backend/app/core/config.py`, `deploy/.env.delivery.example`, `deploy/docker-compose.delivery.yml`.
 
-**Interfaces:** Produces `RedisSmsBudget.reserve(phone_e164: str, request_id: str) -> None`, `RedisSmsBudget.pause() -> None`, and fail-closed staging configuration; Task 3 consumes them.
+**Interfaces:** Produces `RedisSmsBudget.reserve(phone_e164: str, request_id: str) -> None`, `RedisSmsBudget.finish(request_id: str) -> None`, and fail-closed staging configuration; Task 3 consumes them.
 
-- [ ] Write tests for atomic concurrent reservations, allowed phone, four-attempt/300-milli-CNY cap at 75 milli-CNY per attempt, failures remaining charged, missing/malformed key, Redis outage, restart persistence, and paused state. Run tests and see the expected failures.
-- [ ] Implement a non-expiring fixed run-key Redis Lua reservation. The key is initialized once by the guarded CLI only after live approval and never silently recreated by the request path. Set the delivery Redis AOF to `appendfsync always` before arming.
-- [ ] Make `SMS_LIVE_ALLOWED_PHONE_E164` mandatory in staging production SMS mode; require exact normalization and never emit the number in logs/errors.
-- [ ] Run the task tests and confirm the budget cannot reset through process restart, concurrent callers, or a new subtask.
+- [x] Write tests for atomic concurrent reservations with one in-flight call, allowed phone, four-attempt/300-milli-CNY cap at 75 milli-CNY per attempt, failure/timeout remaining charged, missing/malformed key, Redis outage, restart persistence, mismatched finish and paused/in-flight state. Run tests and see the expected failures.
+- [x] Implement a non-expiring fixed run-key Redis Lua reservation. The key is initialized once by the guarded CLI only after live approval and never silently recreated by the request path. Set the delivery Redis AOF to `appendfsync always` before arming; verify `appendonly=yes` as well.
+- [x] Make `SMS_LIVE_ALLOWED_PHONE_E164` mandatory in staging production SMS mode; require exact normalization and never emit the number in logs/errors.
+- [x] Run the task tests and confirm the budget cannot reset through process restart, concurrent callers, or a new subtask. An isolated 6382 restart probe retained the count.
 
 ### Task 3: PNVS provider and frozen dependencies
 
@@ -58,10 +58,10 @@
 
 **Interfaces:** Produces `AliyunSmsProvider.send(phone_e164: str, purpose: str, code: str, request_id: str) -> SmsSendResult`; Task 4 uses the extended provider contract.
 
-- [ ] Inspect exact SDK 2.0.0 metadata and transitive requirements. Pin only necessary new distributions; verify existing frozen versions remain unchanged.
-- [ ] Write failing tests for three purpose/template mappings, 86 number conversion, JSON `code`/`min`, 300-second TTL, `AutoRetry=0`, SDK retry disabled, finite timeout, response rejection, timeout/unknown pause, no fallback, and no secret leakage.
-- [ ] Implement provider with one SDK call and the Task 2 pre-send budget. The API result must indicate acceptance, not final handset delivery.
-- [ ] Run targeted provider/config tests and inspect the dependency diff for unrelated upgrades.
+- [x] Inspect exact SDK 2.0.0 metadata and transitive requirements. Pin only necessary new distributions; verify existing frozen versions remain unchanged.
+- [x] Write failing tests for three purpose/template mappings, 86 number conversion, JSON `code`/`min`, 300-second TTL, `AutoRetry=0`, SDK retry disabled, finite timeout, response rejection, timeout/unknown pause, no fallback, and no secret leakage.
+- [x] Implement provider with one SDK call and the Task 2 pre-send budget. The API result indicates acceptance, not final handset delivery.
+- [x] Run targeted provider/config tests, inspect the dependency diff for unrelated upgrades, and import the module inside the newly built offline image.
 
 ### Task 4: OTP pending state and precise activation
 
@@ -69,10 +69,10 @@
 
 **Interfaces:** Consumes Task 3's provider contract. Preserves public `/auth/sms/send` and `/auth/sms/login` APIs.
 
-- [ ] Write failing tests proving pending OTP cannot be consumed before accepted send, on business rejection, timeout, failed activation/compensation, or budget refusal; prove precise ID matching and late-send concurrency.
-- [ ] Save a new OTP with non-null `consumed_at`. On accepted send, lock its exact ID and activate only if it remains latest for the phone/purpose and has not expired; otherwise return a stable failure.
-- [ ] Ensure no `except` path can re-open or consume a failed/uncertain OTP and all provider failures map to `AUTH.SMS_PROVIDER_DOWN` without Development fallback.
-- [ ] Run auth unit and focused integration tests, including explicit failure paths.
+- [x] Write failing tests proving pending OTP cannot be consumed before accepted send, on business rejection, timeout, failed activation/compensation, or budget refusal; prove precise ID matching and late-send concurrency.
+- [x] Save a new OTP with non-null `consumed_at`. On accepted send, lock its exact ID and activate only if it remains latest for the phone/purpose and has not expired; otherwise return a stable failure.
+- [x] Ensure no `except` path can re-open or consume a failed/uncertain OTP and all provider failures map to `AUTH.SMS_PROVIDER_DOWN` without Development fallback.
+- [x] Run auth unit and focused 3317 MySQL integration tests, including concurrent late return and flushed activation SQL followed by rollback.
 
 ### Task 5: Normal mini-program flows
 
@@ -80,8 +80,8 @@
 
 **Interfaces:** Consumes existing API `SmsSendData.provider_mode`; produces honest production/development notices without exposing OTP.
 
-- [ ] Write failing page tests for production acceptance wording, Development substitute wording, countdown only after API success, and reset flow remaining reachable after login.
-- [ ] Make the smallest page changes and run the focused page tests.
+- [x] Write failing page tests for production acceptance wording, Development substitute wording, countdown only after API success, and reset flow remaining reachable after login.
+- [x] Make the smallest page changes and run the focused page tests, including a visible first-password route and local-session clearing after reset.
 - [ ] Verify actual page navigation and error state without sending a real SMS.
 
 ### Task 6: Offline full-flow and incremental review
@@ -90,10 +90,10 @@
 
 **Interfaces:** Produces offline acceptance bundle for separate read-only reviewer.
 
-- [ ] Write and run the failing full-flow test: unseeded phone → SMS login/user creation → initial password → logout/password login → separate forgot-password SMS → same user/new password/old password and required old sessions rejected → bind request/review/legal resident access.
-- [ ] Run complete relevant backend/unit/integration and mini-program tests; record exact commands and failures.
-- [ ] Inspect diff and runtime configuration for secret, AI, migration, 0015 and WO20 spillover.
-- [ ] Dispatch a separate read-only Codex session to review spec coverage, security, implementation, UI, environment, evidence, and severity; fix verified issues and rerun affected tests.
+- [x] Write and run the full-flow test: unseeded phone → SMS login/user creation → initial password → password login → separate forgot-password SMS → same user/new password/old password and required old sessions rejected → bind request/review/legal resident access. The 3317 reviewer is a test-only synthetic actor.
+- [x] Run relevant backend/unit/integration and mini-program tests; record exact commands and failures in the scoped evidence.
+- [x] Inspect diff and runtime configuration for secret, AI, migration, 0015 and WO20 spillover.
+- [x] Dispatch a separate read-only Codex session to review spec coverage, security, implementation, UI, environment, evidence, and severity; fix verified issues and rerun affected tests. Review does not replace actual page acceptance.
 
 ### Task 7: Controlled 8093 staging and real acceptance
 
