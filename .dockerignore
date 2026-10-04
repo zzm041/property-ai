@@ -2,6 +2,8 @@
 .venv
 .env
 .env.*
+deploy/.env.delivery
+deploy/.env.delivery.*
 !.env.example
 **/*.pem
 **/*.key
