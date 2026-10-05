@@ -38,13 +38,37 @@ vm.runInNewContext(fs.readFileSync(path.join(root, manager ? 'miniprogram/pages/
 page.setData = value => Object.assign(page.data,value);
 async function main() {
   if (manager) {
+    if(scenario==='manager-details') {
+      api.bindRequests = () => Promise.resolve({items:[{
+        id:9, user_id:42, status:'PENDING', relation_type:'FAMILY',
+        applicant_display_name:'Resident A', property_name:'T4 Property 1',
+        building_name:'Building 1', unit_name:'Unit 1', room_no:'101',
+      }], next_cursor:null});
+      await page.loadItems();
+      assert.equal(page.data.items[0].reviewReady,true);
+      assert.equal(page.data.items[0].applicantLabel,'Resident A（账号 #42）');
+      assert.equal(page.data.items[0].houseLabel,'T4 Property 1 · Building 1 · Unit 1 · 101');
+      return;
+    }
     const pending = deferred(), reload = deferred();
-    page.setData({items:[{id:9,status:'PENDING'}]});
+    page.setData({items:[{id:9,status:'PENDING',reviewReady:true}]});
     api.rejectBindRequest = (id,reason) => {calls.push({id,reason});return pending.promise;};
     api.approveBindRequest = id => {calls.push({id});return pending.promise;};
     api.bindRequests = () => reload.promise;
     const e = {currentTarget:{dataset:{id:9}}};
-    if(scenario==='manager-reason') {
+    if(scenario==='manager-incomplete') {
+      api.bindRequests = () => Promise.resolve({items:[{
+        id:9, user_id:42, status:'PENDING', relation_type:'FAMILY',
+        applicant_display_name:'Resident A', property_name:'T4 Property 1',
+        building_name:'Building 1', unit_name:'Unit 1', room_no:'',
+      }], next_cursor:null});
+      await page.loadItems();
+      assert.equal(page.data.items[0].reviewReady,false);
+      page.approve({currentTarget:{dataset:{id:9}}});
+      await tick();
+      assert.equal(calls.length,0);
+      assert.match(page.data.error,/资料不完整/);
+    } else if(scenario==='manager-reason') {
       page.reject(e); assert.equal(calls.length,0);
       page.onRejectReason(event(' '.repeat(2))); page.reject(e); assert.equal(calls.length,0);
       page.onRejectReason(event('x'.repeat(501)));page.reject(e);assert.equal(calls.length,0);
@@ -117,7 +141,8 @@ main().then(()=>console.log('handler simulation PASS')).catch(e=>{console.error(
 @pytest.mark.parametrize("scenario", [
     "relation:0", "relation:1", "relation:2", "relation:3", "history", "invalid",
     "submit-guard", "race:property", "race:building", "race:unit", "stale-error",
-    "empty-error-unload", "pagination", "manager-reason", "manager-conflict",
+    "empty-error-unload", "pagination", "manager-details", "manager-incomplete",
+    "manager-reason", "manager-conflict",
 ])
 def test_binding_page_handlers(scenario):
     result = subprocess.run(["node", "-e", SCRIPT, str(ROOT), scenario], capture_output=True, text=True, timeout=15)

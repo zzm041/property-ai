@@ -105,4 +105,5 @@
 - [ ] Arm the one-time budget, then switch only `SMS_PROVIDER`, rebuild/recreate the approved 8093 application services, and verify image digest, configuration, `/readyz`, and absence of Development fallback.
 - [ ] After explicit phone-ready confirmation, perform at most three normal sends; a fourth is contingency only. Stop further sends on unknown result while continuing read-only diagnosis.
 - [ ] Inspect page interaction, API results, one `user_id`, password/session invalidation, house application/review/access, read-only DB, masked screenshots, budget ledger and actual operator billing.
+- [ ] Close the discovered blind-review gap with property-scoped, read-only applicant/house details and fail-closed page controls; run the resident-binding permission, history, concurrency and audit regressions, then verify the normal admin page before any approval.
 - [ ] Close the limited phone entry and report exact attempt count, cost, unknowns, binding, evidence and independent-review scope. Do not declare Production release acceptance.

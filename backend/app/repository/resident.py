@@ -1,13 +1,23 @@
 """Scoped persistence for resident bind requests and house relations."""
 
+from dataclasses import dataclass
 from datetime import datetime
 
-from sqlalchemy import or_, select
+from sqlalchemy import and_, or_, select
 from sqlalchemy.orm import Session
 
-from app.model.property import House
 from app.model.identity import User
+from app.model.property import Building, House, Property, Unit
 from app.model.resident import ResidentBindRequest, ResidentHouseRelation
+
+
+@dataclass(frozen=True)
+class ResidentBindReviewDetails:
+    applicant_display_name: str
+    property_name: str
+    building_name: str
+    unit_name: str
+    room_no: str
 
 
 class ResidentBindingRepository:
@@ -277,6 +287,80 @@ class ResidentBindingRepository:
             statement.order_by(ResidentHouseRelation.id).limit(limit)
         ).all()
         return tuple((relation, house, user) for relation, house, user in rows)
+
+    def get_review_details_for_requests(
+        self,
+        *,
+        tenant_id: int,
+        property_id: int,
+        request_ids: tuple[int, ...],
+    ) -> dict[int, ResidentBindReviewDetails]:
+        if not request_ids:
+            return {}
+        rows = self._session.execute(
+            select(
+                ResidentBindRequest.id,
+                User.display_name,
+                Property.name,
+                Building.name,
+                Unit.name,
+                House.room_no,
+            )
+            .join(User, User.id == ResidentBindRequest.user_id)
+            .join(
+                House,
+                and_(
+                    House.id == ResidentBindRequest.house_id,
+                    House.tenant_id == ResidentBindRequest.tenant_id,
+                    House.property_id == ResidentBindRequest.property_id,
+                ),
+            )
+            .join(
+                Unit,
+                and_(
+                    Unit.id == House.unit_id,
+                    Unit.tenant_id == House.tenant_id,
+                    Unit.property_id == House.property_id,
+                ),
+            )
+            .join(
+                Building,
+                and_(
+                    Building.id == Unit.building_id,
+                    Building.tenant_id == Unit.tenant_id,
+                    Building.property_id == Unit.property_id,
+                ),
+            )
+            .join(
+                Property,
+                and_(
+                    Property.id == House.property_id,
+                    Property.tenant_id == House.tenant_id,
+                ),
+            )
+            .where(
+                ResidentBindRequest.tenant_id == tenant_id,
+                ResidentBindRequest.property_id == property_id,
+                ResidentBindRequest.id.in_(request_ids),
+            )
+        ).all()
+        return {
+            request_id: ResidentBindReviewDetails(
+                applicant_display_name=applicant_display_name,
+                property_name=property_name,
+                building_name=building_name,
+                unit_name=unit_name,
+                room_no=room_no,
+            )
+            for (
+                request_id,
+                applicant_display_name,
+                property_name,
+                building_name,
+                unit_name,
+                room_no,
+            ) in rows
+        }
 
     def add_bind_request(
         self,

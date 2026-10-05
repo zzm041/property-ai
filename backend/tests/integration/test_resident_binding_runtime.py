@@ -16,7 +16,7 @@ from app.core.errors import AppError, IamErrorCode, ResidentErrorCode
 from app.core.time import utc_now
 from app.domain.resident import ResidentRelationStatus
 from app.main import create_app
-from app.model.identity import AuditLog, Role, RolePermission, User, UserRole
+from app.model.identity import AuditLog, Permission, Role, RolePermission, User, UserRole
 from app.model.resident import ResidentBindRequest, ResidentHouseRelation
 from app.service.auth import AuthService
 from app.repository.identity import IdentityRepository
@@ -237,6 +237,14 @@ def test_approve_creates_relation_and_audit(identity_session: Session) -> None:
 
     assert pending.status_code == 200
     assert len(pending.json()["data"]["items"]) == 1
+    review_item = pending.json()["data"]["items"][0]
+    assert review_item["id"] == request_id
+    assert review_item["user_id"] == graph.resident_a_id
+    assert review_item["applicant_display_name"] == "Resident A"
+    assert review_item["property_name"] == "T4 Property 1"
+    assert review_item["building_name"] == "Building 1"
+    assert review_item["unit_name"] == "Unit 1"
+    assert review_item["room_no"] == "101"
     assert approved.status_code == 200
     assert approved.json()["data"]["status"] == "APPROVED"
     assert approved.json()["data"]["reviewer_id"] == graph.reviewer_p1_id
@@ -252,6 +260,53 @@ def test_approve_creates_relation_and_audit(identity_session: Session) -> None:
     assert len(approve_audits) == 1
     assert approve_audits[0].action == "RESIDENT_BIND_REQUEST_APPROVED"
     assert "reason" not in json.dumps(approve_audits[0].details_json)
+
+
+def test_admin_relation_history_still_lists_scoped_approved_house(
+    identity_session: Session,
+) -> None:
+    graph = create_resident_binding_graph(identity_session)
+    with identity_session.begin():
+        reviewer_role = identity_session.scalar(
+            select(Role).where(Role.code == "PROPERTY_ADMIN")
+        )
+        relation_read = identity_session.scalar(
+            select(Permission).where(Permission.code == "resident_relation:read")
+        )
+        identity_session.add(
+            RolePermission(
+                role_id=reviewer_role.id,
+                permission_id=relation_read.id,
+            )
+        )
+    with _client() as client:
+        resident = _token(client, graph.resident_a_id)
+        reviewer = _token(client, graph.reviewer_p1_id)
+        created = client.post(
+            "/api/v1/resident-bind-requests",
+            json={"house_id": graph.house_1_id, "relation_type": "FAMILY"},
+            headers=_auth(resident),
+        )
+        request_id = created.json()["data"]["id"]
+        approved = client.post(
+            f"/api/v1/admin/resident-bind-requests/{request_id}/approve",
+            headers=_auth(reviewer),
+        )
+        history = client.get(
+            "/api/v1/admin/resident-house-relations",
+            params={
+                "tenant_id": graph.tenant_1_id,
+                "property_id": graph.property_1_id,
+                "house_id": graph.house_1_id,
+                "user_id": graph.resident_a_id,
+            },
+            headers=_auth(reviewer),
+        )
+
+    assert approved.status_code == 200
+    assert history.status_code == 200
+    assert len(history.json()["data"]["items"]) == 1
+    assert history.json()["data"]["items"][0]["house_id"] == graph.house_1_id
 
 
 def test_reject_persists_reason_without_relation(

@@ -36,6 +36,14 @@ class ResidentBindRequestData(BaseModel):
     reviewed_at: datetime | None
 
 
+class ResidentBindReviewData(ResidentBindRequestData):
+    applicant_display_name: str
+    property_name: str
+    building_name: str
+    unit_name: str
+    room_no: str
+
+
 class ResidentHouseData(BaseModel):
     relation_id: int
     house_id: int
@@ -54,6 +62,11 @@ class ResidentHouseData(BaseModel):
 
 class BindRequestListData(BaseModel):
     items: list[ResidentBindRequestData]
+    next_cursor: int | None
+
+
+class BindReviewListData(BaseModel):
+    items: list[ResidentBindReviewData]
     next_cursor: int | None
 
 

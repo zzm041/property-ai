@@ -40,11 +40,19 @@ Page({
         const labels = require("../../utils/business-labels");
         const decorated = {
           ...data,
-          items: ((data && data.items) || []).map((item) => ({
-            ...item,
-            statusText: item.status === "PENDING" ? "待审核" : item.status === "APPROVED" ? "已通过" : item.status === "REJECTED" ? "已拒绝" : "状态待确认",
-            relationText: labels.relationType(item.relation_type),
-          })),
+          items: ((data && data.items) || []).map((item) => {
+            const reviewReady = Number.isSafeInteger(Number(item.user_id)) && Number(item.user_id) > 0 &&
+              [item.applicant_display_name, item.property_name, item.building_name, item.unit_name, item.room_no]
+                .every((value) => typeof value === "string" && value.trim().length > 0);
+            return {
+              ...item,
+              statusText: item.status === "PENDING" ? "待审核" : item.status === "APPROVED" ? "已通过" : item.status === "REJECTED" ? "已拒绝" : "状态待确认",
+              relationText: labels.relationType(item.relation_type),
+              reviewReady,
+              applicantLabel: reviewReady ? `${item.applicant_display_name}（账号 #${item.user_id}）` : "",
+              houseLabel: reviewReady ? [item.property_name, item.building_name, item.unit_name, item.room_no].join(" · ") : "",
+            };
+          }),
         };
         const result = require("../../utils/paging").appendPage(afterId ? this.data.items : [], decorated, afterId, 50);
         this.setData({ items: result.items, nextCursor: result.nextCursor });
@@ -67,7 +75,13 @@ Page({
     return this.review(e.currentTarget.dataset.id, true);
   },
   review(id, reject) {
-    if (this.data.loading || !this.data.items.some((item) => Number(item.id) === Number(id) && item.status === "PENDING")) return;
+    if (this.data.loading) return;
+    const item = this.data.items.find((entry) => Number(entry.id) === Number(id) && entry.status === "PENDING");
+    if (!item) return;
+    if (!item.reviewReady) {
+      this.setData({ error: "审核资料不完整，暂不能操作" });
+      return;
+    }
     const reason = this.data.rejectReason.trim();
     if (reject && (!reason || reason.length > 500)) {
       this.setData({ error: "请输入1至500字的驳回原因" });

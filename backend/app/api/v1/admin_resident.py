@@ -9,10 +9,13 @@ from app.api.dependencies.auth import get_current_principal
 from app.api.dependencies.db import get_db_session
 from app.core.errors import AppError, ResidentErrorCode
 from app.domain.iam import Principal
+from app.model.resident import ResidentBindRequest
+from app.repository.resident import ResidentBindReviewDetails
 from app.schema.common import request_id_for, success_envelope
 from app.schema.resident import (
-    BindRequestListData,
+    BindReviewListData,
     RejectResidentBindRequest,
+    ResidentBindReviewData,
     ResidentBindRequestData,
 )
 from app.schema.property import (
@@ -44,6 +47,20 @@ def _request_data(record) -> ResidentBindRequestData:
         review_reason=record.review_reason,
         requested_at=record.requested_at,
         reviewed_at=record.reviewed_at,
+    )
+
+
+def _review_request_data(
+    record: ResidentBindRequest,
+    details: ResidentBindReviewDetails,
+) -> ResidentBindReviewData:
+    return ResidentBindReviewData(
+        **_request_data(record).model_dump(),
+        applicant_display_name=details.applicant_display_name,
+        property_name=details.property_name,
+        building_name=details.building_name,
+        unit_name=details.unit_name,
+        room_no=details.room_no,
     )
 
 
@@ -87,18 +104,18 @@ def list_pending_resident_bind_requests(
         property_id=property_id,
         x_property_id=x_property_id,
     )
-    records = service.list_pending_bind_requests(
+    records = service.list_pending_bind_review_items(
         actor=actor,
         tenant_id=tenant_id,
         property_id=property_id,
         after_id=after_id,
         limit=limit,
     )
-    items = [_request_data(record) for record in records]
+    items = [_review_request_data(record, details) for record, details in records]
     next_cursor = items[-1].id if len(items) == limit else None
     return success_envelope(
         request,
-        BindRequestListData(items=items, next_cursor=next_cursor).model_dump(
+        BindReviewListData(items=items, next_cursor=next_cursor).model_dump(
             mode="json"
         ),
     )

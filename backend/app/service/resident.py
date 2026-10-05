@@ -30,7 +30,10 @@ from app.model.property import House
 from app.model.resident import ResidentBindRequest, ResidentHouseRelation
 from app.repository.identity import IdentityRepository
 from app.repository.property import PropertyRepository
-from app.repository.resident import ResidentBindingRepository
+from app.repository.resident import (
+    ResidentBindReviewDetails,
+    ResidentBindingRepository,
+)
 from app.service.audit import AuditService
 from app.service.auth import AuthService
 from app.service.rbac import RbacService
@@ -143,6 +146,35 @@ class ResidentBindingService:
             after_id=max(after_id, 0),
             limit=self._page_limit(limit),
         )
+
+    def list_pending_bind_review_items(
+        self,
+        *,
+        actor: Principal,
+        tenant_id: int,
+        property_id: int,
+        after_id: int = 0,
+        limit: int = 50,
+    ) -> tuple[tuple[ResidentBindRequest, ResidentBindReviewDetails], ...]:
+        records = self.list_pending_bind_requests(
+            actor=actor,
+            tenant_id=tenant_id,
+            property_id=property_id,
+            after_id=after_id,
+            limit=limit,
+        )
+        details = self._repository.get_review_details_for_requests(
+            tenant_id=tenant_id,
+            property_id=property_id,
+            request_ids=tuple(record.id for record in records),
+        )
+        if set(details) != {record.id for record in records}:
+            raise AppError(
+                code=ResidentErrorCode.CONFLICT,
+                message="Binding review details are incomplete",
+                status_code=409,
+            )
+        return tuple((record, details[record.id]) for record in records)
 
     def approve_bind_request(
         self,
