@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>物业报修 · 在线体验</title>
+  <link rel="stylesheet" href="/assets/style.css">
+  <script src="/assets/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header"><a class="brand" href="/">物业报修</a><span id="availability" role="status">正在确认开放状态</span></header>
+  <main>
+    <section class="intro" aria-labelledby="title">
+      <p class="intro-label">从报修到派单</p>
+      <h1 id="title">描述问题，<br>让维修及时开始。</h1>
+      <p>选择一个报修场景，查看 AI 如何识别问题，再由派单规则匹配工作人员。</p>
+      <p class="boundary">本页使用合成报修场景，不安排实际维修。演示电脑和服务开启期间可体验。</p>
+    </section>
+    <div class="workspace">
+      <section class="report" aria-labelledby="report-title">
+        <h2 id="report-title">提交报修</h2>
+        <form id="access-form">
+          <label for="access-code">体验口令</label>
+          <div class="access-row"><input id="access-code" type="password" autocomplete="off" maxlength="128" required aria-describedby="access-help"><button type="submit" id="access-button" disabled>进入体验</button></div>
+          <p class="help" id="access-help">请输入演示负责人提供的口令。</p>
+        </form>
+        <form id="report-form">
+          <fieldset id="scenario-fieldset" disabled>
+            <legend>选择报修场景</legend>
+            <label class="scenario"><input type="radio" name="scenario" value="light" checked><span><strong>房间照明</strong><span>房间顶灯打开后不亮，请安排维修。</span></span></label>
+            <label class="scenario"><input type="radio" name="scenario" value="tap"><span><strong>水龙头漏水</strong><span>厨房水龙头关闭后仍持续滴水，请安排维修。</span></span></label>
+            <label class="scenario"><input type="radio" name="scenario" value="door"><span><strong>公共门故障</strong><span>单元公共门的合页松动，门关不上，请安排维修。</span></span></label>
+          </fieldset>
+          <button class="submit" type="submit" id="submit-button" disabled>提交报修并查看处理</button>
+          <p class="help">本轮仅接收一张体验工单，提交后无需重复报修。</p>
+        </form>
+        <p id="notice" class="notice" role="status" aria-live="polite"></p>
+      </section>
+      <section class="progress" aria-labelledby="progress-title" tabindex="-1" id="progress-panel">
+        <h2 id="progress-title">处理进度</h2>
+        <p id="progress-summary" role="status" aria-live="polite">提交后，在这里查看这张工单的处理进度。</p>
+        <ol class="steps">
+          <li id="step-report"><span class="step-number" aria-hidden="true">1</span><div><h3>收到报修</h3><p id="report-state">等待提交</p></div></li>
+          <li id="step-analysis"><span class="step-number" aria-hidden="true">2</span><div><h3>AI 识别问题</h3><p id="analysis-state">等待分析</p></div></li>
+          <li id="step-assignment"><span class="step-number" aria-hidden="true">3</span><div><h3>规则匹配人员</h3><p id="assignment-state">等待派单</p></div></li>
+        </ol>
+        <dl id="details" hidden><div><dt>问题类型</dt><dd id="category">—</dd></div><div><dt>优先级</dt><dd id="priority">—</dd></div><div><dt>提交时间</dt><dd id="created-at">—</dd></div></dl>
+        <button class="secondary" id="refresh-button" type="button" hidden>刷新进度</button>
+      </section>
+    </div>
+    <footer>AI 负责理解报修内容，派单规则负责人员匹配。无法自动确认的情况交由物业核实。</footer>
+  </main>
+</body>
+</html>

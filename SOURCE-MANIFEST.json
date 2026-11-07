@@ -499,7 +499,7 @@
     "docs/12-BUSINESS-EVALUATION.md": "f7c6e28bb7522ca675b74ecb966df937c4b77562b7e5d3e7c9056430151a8110",
     "docs/12-UAT-DAY1.md": "98ccb8f822c8ba67c3f02566639f7880e203a8937b442bcecb46fb0ca193d236",
     "docs/13-SUPERVISOR-ASSISTANT.md": "5c68f90928798d660e398d182dac6abb522d2e704b07fc597dbbb6105063a9b9",
-    "docs/14-DELIVERY-STATUS.md": "b0f2091510c19b421cce540fde78156b49f612cb4a4c463381541a2b58401f02",
+    "docs/14-DELIVERY-STATUS.md": "fb790fe17aa15e075ac14ff6e9d297889a55eed33240526711946dc9ed8206ea",
     "miniprogram/app.js": "8794cfc6b55216d1d3df9ef9b4d65c1d6470798a8db5be0449481306917475c8",
     "miniprogram/app.json": "1727a71a334c2a34069f1287cf4240da11e5e218448c088e8e4ea779e5a605b8",
     "miniprogram/app.wxss": "5200b3d04a3c93f07de45a7604c0ccaa293b38c0ee8c2204eb97efff5d28ca6d",
@@ -723,6 +723,13 @@
     "scripts/selfhost/runner.py": "f499a625b361eb3659b9de47bd9fdc890289d73defc8327a7b28ac1d58b97269",
     "scripts/selfhost/server.py": "0157ff0ebdee7143738812e87d526266621b76b9b60a56f12f626dc37240d5c5",
     "scripts/selfhost/worker.py": "b364fd5c4357c25a2e1679b90b7223ecbee0a4bf6b0d329e5f5c4a7209f45fe4",
-    "scripts/verify_business_ai.py": "4f8acb530b15702c716a514f49eabdb1ba47798cfa018c1d86f4d8fea3dd7670"
+    "scripts/verify_business_ai.py": "4f8acb530b15702c716a514f49eabdb1ba47798cfa018c1d86f4d8fea3dd7670",
+    "scripts/online_demo.py": "69846ff46cabfb4028c172578755ec6fc56be5ff2f2ef883195ca4a4375ead09",
+    "backend/tests/unit/test_online_demo_gateway.py": "553afd77c6e176a3e6262916b5ea51b6320aadb01a36f143b4241d6abd742e30",
+    "deploy/online-demo/README.md": "45ac82b99e09f540793e3a045313c047fc7bed07b0e298ce5c1c9fcbdc37d334",
+    "deploy/online-demo/runtime.example.json": "8197fd26cfaa9948bfd61f9828aa1cb833a455ac9dad60177a39d748c9d5fdfe",
+    "deploy/online-demo/web/index.html": "98d30e0f3d216201b8e84ac9631466f2d7784d228330c2ea538d61a3af950c4f",
+    "deploy/online-demo/web/app.js": "52e2b141a45da163aae52cfaebf38a5e2d1167c9f3933c1c649153a8c3f6f7ac",
+    "deploy/online-demo/web/style.css": "f3d77088b252498825ba23181212b5203d86216ac3871c7b1c8564f9515a8773"
   }
 }
