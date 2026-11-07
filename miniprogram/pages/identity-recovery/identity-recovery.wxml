@@ -1,0 +1,40 @@
+<view class="card">
+  <view class="section-title">账号合并与高风险恢复</view>
+  <view class="empty">为保护账号和房屋资料，恢复账号需要核验身份。</view>
+  <block wx:if="{{capabilities}}">
+    <block wx:if="{{capabilities.enabled}}">
+      <view>可信核验入口已配置。提交后进入 {{capabilities.quarantine_days}} 天隔离和 {{capabilities.required_distinct_reviewers}} 人复核。</view>
+      <picker range="{{purposes}}" range-key="label" value="{{purposeIndex}}" bindchange="onPurpose">
+        <view class="picker">用途：{{purposes[purposeIndex].label}}</view>
+      </picker>
+      <input data-field="phone" value="{{phone}}" bindinput="onField" placeholder="待核验联系电话" maxlength="20" />
+      <input data-field="proofAssertion" value="{{proofAssertion}}" bindinput="onField" password="true" placeholder="核验渠道一次性令牌" maxlength="2048" />
+      <view class="empty">这里只接收获批准核验渠道的一次性令牌，不上传证件、人脸或短信验证码。</view>
+      <button class="btn" disabled="{{loading}}" bindtap="submit">提交核验申请</button>
+    </block>
+    <view wx:else class="error">身份核验暂不可用，请联系物业协助处理。</view>
+  </block>
+</view>
+<view class="card" wx:if="{{cases.length}}">
+  <view class="section-title">我的申请</view>
+  <block wx:for="{{cases}}" wx:key="id">
+    <view class="case-row">
+      <view>申请 {{item.id}} · {{item.purposeText}} · {{item.statusText}}</view>
+      <view>号码：{{item.masked_phone}} · 审核 {{item.approval_count}}/2</view>
+      <view wx:if="{{item.status === 'APPROVED'}}" class="completion-box">
+        <view class="empty">审核通过尚未改变账号。请再次验证目标账号；目标尚无密码时需设置新密码。</view>
+        <input data-field="currentPassword" value="{{currentPassword}}" bindinput="onField" password="true" placeholder="目标账号当前密码（如已有）" maxlength="128" />
+        <input data-field="targetReauthAssertion" value="{{targetReauthAssertion}}" bindinput="onField" password="true" placeholder="无密码账号的目标身份核验令牌" maxlength="2048" />
+        <input data-field="newPassword" value="{{newPassword}}" bindinput="onField" password="true" placeholder="新密码（目标尚无密码时）" maxlength="128" />
+        <input data-field="confirmPassword" value="{{confirmPassword}}" bindinput="onField" password="true" placeholder="确认新密码" maxlength="128" />
+        <checkbox-group wx:if="{{item.purpose === 'PHONE_REUSE'}}" bindchange="onReplacePhoneConfirm">
+          <label><checkbox value="replace" checked="{{confirmReplacePhone}}" />确认用本次号码替换目标账号当前手机号</label>
+        </checkbox-group>
+        <button class="btn" disabled="{{loading}}" data-id="{{item.id}}" bindtap="complete">确认并执行身份事务</button>
+      </view>
+    </view>
+  </block>
+</view>
+<view class="loading" wx:if="{{loading}}">加载中...</view>
+<view class="notice" wx:if="{{notice}}">{{notice}}</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>

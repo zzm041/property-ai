@@ -1,0 +1,25 @@
+.field {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 76rpx;
+  padding: 16rpx;
+  border: 1rpx solid #d0d5dd;
+  border-radius: 8rpx;
+}
+
+textarea.field {
+  min-height: 160rpx;
+}
+
+.pending-media {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin: 12rpx 0;
+}
+
+.pending-media-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 8rpx;
+}

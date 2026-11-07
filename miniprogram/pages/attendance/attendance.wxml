@@ -1,0 +1,16 @@
+<picker range="{{properties}}" range-key="name" value="{{propertyIndex}}" bindchange="onPropertyChange" disabled="{{actionBusy}}">
+  <view class="picker">{{properties[propertyIndex].name || '请选择小区'}}</view>
+</picker>
+<view class="card" wx:if="{{snapshot}}">
+  <view class="section-title">今日在岗状态</view>
+  <view>日期 {{snapshot.business_date}}</view>
+  <view class="result-label">{{attendanceLabel}} · {{onDutyLabel}}</view>
+  <view class="detail-field"><view class="detail-label">今日首次签到</view><view class="detail-value">{{checkInLabel}}</view></view>
+  <view class="detail-field"><view class="detail-label">签退时间</view><view class="detail-value">{{checkOutLabel}}</view></view>
+  <view class="hint">签到用于登记当前小区的在岗状态。签退后不再参与新的自动派单，已有工单仍需处理。</view>
+</view>
+<button class="btn" bindtap="checkIn" disabled="{{loading || actionBusy || !canCheckIn}}">签到</button>
+<button class="btn btn-secondary" bindtap="checkOut" disabled="{{loading || actionBusy || !canCheckOut}}">签退</button>
+<button class="btn btn-secondary" bindtap="reload" disabled="{{loading || actionBusy}}">刷新状态</button>
+<view class="loading" wx:if="{{loading}}">处理中...</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>

@@ -1,0 +1,47 @@
+.section-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+}
+
+.source-box {
+  min-height: 220rpx;
+}
+
+.hint {
+  color: #667085;
+  font-size: 30rpx;
+  margin-top: 10rpx;
+}
+
+.notice {
+  color: #067647;
+  margin: 16rpx 24rpx;
+}
+
+.compact-row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.document-card.selected {
+  border: 3rpx solid #1f4b99;
+}
+
+.document-title,
+.history-heading {
+  font-size: 34rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.history-heading {
+  margin-top: 20rpx;
+}
+
+.danger {
+  background: #b42318;
+}

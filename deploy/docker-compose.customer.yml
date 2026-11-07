@@ -1,0 +1,22 @@
+# Overlay the frozen application stack for a NEW customer installation.
+# Existing local delivery.ps1 remains a separate, protected workflow.
+name: ${CUSTOMER_PROJECT_NAME:?set a unique CUSTOMER_PROJECT_NAME}
+
+services:
+  installer:
+    image: property-ai-delivery:${DELIVERY_IMAGE_TAG:?set the reviewed image tag}
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    profiles: ["install"]
+    env_file:
+      - ${DELIVERY_ENV_FILE:?set DELIVERY_ENV_FILE to the customer env file}
+      - ${CUSTOMER_BOOTSTRAP_ENV_FILE:?set CUSTOMER_BOOTSTRAP_ENV_FILE}
+    entrypoint: ["python", "-m", "app.cli.customer_install"]
+    volumes:
+      - ./customer-install:/install
+    restart: "no"
+
+volumes:
+  mysql_data:
+    name: ${CUSTOMER_PROJECT_NAME:?set a unique CUSTOMER_PROJECT_NAME}-mysql-data

@@ -1,0 +1,14 @@
+<view class="loading" wx:if="{{loading}}">处理中...</view>
+<view class="card" wx:if="{{workOrder}}">
+  <view class="section-title">工单 {{workOrder.id}} · 无法处理</view>
+  <view class="hint">说明遇到的问题，主管将协助安排后续处理。</view>
+  <view class="field-label">当前情况</view>
+  <picker range="{{options}}" range-key="label" value="{{reasonIndex}}" bindchange="onType" disabled="{{loading}}">
+    <view class="field">{{options[reasonIndex].label}}</view>
+  </picker>
+  <view class="field-label">原因说明（必填）</view>
+  <textarea class="field" value="{{reason}}" bindinput="onReason" placeholder="说明无法解决的情况、所需协助或等待事项" placeholder-class="reason-placeholder" maxlength="255" disabled="{{loading}}"></textarea>
+  <button class="btn" bindtap="submit" disabled="{{loading}}">提交主管处理</button>
+</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>
+<button class="btn btn-secondary" wx:if="{{!workOrder && !loading}}" bindtap="reload">刷新工单状态</button>

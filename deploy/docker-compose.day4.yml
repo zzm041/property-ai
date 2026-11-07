@@ -1,0 +1,125 @@
+name: property-ai-day4
+
+# Disposable APP_ENV=test E2E. Joins the development Compose network so it can
+# use mysql-test / rabbitmq / redis / milvus / minio without sharing
+# development MySQL data, the development Celery queue, or knowledge_chunks_v1.
+# Service names are unique (api-day4 / worker-day4) to avoid DNS collision
+# with the development `api` and `worker` on the same network.
+
+networks:
+  property_ai:
+    external: true
+    name: property-ai_property_ai
+
+services:
+  api-day4:
+    image: property-ai-api:latest
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      APP_ENV: test
+      APP_SECRET_KEY: day4-e2e-secret-that-is-long-enough
+      DEV_AUTH_ENABLED: "true"
+      WECHAT_LOGIN_ENABLED: "true"
+      WECHAT_PROVIDER: development
+      AI_ENQUEUE_ON_CREATE: "true"
+      LLM_PROVIDER: development
+      VLM_PROVIDER: development
+      ASR_PROVIDER: development
+      EMBEDDING_PROVIDER: development
+      RERANKER_PROVIDER: development
+      STORAGE_PROVIDER: production
+      STORAGE_ENDPOINT: http://minio:9000
+      STORAGE_BUCKET: property-ai-day4
+      STORAGE_ACCESS_KEY: minioadmin
+      STORAGE_SECRET_KEY: minioadmin
+      DATABASE_URL: mysql+pymysql://property_test:change-me-test@mysql-test:3306/property_ai_test?charset=utf8mb4
+      TEST_DATABASE_URL: mysql+pymysql://property_test:change-me-test@mysql-test:3306/property_ai_day4?charset=utf8mb4
+      REDIS_URL: redis://redis:6379/5
+      CELERY_BROKER_URL: ${DAY4_CELERY_BROKER_URL:-amqp://day4:change-me-day4@rabbitmq:5672/property_ai_day4}
+      CELERY_TASK_QUEUE: property_ai.day4
+      MILVUS_URI: http://milvus:19530
+      MILVUS_COLLECTION: knowledge_chunks_day4
+      EMBEDDING_DIMENSIONS: "8"
+      LLM_PROVIDER_BEHAVIOR: ${LLM_PROVIDER_BEHAVIOR:-success}
+    networks:
+      - property_ai
+    restart: unless-stopped
+
+  worker-day4:
+    image: property-ai-worker:latest
+    command:
+      [
+        "celery",
+        "-A",
+        "app.worker.celery_app.celery_app",
+        "worker",
+        "--loglevel=info",
+        "-Q",
+        "property_ai.day4",
+      ]
+    environment:
+      APP_ENV: test
+      APP_SECRET_KEY: day4-e2e-secret-that-is-long-enough
+      DEV_AUTH_ENABLED: "true"
+      WECHAT_LOGIN_ENABLED: "true"
+      WECHAT_PROVIDER: development
+      AI_ENQUEUE_ON_CREATE: "true"
+      LLM_PROVIDER: development
+      VLM_PROVIDER: development
+      ASR_PROVIDER: development
+      EMBEDDING_PROVIDER: development
+      RERANKER_PROVIDER: development
+      STORAGE_PROVIDER: production
+      STORAGE_ENDPOINT: http://minio:9000
+      STORAGE_BUCKET: property-ai-day4
+      STORAGE_ACCESS_KEY: minioadmin
+      STORAGE_SECRET_KEY: minioadmin
+      DATABASE_URL: mysql+pymysql://property_test:change-me-test@mysql-test:3306/property_ai_test?charset=utf8mb4
+      TEST_DATABASE_URL: mysql+pymysql://property_test:change-me-test@mysql-test:3306/property_ai_day4?charset=utf8mb4
+      REDIS_URL: redis://redis:6379/5
+      CELERY_BROKER_URL: amqp://day4:change-me-day4@rabbitmq:5672/property_ai_day4
+      CELERY_TASK_QUEUE: property_ai.day4
+      MILVUS_URI: http://milvus:19530
+      MILVUS_COLLECTION: knowledge_chunks_day4
+      EMBEDDING_DIMENSIONS: "8"
+      LLM_PROVIDER_BEHAVIOR: ${LLM_PROVIDER_BEHAVIOR:-success}
+    networks:
+      - property_ai
+    restart: unless-stopped
+
+  beat-day4:
+    image: property-ai-worker:latest
+    command:
+      [
+        "celery",
+        "-A",
+        "app.worker.celery_app.celery_app",
+        "beat",
+        "--loglevel=info",
+        "--schedule=/tmp/celerybeat-schedule",
+      ]
+    environment:
+      APP_ENV: test
+      APP_SECRET_KEY: day4-e2e-secret-that-is-long-enough
+      DEV_AUTH_ENABLED: "true"
+      TEST_DATABASE_URL: mysql+pymysql://property_test:change-me-test@mysql-test:3306/property_ai_day4?charset=utf8mb4
+      REDIS_URL: redis://redis:6379/5
+      CELERY_BROKER_URL: amqp://day4:change-me-day4@rabbitmq:5672/property_ai_day4
+      CELERY_TASK_QUEUE: property_ai.day4
+      SLA_SWEEP_INTERVAL_SECONDS: "30"
+      NOTIFICATION_RETRY_SWEEP_INTERVAL_SECONDS: "30"
+    networks:
+      - property_ai
+    restart: unless-stopped
+
+  nginx-day4:
+    image: nginx:1.27.4-alpine
+    ports:
+      - "127.0.0.1:8082:80"
+    volumes:
+      - ./nginx-day4.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api-day4
+    networks:
+      - property_ai
+    restart: unless-stopped

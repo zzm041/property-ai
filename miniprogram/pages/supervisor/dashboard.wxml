@@ -1,0 +1,69 @@
+<view class="card">
+  <view class="section-title">统计范围</view>
+  <picker wx:if="{{tenants.length > 1}}" range="{{tenants}}" range-key="name" value="{{tenantIndex}}" bindchange="onTenantChange">
+    <view class="picker">{{tenants[tenantIndex].name}}</view>
+  </picker>
+  <picker range="{{properties}}" range-key="name" value="{{propertyIndex}}" bindchange="onPropertyChange">
+    <view class="picker">配置目标：{{properties[propertyIndex].name || '暂无小区'}}</view>
+  </picker>
+  <picker range="{{scopeOptions}}" range-key="label" value="{{scopeIndex}}" bindchange="onScopeChange">
+    <view class="picker">统计口径：{{scopeOptions[scopeIndex].label || '无可用范围'}}</view>
+  </picker>
+  <view class="hint">当前在办工单与事件统计。</view>
+</view>
+
+<view class="loading" wx:if="{{loading}}">读取最新状态...</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>
+
+<block wx:if="{{overview}}">
+  <view class="card">
+    <view class="section-title">当前工单</view>
+    <view class="metrics">
+      <view><text class="metric">{{overview.work_orders.total}}</text><text>全部</text></view>
+      <view><text class="metric">{{overview.work_orders.open}}</text><text>未终结</text></view>
+      <view><text class="metric">{{overview.work_orders.terminal}}</text><text>已终结</text></view>
+    </view>
+    <view class="chips"><text wx:for="{{workOrderStatuses}}" wx:key="code">{{item.label}} {{item.count}}</text></view>
+    <view class="subheading">分类</view>
+    <view class="chips"><text wx:for="{{workOrderCategories}}" wx:key="code">{{item.label}} {{item.count}}</text></view>
+    <view class="subheading">优先级</view>
+    <view class="chips"><text wx:for="{{workOrderPriorities}}" wx:key="code">{{item.label}} {{item.count}}</text></view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">SLA 与共同事件</view>
+    <view>事件总数：{{overview.incidents.total}}，开放/观察：{{overview.incidents.active}}</view>
+    <view class="chips"><text wx:for="{{incidentStatuses}}" wx:key="code">{{item.label}} {{item.count}}</text></view>
+    <view>SLA 预警：{{overview.sla_clocks.warning}}，逾期：{{overview.sla_clocks.overdue}}</view>
+    <view class="chips"><text wx:for="{{slaStates}}" wx:key="code">{{item.label}} {{item.count}}</text></view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">当前人员状态</view>
+    <view>有效小区任职：{{overview.staffing.active_property_assignments}}</view>
+    <view>今日已上报状态：{{overview.staffing.current_status_records}}，未上报：{{overview.staffing.unreported_status}}</view>
+    <view>在岗：{{overview.staffing.on_duty}}，可接单：{{overview.staffing.available}}</view>
+    <view>在岗负载 / 容量：{{overview.staffing.current_load}} / {{overview.staffing.on_duty_capacity}}</view>
+  </view>
+
+  <view class="section-heading">按小区分解</view>
+  <view class="card property-row" wx:for="{{overview.properties}}" wx:key="property_id">
+    <view class="row-title">{{item.property_name}}</view>
+    <view>业务日 {{item.business_date}}</view>
+    <view>工单 {{item.work_orders_total}}（未终结 {{item.work_orders_open}} / 已终结 {{item.work_orders_terminal}}）</view>
+    <view>事件 {{item.incidents_active}} · SLA 预警 {{item.sla_warning}} / 逾期 {{item.sla_overdue}}</view>
+    <view>任职 {{item.active_staff_assignments}} · 在岗 {{item.on_duty}} · 可接单 {{item.available}} · 未上报 {{item.unreported_status}}</view>
+  </view>
+  <view class="empty" wx:if="{{!overview.properties.length}}">当前授权企业暂无小区。</view>
+
+  <view class="card">
+    <view class="section-title">现有配置入口</view>
+    <view class="hint">管理当前所选小区的业务配置。</view>
+    <button class="btn" wx:for="{{configEntries}}" wx:key="path" data-path="{{item.path}}" bindtap="openConfig">{{item.label}}</button>
+    <view class="empty" wx:if="{{!configEntries.length}}">当前范围没有可管理的配置入口。</view>
+  </view>
+
+  <view class="snapshot">生成时间：{{overview.generatedAtLabel}} · 小区数：{{overview.property_count}}</view>
+</block>
+
+<button class="btn" disabled="{{loading}}" bindtap="refresh">刷新统计</button>

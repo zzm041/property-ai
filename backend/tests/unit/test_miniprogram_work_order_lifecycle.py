@@ -1,0 +1,154 @@
+from decimal import Decimal
+from pathlib import Path
+
+import pytest
+from pydantic import ValidationError
+
+from app.schema.work_order import StaffReceiptRequest
+
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
+
+
+def test_receipt_fee_fields_are_consistent() -> None:
+    no_fee = StaffReceiptRequest.model_validate(
+        {
+            "problem_type": "ELECTRICAL",
+            "method": "Inspected and replaced the loose terminal",
+            "resolved": True,
+        }
+    )
+    recorded = StaffReceiptRequest.model_validate(
+        {
+            "problem_type": "ELECTRICAL",
+            "method": "Inspected and replaced the loose terminal",
+            "fee_flag": "RECORDED",
+            "fee_amount": "12.50",
+            "resolved": True,
+        }
+    )
+
+    assert no_fee.fee_flag == "NONE"
+    assert no_fee.fee_amount is None
+    assert recorded.fee_amount == Decimal("12.50")
+
+    invalid_bodies = (
+        {
+            "problem_type": "ELECTRICAL",
+            "method": "Replace terminal",
+            "fee_flag": "RECORDED",
+            "resolved": True,
+        },
+        {
+            "problem_type": "ELECTRICAL",
+            "method": "Replace terminal",
+            "fee_amount": "12.50",
+            "resolved": True,
+        },
+        {
+            "problem_type": "ELECTRICAL",
+            "method": "Replace terminal",
+            "fee_flag": "RECORDED",
+            "fee_amount": "-1",
+            "resolved": True,
+        },
+        {
+            "problem_type": "ELECTRICAL",
+            "method": "Replace terminal",
+            "fee_flag": "UNSPECIFIED",
+            "resolved": True,
+        },
+    )
+    for body in invalid_bodies:
+        with pytest.raises(ValidationError):
+            StaffReceiptRequest.model_validate(body)
+
+
+def test_staff_page_submits_complete_receipt_and_versions_mutations() -> None:
+    source = (
+        REPO_ROOT / "miniprogram/pages/staff-orders/detail.js"
+    ).read_text(encoding="utf-8")
+    template = (
+        REPO_ROOT / "miniprogram/pages/staff-orders/detail.wxml"
+    ).read_text(encoding="utf-8")
+
+    for field in (
+        "problem_type",
+        "method",
+        "materials",
+        "fee_flag",
+        "fee_amount",
+        "resolved",
+        "follow_up",
+        "before_file_ids",
+        "after_file_ids",
+        "version",
+    ):
+        assert field in source
+    assert 'problem_type: "repair"' not in source
+    assert 'method: "on_site"' not in source
+    assert "处理回执" in template
+    assert "处理方式与过程" in template
+    assert "产生费用" in template
+    assert "添加处理前照片" in template
+    assert "添加处理后照片" in template
+    assert "添加现场照片" in template
+    assert 'taken_phase: "ON_SITE"' in source
+    assert "file_ids: this.data.onSiteFileIds" in source
+    assert "before_file_ids: this.data.beforeFileIds" in source
+    assert "after_file_ids: this.data.afterFileIds" in source
+    assert 'data-group="beforeMedia"' in template
+    assert 'data-group="afterMedia"' in template
+    assert 'data-group="onSiteMedia"' in template
+    assert "wx.previewImage({ current, urls })" in source
+    assert "beforeMedia: []" in source
+    assert "afterMedia: []" in source
+
+
+def test_staff_page_can_supplement_missing_media_for_submitted_receipt() -> None:
+    """Removing the post-receipt native supplement UI must make this fail."""
+
+    source = (
+        REPO_ROOT / "miniprogram/pages/staff-orders/detail.js"
+    ).read_text(encoding="utf-8")
+    template = (
+        REPO_ROOT / "miniprogram/pages/staff-orders/detail.wxml"
+    ).read_text(encoding="utf-8")
+    api = (REPO_ROOT / "miniprogram/services/api.js").read_text(encoding="utf-8")
+
+    assert "canSupplementReceiptMedia" in source
+    assert "supplementReceiptMedia" in source
+    assert 'status === "WAIT_CONFIRM"' in source
+    assert "entry.receipt_id === latestReceipt.id" in source
+    assert "(missingBeforeMedia || missingAfterMedia)" in source
+    assert "supplementReceiptId: latestReceipt ? latestReceipt.id : null" in source
+    assert "this.data.missingBeforeMedia && !this.data.beforeFileIds.length" in source
+    assert "this.data.missingAfterMedia && !this.data.afterFileIds.length" in source
+    assert "this.id, this.data.supplementReceiptId" in source
+    assert "before_file_ids: this.data.beforeFileIds" in source
+    assert "after_file_ids: this.data.afterFileIds" in source
+    assert "version: this.data.workOrder.version" in source
+    assert "补传本周期处理照片" in template
+    assert 'wx:if="{{missingBeforeMedia}}"' in template
+    assert 'wx:if="{{missingAfterMedia}}"' in template
+    assert "补传照片" in template
+    assert "/receipts/${receiptId}/media`" in api
+
+
+def test_resident_page_shows_receipt_and_versions_confirmation() -> None:
+    source = (
+        REPO_ROOT / "miniprogram/pages/work-orders/detail.js"
+    ).read_text(encoding="utf-8")
+    template = (
+        REPO_ROOT / "miniprogram/pages/work-orders/detail.wxml"
+    ).read_text(encoding="utf-8")
+
+    assert "latestReceipt" in source
+    assert "confirmWorkOrder(this.id, { version: this.data.workOrder.version })" in source
+    assert "处理回执" in template
+    assert "cycle.receipt.method" in template
+    assert "cycle.receipt.fee_amount" in template
+    assert 'wx:for="{{processHistory}}"' in template
+    assert 'wx:for="{{appendMedia}}"' in template
+    assert "wx.previewImage({ current, urls })" in source
+    assert "appendMedia: []" in source

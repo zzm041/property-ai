@@ -1,0 +1,18 @@
+<picker range="{{properties}}" range-key="name" value="{{propertyIndex}}" bindchange="onPropertyChange" disabled="{{loading}}">
+  <view class="picker">{{properties[propertyIndex].name || '请选择小区'}}</view>
+</picker>
+<button class="btn" bindtap="load" disabled="{{loading}}">加载绑定申请</button>
+<button class="btn" wx:if="{{nextCursor}}" bindtap="loadMore" disabled="{{loading}}">加载更多待审申请</button>
+<textarea placeholder="驳回原因（仅拒绝时必填，住户可见）" value="{{rejectReason}}" bindinput="onRejectReason" maxlength="500" disabled="{{loading}}" />
+<view class="loading" wx:if="{{loading}}">加载中...</view>
+<view class="empty" wx:if="{{!loading && !items.length}}">暂无申请</view>
+<view class="card" wx:for="{{items}}" wx:key="id">
+  <view>申请 #{{item.id}} · {{item.statusText}} · {{item.relationText}}</view>
+  <view wx:if="{{item.reviewReady}}">申请人：{{item.applicantLabel}}</view>
+  <view wx:if="{{item.reviewReady}}">房屋：{{item.houseLabel}}</view>
+  <view class="error" wx:if="{{!item.reviewReady}}">审核资料不完整，暂不能操作</view>
+  <view class="hint" wx:if="{{item.reviewReady}}">请核对申请人与房屋资料后再审核。</view>
+  <button class="btn" wx:if="{{item.status === 'PENDING' && item.reviewReady}}" data-id="{{item.id}}" bindtap="approve" disabled="{{loading}}">通过</button>
+  <button class="btn" wx:if="{{item.status === 'PENDING' && item.reviewReady}}" data-id="{{item.id}}" bindtap="reject" disabled="{{loading}}">拒绝</button>
+</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>

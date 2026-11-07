@@ -1,0 +1,22 @@
+FROM python:3.12.10-slim-bookworm@sha256:fd95fa221297a88e1cf49c55ec1828edd7c5a428187e67b5d1805692d11588db
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+RUN python -c "import sys; assert sys.version_info[:3] == (3, 12, 10), sys.version"
+
+RUN useradd --create-home --uid 10001 appuser
+
+COPY deploy/requirements.delivery.lock /requirements.delivery.lock
+COPY backend/ /app/
+RUN pip install --no-cache-dir --requirement /requirements.delivery.lock \
+    && pip install --no-cache-dir --no-deps .
+
+USER appuser
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

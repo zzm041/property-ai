@@ -1,0 +1,47 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/password-reset/password-reset",
+    "pages/home/home",
+    "pages/profile/profile",
+    "pages/identity-recovery/identity-recovery",
+    "pages/supervisor/identity-recovery",
+    "pages/system/organizations",
+    "pages/work-orders/create",
+    "pages/work-orders/list",
+    "pages/work-orders/detail",
+    "pages/houses/houses",
+    "pages/employee-claim/employee-claim",
+    "pages/announcements/list",
+    "pages/announcements/detail",
+    "pages/assistant/assistant",
+    "pages/attendance/attendance",
+    "pages/staff-orders/list",
+    "pages/staff-orders/detail",
+    "pages/staff-orders/escalate",
+    "pages/supervisor/queue",
+    "pages/supervisor/incidents",
+    "pages/supervisor/announcements",
+    "pages/supervisor/bindings",
+    "pages/supervisor/staff",
+    "pages/supervisor/properties",
+    "pages/supervisor/knowledge",
+    "pages/supervisor/sla",
+    "pages/supervisor/dashboard",
+    "pages/notifications/list",
+    "pages/dev-login/dev-login"
+  ],
+  "window": {
+    "navigationBarTitleText": "智慧物业",
+    "navigationBarBackgroundColor": "#1f4b99",
+    "navigationBarTextStyle": "white",
+    "backgroundTextStyle": "light"
+  },
+  "permission": {
+    "scope.record": {
+      "desc": "用于住户录制本次报修的语音说明"
+    }
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

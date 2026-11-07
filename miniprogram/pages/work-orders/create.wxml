@@ -1,0 +1,29 @@
+<view class="card">
+  <view class="section-title">选择报修房屋</view>
+  <view class="empty">仅显示本人当前有效绑定的房屋。请选择完整地址，无需填写房屋编号。</view>
+  <button id="house-choice-{{item.house_id}}" class="house-choice" wx:for="{{houses}}" wx:key="relation_id" data-id="{{item.house_id}}" bindtap="selectHouse" disabled="{{loading || houseLoading}}">
+    {{houseId == item.house_id ? '✓ 已选：' : ''}}{{item.addressLabel}}
+    <view class="empty">{{item.property_address}}</view>
+  </button>
+  <view class="empty" wx:if="{{!houseLoading && !houseError && !houses.length}}">暂无有效绑定房屋，请先申请绑定并等待物业审核。</view>
+  <view class="error" wx:if="{{houseError}}">{{houseError}}</view>
+  <view class="loading" wx:if="{{houseLoading}}">正在加载本人房屋...</view>
+  <button class="btn btn-secondary btn-compact" wx:if="{{houseCursor}}" bindtap="loadMoreHouses" disabled="{{loading || houseLoading}}">加载更多房屋</button>
+  <button class="btn btn-secondary btn-compact" bindtap="reloadHouses" disabled="{{loading || houseLoading}}">刷新房屋</button>
+  <button class="btn btn-secondary btn-compact" bindtap="manageHouses" disabled="{{loading || houseLoading || recordingBusy}}">我的房屋 / 申请绑定</button>
+  <view wx:if="{{selectedHouseLabel}}">报修地址：{{selectedHouseLabel}}</view>
+  <textarea id="work-order-description" placeholder="报修说明" value="{{text}}" bindinput="onText" disabled="{{loading}}"></textarea>
+  <view>本次联系电话（必填）</view>
+  <input id="work-order-contact" value="{{contactPhone}}" bindinput="onContact" maxlength="40" disabled="{{loading}}" placeholder="手机号，或 +国家区号 的固定/移动电话" />
+  <view class="empty">默认本人当前手机号，可改为本次实际联系号码。不会修改登录号码。</view>
+  <checkbox-group id="confirm-work-order-contact" bindchange="confirmContact"><label><checkbox value="confirmed" checked="{{contactConfirmed}}" disabled="{{loading}}" />已确认此号码可用于本次报修联系</label></checkbox-group>
+  <button id="choose-work-order-image" class="btn" bindtap="chooseImage" disabled="{{loading || houseLoading || recordingBusy}}">选择图片（可选）</button>
+  <button id="start-work-order-recording" class="btn" bindtap="startRecording" disabled="{{loading || houseLoading || recordingBusy}}">开始录音（可选）</button>
+  <button id="stop-work-order-recording" class="btn" bindtap="stopRecording" disabled="{{loading || houseLoading || !recording}}">停止录音</button>
+  <button id="choose-work-order-audio" class="btn" bindtap="chooseAudio" disabled="{{loading || houseLoading || recordingBusy}}">选择已有音频（可选）</button>
+  <view class="empty" wx:if="{{recordingHint}}">{{recordingHint}}</view>
+  <view class="empty" wx:if="{{mediaHint}}">{{mediaHint}}</view>
+  <button id="submit-work-order" class="btn" bindtap="submit" disabled="{{loading || houseLoading || recording || recordingBusy || !houseId}}">提交报修</button>
+  <view class="loading" wx:if="{{loading}}">处理中...</view>
+  <view class="error" wx:if="{{error}}">{{error}}</view>
+</view>

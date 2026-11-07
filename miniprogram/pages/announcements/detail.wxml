@@ -1,0 +1,11 @@
+<view class="loading" wx:if="{{loading}}">加载中...</view>
+<picker wx:if="{{canReadInternal}}" range="{{audienceOptions}}" value="{{audienceIndex}}" bindchange="onAudienceChange">
+  <view class="picker">{{audienceOptions[audienceIndex]}}</view>
+</picker>
+<view class="card" wx:if="{{title}}">
+  <view>{{title}}</view>
+  <view class="empty">{{status}}</view>
+  <view>{{content}}</view>
+</view>
+<button class="btn" bindtap="reload">刷新</button>
+<view class="error" wx:if="{{error}}">{{error}}</view>

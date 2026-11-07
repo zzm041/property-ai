@@ -1,0 +1,8 @@
+<view class="card">
+  <view>物业邀请认领</view>
+  <view class="empty">请输入邀请令牌。不能用自行填写的工号获取权限。</view>
+  <input placeholder="邀请令牌" value="{{token}}" bindinput="onToken" />
+  <button class="btn" bindtap="claim" disabled="{{loading}}">认领</button>
+</view>
+<view class="loading" wx:if="{{loading}}">处理中...</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>

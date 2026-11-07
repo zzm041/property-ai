@@ -1,0 +1,55 @@
+<view class="card" wx:if="{{properties.length}}">
+  <view class="section-title">事件范围</view>
+  <picker disabled="{{loading}}" range="{{properties}}" range-key="name" value="{{propertyIndex}}" bindchange="onPropertyChange">
+    <view class="picker">小区：{{properties[propertyIndex].name}}</view>
+  </picker>
+  <picker disabled="{{loading}}" range="{{statusOptions}}" range-key="label" value="{{statusIndex}}" bindchange="onStatusChange">
+    <view class="picker">状态：{{statusOptions[statusIndex].label}}</view>
+  </picker>
+  <view class="empty" wx:if="{{!canManage}}">当前身份只能查看本人正在参与的事件。</view>
+</view>
+
+<view class="loading" wx:if="{{loading}}">处理中...</view>
+<view class="notice" wx:if="{{notice}}">{{notice}}</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>
+
+<view class="empty" wx:if="{{!loading && !items.length}}">当前范围暂无事件</view>
+<view class="card incident-card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="selectIncident">
+  <view class="section-title">#{{item.id}} · {{item.categoryText}}</view>
+  <view>状态：{{item.statusText}}</view>
+  <view wx:if="{{item.subcategory}}">细分类：{{item.subcategory}}</view>
+  <view>关联工单：{{item.work_order_count}} 条</view>
+  <view>最近发现：{{item.lastSeenText}}</view>
+  <view wx:if="{{item.affected_scope}}">影响范围：{{item.affected_scope}}</view>
+</view>
+
+<button class="btn" wx:if="{{hasMore}}" bindtap="loadMore" disabled="{{loading}}">加载更多</button>
+
+<view class="card" wx:if="{{selected}}">
+  <view class="section-title">事件详情 · #{{selected.id}}</view>
+  <view>状态：{{selected.statusText}}</view>
+  <view>类型：{{selected.categoryText}} {{selected.subcategory || ''}}</view>
+  <view>楼栋范围：{{selected.building_id ? '已定位' : '未定位到楼栋'}}</view>
+  <view>首单时间：{{selected.firstSeenText}}</view>
+  <view>最近发现：{{selected.lastSeenText}}</view>
+  <view>最近更新：{{selected.updatedText}}</view>
+  <view>关联工单：{{selected.work_order_count}} 条</view>
+  <view>主工单：{{selected.primary_work_order_id || '待确定'}}</view>
+  <view>主处理人员：{{selected.primary_employee_id ? '已指定' : '待确定'}}</view>
+  <view wx:if="{{selected.summary}}">事件摘要：{{selected.summary}}</view>
+  <view wx:if="{{selected.ai_summary}}">AI 运营摘要：{{selected.ai_summary}}</view>
+  <view wx:if="{{selected.affected_scope}}">影响范围：{{selected.affected_scope}}</view>
+  <block wx:if="{{canManage}}">
+    <textarea disabled="{{loading}}" class="input" maxlength="255" placeholder="处置或重开原因（必填）" value="{{dispositionReason}}" bindinput="onDispositionReasonInput"></textarea>
+    <button class="btn" wx:if="{{selected.status === 'OPEN'}}" data-status="MONITORING" bindtap="updateIncidentStatus" disabled="{{loading}}">转为监控中</button>
+    <button class="btn" wx:if="{{selected.status === 'OPEN' || selected.status === 'MONITORING'}}" data-status="RESOLVED" bindtap="updateIncidentStatus" disabled="{{loading}}">标记已解决</button>
+    <button class="btn" wx:if="{{selected.status === 'RESOLVED'}}" data-status="CLOSED" bindtap="updateIncidentStatus" disabled="{{loading}}">关闭事件</button>
+    <button class="btn" wx:if="{{selected.status === 'RESOLVED' || selected.status === 'CLOSED'}}" data-status="OPEN" bindtap="updateIncidentStatus" disabled="{{loading}}">重开事件</button>
+    <button class="btn" bindtap="summarize" disabled="{{loading}}">生成 / 刷新 AI 运营摘要</button>
+    <button class="btn" wx:if="{{canDraftAnnouncement}}" bindtap="createAnnouncementDraft" disabled="{{loading}}">生成待人工审核的公告草稿</button>
+    <button class="btn" wx:if="{{lastDraftId}}" bindtap="openAnnouncements">前往公告审核</button>
+  </block>
+  <view class="empty">事件处置不会批量关闭住户工单或覆盖回执；AI 摘要和公告草稿不会自动改变事件状态或自动发布。</view>
+</view>
+
+<button class="btn" bindtap="refresh" disabled="{{loading}}">刷新事件</button>

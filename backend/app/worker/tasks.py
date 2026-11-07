@@ -1,0 +1,399 @@
+"""Celery tasks delegate to domain services. Duplicate delivery is idempotent."""
+
+from contextlib import suppress
+from time import perf_counter
+from uuid import uuid4
+
+from sqlalchemy.exc import OperationalError, SQLAlchemyError
+from sqlalchemy.orm import Session
+
+from app.core.config import get_settings
+from app.core.database import (
+    create_database_engine,
+    retryable_mysql_transaction_error_code,
+    retryable_mysql_analysis_error_code,
+)
+from app.core.errors import AiErrorCode
+from app.core.logging import get_logger
+from app.domain.ai import AnalysisStatus
+from app.provider.errors import (
+    ProviderRateLimitError,
+    ProviderTimeoutError,
+    ProviderUnavailableError,
+)
+from app.service.analysis import AnalysisService
+from app.service.notification import delivery_retry_delay_seconds
+from app.worker.celery_app import celery_app
+
+logger = get_logger(__name__)
+
+
+def _analysis_diagnostic(level: str, event: str, **fields) -> None:
+    """Diagnostics must never replace an analysis outcome or retry exception."""
+    try:
+        getattr(logger, level)(event, **fields)
+    except Exception:
+        pass
+
+
+class AnalysisDatabaseRetryExhausted(Exception):
+    error_code = AiErrorCode.DATABASE_RETRY_EXHAUSTED
+
+
+def _persist_database_exhaustion(engine, settings, work_order_id, request_id, context) -> bool:
+    """New connection/identity map. False never means a DB failure was written."""
+    try:
+        with Session(bind=engine, autoflush=False, expire_on_commit=False) as fresh:
+            return AnalysisService(fresh, settings=settings).record_database_exhaustion(
+                work_order_id=work_order_id, request_id=request_id, context=context,
+            )
+    except SQLAlchemyError:
+        _analysis_diagnostic("error", "analysis_failure_state_not_persisted", work_order_id=work_order_id,
+                     error_code=AiErrorCode.DATABASE_RETRY_EXHAUSTED, db_persisted=False)
+        return False
+
+def raise_retryable_analysis_failure(analysis: object | None) -> None:
+    """Surface retryable provider outcomes so Celery can retry and record failure."""
+
+    if analysis is None:
+        return
+    if getattr(analysis, "status", None) != AnalysisStatus.FAILED.value:
+        return
+    code = getattr(analysis, "error_code", None)
+    if code == AiErrorCode.TIMEOUT:
+        raise ProviderTimeoutError("LLM timed out")
+    if code == AiErrorCode.RATE_LIMITED:
+        raise ProviderRateLimitError("LLM rate limited")
+    if code == AiErrorCode.UNAVAILABLE:
+        raise ProviderUnavailableError("LLM is unavailable")
+
+
+def _record_analysis_attempt_outcome(task_id: str | None, analysis: object | None) -> None:
+    if not task_id:
+        return
+    from app.worker.failed_tasks import (
+        STATUS_IGNORED_EXPIRED,
+        STATUS_PERMANENT_FAILED,
+        STATUS_SUCCEEDED,
+        complete_attempt,
+    )
+
+    status = getattr(analysis, "status", None)
+    error_code = getattr(analysis, "error_code", None)
+    outcome = STATUS_IGNORED_EXPIRED if analysis is None else None
+    if status in {AnalysisStatus.COMPLETED.value, AnalysisStatus.LOW_CONFIDENCE.value}:
+        outcome = STATUS_SUCCEEDED
+    elif status == AnalysisStatus.STALE.value:
+        outcome = STATUS_IGNORED_EXPIRED
+    elif status == AnalysisStatus.FAILED.value and error_code == AiErrorCode.INVALID_OUTPUT:
+        outcome = STATUS_PERMANENT_FAILED
+    if outcome is None:
+        return
+    try:
+        complete_attempt(str(task_id), outcome, error_code=error_code)
+    except Exception:
+        _analysis_diagnostic("warning", "failed_task_outcome_unavailable", task_id=str(task_id), outcome=outcome)
+
+
+@celery_app.task(
+    bind=True,
+    name="app.worker.tasks.analyze_work_order_task",
+    max_retries=2,
+    acks_late=True,
+)
+def analyze_work_order_task(self, work_order_id: int, request_id: str) -> None:
+    settings = get_settings()
+    engine = create_database_engine(settings.active_database_url)
+    session = Session(bind=engine, autoflush=False, expire_on_commit=False)
+    retries = int(getattr(self.request, "retries", 0))
+    headers = dict(getattr(self.request, "headers", None) or {})
+    context = {
+        "task_id": str(getattr(self.request, "id", None) or uuid4()),
+        "attempt": retries + 1, "execution_token": uuid4().hex,
+        "expected_version": headers.get("analysis_expected_version"),
+        "claim": headers.get("analysis_recovery"),
+    }
+    trace = dict(request_id=request_id, task_id=context["task_id"],
+                 work_order_id=work_order_id, attempt=context["attempt"])
+    started = perf_counter()
+    outcome, analysis_id = "ERROR", None
+    _analysis_diagnostic("info", "analysis_task_started", **trace)
+    try:
+        analysis = AnalysisService(session, settings=settings).analyze_work_order(
+            work_order_id=work_order_id,
+            request_id=request_id,
+            attempt=int(getattr(self.request, "retries", 0)) + 1,
+            task_context=context,
+        )
+        # Use only the returned record's fixed metadata, never model/body text.
+        record_id = getattr(analysis, "id", None)
+        analysis_id = record_id if type(record_id) is int and record_id > 0 else None
+        status = getattr(analysis, "status", None)
+        outcome = ("NO_RESULT" if analysis is None else
+                   status if status in {item.value for item in AnalysisStatus} else "UNKNOWN_RESULT")
+        raise_retryable_analysis_failure(analysis)
+        _record_analysis_attempt_outcome(getattr(self.request, "id", None), analysis)
+    except (ProviderTimeoutError, ProviderUnavailableError, ProviderRateLimitError) as exc:
+        outcome = "PROVIDER_FAILED"
+        _analysis_diagnostic("warning",
+            "ai_analysis_retry",
+            **trace,
+            error_code=exc.error_code,
+        )
+        retries = int(getattr(self.request, "retries", 0))
+        headers["analysis_recovery"] = context.get("claim")
+        raise self.retry(exc=exc, countdown=min(2 ** retries, 30), headers=headers)
+    except OperationalError as exc:
+        outcome = "DATABASE_FAILED"
+        mysql_error_code = retryable_mysql_analysis_error_code(exc)
+        if mysql_error_code is None:
+            raise
+        with suppress(SQLAlchemyError):
+            session.invalidate()
+        _analysis_diagnostic("warning",
+            "ai_analysis_transaction_retry",
+            **trace,
+            mysql_error_code=mysql_error_code,
+        )
+        if retries >= self.max_retries:
+            outcome = "DATABASE_RETRY_EXHAUSTED"
+            persisted = _persist_database_exhaustion(engine, settings, work_order_id, request_id, context)
+            _analysis_diagnostic("error", "analysis_database_retries_exhausted", **trace,
+                         db_persisted=persisted,
+                         error_code=AiErrorCode.DATABASE_RETRY_EXHAUSTED)
+            raise AnalysisDatabaseRetryExhausted("Analysis database retry budget exhausted") from None
+        headers["analysis_recovery"] = context.get("claim")
+        raise self.retry(exc=exc, countdown=min(2 ** retries, 30), headers=headers)
+    finally:
+        _analysis_diagnostic("info", "analysis_task_finished", **trace,
+                             analysis_id=analysis_id, outcome=outcome,
+                             duration_ms=round(max(0.0, perf_counter() - started) * 1000, 3))
+        session.close()
+        engine.dispose()
+
+
+def _record_ingest_attempt_outcome(task_id: str | None, outcome: str | None) -> None:
+    if not task_id or not outcome:
+        return
+    from app.worker.failed_tasks import (
+        STATUS_IGNORED_EXPIRED,
+        STATUS_PERMANENT_FAILED,
+        STATUS_SUCCEEDED,
+        complete_attempt,
+    )
+
+    mapped = None
+    if outcome == "SUCCEEDED":
+        mapped = STATUS_SUCCEEDED
+    elif outcome == "FAILED":
+        mapped = STATUS_PERMANENT_FAILED
+    elif outcome == "SKIPPED":
+        mapped = STATUS_IGNORED_EXPIRED
+    if mapped is None:
+        return
+    try:
+        complete_attempt(str(task_id), mapped, error_code=None if mapped == STATUS_SUCCEEDED else outcome)
+    except Exception:
+        logger.warning("failed_task_outcome_unavailable", task_id=str(task_id), outcome=mapped)
+
+
+def _record_delivery_attempt_outcome(task_id: str | None, outcome: str | None) -> None:
+    if not task_id or not outcome:
+        return
+    from app.worker.failed_tasks import (
+        STATUS_PERMANENT_FAILED,
+        STATUS_SUCCEEDED,
+        complete_attempt,
+    )
+
+    mapped = None
+    if outcome == "SUCCEEDED":
+        mapped = STATUS_SUCCEEDED
+    elif outcome == "FAILED":
+        mapped = STATUS_PERMANENT_FAILED
+    if mapped is None:
+        return
+    try:
+        complete_attempt(str(task_id), mapped, error_code=None if mapped == STATUS_SUCCEEDED else outcome)
+    except Exception:
+        logger.warning("failed_task_outcome_unavailable", task_id=str(task_id), outcome=mapped)
+
+
+@celery_app.task(
+    bind=True,
+    name="app.worker.tasks.ingest_knowledge_task",
+    max_retries=2,
+    acks_late=True,
+)
+def ingest_knowledge_task(
+    self,
+    document_id: int,
+    version: int,
+    request_id: str,
+) -> None:
+    settings = get_settings()
+    engine = create_database_engine(settings.active_database_url)
+    session = Session(bind=engine, autoflush=False, expire_on_commit=False)
+    try:
+        from app.service.knowledge import KnowledgeService
+
+        outcome = KnowledgeService(session, settings=settings).ingest_version(
+            document_id=document_id,
+            version=version,
+            request_id=request_id,
+        )
+        _record_ingest_attempt_outcome(getattr(self.request, "id", None), outcome)
+    except (ProviderTimeoutError, ProviderUnavailableError, ProviderRateLimitError) as exc:
+        logger.warning(
+            "knowledge_ingest_retry",
+            document_id=document_id,
+            error_code=exc.error_code,
+        )
+        retries = int(getattr(self.request, "retries", 0))
+        raise self.retry(exc=exc, countdown=min(2 ** retries, 30))
+    finally:
+        session.close()
+        engine.dispose()
+
+
+def run_ingest_knowledge(
+    document_id: int,
+    version: int,
+    request_id: str,
+    settings=None,
+) -> None:
+    settings = settings or get_settings()
+    engine = create_database_engine(settings.active_database_url)
+    session = Session(bind=engine, autoflush=False, expire_on_commit=False)
+    try:
+        from app.service.knowledge import KnowledgeService
+
+        KnowledgeService(session, settings=settings).ingest_version(
+            document_id=document_id,
+            version=version,
+            request_id=request_id,
+        )
+    finally:
+        session.close()
+        engine.dispose()
+
+
+@celery_app.task(
+    bind=True,
+    name="app.worker.tasks.deliver_notification_task",
+    max_retries=3,
+    acks_late=True,
+)
+def deliver_notification_task(self, delivery_id: int) -> None:
+    settings = get_settings()
+    engine = create_database_engine(settings.active_database_url)
+    session = Session(bind=engine, autoflush=False, expire_on_commit=False)
+    try:
+        from app.service.notification import NotificationService
+
+        outcome = NotificationService(session, settings=settings).deliver_pending(delivery_id)
+        _record_delivery_attempt_outcome(getattr(self.request, "id", None), outcome)
+        if outcome == "RETRY":
+            retries = int(getattr(self.request, "retries", 0))
+            raise self.retry(
+                exc=ProviderUnavailableError("Notification provider is unavailable"),
+                countdown=delivery_retry_delay_seconds(retries + 1),
+            )
+    except (ProviderTimeoutError, ProviderUnavailableError, ProviderRateLimitError) as exc:
+        retries = int(getattr(self.request, "retries", 0))
+        raise self.retry(exc=exc, countdown=min(2 ** retries, 30))
+    finally:
+        session.close()
+        engine.dispose()
+
+
+@celery_app.task(name="app.worker.tasks.sweep_sla_task", acks_late=True)
+def sweep_sla_task(work_order_id: int | None = None) -> dict[str, int]:
+    """Run the normal SLA sweep, optionally scoped for an isolated drill.
+
+    Production Beat does not pass an id and retains the existing bounded global
+    sweep.  The exact-id form exists so a restored test database can exercise a
+    real Beat/Worker pair without mutating imported historical work orders.
+    """
+
+    settings = get_settings()
+    engine = create_database_engine(settings.active_database_url)
+    session = Session(bind=engine, autoflush=False, expire_on_commit=False)
+    try:
+        from app.service.sla import SlaService
+
+        service = SlaService(session, settings=settings)
+        completion = service.sweep_due(work_order_id=work_order_id).as_dict()
+        assignment = service.sweep_assignment_deadlines(
+            work_order_id=work_order_id
+        ).as_dict()
+        if work_order_id is None:
+            unavailable = service.sweep_unavailable_assignments()
+            # Existing bounded beat cadence; use stored analysis, never invoke LLM.
+            dispatch = AnalysisService(
+                session, settings=settings
+            ).sweep_waiting_dispatch()
+        else:
+            # The exact-id acceptance path must not scan imported assignments or
+            # waiting-dispatch rows outside the approved synthetic object.
+            unavailable = 0
+            dispatch = {"scanned": 0, "assigned": 0, "waiting": 0}
+        return {
+            **{f"completion_{key}": value for key, value in completion.items()},
+            **{f"assignment_{key}": value for key, value in assignment.items()},
+            **{f"dispatch_{key}": value for key, value in dispatch.items()},
+            "unavailable_reassigned": unavailable,
+        }
+    finally:
+        session.close()
+        engine.dispose()
+
+
+@celery_app.task(name="app.worker.tasks.retry_waiting_dispatch_task", acks_late=True)
+def retry_waiting_dispatch_task() -> dict[str, int]:
+    """Same bounded recovery after availability changes; no model/SLA replay."""
+    settings = get_settings()
+    engine = create_database_engine(settings.active_database_url)
+    session = Session(bind=engine, autoflush=False, expire_on_commit=False)
+    try:
+        from app.service.sla import SlaService
+        unavailable = SlaService(session, settings=settings).sweep_unavailable_assignments()
+        result = AnalysisService(session, settings=settings).sweep_waiting_dispatch(availability_changed=True)
+        return {**result, "unavailable_reassigned": unavailable}
+    finally:
+        session.close()
+        engine.dispose()
+
+
+@celery_app.task(
+    name="app.worker.tasks.schedule_due_notification_deliveries_task",
+    acks_late=True,
+)
+def schedule_due_notification_deliveries_task() -> int:
+    settings = get_settings()
+    engine = create_database_engine(settings.active_database_url)
+    session = Session(bind=engine, autoflush=False, expire_on_commit=False)
+    try:
+        from app.service.notification import NotificationService
+
+        return NotificationService(session, settings=settings).schedule_due_deliveries()
+    finally:
+        session.close()
+        engine.dispose()
+
+
+def run_analyze_work_order(work_order_id: int, request_id: str, attempt: int = 1) -> None:
+    """In-process entry used by tests and development smoke."""
+
+    settings = get_settings()
+    engine = create_database_engine(settings.active_database_url)
+    session = Session(bind=engine, autoflush=False, expire_on_commit=False)
+    try:
+        AnalysisService(session, settings=settings).analyze_work_order(
+            work_order_id=work_order_id,
+            request_id=request_id,
+            attempt=attempt,
+        )
+    finally:
+        session.close()
+        engine.dispose()

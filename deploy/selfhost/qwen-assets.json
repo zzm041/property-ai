@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "repository": "qtum/Qwen3.8-27B-GGUF",
+  "revision": "7af3b8fef254c9246345e0aa6dfc5ea8b5c45f02",
+  "source": "https://huggingface.co/qtum/Qwen3.8-27B-GGUF/tree/7af3b8fef254c9246345e0aa6dfc5ea8b5c45f02",
+  "source_license_record": "apache-2.0",
+  "identity_note": "Community quantization repository name; Ollama reports qwen35, 26.9B, Q3_K_M. Not a claim of an official Qwen3.8 release.",
+  "files": [
+    {"path": "Qwen3.8-27B-Q3_K_M.gguf", "size": 14210448032, "mode": "sha256", "expected": "fa09d2fbe7d10fe6d91d3e647bd5a2782ec028c2acd9588dd73c9757f82d9631"},
+    {"path": "mmproj-Qwen3.8-27B-Q8_0.gguf", "size": 629247136, "mode": "sha256", "expected": "9793ab158aefdce41d531d37a5458287dcdfc2d10585f4af106802810dfc2618"}
+  ]
+}

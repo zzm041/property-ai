@@ -1,0 +1,41 @@
+.section-title,
+.section-heading {
+  font-size: 36rpx;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+}
+
+.section-heading {
+  margin: 28rpx 24rpx 12rpx;
+}
+
+.csv-box {
+  font-family: monospace;
+  min-height: 190rpx;
+}
+
+.hint {
+  color: #667085;
+  font-size: 30rpx;
+  margin-top: 10rpx;
+  word-break: break-all;
+}
+
+.notice {
+  color: #067647;
+  margin: 16rpx 24rpx;
+}
+
+.archive-card.selected {
+  border: 3rpx solid #1f4b99;
+}
+
+.house-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.danger {
+  background: #b42318;
+}

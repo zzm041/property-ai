@@ -1,0 +1,19 @@
+<view class="card">
+  <view class="section-title">身份恢复审核</view>
+  <view class="empty">两名不同且当前仍有权限的审核人必须独立批准；隔离期结束后只能确认审核完成，身份变更仍需申请人再次认证并执行。</view>
+</view>
+<block wx:for="{{items}}" wx:key="id">
+  <view class="card">
+    <view>申请 {{item.id}} · {{item.purposeText}} · {{item.statusText}}</view>
+    <view>号码：{{item.masked_phone}} · 已批准：{{item.approval_count}}/2</view>
+    <view>隔离截止：{{item.quarantineEndsAtLabel}}</view>
+    <input placeholder="审核原因" value="{{reasonById[item.id]}}" data-id="{{item.id}}" bindinput="onReason" maxlength="255" />
+    <view class="action-row" wx:if="{{item.status === 'PENDING_REVIEW'}}">
+      <button class="btn btn-compact" size="mini" data-id="{{item.id}}" data-decision="APPROVE" bindtap="review">批准</button>
+      <button class="btn danger btn-compact" size="mini" data-id="{{item.id}}" data-decision="REJECT" bindtap="review">拒绝</button>
+      <button class="btn btn-secondary btn-compact" size="mini" data-id="{{item.id}}" bindtap="finalize">确认审核完成</button>
+    </view>
+  </view>
+</block>
+<view class="loading" wx:if="{{loading}}">加载中...</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>
