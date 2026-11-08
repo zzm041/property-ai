@@ -1,0 +1,77 @@
+.section-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+}
+
+.field-title {
+  color: #475467;
+  margin-top: 20rpx;
+  margin-bottom: 10rpx;
+}
+
+.choice {
+  display: inline-block;
+  margin: 8rpx 22rpx 8rpx 0;
+}
+
+.employee-card.selected {
+  border: 3rpx solid #1f4b99;
+}
+
+.employee-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.assignment {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin: 10rpx 0;
+}
+
+.history-item {
+  display: block;
+  margin: 20rpx 0;
+  padding: 20rpx;
+  border: 1rpx solid #e4e7ec;
+  border-radius: 12rpx;
+  line-height: 1.65;
+  word-break: break-word;
+}
+
+.history-item > view + view {
+  margin-top: 8rpx;
+}
+
+.inline-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.input-box {
+  flex: 1 1 240rpx;
+  min-width: 0;
+}
+
+.inline-button {
+  margin: 0;
+}
+
+.hint,
+.token {
+  color: #667085;
+  font-size: 30rpx;
+  margin-top: 12rpx;
+  word-break: break-all;
+}
+
+.notice {
+  color: #067647;
+  margin: 16rpx 24rpx;
+}

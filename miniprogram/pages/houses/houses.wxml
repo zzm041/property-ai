@@ -1,0 +1,46 @@
+<view class="loading" wx:if="{{loading}}">加载中...</view>
+<view class="empty" wx:if="{{!loading && !items.length}}">暂无绑定房屋。请按小区 / 楼栋 / 单元 / 房号申请，等待物业审核。</view>
+<view class="card" wx:for="{{items}}" wx:key="relation_id" data-id="{{item.house_id}}" bindtap="selectHouse">
+  {{item.addressLabel}} · {{item.relationLabel}}
+  <view class="empty">{{item.property_address}}</view>
+  <view class="empty">点此用该房屋报修</view>
+</view>
+<button class="btn" wx:if="{{activeCursor}}" bindtap="loadMoreActive" disabled="{{loading || catalogLoading || moreLoading}}">加载更多已绑定房屋</button>
+<view class="card">
+  <view>申请绑定（按地址选择，无需填写房屋编号）</view>
+  <picker id="property-picker" range="{{propertyNames}}" value="{{propertyIndex}}" bindchange="onProperty" disabled="{{loading}}">
+    <view>小区：{{propertyNames[propertyIndex] || "请选择"}}</view>
+  </picker>
+  <button class="btn btn-secondary btn-compact" wx:if="{{propertyCursor}}" data-level="property" bindtap="loadMoreCatalog" disabled="{{loading || catalogLoading || moreLoading}}">加载更多小区</button>
+  <picker id="building-picker" range="{{buildingNames}}" value="{{buildingIndex}}" bindchange="onBuilding" disabled="{{loading || catalogLoading}}">
+    <view>楼栋：{{buildingNames[buildingIndex] || "请选择"}}</view>
+  </picker>
+  <button class="btn btn-secondary btn-compact" wx:if="{{buildingCursor}}" data-level="building" bindtap="loadMoreCatalog" disabled="{{loading || catalogLoading || moreLoading}}">加载更多楼栋</button>
+  <picker id="unit-picker" range="{{unitNames}}" value="{{unitIndex}}" bindchange="onUnit" disabled="{{loading || catalogLoading}}">
+    <view>单元：{{unitNames[unitIndex] || "请选择"}}</view>
+  </picker>
+  <button class="btn btn-secondary btn-compact" wx:if="{{unitCursor}}" data-level="unit" bindtap="loadMoreCatalog" disabled="{{loading || catalogLoading || moreLoading}}">加载更多单元</button>
+  <picker id="house-picker" range="{{houseNames}}" value="{{houseIndex}}" bindchange="onHousePick" disabled="{{loading || catalogLoading}}">
+    <view>房号：{{houseNames[houseIndex] || "请选择"}}</view>
+  </picker>
+  <button class="btn btn-secondary btn-compact" wx:if="{{houseCursor}}" data-level="house" bindtap="loadMoreCatalog" disabled="{{loading || catalogLoading || moreLoading}}">加载更多房号</button>
+  <picker id="relation-picker" range="{{relationNames}}" value="{{relationIndex < 0 ? 0 : relationIndex}}" bindchange="onRelation" disabled="{{loading}}">
+    <view>与房屋关系：{{relationIndex < 0 ? "请选择" : relationNames[relationIndex]}}</view>
+  </picker>
+  <view class="loading" wx:if="{{catalogLoading}}">正在加载地址...</view>
+  <button class="btn" bindtap="applyBind" disabled="{{loading || catalogLoading || moreLoading || !selectedHouseId}}">提交绑定申请</button>
+</view>
+<view class="card" wx:if="{{requests.length}}">
+  <view>我的申请</view>
+  <view wx:for="{{requests}}" wx:key="id" id="bind-request-{{item.id}}">
+    <view>申请 {{item.id}} · {{item.statusLabel}} · {{item.relationLabel}}</view>
+    <text wx:if="{{item.id === focusedRequestId}}">（当前通知）</text>
+    <view>房屋资料已提交 · 申请时间：{{item.requestedAtLabel}}</view>
+    <view wx:if="{{item.reviewed_at}}">审核时间：{{item.reviewedAtLabel}}</view>
+    <view wx:if="{{item.review_reason}}">审核原因：{{item.review_reason}}</view>
+    <view wx:if="{{item.status === 'REJECTED'}}">请根据审核原因核对资料后，在上方重新申请。原申请记录会保留。</view>
+  </view>
+</view>
+<view class="loading" wx:if="{{moreLoading}}">正在加载下一页...</view>
+<button class="btn" bindtap="retry" disabled="{{loading || moreLoading}}">刷新</button>
+<view class="error" wx:if="{{error}}">{{error}}</view>

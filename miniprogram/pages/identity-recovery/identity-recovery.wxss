@@ -1,0 +1,3 @@
+.section-title { font-weight: 600; margin-bottom: 16rpx; }
+.case-row { border-top: 1rpx solid #eee; padding: 16rpx 0; }
+.completion-box { margin-top: 12rpx; }

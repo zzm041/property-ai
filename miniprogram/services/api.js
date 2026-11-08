@@ -1,0 +1,652 @@
+const { BASE_URL } = require("../config/env");
+const auth = require("./auth");
+const { isUnauthorized, messageFromError } = require("../utils/error");
+
+function responseError(response, fallback) {
+  const payload = response.data || {};
+  const error = new Error(messageFromError(payload, fallback));
+  error.statusCode = response.statusCode;
+  error.code = (payload.error && payload.error.code) || "SYS.HTTP_ERROR";
+  return error;
+}
+
+const CREDENTIAL_AUTH_PATHS = {
+  "/auth/wechat/login": true,
+  "/auth/wechat/bind": true,
+  "/auth/wechat/rebind": true,
+  "/auth/challenge": true,
+  "/auth/sms/send": true,
+  "/auth/sms/login": true,
+  "/auth/sms/test-inbox": true,
+  "/auth/password/login": true,
+  "/auth/password/change": true,
+  "/auth/phone/change": true,
+  "/auth/password/reset/verify": true,
+  "/auth/password/reset/confirm": true,
+  "/auth/token/refresh": true,
+  "/auth/dev/token": true,
+  "/auth/logout": true,
+};
+
+function sendUnauthorizedToLogin() {
+  auth.clearSession();
+  wx.reLaunch({ url: "/pages/login/login" });
+}
+
+let refreshInFlight = null;
+
+function refreshSessionOnce() {
+  if (refreshInFlight) {
+    return refreshInFlight;
+  }
+  const refreshToken = auth.getRefreshToken();
+  if (!refreshToken) {
+    return Promise.reject(new Error("请重新登录"));
+  }
+  refreshInFlight = new Promise((resolve, reject) => {
+    wx.request({
+      url: `${BASE_URL}/auth/token/refresh`,
+      method: "POST",
+      header: { "Content-Type": "application/json" },
+      data: { refresh_token: refreshToken },
+      success: (response) => {
+        const payload = response.data || {};
+        if (response.statusCode >= 400) {
+          reject(new Error(messageFromError(payload, "请重新登录")));
+          return;
+        }
+        const data = payload.data || {};
+        if (!data.access_token) {
+          reject(new Error("请重新登录"));
+          return;
+        }
+        auth.setToken(data.access_token);
+        if (data.refresh_token) {
+          auth.setRefreshToken(data.refresh_token);
+        }
+        resolve(data);
+      },
+      fail: () => reject(new Error("网络不可用")),
+    });
+  }).finally(() => {
+    refreshInFlight = null;
+  });
+  return refreshInFlight;
+}
+
+function request({ path, method, data, headers, retried, unauthorizedBusinessCodes }) {
+  if (!BASE_URL) {
+    return Promise.reject(new Error("当前服务未配置，请联系管理员"));
+  }
+  const token = auth.getToken();
+  const verb = method || "GET";
+  const options = {
+    url: `${BASE_URL}${path}`,
+    method: verb,
+    header: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(headers || {}),
+    },
+  };
+  if (data !== undefined) {
+    options.data = data;
+  } else if (verb !== "GET") {
+    options.data = {};
+  }
+  return new Promise((resolve, reject) => {
+    wx.request({
+      ...options,
+      success: (response) => {
+        const payload = response.data || {};
+        if (isUnauthorized(response.statusCode, payload)) {
+          const errorCode = payload && payload.error && payload.error.code;
+          if (Array.isArray(unauthorizedBusinessCodes) && unauthorizedBusinessCodes.includes(errorCode)) {
+            reject(responseError(response, "认证失败"));
+            return;
+          }
+          if (CREDENTIAL_AUTH_PATHS[path]) {
+            reject(responseError(response, "认证失败"));
+            return;
+          }
+          const latestToken = auth.getToken();
+          if (!retried && latestToken && latestToken !== token) {
+            request({ path, method, data, headers, retried: true, unauthorizedBusinessCodes })
+              .then(resolve)
+              .catch(reject);
+            return;
+          }
+          if (!retried && auth.getRefreshToken()) {
+            refreshSessionOnce()
+              .then(
+                () => request({ path, method, data, headers, retried: true, unauthorizedBusinessCodes }),
+                () => {
+                  sendUnauthorizedToLogin();
+                  throw responseError(response, "请重新登录");
+                }
+              )
+              .then(resolve, reject);
+            return;
+          }
+          sendUnauthorizedToLogin();
+          reject(responseError(response, "请重新登录"));
+          return;
+        }
+        if (response.statusCode === 403) {
+          reject(responseError(response, "无权限"));
+          return;
+        }
+        if (response.statusCode >= 400) {
+          reject(responseError(response, "请求失败"));
+          return;
+        }
+        resolve(payload.data);
+      },
+      fail: () => reject(new Error("网络不可用")),
+    });
+  });
+}
+
+function uploadFile({ fileId, filePath, retried }) {
+  if (!BASE_URL) {
+    return Promise.reject(new Error("当前服务未配置，请联系管理员"));
+  }
+  const token = auth.getToken();
+  return new Promise((resolve, reject) => {
+    wx.uploadFile({
+      url: `${BASE_URL}/files/${fileId}/content`,
+      filePath,
+      name: "file",
+      header: token ? { Authorization: `Bearer ${token}` } : {},
+      success: (response) => {
+        let payload = {};
+        try {
+          payload = JSON.parse(response.data || "{}");
+        } catch (error) {
+          reject(new Error("上传响应无效"));
+          return;
+        }
+        if (isUnauthorized(response.statusCode, payload)) {
+          const latestToken = auth.getToken();
+          if (!retried && latestToken && latestToken !== token) {
+            uploadFile({ fileId, filePath, retried: true })
+              .then(resolve)
+              .catch(reject);
+            return;
+          }
+          if (!retried && auth.getRefreshToken()) {
+            refreshSessionOnce()
+              .then(() => uploadFile({ fileId, filePath, retried: true }))
+              .then(resolve)
+              .catch(() => {
+                sendUnauthorizedToLogin();
+                reject(new Error("请重新登录"));
+              });
+            return;
+          }
+          sendUnauthorizedToLogin();
+          reject(new Error("请重新登录"));
+          return;
+        }
+        if (response.statusCode >= 400) {
+          reject(new Error(messageFromError(payload, "上传失败")));
+          return;
+        }
+        resolve(payload.data);
+      },
+      fail: () => reject(new Error("上传失败，请检查网络后重试")),
+    });
+  });
+}
+
+function downloadFile({ fileId, retried, audience = "resident" }) {
+  if (!BASE_URL) {
+    return Promise.reject(new Error("当前服务未配置，请联系管理员"));
+  }
+  const token = auth.getToken();
+  return new Promise((resolve, reject) => {
+    wx.downloadFile({
+      url: `${BASE_URL}/files/${fileId}/content${audience === "property" ? "?audience=property" : ""}`,
+      header: token ? { Authorization: `Bearer ${token}` } : {},
+      success: (response) => {
+        if (response.statusCode === 401) {
+          const latestToken = auth.getToken();
+          if (!retried && latestToken && latestToken !== token) {
+            downloadFile({ fileId, retried: true, audience }).then(resolve).catch(reject);
+            return;
+          }
+          if (!retried && auth.getRefreshToken()) {
+            refreshSessionOnce()
+              .then(() => downloadFile({ fileId, retried: true, audience }))
+              .then(resolve)
+              .catch(() => {
+                sendUnauthorizedToLogin();
+                reject(new Error("请重新登录"));
+              });
+            return;
+          }
+          sendUnauthorizedToLogin();
+          reject(new Error("请重新登录"));
+          return;
+        }
+        if (response.statusCode >= 400 || !response.tempFilePath) {
+          reject(new Error("附件读取失败"));
+          return;
+        }
+        resolve(response.tempFilePath);
+      },
+      fail: () => reject(new Error("附件读取失败，请检查网络后重试")),
+    });
+  });
+}
+
+function registerAndUpload({ filePath, mimeType, sizeBytes, originalName, propertyId }) {
+  return request({
+    path: "/files",
+    method: "POST",
+    data: {
+      mime_type: mimeType,
+      size_bytes: sizeBytes,
+      original_name: originalName,
+      property_id: propertyId || undefined,
+    },
+  }).then((file) => uploadFile({ fileId: file.id, filePath }).then(() => file));
+}
+
+module.exports = {
+  request,
+  uploadFile,
+  downloadFile,
+  registerAndUpload,
+  wechatLogin: (code) => request({ path: "/auth/wechat/login", method: "POST", data: { code } }),
+  wechatBind: (code) => request({ path: "/auth/wechat/bind", method: "POST", data: { code } }),
+  wechatRebind: (body) =>
+    request({ path: "/auth/wechat/rebind", method: "POST", data: body }),
+  issueChallenge: (phone, purpose) =>
+    request({ path: "/auth/challenge", method: "POST", data: { phone, purpose: purpose || "login" } }),
+  sendSms: (phone, purpose, challengeId, challengeAnswer) =>
+    request({
+      path: "/auth/sms/send",
+      method: "POST",
+      data: {
+        phone,
+        purpose: purpose || "login",
+        challenge_id: challengeId,
+        challenge_answer: challengeAnswer,
+      },
+    }),
+  smsLogin: (phone, code) =>
+    request({ path: "/auth/sms/login", method: "POST", data: { phone, code } }),
+  passwordLogin: (phone, password) =>
+    request({ path: "/auth/password/login", method: "POST", data: { phone, password } }),
+  changePassword: (oldPassword, newPassword, confirmPassword) =>
+    request({
+      path: "/auth/password/change",
+      method: "POST",
+      data: {
+        old_password: oldPassword,
+        new_password: newPassword,
+        confirm_password: confirmPassword,
+      },
+    }),
+  changePhone: (body) =>
+    request({ path: "/auth/phone/change", method: "POST", data: body }),
+  verifyPasswordReset: (phone, code) =>
+    request({ path: "/auth/password/reset/verify", method: "POST", data: { phone, code } }),
+  confirmPasswordReset: (resetToken, newPassword, confirmPassword) =>
+    request({
+      path: "/auth/password/reset/confirm",
+      method: "POST",
+      data: {
+        reset_token: resetToken,
+        new_password: newPassword,
+        confirm_password: confirmPassword,
+      },
+    }),
+  refreshToken: (refreshToken) =>
+    request({ path: "/auth/token/refresh", method: "POST", data: { refresh_token: refreshToken } }),
+  logout: (refreshToken) =>
+    request({ path: "/auth/logout", method: "POST", data: { refresh_token: refreshToken || undefined } }),
+  updateProfile: (displayName) =>
+    request({ path: "/me/profile", method: "PATCH", data: { display_name: displayName } }),
+  identityRecoveryCapabilities: () => request({ path: "/identity/recovery/capabilities" }),
+  createIdentityRecoveryCase: (body) =>
+    request({ path: "/identity/recovery/cases", method: "POST", data: body }),
+  myIdentityRecoveryCases: (afterId = 0) =>
+    request({ path: `/identity/recovery/cases/mine?after_id=${afterId}&limit=50` }),
+  completeIdentityRecoveryCase: (id, body) =>
+    request({
+      path: `/identity/recovery/cases/${id}/complete`,
+      method: "POST",
+      data: body,
+      unauthorizedBusinessCodes: ["IDENTITY_RECOVERY.PROOF_REJECTED"],
+    }),
+  identityRecoveryCases: (afterId = 0, status = "") =>
+    request({ path: `/admin/identity-recovery/cases?after_id=${afterId}&limit=50${status ? `&status=${status}` : ""}` }),
+  reviewIdentityRecoveryCase: (id, body) =>
+    request({ path: `/admin/identity-recovery/cases/${id}/reviews`, method: "POST", data: body }),
+  finalizeIdentityRecoveryCase: (id, expectedVersion) =>
+    request({ path: `/admin/identity-recovery/cases/${id}/finalize`, method: "POST", data: { expected_version: expectedVersion } }),
+  catalogProperties: (afterId, limit = 100) =>
+    request({
+      path: `/properties?limit=${limit}${afterId ? `&after_id=${afterId}` : ""}`,
+    }),
+  catalogBuildings: (propertyId, afterId = 0, limit = 50) => request({ path: `/properties/${propertyId}/buildings?after_id=${afterId}&limit=${limit}` }),
+  catalogUnits: (buildingId, afterId = 0, limit = 50) => request({ path: `/buildings/${buildingId}/units?after_id=${afterId}&limit=${limit}` }),
+  catalogHouses: (unitId, afterId = 0, limit = 50) => request({ path: `/units/${unitId}/houses?after_id=${afterId}&limit=${limit}` }),
+  claimEmployee: (token) =>
+    request({ path: "/staff/employee-claim", method: "POST", data: { token } }),
+  devToken: (seedKey) =>
+    request({ path: "/auth/dev/token", method: "POST", data: { seed_key: seedKey } }),
+  me: () => request({ path: "/me" }),
+  createOrganization: (body, idempotencyKey) =>
+    request({
+      path: "/system/organizations",
+      method: "POST",
+      data: body,
+      headers: { "Idempotency-Key": idempotencyKey },
+    }),
+  contactDefault: () => request({ path: "/me/contact-phone" }),
+  workOrderContact: (id, reveal = false) => request({ path: `/work-orders/${id}/contact?reveal=${reveal ? 'true' : 'false'}` }),
+  houses: (afterId = 0, limit = 50) => request({ path: `/me/houses?after_id=${afterId}&limit=${limit}` }),
+  myBindRequests: (afterId, limit = 50) =>
+    request({
+      path: `/resident-bind-requests/mine?limit=${limit}${
+        afterId ? `&after_id=${afterId}` : ""
+      }`,
+    }),
+  createBindRequest: (body) =>
+    request({ path: "/resident-bind-requests", method: "POST", data: body }),
+  createWorkOrder: (body, idempotencyKey) =>
+    request({
+      path: "/work-orders",
+      method: "POST",
+      data: body,
+      headers: { "Idempotency-Key": idempotencyKey || `mp-${Date.now()}-${Math.random().toString(16).slice(2)}` },
+    }),
+  listWorkOrders: (afterId, limit = 20) =>
+    request({
+      path: `/work-orders?limit=${limit}${afterId ? `&after_id=${afterId}` : ""}`,
+    }),
+  workOrder: (id, audience = "resident") => request({ path: `/work-orders/${id}${audience === "property" ? "?audience=property" : ""}` }),
+  appendWorkOrder: (id, body) =>
+    request({ path: `/work-orders/${id}/append`, method: "POST", data: body }),
+  cancelWorkOrder: (id, body) =>
+    request({ path: `/work-orders/${id}/cancel`, method: "POST", data: body }),
+  confirmWorkOrder: (id, body = {}) =>
+    request({ path: `/work-orders/${id}/confirm`, method: "POST", data: body }),
+  reopenWorkOrder: (id, body) =>
+    request({ path: `/work-orders/${id}/reopen`, method: "POST", data: body }),
+  rateWorkOrder: (id, body) =>
+    request({ path: `/work-orders/${id}/rate`, method: "POST", data: body }),
+  supervisorAgentCapabilities: propertyId => request({
+    path: `/supervisor/work-order-agent/capabilities?property_id=${Number(propertyId)}`,
+    headers: { 'X-Property-Id': String(propertyId) },
+  }),
+  supervisorAgent: (propertyId, question) => request({
+    path: '/supervisor/work-order-agent', method: 'POST',
+    data: { property_id: Number(propertyId), question },
+    headers: { 'X-Property-Id': String(propertyId) },
+  }),
+  workOrderDiagnosis: (id, propertyId, version) => request({
+    path: `/supervisor/work-orders/${id}/diagnosis?property_id=${propertyId}&version=${version}`,
+  }),
+  announcements: (propertyId, afterId, limit = 50, audience = "resident") =>
+    request({
+      path: `/announcements?property_id=${propertyId}&limit=${limit}${
+        afterId ? `&after_id=${afterId}` : ""
+      }&audience=${audience === "property" ? "property" : "resident"}`,
+    }),
+  announcement: (propertyId, id, audience = "resident") =>
+    request({
+      path: `/announcements?property_id=${propertyId}&after_id=${Math.max(
+        Number(id) - 1,
+        0
+      )}&limit=1&audience=${audience === "property" ? "property" : "resident"}`,
+    }).then((payload) => {
+      const item = ((payload && payload.items) || []).find(
+        (row) => Number(row.id) === Number(id)
+      );
+      if (!item) {
+        throw new Error("公告不存在、未发布或无权查看");
+      }
+      return item;
+    }),
+  queryAssistant: (body) =>
+    request({ path: "/assistant/query", method: "POST", data: body }),
+  adminKnowledgeDocuments: (propertyId, afterId, includeArchived) =>
+    request({
+      path: `/admin/knowledge-documents?property_id=${propertyId}&limit=100${
+        afterId ? `&after_id=${afterId}` : ""
+      }${includeArchived ? "&include_archived=true" : ""}`,
+    }),
+  adminKnowledgeDocument: (id) =>
+    request({ path: `/admin/knowledge-documents/${id}` }),
+  createKnowledgeDocument: (body) =>
+    request({ path: "/admin/knowledge-documents", method: "POST", data: body }),
+  createKnowledgeVersion: (id, body) =>
+    request({
+      path: `/admin/knowledge-documents/${id}/versions`,
+      method: "POST",
+      data: body,
+    }),
+  archiveKnowledgeDocument: (id, body) =>
+    request({
+      path: `/admin/knowledge-documents/${id}/archive`,
+      method: "POST",
+      data: body,
+    }),
+  notifications: (afterId, limit = 20) =>
+    request({
+      path: `/notifications?limit=${limit}${afterId ? `&after_id=${afterId}` : ""}`,
+    }),
+  readNotification: (id) =>
+    request({ path: `/notifications/${id}/read`, method: "POST", data: {} }),
+  attendanceToday: (propertyId) =>
+    request({ path: `/staff/attendance/today?property_id=${propertyId}` }),
+  checkIn: (propertyId) =>
+    request({
+      path: "/staff/attendance/checkin",
+      method: "POST",
+      data: { property_id: propertyId },
+    }),
+  checkOut: (propertyId) =>
+    request({
+      path: "/staff/attendance/checkout",
+      method: "POST",
+      data: { property_id: propertyId },
+    }),
+  staffWorkOrders: (afterId, limit = 50) =>
+    request({
+      path: `/staff/work-orders?limit=${limit}${afterId ? `&after_id=${afterId}` : ""}`,
+    }),
+  acceptWorkOrder: (id, body = {}) =>
+    request({ path: `/staff/work-orders/${id}/accept`, method: "POST", data: body }),
+  rejectWorkOrder: (id, body) =>
+    request({ path: `/staff/work-orders/${id}/reject`, method: "POST", data: body }),
+  startWorkOrder: (id, body = {}) =>
+    request({ path: `/staff/work-orders/${id}/start`, method: "POST", data: body }),
+  feedbackWorkOrder: (id, body) =>
+    request({ path: `/staff/work-orders/${id}/feedback`, method: "POST", data: body }),
+  resolveWorkOrder: (id, body) =>
+    request({ path: `/staff/work-orders/${id}/receipts`, method: "POST", data: body }),
+  supplementReceiptMedia: (id, receiptId, body) =>
+    request({
+      path: `/staff/work-orders/${id}/receipts/${receiptId}/media`,
+      method: "POST",
+      data: body,
+    }),
+  escalateWorkOrder: (id, body) =>
+    request({ path: `/staff/work-orders/${id}/escalate`, method: "POST", data: body }),
+  supervisorQueue: (propertyId, afterId, view = "dispatch") =>
+    request({
+      path: `/supervisor/work-orders?property_id=${propertyId}${
+        afterId ? `&after_id=${afterId}` : ""
+      }${view === "unstarted" ? "&view=unstarted" : ""}`,
+    }),
+  assignWorkOrder: (id, body) =>
+    request({ path: `/supervisor/work-orders/${id}/assign`, method: "POST", data: body }),
+  reassignWorkOrder: (id, body) =>
+    request({
+      path: `/supervisor/work-orders/${id}/decide`,
+      method: "POST",
+      data: { decision: "REASSIGN", ...body },
+    }),
+  decideWorkOrder: (id, body) =>
+    request({ path: `/supervisor/work-orders/${id}/decide`, method: "POST", data: body }),
+  analyzeWorkOrder: (id) =>
+    request({ path: `/supervisor/work-orders/${id}/analyze`, method: "POST", data: {} }),
+  workOrderRecommendations: (id) =>
+    request({ path: `/supervisor/work-orders/${id}/recommendations` }),
+  incidents: (propertyId, tenantId, afterId, status) =>
+    request({
+      path: `/supervisor/incidents?property_id=${propertyId}&tenant_id=${tenantId}&limit=50${
+        afterId ? `&after_id=${afterId}` : ""
+      }${status ? `&status=${encodeURIComponent(status)}` : ""}`,
+    }),
+  incident: (id) => request({ path: `/supervisor/incidents/${id}` }),
+  summarizeIncident: (id) =>
+    request({
+      path: `/supervisor/incidents/${id}/summary`,
+      method: "POST",
+      data: {},
+    }),
+  updateIncidentStatus: (id, body) =>
+    request({
+      path: `/supervisor/incidents/${id}/status`,
+      method: "POST",
+      data: body,
+    }),
+  createAnnouncement: (body) =>
+    request({ path: "/admin/announcements", method: "POST", data: body }),
+  adminAnnouncements: (propertyId, afterId) =>
+    request({
+      path: `/admin/announcements?property_id=${propertyId}&limit=100${
+        afterId ? `&after_id=${afterId}` : ""
+      }`,
+    }),
+  adminAnnouncement: (id) => request({ path: `/admin/announcements/${id}` }),
+  updateAnnouncement: (id, body) =>
+    request({ path: `/admin/announcements/${id}`, method: "PATCH", data: body }),
+  submitAnnouncementReview: (id) =>
+    request({
+      path: `/admin/announcements/${id}/submit-review`,
+      method: "POST",
+      data: {},
+    }),
+  publishAnnouncement: (id, body) =>
+    request({
+      path: `/admin/announcements/${id}/publish`,
+      method: "POST",
+      data: body || { decision: "APPROVE" },
+    }),
+  bindRequests: (propertyId, tenantId, afterId = 0, limit = 50) =>
+    request({
+      path: `/admin/resident-bind-requests?property_id=${propertyId}&tenant_id=${tenantId}&after_id=${afterId}&limit=${limit}`,
+    }),
+  approveBindRequest: (id) =>
+    request({
+      path: `/admin/resident-bind-requests/${id}/approve`,
+      method: "POST",
+      data: {},
+    }),
+  rejectBindRequest: (id, reason) =>
+    request({
+      path: `/admin/resident-bind-requests/${id}/reject`,
+      method: "POST",
+      data: { reason },
+    }),
+  employees: (propertyId, tenantId, afterId, includeHistorical) =>
+    request({
+      path: `/admin/employees?property_id=${propertyId}&tenant_id=${tenantId}&limit=100${
+        afterId ? `&after_id=${afterId}` : ""
+      }${includeHistorical ? "&include_historical=true" : ""}`,
+    }),
+  employeeCatalog: (propertyId, tenantId) =>
+    request({
+      path: `/admin/employee-catalog?property_id=${propertyId}&tenant_id=${tenantId}`,
+    }),
+  employeeWorkHistory: (id, propertyId, tenantId, beforeId) =>
+    request({ path: `/admin/employees/${id}/work-history?property_id=${propertyId}&tenant_id=${tenantId}&limit=20&before_id=${beforeId || 0}`,
+      headers: { "X-Property-Id": String(propertyId) } }),
+  createEmployee: (body) =>
+    request({ path: "/admin/employees", method: "POST", data: body }),
+  updateEmployee: (id, body) =>
+    request({ path: `/admin/employees/${id}`, method: "PATCH", data: body }),
+  createDuty: (body) =>
+    request({ path: "/admin/duties", method: "POST", data: body }),
+  createSkill: (body) =>
+    request({ path: "/admin/skills", method: "POST", data: body }),
+  issueEmployeeInvite: (id, phone) =>
+    request({
+      path: `/admin/employees/${id}/invites`,
+      method: "POST",
+      data: { phone },
+    }),
+  assignEmployeeProperty: (id, propertyId) =>
+    request({
+      path: `/admin/employees/${id}/property-assignments`,
+      method: "POST",
+      data: { property_id: propertyId },
+    }),
+  endEmployeeProperty: (employeeId, assignmentId) =>
+    request({
+      path: `/admin/employees/${employeeId}/property-assignments/${assignmentId}/end`,
+      method: "POST",
+      data: {},
+    }),
+  propertyArchive: (propertyId, tenantId) =>
+    request({
+      path: `/admin/property-archive?property_id=${propertyId}&tenant_id=${tenantId}`,
+    }),
+  createBuilding: (body) =>
+    request({ path: "/admin/buildings", method: "POST", data: body }),
+  updateBuilding: (id, body) =>
+    request({ path: `/admin/buildings/${id}`, method: "PATCH", data: body }),
+  createUnit: (body) =>
+    request({ path: "/admin/units", method: "POST", data: body }),
+  updateUnit: (id, body) =>
+    request({ path: `/admin/units/${id}`, method: "PATCH", data: body }),
+  createHouse: (body) =>
+    request({ path: "/admin/houses", method: "POST", data: body }),
+  updateHouse: (id, body) =>
+    request({ path: `/admin/houses/${id}`, method: "PATCH", data: body }),
+  importHouses: (body) =>
+    request({ path: "/admin/houses/import", method: "POST", data: body }),
+  exportHouses: (propertyId, tenantId) =>
+    request({
+      path: `/admin/houses/export?property_id=${propertyId}&tenant_id=${tenantId}`,
+    }),
+  residentRelationHistory: (propertyId, tenantId, afterId, houseId) =>
+    request({
+      path: `/admin/resident-house-relations?property_id=${propertyId}&tenant_id=${tenantId}&limit=100${
+        afterId ? `&after_id=${afterId}` : ""
+      }${houseId ? `&house_id=${houseId}` : ""}`,
+    }),
+  endResidentRelation: (id, status) =>
+    request({
+      path: `/admin/resident-house-relations/${id}/end`,
+      method: "POST",
+      data: { status: status || "ENDED" },
+    }),
+  slaPolicies: (propertyId, tenantId) =>
+    request({
+      path: `/admin/sla-policies?property_id=${propertyId}&tenant_id=${tenantId}`,
+    }),
+  putSlaPolicy: (body) =>
+    request({ path: "/admin/sla-policies", method: "PUT", data: body }),
+  operationsOverview: (scopeType, tenantId, propertyId) =>
+    request({
+      path: `/admin/operations-overview?scope_type=${encodeURIComponent(
+        scopeType
+      )}&tenant_id=${encodeURIComponent(tenantId)}${
+        propertyId ? `&property_id=${encodeURIComponent(propertyId)}` : ""
+      }`,
+    }),
+  staffDaily: (propertyId, tenantId, afterId) =>
+    request({
+      path: `/supervisor/staff/daily?property_id=${propertyId}&tenant_id=${tenantId}&limit=100${
+        afterId ? `&after_id=${afterId}` : ""
+      }`,
+    }),
+};

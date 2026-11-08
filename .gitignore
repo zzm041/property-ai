@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+secrets/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs & local data
+logs/
+*.log
+tmp/
+data/uploads/
+data/local-storage/
+
+# Alembic local
+backend/alembic/versions/*.pyc
+
+# WeChat miniprogram
+miniprogram/node_modules/
+miniprogram/miniprogram_npm/
+miniprogram/project.private.config.json
+miniprogram/config/env.local.js
+
+# Docker volumes / local compose overrides
+docker-compose.override.yml
+.docker/
+deploy/backups/
+deploy/customer-install/
+
+# Cursor / agent local
+.cursor/*.log
+
+# Local isolated miniprogram release-pack tree (inventory JSON is kept)
+reports/auth-identity-ai-001/release-pack/
+
+# MP-CURRENT-FULL-REGRESSION-001 secrets and operator backups
+reports/mp-current-full-regression/private/
+reports/mp-current-full-regression/accounts.local.json

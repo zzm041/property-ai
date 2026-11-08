@@ -1,0 +1,7 @@
+<view class="card" wx:if="{{visible}}">
+  <view class="section-title">报修联系方式</view>
+  <view>本次联系电话：{{phone || masked || '未采集（历史工单）'}}</view>
+  <button class="btn btn-secondary" wx:if="{{collected}}" bindtap="reveal" disabled="{{busy}}">查看联系电话</button>
+  <button class="btn" wx:if="{{collected}}" bindtap="call" disabled="{{busy}}">联系报修人</button>
+  <view class="error" wx:if="{{error}}">{{error}}</view>
+</view>

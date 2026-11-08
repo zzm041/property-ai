@@ -1,0 +1,59 @@
+<view class="card">
+  <view>完善资料</view>
+  <input placeholder="姓名" value="{{displayName}}" bindinput="onName" />
+  <button class="btn" bindtap="save" disabled="{{loading}}">保存</button>
+</view>
+<view class="card">
+  <view>修改密码</view>
+  <view class="password-row">
+    <input class="grow" placeholder="当前密码" value="{{currentPassword}}" data-field="currentPassword" bindinput="onPasswordField" password="{{!showPassword}}" />
+    <button class="link" bindtap="togglePassword">{{showPassword ? "隐藏" : "显示"}}</button>
+  </view>
+  <input placeholder="新密码" value="{{newPassword}}" data-field="newPassword" bindinput="onPasswordField" password="{{!showPassword}}" />
+  <input placeholder="确认新密码" value="{{confirmPassword}}" data-field="confirmPassword" bindinput="onPasswordField" password="{{!showPassword}}" />
+  <view class="empty">强度：{{passwordStrength}}（至少 8 个字符，不强制大写；不能是纯数字或纯小写字母）</view>
+  <button class="btn" bindtap="changePassword" disabled="{{loading}}">确认修改密码</button>
+  <button class="link" bindtap="goPasswordSetup">首次设置密码或忘记密码？使用手机号验证</button>
+  <view class="empty" wx:if="{{passwordNotice}}">{{passwordNotice}}</view>
+</view>
+<view class="card">
+  <button id="wechat-bind-button" class="btn" bindtap="bindWechat" disabled="{{loading}}">绑定当前微信</button>
+  <view class="empty">绑定后可使用微信登录当前账号。</view>
+</view>
+<view class="card">
+  <view>安全更换微信</view>
+  <view class="empty">验证当前账号手机号后，旧微信登录和其他旧会话会失效。</view>
+  <input placeholder="当前账号手机号" value="{{wechatPhone}}" data-field="wechatPhone" bindinput="onWechatField" type="number" />
+  <view class="empty" wx:if="{{wechatChallengePrompt}}">安全挑战：{{wechatChallengePrompt}}</view>
+  <input wx:if="{{wechatChallengePrompt}}" placeholder="挑战答案" value="{{wechatChallengeAnswer}}" data-field="wechatChallengeAnswer" bindinput="onWechatField" />
+  <input placeholder="当前手机号验证码" value="{{wechatCode}}" data-field="wechatCode" bindinput="onWechatField" />
+  <button class="btn btn-secondary" bindtap="sendWechatCode" disabled="{{loading}}">获取验证短信</button>
+  <button class="btn" bindtap="rebindWechat" disabled="{{loading}}">确认更换为当前微信</button>
+  <view class="empty" wx:if="{{wechatNotice}}">{{wechatNotice}}</view>
+</view>
+<view class="card">
+  <view>更换手机号</view>
+  <view class="empty">必须分别验证当前手机号和未注册的新手机号。变更后其他旧会话失效。</view>
+  <input placeholder="当前手机号" value="{{oldPhone}}" data-field="oldPhone" bindinput="onPhoneField" type="number" />
+  <view class="empty" wx:if="{{oldChallengePrompt}}">旧号安全挑战：{{oldChallengePrompt}}</view>
+  <input wx:if="{{oldChallengePrompt}}" placeholder="旧号挑战答案" value="{{oldChallengeAnswer}}" data-field="oldChallengeAnswer" bindinput="onPhoneField" />
+  <input placeholder="旧号验证码" value="{{oldCode}}" data-field="oldCode" bindinput="onPhoneField" />
+  <button class="btn btn-secondary" data-kind="old" bindtap="sendPhoneCode" disabled="{{loading}}">获取旧号验证码</button>
+  <input placeholder="新手机号" value="{{newPhone}}" data-field="newPhone" bindinput="onPhoneField" type="number" />
+  <view class="empty" wx:if="{{newChallengePrompt}}">新号安全挑战：{{newChallengePrompt}}</view>
+  <input wx:if="{{newChallengePrompt}}" placeholder="新号挑战答案" value="{{newChallengeAnswer}}" data-field="newChallengeAnswer" bindinput="onPhoneField" />
+  <input placeholder="新号验证码" value="{{newCode}}" data-field="newCode" bindinput="onPhoneField" />
+  <button class="btn btn-secondary" data-kind="new" bindtap="sendPhoneCode" disabled="{{loading}}">获取新号验证码</button>
+  <button class="btn" bindtap="changePhone" disabled="{{loading}}">确认更换手机号</button>
+  <view class="empty" wx:if="{{phoneNotice}}">{{phoneNotice}}</view>
+</view>
+<view class="card">
+  <button class="btn" data-url="/pages/employee-claim/employee-claim" bindtap="goClaim">员工邀请认领</button>
+</view>
+<view class="card">
+  <button class="btn btn-secondary" bindtap="goIdentityRecovery">账号合并 / 高风险恢复</button>
+  <view class="empty">新短信不能继承旧账号；需独立身份核验、30 天隔离及两名不同授权人审核。</view>
+</view>
+<button class="btn" bindtap="back">返回</button>
+<view class="loading" wx:if="{{loading}}">处理中...</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>

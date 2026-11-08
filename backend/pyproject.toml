@@ -1,0 +1,52 @@
+[project]
+name = "property-ai"
+version = "0.1.0"
+description = "智慧物业 AI 运营与工单调度平台 — Production V1"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+authors = [{ name = "Property AI Team" }]
+dependencies = [
+  "fastapi==0.115.12",
+  "starlette==0.41.3",
+  "pydantic==2.10.6",
+  "pydantic-settings==2.7.1",
+  "uvicorn[standard]==0.32.1",
+  "sqlalchemy==2.0.36",
+  "alembic==1.14.0",
+  "pymysql==1.1.1",
+  "cryptography==44.0.0",
+  "redis==5.2.1",
+  "celery==5.5.3",
+  "kombu==5.5.4",
+  "billiard==4.2.1",
+  "pymilvus==2.5.14",
+  "httpx==0.28.1",
+  "PyJWT==2.10.1",
+  "argon2-cffi==23.1.0",
+  "python-multipart==0.0.20",
+  "orjson==3.10.15",
+  "structlog==24.4.0",
+  "alibabacloud-dypnsapi20170525==2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest==8.3.4",
+  "pytest-asyncio==0.25.2",
+  "pytest-cov==6.0.0",
+]
+
+[build-system]
+requires = ["setuptools==75.8.0", "wheel==0.45.1"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+
+# Stage 0.5：仅统一冻结依赖元数据。未经 Task 计划确认，不添加业务依赖。

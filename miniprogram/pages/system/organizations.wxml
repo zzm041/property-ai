@@ -1,0 +1,22 @@
+<view class="card">
+  <view class="section-title">建立物业组织</view>
+  <view class="hint">仅系统管理员可操作。首位管理员须先通过正常登录注册为有效账号。</view>
+  <input placeholder="物业企业 / 租户名称" value="{{tenantName}}" data-field="tenantName" bindinput="onInput" />
+  <input placeholder="企业联系方式（可不填）" value="{{tenantContact}}" data-field="tenantContact" bindinput="onInput" />
+  <input placeholder="小区名称" value="{{propertyName}}" data-field="propertyName" bindinput="onInput" />
+  <textarea placeholder="小区地址" value="{{propertyAddress}}" data-field="propertyAddress" bindinput="onInput" auto-height />
+  <input placeholder="IANA 时区" value="{{timezone}}" data-field="timezone" bindinput="onInput" />
+  <input type="number" placeholder="首位管理员手机号" value="{{initialAdminPhone}}" data-field="initialAdminPhone" bindinput="onInput" />
+  <button class="btn" loading="{{loading}}" disabled="{{loading || created}}" bindtap="submit">建立并授权</button>
+</view>
+
+<view class="notice" wx:if="{{notice}}">{{notice}}</view>
+<view class="error" wx:if="{{error}}">{{error}}</view>
+
+<view class="card" wx:if="{{created}}">
+  <view class="section-title">建立结果</view>
+  <view>物业企业：{{created.tenant_name}}</view>
+  <view>小区：{{created.property_name}}</view>
+  <view>首位管理员：已完成授权</view>
+  <view>管理范围：租户管理员</view>
+</view>

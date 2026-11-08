@@ -1,0 +1,6 @@
+# Include only for explicit initialization/migration. Routine operations do not
+# require retaining the one-time administrator credentials on this host.
+services:
+  migrate:
+    env_file:
+      - ${DELIVERY_BOOTSTRAP_ENV_FILE:-.env.delivery.bootstrap}

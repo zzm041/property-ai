@@ -1,0 +1,6 @@
+{
+  "window_id": "online-first",
+  "max_attempts": 3,
+  "expires_at": 0,
+  "record": "private-online-window.jsonl"
+}

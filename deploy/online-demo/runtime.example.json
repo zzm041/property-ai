@@ -1,0 +1,14 @@
+{
+  "window_id": "online-example",
+  "expires_at": 0,
+  "origin": "https://replace-with-approved-demo-host.invalid",
+  "backend_url": "http://127.0.0.1:18095",
+  "resident_token_file": "/replace/private/resident-token",
+  "operator_token_file": "/replace/private/operator-token",
+  "invite_file": "/replace/private/invite-code",
+  "ledger_file": "/replace/private/online-example.jsonl",
+  "tenant_id": 0,
+  "property_id": 0,
+  "house_id": 0,
+  "reporter_user_id": 0
+}
