@@ -58,4 +58,4 @@ docker compose --env-file deploy/.env.customer -f deploy/docker-compose.delivery
 
 数据库完成后按[客户存储步骤](CUSTOMER-STORAGE.md)初始化桶/权限，随后核对可信扫描与病毒库、模型实际推理、知识索引、企业身份通道、应用四服务与 TLS，再进行部署验收。当前 `delivery.ps1 init` 和旧 `storage-init` 是固定本地验收目标，不能用于客户库/bucket；不要用它们替代客户准备步骤。
 
-正常服务启动命令准备中以受审交付清单为准；在模型可移植安装与线上隔离验收完成前，不发布“甲方一键安装已通过”的结论。
+正常启动、日常检查、维护停机与恢复准备见 [CUSTOMER-OPERATIONS.md](CUSTOMER-OPERATIONS.md)。这些操作说明不代表已经完成甲方整机验收；在最终净包全栈及实际部署验证完成前，不发布“甲方一键安装已通过”的结论。

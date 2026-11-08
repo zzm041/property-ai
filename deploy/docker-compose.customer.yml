@@ -16,6 +16,11 @@ x-customer-app: &customer-app
       condition: service_healthy
 
 services:
+  mysql:
+    # Preserve password bytes as one argument, including whitespace and '*'.
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
+
   scanner:
     image: clamav/clamav:1.4.6-debian13-slim@sha256:ce80e97855d937e93009bb47eb5ecb410b514b844b03d0ecf00e8eeec92810cc
     environment:

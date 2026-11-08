@@ -13,8 +13,7 @@ from app.cli.customer_environment import export
 ROOT = Path(__file__).resolve().parents[3]
 
 
-@pytest.mark.parametrize("install_profile", [False, "install", "storage-install"])
-def test_customer_project_and_credentials_are_isolated(tmp_path, install_profile):
+def render_customer_config(tmp_path, install_profile=False):
     if not shutil.which("docker"):
         pytest.skip("Docker Compose config renderer is required")
     for name in ("docker-compose.delivery.yml", "docker-compose.customer.yml"):
@@ -40,7 +39,12 @@ def test_customer_project_and_credentials_are_isolated(tmp_path, install_profile
     result = subprocess.run([*args, "config", "--format", "json"], cwd=tmp_path, env=env,
                             capture_output=True, text=True, timeout=20)
     assert result.returncode == 0, "isolated customer Compose config failed (output withheld)"
-    config = json.loads(result.stdout)
+    return json.loads(result.stdout)
+
+
+@pytest.mark.parametrize("install_profile", [False, "install", "storage-install"])
+def test_customer_project_and_credentials_are_isolated(tmp_path, install_profile):
+    config = render_customer_config(tmp_path, install_profile)
     assert config["name"] == "customer-property-ai"
     assert config["volumes"]["mysql_data"]["name"] == "customer-property-ai-mysql-data"
     services = config["services"]
@@ -79,3 +83,35 @@ def test_customer_project_and_credentials_are_isolated(tmp_path, install_profile
         assert services["storage-installer"]["entrypoint"] == ["python", "-m", "app.cli.customer_storage"]
         assert services["storage-installer"]["environment"]["STORAGE_BOOTSTRAP_SECRET_KEY"] == "SYNTHETIC_ONLY"
         assert "BOOTSTRAP_ADMIN_PASSWORD" not in services["storage-installer"]["environment"]
+
+
+@pytest.mark.parametrize("password", ["synthetic-simple", "synthetic with spaces", "*", "synthetic'\"$;value"])
+def test_mysql_healthcheck_passes_password_as_one_literal_argument(tmp_path, password):
+    shell = shutil.which("bash")
+    if os.name == "nt":
+        shell = next((str(path) for path in (
+            Path(os.environ.get("ProgramFiles", "C:/Program Files")) / "Git/bin/bash.exe",
+            Path(os.environ.get("LOCALAPPDATA", "C:/Users/Default/AppData/Local")) / "Programs/Git/bin/bash.exe",
+        ) if path.is_file()), None)
+    if not shell:
+        pytest.skip("POSIX shell is required for the actual healthcheck argument boundary")
+    config = render_customer_config(tmp_path)
+    check = config["services"]["mysql"]["healthcheck"]["test"]
+    assert check[0] == "CMD-SHELL"
+    # Compose config retains $$ escaping; the container receives a single $.
+    command = check[1].replace("$$", "$")
+    (tmp_path / "-pglob-match").write_text("synthetic glob target", encoding="utf-8")
+    # Execute the rendered shell command with a capture stub, never a database.
+    capture = """mysqladmin() {
+      [ "$#" -eq 6 ] || return 41
+      [ "$1" = ping ] && [ "$2" = -h ] && [ "$3" = 127.0.0.1 ] && [ "$4" = -uroot ] || return 42
+      shift 4
+      [ "$1" = "-p$MYSQL_ROOT_PASSWORD" ] && [ "$2" = --silent ] || return 43
+    }
+"""
+    env = dict(os.environ, MYSQL_ROOT_PASSWORD=password)
+    for name in ("BASH_ENV", "ENV", "SHELLOPTS", "BASHOPTS"):
+        env.pop(name, None)
+    result = subprocess.run([shell, "--noprofile", "--norc", "-c", capture + command],
+                            cwd=tmp_path, env=env, capture_output=True, timeout=10)
+    assert result.returncode == 0, "healthcheck split or expanded the synthetic password"

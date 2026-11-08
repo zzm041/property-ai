@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="智慧物业 AI 项目作品：多模态报修理解、规则派单、权限隔离与可追溯处理闭环。查看实现、验证范围和面试体验方式。">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; connect-src 'none'">
+  <title>智慧物业 AI · 项目作品</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+<header class="topbar">
+  <a class="brand" href="#main">智慧物业 <span>AI</span></a>
+  <nav aria-label="页面导航"><a href="#flow">业务流程</a><a href="#evidence">验证证据</a><a href="#experience">面试体验</a></nav>
+</header>
+<main id="main">
+  <section class="hero" aria-labelledby="title">
+    <div class="intro">
+      <p class="context">AI 应用开发项目作品</p>
+      <h1 id="title">从报修理解，<br>到规则派单。</h1>
+      <p class="lead">从住户的文字、图片或语音中整理问题，让物业按人员资格与服务规则派单，再由员工处理、住户确认。</p>
+      <div class="actions"><a class="button primary" href="#experience">面试体验方式</a><a class="button secondary" href="https://github.com/zzm041/property-ai">查看项目源码</a></div>
+      <p class="caption">源码访问以 GitHub 仓库权限为准。本页不调用模型、不占用 GPU。</p>
+    </div>
+    <aside class="case" aria-label="业务设计示意，不是实时模型输出">
+      <div class="case-header"><span>报修场景</span><span class="tag">设计示意</span></div>
+      <blockquote>“厨房的灯打开以后不亮，请安排维修。”</blockquote>
+      <ol class="case-steps">
+        <li><span class="step-dot">1</span><div><strong>理解问题</strong><p>AI 整理设备、现象与待澄清信息。</p></div></li>
+        <li><span class="step-dot">2</span><div><strong>规则派单</strong><p>校验服务小区、签到、职责与工作容量。</p></div></li>
+        <li><span class="step-dot">3</span><div><strong>形成闭环</strong><p>员工处理与回执，住户确认或继续反馈。</p></div></li>
+      </ol>
+      <p class="case-note">这张流程图解释系统设计，不显示预设“AI 成功”结果。</p>
+    </aside>
+  </section>
+
+  <section id="flow" class="section" aria-labelledby="flow-title">
+    <div class="section-heading"><p>业务与实现</p><h2 id="flow-title">AI 理解信息，业务服务控制操作。</h2></div>
+    <div class="feature-grid">
+      <article><h3>多模态理解</h3><p>文字、图片和语音统一进入工单分析。结构化结果接受语义校验，缺少事实时补充澄清；模型失败时保留工单。</p></article>
+      <article><h3>规则决定派给谁</h3><p>模型不直接点名员工。业务服务过滤权限、服务范围、签到、职责和容量，再执行既定派单政策。</p></article>
+      <article><h3>有来源的知识问答</h3><p>Milvus 检索、bge-m3 向量与重排结合；按租户、小区和可见性过滤，返回引用并检查版本与权限。</p></article>
+    </div>
+    <div class="architecture" aria-label="系统架构">
+      <div><strong>微信原生小程序</strong><span>住户 · 员工 · 物业主管</span></div><span class="arrow" aria-hidden="true">→</span>
+      <div><strong>FastAPI 业务服务</strong><span>权限、事务、规则、状态</span></div><span class="arrow" aria-hidden="true">→</span>
+      <div><strong>Worker 与自托管 AI</strong><span>任务投递、推理、检索</span></div>
+    </div>
+    <p class="supporting">模块化单体 + Worker；MySQL、Redis、RabbitMQ、Milvus；通过 Docker Compose 与 Nginx 部署。浏览器面试入口复用现有业务 API。</p>
+  </section>
+
+  <section id="evidence" class="section evidence" aria-labelledby="evidence-title">
+    <div class="section-heading"><p>可核对的结果</p><h2 id="evidence-title">区分已经验证的能力与尚未验证的范围。</h2></div>
+    <div class="evidence-list">
+      <article><span class="evidence-type">业务闭环</span><div><h3>真实 AI 分析与规则自动派单</h3><p>已有本地真实模型分析、自动派单和手机业务流程证据。时间显示、回执分组、字号及独立异常页已有用户确认。</p><p class="limit">剩余客户端增量仍需集中确认；不据此声称真实物业上线运营。</p></div></article>
+      <article><span class="evidence-type">模型接口</span><div><h3>五类接口各有一条真实合成输入证据</h3><p>文字、图片、语音、向量和重排已实际调用。向量返回 1024 维；两轮窗口共 6 次 HTTP 尝试，含第一次图片请求失败与后续修复记录。</p><p class="limit">这是接口与集成验证，不是准确率统计；不将合成素材结果冒充真实住户评测。</p></div></article>
+      <article><span class="evidence-type">工程准备</span><div><h3>安装、存储权限与附件扫描</h3><p>独立 MySQL 空库安装及重复拒绝、MinIO 应用读写与越权拒绝、ClamAV 正常/威胁/失败路径已有隔离验证。提供配置、启动和恢复说明。</p><p class="limit">完整交付包复现仍在收尾；不以局部通过声称任意机器一键安装成功。</p></div></article>
+    </div>
+  </section>
+
+  <section id="experience" class="section experience" aria-labelledby="experience-title">
+    <div class="section-heading"><p>面试现场</p><h2 id="experience-title">看一条完整链路，再亲自操作。</h2></div>
+    <div class="experience-grid">
+      <div><h3>建议演示路线</h3><ol class="demo-route"><li>选择一个合成报修场景，提交新工单。</li><li>查看真实 AI 分类、优先级和实际分析状态。</li><li>查看规则派单结果，说明员工资格与人工回退。</li><li>结合小程序展示员工处理、异常上报和住户回执。</li></ol><p>远程浏览器目前聚焦提交、分析与派单；完整角色流程由原生小程序展示。</p></div>
+      <aside class="availability"><p class="status">受邀远程体验尚未开放</p><h3>只在持有人开启时提供真实操作</h3><p>面试时私下提供体验地址和一次性口令；本场有总时长、调用次数和并发限制，结束关闭入口。</p><p>此页面没有可用的远程体验地址。上线前须完成一次真实远程操作与关闭核对。</p><p class="limit">网络或模型不可用时明确展示原因，不把历史结果标成当前输出。备用录像尚未提供，不以模拟页面替代真实推理。</p></aside>
+    </div>
+  </section>
+
+  <section class="section discussion" aria-labelledby="discussion-title">
+    <h2 id="discussion-title">可以进一步讨论的工程取舍</h2>
+    <details><summary>为什么让 AI 理解报修，却不让它直接选择员工？</summary><p>人员服务范围、在岗状态、技能和容量需要可重复检查。AI 提供结构化信息，业务服务执行规则并记录状态变化，便于追溯和解释。</p></details>
+    <details><summary>模型超时后，为什么住户不用重新报修？</summary><p>工单保存与 AI 分析分离。业务记录先保留，异步处理有投递、幂等、重试和失败记录；耗尽后可由物业跟进，避免丢失诉求和重复提交。</p></details>
+    <details><summary>如何避免把工程测试当成 AI 效果指标？</summary><p>分别记录模型真实调用、隔离服务验证和手机确认。单条合成输入通过只能支持接口可用性，不能支持全量准确率、效率提升或商业收益。</p></details>
+  </section>
+</main>
+<footer><span>智慧物业 AI 项目作品</span><span>验证范围更新于 2026-11-08 · 交付准备中</span></footer>
+</body>
+</html>
