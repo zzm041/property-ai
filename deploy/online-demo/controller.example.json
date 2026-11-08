@@ -1,0 +1,17 @@
+{
+  "window_id": "online-interview-01",
+  "duration_seconds": 1800,
+  "remote_access": false,
+  "source_sha256": "REPLACE_WITH_REVIEWED_SOURCE_DIGEST",
+  "python": "C:/replace/private-python/Scripts/python.exe",
+  "ollama_exe": "C:/replace/ollama-0.34.4/ollama.exe",
+  "ollama_models": "C:/replace/private-models",
+  "tailscale_exe": "C:/Program Files/Tailscale/tailscale.exe",
+  "model_config": "C:/replace/private/model-runtime.json",
+  "model_config_sha256": "REPLACE_WITH_REVIEWED_PRIVATE_CONFIG_DIGEST",
+  "demo_config": "C:/replace/private/browser-runtime.json",
+  "demo_config_sha256": "REPLACE_WITH_REVIEWED_PRIVATE_CONFIG_DIGEST",
+  "run_dir": "C:/replace/private/online-interview-01",
+  "docker_endpoint": "npipe:////./pipe/dockerDesktopLinuxEngine",
+  "containers": {}
+}

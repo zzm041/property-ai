@@ -40,6 +40,7 @@ MESSAGES = {
     "UNKNOWN": "提交结果待核实，本轮不重复提交，请联系演示负责人。",
     "UPSTREAM": "业务服务暂时无法确认结果，请稍后查看。",
     "NO_ORDER": "请先选择场景并提交报修。",
+    "INVITE_USED": "本场邀请已用于另一个会话，请联系演示负责人。",
 }
 
 
@@ -293,13 +294,15 @@ def create_app(config: dict, *, transport=None) -> FastAPI:
     async def start_session(request: Request):
         runtime.require_open()
         runtime.login_attempts += 1
-        if runtime.login_attempts > 50 or len(runtime.sessions) >= 32:
+        if runtime.login_attempts > 50:
             raise GatewayError("LIMIT", 429)
         body = await read_body(request)
         code = body.get("code")
         if set(body) != {"code"} or not isinstance(code, str) or not hmac.compare_digest(code.encode(), runtime.invite.encode()):
             raise GatewayError("AUTH", 401)
         existing = request.cookies.get("property_demo", "")
+        if runtime.sessions and existing not in runtime.sessions:
+            raise GatewayError("INVITE_USED", 403)
         token = existing if existing in runtime.sessions else secrets.token_urlsafe(32)
         runtime.sessions.setdefault(token, Session())
         response = JSONResponse({"authenticated": True})

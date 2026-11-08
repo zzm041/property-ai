@@ -114,8 +114,9 @@ def test_uncertain_create_consumes_quota_without_retry_or_leak(tmp_path):
         assert r.status_code == 409
         assert "private" not in r.text
         assert len([r for r in up.calls if r.method == "POST"]) == 1
-        c.cookies.clear(); login(c)
-        assert submit(c).status_code == 429
+        c.cookies.clear()
+        assert login(c).status_code == 403
+        assert submit(c).status_code == 401
 
 
 @pytest.mark.parametrize("change", [{"app_env": "production"}, {"llm_provider": "development"},
@@ -189,6 +190,20 @@ def test_static_page_and_missing_runtime_are_explicit(tmp_path):
         assert c.get("/assets/../online_demo.py").status_code == 404
 
 
+def test_invite_is_bound_to_one_browser_session(tmp_path):
+    c, up, cfg = client(tmp_path)
+    with c:
+        assert login(c).status_code == 200
+        cookie = c.cookies.get("property_demo")
+        assert login(c).status_code == 200
+        assert c.cookies.get("property_demo") == cookie
+        c.cookies.clear()
+        response = login(c)
+        assert response.status_code == 403
+        assert response.json()["error"]["code"] == "INVITE_USED"
+        assert not any(r.method == "POST" for r in up.calls)
+
+
 @pytest.mark.parametrize("analysis,status,assignment,expected", [
     ("LOW_CONFIDENCE", "PENDING_ANALYSIS", "ACTIVE", "REVIEW"),
     ("STALE", "PENDING_ANALYSIS", "ACTIVE", "REVIEW"),
@@ -210,7 +225,7 @@ def test_real_terminal_and_assignment_states_are_distinguished(tmp_path, analysi
             assert data["auto_assigned"] is False
 
 
-def test_concurrent_visitors_can_reserve_only_one_upstream_write(tmp_path):
+def test_concurrent_requests_in_invited_session_reserve_only_one_upstream_write(tmp_path):
     async def run():
         started, release = asyncio.Event(), asyncio.Event()
         upstream = Upstream()
@@ -227,13 +242,13 @@ def test_concurrent_visitors_can_reserve_only_one_upstream_write(tmp_path):
             async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url=cfg["origin"]) as first:
                 async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url=cfg["origin"]) as second:
                     headers = {"Origin": cfg["origin"]}
-                    for c in (first, second):
-                        assert (await c.post("/session", json={"code": "invite-" + "x" * 48}, headers=headers)).status_code == 200
+                    assert (await first.post("/session", json={"code": "invite-" + "x" * 48}, headers=headers)).status_code == 200
+                    second.cookies.update(first.cookies)
                     pending = asyncio.create_task(first.post("/order", json={"scenario": "light"}, headers=headers))
                     await asyncio.wait_for(started.wait(), 2)
                     response = await second.post("/order", json={"scenario": "tap"}, headers=headers)
                     release.set()
-                    assert response.status_code == 429
+                    assert response.status_code == 409
                     assert (await pending).status_code == 200
                     assert len([r for r in upstream.calls if r.method == "POST"]) == 1
 

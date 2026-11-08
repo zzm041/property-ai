@@ -2,7 +2,56 @@
 # Existing local delivery.ps1 remains a separate, protected workflow.
 name: ${CUSTOMER_PROJECT_NAME:?set a unique CUSTOMER_PROJECT_NAME}
 
+x-customer-app: &customer-app
+  # Requires Compose >= 2.30. Do not give infrastructure/root credentials to apps.
+  env_file: !override
+    - path: ${CUSTOMER_APP_ENV_FILE:?generate CUSTOMER_APP_ENV_FILE first}
+      format: raw
+  environment: !reset {}
+  networks:
+    default:
+    scanner:
+  depends_on:
+    scanner:
+      condition: service_healthy
+
 services:
+  scanner:
+    image: clamav/clamav:1.4.6-debian13-slim@sha256:ce80e97855d937e93009bb47eb5ecb410b514b844b03d0ecf00e8eeec92810cc
+    environment:
+      CLAMAV_NO_FRESHCLAMD: "false"
+      CLAMAV_NO_MILTERD: "true"
+      CLAMD_CONF_StreamMaxLength: "10M"
+      CLAMD_CONF_MaxFileSize: "10M"
+      CLAMD_CONF_MaxScanSize: "40M"
+      CLAMD_CONF_MaxThreads: "2"
+      CLAMD_CONF_ConcurrentDatabaseReload: "no"
+      CLAMD_CONF_AlertExceedsMax: "yes"
+    mem_limit: 4g
+    cpus: 1.0
+    pids_limit: 128
+    networks:
+      scanner:
+        ipv4_address: ${FILE_SCANNER_HOST:?set scanner private IP}
+    volumes:
+      - scanner_data:/var/lib/clamav
+    healthcheck:
+      test: ["CMD", "clamdcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 180s
+    restart: unless-stopped
+
+  api:
+    <<: *customer-app
+  worker:
+    <<: *customer-app
+  publisher:
+    <<: *customer-app
+  beat:
+    <<: *customer-app
+
   installer:
     image: property-ai-delivery:${DELIVERY_IMAGE_TAG:?set the reviewed image tag}
     build:
@@ -10,13 +59,36 @@ services:
       dockerfile: deploy/Dockerfile
     profiles: ["install"]
     env_file:
-      - ${DELIVERY_ENV_FILE:?set DELIVERY_ENV_FILE to the customer env file}
-      - ${CUSTOMER_BOOTSTRAP_ENV_FILE:?set CUSTOMER_BOOTSTRAP_ENV_FILE}
+      - path: ${CUSTOMER_APP_ENV_FILE:?generate CUSTOMER_APP_ENV_FILE first}
+        format: raw
+      - path: ${CUSTOMER_BOOTSTRAP_ENV_FILE:?set CUSTOMER_BOOTSTRAP_ENV_FILE}
+        format: raw
     entrypoint: ["python", "-m", "app.cli.customer_install"]
     volumes:
       - ./customer-install:/install
     restart: "no"
 
+  storage-installer:
+    image: property-ai-delivery:${DELIVERY_IMAGE_TAG:?set the reviewed image tag}
+    profiles: ["storage-install"]
+    env_file:
+      - path: ${CUSTOMER_APP_ENV_FILE:?generate CUSTOMER_APP_ENV_FILE first}
+        format: raw
+      - path: ${CUSTOMER_STORAGE_BOOTSTRAP_ENV_FILE:?set CUSTOMER_STORAGE_BOOTSTRAP_ENV_FILE}
+        format: raw
+    entrypoint: ["python", "-m", "app.cli.customer_storage"]
+    volumes:
+      - ./customer-install:/install
+    restart: "no"
+
 volumes:
+  scanner_data:
   mysql_data:
     name: ${CUSTOMER_PROJECT_NAME:?set a unique CUSTOMER_PROJECT_NAME}-mysql-data
+
+networks:
+  default:
+  scanner:
+    ipam:
+      config:
+        - subnet: ${CUSTOMER_SCANNER_SUBNET:?choose an unused private subnet}

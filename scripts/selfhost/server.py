@@ -12,6 +12,7 @@ from .config import RuntimeConfig
 from .preflight import check
 from .requests import validate
 from .runner import RuntimeFailure, ModelRunner
+from .window import WindowRunner, WindowSpec
 
 
 def error(code, status):
@@ -111,16 +112,33 @@ def create_app(config, runner=None):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)
+    parser.add_argument("--window", help="optional one-use demo admission window; never reuse a closed record")
     args = parser.parse_args()
     try:
         config = RuntimeConfig.read(args.config)
         check(config)
-    except (ValueError, OSError, KeyError):
+        window = WindowSpec.read(args.window) if args.window else None
+        runner = WindowRunner(ModelRunner(config), window) if window else ModelRunner(config)
+    except (ValueError, OSError, KeyError, RuntimeFailure):
         print("SELFHOST_PREFLIGHT_FAILED", file=sys.stderr)
         return 1
     import uvicorn
-    uvicorn.run(create_app(config), host=config.bind, port=config.port, workers=1,
-                access_log=False, log_level="warning", timeout_graceful_shutdown=15)
+    async def serve():
+        server = uvicorn.Server(uvicorn.Config(create_app(config, runner), host=config.bind, port=config.port,
+            workers=1, access_log=False, log_level="warning", timeout_graceful_shutdown=15))
+        async def expire():
+            while runner.remaining() > 0:
+                await asyncio.sleep(min(1, runner.remaining()))
+            server.should_exit = True
+        expiry = asyncio.create_task(expire()) if window else None
+        try:
+            await server.serve()
+        finally:
+            if expiry:
+                expiry.cancel()
+                await asyncio.gather(expiry, return_exceptions=True)
+                runner.close()
+    asyncio.run(serve())
     return 0
 
 

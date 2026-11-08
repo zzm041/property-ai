@@ -2,9 +2,9 @@
 
 Production V1 使用 Docker Compose + Nginx。镜像版本见 `docs/09-DEPLOYMENT.md`。运行手册见 `docs/11-OPERATIONS.md`。
 
-私有自托管模型的新配置、离线文件校验和 HTTP 入口见 [selfhost/README.md](selfhost/README.md)。它不依赖历史验收报告；已完成源码控制检查、现有资产离线核验，以及当前环境中文字、图片、语音、向量、重排各一次固定合成输入的真实调用。新环境安装与完整客户部署仍待验证。
+私有自托管模型的新配置、离线文件校验和 HTTP 入口见 [selfhost/README.md](selfhost/README.md)。它不依赖历史验收报告；已完成源码控制检查、现有资产离线核验，以及当前环境中文字、图片、语音、向量、重排各一次固定合成输入的真实调用。两个Windows新空环境的冻结依赖安装已通过；完整客户部署与新硬件推理仍待验证。
 
-甲方全新数据库安装入口见 [CUSTOMER-INSTALL.md](CUSTOMER-INSTALL.md)。它使用独立客户配置和具名空库授权；下文 delivery.ps1、历史模型启动器与受控 staging 排练不能作为甲方任意环境的一键安装流程。客户空库迁移已通过一次临时 MySQL 验证；模型可移植安装、真实扫描引擎及整套客户部署仍待交付收尾。
+甲方全新数据库安装入口见 [CUSTOMER-INSTALL.md](CUSTOMER-INSTALL.md)。它使用独立客户配置和具名空库授权；下文 delivery.ps1、历史模型启动器与受控 staging 排练不能作为甲方任意环境的一键安装流程。客户空库迁移、对象存储和真实扫描引擎已分别通过独立临时环境验证；病毒库更新网络、新硬件模型安装及整套客户部署仍待收尾。
 
 ## Development 数据面
 
