@@ -1,5 +1,5 @@
 {
-  "window_id": "online-interview-01",
+  "window_id": "online-demo-01",
   "duration_seconds": 1800,
   "remote_access": false,
   "source_sha256": "REPLACE_WITH_REVIEWED_SOURCE_DIGEST",
@@ -11,7 +11,7 @@
   "model_config_sha256": "REPLACE_WITH_REVIEWED_PRIVATE_CONFIG_DIGEST",
   "demo_config": "C:/replace/private/browser-runtime.json",
   "demo_config_sha256": "REPLACE_WITH_REVIEWED_PRIVATE_CONFIG_DIGEST",
-  "run_dir": "C:/replace/private/online-interview-01",
+  "run_dir": "C:/replace/private/online-demo-01",
   "docker_endpoint": "npipe:////./pipe/dockerDesktopLinuxEngine",
   "containers": {}
 }

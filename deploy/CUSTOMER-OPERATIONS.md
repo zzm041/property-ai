@@ -60,7 +60,7 @@ healthz 仅证明 API 存活。readyz 返回 200 也可能是 degraded，且不�
 
 Supervisor Agent 是独立可选入口，默认关闭；如启用，应按 docs/13-SUPERVISOR-ASSISTANT.md 单独配置真实模型及权限，不能将 Development Agent 输出当真实推理。通知是否具有外部推送能力，以实际 Provider 为准；站内消息与外部推送成功须区分。
 
-甲方正式 TLS、小程序合法域名及上线审批按 docs/09-DEPLOYMENT.md、docs/11-OPERATIONS.md 执行。私密面试演示使用独立的 online-demo 流程，不能直接把本客户环境或 GPU 端口转到公网。
+正式 TLS、小程序合法域名及上线审批按 docs/09-DEPLOYMENT.md、docs/11-OPERATIONS.md 执行。受控交互环境使用独立的 online-demo 流程，不能直接把业务环境或 GPU 端口转到公网。
 
 ## 日常状态与故障
 
