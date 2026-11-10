@@ -24,7 +24,11 @@ ANALYZE_TASK_NAME = "app.worker.tasks.analyze_work_order_task"
 
 
 def _settings(**overrides) -> Settings:
-    return Settings(_env_file=None, **overrides)
+    # The create path enqueues analysis only when `should_enqueue_ai_on_create`
+    # is true, and under `APP_ENV=test` that needs `AI_ENQUEUE_ON_CREATE=true`.
+    # These cases model a running deployment, so they state the environment
+    # instead of inheriting `APP_ENV` from whoever launched pytest.
+    return Settings(_env_file=None, **{"app_env": "development", **overrides})
 
 
 class _Record:

@@ -97,8 +97,11 @@ def test_non_production_keeps_previous_log_only_behaviour():
     recorded: list[dict] = []
     with Session(engine) as session:
         service = _service(
-            session, Settings(_env_file=None, durable_tasks_enabled=False)
-        )  # development，直投路径
+            session,
+            # 直投路径只在非 test 环境成立（test 环境还要 AI_ENQUEUE_ON_CREATE），
+            # 所以这里显式声明 development，不继承 pytest 进程的 APP_ENV。
+            Settings(_env_file=None, app_env="development", durable_tasks_enabled=False),
+        )
         with patch("app.worker.enqueue.running_under_pytest", lambda: False), \
                 patch(ANALYZE_TASK, _boom), \
                 patch("app.worker.failed_tasks.record_failed_task", lambda *a, **k: recorded.append(k)):
