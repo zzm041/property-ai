@@ -837,3 +837,18 @@ def failure_body(exc):
     snapshot=getattr(exc,'resource_floor',None)
     if snapshot is not None:body['resource_floor']=snapshot
     return body
+
+# 子进程入口。包化之前 Runner.run 用 Path(__file__) 把自己当脚本再拉起一次，
+# 那段 __main__ 分发留在 scripts/ops/local_ai_http.py 里；文件搬进包之后这一份
+# 才是 Runner.run 真正 spawn 的文件，所以 child 模式必须在这里可达，否则子进程
+# 空跑退出、prompt 请求统一报 REMOTE_RESPONSE_INVALID（t138 实测）。
+if __name__ == '__main__':
+    import argparse as _argparse
+
+    _parser = _argparse.ArgumentParser(prog='local_ai_runtime_control')
+    _parser.add_argument('mode', choices=['child'])
+    _parser.add_argument('--config', required=True)
+    _parser.add_argument('--input')
+    _parser.add_argument('--job-name')
+    _args = _parser.parse_args()
+    child(_args.config, _args.input, _args.job_name)
