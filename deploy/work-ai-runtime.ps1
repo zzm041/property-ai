@@ -14,14 +14,15 @@ $RuntimeDir = Join-Path $RepoRoot "tmp\delivery-work-ai-runtime"
 $PrivateDir = Join-Path $RuntimeDir "calls"
 $SecretPath = Join-Path $RuntimeDir "internal-token.txt"
 $ConfigPath = Join-Path $RuntimeDir "config.json"
+$EvidenceRecordsPath = Join-Path $RuntimeDir "evidence-records.txt"
 $CurrentPath = Join-Path $RuntimeDir "current.json"
 $OllamaCurrent = Join-Path $RepoRoot "tmp\delivery-ollama-runtime\current.json"
-$SourceCommit = "8c53c06c0d6fb741efea94aca73ed010534670ba"
+$SourceCommit = "90eb1ae334ace82f578ff3d193d4e2812a2cad96"
 $CandidateRoot = Join-Path $RuntimeDir "candidate-$SourceCommit"
 $AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
 $ModelAdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_models.py"
 $RuntimeControlPath = Join-Path $CandidateRoot "scripts\ops\local_ai_runtime_control.py"
-$ExpectedAdapterSha256 = "D4B6B379039A189DD9B3E807C9AC92D8AD2DFD37AF7B743873148DD8F371988D"
+$ExpectedAdapterSha256 = "6B64C192808566A780989DD2067ADF01EFD5050A7B22CD6C109EB5B38955D5AF"
 $ExpectedModelAdapterSha256 = "FAF70CF69B8D7058026881D47B90CB20E3B03F6A99E693F16BD06CDA87AC0BB2"
 $ExpectedRuntimeControlSha256 = "B0DE6D3544D8875E0A57CED1A1946744736FC9074AF1ECEA5228A79468C60CFF"
 $ResolutionRoot = Join-Path $RepoRoot "reports"
@@ -299,6 +300,20 @@ function Read-ConfiguredBindingPath {
     return $path
 }
 
+function Read-EvidenceRecords {
+    # PA-166: reviewed evidence lives in calls/ (the startup gate needs it) but must not be
+    # charged against limits/call_baseline, otherwise restoring the evidence reopens the gate
+    # and immediately trips R2_CALL_LIMIT. The corpus is named explicitly in this manifest so
+    # the split stays auditable; a missing manifest simply means "no evidence designations".
+    if (-not (Test-Path -LiteralPath $EvidenceRecordsPath -PathType Leaf)) { return @() }
+    $names = @()
+    foreach ($line in (Get-Content -LiteralPath $EvidenceRecordsPath)) {
+        $name = $line.Trim()
+        if ($name -and $name -match "^call-[0-9]{3}$") { $names += $name }
+    }
+    return $names
+}
+
 function New-RuntimeBinding {
     $bindingPath = Join-Path $RuntimeDir ("runtime-binding-{0}.json" -f ([DateTime]::UtcNow.ToString("yyyyMMddTHHmmssZ")))
     if (Test-Path -LiteralPath $bindingPath) { throw "runtime binding already exists" }
@@ -409,6 +424,7 @@ switch ($Action) {
             call_baseline=[ordered]@{asr=1;embedding=6;reranker=2;qwen=46}
             duration_seconds=4336;duration_baseline_seconds=535.483
             asr_start_ram_mib=11264;evidence_root=$RuntimeDir
+            evidence_records=@(Read-EvidenceRecords)
             shared_model_lock_path=(Join-Path $RepoRoot "tmp\delivery-ai-shared\model.lock")
             shared_model_lock_wait_seconds=55
             resolution_root=$ResolutionRoot

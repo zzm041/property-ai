@@ -194,6 +194,20 @@ docker network inspect -f '{{range .IPAM.Config}}{{.Subnet}}{{end}}' property-ai
 
 判定不变的部分：完成屏障、失败输入不自动重放、证据缺失/漂移仍然 fail-closed（`gate()` 仍遍历**全部**调用，包含证据）。改配置后需重启适配器才生效；重启与单入口回归由 `deploy/ai-runtime.ps1 up` 负责。
 
+`up` 每次都会重写 `config.json`（`deploy/work-ai-runtime.ps1` 的 `$config` 块是唯一来源），所以手工往里加的键会在下一次 `up` 时消失。`evidence_records` 因此走**清单文件**：`tmp\delivery-work-ai-runtime\evidence-records.txt`，每行一个 `call-NNN`，`up` 读它写进配置（缺文件＝没有证据声明）。改清单同样要 `up` 一次才生效。
+
+### 运行时的单一入口（只允许 `ai-runtime.ps1 up|down`）
+
+`deploy/ai-runtime.ps1 up|down|status|verify|resolve-unknown` 是 Ollama 与工单适配器的唯一入口。**禁止手工起适配器**（`python scripts/ops/local_ai_http.py serve --config …`）：手工进程不会被 receipt 记录，`ai-runtime.ps1 status` 会继续显示旧 receipt 的 `launcher_pid` / `listener_pid`，`config_sha256`、`runtime_binding_sha256` 与实际运行的东西脱钩，出问题时无法判断「跑的是哪份代码」。
+
+对账三步（每次收口后都做）：
+
+1. `deploy\ai-runtime.ps1 status` 的 `receipt.launcher_pid` / `receipt.listener_pid` 必须与 `netstat -ano | findstr :11437` 的 pid、以及 `python.exe … local_ai_http.py serve` 的父子进程一致；
+2. `receipt.source_commit` 必须等于当前要跑的提交（它只对 `equiv_scope` 有效，仓库 HEAD 用 `git rev-parse HEAD` 看），`receipt.adapter_sha256` 等于 `git show <commit>:scripts/ops/local_ai_http.py` 的 sha256；
+3. `GET /healthz`（带 `internal-token.txt` 里的 Bearer）返回 `status=ready`、`reservation_gate=READY`、`accepting_requests=true`，且 `GET http://127.0.0.1:8093/api/v1/readyz` 的 `ai_credentials.status=configured`。
+
+改了 `scripts/ops/local_ai_http.py` 之后，`up` 会因为钉住的 `$ExpectedAdapterSha256` 对不上而**拒绝启动**——这是设计使然：必须先在 `deploy/work-ai-runtime.ps1` 里同时更新 `$SourceCommit` 与 `$ExpectedAdapterSha256`（按 `git show <commit>:<path>` 的 LF 字节算 sha256，与 `Get-FileHash` 口径一致），再 `up`。不要绕过校验直接手起适配器。
+
 ### 资源地板：可观测、可覆盖（PA-130）
 
 适配器在每次 Qwen 调用前后比较宿主剩余内存与显卡空闲显存，低于地板即拒绝（`QWEN_RESOURCE_GUARD` → 对外 `RESOURCE_ADMISSION_REJECTED`）。地板过去是三个写死的字面量，只能报「拒了」；现在它们可观测、可覆盖，默认值不变：
