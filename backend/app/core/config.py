@@ -98,8 +98,13 @@ class Settings(BaseSettings):
     ai_context_recent_orders_limit: int = Field(default=5, ge=0, le=20)
     ai_context_recent_days: int = Field(default=30, ge=1, le=365)
     ai_enqueue_on_create: bool = False
-    # Staged rollout: opt in only after0012, never silently detect/create tables.
-    durable_tasks_enabled: bool = False
+    # PA-104: the durable task chain (business row + task intent in one
+    # transaction, the publisher hands off) is the safe default. With it off an
+    # enqueue failure after commit either loses the analysis or answers 503, and
+    # production refuses to assemble without it (PA-104-A-1). The switch stays
+    # for rollback: DURABLE_TASKS_ENABLED=false. Requires the task_intents table
+    # (migration 0012+) and the intent publisher/beat to be running.
+    durable_tasks_enabled: bool = True
     ai_auto_assign: bool = False
     dispatch_weight_duty: float = Field(default=0.25, ge=0, le=1)
     dispatch_weight_skill: float = Field(default=0.20, ge=0, le=1)
