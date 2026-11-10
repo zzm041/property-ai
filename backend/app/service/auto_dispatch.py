@@ -18,6 +18,7 @@ from app.domain.ai import (
     DispatchWeights,
     FilterReason,
     MappedAnalysis,
+    capability_note,
     hard_filter_candidate,
     rank_candidates,
     ordinary_maintenance,
@@ -323,6 +324,14 @@ class AutoDispatchService:
             candidate.employee_id: (rank_no, score, reasons)
             for rank_no, (candidate, score, reasons) in enumerate(ranked, start=1)
         }
+        # PA-127 F2: the manual 409 explained an unconstrained `other` skill via
+        # capability_note, but the automatic snapshot only stored the filter
+        # reason, so the same gate read as a bare "eligible" there. Carry the
+        # gate's inputs and its note on every row.
+        gate_note = capability_note(
+            required_duty=mapped.required_duty,
+            required_skill=mapped.required_skill,
+        )
         snapshot: list[dict[str, Any]] = []
         for candidate in candidates:
             rank_no, score, reasons = ranking.get(candidate.employee_id, (None, 0.0, ()))
@@ -331,6 +340,9 @@ class AutoDispatchService:
                     "employee_id": candidate.employee_id,
                     "eligible": filter_reasons[candidate.employee_id] is None,
                     "filter_reason": filter_reasons[candidate.employee_id],
+                    "required_duty": mapped.required_duty,
+                    "required_skill": mapped.required_skill,
+                    "capability_note": gate_note,
                     "rank": rank_no,
                     "score": score,
                     "reasons": list(reasons),

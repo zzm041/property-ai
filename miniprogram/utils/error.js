@@ -120,13 +120,47 @@ function containsChinese(value) {
   return /[\u3400-\u9fff]/.test(String(value || ""));
 }
 
+// PA-127 F3: `EMPLOYEE_NOT_ELIGIBLE` used to collapse every dispatch refusal
+// into one sentence, so a supervisor could not tell a skill gate from an
+// attendance or capacity one. The backend now puts `details.reason` on the 409;
+// show it as a short parenthetical after the stable headline. Unknown reasons
+// fall back to the plain headline, so this never leaks a raw code.
+const DENIAL_REASONS = {
+  NOT_ACTIVE: "员工已停用",
+  USER_NOT_ACTIVE: "员工账号不可用",
+  NO_STAFF_ROLE: "该员工没有员工角色",
+  PROPERTY_NOT_EFFECTIVE: "不在该项目的有效任职期内",
+  NOT_ON_DUTY: "当日未排班",
+  NOT_CHECKED_IN: "当日未签到",
+  DUTY_MISMATCH: "班组职责与工单品类不符",
+  SKILL_MISMATCH: "技能与工单要求不符",
+  CAPACITY_FULL: "已达最大承载量",
+  BUSY: "已有在手的普通维修工单",
+  RECENTLY_REJECTED: "近期拒过该工单",
+  TENANT_MISMATCH: "不属于该项目租户",
+  EMPLOYEE_NOT_FOUND: "员工不存在或不可见",
+  ANALYSIS_UNREADABLE: "分析结果不可用，请重新分析",
+};
+
+function denialReason(payload) {
+  const error = payload && payload.error;
+  const details = error && error.details;
+  const reason = details && details.reason;
+  if (!reason) {
+    return "";
+  }
+  return DENIAL_REASONS[reason] || "";
+}
+
 function messageFromError(payload, fallback) {
   const error = payload && payload.error;
+  const reason = denialReason(payload);
+  const suffix = reason ? `（原因：${reason}）` : "";
   if (error && USER_MESSAGES[error.code]) {
-    return USER_MESSAGES[error.code];
+    return `${USER_MESSAGES[error.code]}${suffix}`;
   }
   if (error && containsChinese(error.message)) {
-    return error.message;
+    return `${error.message}${suffix}`;
   }
   return fallback || "请求失败";
 }

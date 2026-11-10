@@ -35,7 +35,18 @@ def _error_response(
 
 
 async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
-    logger.warning("application_error", error_code=exc.code, status_code=exc.status_code)
+    # PA-127 F3: the envelope already carried `details.reason`, but the log line
+    # only had code/status, so operations could not tell why a dispatch was
+    # refused without replaying the request. Log the reason and the detail keys
+    # (never the whole payload) so the diagnosis survives in the log stream.
+    details = exc.details or {}
+    logger.warning(
+        "application_error",
+        error_code=exc.code,
+        status_code=exc.status_code,
+        error_reason=details.get("reason"),
+        error_detail_keys=sorted(details),
+    )
     return _error_response(
         request,
         status_code=exc.status_code,

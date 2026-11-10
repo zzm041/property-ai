@@ -180,6 +180,50 @@ _STAFF_ESCALATION_REASONS = frozenset(
 )
 
 
+def eligibility_denied(
+    *,
+    reason: str,
+    required_duty: str | None = None,
+    required_skill: str | None = None,
+) -> AppError:
+    """One 409 shape for every dispatch denial, now carrying its reason.
+
+    PA-127 F1: the two scope pre-checks that run before `_eligibility_error`
+    (unknown employee, employee from another tenant) used to raise this code
+    with an empty `details` payload, so a rejected manual dispatch could not be
+    told apart from a skill or roster gate.
+    """
+
+    return AppError(
+        code=WorkOrderErrorCode.EMPLOYEE_NOT_ELIGIBLE,
+        message="Employee is not eligible for dispatch",
+        status_code=409,
+        details=eligibility_denial_details(
+            reason,
+            required_duty=required_duty,
+            required_skill=required_skill,
+        ),
+    )
+
+
+def _employee_scope_denial(
+    employee: Employee | None,
+    *,
+    tenant_id: int,
+) -> AppError | None:
+    """Deny before any roster lookup when the employee is unknown or foreign.
+
+    Kept as a named function (instead of an inline `or`) so the two reasons are
+    asserted directly in unit tests without a database.
+    """
+
+    if employee is None:
+        return eligibility_denied(reason="EMPLOYEE_NOT_FOUND")
+    if employee.tenant_id != tenant_id:
+        return eligibility_denied(reason="TENANT_MISMATCH")
+    return None
+
+
 class WorkOrderService:
     """Own WorkOrder transactions; repositories never commit."""
 
@@ -1952,12 +1996,14 @@ class WorkOrderService:
         # Share the global assignment mutex with AUTO, even for authorized
         # manual intervention. No business scope is inferred from this lock.
         employee = self._employees.get_employee_for_update(employee_id)
-        if employee is None or employee.tenant_id != record.tenant_id:
-            raise AppError(
-                code=WorkOrderErrorCode.EMPLOYEE_NOT_ELIGIBLE,
-                message="Employee is not eligible for dispatch",
-                status_code=409,
-            )
+        # PA-127 F1: these two pre-checks used to raise the same bare 409 as
+        # every other denial, so "unknown employee" and "employee belongs to
+        # another tenant" were indistinguishable from a skill or roster gate.
+        scope_denial = _employee_scope_denial(
+            employee, tenant_id=record.tenant_id
+        )
+        if scope_denial is not None:
+            raise scope_denial
         now = self._clock()
         current_status = WorkOrderStatus(record.status)
         is_first = current_status in PENDING_DISPATCH_STATUSES
@@ -3119,19 +3165,19 @@ class WorkOrderService:
         required_skill: str | None = None
 
         def denied(reason: str) -> AppError:
-            return AppError(
-                code=WorkOrderErrorCode.EMPLOYEE_NOT_ELIGIBLE,
-                message="Employee is not eligible for dispatch",
-                status_code=409,
-                details=eligibility_denial_details(
-                    reason,
-                    required_duty=required_duty,
-                    required_skill=required_skill,
-                ),
+            return eligibility_denied(
+                reason=reason,
+                required_duty=required_duty,
+                required_skill=required_skill,
             )
 
         if employee.status != EmployeeStatus.ACTIVE.value:
             return denied(FilterReason.NOT_ACTIVE.value)
+        # PA-127 F1: `_assign` rejects a foreign employee before calling here,
+        # so this branch is only reachable from callers that load the assignee
+        # themselves (the resident reopen path at :1776). Kept as defence in
+        # depth; the manual path now reports TENANT_MISMATCH from the
+        # pre-check instead.
         if employee.tenant_id != record.tenant_id:
             return denied("TENANT_MISMATCH")
         if employee.user_id is None or self._analysis.get_user_status(employee.user_id) != "ACTIVE":

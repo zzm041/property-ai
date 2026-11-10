@@ -37,6 +37,7 @@ from app.domain.ai import (
     AnalysisStatus,
     DispatchCandidate,
     FilterReason,
+    capability_note,
     MappedAnalysis,
     ProviderType,
     WorkOrderAnalysisOutput,
@@ -1859,6 +1860,15 @@ class AnalysisService:
             weights=configured_dispatch_weights(self._settings),
         )
         rank_no = 1
+        # PA-127 F2: record the capability gate's inputs and note on every
+        # recommendation row, so an eligible `other` skill is auditable from the
+        # recommendation table alone (reason_codes is a JSON column: no schema
+        # change needed).
+        gate_note = capability_note(
+            required_duty=mapped.required_duty,
+            required_skill=mapped.required_skill,
+        )
+        gate_codes = () if gate_note is None else (gate_note,)
         for candidate, score, reasons in ranked:
             self._ai.add_recommendation(
                 DispatchRecommendation(
@@ -1870,7 +1880,7 @@ class AnalysisService:
                     score=Decimal(str(score)),
                     rank_no=rank_no,
                     eligible=1,
-                    reason_codes=list(reasons),
+                    reason_codes=list(reasons) + list(gate_codes),
                     filter_reason=None,
                 )
             )
@@ -1886,7 +1896,7 @@ class AnalysisService:
                     score=Decimal("0"),
                     rank_no=0,
                     eligible=0,
-                    reason_codes=[reason.value],
+                    reason_codes=[reason.value, *gate_codes],
                     filter_reason=reason.value,
                 )
             )
