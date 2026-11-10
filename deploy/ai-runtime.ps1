@@ -1,8 +1,11 @@
 param(
     [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateSet("up", "down", "status", "verify")]
+    [ValidateSet("up", "down", "status", "verify", "resolve-unknown")]
     [string]$Action,
-    [switch]$KeepOllama
+    [switch]$KeepOllama,
+    # PA-132: which call the shared completion barrier belongs to, and why releasing it is safe.
+    [string]$Call,
+    [string]$Reason
 )
 
 # PA-116-A-4: one entry point for the local work-AI runtime.
@@ -27,6 +30,12 @@ $SecretPath = Join-Path $RuntimeDir "internal-token.txt"
 $CurrentPath = Join-Path $RuntimeDir "current.json"
 $OllamaCurrentPath = Join-Path $OllamaRuntimeDir "current.json"
 $PromptVersionsPath = Join-Path $DeployDir "ai-runtime-prompts.json"
+# PA-132: the shared completion barrier is written by whichever adapter scope hit UNKNOWN.
+# Its release path lives in scripts\ops\ai_barrier.py so it can be unit tested and so the
+# decision (who/when/why) ends up in a receipt instead of a bare `del`.
+$BarrierPath = Join-Path $RepoRoot "tmp\\delivery-ai-shared\\completion-unknown.json"
+$BarrierTool = Join-Path $RepoRoot "scripts\\ops\\ai_barrier.py"
+$BarrierPython = Join-Path $RepoRoot "tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe"
 $WorkAiLauncher = Join-Path $DeployDir "work-ai-runtime.ps1"
 $OllamaLauncher = Join-Path $DeployDir "ollama-runtime.ps1"
 $Endpoint = "http://127.0.0.1:11437"
@@ -172,6 +181,35 @@ function Assert-Health([string]$Token, [object]$Current) {
     } | ConvertTo-Json -Depth 6
 }
 
+function Get-CompletionBarrier {
+    # Read-only description of the shared barrier: an operator must be able to see why the
+    # whole AI chain is BLOCKED without opening the adapter source.
+    if (-not (Test-Path -LiteralPath $BarrierPath -PathType Leaf)) {
+        return [ordered]@{
+            status = "clear"; path = $BarrierPath; gate = "READY"
+            call_id = $null; utc = $null; reason = $null; scopes = @(); remediation = $null
+        }
+    }
+    $payload = $null
+    try { $payload = Read-Json $BarrierPath } catch { $payload = $null }
+    if ($null -eq $payload) {
+        return [ordered]@{ status = "unreadable"; path = $BarrierPath; gate = "BLOCKED_RESOLUTION_INVALID" }
+    }
+    $callId = [string]$payload.call_id
+    if (-not $callId) { $callId = [string]$payload.record }
+    $scopes = @()
+    if ($null -ne $payload.affected_scopes) { $scopes = @($payload.affected_scopes) }
+    elseif ($payload.scope) { $scopes = @([string]$payload.scope) }
+    [ordered]@{
+        status = "blocked"; path = $BarrierPath; gate = "BLOCKED_SHARED_REQUEST_COMPLETION_UNKNOWN_NO_REPLAY"
+        call_id = $callId; utc = $payload.utc; reason = $payload.reason
+        status_code = $payload.status; remote_completion = $payload.remote_completion
+        scopes = $scopes
+        remediation = $payload.remediation
+        release_command = ("deploy\ai-runtime.ps1 resolve-unknown -Call {0} -Reason `"<why releasing is safe>`"" -f $callId)
+    }
+}
+
 switch ($Action) {
     "up" {
         $null = Get-PromptVersionsFile
@@ -275,6 +313,7 @@ switch ($Action) {
             health = (Invoke-Api "/healthz" "GET" $token)
             versioned_prompt_versions = @(Get-PromptVersionsFile)
             prompt_versions_file = $PromptVersionsPath
+            completion_barrier = (Get-CompletionBarrier)
         } | ConvertTo-Json -Depth 8
     }
     "verify" {
@@ -283,5 +322,23 @@ switch ($Action) {
         $token = Read-Token
         if (-not $token) { throw "internal token is missing" }
         Assert-Health $token $current
+    }
+    "resolve-unknown" {
+        # PA-132: the shared completion barrier fails closed on purpose. Releasing it used to
+        # mean deleting a file by hand, with no record of who did it or why. This action keeps
+        # the same gate semantics and only makes the release explicit and auditable: the
+        # barrier is archived under resolved/ with an operator receipt, and nothing restarts.
+        if (-not $Call) { throw "resolve-unknown requires -Call <call id> (run: deploy\ai-runtime.ps1 status and read completion_barrier.call_id)" }
+        if (-not $Reason) { throw "resolve-unknown requires -Reason '<why releasing is safe>'" }
+        if (-not (Test-Path -LiteralPath $BarrierTool -PathType Leaf)) { throw "barrier tool is missing: $BarrierTool" }
+        $python = $BarrierPython
+        if (-not (Test-Path -LiteralPath $python -PathType Leaf)) { $python = "python" }
+        $result = & $python -I -B -X utf8 $BarrierTool --barrier $BarrierPath resolve --call $Call --reason $Reason
+        $exitCode = $LASTEXITCODE
+        Write-Output $result
+        if ($exitCode -ne 0) { throw "completion barrier was not released (exit $exitCode)" }
+        $receiptJson = $result | ConvertFrom-Json
+        Write-Output ("completion_barrier=released call={0} archive={1} receipt={2} restart_required={3}" -f $receiptJson.call_id, $receiptJson.barrier.archive_path, $receiptJson.utc, $receiptJson.restart_required)
+        Write-Output ("completion_barrier_status={0}" -f (Get-CompletionBarrier).status)
     }
 }

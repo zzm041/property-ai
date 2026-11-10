@@ -446,6 +446,11 @@ class Runner:
         if self.shared_completion_barrier_path.exists():
             raise RuntimeError('SHARED_PREVIOUS_REQUEST_COMPLETION_UNKNOWN')
     def record_shared_completion_unknown(self,folder,result):
+        # PA-132: the barrier explains itself. Before this, an operator facing "everything is
+        # blocked" had to read this source to learn which call caused it, what it touches, and
+        # what the sanctioned way out is (there was none besides deleting a file by hand).
+        # These fields are additive: gate() still keys off the file's existence, so the
+        # fail-closed semantics are unchanged.
         record={
             'format':'property-ai-shared-model-completion-barrier-v1',
             'utc':stamp(),'scope':self.scope,'record':folder.name,
@@ -453,6 +458,15 @@ class Runner:
             'status':result['status'],'reason':result.get('reason'),
             'owned_exit_confirmed':result.get('owned_exit_confirmed'),
             'remote_completion':result.get('remote_completion'),
+            'call_id':folder.name,
+            'affected_scopes':[self.scope,'rag'] if self.scope!='rag' else ['rag','work_order_only'],
+            'gate':'BLOCKED_SHARED_REQUEST_COMPLETION_UNKNOWN_NO_REPLAY',
+            'remediation':{
+                'command':f'deploy/ai-runtime.ps1 resolve-unknown -Call {folder.name} -Reason "<why releasing is safe>"',
+                'effect':'archives this barrier under resolved/ with an operator receipt; no restart needed',
+                'requires_restart':False,
+                'replay_authorized':False,
+            },
         }
         self.shared_completion_barrier_path.parent.mkdir(parents=True,exist_ok=True)
         try:
