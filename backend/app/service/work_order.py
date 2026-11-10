@@ -23,6 +23,7 @@ from app.core.errors import (
     WorkOrderErrorCode,
 )
 from app.core.logging import get_logger
+from app.service.media_scan import admit_scanned_media, log_media_scan_skipped
 from app.core.time import current_business_date, utc_now
 from app.domain.audit import AuditAction, AuditResourceType
 from app.domain.ai import FilterReason, WorkOrderAnalysisOutput, capability_filter_reason, category_duty, eligibility_denial_details, map_analysis_output, ordinary_maintenance
@@ -567,7 +568,11 @@ class WorkOrderService:
         return bool(allowed)
 
     def _read_stored_file(self, record: FileObject) -> bytes:
-        if record.scanner_status not in {"clean", "skipped_dev"}:
+        # D6: the verdict is decided in one place. `skipped_dev` is only usable
+        # when the deployment declared the demo stub, and even then the use is
+        # recorded as `media_scan_skipped` instead of being treated as scanned.
+        admission = admit_scanned_media(record.scanner_status, self._settings)
+        if not admission.usable:
             # PA-163: `details` used to be empty here, so a deployment with no
             # scanner produced a bare 409 that named neither the reason nor the
             # state of the file. The message stays the same for existing clients.
@@ -576,10 +581,12 @@ class WorkOrderService:
                 message="File content is not ready for use",
                 status_code=409,
                 details={
-                    "reason": "MEDIA_NOT_READY",
+                    "reason": admission.reason_code,
                     "scanner_status": record.scanner_status,
                 },
             )
+        if admission.demo_stub_skip:
+            log_media_scan_skipped(logger, file_id=record.id, admission=admission)
 
         from app.provider.errors import (
             ProviderInvalidOutputError,

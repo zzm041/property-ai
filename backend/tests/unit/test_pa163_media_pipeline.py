@@ -88,6 +88,9 @@ def test_every_documented_reason_code_has_a_sentence():
 # --------------------------------------------------------------- the 409 detail
 def _service(**overrides):
     service = object.__new__(WorkOrderService)
+    # D6: the read gate now asks the deployment whether the demo stub was
+    # declared, so the fixture states it instead of relying on a status check.
+    service._settings = settings(file_scanner_provider="development")
     for name, value in overrides.items():
         setattr(service, name, value)
     return service

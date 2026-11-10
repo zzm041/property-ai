@@ -32,6 +32,7 @@ from app.model.work_order import FileObject
 from app.provider.asr import ASRProvider
 from app.provider.errors import ProviderError
 from app.provider.factory import build_asr_provider, build_vlm_provider
+from app.service.media_scan import admit_scanned_media, log_media_scan_skipped
 from app.provider.vision import VLMProvider
 from app.repository.work_order import WorkOrderRepository
 
@@ -49,7 +50,7 @@ SUGGESTIBLE_MIME = {
     "audio/wav": MediaKind.AUDIO,
     "audio/webm": MediaKind.AUDIO,
 }
-READY_SCANNER_STATES = frozenset({"clean", "skipped_dev"})
+#: D6: `skipped_dev` is *not* ready by itself - the admission rule decides.
 MAX_SUGGESTED_TEXT = 200
 RESIDENT_ROLE = "RESIDENT"
 SUGGEST_TEXT_KIND = {"vlm": "image", "asr": "audio"}
@@ -63,6 +64,12 @@ SUGGESTION_REASONS = {
     "MEDIA_SCAN_UNAVAILABLE": (
         "本部署没有配置文件安全扫描器，上传的媒体无法使用，请手动填写。"
     ),
+    "MEDIA_SCAN_STUB_UNACKNOWLEDGED": (
+        "本部署用的是开发用扫描桩、没有真正扫描，且未声明演示模式，"
+        "上传的媒体不能用于识别，请手动填写。"
+    ),
+    "MEDIA_SCAN_BLOCKED": "上传的媒体没有通过安全扫描，不能用于识别，请手动填写。",
+    "MEDIA_SCAN_UNKNOWN": "无法确认上传媒体的扫描状态，请手动填写。",
     "AI.UNAVAILABLE": "描述识别服务当前不可用，请手动填写。",
     "AI.TIMEOUT": "描述识别超时，请手动填写。",
     "AI.INVALID_OUTPUT": "模型没有给出可用的描述，请手动填写。",
@@ -264,10 +271,15 @@ class DescriptionSuggestionService:
 
     # ----------------------------------------------------------------- calling
     def _suggest_from(self, record: FileObject, source: str) -> DescriptionSuggestion:
-        if record.scanner_status not in READY_SCANNER_STATES:
+        # D6: never treat an unscanned file as ready; the shared rule names both
+        # the verdict and the reason a reporter should be told.
+        admission = admit_scanned_media(record.scanner_status, self._settings)
+        if not admission.usable:
             return DescriptionSuggestion(
-                text="", source="none", reason_code="MEDIA_NOT_READY"
+                text="", source="none", reason_code=admission.reason_code
             )
+        if admission.demo_stub_skip:
+            log_media_scan_skipped(logger, file_id=record.id, admission=admission)
         if not record.storage_key:
             return DescriptionSuggestion(
                 text="", source="none", reason_code="MEDIA_NOT_READY"

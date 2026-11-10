@@ -118,7 +118,7 @@ def build_service(
     settings=None,
     limiter=None,
 ) -> DescriptionSuggestionService:
-    settings = settings or Settings(_env_file=None)
+    settings = settings or Settings(_env_file=None, file_scanner_provider="development")
     service = DescriptionSuggestionService(
         MagicMock(),
         settings=settings,
@@ -294,7 +294,9 @@ def test_only_a_resident_may_ask_for_a_suggestion():
 def test_per_user_limit_blocks_the_second_call_in_the_window():
     service = build_service(
         files=(media(),),
-        settings=Settings(_env_file=None, wo_suggest_limit_per_hour=1),
+        settings=Settings(
+            _env_file=None, file_scanner_provider="development", wo_suggest_limit_per_hour=1
+        ),
     )
 
     assert suggest(service).status_code == 200
@@ -326,7 +328,12 @@ def test_the_suggestion_call_is_capped_at_fifteen_seconds(monkeypatch):
         "app.service.description_suggestion.build_asr_provider",
         lambda settings: StubASR(),
     )
-    settings = Settings(_env_file=None, asr_timeout_seconds=20.0, vlm_timeout_seconds=12.0)
+    settings = Settings(
+        _env_file=None,
+        file_scanner_provider="development",
+        asr_timeout_seconds=20.0,
+        vlm_timeout_seconds=12.0,
+    )
 
     DescriptionSuggestionService(MagicMock(), settings=settings)
 

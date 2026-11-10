@@ -49,7 +49,11 @@ def _file(*, uploader_user_id: int = 7, content: bytes = JPEG) -> FileObject:
 
 def _service(record: FileObject, *, content: bytes = JPEG) -> WorkOrderService:
     service = WorkOrderService.__new__(WorkOrderService)
-    service._settings = Settings(_env_file=None, app_env="test")
+    # D6: `skipped_dev` is only usable when the deployment declares the demo
+    # stub, so the fixture configures one.
+    service._settings = Settings(
+        _env_file=None, app_env="test", file_scanner_provider="development"
+    )
     service._repository = MagicMock()
     service._repository.get_file.return_value = record
     service._repository.get_file_for_update.return_value = record
