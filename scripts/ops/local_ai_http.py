@@ -64,9 +64,76 @@ if QWEN_ENDPOINT not in {'http://127.0.0.1:11435','http://127.0.0.1:11438'}:rais
 QWEN_INFERENCE_TIMEOUT_SECONDS=(
     180 if (QWEN_MODEL,QWEN_RUNTIME_MODEL) in QWEN_RUNTIME_BINDINGS else 60
 )
-QWEN_RUNNING_RAM_FLOOR_MIB=4500
-QWEN_RUNNING_GPU_FLOOR_MIB=2000
-QWEN_COLD_START_GPU_FLOOR_MIB=6000
+# PA-130 (t130): the three resource floors were literals, so a host that misses
+# the floor by a few dozen MiB could not say by how much, and could not be
+# measured against any other value without editing this file. They stay
+# observable and overridable through the environment, the defaults do not move,
+# and a malformed value stops the adapter at import instead of silently
+# admitting requests against a floor nobody chose.
+FLOOR_ENV_VARS={
+    'ram':'LOCAL_AI_RAM_FLOOR_MIB',
+    'gpu':'LOCAL_AI_GPU_FLOOR_MIB',
+    'cold_start_gpu':'LOCAL_AI_COLD_START_GPU_FLOOR_MIB',
+}
+FLOOR_DEFAULTS={'ram':4500,'gpu':2000,'cold_start_gpu':6000}
+FLOOR_CEILING_MIB=262144
+def floor_from_env(key):
+    """Return (value, source) for one floor, or raise on an unusable value."""
+    name=FLOOR_ENV_VARS[key];default=FLOOR_DEFAULTS[key]
+    raw=os.environ.get(name)
+    if raw is None or not raw.strip():return default,'default'
+    try:value=int(raw.strip())
+    except ValueError as exc:raise ValueError(f'INVALID_FLOOR_MIB:{name}:{raw.strip()}') from exc
+    if not 0<value<=FLOOR_CEILING_MIB:raise ValueError(f'INVALID_FLOOR_MIB:{name}:{raw.strip()}')
+    return value,f'env:{name}'
+QWEN_RUNNING_RAM_FLOOR_MIB,QWEN_RUNNING_RAM_FLOOR_SOURCE=floor_from_env('ram')
+QWEN_RUNNING_GPU_FLOOR_MIB,QWEN_RUNNING_GPU_FLOOR_SOURCE=floor_from_env('gpu')
+QWEN_COLD_START_GPU_FLOOR_MIB,QWEN_COLD_START_GPU_FLOOR_SOURCE=floor_from_env('cold_start_gpu')
+def effective_floors():
+    return {
+        'ram':{'floor_mib':QWEN_RUNNING_RAM_FLOOR_MIB,'source':QWEN_RUNNING_RAM_FLOOR_SOURCE},
+        'gpu':{'floor_mib':QWEN_RUNNING_GPU_FLOOR_MIB,'source':QWEN_RUNNING_GPU_FLOOR_SOURCE},
+        'cold_start_gpu':{'floor_mib':QWEN_COLD_START_GPU_FLOOR_MIB,'source':QWEN_COLD_START_GPU_FLOOR_SOURCE},
+        'defaults':dict(FLOOR_DEFAULTS),
+    }
+def _observed(reader):
+    try:return int(reader()),None
+    except Exception as exc:return None,type(exc).__name__ or exc.__class__.__name__
+def resource_floor(*,ram_mib=None,gpu_mib=None,cold_start=False,skip_gpu=False):
+    """Report the floor that applies, what was measured, and the shortfall.
+
+    ``short_by_mib`` is positive exactly when the measurement is below the
+    floor, so an operator reads "38 MiB short" instead of a bare refusal, and
+    the failing dimension is named rather than inferred.
+    """
+    if ram_mib is None:ram_mib,ram_error=_observed(ram)
+    else:ram_error=None
+    if skip_gpu:gpu_mib,gpu_error=None,None
+    elif gpu_mib is None:gpu_mib,gpu_error=_observed(gpu)
+    else:gpu_error=None
+    gpu_floor=QWEN_COLD_START_GPU_FLOOR_MIB if cold_start else QWEN_RUNNING_GPU_FLOOR_MIB
+    gpu_source=QWEN_COLD_START_GPU_FLOOR_SOURCE if cold_start else QWEN_RUNNING_GPU_FLOOR_SOURCE
+    def bucket(floor,observed,source,error,skipped=False):
+        if skipped:
+            return {'floor_mib':floor,'observed_mib':None,'short_by_mib':None,'ok':True,'source':source,'observation_error':None,'skipped':True}
+        short=None if observed is None else max(0,floor-observed)
+        return {'floor_mib':floor,'observed_mib':observed,'short_by_mib':short,'ok':bool(short==0),'source':source,'observation_error':error}
+    ram_bucket=bucket(QWEN_RUNNING_RAM_FLOOR_MIB,ram_mib,QWEN_RUNNING_RAM_FLOOR_SOURCE,ram_error)
+    gpu_bucket=bucket(gpu_floor,gpu_mib,gpu_source,gpu_error,skipped=skip_gpu)
+    shorts=[v['short_by_mib'] for v in (ram_bucket,gpu_bucket) if v['short_by_mib'] is not None]
+    ok=bool(ram_bucket['ok'] and gpu_bucket['ok'])
+    short_by=max(shorts) if shorts else None
+    return {
+        'ok':ok,'short_by_mib':short_by,'cold_start':bool(cold_start),
+        'floor_mib':ram_bucket['floor_mib'] if not ram_bucket['ok'] else gpu_bucket['floor_mib'],
+        'observed_mib':ram_bucket['observed_mib'] if not ram_bucket['ok'] else gpu_bucket['observed_mib'],
+        'ram':ram_bucket,'gpu':gpu_bucket,'utc':stamp(),
+    }
+class ResourceFloorRefused(RuntimeError):
+    """A floor refusal that keeps its original message and carries the numbers."""
+    def __init__(self,snapshot,message='QWEN_RESOURCE_GUARD'):
+        super().__init__(message)
+        self.resource_floor=snapshot
 MODELS={'asr':'Qwen3-ASR-0.6B','embedding':'bge-m3','reranker':'bge-reranker-v2-m3','qwen':QWEN_MODEL}
 LIMITS={'asr':6,'embedding':12,'reranker':8,'qwen':120}
 CONTINUATION_MAX={'asr':1,'embedding':6,'reranker':6,'qwen':6}
@@ -183,9 +250,12 @@ def qwen_guard():
     # supervises an in-flight request. Requiring a larger second-call margin
     # here rejects the LLM stage immediately after a successful VLM stage even
     # though the first call remained above the approved running floor.
-    gpu_floor=QWEN_RUNNING_GPU_FLOOR_MIB if loaded else QWEN_COLD_START_GPU_FLOOR_MIB
-    if ram()<QWEN_RUNNING_RAM_FLOOR_MIB or gpu()<gpu_floor:
-        raise RuntimeError('QWEN_RESOURCE_GUARD')
+    snapshot=resource_floor(cold_start=not loaded)
+    if not snapshot['ok']:
+        # PA-130: keep the reason text (callers and unit tests match on it) and
+        # carry the measurement alongside, so the refusal can say which
+        # dimension is short and by how many MiB.
+        raise ResourceFloorRefused(snapshot)
 
 def inference_timeout_seconds(kind):
     return QWEN_INFERENCE_TIMEOUT_SECONDS if kind=='qwen' else 60
@@ -437,6 +507,9 @@ class Runner:
             'input_sha256':input_hash,'request_binding_sha256':request_binding,
             'prompt_version':prompt_version,'allowed_prompt_versions':allowed_prompt_versions(),
             'reservation_created':False,'fail_closed':True,
+            # PA-130: a resource refusal carries the numbers beside the code, so
+            # "rejected" never has to be read as "the machine is broken".
+            'resource_floor':getattr(exc,'resource_floor',None),
         }
         self.private.mkdir(parents=True,exist_ok=True)
         with self.audit_lock,(self.private/'pre-reservation-failures.jsonl').open('a',encoding='utf-8') as f:
@@ -656,6 +729,7 @@ class Runner:
         job=RequestJob()
         command=[self.config[environment],'-I','-B','-X','utf8',str(Path(__file__).resolve()),'child','--config',str(self.path),'--input',str(folder/'input.json'),'--job-name',job.name]
         samples=[];events=[];reason=None;start=time.monotonic();phase='load';phase_start=start
+        floor_snapshot=None
         stdout=folder/'stdout.jsonl';stderr=folder/'stderr.txt'
         p=None;owned_exit_confirmed=False;cleanup_error=None
         remote_stop=None;remote_stop_error=None;runtime_disposition='UNTOUCHED'
@@ -674,7 +748,12 @@ class Runner:
                         try:events.append(json.loads(line))
                         except ValueError:pass
                     if any(e.get('phase')=='inference' for e in events) and phase!='inference':phase='inference';phase_start=time.monotonic()
-                    if point['ram_free_mib']<4500 or point.get('gpu_free_mib',2001)<2000:reason='RESOURCE_FLOOR'
+                    floor_snapshot=resource_floor(
+                        ram_mib=point['ram_free_mib'],
+                        gpu_mib=point.get('gpu_free_mib'),
+                        skip_gpu=kind!='qwen',
+                    )
+                    if not floor_snapshot['ok']:reason='RESOURCE_FLOOR'
                     elif time.time()>=deadline:reason='R2_WINDOW_EXHAUSTED'
                     elif time.monotonic()-phase_start>(120 if phase=='load' else inference_timeout_seconds(kind)):reason=phase.upper()+'_TIMEOUT'
                     if reason:break
@@ -733,15 +812,26 @@ class Runner:
             'request_job':job.name,'owned_exit_confirmed':owned_exit_confirmed,'cleanup_error':cleanup_error,
             'remote_stop':remote_stop,'remote_stop_error':remote_stop_error,
             'runtime_disposition':runtime_disposition,
+            'resource_floor':floor_snapshot,
             'remote_completion':('CONTROLLED_STOP' if controlled_remote_stop
                 else 'LEFT_RUNNING' if left_running
                 else 'UNKNOWN' if unknown
                 else 'NOT_UNKNOWN')}
         save(folder/'result.json',result)
         if unknown:self.record_shared_completion_unknown(folder,result)
-        if not success:raise RuntimeError(reason or 'MODEL_REQUEST_FAILED_NO_RETRY')
+        if not success:
+            if reason=='RESOURCE_FLOOR' and floor_snapshot is not None:
+                raise ResourceFloorRefused(floor_snapshot,'RESOURCE_FLOOR')
+            raise RuntimeError(reason or 'MODEL_REQUEST_FAILED_NO_RETRY')
         return results[0]
 
+def failure_body(exc):
+    """The 503 body: the same error string, plus numbers only when refused on
+    resources (PA-130). Readiness codes and status codes are untouched."""
+    body={'error':'MODEL_GUARD_OR_REQUEST_FAILED_NO_RETRY'}
+    snapshot=getattr(exc,'resource_floor',None)
+    if snapshot is not None:body['resource_floor']=snapshot
+    return body
 def serve(config_path):
     runner=Runner(config_path);token=os.environ.get('LOCAL_AI_INTERNAL_TOKEN','')
     if len(token)<32:raise RuntimeError('INTERNAL_AUTH_REQUIRED')
@@ -757,8 +847,14 @@ def serve(config_path):
             return self.client_address[0]=='127.0.0.1' and hmac.compare_digest(self.headers.get('Authorization',''),'Bearer '+token)
         def do_GET(self):
             if not self.authorized():return self.reply(401,{'error':'AUTH_REQUIRED'})
-            if self.path!='/healthz':return self.reply(404,{'error':'NOT_FOUND'})
-            return self.reply(200,{'status':'ready','inference':False,'scope':runner.scope,'models':MODELS,'reservation_gate':runner.gate(),'budget':runner.budget_usage(),'prompt_versions':allowed_prompt_versions(),**runner.admission()})
+            # PA-130: /readyz is the same readiness surface under the name the
+            # delivery stack and its runbooks use; the payload is identical and
+            # now reports the effective floors next to the current measurement.
+            if self.path not in ('/healthz','/readyz'):return self.reply(404,{'error':'NOT_FOUND'})
+            # The measurement is best-effort: a missing nvidia-smi reports an
+            # observation_error instead of turning readiness into a 500, so this
+            # stays usable as the launcher's liveness probe.
+            return self.reply(200,{'status':'ready','inference':False,'scope':runner.scope,'models':MODELS,'reservation_gate':runner.gate(),'budget':runner.budget_usage(),'resource_floor':resource_floor(),'floors':effective_floors(),'prompt_versions':allowed_prompt_versions(),**runner.admission()})
         def do_POST(self):
             if not self.authorized():return self.reply(401,{'error':'AUTH_REQUIRED'})
             if self.path=='/admin/drain':
@@ -791,13 +887,21 @@ def serve(config_path):
             except Exception as exc:
                 if not shared_ready:
                     runner.record_pre_reservation_failure(exc,stage='SHARED_COMPLETION_BARRIER' if shared is not None else 'SHARED_RESOURCE_LOCK',kind=kind,request_binding=request_binding)
-                return self.reply(503,{'error':'MODEL_GUARD_OR_REQUEST_FAILED_NO_RETRY'})
+                body=failure_body(exc)
+                return self.reply(503,body)
             finally:
                 if shared is not None:runner.release_shared_model_lock(shared)
                 runner.lock.release()
     server=ThreadingHTTPServer((runner.config['host'],runner.config['port']),Handler)
-    banner={'pid':os.getpid(),'listen':f"{runner.config['host']}:{runner.config['port']}",'python':sys.executable,'source':str(Path(__file__).resolve()),'utc':stamp(),'health_inference':False,'prompt_versions':allowed_prompt_versions()}
+    floors=effective_floors()
+    banner={'pid':os.getpid(),'listen':f"{runner.config['host']}:{runner.config['port']}",'python':sys.executable,'source':str(Path(__file__).resolve()),'utc':stamp(),'health_inference':False,'prompt_versions':allowed_prompt_versions(),'floors':floors}
     print(json.dumps(banner,ensure_ascii=False),flush=True)
+    print('resource floors:',json.dumps({
+        'ram_mib':f"{floors['ram']['floor_mib']} ({floors['ram']['source']})",
+        'gpu_mib':f"{floors['gpu']['floor_mib']} ({floors['gpu']['source']})",
+        'cold_start_gpu_mib':f"{floors['cold_start_gpu']['floor_mib']} ({floors['cold_start_gpu']['source']})",
+        'overrides':[FLOOR_ENV_VARS['ram'],FLOOR_ENV_VARS['gpu'],FLOOR_ENV_VARS['cold_start_gpu']],
+    },ensure_ascii=False),flush=True)
     server.serve_forever()
 
 if __name__=='__main__':

@@ -194,6 +194,39 @@ docker network inspect -f '{{range .IPAM.Config}}{{.Subnet}}{{end}}' property-ai
 
 判定不变的部分：完成屏障、失败输入不自动重放、证据缺失/漂移仍然 fail-closed（`gate()` 仍遍历**全部**调用，包含证据）。改配置后需重启适配器才生效；重启与单入口回归由 `deploy/ai-runtime.ps1 up` 负责。
 
+### 资源地板：可观测、可覆盖（PA-130）
+
+适配器在每次 Qwen 调用前后比较宿主剩余内存与显卡空闲显存，低于地板即拒绝（`QWEN_RESOURCE_GUARD` → 对外 `RESOURCE_ADMISSION_REJECTED`）。地板过去是三个写死的字面量，只能报「拒了」；现在它们可观测、可覆盖，默认值不变：
+
+| 环境变量 | 默认 | 含义 |
+| --- | --- | --- |
+| `LOCAL_AI_RAM_FLOOR_MIB` | 4500 | 请求期间要求的最小可用内存（MiB） |
+| `LOCAL_AI_GPU_FLOOR_MIB` | 2000 | 模型常驻时要求的最小空闲显存（MiB） |
+| `LOCAL_AI_COLD_START_GPU_FLOOR_MIB` | 6000 | 模型**未常驻**、本次请求要现场加载时要求的最小空闲显存（MiB） |
+
+规则：
+
+- 非法值（非整数、`≤0`、`>262144`）在**进程启动时**就抛 `ValueError: INVALID_FLOOR_MIB:<变量名>:<原值>`，不会带着没选过的地板接请求；空值等同未设置，用默认值。
+- `GET /healthz` 与 `GET /readyz`（同一载荷）新增两块：`floors` 回显三者生效值与来源（`default` / `env:<变量名>`），`resource_floor` 给出 `floor_mib` / `observed_mib` / `short_by_mib`（正数＝还差多少）以及 `ram` / `gpu` 分项与 `observation_error`（`nvidia-smi` 不可用时不会把就绪探针变成 500）。
+- 资源拒绝时，`POST` 的 503 体与 `pre-reservation-failures.jsonl` 记录都会带上同一份 `resource_floor`；错误串与非资源类状态码不变，`detail_code` 语义不变（仍只回显白名单内的原因，`QWEN_RESOURCE_GUARD` 不在名单里，仍为 `null`）。
+- 启动 banner 会多打一行 `resource floors: {...}`，写明三个生效值与可覆盖的变量名。
+
+**32GB / 16GB 机器的现实**：27B（q3）常驻时实测空闲显存 1941–1962 MiB、宿主可用内存 4417–4777 MiB，而默认地板是 2000 / 4500，也就是说**每次加载都会贴地板、差几十 MiB**。这时报 `short_by_mib: 38~59` 属于**容量问题**，不是代码回归：机器在 27B + 视觉这条路上本来就没有余量。可选路径（按代价从小到大，均需另行评审，本文只记录）：
+
+1. **降上下文**：把 `PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL` 指向更小 ctx 的已批准变体（如 `…-g52-ctx8192`），减少 KV cache 占用；
+2. **只跑文本**：关闭图片/视觉调用，省掉 VLM 那一轮常驻与显存峰值；
+3. **换小模型**：改用更小的已批准模型，重跑能力回归后替换——这会改变对外承诺的模型口径，必须走评审，不能由运维直接改。
+
+覆盖示例（仅用于临时排查，需在部署记录里写明原因与时长）：
+
+```powershell
+$env:LOCAL_AI_RAM_FLOOR_MIB      = "4450"
+$env:LOCAL_AI_COLD_START_GPU_FLOOR_MIB = "1950"
+deploy\ai-runtime.ps1 up
+```
+
+覆盖后必须能从 `GET /readyz` 的 `floors.source` 看出「是 env 覆盖，不是默认值」；排查结束后恢复默认并重启，否则这台机器上的地板就再也没人校验过。
+
 ### 媒体模型版本与成功检查点（2026-11-02）
 
 `VLM_MODEL_REVISION`、`ASR_MODEL_REVISION` 可填写已核实的权重 SHA-256（例如 `sha256:<64位摘要>`）或不可变部署发布号。标签最长128字符，仅允许字母、数字、点、下划线、冒号、加号、连字符；禁止凭证或业务内容。实际请求仍使用 `VLM_MODEL` / `ASR_MODEL`，revision 仅进入成功检查点指纹。
