@@ -78,11 +78,25 @@ def test_unknown_employee_is_a_409_with_a_reason() -> None:
     )
 
 
-def test_foreign_employee_is_a_409_with_a_reason() -> None:
-    denial = _employee_scope_denial(_employee(tenant_id=2), tenant_id=1)
+def test_foreign_employee_is_indistinguishable_from_an_unknown_id() -> None:
+    """PA-134: the 409 must not reveal that the id exists in another tenant."""
 
-    assert denial is not None
-    assert denial.details["reason"] == "TENANT_MISMATCH"
+    unknown = _employee_scope_denial(None, tenant_id=1)
+    foreign = _employee_scope_denial(_employee(tenant_id=2), tenant_id=1)
+
+    assert unknown is not None and foreign is not None
+    assert foreign.details["reason"] == "EMPLOYEE_NOT_FOUND"
+    assert (
+        foreign.code,
+        foreign.message,
+        foreign.status_code,
+        foreign.details,
+    ) == (
+        unknown.code,
+        unknown.message,
+        unknown.status_code,
+        unknown.details,
+    )
 
 
 def test_same_tenant_employee_passes_the_scope_precheck() -> None:

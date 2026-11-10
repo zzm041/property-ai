@@ -211,16 +211,23 @@ def _employee_scope_denial(
     *,
     tenant_id: int,
 ) -> AppError | None:
-    """Deny before any roster lookup when the employee is unknown or foreign.
+    """Deny before any roster lookup when the assignee is not this tenant's.
 
-    Kept as a named function (instead of an inline `or`) so the two reasons are
-    asserted directly in unit tests without a database.
+    PA-134: this used to answer ``TENANT_MISMATCH`` for a row owned by another
+    tenant, which turned the 409 body into an oracle: an operator could walk
+    employee ids and learn which of them exist in other tenants. Both cases now
+    answer the single ``EMPLOYEE_NOT_FOUND`` reason, so the two responses are
+    byte-for-byte identical; the distinction survives only in the server log
+    (see ``WorkOrderService._log_assignment_lookup_missed``).
+
+    The tenant check stays as defence in depth even though the caller loads the
+    employee through a tenant-scoped query and can therefore only see ``None``.
     """
 
     if employee is None:
         return eligibility_denied(reason="EMPLOYEE_NOT_FOUND")
     if employee.tenant_id != tenant_id:
-        return eligibility_denied(reason="TENANT_MISMATCH")
+        return eligibility_denied(reason="EMPLOYEE_NOT_FOUND")
     return None
 
 
@@ -1961,6 +1968,25 @@ class WorkOrderService:
         )
         return record
 
+    def _log_assignment_lookup_missed(
+        self, employee_id: int, *, tenant_id: int
+    ) -> None:
+        """Record *why* the tenant-scoped assignee lookup came back empty.
+
+        PA-134: the 409 body is deliberately identical for "no such id" and
+        "id belongs to another tenant", so the reason is kept for internal
+        diagnostics only and never leaves the process. The extra read runs on
+        the denial path only.
+        """
+
+        foreign = self._employees.get_employee(employee_id) is not None
+        logger.warning(
+            "dispatch_employee_lookup_missed",
+            employee_id=employee_id,
+            tenant_id=tenant_id,
+            error_reason="EMPLOYEE_FOREIGN" if foreign else "EMPLOYEE_NOT_FOUND",
+        )
+
     def _assign(
         self,
         *,
@@ -1995,7 +2021,17 @@ class WorkOrderService:
         self._assert_version(record, version)
         # Share the global assignment mutex with AUTO, even for authorized
         # manual intervention. No business scope is inferred from this lock.
-        employee = self._employees.get_employee_for_update(employee_id)
+        # PA-134: the tenant predicate is part of the locking read, so an id
+        # from another tenant is indistinguishable from an unknown one here.
+        employee = self._employees.get_employee_in_tenant(
+            tenant_id=record.tenant_id,
+            employee_id=employee_id,
+            for_update=True,
+        )
+        if employee is None:
+            self._log_assignment_lookup_missed(
+                employee_id, tenant_id=record.tenant_id
+            )
         # PA-127 F1: these two pre-checks used to raise the same bare 409 as
         # every other denial, so "unknown employee" and "employee belongs to
         # another tenant" were indistinguishable from a skill or roster gate.
