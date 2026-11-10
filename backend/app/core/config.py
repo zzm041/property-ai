@@ -313,14 +313,19 @@ class Settings(BaseSettings):
                         f" ({', '.join(sorted(LOCAL_AI_ENDPOINT_HOSTS))});"
                         f" LLM_BASE_URL points at {host or '<no host>'}"
                     )
-            self._reject_shared_token_off_host()
         if self.app_env == "production":
             self._require_production_provider_credentials()
-            self._reject_shared_token_off_host()
             if self.file_scanner_provider == "development":
                 raise ValueError(
                     "Production cannot use the Development file scanner"
                 )
+        # PA-140: the shared-token gate is a property of the credentials, not of the
+        # environment or of the main LLM. It used to sit inside
+        # `app_env == "staging" and llm_provider == "production"`, so a staging box with
+        # LLM_PROVIDER=development but VLM_PROVIDER=production sailed through and sent the
+        # adapter token to whatever VLM_BASE_URL pointed at. Call it unconditionally: it
+        # already skips every family whose provider is not "production".
+        self._reject_shared_token_off_host()
         if self.file_scanner_provider == "clamav":
             try:
                 scanner_address = ip_address(self.file_scanner_host)
