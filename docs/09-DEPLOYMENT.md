@@ -179,6 +179,21 @@ docker network inspect -f '{{range .IPAM.Config}}{{.Subnet}}{{end}}' property-ai
 
 运维说明：`SMS_IP_LIMIT_PER_HOUR` 已在 `deploy/docker-compose.delivery.yml` 暴露为 `${SMS_IP_LIMIT_PER_HOUR:-30}`，改值只需改环境后 `docker compose up -d api`（无需重建镜像）；手机号维度仍由 `SMS_SEND_LIMIT_PER_HOUR` / `SMS_LOGIN_LIMIT_PER_HOUR` 控制。调大 IP 预算前先确认 `TRUSTED_PROXY_CIDRS` 已按实际网段收窄，否则等于给整站共用桶放宽额度。
 
+### 本地 AI 适配器的预算与评审证据（PA-166）
+
+适配器（`scripts/ops/local_ai_http.py`）在 `private` 目录里给每次推理调用写一个 `call-NNN/`（`reservation.json` + `result.json`），累计预算按「`call_baseline` + 已计数调用数 < `limits`」判定。评审证据（`call-001` 等被 `resolutions` 复核过的资产）与线上调用**同目录**，重启时若把归档证据拷回 `calls/`，它会被当成新花费，出现「恢复证据即打爆预算」——对外恒为 `MODEL_GUARD_OR_REQUEST_FAILED_NO_RETRY`，`detail_code` 全空。
+
+现在预算只计**未被声明为证据**的调用：
+
+| 配置键 | 作用 |
+| --- | --- |
+| `evidence_records` | 声明 `calls/` 下属于历史证据的目录名（`["call-001", …]`）。这些目录仍须存在（`work-ai-runtime.ps1 up` 会校验若干条），但**不进入**当前窗口的调用数与时长。`resolutions` 里列出的 `record` 自动计入，无需重复声明 |
+| `call_baseline` / `limits` | 语义不变：窗口前已在预算外花掉的调用数 + 本窗口已计数调用数 必须小于 `limits` |
+
+`GET /healthz` 的 `budget` 字段会回显 `limits`、`call_baseline`、`counted`（本窗口计数）、`counted_records`、`evidence_excluded` 与 `evidence_records`，用来判断「还剩多少」和「哪些被当成证据」。每次 `reservation.json` 也会记 `budget_counted: true` 与 `evidence_excluded_before`，事后可复算。
+
+判定不变的部分：完成屏障、失败输入不自动重放、证据缺失/漂移仍然 fail-closed（`gate()` 仍遍历**全部**调用，包含证据）。改配置后需重启适配器才生效；重启与单入口回归由 `deploy/ai-runtime.ps1 up` 负责。
+
 ### 媒体模型版本与成功检查点（2026-11-02）
 
 `VLM_MODEL_REVISION`、`ASR_MODEL_REVISION` 可填写已核实的权重 SHA-256（例如 `sha256:<64位摘要>`）或不可变部署发布号。标签最长128字符，仅允许字母、数字、点、下划线、冒号、加号、连字符；禁止凭证或业务内容。实际请求仍使用 `VLM_MODEL` / `ASR_MODEL`，revision 仅进入成功检查点指纹。

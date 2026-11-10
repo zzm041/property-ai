@@ -351,6 +351,21 @@ class Runner:
             if set(c.get('limits',{}))!=set(CONTINUATION_MAX) or any(not 0<c['limits'][k]<=CONTINUATION_MAX[k] for k in CONTINUATION_MAX):raise ValueError('CONTINUATION_LIMIT')
             if c.get('asr_start_ram_mib')!=11264:raise ValueError('ASR_ADMISSION_LIMIT')
             self.resolutions.extend(c.get('resolutions',[]))
+        # PA-166: reviewed evidence lives in the same private directory as live
+        # reservations, so the cumulative budget used to double count it. Restoring
+        # the reviewed call-* assets (the launcher refuses to start without them)
+        # then spent the very budget the restore was meant to prove, and the two
+        # numbers could not be told apart in the failure record either.
+        # Budget counting now skips records declared as evidence; those stay on
+        # disk with their pinned sha256 + review verdict and are accounted for by
+        # call_baseline instead of the current window.
+        declared=self.config.get('evidence_records',[])
+        if not isinstance(declared,list) or any(not isinstance(x,str) or not x.strip() for x in declared):
+            raise ValueError('INVALID_EVIDENCE_RECORDS')
+        self.evidence_records={x.strip() for x in declared}
+        self.evidence_records.update(
+            spec['record'] for spec in self.resolutions if isinstance(spec.get('record'),str) and spec['record']
+        )
     def record_runtime_stopped(self,*,reason,remote_stop):
         """Invalidate the in-memory binding and leave a receipt next to it.
 
@@ -497,6 +512,36 @@ class Runner:
                     or verdict.get('resolution_sha256','').lower()!=spec['resolution_sha256'].lower()):raise RuntimeError('RESOLUTION_REVIEW_REQUIRED')
             return data
         return None
+    def reservation_paths(self):
+        return sorted(self.private.glob('call-*/reservation.json'))
+    def budget_ledger(self):
+        """PA-166: split reviewed evidence from live spend.
+
+        ``counted`` reservations consume the cumulative budget; ``evidence``
+        reservations are historical assets that must stay on disk (the launcher
+        and reviewers read them) but are accounted for by ``call_baseline``.
+        """
+        counted=[];evidence=[]
+        for path in self.reservation_paths():
+            (evidence if path.parent.name in self.evidence_records else counted).append(path)
+        return {'counted':counted,'evidence':evidence}
+    def budget_usage(self):
+        ledger=self.budget_ledger()
+        kinds={kind:0 for kind in LIMITS}
+        for path in ledger['counted']:
+            kinds[json.loads(path.read_text(encoding='utf-8'))['kind']]+=1
+        return {
+            'limits':dict(self.limits),'call_baseline':dict(self.call_baseline),
+            'counted':kinds,'counted_records':[p.parent.name for p in ledger['counted']],
+            'evidence_excluded':len(ledger['evidence']),
+            'evidence_records':[p.parent.name for p in ledger['evidence']],
+        }
+    def next_call_index(self):
+        used=[]
+        for path in self.private.glob('call-*'):
+            try:used.append(int(path.name.split('-',1)[1]))
+            except (IndexError,ValueError):continue
+        return max(used,default=0)+1
     def gate(self):
         if self.shared_completion_barrier_path.exists():
             return 'BLOCKED_SHARED_REQUEST_COMPLETION_UNKNOWN_NO_REPLAY'
@@ -517,6 +562,9 @@ class Runner:
     def reserve(self,kind,input_hash=None):
         prior=sorted(self.private.glob('call-*/reservation.json'))
         records=[json.loads(p.read_text()) for p in prior]
+        # PA-166: reviewed evidence is present on disk but is not current spend.
+        ledger=self.budget_ledger()
+        counted_records=[json.loads(p.read_text()) for p in ledger['counted']]
         if self.gate()!='READY':
             raise RuntimeError('PREVIOUS_REQUEST_COMPLETION_UNKNOWN_NO_REPLAY')
         replay_of=None
@@ -549,9 +597,10 @@ class Runner:
             if sum(r['kind']==kind for r in new)>=self.continuation['limits'][kind]:raise RuntimeError('R2_CALL_LIMIT')
             metadata={'window':'r2-continuation-01','window_start_unix':start,'incremental_max_calls':self.continuation['limits'][kind],'replay_of':replay_of}
         else:
-            if self.call_baseline[kind]+sum(r['kind']==kind for r in records)>=self.limits[kind]:raise RuntimeError('R2_CALL_LIMIT')
+            if self.call_baseline[kind]+sum(r['kind']==kind for r in counted_records)>=self.limits[kind]:
+                raise RuntimeError('R2_CALL_LIMIT')
             spent=float(self.duration_baseline_seconds)
-            for path in prior:
+            for path in ledger['counted']:
                 result=json.loads((path.parent/'result.json').read_text(encoding='utf-8'))
                 elapsed=result.get('total_seconds')
                 if isinstance(elapsed,bool) or not isinstance(elapsed,(int,float)) or not math.isfinite(elapsed) or elapsed<0:
@@ -563,8 +612,10 @@ class Runner:
                 'replay_of':replay_of,'budget':'cumulative-model-runtime-v1',
                 'call_baseline':self.call_baseline[kind],
                 'cumulative_seconds_before':spent,
+                'budget_counted':True,
+                'evidence_excluded_before':len(ledger['evidence']),
             }
-        folder=self.private/f'call-{len(records)+1:03d}';folder.mkdir()
+        folder=self.private/f'call-{self.next_call_index():03d}';folder.mkdir()
         save(folder/'reservation.json',{'kind':kind,'unix':now,'utc':stamp(),'model':MODELS[kind],'max_calls':self.limits[kind],'input_hash':input_hash,**metadata})
         return folder,deadline
     def run(self,kind,value,request_binding=None):
@@ -707,7 +758,7 @@ def serve(config_path):
         def do_GET(self):
             if not self.authorized():return self.reply(401,{'error':'AUTH_REQUIRED'})
             if self.path!='/healthz':return self.reply(404,{'error':'NOT_FOUND'})
-            return self.reply(200,{'status':'ready','inference':False,'scope':runner.scope,'models':MODELS,'reservation_gate':runner.gate(),'prompt_versions':allowed_prompt_versions(),**runner.admission()})
+            return self.reply(200,{'status':'ready','inference':False,'scope':runner.scope,'models':MODELS,'reservation_gate':runner.gate(),'budget':runner.budget_usage(),'prompt_versions':allowed_prompt_versions(),**runner.admission()})
         def do_POST(self):
             if not self.authorized():return self.reply(401,{'error':'AUTH_REQUIRED'})
             if self.path=='/admin/drain':
