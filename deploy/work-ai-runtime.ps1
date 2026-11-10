@@ -247,23 +247,81 @@ function Assert-Candidate {
     }
 }
 
-function New-RuntimeBinding {
+function Get-ExpectedRuntimeBinding {
+    # PA-130: the binding is a statement about the *live* Ollama process, so it is derived
+    # from the launcher's receipt every time it is checked instead of being frozen at start.
     if (-not (Test-Path -LiteralPath $OllamaCurrent -PathType Leaf)) { throw "delivery Ollama receipt is missing" }
     $ollama = Get-Content -Raw -LiteralPath $OllamaCurrent | ConvertFrom-Json
     if ($ollama.host -ne "127.0.0.1:11435" -or $ollama.no_cloud -ne $true -or [int]$ollama.concurrency -ne 1) {
         throw "delivery Ollama receipt does not match the approved runtime"
     }
-    $bindingPath = Join-Path $RuntimeDir ("runtime-binding-{0}.json" -f ([DateTime]::UtcNow.ToString("yyyyMMddTHHmmssZ")))
-    if (Test-Path -LiteralPath $bindingPath) { throw "runtime binding already exists" }
-    $binding = [ordered]@{
+    [ordered]@{
         pid = [int]$ollama.pid
         executable = [string]$ollama.executable
         launched_at_utc = ([DateTimeOffset]$ollama.started_at_utc).UtcDateTime.ToString("o")
         listener = "127.0.0.1:11435"
         source_receipt_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $OllamaCurrent).Hash
     }
+}
+
+function Test-RuntimeBinding([string]$Path, [object]$Expected) {
+    # Returns $null when there is no usable binding, otherwise { ok, mismatched, actual }.
+    # The comparison mirrors local_ai_runtime_control.bound_runtime_identity: pid and
+    # executable exactly, launched_at_utc within one second.
+    if (-not $Path -or -not (Test-Path -LiteralPath $Path -PathType Leaf)) { return $null }
+    try {
+        $actual = Get-Content -Raw -LiteralPath $Path | ConvertFrom-Json
+    } catch {
+        return [pscustomobject]@{ ok = $false; mismatched = @("unreadable"); actual = $null }
+    }
+    $mismatched = New-Object System.Collections.Generic.List[string]
+    if ([int]$actual.pid -ne [int]$Expected.pid) { $mismatched.Add("pid") }
+    if ([string]$actual.executable -ne [string]$Expected.executable) { $mismatched.Add("executable") }
+    $actualLaunched = $null
+    try { $actualLaunched = [DateTimeOffset]$actual.launched_at_utc } catch { $mismatched.Add("launched_at_utc") }
+    if ($null -ne $actualLaunched) {
+        $expectedLaunched = [DateTimeOffset]$Expected.launched_at_utc
+        if ([Math]::Abs(($actualLaunched - $expectedLaunched).TotalMilliseconds) -gt 1000) { $mismatched.Add("launched_at_utc") }
+    }
+    if ([string]$actual.source_receipt_sha256 -ne [string]$Expected.source_receipt_sha256) { $mismatched.Add("source_receipt_sha256") }
+    [pscustomobject]@{ ok = ($mismatched.Count -eq 0); mismatched = @($mismatched); actual = $actual }
+}
+
+function Read-ConfiguredBindingPath {
+    if (-not (Test-Path -LiteralPath $ConfigPath -PathType Leaf)) { return $null }
+    try {
+        $config = Get-Content -Raw -LiteralPath $ConfigPath | ConvertFrom-Json
+    } catch {
+        return $null
+    }
+    $path = [string]$config.runtime_binding_path
+    if (-not $path) { return $null }
+    return $path
+}
+
+function New-RuntimeBinding {
+    $bindingPath = Join-Path $RuntimeDir ("runtime-binding-{0}.json" -f ([DateTime]::UtcNow.ToString("yyyyMMddTHHmmssZ")))
+    if (Test-Path -LiteralPath $bindingPath) { throw "runtime binding already exists" }
+    $binding = Get-ExpectedRuntimeBinding
     [IO.File]::WriteAllText($bindingPath, ($binding | ConvertTo-Json), [Text.UTF8Encoding]::new($false))
     return $bindingPath
+}
+
+function Stop-RecordedAdapter([object]$State) {
+    # Same drain-then-exact-pid contract as the "stop" action, reused by the PA-130
+    # convergence path so a stale binding is repaired without going through "down".
+    $null = Assert-CurrentProcess $State
+    $drain = Invoke-Drain (Read-Token)
+    if ($drain.accepting_requests -ne $false -or $drain.request_active) { throw "work AI adapter is not safely drainable" }
+    try {
+        Stop-Process -Id ([int]$State.listener_pid) -ErrorAction Stop
+    } catch {
+        & taskkill /PID ([int]$State.listener_pid) /F | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw "exact work AI adapter process could not be stopped" }
+    }
+    $deadline = [DateTime]::UtcNow.AddSeconds(10)
+    do { Start-Sleep -Milliseconds 100 } until (@(Get-Listener).Count -eq 0 -or [DateTime]::UtcNow -ge $deadline)
+    if (@(Get-Listener).Count -ne 0) { throw "11437 did not release after exact adapter stop" }
 }
 
 function Read-Current {
@@ -292,6 +350,7 @@ switch ($Action) {
         New-Item -ItemType Directory -Force -Path $RuntimeDir,$PrivateDir | Out-Null
         Assert-Candidate
         $existing = @(Get-Listener)
+        $converge = $false
         if ($existing.Count -gt 0) {
             $state = Read-Current
             $token = Read-Token
@@ -304,8 +363,38 @@ switch ($Action) {
             if ($health.scope -ne "work_order_only" -or $health.request_active -or $health.accepting_requests -ne $true) {
                 throw "recorded work AI adapter is not idle and accepting"
             }
-            [ordered]@{ state=$state; health=$health } | ConvertTo-Json -Depth 7
-            break
+            # PA-130: "up" means "converge to a ready runtime", not "report whatever is running".
+            # The adapter freezes the binding it loaded at startup, and the reviewed Ollama
+            # runtime is restarted by the orchestrator on every up, so an adapter that survived
+            # a restart keeps verifying a dead pid and fails every request at RUNTIME_IDENTITY.
+            # If the configured binding no longer describes the live Ollama process the only
+            # convergence is: stop this adapter through its receipt, then start it again on a
+            # freshly derived binding (the start path below rewrites config + receipt).
+            $expectedBinding = Get-ExpectedRuntimeBinding
+            $bindingPath = Read-ConfiguredBindingPath
+            $bindingState = Test-RuntimeBinding $bindingPath $expectedBinding
+            if ($null -ne $bindingState -and $bindingState.ok) {
+                Write-Output ("runtime_binding=ok path={0} pid={1} executable={2}" -f $bindingPath, $expectedBinding.pid, $expectedBinding.executable)
+                [ordered]@{
+                    state = $state
+                    health = $health
+                    runtime_binding = [ordered]@{ status = "ok"; path = $bindingPath; pid = $expectedBinding.pid; adapter_restarted = $false }
+                } | ConvertTo-Json -Depth 7
+                break
+            }
+            $mismatchedText = if ($null -eq $bindingState) { "missing" } else { ($bindingState.mismatched -join ",") }
+            $previousPid = if ($null -eq $bindingState -or $null -eq $bindingState.actual) { "none" } else { [string]$bindingState.actual.pid }
+            Write-Output ("runtime_binding=rewritten reason={0} previous={1} previous_pid={2} expected_pid={3}" -f $mismatchedText, $bindingPath, $previousPid, $expectedBinding.pid)
+            Write-Output "the recorded adapter verifies the binding it loaded at startup; stopping it so it can be restarted on the refreshed binding"
+            Stop-RecordedAdapter $state
+            # keep exactly one live binding in the runtime directory: the stale one is evidence,
+            # not configuration, so retire it under a name nothing reads back.
+            if ($bindingPath -and (Test-Path -LiteralPath $bindingPath -PathType Leaf)) {
+                $superseded = Join-Path $RuntimeDir ("superseded-{0}-{1}" -f ([DateTime]::UtcNow.ToString("yyyyMMddTHHmmssZ")), [IO.Path]::GetFileName($bindingPath))
+                Move-Item -LiteralPath $bindingPath -Destination $superseded -Force
+                Write-Output ("superseded stale binding: {0}" -f [IO.Path]::GetFileName($superseded))
+            }
+            $converge = $true
         }
         $token = Read-Token
         if (-not $token) {
@@ -421,6 +510,16 @@ switch ($Action) {
             equiv_scope_note="source_commit is equivalent only for equiv_scope; run git rev-parse HEAD for the repo HEAD"
         }
         [IO.File]::WriteAllText($CurrentPath, ($state | ConvertTo-Json -Depth 6), [Text.UTF8Encoding]::new($false))
+        # PA-130 self-check: whatever path got here, the runtime must leave behind a binding
+        # that describes the Ollama process it will actually talk to.
+        $verifiedBindingPath = Read-ConfiguredBindingPath
+        $verifiedExpected = Get-ExpectedRuntimeBinding
+        $verifiedBinding = Test-RuntimeBinding $verifiedBindingPath $verifiedExpected
+        if ($null -eq $verifiedBinding -or -not $verifiedBinding.ok) {
+            $detail = if ($null -eq $verifiedBinding) { "missing" } else { ($verifiedBinding.mismatched -join ",") }
+            throw "runtime binding did not converge after start: $detail"
+        }
+        Write-Output ("runtime_binding=ok path={0} pid={1} executable={2}" -f $verifiedBindingPath, $verifiedExpected.pid, $verifiedExpected.executable)
         $state | ConvertTo-Json -Depth 6
     }
     "status" {
