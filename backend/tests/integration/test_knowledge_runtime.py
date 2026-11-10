@@ -362,6 +362,7 @@ def test_rag_failure_does_not_block_core_business(identity_session: Session) -> 
     record = WorkOrderService(identity_session, settings=settings).create_work_order(
         actor=_principal(identity_session, graph.employees.resident_id),
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
         request_id="t8-wo-degraded",
         idempotency_key=f"t8-wo-{uuid4()}",
         text="Kitchen tap is leaking",

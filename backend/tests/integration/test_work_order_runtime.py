@@ -86,7 +86,7 @@ def test_resident_creates_own_house_work_order(identity_session: Session) -> Non
         created = client.post(
             "/api/v1/work-orders",
             json={
-                "house_id": graph.house_1_id,
+                "house_id": graph.house_1_id, "contact_phone": "13800000000",
                 "text": "Broken tap",
                 "category": "PLUMBING",
                 "priority": "HIGH",
@@ -96,7 +96,7 @@ def test_resident_creates_own_house_work_order(identity_session: Session) -> Non
         forbidden_creator = client.post(
             "/api/v1/work-orders",
             json={
-                "house_id": graph.house_1_id,
+                "house_id": graph.house_1_id, "contact_phone": "13800000000",
                 "text": "Forged",
                 "creator_user_id": graph.employees.manager_p1_id,
             },
@@ -104,7 +104,7 @@ def test_resident_creates_own_house_work_order(identity_session: Session) -> Non
         )
         other_house = client.post(
             "/api/v1/work-orders",
-            json={"house_id": graph.house_2_id, "text": "Not mine"},
+            json={"house_id": graph.house_2_id, "contact_phone": "13800000000", "text": "Not mine"},
             headers={**_auth(token, "t6-create-other"), **_idempotency()},
         )
     assert created.status_code == 200
@@ -127,17 +127,17 @@ def test_idempotent_create_returns_same_work_order(identity_session: Session) ->
         token = _token(client, graph.employees.resident_id)
         first = client.post(
             "/api/v1/work-orders",
-            json={"house_id": graph.house_1_id, "text": "Same"},
+            json={"house_id": graph.house_1_id, "contact_phone": "13800000000", "text": "Same"},
             headers={**_auth(token, "t6-idemp-1"), **key},
         )
         second = client.post(
             "/api/v1/work-orders",
-            json={"house_id": graph.house_1_id, "text": "Same"},
+            json={"house_id": graph.house_1_id, "contact_phone": "13800000000", "text": "Same"},
             headers={**_auth(token, "t6-idemp-2"), **key},
         )
         conflict = client.post(
             "/api/v1/work-orders",
-            json={"house_id": graph.house_1_id, "text": "Different"},
+            json={"house_id": graph.house_1_id, "contact_phone": "13800000000", "text": "Different"},
             headers={**_auth(token, "t6-idemp-3"), **key},
         )
     assert first.status_code == 200
@@ -154,7 +154,7 @@ def test_cross_property_house_claim_is_rejected(identity_session: Session) -> No
         mismatch = client.post(
             "/api/v1/work-orders",
             json={
-                "house_id": graph.house_1_id,
+                "house_id": graph.house_1_id, "contact_phone": "13800000000",
                 "text": "Leak",
                 "property_id": graph.employees.property_2_id,
             },
@@ -179,7 +179,7 @@ def test_manual_dispatch_and_staff_loop(identity_session: Session) -> None:
         staff_b = _token(client, graph.employees.staff_b_user_id)
         created = client.post(
             "/api/v1/work-orders",
-            json={"house_id": graph.house_1_id, "text": "Outlet spark", "priority": "URGENT"},
+            json={"house_id": graph.house_1_id, "contact_phone": "13800000000", "text": "Outlet spark", "priority": "URGENT"},
             headers={**_auth(resident, "t6-loop-create"), **_idempotency()},
         )
         work_order_id = created.json()["data"]["id"]
@@ -236,7 +236,7 @@ def test_manual_dispatch_and_staff_loop(identity_session: Session) -> None:
         assert uploaded.status_code == 200
         feedback = client.post(
             f"/api/v1/staff/work-orders/{work_order_id}/feedback",
-            json={"text": "Opened panel", "file_ids": [file_id], "taken_phase": "BEFORE"},
+            json={"text": "Opened panel", "file_ids": [file_id], "taken_phase": "ON_SITE"},
             headers=_auth(staff, "t6-feedback"),
         )
         waiting = client.post(
@@ -336,7 +336,7 @@ def test_reassign_preserves_history(identity_session: Session) -> None:
         manager = _token(client, graph.employees.manager_p1_id)
         created = client.post(
             "/api/v1/work-orders",
-            json={"house_id": graph.house_1_id, "text": "Door lock"},
+            json={"house_id": graph.house_1_id, "contact_phone": "13800000000", "text": "Door lock"},
             headers={**_auth(resident, "t6-re-create"), **_idempotency()},
         )
         work_order_id = created.json()["data"]["id"]
@@ -387,7 +387,7 @@ def test_confirm_closes_and_system_admin_is_denied(identity_session: Session) ->
         system = _token(client, graph.employees.system_admin_id)
         created = client.post(
             "/api/v1/work-orders",
-            json={"house_id": graph.house_1_id, "text": "Light"},
+            json={"house_id": graph.house_1_id, "contact_phone": "13800000000", "text": "Light"},
             headers={**_auth(resident, "t6-cf-create"), **_idempotency()},
         )
         work_order_id = created.json()["data"]["id"]
@@ -458,12 +458,12 @@ def test_stale_permission_and_cross_tenant_denied(identity_session: Session) -> 
         manager = _token(client, graph.employees.manager_p2_id)
         created = client.post(
             "/api/v1/work-orders",
-            json={"house_id": graph.house_1_id, "text": "After revoke"},
+            json={"house_id": graph.house_1_id, "contact_phone": "13800000000", "text": "After revoke"},
             headers={**_auth(resident, "t6-stale-create"), **_idempotency()},
         )
         foreign = client.post(
             "/api/v1/work-orders",
-            json={"house_id": graph.house_3_id, "text": "Other tenant"},
+            json={"house_id": graph.house_3_id, "contact_phone": "13800000000", "text": "Other tenant"},
             headers={**_auth(resident, "t6-stale-t2"), **_idempotency()},
         )
     assert created.status_code == 403
@@ -480,7 +480,7 @@ def test_sla_due_uses_priority_and_utc(identity_session: Session) -> None:
         urgent = client.post(
             "/api/v1/work-orders",
             json={
-                "house_id": graph.house_1_id,
+                "house_id": graph.house_1_id, "contact_phone": "13800000000",
                 "text": "Fire risk",
                 "priority": "URGENT",
             },
@@ -489,7 +489,7 @@ def test_sla_due_uses_priority_and_utc(identity_session: Session) -> None:
         low = client.post(
             "/api/v1/work-orders",
             json={
-                "house_id": graph.house_1_id,
+                "house_id": graph.house_1_id, "contact_phone": "13800000000",
                 "text": "Paint chip",
                 "priority": "LOW",
             },
@@ -551,6 +551,7 @@ def test_concurrent_first_assign_has_single_winner(
     created = WorkOrderService(identity_session).create_work_order(
         actor=principal,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
         request_id="t6-c1-create",
         idempotency_key=str(uuid4()),
         text="Concurrent assign",
@@ -611,6 +612,7 @@ def test_concurrent_confirm_and_reopen_single_winner(
     created = service.create_work_order(
         actor=resident,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
         request_id="t6-c2-create",
         idempotency_key=str(uuid4()),
         text="Concurrent receipt",

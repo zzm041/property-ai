@@ -39,12 +39,14 @@ TASK_5_TABLES = (
     "skills",
 )
 TASK_6_TABLES = (
+    # 0015 binds work_order_media to its process/receipt cycle through composite
+    # foreign keys, so media rows must go before the cycle rows they reference.
+    "work_order_media",
     "work_order_sla_applications",
     "work_order_feedbacks",
     "work_order_receipts",
     "work_order_processes",
     "work_order_logs",
-    "work_order_media",
     "work_order_assignments",
     "sla_clocks",
     "work_order_contents",

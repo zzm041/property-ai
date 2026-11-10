@@ -35,6 +35,7 @@ def test_second_assignment_to_full_employee_is_rejected(
     first = orders.create_work_order(
         actor=_principal(identity_session, graph.employees.resident_id),
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
         request_id="d4-cap-wo-1",
         idempotency_key=str(uuid4()),
         text="First electrical job",
@@ -42,6 +43,7 @@ def test_second_assignment_to_full_employee_is_rejected(
     second = orders.create_work_order(
         actor=_principal(identity_session, graph.employees.resident_id),
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
         request_id="d4-cap-wo-2",
         idempotency_key=str(uuid4()),
         text="Second electrical job",
@@ -83,6 +85,7 @@ def test_cross_day_checkin_preserves_active_assignment_load(
     created = orders.create_work_order(
         actor=_principal(identity_session, graph.employees.resident_id),
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
         request_id="d4-xd-wo",
         idempotency_key=str(uuid4()),
         text="Overnight assignment",
@@ -125,6 +128,7 @@ def test_concurrent_assign_to_same_employee_respects_max_capacity(
     first = orders.create_work_order(
         actor=_principal(identity_session, graph.employees.resident_id),
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
         request_id="d4-cap-race-wo-1",
         idempotency_key=str(uuid4()),
         text="Concurrent electrical job one",
@@ -132,6 +136,7 @@ def test_concurrent_assign_to_same_employee_respects_max_capacity(
     second = orders.create_work_order(
         actor=_principal(identity_session, graph.employees.resident_id),
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
         request_id="d4-cap-race-wo-2",
         idempotency_key=str(uuid4()),
         text="Concurrent electrical job two",

@@ -46,6 +46,7 @@ def test_mysql_restore_preserves_relations_orders_and_audit(
     created = WorkOrderService(identity_session).create_work_order(
         actor=principal,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
         request_id="d4-restore-wo",
         idempotency_key=str(uuid4()),
         text="Restore drill work order",

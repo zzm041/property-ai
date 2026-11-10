@@ -88,7 +88,7 @@ def test_stack_contract_wechat_resident_workorder_knowledge(
         created = client.post(
             "/api/v1/work-orders",
             json={
-                "house_id": graph.house_1_id,
+                "house_id": graph.house_1_id, "contact_phone": "13800000000",
                 "text": "Kitchen outlet sparking",
                 "category": "ELECTRICAL",
             },

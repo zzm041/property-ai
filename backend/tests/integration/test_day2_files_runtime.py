@@ -74,7 +74,7 @@ def test_resident_lists_own_work_orders_and_uploads_media(
         created = client.post(
             "/api/v1/work-orders",
             json={
-                "house_id": graph.house_1_id,
+                "house_id": graph.house_1_id, "contact_phone": "13800000000",
                 "text": "Kitchen outlet sparking",
                 "file_ids": [file_id],
             },
