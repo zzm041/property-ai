@@ -49,6 +49,22 @@ class CreateWorkOrderRequest(BaseModel):
         return phone
 
 
+class SuggestWorkOrderDescriptionRequest(BaseModel):
+    """Already-uploaded media the resident wants turned into draft text."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    file_ids: tuple[int, ...] = Field(min_length=1, max_length=4)
+
+
+class WorkOrderDescriptionSuggestionData(BaseModel):
+    """Draft text for the report form. Empty text is a normal, non-error answer."""
+
+    text: str
+    source: Literal["vlm", "asr", "none"]
+    reason_code: str | None = None
+
+
 class AppendWorkOrderRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 

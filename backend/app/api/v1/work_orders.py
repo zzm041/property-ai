@@ -21,6 +21,7 @@ from app.schema.work_order import (
     CreateWorkOrderRequest,
     RateWorkOrderRequest,
     ReopenWorkOrderRequest,
+    SuggestWorkOrderDescriptionRequest,
     WorkOrderAssignmentData,
     WorkOrderData,
     WorkOrderDetailData,
@@ -28,10 +29,12 @@ from app.schema.work_order import (
     WorkOrderFeedbackData,
     WorkOrderListData,
     WorkOrderLogData,
+    WorkOrderDescriptionSuggestionData,
     WorkOrderMediaData,
     WorkOrderProcessData,
     WorkOrderReceiptData,
 )
+from app.service.description_suggestion import DescriptionSuggestionService
 from app.service.work_order import WorkOrderService
 
 router = APIRouter(tags=["work-orders"])
@@ -42,6 +45,13 @@ def get_work_order_service(
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> WorkOrderService:
     return WorkOrderService(session, settings=settings)
+
+
+def get_description_suggestion_service(
+    session: Annotated[Session, Depends(get_db_session)],
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> DescriptionSuggestionService:
+    return DescriptionSuggestionService(session, settings=settings)
 
 
 def work_order_data(record, *, overdue: bool = False) -> WorkOrderData:
@@ -156,6 +166,36 @@ def create_work_order(
         work_order_data(record, overdue=service.is_overdue(record)).model_dump(
             mode="json"
         ),
+    )
+
+
+@router.post("/work-orders/suggest")
+def suggest_work_order_description(
+    body: SuggestWorkOrderDescriptionRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[
+        DescriptionSuggestionService, Depends(get_description_suggestion_service)
+    ],
+) -> dict[str, object]:
+    """Pre-fill the report form from one uploaded photo or voice note.
+
+    AI-side failures answer 200 with empty text and a reason code: the form must
+    stay usable, so nothing here may block creating a WorkOrder by hand.
+    """
+
+    suggestion = service.suggest(
+        actor=actor,
+        file_ids=body.file_ids,
+        request_id=request_id_for(request),
+    )
+    return success_envelope(
+        request,
+        WorkOrderDescriptionSuggestionData(
+            text=suggestion.text,
+            source=suggestion.source,
+            reason_code=suggestion.reason_code,
+        ).model_dump(mode="json"),
     )
 
 

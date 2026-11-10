@@ -86,6 +86,9 @@ class Settings(BaseSettings):
 
     readiness_timeout_seconds: float = Field(default=2.0, ge=0.1, le=10.0)
     upload_max_mb: int = Field(default=10, ge=1, le=50)
+    # Pre-fill suggestions reuse the shared model runtime, so one resident is
+    # capped per hour: the report form must never become a model proxy.
+    wo_suggest_limit_per_hour: int = Field(default=12, ge=1, le=200)
     llm_provider_behavior: Literal[
         "success", "timeout", "invalid", "low_confidence", "unavailable"
     ] = "success"
