@@ -9,6 +9,10 @@ param(
 $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.Net.Http
 $DeployDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+# PA-170: source pins are compared with the line-ending independent digest in
+# source-hash.ps1; a plain Get-FileHash would make the pin depend on whether this
+# checkout (or the git archive export) happens to carry CRLF.
+. (Join-Path $DeployDir "source-hash.ps1")
 $RepoRoot = Split-Path -Parent $DeployDir
 $RuntimeDir = Join-Path $RepoRoot "tmp\delivery-work-ai-runtime"
 $PrivateDir = Join-Path $RuntimeDir "calls"
@@ -17,7 +21,7 @@ $ConfigPath = Join-Path $RuntimeDir "config.json"
 $EvidenceRecordsPath = Join-Path $RuntimeDir "evidence-records.txt"
 $CurrentPath = Join-Path $RuntimeDir "current.json"
 $OllamaCurrent = Join-Path $RepoRoot "tmp\delivery-ollama-runtime\current.json"
-$SourceCommit = "9c93ce67563b5c0ccc5a01ac5db455fc176cda32"
+$SourceCommit = "2560dfc64e1bead483210a87d34bb24f35d3d7dc"
 $CandidateRoot = Join-Path $RuntimeDir "candidate-$SourceCommit"
 $AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
 $ModelAdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_models.py"
@@ -29,8 +33,8 @@ $ExpectedRuntimeControlSha256 = "B0DE6D3544D8875E0A57CED1A1946744736FC9074AF1ECE
 # 只钉兼容层等于没钉住适配器，所以把真正承载逻辑的两个文件一起钉住。
 $ProviderRuntimeControlPath = Join-Path $CandidateRoot "backend\app\provider\local_ai\runtime_control.py"
 $ProviderHttpApiPath = Join-Path $CandidateRoot "backend\app\provider\local_ai\http_api.py"
-$ExpectedProviderRuntimeControlSha256 = "7F604AA086610C8B0095AA177F9767B68E21EEC909088436D5951818FE4B6777"
-$ExpectedProviderHttpApiSha256 = "DFB9F1A7DB0EAD92A9D434569DF88EA8E231E792C1410EB430F96993D0AB0FD5"
+$ExpectedProviderRuntimeControlSha256 = "FAB4D7D316370FCD899515D9FFD1E8F13611A13DFA401F1E502A5392A440E29C"
+$ExpectedProviderHttpApiSha256 = "2AE1FE1D3E60EF66D2CF877BDA7F2959805CBAABC029623D57B2A72035B33DCB"
 $ResolutionRoot = Join-Path $RepoRoot "reports"
 $ResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\call-001-resolution.json"
 $ResolutionReviewPath = Join-Path $RepoRoot "reports\codex\REAL-AI-INTEGRATION-027-DELIVERY-AUTO-call001-review-round1.raw.json"
@@ -188,19 +192,19 @@ function Assert-Candidate {
             Remove-Item -LiteralPath $archive -Force
         }
     }
-    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $AdapterPath).Hash -ne $ExpectedAdapterSha256) {
+    if ((Get-CanonicalSha256 -LiteralPath $AdapterPath) -ne $ExpectedAdapterSha256) {
         throw "frozen work AI adapter hash mismatch"
     }
-    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $ModelAdapterPath).Hash -ne $ExpectedModelAdapterSha256) {
+    if ((Get-CanonicalSha256 -LiteralPath $ModelAdapterPath) -ne $ExpectedModelAdapterSha256) {
         throw "frozen work AI model adapter hash mismatch"
     }
-    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $RuntimeControlPath).Hash -ne $ExpectedRuntimeControlSha256) {
+    if ((Get-CanonicalSha256 -LiteralPath $RuntimeControlPath) -ne $ExpectedRuntimeControlSha256) {
         throw "frozen runtime control hash mismatch"
     }
-    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $ProviderRuntimeControlPath).Hash -ne $ExpectedProviderRuntimeControlSha256) {
+    if ((Get-CanonicalSha256 -LiteralPath $ProviderRuntimeControlPath) -ne $ExpectedProviderRuntimeControlSha256) {
         throw "frozen provider adapter hash mismatch"
     }
-    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $ProviderHttpApiPath).Hash -ne $ExpectedProviderHttpApiSha256) {
+    if ((Get-CanonicalSha256 -LiteralPath $ProviderHttpApiPath) -ne $ExpectedProviderHttpApiSha256) {
         throw "frozen provider http api hash mismatch"
     }
     $reservation = Join-Path $PrivateDir "call-001\reservation.json"

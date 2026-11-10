@@ -9,6 +9,10 @@ param(
 $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.Net.Http
 $DeployDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+# PA-170: source pins are compared with the line-ending independent digest in
+# source-hash.ps1; a plain Get-FileHash would make the pin depend on whether this
+# checkout (or the git archive export) happens to carry CRLF.
+. (Join-Path $DeployDir "source-hash.ps1")
 $RepoRoot = Split-Path -Parent $DeployDir
 $RuntimeDir = Join-Path $RepoRoot "tmp\delivery-rag-runtime"
 $PrivateDir = Join-Path $RuntimeDir "calls"
@@ -19,12 +23,13 @@ $RagOllamaCurrent = Join-Path $RepoRoot "tmp\delivery-rag-ollama-runtime\current
 $SourceCommit = "caa2d21594bb7b78f2dc01e6bdfacc408161ec58"
 $CandidateRoot = Join-Path $RuntimeDir "candidate-$SourceCommit"
 $AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
-# PA-170: this value is the sha256 of the bytes `git archive` emits for
-# $SourceCommit, not of the stored blob. On a repository with
-# core.autocrlf=true the archive carries CRLF, so `git show | sha256sum`
-# (LF) reports 31EC019F... for the very same file. Keep this pin in sync with
-# archive output, and never compare it against a plain `git show` hash.
-$ExpectedAdapterSha256 = "EE9F19900F923461AB8AD0A1DC65806FF96065E074C89B2B2456810B533C7270"
+# PA-170: this value is the line-ending independent sha256 of the file at
+# $SourceCommit (CRLF normalised to LF), which is also what
+# `git show <rev>:<path> | sha256sum` reports. It is never compared with a raw
+# file hash: `git archive` on a core.autocrlf=true checkout emits CRLF bytes and
+# would otherwise report EE9F1990... (or 31EC019F... as the stored LF blob), so a
+# raw comparison makes the pin depend on the checkout instead of the content.
+$ExpectedAdapterSha256 = "31EC019F3DEBC988364F6096835636BC5AF60ED445C5AE48E65D25185F152DCD"
 $PythonPath = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\bge-142-cpu\.venv\Scripts\python.exe"
 $AsrPython = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\asr-006-cpu\.venv\Scripts\python.exe"
 $ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models-hf"
@@ -70,9 +75,9 @@ function Assert-Candidate {
         if($LASTEXITCODE -ne 0){throw "could not export frozen RAG candidate"}
         try { & tar -xf $archive -C $CandidateRoot;if($LASTEXITCODE -ne 0){throw "could not extract frozen RAG candidate"} } finally { Remove-Item -LiteralPath $archive -Force }
     }
-    if((Get-FileHash -Algorithm SHA256 -LiteralPath $AdapterPath).Hash -ne $ExpectedAdapterSha256){
-        $actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $AdapterPath).Hash
-        throw ("frozen RAG adapter hash mismatch: pinned={0} actual={1} path={2} (the pin is the git-archive byte form; a plain `git show | sha256sum` reports the LF form and will never match on a core.autocrlf=true checkout)" -f $ExpectedAdapterSha256, $actual, $AdapterPath)
+    $actual = Get-CanonicalSha256 -LiteralPath $AdapterPath
+    if($actual -ne $ExpectedAdapterSha256){
+        throw ("frozen RAG adapter hash mismatch: pinned={0} actual={1} path={2} (both are line-ending independent sha256 values; if actual differs, the pinned commit no longer contains the expected adapter)" -f $ExpectedAdapterSha256, $actual, $AdapterPath)
     }
 }
 
@@ -170,7 +175,7 @@ function New-CurrentState([object]$ListenerProcess, [object]$Health, [object]$La
         launcher_started_at_utc = if ($null -eq $Launcher) { $null } else { $Launcher.StartTime.ToUniversalTime().ToString("o") }
         listener_pid = $ListenerProcess.Id
         listener_started_at_utc = $ListenerProcess.StartTime.ToUniversalTime().ToString("o")
-        adapter_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $AdapterPath).Hash
+        adapter_sha256 = (Get-CanonicalSha256 -LiteralPath $AdapterPath)
         config_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $ConfigPath).Hash
         token_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $SecretPath).Hash
         endpoint = "http://127.0.0.1:11436"

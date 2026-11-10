@@ -10,6 +10,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 $DeployDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+# PA-170: source pins are compared with the line-ending independent digest in
+# source-hash.ps1; a plain Get-FileHash would make the pin depend on whether this
+# checkout (or the git archive export) happens to carry CRLF.
+. (Join-Path $DeployDir "source-hash.ps1")
 $RepoRoot = Split-Path -Parent $DeployDir
 $ComposeFile = Join-Path $DeployDir "docker-compose.delivery.yml"
 $EnvFile = Join-Path $DeployDir ".env.delivery"
@@ -175,7 +179,9 @@ function Assert-DeliveryImageContent([object[]]$Facts) {
             $relative = $contract[$name]
             $drift = (& git -C $RepoRoot status --porcelain -- $relative | Out-String).Trim()
             if ($drift) { throw "contract file $relative differs from HEAD; refusing to pin an image to a commit" }
-            $expected = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $RepoRoot $relative)).Hash.ToLower()
+            # PA-170: compare the source file with the line-ending independent digest;
+            # the image reports LF bytes, a CRLF checkout would otherwise never match.
+            $expected = (Get-CanonicalSha256 -LiteralPath (Join-Path $RepoRoot $relative)).ToLower()
             $actual = $provenance.files.PSObject.Properties[$name].Value.sha256
             if (-not $actual) { throw "$($row.Service) does not report $name provenance" }
             if ($actual -ne $expected) {
