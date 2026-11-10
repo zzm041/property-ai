@@ -37,6 +37,8 @@ from app.domain.ai import (
     AnalysisStatus,
     DispatchCandidate,
     FilterReason,
+    SKILL_RESOLUTION_UNMAPPED,
+    SKILL_VALUE_NOT_NORMALIZED,
     capability_note,
     MappedAnalysis,
     ProviderType,
@@ -1728,6 +1730,18 @@ class AnalysisService:
                 mapped = replace(mapped, event_trace=trace,
                     low_confidence=mapped.low_confidence or evidence_missing,
                     dispatch_fields_applied=mapped.dispatch_fields_applied and not evidence_missing)
+            if mapped.skill_resolution == SKILL_RESOLUTION_UNMAPPED:
+                # PA-167 explicit fallback: an unknown skill stays a hard
+                # restriction (erasing it would open the dispatch gate), but it is
+                # announced here and in the analysis audit, never silently carried
+                # through as if it were a known code.
+                logger.warning(
+                    'analysis_skill_not_normalized',
+                    request_id=request_id,
+                    raw_required_skill=mapped.raw_required_skill,
+                    required_skill=mapped.required_skill,
+                    reason_code=SKILL_VALUE_NOT_NORMALIZED,
+                )
         except (ValidationError, ValueError) as exc:
             if request_id is not None:
                 reason = (exc.reason_code if isinstance(exc, ObservationBindingError)
@@ -1747,9 +1761,12 @@ class AnalysisService:
         analysis.summary = mapped.summary
         analysis.risk = mapped.risk.value
         analysis.required_role = mapped.required_role
-        # Keep the original model skill, not the derived execution skill. Stored
-        # analysis is remapped through the same contract for subsequent dispatch.
-        analysis.required_skill = mapped.raw_required_skill or mapped.required_skill
+        # PA-167: store the dispatch code, not the model's trade label. The row is
+        # what the supervisor console prints and what re-dispatch starts from, so
+        # it has to use the same vocabulary the dispatcher compares against. The
+        # original label stays in the audit event (`raw_required_skill`) and in
+        # MappedAnalysis.raw_required_skill, so provenance is not lost.
+        analysis.required_skill = mapped.required_skill
         analysis.confidence = Decimal(str(mapped.confidence))
 
     def _transition_analyzed(self, record: WorkOrder, request_id: str) -> None:
@@ -2024,6 +2041,7 @@ class AnalysisService:
                     None if mapped.low_confidence else mapped.required_skill
                 ),
                 "skill_mapping_applied": mapped.skill_mapping_applied,
+                "skill_resolution": mapped.skill_resolution,
                 **({'event_evidence':mapped.event_trace} if mapped.event_trace is not None else {}),
             },
         )

@@ -583,7 +583,8 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             allowed_detail_keys=frozenset(
                 {"work_order_id", "analysis_id", "status", "confidence",
                  "dispatch_contract_version", "raw_required_skill",
-                 "effective_required_skill", "skill_mapping_applied", "event_evidence",
+                 "effective_required_skill", "skill_mapping_applied", "skill_resolution",
+                 "event_evidence",
                  "decision_code", "dispatch_fields_applied", "raw_category",
                  "effective_category"}
             ),

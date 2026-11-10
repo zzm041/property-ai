@@ -53,11 +53,16 @@ def test_risk_guard_not_overridden_by_derived_skill(risk):
 def test_stored_original_roundtrip_uses_same_mapper_for_recommendation_and_redispatch():
     m=map_analysis_output(output());stored=WorkOrderAnalysis()
     AnalysisService._fill_analysis(stored,m)
-    assert stored.required_skill=='maintenance'
+    # PA-167: the row keeps the dispatch code, not the model's trade label.
+    assert stored.required_skill=='CLEANING' and m.raw_required_skill=='maintenance'
     service=AnalysisService.__new__(AnalysisService);service._settings=Settings(_env_file=None)
     loaded=service._mapped_from_stored_analysis(stored)
     assert loaded.required_skill==m.required_skill and loaded.required_duty==m.required_duty
-    assert loaded.raw_required_skill==m.raw_required_skill and loaded.dispatch_contract_version==m.dispatch_contract_version
+    assert loaded.low_confidence==m.low_confidence
+    assert loaded.dispatch_contract_version==m.dispatch_contract_version
+    # Remapping an already-normalised row is idempotent, so re-dispatch cannot
+    # drift just because the row no longer holds the original label.
+    assert loaded.required_skill=='CLEANING' and loaded.skill_resolution=='canonical'
 
 def test_strict_other_contracts_still_rejected():
     with pytest.raises(ValidationError):output(extra=1)

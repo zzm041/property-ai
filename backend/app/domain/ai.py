@@ -127,6 +127,39 @@ _SKILL_ALIASES = {
     "maintenance": "MAINTENANCE",
 }
 
+# PA-167: the model answers with a plain trade label ("electrician"), while
+# dispatch compares employee skill codes ("ELECTRICAL"). Normalising only inside
+# `map_analysis_output` left the stored analysis row -- the value the supervisor
+# console reads back and the value re-dispatch starts from -- in the model's own
+# vocabulary. Every skill label now goes through `normalize_skill`, and the
+# outcome is recorded instead of being inferred from whether the string changed.
+SKILL_RESOLUTION_ALIASED = "aliased"
+SKILL_RESOLUTION_CANONICAL = "canonical"
+SKILL_RESOLUTION_UNMAPPED = "unmapped"
+# The explicit fallback for a skill nobody has an alias for: it stays a hard
+# restriction (erasing it would silently open the dispatch gate) but it is never
+# silent -- the analysis audit and the worker log both carry this reason code.
+SKILL_VALUE_NOT_NORMALIZED = "SKILL_VALUE_NOT_NORMALIZED"
+_KNOWN_SKILL_CODES = frozenset(_SKILL_ALIASES.values()) | {"OTHER"}
+
+
+def normalize_skill(raw: str) -> tuple[str, str]:
+    """Return ``(dispatch skill code, resolution)`` for a model-provided label."""
+    stripped = raw.strip()
+    folded = stripped.casefold()
+    aliased = _SKILL_ALIASES.get(folded)
+    if aliased is not None:
+        resolution = (
+            SKILL_RESOLUTION_CANONICAL
+            if aliased == stripped
+            else SKILL_RESOLUTION_ALIASED
+        )
+        return aliased, resolution
+    upper = stripped.upper()
+    if upper in _KNOWN_SKILL_CODES:
+        return upper, SKILL_RESOLUTION_CANONICAL
+    return upper, SKILL_RESOLUTION_UNMAPPED
+
 # Owner requirement MAINTENANCE-CONTACT-DISPATCH-024. Explicit special skills
 # remain hard constraints; ordinary trade labels are not exclusive licenses.
 ORDINARY_MAINTENANCE_SKILLS = frozenset({"PLUMBING", "ELECTRICAL", "HVAC", "MAINTENANCE"})
@@ -236,6 +269,7 @@ class MappedAnalysis:
     low_confidence: bool
     raw_required_skill: str | None = None
     skill_mapping_applied: bool = False
+    skill_resolution: str = SKILL_RESOLUTION_CANONICAL
     dispatch_contract_version: str = DISPATCH_CONTRACT_VERSION
     event_trace: dict | None = None
     raw_category: str | None = None
@@ -269,7 +303,7 @@ def map_analysis_output(
     role = output.required_role.strip().upper()
     if role not in {"STAFF", "SUPERVISOR"}:
         raise ValueError("required_role is not a supported value")
-    raw_skill = _SKILL_ALIASES.get(output.required_skill.casefold(), output.required_skill.upper())
+    raw_skill, skill_resolution = normalize_skill(output.required_skill)
     skill = raw_skill
     # Existing category/duty catalogue uniquely defines ordinary cleaning and
     # security. Generic trade labels are redundant, not a second duty decision.
@@ -295,6 +329,7 @@ def map_analysis_output(
         low_confidence=low,
         raw_required_skill=output.required_skill,
         skill_mapping_applied=skill != raw_skill,
+        skill_resolution=skill_resolution,
         raw_category=output.category,
         dispatch_fields_applied=not low,
     )
