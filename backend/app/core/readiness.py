@@ -181,6 +181,11 @@ def check_readiness(
 
     return {
         "status": status,
+        # PA-117: a missing work-order credential used to be invisible until the
+        # first analysis call failed; readiness now states it. Secrets are not
+        # included, and the overall status is untouched: api/beat/publisher never
+        # call the model, so degrading their readiness would be a false alarm.
+        "ai_credentials": settings.ai_credentials(),
         "dependencies": dependencies,
         "queue": {
             "name": settings.resolved_celery_queue,

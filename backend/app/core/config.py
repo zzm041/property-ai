@@ -265,6 +265,18 @@ class Settings(BaseSettings):
                 raise ValueError("Production WeChat login requires WECHAT_APP_ID")
             if not self.wechat_app_secret.get_secret_value():
                 raise ValueError("Production WeChat login requires WECHAT_APP_SECRET")
+        if self.app_env == "staging" and self.llm_provider == "production":
+            # PA-117: a box with no credential anywhere can never serve analysis in
+            # any role, so it fails at startup instead of at the first request. The
+            # narrower case (LOCAL_AI_INTERNAL_TOKEN present, LLM_API_KEY empty) is
+            # reported by /readyz instead — see ai_credentials() for why crashing
+            # api/beat/publisher over a credential only the worker uses is worse.
+            if not self.llm_api_key.get_secret_value() and not (
+                self.local_ai_internal_token.get_secret_value()
+            ):
+                raise ValueError(
+                    "Staging LLM provider requires LLM_API_KEY or LOCAL_AI_INTERNAL_TOKEN"
+                )
         if self.app_env == "production":
             self._require_production_provider_credentials()
             if self.file_scanner_provider == "development":
@@ -335,6 +347,40 @@ class Settings(BaseSettings):
                 raise ValueError("Production WeChat provider requires WECHAT_APP_ID")
             if not self.wechat_app_secret.get_secret_value():
                 raise ValueError("Production WeChat provider requires WECHAT_APP_SECRET")
+
+    def ai_credentials(self) -> dict[str, object]:
+        """Report whether this process holds a credential the work-order LLM can use.
+
+        PA-117: `build_llm_provider` sends `LLM_API_KEY` verbatim — unlike the RAG,
+        VLM and ASR providers it never falls back to `LOCAL_AI_INTERNAL_TOKEN`
+        (`build_rag_llm_provider` calls `resolve_local_ai_key`, `build_llm_provider`
+        does not). A staging box with an empty key therefore answered
+        `/readyz` 200/ready and only failed once analysis ran, which reads as "AI is
+        broken" rather than "the credential is missing". Secrets are never included.
+        """
+
+        work_order_key = bool(self.llm_api_key.get_secret_value())
+        local_token = bool(self.local_ai_internal_token.get_secret_value())
+        if self.llm_provider != "production":
+            status = "not_required"
+            missing: list[str] = []
+        elif work_order_key:
+            status = "configured"
+            missing = []
+        else:
+            status = "missing"
+            missing = ["LLM_API_KEY"]
+        return {
+            "provider": self.llm_provider,
+            "status": status,
+            "missing": missing,
+            "sources": {
+                "llm_api_key": "configured" if work_order_key else "missing",
+                "local_ai_internal_token": "configured" if local_token else "missing",
+            },
+            # Fact, not policy: the work-order path has no local-token fallback.
+            "fallback_to_local_token": False,
+        }
 
     def resolve_local_ai_key(self, explicit: SecretStr, endpoint: str) -> str:
         """Use the shared token only for this host's explicitly local adapter."""
