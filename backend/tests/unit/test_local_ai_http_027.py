@@ -760,10 +760,14 @@ def test_unknown_or_legacy_unproved_failure_blocks_all_new_inputs(tmp_path,recor
     assert len(list(r.private.glob('call-*')))==1
 
 
-@pytest.mark.parametrize('kind,cleanup_fails,remote_stops,expected',[
-    ('embedding',False,False,'FAILED'),('embedding',True,False,'UNKNOWN'),
-    ('qwen',False,False,'UNKNOWN'),('qwen',False,True,'FAILED')])
-def test_resource_stop_confirms_job_or_persists_unknown(tmp_path,monkeypatch,kind,cleanup_fails,remote_stops,expected):
+# PA-131: a resource floor is no longer a reason to stop the shared runtime, so
+# the qwen rows assert that no stop is attempted and that an owned child which
+# is confirmed gone counts as a known state (LEFT_RUNNING) instead of UNKNOWN.
+@pytest.mark.parametrize('kind,cleanup_fails,remote_stops,expected,completion',[
+    ('embedding',False,False,'FAILED','NOT_UNKNOWN'),('embedding',True,False,'UNKNOWN','UNKNOWN'),
+    ('qwen',False,False,'FAILED','LEFT_RUNNING'),('qwen',False,True,'FAILED','LEFT_RUNNING'),
+    ('qwen',True,False,'UNKNOWN','UNKNOWN')])
+def test_resource_stop_confirms_job_or_persists_unknown(tmp_path,monkeypatch,kind,cleanup_fails,remote_stops,expected,completion):
     r=runner(tmp_path);r.config['bge_python']='dummy-not-executed';started=[False];terminated=[]
     if kind=='qwen':
         r.runtime_binding={'pid':42,'executable':'fixed','launched_at_utc':'fixed'}
@@ -783,7 +787,9 @@ def test_resource_stop_confirms_job_or_persists_unknown(tmp_path,monkeypatch,kin
     monkeypatch.setattr(m,'qwen_guard',lambda:None);monkeypatch.setattr(m,'validate',lambda *a:None)
     monkeypatch.setattr(m,'ram',lambda:1000 if started[0] else 10000)
     monkeypatch.setattr(m,'gpu',lambda:7000);monkeypatch.setattr(m.time,'sleep',lambda n:None)
+    stop_calls=[]
     def stop_runtime(*args,**kwargs):
+        stop_calls.append(True)
         if not remote_stops:raise RuntimeError('stop failed')
         return {'stopped':{'tree_exit_confirmed':True,'listener_exit_confirmed':True}}
     monkeypatch.setattr(m,'terminate_bound_runtime',stop_runtime)
@@ -792,7 +798,9 @@ def test_resource_stop_confirms_job_or_persists_unknown(tmp_path,monkeypatch,kin
     assert saved['status']==expected and terminated==[True]
     assert saved['owned_exit_confirmed'] is (not cleanup_fails)
     if kind=='qwen':
-        assert saved['remote_completion']==('CONTROLLED_STOP' if remote_stops else 'UNKNOWN')
+        assert stop_calls==[], 'RESOURCE_FLOOR must not stop the shared runtime'
+        assert saved['remote_completion']==completion
+        assert saved['remote_stop'] is None
     if expected=='UNKNOWN':
         with pytest.raises(RuntimeError,match='COMPLETION_UNKNOWN'):m.Runner(r.path).reserve('reranker','different')
 
