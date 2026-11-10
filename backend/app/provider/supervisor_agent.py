@@ -59,3 +59,95 @@ class SupervisorPlanner:
             disable_thinking=True, max_output_tokens=512)
         self.provider_attempts += 1
         return dict(provider.structured_completion(prompt=prompt, prompt_version=PROMPT_VERSION))
+
+
+class LangChainSupervisorPlanner:
+    """PA-165: the same planning contract, carried by a LangChain tool-calling chain.
+
+    One turn still means one server-validated command. The difference is who produces it: the
+    reviewed prompt plus the *permitted* actions are bound as LangChain tools on a LCEL chain
+    (`prompt | model.bind_tools(tools)`), the model answers with a tool call, and that call is
+    mapped back onto the command dict the bounded loop already understands. Tool *execution*
+    stays server-side — `queue`/`diagnose`/`finish` here are schemas only.
+    """
+
+    def __init__(self, settings, *, chain=None, chain_factory=None):
+        self.settings = settings
+        self.provider_attempts = 0
+        self.mode = 'langchain_real_model'
+        self._chain = chain
+        self._chain_factory = chain_factory
+        if self._chain is None and self._chain_factory is None:
+            # Fail here, not on the first turn, so the factory can fall back and log why.
+            from app.provider import langchain_llm
+
+            if not langchain_llm.optional_dependencies_available():
+                raise langchain_llm.LangChainUnavailable(
+                    'LangChain extra is not installed; install it with '
+                    'pip install -e "backend[langchain]" or keep SUPERVISOR_AGENT_ENGINE=direct'
+                )
+
+    @staticmethod
+    def action_tools():
+        """Schemas for the three actions the loop accepts, as LangChain tools."""
+
+        from langchain_core.tools import tool
+
+        @tool
+        def queue() -> str:
+            """Read the first page of the supervisor queue before anything else."""
+            raise RuntimeError('queue is executed by the server, not by LangChain')
+
+        @tool
+        def diagnose(work_order_id: int, version: int) -> str:
+            """Diagnose one queue row using its exact id and version."""
+            raise RuntimeError('diagnose is executed by the server, not by LangChain')
+
+        @tool
+        def finish(items: list[dict]) -> str:
+            """Finish with items taken from finish_candidates, citing their fact codes."""
+            raise RuntimeError('finish is executed by the server, not by LangChain')
+
+        return [queue, diagnose, finish]
+
+    def _build_chain(self, *, timeout_seconds):
+        from app.provider import langchain_llm
+
+        settings = self.settings
+        model = langchain_llm.build_langchain_chat_model(
+            settings,
+            base_url=settings.supervisor_agent_base_url or None,
+            api_key=settings.supervisor_agent_api_key.get_secret_value() or None,
+            model=settings.supervisor_agent_model or None,
+            timeout_seconds=min(timeout_seconds, settings.llm_timeout_seconds),
+            max_retries=0,
+        )
+        return langchain_llm.build_tool_chain(
+            self.action_tools(), model=model, system_prompt=INSTRUCTIONS
+        )
+
+    def choose(self, state, *, timeout_seconds):
+        settings = self.settings
+        if (
+            not settings.supervisor_agent_base_url
+            or not settings.supervisor_agent_model
+            or not settings.supervisor_agent_api_key.get_secret_value()
+        ):
+            raise ProviderUnavailableError('Supervisor planner is not configured')
+        payload = json.dumps(state, ensure_ascii=False, allow_nan=False)
+        if len(INSTRUCTIONS) + len(payload) > 18000 or timeout_seconds <= 0:
+            raise ProviderInvalidOutputError('Planner input exceeds budget')
+        chain = self._chain
+        if chain is None:
+            chain = self._chain_factory(timeout_seconds=timeout_seconds) if self._chain_factory else None
+        if chain is None:
+            chain = self._build_chain(timeout_seconds=timeout_seconds)
+            self._chain = chain
+        self.provider_attempts += 1
+        message = chain.invoke({'input': payload})
+        from app.provider.langchain_llm import tool_call_to_command
+
+        command = tool_call_to_command(message)
+        if command is None:
+            raise ProviderInvalidOutputError('Planner did not return a tool call')
+        return command

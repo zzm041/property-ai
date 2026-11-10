@@ -150,6 +150,11 @@ class Settings(BaseSettings):
     supervisor_agent_base_url: str = ''
     supervisor_agent_model: str = ''
     supervisor_agent_api_key: SecretStr = SecretStr('')
+    # PA-165: which engine orchestrates the supervisor's tool calls. `direct` keeps the
+    # reviewed single-shot JSON planner (unchanged behaviour); `langchain` routes the same
+    # prompt and the same server-side tool contract through a LangChain tool-calling chain
+    # and falls back to `direct` — with the reason logged — when the optional extra is absent.
+    supervisor_agent_engine: Literal['direct', 'langchain'] = 'direct'
     # Knowledge answers may use a separately approved self-hosted model while
     # work-order analysis remains on its independently gated provider.  The
     # default preserves the historical single-provider configuration.
