@@ -235,3 +235,106 @@ receipt: source_commit=50bcad5320e1e41033b97e82f0e99da8db4521e0  listener_pid=45
 health : reservation_gate=READY  prompt_versions.source=file:D:\property-ai\deploy\ai-runtime-prompts.json
 ```
 日志：`reports/pa116c/logs/{p3-down,p3-down2,p3-ollama-start,p3-launcher-only-wrong-env,p3-up2,p3-status2}.log`（该目录被 `.gitignore` 忽略，仅供复核读盘）。提交：`b4017a5`。
+
+## PA-116-C 收口（2026-11-10 20:35 CST，t29 / attempt 6894fe9b，按 7 号四条验收执行）
+
+问题不是"文档不同步"，是**行为差异**：`main.py` 的启动守卫与 `enqueue.py` 的孤儿态日志只活在脏树里，`git log --all -S "verify_task_delivery_configuration" -- backend/app/main.py` 0 命中。一次 `git checkout .` 就丢，按 label `62c2551` 重建会造出没有启动守卫的镜像——生产 misconfiguration 从"启动即失败"退回"请求时静默丢任务"。
+
+### ① 提交化（commit 存在且 `-S` 可查）
+
+```
+> git rev-parse HEAD
+407e704ebfbc693bcffa61adc04f3f27d52e306b
+> git log --all --oneline -S "verify_task_delivery_configuration" -- backend/app/main.py
+407e704 PA-104-A-1: commit startup guard and orphan enqueue reporting
+> git log -1 --format='%an <%ae>'
+property-dev <property-dev@local>
+> git show --stat 407e704
+ backend/app/core/startup.py                        |  41 ++++++
+ backend/app/main.py                                |   4 +
+ backend/app/worker/enqueue.py                      |  13 +-
+ .../unit/test_task_delivery_selfcheck_104a1.py     | 150 +++++++++++++++++++++
+ 4 files changed, 207 insertions(+), 1 deletion(-)
+```
+
+三处说明：
+- 提交的是**既有 WIP 原样**，没有重写逻辑：`git diff HEAD~1 -- backend/app/main.py` 与提交前 `git diff` 一致（+4 行：import、两条注释、调用）。
+- `backend/app/core/startup.py` 是 `main.py` 的 import 目标，此前也是未跟踪文件；不一起提交，干净克隆连 `import` 都过不去（④ 会假通过）。它属于本条的必要面。
+- 作者按要求记 `property-dev`，commit message 写明来源是 PA-104-A-1 WIP，并逐条对上 req1（启动守卫）/ req2（孤儿态可枚举）/ req2b（记录写不进时 ERROR 报出）。
+
+### ② 两条单测在位且通过
+
+`backend/tests/unit/test_task_delivery_selfcheck_104a1.py`（5 例，两条要求各有对应用例）：
+
+```
+> cd backend && ../.venv/Scripts/python.exe -m pytest tests/unit/test_task_delivery_selfcheck_104a1.py -q -p no:randomly
+5 passed, 1 warning in 0.36s
+```
+
+- **A 启动守卫**：`test_production_without_durable_tasks_refuses_to_assemble` 断言 `create_app(production + durable=false)` 抛 `RuntimeError` 且消息含 `DURABLE_TASKS_ENABLED`，同时 `app.core.startup.logger.error` 只被调用一次、事件名 = `durable_task_delivery_disabled`、带 `fix`；`test_production_with_durable_tasks_assembles`（有 durable 正常装配）与 `test_development_without_durable_tasks_assembles_silently`（非生产不抛、且不记 error）是反向对照——**不只测"会炸"，也测"不该炸时不炸"**。
+- **B 孤儿态**：`test_unrecordable_enqueue_failure_is_reported` 打桩 `app.worker.failed_tasks.record_failed_task` 返回 `None`，断言 `enqueue_logger.error` 的事件序列里出现 `enqueue_failure_unrecorded`；`test_development_enqueue_failure_leaves_enumerable_record` 验证正常路径下失败记录可被 `list_failed_tasks` 查出（`error_code=ENQUEUE_FAILED`、`status=RECORDED`、`record_id` 前缀 `enqueue-`），证明 req2b 的守卫没有把 req2 的主路径吃掉。
+
+### ③ 镜像只从该 commit 构建 + provenance 原文
+
+构建方式：**干净克隆**（不是当前工作树，不带任何 dirty 项）+ 直接 `docker build`（不经 compose，避免 `--env-file` 依赖）：
+
+```
+> git clone --local /d/property-ai /d/property-ai-clean-407e704
+> cd /d/property-ai-clean-407e704 && git rev-parse HEAD
+407e704ebfbc693bcffa61adc04f3f27d52e306b
+> git status --porcelain -uno | wc -l
+0
+> docker build -f deploy/Dockerfile \
+    --build-arg PROPERTY_AI_SOURCE_SHA=407e704ebfbc693bcffa61adc04f3f27d52e306b \
+    -t property-ai-delivery:src-407e704ebfbc .
+```
+
+镜像身份与 provenance（原文）：
+
+```
+> docker images --no-trunc | grep src-407e704
+sha256:bf23599c05f0c8bcb3efd4b1c82ddec2dd1760eeef891dc482c9210d67c085ff  property-ai-delivery:src-407e704ebfbc
+created=2026-11-10T12:23:00Z  user=appuser  size=906659898
+label property-ai.source-sha=407e704ebfbc693bcffa61adc04f3f27d52e306b
+
+> docker run --rm --entrypoint python property-ai-delivery:src-407e704ebfbc -m app.cli.build_provenance
+{"app_copies": ["/usr/local/lib/python3.12/site-packages/app"], "app_package": "/usr/local/lib/python3.12/site-packages/app", "files": {"domain/ai.py": {"path": "/usr/local/lib/python3.12/site-packages/app/domain/ai.py", "sha256": "4a0f317116ed40db5579afc24e77ef023834630cfcb7f2270db59282abcaaf9f"}, "domain/observed_event.py": {"path": "/usr/local/lib/python3.12/site-packages/app/domain/observed_event.py", "sha256": "64d364857b85f2b8ffd11c2f9080b8055dd0d461b480e0b22e5138b940a15143"}}, "prompt_versions": {"vision": "repair-photo-v7-confidence-scale", "work_order": "wo-analysis-v26-summary-fidelity"}, "shadow_source_tree": null, "source_sha": "407e704ebfbc693bcffa61adc04f3f27d52e306b"}
+```
+
+- `source_sha` = commit 全 40 位，**不带 `-wip`**（7 号原话：不要用 `-wip` 兜住一切）；`app_copies` 单份、`shadow_source_tree: null`、`/app/app` 不存在。
+- **dirty 项单列**：本次构建的 dirty 集为空（干净克隆 0 项），镜像与 commit 逐字节等价；作为对照，**源工作树当时的 dirty 项**（提交后复测）只剩 10 项且全在 docs/reports，**不含任何 `backend/app`**：
+  ```
+  M docs/00-PROJECT-SCOPE.md            M docs/05-AI-DISPATCH-SPEC.md
+  M docs/06-API-CONTRACT.md             M docs/09-DEPLOYMENT.md
+  M docs/10-ACCEPTANCE.md               M docs/11-OPERATIONS.md
+  M reports/codex/AUTH-IDENTITY-AI-001-login-review.call.json
+  M reports/codex/AUTH-IDENTITY-AI-001-login-review.json
+  M reports/real-ai-integration-027/diagnostic-r3-9b/qwen-budget.jsonl
+  M reports/real-sms-onboarding-20261005/preflight.md
+  ```
+  即 7 号记的「12 项非本轮 tracked 修改」里那两处**生产代码**已出列，剩文档与报告。
+- 守卫确实在镜像里：`grep -c verify_task_delivery_configuration …/app/main.py` = **2**、`grep -c enqueue_failure_unrecorded …/app/worker/enqueue.py` = **1**、`…/app/core/startup.py` 在位。
+- 字节级不变：镜像内 `app/main.py` sha256 = `a1113be8be8e59e04f3ad9825ad119fbbd986e79a40115bc88e9586db5db99ff`，与 7 号在 `62c2551-wip` 镜像里量的**完全一致** ⇒ 提交过程没有改动这几处代码。
+
+### ④ 干净克隆可复现（不 stash、不 patch）
+
+③ 的构建就是从 `git clone --local` 出来的干净副本完成的：clone 内 `git status --porcelain -uno` = 0 项、`HEAD` = `407e704`，未做任何 stash/patch/复制粘贴。内容断言同样成立（镜像内取字节归一后与 HEAD blob 比对）：
+
+```
+> docker run --rm --entrypoint sh property-ai-delivery:src-407e704ebfbc -lc \
+    'for f in domain/ai.py domain/observed_event.py; do tr -d "\r" < …/app/$f | sha256sum; done'
+f1fb4aea320303944c2691433f08b2628a90655c34896d097d6fdca29a8965d6  domain/ai.py
+f0db09af1d5a5416eb522e17816cc0e6e1ad66f931d5d512c73ac47e64fa3420  domain/observed_event.py
+
+> git cat-file blob HEAD:backend/app/domain/ai.py | sha256sum
+f1fb4aea320303944c2691433f08b2628a90655c34896d097d6fdca29a8965d6
+> git cat-file blob HEAD:backend/app/domain/observed_event.py | sha256sum
+f0db09af1d5a5416eb522e17816cc0e6e1ad66f931d5d512c73ac47e64fa3420
+```
+（口径沿用 7 号 19:45 的更正：镜像内是 CRLF 工作树字节 `4a0f3171…`/`64d36485…`，`tr -d "\r"` 归一后必须等于 git blob；此处两者相等。`tests/unit/test_task_delivery_selfcheck_104a1.py` 也在镜像 `/app/tests/` 下——`/app/app` 已删但 `/app/tests` 保留；镜像内无 pytest，单测在宿主 venv 跑。）
+
+### 边界与未做
+
+- **未切换运行容器**：四容器仍是 `src-94367eda50d0-wip2`（`sha256:69372219582b…`）。本单只要求"从 commit 可重建"；`delivery.ps1 release` 仍被 `Assert-NoRetainedRollbackContainers`（实测 29 个保留容器）拦着，切换属另一条决策。
+- **PA-116-C 关单 ≠ PA-116 关闭**：B 部分（真实 e2e 复现 PA-001 效果）仍 blocked，`qwen_guard` 4500MiB 与 27B 冷加载 `WinError 10054` 归 PA-002/PA-104。
+- 镜像 tag 用短 sha `src-407e704ebfbc`、构建参数给全 40 位；`delivery.ps1` 的 `Assert-DeliveryImageTag` 要求 `^src-[0-9a-f]{12}(-wip)?$`，与之一致。
