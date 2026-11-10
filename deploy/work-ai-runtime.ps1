@@ -371,13 +371,23 @@ switch ($Action) {
         $operationId=[guid]::NewGuid().ToString("N")
         $stdout=Join-Path $RuntimeDir "adapter-$operationId.stdout.log"
         $stderr=Join-Path $RuntimeDir "adapter-$operationId.stderr.log"
-        # PA-116-A-1: the prompt-version selection must travel with the process that
-        # serves requests, not with whatever shell happened to be open.
+        # PA-116-A-1 / P3-1: the prompt-version selection must travel with the process that
+        # serves requests, not with whatever shell happened to be open. The reviewed file that
+        # ships in the repo is authoritative; an operator-supplied path is only honoured when
+        # that file is missing, and a diverging value is reported instead of silently winning.
         $promptVersionsPath = Join-Path (Join-Path $RepoRoot "deploy") "ai-runtime-prompts.json"
+        $promptVersionsSource = $promptVersionsPath
         $oldPromptVersionsFile=$env:PROPERTY_AI_PROMPT_VERSIONS_FILE
-        if ((Test-Path -LiteralPath $promptVersionsPath -PathType Leaf) -and -not $env:PROPERTY_AI_PROMPT_VERSIONS_FILE) {
+        if (Test-Path -LiteralPath $promptVersionsPath -PathType Leaf) {
+            if ($env:PROPERTY_AI_PROMPT_VERSIONS_FILE -and ($env:PROPERTY_AI_PROMPT_VERSIONS_FILE -ne $promptVersionsPath)) {
+                Write-Warning ("prompt_versions_env_ignored: PROPERTY_AI_PROMPT_VERSIONS_FILE='{0}' is ignored; the reviewed file '{1}' is authoritative" -f $env:PROPERTY_AI_PROMPT_VERSIONS_FILE, $promptVersionsPath)
+            }
             $env:PROPERTY_AI_PROMPT_VERSIONS_FILE=$promptVersionsPath
+        } elseif ($env:PROPERTY_AI_PROMPT_VERSIONS_FILE) {
+            $promptVersionsSource = $env:PROPERTY_AI_PROMPT_VERSIONS_FILE
+            Write-Warning ("prompt_versions_repo_file_missing: falling back to PROPERTY_AI_PROMPT_VERSIONS_FILE='{0}'" -f $env:PROPERTY_AI_PROMPT_VERSIONS_FILE)
         }
+        Write-Output ("prompt_versions_source={0}" -f $promptVersionsSource)
         $oldToken=$env:LOCAL_AI_INTERNAL_TOKEN;$oldModel=$env:PROPERTY_AI_LOCAL_QWEN_MODEL;$oldRuntimeModel=$env:PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL
         try {
             $env:LOCAL_AI_INTERNAL_TOKEN=$token;$env:PROPERTY_AI_LOCAL_QWEN_MODEL=$ModelName;$env:PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL=$RuntimeModelName
@@ -404,6 +414,11 @@ switch ($Action) {
             token_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $SecretPath).Hash
             stdout=$stdout;stderr=$stderr
             endpoint="http://127.0.0.1:11437";scope="work_order_only";models=$health.models;runtime_qwen_model=$RuntimeModelName;inference_on_start=$false
+            prompt_versions_file=$promptVersionsSource
+            # P3-2: source_commit guarantees equivalence only for the paths the candidate export
+            # takes. Anyone reading this receipt must not assume the whole repo is at that commit.
+            equiv_scope=@("backend/app","scripts/ops/local_ai_http.py","scripts/ops/local_ai_models.py","scripts/ops/local_ai_runtime_control.py")
+            equiv_scope_note="source_commit is equivalent only for equiv_scope; run git rev-parse HEAD for the repo HEAD"
         }
         [IO.File]::WriteAllText($CurrentPath, ($state | ConvertTo-Json -Depth 6), [Text.UTF8Encoding]::new($false))
         $state | ConvertTo-Json -Depth 6
