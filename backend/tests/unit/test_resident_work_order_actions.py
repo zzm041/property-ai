@@ -257,10 +257,10 @@ def test_changed_pending_content_creates_new_analysis_version(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr(
-        "app.service.analysis.begin_owned_transaction",
+        "app.service.analysis.context.begin_owned_transaction",
         lambda _session: nullcontext(),
     )
-    monkeypatch.setattr("app.service.analysis.require_execution_lease", lambda _session: None)
+    monkeypatch.setattr("app.service.analysis.context.require_execution_lease", lambda _session: None)
     service = AnalysisService.__new__(AnalysisService)
     service._session = MagicMock()
     service._settings = Settings(_env_file=None, app_env="test")
@@ -312,10 +312,10 @@ def test_analysis_apply_rejects_snapshot_from_before_append(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr(
-        "app.service.analysis.begin_owned_transaction",
+        "app.service.analysis.context.begin_owned_transaction",
         lambda _session: nullcontext(),
     )
-    monkeypatch.setattr("app.service.analysis.require_execution_lease", lambda _session: None)
+    monkeypatch.setattr("app.service.analysis.context.require_execution_lease", lambda _session: None)
     service = AnalysisService.__new__(AnalysisService)
     service._session = MagicMock()
     service._work_orders = MagicMock()

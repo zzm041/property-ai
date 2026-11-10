@@ -220,7 +220,7 @@ def test_budget_exhaustion_uses_fresh_failure_boundary_not_fourth_retry(monkeypa
     ('PENDING_ANALYSIS',2,False,False), ('PENDING_ANALYSIS',1,True,False),
 ])
 def test_exhaustion_never_overwrites_terminal_new_version_or_attempt(monkeypatch,status,version,newer,allowed):
-    monkeypatch.setattr('app.service.analysis.begin_owned_transaction',lambda _:nullcontext())
+    monkeypatch.setattr('app.service.analysis.context.begin_owned_transaction',lambda _:nullcontext())
     s = AnalysisService.__new__(AnalysisService); s._session=MagicMock()
     s._session.info = {}  # This legacy-path fixture has no durable execution lease.
     s._work_orders=repo(claim(attempt=4 if newer else 1)); s._ai=MagicMock()
@@ -247,7 +247,7 @@ def test_db_unavailable_does_not_claim_failure_was_persisted(monkeypatch):
 def test_fenced_committed_analysis_survives_changed_historical_context(monkeypatch):
     from app.core.config import Settings
     from app.core.time import utc_now
-    monkeypatch.setattr('app.service.analysis.begin_owned_transaction',lambda _:nullcontext())
+    monkeypatch.setattr('app.service.analysis.context.begin_owned_transaction',lambda _:nullcontext())
     s=AnalysisService.__new__(AnalysisService);s._session=MagicMock();s._settings=Settings(_env_file=None)
     s._session.info = {}
     s._clock=utc_now;s._task_context=context(2);s._work_orders=repo(claim());s._ai=MagicMock()
@@ -269,7 +269,7 @@ def test_fenced_committed_analysis_survives_changed_historical_context(monkeypat
 def test_same_task_keeps_claimed_input_hash_after_asr_was_persisted(monkeypatch):
     from app.core.config import Settings
     from app.core.time import utc_now
-    monkeypatch.setattr('app.service.analysis.begin_owned_transaction',lambda _:nullcontext())
+    monkeypatch.setattr('app.service.analysis.context.begin_owned_transaction',lambda _:nullcontext())
     s=AnalysisService.__new__(AnalysisService);s._session=MagicMock();s._session.info={}
     s._settings=Settings(_env_file=None);s._clock=utc_now;s._task_context=context(2);s._work_orders=repo(claim());s._ai=MagicMock()
     r=record();r.house_id=3;r.created_at=utc_now()
@@ -292,7 +292,7 @@ def test_attachment_completion_retry_reuses_failed_version_and_immutable_source(
     from app.core.config import Settings
     from app.core.time import utc_now
 
-    monkeypatch.setattr('app.service.analysis.begin_owned_transaction', lambda _: nullcontext())
+    monkeypatch.setattr('app.service.analysis.context.begin_owned_transaction', lambda _: nullcontext())
     previous = {
         **claim(attempt=1, version=5),
         'analysis_id': 72,
@@ -363,7 +363,7 @@ def test_attachment_completion_retry_resumes_same_incomplete_analysis(monkeypatc
     from app.core.config import Settings
     from app.core.time import utc_now
 
-    monkeypatch.setattr('app.service.analysis.begin_owned_transaction', lambda _: nullcontext())
+    monkeypatch.setattr('app.service.analysis.context.begin_owned_transaction', lambda _: nullcontext())
     previous = {
         **claim(attempt=1, version=5),
         'analysis_id': 72,
@@ -407,7 +407,7 @@ def test_attachment_completion_retry_reuses_final_result_without_new_claim(
     from app.core.config import Settings
     from app.core.time import utc_now
 
-    monkeypatch.setattr('app.service.analysis.begin_owned_transaction', lambda _: nullcontext())
+    monkeypatch.setattr('app.service.analysis.context.begin_owned_transaction', lambda _: nullcontext())
     previous = {
         **claim(attempt=1, version=5),
         'analysis_id': 72, 'analysis_version': 2,
@@ -446,7 +446,7 @@ def test_attachment_completion_retry_reuses_final_result_without_new_claim(
 def test_committed_attachment_completion_redispatch_uses_original_version_fence(monkeypatch):
     from app.core.config import Settings
 
-    monkeypatch.setattr('app.service.analysis.begin_owned_transaction', lambda _: nullcontext())
+    monkeypatch.setattr('app.service.analysis.context.begin_owned_transaction', lambda _: nullcontext())
     previous = {
         **claim(attempt=1, version=5),
         'analysis_id': 72, 'analysis_version': 2,
@@ -480,7 +480,7 @@ def test_committed_attachment_completion_redispatch_uses_original_version_fence(
 def test_attachment_completion_database_exhaustion_uses_actual_committed_version(
     monkeypatch, analysis_status, work_version,
 ):
-    monkeypatch.setattr('app.service.analysis.begin_owned_transaction', lambda _: nullcontext())
+    monkeypatch.setattr('app.service.analysis.context.begin_owned_transaction', lambda _: nullcontext())
     payload = {
         **claim(attempt=3, version=5),
         'analysis_id': 72, 'analysis_version': 2,

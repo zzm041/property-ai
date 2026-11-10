@@ -337,7 +337,7 @@ def test_missing_scoped_house_does_not_query_other_relations_or_history():
 
 
 def test_call_log_uses_existing_column_and_never_invents_missing_usage(monkeypatch):
-    monkeypatch.setattr('app.service.analysis.begin_owned_transaction', lambda _: nullcontext())
+    monkeypatch.setattr('app.service.analysis.context.begin_owned_transaction', lambda _: nullcontext())
     s = service()
     s._ai = MagicMock()
     s._write_provider_mode = MagicMock()
@@ -348,7 +348,7 @@ def test_call_log_uses_existing_column_and_never_invents_missing_usage(monkeypat
 
 
 def test_retry_of_old_failed_analysis_updates_prompt_provenance_and_context_hash(monkeypatch):
-    monkeypatch.setattr('app.service.analysis.begin_owned_transaction', lambda _: nullcontext())
+    monkeypatch.setattr('app.service.analysis.context.begin_owned_transaction', lambda _: nullcontext())
     s = service()
     s._session.info = {}  # This direct legacy prepare fixture has no durable lease.
     s._work_orders = MagicMock()

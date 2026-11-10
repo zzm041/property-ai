@@ -11,7 +11,7 @@ from app.service.analysis import AnalysisService
 
 @pytest.mark.parametrize('risk', ['none', 'electric', 'flooding', 'other', 'gas', 'safety'])
 def test_observed_gas_smell_requires_existing_manual_risk_category(risk, monkeypatch):
-    import app.service.analysis as module
+    import app.service.analysis.validation as module
     logger = Mock()
     monkeypatch.setattr(module, 'logger', logger)
     text = '厨房现在有燃气气味。'
