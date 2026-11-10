@@ -57,9 +57,9 @@ $ExpectedNativeMediaReplayReservationSha256 = "FDAEADEAE1F83160C0EB21FA0495F8DFD
 $ExpectedNativeMediaReplayResultSha256 = "95F9A3B51A6447796D6318321390562B424A90A96277CA2595EAC4C8CE90CE4B"
 $PythonPath = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\bge-142-cpu\.venv\Scripts\python.exe"
 $AsrPython = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\asr-006-cpu\.venv\Scripts\python.exe"
-$ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models-hf"
+$ModelRoot = "E:\ai-models\property-ai\models-hf"
 $ModelName = "qwen38-27b-q3km-g55:7af3b8f"
-$RuntimeModelName = "qwen38-27b-q3km-g55-ctx8192:7af3b8f"
+$RuntimeModelName = "qwen38-27b-q3km-g52-ctx8192:7af3b8f"
 $RuntimeArtifact = $null
 if ([bool]$ArtifactManifest -xor [bool]$ArtifactSha256) { throw "artifact manifest and SHA256 must be provided together" }
 if ($ArtifactManifest) {
@@ -74,7 +74,7 @@ if ($ArtifactManifest) {
     $ExpectedModelAdapterSha256 = $RuntimeArtifact.files.'scripts/ops/local_ai_models.py'
     $ExpectedRuntimeControlSha256 = $RuntimeArtifact.files.'scripts/ops/local_ai_runtime_control.py'
     $SourceCommit = $null
-    $RuntimeModelName = "qwen38-27b-q3km-g55-ctx8192:7af3b8f"
+    $RuntimeModelName = "qwen38-27b-q3km-g52-ctx8192:7af3b8f"
 }
 if ($Action -eq "verify-artifact") {
     if ($null -eq $RuntimeArtifact) { throw "verify-artifact requires a pinned artifact" }
