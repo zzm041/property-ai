@@ -12,6 +12,7 @@ from app.core.database import dispose_database_engines
 from app.core.exception_handlers import install_exception_handlers
 from app.core.logging import configure_logging, get_logger
 from app.core.request_context import RequestContextMiddleware
+from app.core.startup import verify_task_delivery_configuration
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -20,6 +21,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     resolved_settings = settings or get_settings()
     configure_logging(debug=resolved_settings.app_debug, service="api")
     logger = get_logger(__name__)
+    # PA-104-A-1: assembly-time self-check; a production misconfiguration must
+    # fail here instead of degrading into silent enqueue loss at request time.
+    verify_task_delivery_configuration(resolved_settings)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
