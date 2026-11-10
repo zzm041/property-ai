@@ -81,6 +81,12 @@ SHIMMED_MODULES: dict[str, str] = {
     "app.domain.phone": "identity",
     "app.domain.resident": "identity",
     "app.domain.property": "identity",
+    # S2: the work_order domain modules moved into app.domain.work_order.
+    "app.domain.work_order": "work_order",
+    "app.domain.work_order_visibility": "work_order",
+    "app.domain.receipt_handling": "work_order",
+    "app.domain.diagnosis": "work_order",
+    "app.domain.vision": "work_order",
 }
 
 SHIM_MAX_EFFECTIVE_LINES = 8
@@ -265,9 +271,8 @@ def report() -> None:
         print(f"{source:14s} -> {dest:14s} {allowed}")
     unmapped = sorted(
         path.stem
-        for path in (DOMAIN_ROOT.rglob("*.py"))
-        if "__pycache__" not in path.parts
-        and path.stem != "__init__"
+        for path in DOMAIN_ROOT.glob("*.py")
+        if path.stem != "__init__"
         and (DOMAIN_ROOT / path.stem).is_dir() is False
         and path.stem not in FLAT_MODULE_PACKAGE
     )
