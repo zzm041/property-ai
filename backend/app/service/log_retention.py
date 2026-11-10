@@ -10,9 +10,10 @@ Two independent reductions are offered:
 * **collapse** — inside the retained window keep only the newest row per
   ``(work order, event code, day)``.
 
-Only event codes whose rows are repeated observations are prunable; anything
-that records a business decision (``CREATE``, ``ASSIGN``, ``REASSIGN``,
-``ANALYZE`` …) stays untouched by default.
+Only event codes whose rows are repeated observations are prunable, and the
+list is a closed allow-list (``PRUNABLE_EVENT_CODES``): anything that records a
+business decision (``CREATE``, ``ASSIGN``, ``REASSIGN``, ``ANALYZE`` …) is
+refused outright, not merely skipped by default.
 """
 
 from __future__ import annotations
@@ -34,8 +35,15 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Session
 
-#: Event codes that only repeat an observation of the same state.
-DEFAULT_EVENT_CODES: tuple[str, ...] = ("AUTO_DISPATCH_WAIT",)
+#: The **only** event codes a prune may delete. This is an allow-list, not a
+#: default: business events (``CREATE``, ``ASSIGN``, ``REASSIGN``, ``ANALYZE``,
+#: ``SLA_OVERDUE`` …) are the audit trail and stay untouched no matter what a
+#: caller passes on the command line. Adding noise here is a deliberate code
+#: change, never an operator flag.
+PRUNABLE_EVENT_CODES: tuple[str, ...] = ("AUTO_DISPATCH_WAIT",)
+
+#: Kept for callers that only need "what happens by default".
+DEFAULT_EVENT_CODES: tuple[str, ...] = PRUNABLE_EVENT_CODES
 
 #: Columns the prune needs. Declared separately from the ORM model so the same
 #: statements run against MySQL and against the SQLite fixture the unit tests
@@ -84,6 +92,14 @@ def _normalise_event_codes(event_codes: tuple[str, ...] | list[str] | None) -> t
     codes = tuple(dict.fromkeys(code.strip() for code in (event_codes or DEFAULT_EVENT_CODES) if code.strip()))
     if not codes:
         raise ValueError("at least one event code is required")
+    refused = [code for code in codes if code not in PRUNABLE_EVENT_CODES]
+    if refused:
+        # D9/P2: `--event-code CREATE` used to be accepted and would have
+        # deleted 22 real business rows. Refuse the whole call instead.
+        raise ValueError(
+            "event code(s) " + ", ".join(refused) + " are not prunable; "
+            "allowed: " + ", ".join(PRUNABLE_EVENT_CODES)
+        )
     return codes
 
 
