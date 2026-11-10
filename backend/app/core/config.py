@@ -431,6 +431,33 @@ class Settings(BaseSettings):
             "fallback_to_local_token": resolved_from == "local_ai_internal_token",
         }
 
+    def media_pipeline(self) -> dict[str, object]:
+        """Report whether uploaded media can ever become usable here.
+
+        PA-163: `FileScannerProvider` fails closed by returning `pending`, and the
+        upload, attach, download and analysis paths all require
+        `scanner_status in {clean, skipped_dev}`. On a deployment that never
+        configures a scanner, every upload therefore stays unusable forever and
+        the only symptom is a blank description suggestion. Readiness states the
+        cause instead of leaving operators to infer it from a silent empty string.
+        """
+
+        provider = self.file_scanner_provider
+        usable = provider in {"clamav", "development"}
+        return {
+            "scanner": provider,
+            "media_becomes_usable": usable,
+            "reason_code": None if usable else "MEDIA_SCAN_UNAVAILABLE",
+            "note": (
+                None
+                if usable
+                else "FILE_SCANNER_PROVIDER='unavailable' fails closed: uploads stay"
+                " scanner_status=pending, so they cannot be attached to a work order,"
+                " downloaded, described or analysed until an approved scanner"
+                " (FILE_SCANNER_PROVIDER=clamav) is configured"
+            ),
+        }
+
     def resolve_local_ai_key(self, explicit: SecretStr, endpoint: str) -> str:
         """Use the shared token only for this host's explicitly local adapter."""
 

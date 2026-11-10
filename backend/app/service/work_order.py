@@ -561,10 +561,17 @@ class WorkOrderService:
 
     def _read_stored_file(self, record: FileObject) -> bytes:
         if record.scanner_status not in {"clean", "skipped_dev"}:
+            # PA-163: `details` used to be empty here, so a deployment with no
+            # scanner produced a bare 409 that named neither the reason nor the
+            # state of the file. The message stays the same for existing clients.
             raise AppError(
                 code=FileErrorCode.INVALID_INPUT,
                 message="File content is not ready for use",
                 status_code=409,
+                details={
+                    "reason": "MEDIA_NOT_READY",
+                    "scanner_status": record.scanner_status,
+                },
             )
 
         from app.provider.errors import (

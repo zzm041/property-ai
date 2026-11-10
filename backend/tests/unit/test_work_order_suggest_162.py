@@ -27,6 +27,7 @@ from app.provider.errors import ProviderTimeoutError, ProviderUnavailableError
 from app.provider.vision import VisionInsight
 from app.service.description_suggestion import (
     SUGGEST_TIMEOUT_SECONDS,
+    SUGGESTION_REASONS,
     DescriptionSuggestionService,
 )
 
@@ -161,6 +162,8 @@ def test_photo_is_described_by_the_vision_provider():
         "source": "vlm",
         "reason_code": None,
     }
+    # PA-163: a successful suggestion has nothing to explain, so the key is absent.
+    assert "reason" not in data
     assert vlm.calls == [("tenant/1/file/11", "image/jpeg")]
 
 
@@ -205,11 +208,14 @@ def test_provider_timeout_answers_200_with_a_reason_code():
     response = suggest(service)
 
     assert response.status_code == 200
-    assert response.json()["data"] == {
+    payload = response.json()["data"]
+    assert {k: v for k, v in payload.items() if k != "reason"} == {
         "text": "",
         "source": "none",
         "reason_code": "AI.TIMEOUT",
     }
+    # PA-163: the reporter sees a sentence, not only a machine code.
+    assert payload["reason"] == SUGGESTION_REASONS["AI.TIMEOUT"]
 
 
 def test_provider_unavailable_answers_200_with_a_reason_code():
@@ -218,11 +224,13 @@ def test_provider_unavailable_answers_200_with_a_reason_code():
         vlm=StubVLM(error=ProviderUnavailableError("VLM is unavailable")),
     )
 
-    assert suggest(service).json()["data"] == {
+    payload = suggest(service).json()["data"]
+    assert {k: v for k, v in payload.items() if k != "reason"} == {
         "text": "",
         "source": "none",
         "reason_code": "AI.UNAVAILABLE",
     }
+    assert payload["reason"] == SUGGESTION_REASONS["AI.UNAVAILABLE"]
 
 
 @pytest.mark.parametrize("description", ["", "   ", "\n\t "])
@@ -232,11 +240,13 @@ def test_empty_model_output_is_never_prefilled(description):
     response = suggest(service)
 
     assert response.status_code == 200
-    assert response.json()["data"] == {
+    payload = response.json()["data"]
+    assert {k: v for k, v in payload.items() if k != "reason"} == {
         "text": "",
         "source": "none",
         "reason_code": "AI.INVALID_OUTPUT",
     }
+    assert payload["reason"] == SUGGESTION_REASONS["AI.INVALID_OUTPUT"]
 
 
 def test_media_type_outside_the_pipeline_allow_list_is_refused():
@@ -254,11 +264,13 @@ def test_media_that_is_not_ready_answers_200_and_stays_out_of_the_form():
     response = suggest(service)
 
     assert response.status_code == 200
-    assert response.json()["data"] == {
+    payload = response.json()["data"]
+    assert {k: v for k, v in payload.items() if k != "reason"} == {
         "text": "",
         "source": "none",
         "reason_code": "MEDIA_NOT_READY",
     }
+    assert payload["reason"] == SUGGESTION_REASONS["MEDIA_NOT_READY"]
 
 
 def test_a_file_uploaded_by_someone_else_is_not_readable():

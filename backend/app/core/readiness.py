@@ -186,6 +186,9 @@ def check_readiness(
         # included, and the overall status is untouched: api/beat/publisher never
         # call the model, so degrading their readiness would be a false alarm.
         "ai_credentials": settings.ai_credentials(),
+        # PA-163: with no scanner configured media can never become usable, and the
+        # only symptom used to be an empty description suggestion. Report the cause.
+        "media_pipeline": settings.media_pipeline(),
         "dependencies": dependencies,
         "queue": {
             "name": settings.resolved_celery_queue,

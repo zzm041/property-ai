@@ -189,14 +189,17 @@ def suggest_work_order_description(
         file_ids=body.file_ids,
         request_id=request_id_for(request),
     )
-    return success_envelope(
-        request,
-        WorkOrderDescriptionSuggestionData(
-            text=suggestion.text,
-            source=suggestion.source,
-            reason_code=suggestion.reason_code,
-        ).model_dump(mode="json"),
-    )
+    payload = WorkOrderDescriptionSuggestionData(
+        text=suggestion.text,
+        source=suggestion.source,
+        reason_code=suggestion.reason_code,
+        reason=suggestion.reason,
+    ).model_dump(mode="json")
+    if payload["reason"] is None:
+        # PA-163 keeps the success payload byte-identical to the original
+        # contract: only a non-empty suggestion has nothing to explain.
+        payload.pop("reason")
+    return success_envelope(request, payload)
 
 
 @router.get("/work-orders")

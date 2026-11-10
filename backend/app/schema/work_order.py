@@ -63,6 +63,9 @@ class WorkOrderDescriptionSuggestionData(BaseModel):
     text: str
     source: Literal["vlm", "asr", "none"]
     reason_code: str | None = None
+    # PA-163: the machine code never reached the reporter, so a deployment whose
+    # media can never be used looked like "the AI had nothing to say".
+    reason: str | None = None
 
 
 class AppendWorkOrderRequest(BaseModel):

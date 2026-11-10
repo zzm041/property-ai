@@ -9,7 +9,7 @@ Model access goes through the existing VLM/ASR providers (same contracts the
 post-submit analysis uses); this module adds no new model call path.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from hashlib import sha256
 from time import perf_counter
 from typing import Sequence
@@ -53,6 +53,30 @@ READY_SCANNER_STATES = frozenset({"clean", "skipped_dev"})
 MAX_SUGGESTED_TEXT = 200
 RESIDENT_ROLE = "RESIDENT"
 SUGGEST_TEXT_KIND = {"vlm": "image", "asr": "audio"}
+#: PA-163: a machine code alone leaves the reporter staring at an empty box, so
+#: every returned ``reason_code`` carries an operator/reporter readable sentence.
+#: The wording never claims a scan happened; it only states what to do next.
+SUGGESTION_REASONS = {
+    "MEDIA_NOT_READY": (
+        "媒体文件还没有通过安全扫描（scanner_status=pending），暂时无法识别，请手动填写。"
+    ),
+    "MEDIA_SCAN_UNAVAILABLE": (
+        "本部署没有配置文件安全扫描器，上传的媒体无法使用，请手动填写。"
+    ),
+    "AI.UNAVAILABLE": "描述识别服务当前不可用，请手动填写。",
+    "AI.TIMEOUT": "描述识别超时，请手动填写。",
+    "AI.INVALID_OUTPUT": "模型没有给出可用的描述，请手动填写。",
+    "AI.RATE_LIMITED": "描述识别请求过于频繁，请稍后重试或手动填写。",
+}
+SUGGESTION_REASON_FALLBACK = "未能生成描述，请手动填写。"
+
+
+def suggestion_reason(reason_code: str | None) -> str | None:
+    """Turn a machine reason code into one sentence a reporter can act on."""
+
+    if reason_code is None:
+        return None
+    return SUGGESTION_REASONS.get(reason_code, SUGGESTION_REASON_FALLBACK)
 
 
 @dataclass(frozen=True, slots=True)
@@ -62,6 +86,7 @@ class DescriptionSuggestion:
     text: str
     source: str
     reason_code: str | None = None
+    reason: str | None = None
 
 
 class DescriptionSuggestionService:
@@ -114,9 +139,19 @@ class DescriptionSuggestionService:
         self._require_rate_limit(actor)
         target = self._select_target(actor, normalized)
         if target is None:
-            return DescriptionSuggestion(text="", source="none", reason_code="MEDIA_NOT_READY")
+            # PA-163: only a media file that is not usable yet gets here; say so in
+            # words instead of handing the form an unexplained empty string.
+            return self._explained(
+                DescriptionSuggestion(text="", source="none", reason_code="MEDIA_NOT_READY")
+            )
         record, source = target
-        return self._suggest_from(record, source)
+        return self._explained(self._suggest_from(record, source))
+
+    @staticmethod
+    def _explained(result: DescriptionSuggestion) -> DescriptionSuggestion:
+        """Attach the human sentence matching the machine reason code."""
+
+        return replace(result, reason=suggestion_reason(result.reason_code))
 
     # ------------------------------------------------------------------ guards
     @staticmethod
