@@ -161,12 +161,14 @@ def create_work_order(
         claimed_tenant_id=body.tenant_id,
         claimed_property_id=body.property_id,
     )
-    return success_envelope(
-        request,
-        work_order_data(record, overdue=service.is_overdue(record)).model_dump(
-            mode="json"
-        ),
+    payload = work_order_data(record, overdue=service.is_overdue(record)).model_dump(
+        mode="json"
     )
+    # PA-169 (t150): a repeat of the same report inside the window answers with the
+    # work order that already exists, and says so. The content fingerprint itself
+    # stays internal.
+    payload["deduplicated"] = service.last_create_deduplicated
+    return success_envelope(request, payload)
 
 
 @router.post("/work-orders/suggest")

@@ -61,6 +61,33 @@ class WorkOrderRepository:
             .execution_options(populate_existing=True)
         )
 
+    def find_duplicate_content(
+        self,
+        *,
+        house_id: int,
+        reporter_user_id: int,
+        content_fingerprint: str,
+        since: datetime,
+    ) -> WorkOrder | None:
+        """A report the same resident already filed under this house (PA-169/t150).
+
+        One indexed read on ``ix_work_orders_house_fingerprint_created``. The
+        reporter is part of the predicate on purpose: the duplicate window must not
+        merge two different residents reporting the same problem.
+        """
+
+        return self._session.scalar(
+            select(WorkOrder)
+            .where(
+                WorkOrder.house_id == house_id,
+                WorkOrder.reporter_user_id == reporter_user_id,
+                WorkOrder.content_fingerprint == content_fingerprint,
+                WorkOrder.created_at >= since,
+            )
+            .order_by(WorkOrder.id.desc())
+            .limit(1)
+        )
+
     def get_house(self, house_id: int) -> House | None:
         return self._session.get(House, house_id)
 

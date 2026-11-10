@@ -26,7 +26,7 @@ from app.core.logging import get_logger
 from app.service.media_scan import admit_scanned_media, log_media_scan_skipped
 from app.core.time import current_business_date, utc_now
 from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.ai import FilterReason, WorkOrderAnalysisOutput, capability_filter_reason, category_duty, eligibility_denial_details, map_analysis_output, ordinary_maintenance
+from app.domain.ai import FilterReason, WorkOrderAnalysisOutput, capability_filter_reason, category_duty, content_fingerprint, eligibility_denial_details, map_analysis_output, ordinary_maintenance
 from app.domain.employee import DISPATCH_STAFF_ROLES, AttendanceOnDuty, EmployeeStatus
 from app.domain.iam import OrganizationScope, Principal, ScopeType
 from app.domain.work_order_visibility import resident_media_visible
@@ -95,6 +95,11 @@ from app.service.sla import (
 
 T = TypeVar("T")
 logger = get_logger(__name__)
+
+# PA-169 (t150): how long a repeated report counts as the same submission. Only
+# the same resident on the same house is merged; 10 minutes is the window the
+# guard was specified with.
+DUPLICATE_WINDOW_MINUTES = 10
 _ALLOWED_MIME = {
     "image/jpeg": MediaKind.IMAGE,
     "image/png": MediaKind.IMAGE,
@@ -272,12 +277,35 @@ class WorkOrderService:
             self._settings
         )
         self._clock = clock
+        # PA-169 (t150): whether the last create call answered with an existing
+        # work order instead of inserting one. Read by the API layer only.
+        self._last_create_deduplicated = False
+
+    @property
+    def last_create_deduplicated(self) -> bool:
+        """True when the previous ``create_work_order`` returned a duplicate."""
+
+        return self._last_create_deduplicated
 
     @property
     def max_upload_bytes(self) -> int:
         """Maximum accepted upload payload, shared by registration and streaming."""
 
         return self._settings.upload_max_mb * 1024 * 1024
+
+    def _content_fingerprint(
+        self,
+        text: str | None,
+        file_ids: tuple[int, ...],
+    ) -> str:
+        """Content identity of a report being created (PA-169/t150)."""
+
+        digests = []
+        for file_id in file_ids:
+            stored = self._repository.get_file(file_id)
+            if stored is not None and stored.content_hash:
+                digests.append(stored.content_hash)
+        return content_fingerprint(text, digests)
 
     def register_file(
         self,
@@ -668,6 +696,7 @@ class WorkOrderService:
         if contact is None or not contact.isascii():
             raise AppError(code=WorkOrderErrorCode.INVALID_INPUT,
                            message="A valid contact telephone is required", status_code=422)
+        self._last_create_deduplicated = False
         record, created = self._execute(
             lambda: self._create_work_order(
                 actor=actor,
@@ -1439,6 +1468,19 @@ class WorkOrderService:
             property_id=owned.property_id,
         )
         RbacService.require_permission(current, WORK_ORDER_CREATE, scope)
+        # PA-169 (t150): a resident who re-files the same report within the window
+        # gets the work order they already have. Scoped to this resident and this
+        # house: two residents reporting the same thing are two reports.
+        fingerprint = self._content_fingerprint(cleaned_text, file_ids)
+        duplicate = self._repository.find_duplicate_content(
+            house_id=owned.id,
+            reporter_user_id=current.user_id,
+            content_fingerprint=fingerprint,
+            since=self._clock() - timedelta(minutes=DUPLICATE_WINDOW_MINUTES),
+        )
+        if duplicate is not None:
+            self._last_create_deduplicated = True
+            return duplicate, False
         category_value = self._parse_enum(
             category, WorkOrderCategory, WorkOrderCategory.OTHER, "category"
         )
@@ -1489,6 +1531,7 @@ class WorkOrderService:
                 house_id=owned.id,
                 reporter_user_id=current.user_id,
                 contact_phone_e164=contact_phone,
+                content_fingerprint=fingerprint,
                 status=WorkOrderStatus.PENDING_ANALYSIS.value,
                 process_reason=ProcessReason.NONE.value,
                 category=category_value.value,
