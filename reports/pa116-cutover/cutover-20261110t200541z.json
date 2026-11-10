@@ -1,0 +1,38 @@
+{
+  "image": "property-ai-delivery:src-65cdd383d806-wip",
+  "stamp": "20261110t200541z",
+  "env_overrides": {
+    "TRUSTED_PROXY_CIDRS": "172.16.0.0/12",
+    "SMS_IP_LIMIT_PER_HOUR": "30"
+  },
+  "image_identity": {
+    "source_sha_env": "65cdd383d806-wip",
+    "source_sha_label": "65cdd383d806-wip"
+  },
+  "services": {
+    "api": {
+      "replacement": "property-ai-delivery-check-api-1-next-20261110t200541z",
+      "original": "property-ai-delivery-check-api-1",
+      "rollback": "property-ai-delivery-check-api-1-rollback-20261110t200541z",
+      "state": "running/healthy"
+    },
+    "worker": {
+      "replacement": "property-ai-delivery-check-worker-1-next-20261110t200541z",
+      "original": "property-ai-delivery-check-worker-1",
+      "rollback": "property-ai-delivery-check-worker-1-rollback-20261110t200541z",
+      "state": "running/starting"
+    },
+    "publisher": {
+      "replacement": "property-ai-delivery-check-publisher-1-next-20261110t200541z",
+      "original": "property-ai-delivery-check-publisher-1",
+      "rollback": "property-ai-delivery-check-publisher-1-rollback-20261110t200541z",
+      "state": "running/starting"
+    },
+    "beat": {
+      "replacement": "property-ai-delivery-check-beat-1-next-20261110t200541z",
+      "original": "property-ai-delivery-check-beat-1",
+      "rollback": "property-ai-delivery-check-beat-1-rollback-20261110t200541z",
+      "state": "running/-"
+    }
+  }
+}

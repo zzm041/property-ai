@@ -8,7 +8,7 @@ stop + rename the original to `-rollback-<ts>`.
 
 Usage:
     python cutover_delivery.py plan  <image>
-    python cutover_delivery.py apply <image>
+    python cutover_delivery.py apply <image> [--env KEY=VALUE ...]
     python cutover_delivery.py verify
 """
 
@@ -211,19 +211,47 @@ def adopt_image_identity(facts: dict, identity: dict) -> None:
         facts["labels"][SOURCE_SHA_LABEL] = label_sha
 
 
+def apply_env_overrides(facts: dict, overrides: dict[str, str]) -> None:
+    """Apply compose-level settings the clone path cannot see.
+
+    Everything else is cloned from the running container, which is exactly what
+    makes a cutover safe — but a variable added to `docker-compose.delivery.yml`
+    *after* the running container was created is not in its `Config.Env`, so a
+    clone would silently keep the old, missing value. `--env KEY=VALUE` puts such
+    a setting into the replacement explicitly and records it in the cutover file.
+    """
+    if not overrides:
+        return
+    rewritten, seen = [], set()
+    for item in facts["env"]:
+        key, sep, _ = item.partition("=")
+        if sep and key in overrides:
+            rewritten.append(f"{key}={overrides[key]}")
+            seen.add(key)
+        else:
+            rewritten.append(item)
+    for key, value in overrides.items():
+        if key not in seen:
+            rewritten.append(f"{key}={value}")
+    facts["env"] = rewritten
+    facts["env_overrides"] = dict(overrides)
+
+
 def cmd_plan(image: str) -> None:
     for service in SERVICES:
         facts = plan(service)
         print(json.dumps({k: (v if k != "env" else f"<{len(v)} vars>") for k, v in facts.items()}, ensure_ascii=False))
 
 
-def cmd_apply(image: str) -> None:
+def cmd_apply(image: str, overrides: dict[str, str] | None = None) -> None:
+    overrides = overrides or {}
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ").lower()
     TMP.mkdir(parents=True, exist_ok=True)
     identity = image_identity(image)
     record: dict[str, dict] = {
         "image": image,
         "stamp": stamp,
+        "env_overrides": dict(overrides),
         "image_identity": {
             "source_sha_env": identity["env"].get(SOURCE_SHA_ENV),
             "source_sha_label": identity["labels"].get(SOURCE_SHA_LABEL),
@@ -234,6 +262,7 @@ def cmd_apply(image: str) -> None:
         facts = plan(service)
         facts["image"] = image
         adopt_image_identity(facts, identity)
+        apply_env_overrides(facts, overrides)
         facts["env_file"] = write_env_file(service, facts["env"])
         facts["target"] = f"{container_name(service)}-next-{stamp}"
         existing = docker("ps", "-a", "--filter", f"name=^{facts['target']}$", "--format", "{{.Names}}").strip()
@@ -293,13 +322,22 @@ def main() -> None:
     if len(sys.argv) < 2:
         raise SystemExit(__doc__)
     action = sys.argv[1]
-    image = sys.argv[2] if len(sys.argv) > 2 else ""
+    args = [value for value in sys.argv[2:] if not value.startswith("--")]
+    overrides: dict[str, str] = {}
+    tokens = sys.argv[2:]
+    for index, token in enumerate(tokens):
+        if token == "--env" and index + 1 < len(tokens):
+            key, sep, value = tokens[index + 1].partition("=")
+            if not sep or not key:
+                raise SystemExit(f"--env expects KEY=VALUE, got {tokens[index + 1]!r}")
+            overrides[key] = value
+    image = args[0] if args else ""
     if action == "plan":
         cmd_plan(image)
     elif action == "apply":
         if not image:
             raise SystemExit("image id required")
-        cmd_apply(image)
+        cmd_apply(image, overrides)
     elif action == "verify":
         cmd_verify(image)
     else:
