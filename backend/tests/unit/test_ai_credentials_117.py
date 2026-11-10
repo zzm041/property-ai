@@ -43,11 +43,15 @@ def test_staging_with_only_the_local_token_starts_and_reports_the_missing_key():
 
     # The container that produced PA-117 looked exactly like this: a local token,
     # no LLM_API_KEY, provider=production => guaranteed ProviderUnavailableError.
+    # PA-128 added the local-token fallback, but it only applies when LLM_BASE_URL
+    # is this host's adapter; this fixture leaves the default (non-local) endpoint,
+    # so the report still says the key is missing.
     assert credentials["status"] == "missing"
     assert credentials["missing"] == ["LLM_API_KEY"]
     assert credentials["sources"] == {
         "llm_api_key": "missing",
         "local_ai_internal_token": "configured",
+        "resolved_from": "none",
     }
     assert credentials["fallback_to_local_token"] is False
 

@@ -74,7 +74,13 @@ def build_llm_provider(settings: Settings) -> LLMProvider:
         return QwenLLMProvider(
             base_url=settings.llm_base_url,
             model=settings.llm_model,
-            api_key=settings.llm_api_key.get_secret_value(),
+            # PA-128: same fallback as RAG/embedding/reranker. Explicit
+            # LLM_API_KEY still wins; the local token only applies when the
+            # endpoint is this host's adapter (see resolve_local_ai_key).
+            api_key=settings.resolve_local_ai_key(
+                settings.llm_api_key,
+                settings.llm_base_url,
+            ),
             timeout_seconds=settings.llm_timeout_seconds,
             disable_thinking=settings.llm_disable_thinking,
             max_output_tokens=settings.llm_max_output_tokens,

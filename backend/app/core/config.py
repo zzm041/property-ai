@@ -356,25 +356,32 @@ class Settings(BaseSettings):
     def ai_credentials(self) -> dict[str, object]:
         """Report whether this process holds a credential the work-order LLM can use.
 
-        PA-117: `build_llm_provider` sends `LLM_API_KEY` verbatim — unlike the RAG,
-        VLM and ASR providers it never falls back to `LOCAL_AI_INTERNAL_TOKEN`
-        (`build_rag_llm_provider` calls `resolve_local_ai_key`, `build_llm_provider`
-        does not). A staging box with an empty key therefore answered
-        `/readyz` 200/ready and only failed once analysis ran, which reads as "AI is
-        broken" rather than "the credential is missing". Secrets are never included.
+        PA-117 opened this probe because `build_llm_provider` sent `LLM_API_KEY`
+        verbatim while the RAG/embedding/reranker builders already fell back to
+        `LOCAL_AI_INTERNAL_TOKEN`. PA-128 closed that gap, so the report now
+        describes what `build_llm_provider` will actually put on the wire:
+        `resolve_local_ai_key` decides, explicit key first. Secrets are never
+        included.
         """
 
         work_order_key = bool(self.llm_api_key.get_secret_value())
         local_token = bool(self.local_ai_internal_token.get_secret_value())
+        resolved = self.resolve_local_ai_key(self.llm_api_key, self.llm_base_url)
         if self.llm_provider != "production":
             status = "not_required"
             missing: list[str] = []
-        elif work_order_key:
+        elif resolved:
             status = "configured"
             missing = []
         else:
             status = "missing"
             missing = ["LLM_API_KEY"]
+        if not resolved:
+            resolved_from = "none"
+        elif work_order_key:
+            resolved_from = "llm_api_key"
+        else:
+            resolved_from = "local_ai_internal_token"
         return {
             "provider": self.llm_provider,
             "status": status,
@@ -382,9 +389,11 @@ class Settings(BaseSettings):
             "sources": {
                 "llm_api_key": "configured" if work_order_key else "missing",
                 "local_ai_internal_token": "configured" if local_token else "missing",
+                "resolved_from": resolved_from,
             },
-            # Fact, not policy: the work-order path has no local-token fallback.
-            "fallback_to_local_token": False,
+            # Fact, not policy: PA-128 makes the work-order path use the same
+            # local-token fallback as RAG/embedding/reranker.
+            "fallback_to_local_token": resolved_from == "local_ai_internal_token",
         }
 
     def resolve_local_ai_key(self, explicit: SecretStr, endpoint: str) -> str:
