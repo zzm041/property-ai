@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="智慧物业 AI：一条报修从提交到派单的真实链路。含工单 33 的真实分析输出、派单约束与本地部署方式。">
+<meta name="description" content="智慧物业 AI：一条报修从提交到派单的真实链路，含一次实测的时间线。含工单 33 的真实分析输出、派单约束与本地部署方式。">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; connect-src 'none'">
 <title>智慧物业 AI · 一条报修的处理记录</title>
 <link rel="stylesheet" href="style.css">
@@ -25,7 +25,7 @@
 
 <section class="hero">
   <div class="hero-text">
-    <h1>一条报修，<br>二十三秒后<br>变成可派的工单。</h1>
+    <h1>一条报修，<br>变成九个字段的<br>工单判定。</h1>
     <p class="lede">住户用一句话描述问题，AI 把它整理成九个字段的结构化判定，系统按服务范围、职责、签到与技能筛人，再由规则派单。右边这张卡不是截图，是本地库里的真实一行。</p>
     <p class="links">
       <a href="https://github.com/zzm041/property-ai">源码</a>
@@ -44,12 +44,12 @@
       <div><dt>required_skill</dt><dd>maintenance</dd></div>
       <div><dt>confidence</dt><dd>0.950</dd></div>
     </dl>
-    <p class="ticket-foot">提交 <time>00:09:22.122</time> · 判定完成 <time>00:09:45.414</time></p>
+    <p class="ticket-foot">提交 <time>00:09:22.122</time> · 判定完成 <time>00:09:45.414</time><br>本机实测一次，模型已驻留，不含首次加载</p>
   </aside>
 </section>
 
 <section id="record" class="section">
-  <h2>这二十三秒里发生了什么</h2>
+  <h2>这一次，二十三秒里发生了什么</h2>
   <table class="timeline">
     <thead>
       <tr><th scope="col">时刻</th><th scope="col">动作</th><th scope="col">落点</th></tr>
@@ -61,7 +61,7 @@
       <tr><td>派单</td><td>按小区、职责、签到、技能与容量筛人，规则决定最终人选</td><td>assignments</td></tr>
     </tbody>
   </table>
-  <p class="note">模型只提供问题事实与建议，谁去修由业务规则决定。模型超时或输出不合格时，工单留在库里等人处理，不会丢。</p>
+  <p class="note">时间不是固定值：模型已驻留时二十秒上下，冷启动还要先加载约三十秒，并发排队会更久，所以这里只写这一单的实测值，不写平均耗时。模型只提供问题事实与建议，谁去修由业务规则决定。模型超时或输出不合格时，工单留在库里等人处理，不会丢。</p>
 </section>
 
 <section id="rules" class="section">
