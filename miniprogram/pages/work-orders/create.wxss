@@ -11,7 +11,7 @@
   border-radius: 12rpx;
   background: #f8faff;
   color: #172033;
-  font-size: 28rpx;
+  font-size: 34rpx;
   line-height: 1.45;
   text-align: left;
 }

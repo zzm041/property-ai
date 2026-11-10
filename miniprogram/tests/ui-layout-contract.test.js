@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 const ROOT = path.resolve(__dirname, "..");
-const read = (relativePath) => fs.readFileSync(path.join(ROOT, relativePath), "utf8");
+const read = (relativePath) => fs.readFileSync(path.join(ROOT, relativePath), "utf8").replace(/\r\n/g, "\n");
 
 function ruleBody(source, selector) {
   const selectorIndex = source.indexOf(selector);

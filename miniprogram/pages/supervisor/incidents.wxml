@@ -1,9 +1,9 @@
 <view class="card" wx:if="{{properties.length}}">
   <view class="section-title">事件范围</view>
-  <picker range="{{properties}}" range-key="name" value="{{propertyIndex}}" bindchange="onPropertyChange">
+  <picker disabled="{{loading}}" range="{{properties}}" range-key="name" value="{{propertyIndex}}" bindchange="onPropertyChange">
     <view class="picker">小区：{{properties[propertyIndex].name}}</view>
   </picker>
-  <picker range="{{statusOptions}}" range-key="label" value="{{statusIndex}}" bindchange="onStatusChange">
+  <picker disabled="{{loading}}" range="{{statusOptions}}" range-key="label" value="{{statusIndex}}" bindchange="onStatusChange">
     <view class="picker">状态：{{statusOptions[statusIndex].label}}</view>
   </picker>
   <view class="empty" wx:if="{{!canManage}}">当前身份只能查看本人正在参与的事件。</view>
@@ -40,7 +40,7 @@
   <view wx:if="{{selected.ai_summary}}">AI 运营摘要：{{selected.ai_summary}}</view>
   <view wx:if="{{selected.affected_scope}}">影响范围：{{selected.affected_scope}}</view>
   <block wx:if="{{canManage}}">
-    <textarea class="input" maxlength="255" placeholder="处置或重开原因（必填）" value="{{dispositionReason}}" bindinput="onDispositionReasonInput"></textarea>
+    <textarea disabled="{{loading}}" class="input" maxlength="255" placeholder="处置或重开原因（必填）" value="{{dispositionReason}}" bindinput="onDispositionReasonInput"></textarea>
     <button class="btn" wx:if="{{selected.status === 'OPEN'}}" data-status="MONITORING" bindtap="updateIncidentStatus" disabled="{{loading}}">转为监控中</button>
     <button class="btn" wx:if="{{selected.status === 'OPEN' || selected.status === 'MONITORING'}}" data-status="RESOLVED" bindtap="updateIncidentStatus" disabled="{{loading}}">标记已解决</button>
     <button class="btn" wx:if="{{selected.status === 'RESOLVED'}}" data-status="CLOSED" bindtap="updateIncidentStatus" disabled="{{loading}}">关闭事件</button>

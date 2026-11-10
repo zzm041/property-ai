@@ -35,8 +35,8 @@
   <view wx:for="{{requests}}" wx:key="id" id="bind-request-{{item.id}}">
     <view>申请 {{item.id}} · {{item.statusLabel}} · {{item.relationLabel}}</view>
     <text wx:if="{{item.id === focusedRequestId}}">（当前通知）</text>
-    <view>房屋资料已提交 · 申请时间：{{item.requested_at}}</view>
-    <view wx:if="{{item.reviewed_at}}">审核时间：{{item.reviewed_at}}</view>
+    <view>房屋资料已提交 · 申请时间：{{item.requestedAtLabel}}</view>
+    <view wx:if="{{item.reviewed_at}}">审核时间：{{item.reviewedAtLabel}}</view>
     <view wx:if="{{item.review_reason}}">审核原因：{{item.review_reason}}</view>
     <view wx:if="{{item.status === 'REJECTED'}}">请根据审核原因核对资料后，在上方重新申请。原申请记录会保留。</view>
   </view>

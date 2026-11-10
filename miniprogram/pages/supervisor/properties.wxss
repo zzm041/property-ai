@@ -1,6 +1,6 @@
 .section-title,
 .section-heading {
-  font-size: 32rpx;
+  font-size: 36rpx;
   font-weight: 600;
   margin-bottom: 20rpx;
 }
@@ -16,7 +16,7 @@
 
 .hint {
   color: #667085;
-  font-size: 24rpx;
+  font-size: 30rpx;
   margin-top: 10rpx;
   word-break: break-all;
 }
@@ -31,7 +31,7 @@
 }
 
 .house-title {
-  font-size: 30rpx;
+  font-size: 34rpx;
   font-weight: 600;
   margin-bottom: 12rpx;
 }

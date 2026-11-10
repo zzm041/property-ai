@@ -1,6 +1,6 @@
 <view class="card">
   <view class="section-title">账号合并与高风险恢复</view>
-  <view class="empty">该流程不会仅凭新收到的短信恢复旧账号，也不会把旧账号资产交给未经核验的新持有人。</view>
+  <view class="empty">为保护账号和房屋资料，恢复账号需要核验身份。</view>
   <block wx:if="{{capabilities}}">
     <block wx:if="{{capabilities.enabled}}">
       <view>可信核验入口已配置。提交后进入 {{capabilities.quarantine_days}} 天隔离和 {{capabilities.required_distinct_reviewers}} 人复核。</view>
@@ -12,7 +12,7 @@
       <view class="empty">这里只接收获批准核验渠道的一次性令牌，不上传证件、人脸或短信验证码。</view>
       <button class="btn" disabled="{{loading}}" bindtap="submit">提交核验申请</button>
     </block>
-    <view wx:else class="error">当前尚未配置获批准的可信身份核验渠道，系统不会伪造核验或允许短信接管。请联系系统负责人。</view>
+    <view wx:else class="error">身份核验暂不可用，请联系物业协助处理。</view>
   </block>
 </view>
 <view class="card" wx:if="{{cases.length}}">

@@ -2,7 +2,8 @@
 <work-order-contact id="order-contact" wx:if="{{workOrder}}" work-order-id="{{workOrder.id}}" />
 <view class="card" wx:if="{{workOrder}}">
   <view>工单 {{workOrder.id}}</view>
-  <view>本次报修全部事项：{{item.text || item.asr_text}}</view>
+  <view wx:if="{{item.text}}">报修文字：{{item.text}}</view>
+  <view wx:if="{{item.asr_text}}">语音转写（可对照原语音）：{{item.asr_text}}</view>
   <view wx:if="{{item.extra_notes}}">补充问题：{{item.extra_notes}}</view>
   <view>状态 {{statusLabel}}</view>
   <view wx:if="{{workOrder.process_reason != 'NONE'}}">处理原因 {{reasonLabel}}</view>
@@ -13,16 +14,9 @@
     <button class="btn btn-secondary" bindtap="reject" disabled="{{loading}}">拒单并自动改派</button>
   </block>
   <button class="btn" wx:if="{{canStart}}" bindtap="start">开始处理</button>
-  <block wx:if="{{canEscalate}}">
-    <view class="section-title">异常上报</view>
-    <picker mode="selector" range="{{escalationOptions}}" range-key="label" value="{{escalationIndex}}" bindchange="onEscalationType">
-      <view class="field">{{escalationOptions[escalationIndex].label}}</view>
-    </picker>
-    <textarea class="field" placeholder="异常或等待原因（必填）" value="{{escalationReason}}" bindinput="onEscalationReason" maxlength="255"></textarea>
-    <button class="btn btn-secondary" bindtap="escalate" disabled="{{loading}}">提交主管处理</button>
-  </block>
   <block wx:if="{{canFinish}}">
     <view class="section-title">处理回执</view>
+    <view class="empty">以下回执和处理前后照片将向住户展示。</view>
     <view class="field-label">问题类型（必填）</view>
     <input class="field" placeholder="例如：电气维修" value="{{problemType}}" bindinput="onProblemType" maxlength="64" />
     <view class="field-label">处理方式与过程（必填）</view>
@@ -52,19 +46,26 @@
     <view class="pending-media" wx:if="{{afterMedia.length}}">
       <image wx:for="{{afterMedia}}" wx:key="fileId" class="pending-media-image" mode="aspectFill" src="{{item.tempFilePath}}" data-group="afterMedia" data-src="{{item.tempFilePath}}" bindtap="previewPendingMedia" />
     </view>
+    <view class="field-label">实际处理情况（内部，可选）</view>
+    <view class="empty">填写实际参与人员及分工。</view>
+    <picker range="{{handlingOptions}}" range-key="label" value="{{handlingIndex}}" bindchange="onHandlingMode">
+      <view class="field">{{handlingOptions[handlingIndex].label}}</view>
+    </picker>
+    <textarea wx:if="{{handlingIndex > 0}}" class="field" placeholder="参与人员或单位及分工；协作或支援时必填，不填写私人联系方式" value="{{handlingNote}}" bindinput="onHandlingNote" maxlength="255"></textarea>
     <view class="field-label">过程反馈</view>
-    <button class="btn" bindtap="chooseOnSiteImage">添加现场照片（可选）</button>
+    <button class="btn" bindtap="chooseOnSiteImage">添加现场照片（内部，可选）</button>
     <view class="empty" wx:if="{{onSiteMediaHint}}">{{onSiteMediaHint}}</view>
     <view class="pending-media" wx:if="{{onSiteMedia.length}}">
       <image wx:for="{{onSiteMedia}}" wx:key="fileId" class="pending-media-image" mode="aspectFill" src="{{item.tempFilePath}}" data-group="onSiteMedia" data-src="{{item.tempFilePath}}" bindtap="previewPendingMedia" />
     </view>
-    <textarea placeholder="处理反馈（可选）" value="{{feedback}}" bindinput="onFeedback"></textarea>
+    <textarea placeholder="内部处理反馈（可选）" value="{{feedback}}" bindinput="onFeedback"></textarea>
     <button class="btn" bindtap="feedback">提交反馈</button>
     <button class="btn" bindtap="resolve" disabled="{{loading}}">{{receiptResolved ? "提交完整回执并完成" : "提交未解决回执并上报"}}</button>
   </block>
+  <button class="btn btn-secondary" wx:if="{{canEscalate}}" bindtap="openEscalation" disabled="{{loading}}">无法处理 · 上报主管</button>
   <block wx:if="{{canSupplementReceiptMedia}}">
     <view class="section-title">补传本周期处理照片</view>
-    <view class="empty">照片将绑定到刚提交的本周期回执，不会改写此前周期。</view>
+    <view class="empty">补充本次处理的照片。</view>
     <button class="btn" wx:if="{{missingBeforeMedia}}" bindtap="chooseBeforeImage">添加缺失的处理前照片</button>
     <view class="empty" wx:if="{{beforeMediaHint}}">{{beforeMediaHint}}</view>
     <view class="pending-media" wx:if="{{beforeMedia.length}}">
@@ -79,11 +80,32 @@
   </block>
 </view>
 <view class="card" wx:if="{{logs.length}}">
-  <view>历史</view>
-  <view wx:for="{{logs}}" wx:key="id">
-    <view>{{item.fromStatusLabel}} → {{item.toStatusLabel}} · {{item.eventLabel}}</view>
-    <view class="empty">{{item.actorLabel}} · {{item.createdAtLabel}}</view>
+  <view class="section-title">本工单处理进展</view>
+  <view class="hint">包含本工单各方操作，最新进展在前。当前显示 {{logs.length}} / {{logCount}} 条。</view>
+  <view class="receipt-section" wx:for="{{logs}}" wx:key="id">
+    <view class="field-label">{{item.eventLabel}}</view>
+    <view class="record-time">{{item.actorLabel}} · {{item.createdAtLabel}}</view>
+    <view wx:if="{{item.from_status != item.to_status}}">{{item.fromStatusLabel}} → {{item.toStatusLabel}}</view>
+    <view class="detail-value" wx:if="{{item.reason}}">{{item.reason}}</view>
   </view>
+  <button class="btn btn-secondary" wx:if="{{hasMoreLogs}}" bindtap="showMoreLogs">查看更多进展</button>
+</view>
+<view class="card" wx:if="{{systemLogCount}}">
+  <view class="section-title">系统运行记录</view>
+  <view class="hint">仅属于本工单；等待和尝试次数不等于模型调用次数。</view>
+  <view wx:for="{{systemGroups}}" wx:key="eventCode">
+    <view>{{item.label}} · {{item.count}} 次</view>
+    <view class="record-time">最近记录 {{item.latestAtLabel}}</view>
+  </view>
+  <button class="btn btn-secondary" bindtap="toggleSystemLogs">{{systemExpanded ? "收起系统记录" : "展开系统记录"}}</button>
+  <block wx:if="{{systemExpanded}}">
+    <view class="receipt-section" wx:for="{{systemLogs}}" wx:key="id">
+      <view>{{item.eventLabel}}</view>
+      <view class="record-time">{{item.createdAtLabel}}</view>
+      <view class="detail-value" wx:if="{{item.reason}}">{{item.reason}}</view>
+    </view>
+    <button class="btn btn-secondary" wx:if="{{hasMoreSystemLogs}}" bindtap="showMoreSystemLogs">查看更多系统记录</button>
+  </block>
 </view>
 <button class="btn" bindtap="reload">刷新</button>
 <view class="error" wx:if="{{error}}">{{error}}</view>

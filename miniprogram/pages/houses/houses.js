@@ -1,3 +1,4 @@
+const { formatBeijingTime } = require("../../utils/date-time");
 const RELATIONS = [
   { value: "OWNER", label: "业主" },
   { value: "TENANT", label: "租户" },
@@ -11,6 +12,8 @@ const PAGE_SIZE = 50;
 const withRelationLabel = (item) => ({
   ...item,
   addressLabel: houseLabel(item),
+  requestedAtLabel: formatBeijingTime(item.requested_at),
+  reviewedAtLabel: formatBeijingTime(item.reviewed_at),
   relationLabel: (RELATIONS.find((option) => option.value === item.relation_type) || {}).label || item.relation_type,
   statusLabel: STATUS_NAMES[item.status] || item.status,
 });

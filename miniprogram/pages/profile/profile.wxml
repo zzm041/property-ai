@@ -18,7 +18,7 @@
 </view>
 <view class="card">
   <button id="wechat-bind-button" class="btn" bindtap="bindWechat" disabled="{{loading}}">绑定当前微信</button>
-  <view class="empty">微信只是同一账号的凭证，不会新建另一套身份。</view>
+  <view class="empty">绑定后可使用微信登录当前账号。</view>
 </view>
 <view class="card">
   <view>安全更换微信</view>

@@ -1,6 +1,6 @@
 <view class="card">
   <view class="section-title">知识库管理范围</view>
-  <picker range="{{properties}}" range-key="name" value="{{propertyIndex}}" bindchange="onPropertyChange">
+  <picker disabled="{{loading}}" range="{{properties}}" range-key="name" value="{{propertyIndex}}" bindchange="onPropertyChange">
     <view class="picker">{{properties[propertyIndex].name || '请选择小区'}}</view>
   </picker>
   <view class="hint">只显示当前身份有权维护的范围；企业级知识仅企业管理员可维护。</view>
@@ -12,23 +12,23 @@
 
 <view class="card">
   <view class="section-title">新建知识文档</view>
-  <picker range="{{scopeOptions}}" range-key="label" value="{{scopeIndex}}" bindchange="onScopeChange">
+  <picker disabled="{{loading}}" range="{{scopeOptions}}" range-key="label" value="{{scopeIndex}}" bindchange="onScopeChange">
     <view class="picker">范围：{{scopeOptions[scopeIndex].label}}</view>
   </picker>
-  <picker range="{{typeOptions}}" range-key="label" value="{{typeIndex}}" bindchange="onTypeChange">
+  <picker disabled="{{loading}}" range="{{typeOptions}}" range-key="label" value="{{typeIndex}}" bindchange="onTypeChange">
     <view class="picker">类型：{{typeOptions[typeIndex].label}}</view>
   </picker>
-  <picker range="{{visibilityOptions}}" range-key="label" value="{{visibilityIndex}}" bindchange="onVisibilityChange">
+  <picker disabled="{{loading}}" range="{{visibilityOptions}}" range-key="label" value="{{visibilityIndex}}" bindchange="onVisibilityChange">
     <view class="picker">可见性：{{visibilityOptions[visibilityIndex].label}}</view>
   </picker>
-  <input placeholder="文档标题" value="{{title}}" data-field="title" bindinput="onField" />
-  <textarea class="source-box" placeholder="粘贴本版本知识正文" value="{{sourceText}}" data-field="sourceText" bindinput="onField" />
+  <input disabled="{{loading}}" placeholder="文档标题" value="{{title}}" data-field="title" bindinput="onField" />
+  <textarea disabled="{{loading}}" class="source-box" placeholder="粘贴本版本知识正文" value="{{sourceText}}" data-field="sourceText" bindinput="onField" />
   <button class="btn" bindtap="create">建立并提交导入</button>
 </view>
 
 <view class="card compact-row">
   <text>显示已归档文档</text>
-  <switch checked="{{includeArchived}}" bindchange="onIncludeArchived" />
+  <switch disabled="{{loading}}" checked="{{includeArchived}}" bindchange="onIncludeArchived" />
 </view>
 
 <view class="empty" wx:if="{{!loading && !items.length}}">当前范围暂无知识文档</view>
@@ -42,13 +42,13 @@
 <view class="card" wx:if="{{selected}}">
   <view class="section-title">版本与导入历史 · #{{selected.id}}</view>
   <view wx:for="{{selected.versions}}" wx:key="version">
-    v{{item.version}} · {{item.statusText}} · {{item.created_at}}
+    v{{item.version}} · {{item.statusText}} · {{item.createdAtLabel}}
   </view>
   <view class="history-heading">导入任务</view>
   <view wx:for="{{selected.ingestion_jobs}}" wx:key="version">
     v{{item.version}} · {{item.statusText}} · 已处理 {{item.attempt}} 次<text wx:if="{{item.error_code}}"> · 导入失败，请重试</text>
   </view>
-  <textarea class="source-box" placeholder="新版本知识正文" value="{{versionSourceText}}" data-field="versionSourceText" bindinput="onField" />
+  <textarea disabled="{{loading}}" class="source-box" placeholder="新版本知识正文" value="{{versionSourceText}}" data-field="versionSourceText" bindinput="onField" />
   <button class="btn" bindtap="createVersion">{{selected.status === 'ARCHIVED' ? '提交新版本并重新激活' : '提交新版本导入'}}</button>
   <button class="btn danger" wx:if="{{selected.status != 'ARCHIVED'}}" bindtap="archive">归档文档</button>
 </view>

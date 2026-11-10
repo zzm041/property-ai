@@ -1,6 +1,9 @@
 <picker range="{{properties}}" range-key="name" value="{{propertyIndex}}" bindchange="onPropertyChange">
   <view class="picker">{{properties[propertyIndex].name || '请选择小区'}}</view>
 </picker>
+<picker wx:if="{{canReadInternal}}" range="{{audienceOptions}}" value="{{audienceIndex}}" bindchange="onAudienceChange">
+  <view class="picker">{{audienceOptions[audienceIndex]}}</view>
+</picker>
 <button class="btn" bindtap="load">刷新公告</button>
 <view class="loading" wx:if="{{loading}}">加载中...</view>
 <view class="empty" wx:if="{{!loading && !items.length}}">暂无公告</view>
@@ -9,3 +12,4 @@
   <view>{{item.statusText}}</view>
 </view>
 <view class="error" wx:if="{{error}}">{{error}}</view>
+<button class="btn btn-secondary" wx:if="{{hasMore}}" disabled="{{loading}}" bindtap="loadMore">加载更多公告</button>

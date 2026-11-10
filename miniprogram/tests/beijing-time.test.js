@@ -1,0 +1,13 @@
+const assert = require('node:assert/strict');
+const { utcLabel, presentDetail } = require('../utils/work-order-display');
+assert.equal(utcLabel('2026-11-06T12:25:09.748121Z'), '2026-11-06 20:25');
+assert.equal(utcLabel('2026-12-31T20:05:59Z'), '2027-01-01 04:05');
+assert.equal(utcLabel('2026-11-06T20:25:09+08:00'), '2026-11-06 20:25');
+assert.equal(utcLabel('2026-11-06T12:25:09'), '2026-11-06 20:25');
+assert.equal(utcLabel(null), '未记录');
+assert.equal(utcLabel('invalid'), '时间不可用');
+const raw = '2026-11-06T12:25:09.748121Z';
+const item = { work_order: { created_at: raw }, display: { timestamp_labels: { [raw]: 'old seconds UTC' } } };
+assert.equal(presentDetail(item).createdAtLabel, '2026-11-06 20:25');
+assert.equal(item.work_order.created_at, raw);
+console.log('Beijing minute presentation passed');

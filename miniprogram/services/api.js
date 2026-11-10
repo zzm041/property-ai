@@ -2,6 +2,14 @@ const { BASE_URL } = require("../config/env");
 const auth = require("./auth");
 const { isUnauthorized, messageFromError } = require("../utils/error");
 
+function responseError(response, fallback) {
+  const payload = response.data || {};
+  const error = new Error(messageFromError(payload, fallback));
+  error.statusCode = response.statusCode;
+  error.code = (payload.error && payload.error.code) || "SYS.HTTP_ERROR";
+  return error;
+}
+
 const CREDENTIAL_AUTH_PATHS = {
   "/auth/wechat/login": true,
   "/auth/wechat/bind": true,
@@ -94,11 +102,11 @@ function request({ path, method, data, headers, retried, unauthorizedBusinessCod
         if (isUnauthorized(response.statusCode, payload)) {
           const errorCode = payload && payload.error && payload.error.code;
           if (Array.isArray(unauthorizedBusinessCodes) && unauthorizedBusinessCodes.includes(errorCode)) {
-            reject(new Error(messageFromError(payload, "认证失败")));
+            reject(responseError(response, "认证失败"));
             return;
           }
           if (CREDENTIAL_AUTH_PATHS[path]) {
-            reject(new Error(messageFromError(payload, "认证失败")));
+            reject(responseError(response, "认证失败"));
             return;
           }
           const latestToken = auth.getToken();
@@ -110,26 +118,26 @@ function request({ path, method, data, headers, retried, unauthorizedBusinessCod
           }
           if (!retried && auth.getRefreshToken()) {
             refreshSessionOnce()
-              .then(() =>
-                request({ path, method, data, headers, retried: true, unauthorizedBusinessCodes })
+              .then(
+                () => request({ path, method, data, headers, retried: true, unauthorizedBusinessCodes }),
+                () => {
+                  sendUnauthorizedToLogin();
+                  throw responseError(response, "请重新登录");
+                }
               )
-              .then(resolve)
-              .catch(() => {
-                sendUnauthorizedToLogin();
-                reject(new Error("请重新登录"));
-              });
+              .then(resolve, reject);
             return;
           }
           sendUnauthorizedToLogin();
-          reject(new Error("请重新登录"));
+          reject(responseError(response, "请重新登录"));
           return;
         }
         if (response.statusCode === 403) {
-          reject(new Error(messageFromError(payload, "无权限")));
+          reject(responseError(response, "无权限"));
           return;
         }
         if (response.statusCode >= 400) {
-          reject(new Error(messageFromError(payload, "请求失败")));
+          reject(responseError(response, "请求失败"));
           return;
         }
         resolve(payload.data);
@@ -191,25 +199,25 @@ function uploadFile({ fileId, filePath, retried }) {
   });
 }
 
-function downloadFile({ fileId, retried }) {
+function downloadFile({ fileId, retried, audience = "resident" }) {
   if (!BASE_URL) {
     return Promise.reject(new Error("当前服务未配置，请联系管理员"));
   }
   const token = auth.getToken();
   return new Promise((resolve, reject) => {
     wx.downloadFile({
-      url: `${BASE_URL}/files/${fileId}/content`,
+      url: `${BASE_URL}/files/${fileId}/content${audience === "property" ? "?audience=property" : ""}`,
       header: token ? { Authorization: `Bearer ${token}` } : {},
       success: (response) => {
         if (response.statusCode === 401) {
           const latestToken = auth.getToken();
           if (!retried && latestToken && latestToken !== token) {
-            downloadFile({ fileId, retried: true }).then(resolve).catch(reject);
+            downloadFile({ fileId, retried: true, audience }).then(resolve).catch(reject);
             return;
           }
           if (!retried && auth.getRefreshToken()) {
             refreshSessionOnce()
-              .then(() => downloadFile({ fileId, retried: true }))
+              .then(() => downloadFile({ fileId, retried: true, audience }))
               .then(resolve)
               .catch(() => {
                 sendUnauthorizedToLogin();
@@ -360,7 +368,7 @@ module.exports = {
     request({
       path: `/work-orders?limit=${limit}${afterId ? `&after_id=${afterId}` : ""}`,
     }),
-  workOrder: (id) => request({ path: `/work-orders/${id}` }),
+  workOrder: (id, audience = "resident") => request({ path: `/work-orders/${id}${audience === "property" ? "?audience=property" : ""}` }),
   appendWorkOrder: (id, body) =>
     request({ path: `/work-orders/${id}/append`, method: "POST", data: body }),
   cancelWorkOrder: (id, body) =>
@@ -371,18 +379,30 @@ module.exports = {
     request({ path: `/work-orders/${id}/reopen`, method: "POST", data: body }),
   rateWorkOrder: (id, body) =>
     request({ path: `/work-orders/${id}/rate`, method: "POST", data: body }),
-  announcements: (propertyId, afterId, limit = 50) =>
+  supervisorAgentCapabilities: propertyId => request({
+    path: `/supervisor/work-order-agent/capabilities?property_id=${Number(propertyId)}`,
+    headers: { 'X-Property-Id': String(propertyId) },
+  }),
+  supervisorAgent: (propertyId, question) => request({
+    path: '/supervisor/work-order-agent', method: 'POST',
+    data: { property_id: Number(propertyId), question },
+    headers: { 'X-Property-Id': String(propertyId) },
+  }),
+  workOrderDiagnosis: (id, propertyId, version) => request({
+    path: `/supervisor/work-orders/${id}/diagnosis?property_id=${propertyId}&version=${version}`,
+  }),
+  announcements: (propertyId, afterId, limit = 50, audience = "resident") =>
     request({
       path: `/announcements?property_id=${propertyId}&limit=${limit}${
         afterId ? `&after_id=${afterId}` : ""
-      }`,
+      }&audience=${audience === "property" ? "property" : "resident"}`,
     }),
-  announcement: (propertyId, id) =>
+  announcement: (propertyId, id, audience = "resident") =>
     request({
       path: `/announcements?property_id=${propertyId}&after_id=${Math.max(
         Number(id) - 1,
         0
-      )}&limit=1`,
+      )}&limit=1&audience=${audience === "property" ? "property" : "resident"}`,
     }).then((payload) => {
       const item = ((payload && payload.items) || []).find(
         (row) => Number(row.id) === Number(id)
@@ -422,6 +442,8 @@ module.exports = {
     }),
   readNotification: (id) =>
     request({ path: `/notifications/${id}/read`, method: "POST", data: {} }),
+  attendanceToday: (propertyId) =>
+    request({ path: `/staff/attendance/today?property_id=${propertyId}` }),
   checkIn: (propertyId) =>
     request({
       path: "/staff/attendance/checkin",
@@ -544,6 +566,9 @@ module.exports = {
     request({
       path: `/admin/employee-catalog?property_id=${propertyId}&tenant_id=${tenantId}`,
     }),
+  employeeWorkHistory: (id, propertyId, tenantId, beforeId) =>
+    request({ path: `/admin/employees/${id}/work-history?property_id=${propertyId}&tenant_id=${tenantId}&limit=20&before_id=${beforeId || 0}`,
+      headers: { "X-Property-Id": String(propertyId) } }),
   createEmployee: (body) =>
     request({ path: "/admin/employees", method: "POST", data: body }),
   updateEmployee: (id, body) =>

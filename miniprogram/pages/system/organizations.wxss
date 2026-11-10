@@ -1,12 +1,12 @@
 .section-title {
-  font-size: 32rpx;
+  font-size: 36rpx;
   font-weight: 600;
   margin-bottom: 20rpx;
 }
 
 .hint {
   color: #667085;
-  font-size: 24rpx;
+  font-size: 30rpx;
   margin-bottom: 16rpx;
 }
 

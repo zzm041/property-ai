@@ -1,5 +1,6 @@
+const { formatBeijingTime } = require("../../utils/date-time");
 const api = require("../../services/api");
-const { withLoading } = require("../../utils/ui");
+const { withLoading, withMutation, capturePage, isPageCurrent, resetPage } = require("../../utils/page-context");
 
 const CATEGORY_OPTIONS = [
   { value: "PLUMBING", label: "给排水" },
@@ -104,6 +105,7 @@ Page({
     escalationMinutes: "",
     changeReason: "",
     versioningAvailable: false,
+    policiesReady: false,
     expectedUpdatedAt: "",
     editingId: "",
     items: [],
@@ -118,12 +120,18 @@ Page({
   },
 
   onShow() {
-    this.bootstrap();
+    if (this._pendingMutation) { this._hidden = false; this.setData({ loading: true }); return Promise.resolve(); }
+    resetPage(this, false, { policiesReady: false, canTenant: false, effective: [], editingId: "", expectedUpdatedAt: "", acceptMinutes: "", respondMinutes: "", completeMinutes: "", warningLeadMinutes: "", escalationMinutes: "", changeReason: "", versioningAvailable: false });
+    return this.bootstrap();
   },
+  onHide() { resetPage(this, true, { policiesReady: false, canTenant: false, effective: [], editingId: "", expectedUpdatedAt: "", acceptMinutes: "", respondMinutes: "", completeMinutes: "", warningLeadMinutes: "", escalationMinutes: "", changeReason: "", versioningAvailable: false }); },
+  onUnload() { this.onHide(); },
 
   bootstrap() {
+    const generation = capturePage(this);
     return withLoading(this, () =>
       Promise.all([api.me(), loadAllProperties()]).then(([me, allProperties]) => {
+        if (!isPageCurrent(this, generation)) return;
         const scopes = me.scopes || [];
         const properties = allProperties.filter((property) =>
           scopes.some((scope) => scopeAllows(scope, property))
@@ -163,20 +171,25 @@ Page({
       visibleStatusOptions: STATUS_OPTIONS,
       items: [],
       effective: [],
+      policiesReady: false, versioningAvailable: false, editingId: "", expectedUpdatedAt: "",
+      acceptMinutes: "", respondMinutes: "", completeMinutes: "", warningLeadMinutes: "", escalationMinutes: "", changeReason: "",
       notice: "",
     });
   },
 
   onPropertyChange(event) {
+    if (this._hidden || this.data.loading) return;
     const propertyIndex = Number(event.detail.value);
     if (!this.data.properties[propertyIndex]) {
       return;
     }
+    this.requestedPropertyId = String(this.data.properties[propertyIndex].id);
     this.applyProperty(this.data.properties, propertyIndex);
     this.load();
   },
 
   onScopeChange(event) {
+    if (this._hidden || this.data.loading) return;
     const scopeIndex = Number(event.detail.value);
     const scope = optionValue(this.data.scopeOptions, scopeIndex);
     this.setData(
@@ -191,46 +204,63 @@ Page({
   },
 
   onCategoryChange(event) {
+    if (this._hidden || this.data.loading) return;
     this.setData({ categoryIndex: Number(event.detail.value), notice: "" });
     this.syncEditor();
   },
 
   onPriorityChange(event) {
+    if (this._hidden || this.data.loading) return;
     this.setData({ priorityIndex: Number(event.detail.value), notice: "" });
     this.syncEditor();
   },
 
   onStatusChange(event) {
+    if (this._hidden || this.data.loading) return;
     this.setData({ statusIndex: Number(event.detail.value), notice: "" });
   },
 
   onField(event) {
+    if (this._hidden || this.data.loading) return;
     this.setData({ [event.currentTarget.dataset.field]: event.detail.value });
   },
 
   fetchPolicies() {
+    const generation = capturePage(this);
+    this.setData({ policiesReady: false, versioningAvailable: false, items: [], effective: [],
+      editingId: "", expectedUpdatedAt: "", acceptMinutes: "", respondMinutes: "", completeMinutes: "",
+      warningLeadMinutes: "", escalationMinutes: "", changeReason: "" });
     return api.slaPolicies(this.data.propertyId, this.data.tenantId).then((payload) => {
+        if (!isPageCurrent(this, generation)) return;
       const items = (payload.items || []).map((item) => ({
         ...item,
+        updatedAtLabel: formatBeijingTime(item.updated_at),
         scopeText: item.property_id ? "当前小区覆盖" : "企业默认",
         categoryText: optionLabel(CATEGORY_OPTIONS, item.category, "其他"),
         priorityText: optionLabel(PRIORITY_OPTIONS, item.priority, "待确认"),
         statusText: optionLabel(STATUS_OPTIONS, item.status, "待确认"),
       }));
-      const effective = (payload.effective || []).map((item) => ({
+      const effective = (payload.effective || []).map((item) => {
+        const version = items.find((row) => row.id === item.policy_id);
+        if (item.policy_id != null && !version) throw new Error("生效策略版本未完整返回，请刷新后再编辑");
+        return {
         ...item,
+        accept_minutes: version && version.accept_minutes != null ? version.accept_minutes : item.respond_minutes,
+        warning_lead_minutes: version && version.warning_lead_minutes != null ? version.warning_lead_minutes
+          : Math.min(item.complete_minutes, Math.max(Math.floor(item.complete_minutes / 4), 15)),
+        escalation_minutes: version && version.escalation_minutes != null ? version.escalation_minutes : 0,
         key: `${item.category}-${item.priority}`,
         sourceText: sourceLabel(item.source),
         categoryText: optionLabel(CATEGORY_OPTIONS, item.category, "其他"),
         priorityText: optionLabel(PRIORITY_OPTIONS, item.priority, "待确认"),
-      }));
-      this.setData({ items, effective, versioningAvailable: !!payload.versioning_available, error: "" });
+      }; });
+      this.setData({ items, effective, policiesReady: true, versioningAvailable: !!payload.versioning_available, error: "" });
       this.syncEditor();
     });
   },
 
   load() {
-    if (!this.data.propertyId) {
+    if (this._hidden || !this.data.propertyId || this.data.loading) {
       return Promise.resolve();
     }
     return withLoading(this, () => this.fetchPolicies()).catch(() => {});
@@ -263,15 +293,21 @@ Page({
       expectedUpdatedAt: exact ? exact.updated_at : "",
       respondMinutes: source ? String(source.respond_minutes) : "",
       completeMinutes: source ? String(source.complete_minutes) : "",
-      acceptMinutes: exact && exact.accept_minutes != null ? String(exact.accept_minutes) : source ? String(source.respond_minutes) : "",
-      warningLeadMinutes: exact && exact.warning_lead_minutes != null ? String(exact.warning_lead_minutes) : "15",
-      escalationMinutes: exact && exact.escalation_minutes != null ? String(exact.escalation_minutes) : "0",
+      acceptMinutes: source ? String(source.accept_minutes != null ? source.accept_minutes : source.respond_minutes) : "",
+      warningLeadMinutes: source ? String(source.warning_lead_minutes != null ? source.warning_lead_minutes
+        : Math.min(source.complete_minutes, Math.max(Math.floor(source.complete_minutes / 4), 15))) : "",
+      escalationMinutes: source ? String(source.escalation_minutes != null ? source.escalation_minutes : 0) : "",
       changeReason: "",
       statusIndex,
     });
   },
 
   save() {
+    const generation = capturePage(this);
+    if (this._hidden || !this.data.policiesReady) {
+      this.setData({ error: "请先成功读取当前小区的策略，再保存修改" });
+      return;
+    }
     if (this.data.loading) {
       return;
     }
@@ -323,8 +359,9 @@ Page({
       status: optionValue(this.data.visibleStatusOptions, this.data.statusIndex),
       expected_updated_at: this.data.expectedUpdatedAt || null,
     };
-    withLoading(this, () =>
+    withMutation(this, () =>
       api.putSlaPolicy(body).then((saved) => {
+        if (!isPageCurrent(this, generation)) return;
         this.setData({
           notice: `策略 #${saved.id} 已保存；刷新后以服务端结果为准`,
         });

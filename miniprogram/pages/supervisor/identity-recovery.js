@@ -1,3 +1,4 @@
+const { formatBeijingTime } = require("../../utils/date-time");
 const api = require("../../services/api");
 const { withLoading } = require("../../utils/ui");
 
@@ -9,6 +10,7 @@ Page({
       const labels = require("../../utils/business-labels");
       const items = (payload.items || []).map((item) => ({
         ...item,
+        quarantineEndsAtLabel: formatBeijingTime(item.quarantine_ends_at),
         purposeText: labels.identityPurpose(item.purpose),
         statusText: labels.identityStatus(item.status),
       }));

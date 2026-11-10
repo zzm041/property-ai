@@ -1,5 +1,5 @@
 const api = require("../../services/api");
-const { withLoading } = require("../../utils/ui");
+const { withLoading, withMutation, capturePage, isPageCurrent, resetPage } = require("../../utils/page-context");
 
 const STATUS_OPTIONS = [
   { value: "", label: "全部状态" },
@@ -58,19 +58,7 @@ function loadAllProperties(afterId, collected) {
   });
 }
 
-function formatDate(value) {
-  if (!value) {
-    return "-";
-  }
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return String(value);
-  }
-  const pad = (part) => String(part).padStart(2, "0");
-  return `${parsed.getFullYear()}-${pad(parsed.getMonth() + 1)}-${pad(
-    parsed.getDate()
-  )} ${pad(parsed.getHours())}:${pad(parsed.getMinutes())}`;
-}
+const formatDate = require("../../utils/date-time").formatBeijingTime;
 
 function decorate(item) {
   return {
@@ -117,16 +105,18 @@ Page({
   },
 
   onShow() {
-    if (this.initialized) {
-      this.refresh();
-      return;
-    }
-    this.bootstrap();
+    if (this._pendingMutation) { this._hidden = false; this.setData({ loading: true }); return Promise.resolve(); }
+    resetPage(this, false, { canManage: false, canDraftAnnouncement: false, lastDraftId: "", dispositionReason: "", hasMore: false, nextCursor: "" });
+    return this.bootstrap();
   },
+  onHide() { resetPage(this, true, { canManage: false, canDraftAnnouncement: false, lastDraftId: "", dispositionReason: "", hasMore: false, nextCursor: "" }); },
+  onUnload() { this.onHide(); },
 
   bootstrap() {
-    withLoading(this, () =>
+    const generation = capturePage(this);
+    return withLoading(this, () =>
       Promise.all([api.me(), loadAllProperties()]).then(([me, allProperties]) => {
+        if (!isPageCurrent(this, generation)) return;
         const scopes = me.scopes || [];
         const properties = allProperties
           .filter((property) =>
@@ -161,6 +151,7 @@ Page({
           canDraftAnnouncement: current.canDraftAnnouncement,
         });
         return this.fetchIncidents(false).then(() => {
+        if (!isPageCurrent(this, generation)) return;
           if (this.requestedIncidentId) {
             const incidentId = Number(this.requestedIncidentId);
             this.requestedIncidentId = "";
@@ -173,6 +164,7 @@ Page({
   },
 
   onPropertyChange(event) {
+    if (this._hidden || this.data.loading) return;
     const propertyIndex = Number(event.detail.value);
     const current = this.data.properties[propertyIndex];
     if (!current) {
@@ -187,6 +179,8 @@ Page({
       canDraftAnnouncement: current.canDraftAnnouncement,
       selected: null,
       selectedId: "",
+      items: [],
+      dispositionReason: "",
       statusIndex: 0,
       nextCursor: "",
       hasMore: false,
@@ -197,6 +191,7 @@ Page({
   },
 
   onStatusChange(event) {
+    if (this._hidden || this.data.loading) return;
     this.setData({
       statusIndex: Number(event.detail.value),
       selected: null,
@@ -209,6 +204,7 @@ Page({
   },
 
   fetchIncidents(append) {
+    const generation = capturePage(this);
     const afterId = append ? this.data.nextCursor : "";
     const selectedStatus = STATUS_OPTIONS[this.data.statusIndex];
     return api
@@ -219,6 +215,7 @@ Page({
         selectedStatus ? selectedStatus.value : ""
       )
       .then((response) => {
+        if (!isPageCurrent(this, generation)) return;
         const incoming = ((response && response.items) || []).map(decorate);
         const nextCursor = (response && response.next_cursor) || "";
         if (
@@ -259,18 +256,23 @@ Page({
   },
 
   selectIncident(event) {
+    if (this._hidden || this.data.loading) return;
     withLoading(this, () =>
       this.loadSelected(Number(event.currentTarget.dataset.id), false)
     ).catch(() => {});
   },
 
   loadSelected(id, updateLoading) {
+    const generation = capturePage(this);
     const operation = () =>
       api.incident(id).then((incident) => {
+        if (!isPageCurrent(this, generation)) return;
+        if (Number(incident.property_id) !== Number(this.data.propertyId) || Number(incident.tenant_id) !== Number(this.data.tenantId)) throw new Error("事件与当前小区不一致，请刷新");
         const selected = decorate(incident);
         this.setData({
           selected,
           selectedId: String(selected.id),
+          dispositionReason: "",
           items: replaceItem(this.data.items, selected),
           error: "",
         });
@@ -279,12 +281,15 @@ Page({
   },
 
   summarize() {
+    const generation = capturePage(this);
     if (!this.data.canManage || !this.data.selected || this.data.loading) {
       return;
     }
     const incidentId = this.data.selected.id;
-    withLoading(this, () =>
+    withMutation(this, () =>
       api.summarizeIncident(incidentId).then((incident) => {
+        if (!isPageCurrent(this, generation)) return;
+        if (Number(incident.property_id) !== Number(this.data.propertyId) || Number(incident.tenant_id) !== Number(this.data.tenantId)) throw new Error("事件与当前小区不一致，请刷新");
         const selected = decorate(incident);
         this.setData({
           selected,
@@ -296,10 +301,12 @@ Page({
   },
 
   onDispositionReasonInput(event) {
+    if (this._hidden || this.data.loading) return;
     this.setData({ dispositionReason: event.detail.value || "" });
   },
 
   updateIncidentStatus(event) {
+    const generation = capturePage(this);
     if (!this.data.canManage || !this.data.selected || this.data.loading) {
       return;
     }
@@ -310,7 +317,7 @@ Page({
       return;
     }
     const selected = this.data.selected;
-    withLoading(this, () =>
+    withMutation(this, () =>
       api
         .updateIncidentStatus(selected.id, {
           status,
@@ -318,6 +325,7 @@ Page({
           expected_updated_at: selected.updated_at,
         })
         .then((incident) => {
+        if (!isPageCurrent(this, generation)) return;
           const updated = decorate(incident);
           this.setData({
             selected: updated,
@@ -331,6 +339,7 @@ Page({
   },
 
   createAnnouncementDraft() {
+    const generation = capturePage(this);
     if (
       !this.data.canDraftAnnouncement ||
       !this.data.selected ||
@@ -338,7 +347,7 @@ Page({
     ) {
       return;
     }
-    withLoading(this, () =>
+    withMutation(this, () =>
       api
         .createAnnouncement({
           tenant_id: Number(this.data.tenantId),
@@ -349,6 +358,7 @@ Page({
           audience: "RESIDENT",
         })
         .then((announcement) => {
+        if (!isPageCurrent(this, generation)) return;
           this.setData({
             lastDraftId: String(announcement.id),
             notice: "公告草稿已建立，仍须人工编辑、审核后发布。",
@@ -358,6 +368,7 @@ Page({
   },
 
   openAnnouncements() {
+    if (this._hidden || this.data.loading) return;
     wx.navigateTo({
       url: `/pages/supervisor/announcements?propertyId=${this.data.propertyId}&tenantId=${this.data.tenantId}`,
     });

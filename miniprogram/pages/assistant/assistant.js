@@ -1,5 +1,4 @@
 const api = require("../../services/api");
-const { withLoading } = require("../../utils/ui");
 
 function scopeAllows(scope, permission, property) {
   if ((scope.permissions || []).indexOf(permission) < 0) {
@@ -45,6 +44,10 @@ Page({
     citations: [],
     error: "",
     loading: false,
+    audience: "resident",
+    audienceIndex: 0,
+    audienceOptions: ["住户知识", "物业内部知识"],
+    canReadInternal: false,
   },
 
   onLoad(query) {
@@ -52,13 +55,38 @@ Page({
   },
 
   onShow() {
-    this.bootstrap();
+    return this.bootstrap();
+  },
+
+  onHide() {
+    this.clearAnswer();
+  },
+
+  onUnload() {
+    this.clearAnswer();
+  },
+
+  clearAnswer() {
+    this.queryVersion = (this.queryVersion || 0) + 1;
+    this.setData({ answer: "", answerStatus: "", citations: [], error: "", loading: false });
+    return this.queryVersion;
+  },
+
+  internalScopeAllows(property) {
+    return (this.knowledgeScopes || []).some((scope) =>
+      ["STAFF", "SUPERVISOR", "PROPERTY_ADMIN", "TENANT_ADMIN", "SYSTEM_ADMIN"].includes(scope.role_code) &&
+      scopeAllows(scope, "knowledge:read", property)
+    );
   },
 
   bootstrap() {
-    return withLoading(this, () =>
-      Promise.all([api.me(), loadAllProperties()]).then(([me, allProperties]) => {
+    const version = this.clearAnswer();
+    this.knowledgeScopes = [];
+    this.setData({ properties: [], propertyId: "", audience: "resident", audienceIndex: 0, canReadInternal: false, loading: true });
+    return Promise.all([api.me(), loadAllProperties()]).then(([me, allProperties]) => {
+        if (version !== this.queryVersion) return;
         const scopes = me.scopes || [];
+        this.knowledgeScopes = scopes;
         const properties = allProperties.filter((property) =>
           scopes.some((scope) => scopeAllows(scope, "knowledge:read", property))
         );
@@ -75,10 +103,16 @@ Page({
           properties,
           propertyIndex,
           propertyId: String(properties[propertyIndex].id),
+          canReadInternal: this.internalScopeAllows(properties[propertyIndex]),
           error: "",
         });
       })
-    ).catch(() => {});
+      .catch((error) => {
+        if (version === this.queryVersion) this.setData({ error: error.message || "加载失败" });
+      })
+      .finally(() => {
+        if (version === this.queryVersion) this.setData({ loading: false });
+      });
   },
 
   onPropertyChange(event) {
@@ -87,13 +121,21 @@ Page({
     if (!property) {
       return;
     }
+    this.clearAnswer();
     this.setData({
       propertyIndex,
       propertyId: String(property.id),
-      answer: "",
-      answerStatus: "",
-      citations: [],
+      audience: "resident",
+      audienceIndex: 0,
+      canReadInternal: this.internalScopeAllows(property),
     });
+  },
+
+  onAudienceChange(event) {
+    const audienceIndex = Number(event.detail.value);
+    if (audienceIndex !== 0 && audienceIndex !== 1) return;
+    this.clearAnswer();
+    this.setData({ audienceIndex, audience: audienceIndex === 1 ? "property" : "resident" });
   },
 
   onQuestion(event) {
@@ -101,25 +143,32 @@ Page({
   },
 
   ask() {
+    const version = this.clearAnswer();
     const question = String(this.data.question || "").trim();
     if (!question || !this.data.propertyId) {
       this.setData({ error: "请选择小区并填写问题" });
       return;
     }
-    withLoading(this, () =>
-      api
-        .queryAssistant({
-          question,
-          property_id: Number(this.data.propertyId),
+    this.setData({ loading: true });
+    const body = { question, property_id: Number(this.data.propertyId), audience: this.data.audience };
+    return Promise.resolve().then(() => {
+          if (version !== this.queryVersion) return;
+          return api.queryAssistant(body);
         })
-        .then((data) =>
+        .then((data) => {
+          if (version !== this.queryVersion) return;
           this.setData({
             answer: data.answer || "当前知识库未能生成答案",
             answerStatus: data.status || "",
             citations: data.citations || [],
-          })
-        )
-    ).catch(() => {});
+          });
+        })
+        .catch((error) => {
+          if (version === this.queryVersion) this.setData({ error: error.message || "请求失败" });
+        })
+        .finally(() => {
+          if (version === this.queryVersion) this.setData({ loading: false });
+        });
   },
 });
 

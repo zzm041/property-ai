@@ -5,12 +5,58 @@
 <button class="btn btn-secondary" data-view="unstarted" bindtap="changeView" disabled="{{loading}}">未开工工单</button>
 <view>{{queueView == 'unstarted' ? '未开工工单，可按权限撤销' : '待派与异常处理队列'}}</view>
 <button class="btn" bindtap="load">刷新队列</button>
+<view class="card" wx:if="{{agentAvailable && queueView == 'dispatch'}}">
+  <button class="btn btn-secondary" bindtap="reviewQueue" disabled="{{loading || agentLoading}}">生成跟进建议</button>
+  <view class="loading" wx:if="{{agentLoading}}">正在核对队列与处理依据...</view>
+  <view class="error" wx:if="{{agentError}}">{{agentError}}</view>
+  <block wx:if="{{agentResult}}">
+    <view class="empty">本次只检查队列前 5 条中的最多 3 张工单。建议供人工核实，不会自动派单或改变工单。</view>
+    <view class="empty" wx:if="{{agentResult.execution_mode != 'real_model'}}">演练结果，未调用真实模型。</view>
+    <view class="empty" wx:if="{{!agentResult.items.length}}">本次查询范围内暂无工单。</view>
+    <view wx:for="{{agentResult.items}}" wx:key="work_order_id" wx:for-item="suggestion">
+      <view class="section-title">工单 {{suggestion.work_order_id}}</view>
+      <view wx:for="{{suggestion.facts}}" wx:key="code" wx:for-item="fact">{{fact.text}}</view>
+      <view wx:for="{{suggestion.suggested_actions}}" wx:key="*this" wx:for-item="action">{{action}}</view>
+    </view>
+  </block>
+</view>
 <button class="btn" wx:if="{{nextCursor}}" bindtap="loadMore">加载更多</button>
 <view class="loading" wx:if="{{loading}}">加载中...</view>
 <view class="empty" wx:if="{{!loading && !items.length}}">当前队列暂无工单</view>
 <view class="card" wx:for="{{items}}" wx:key="id" data-id="{{item.id}}" bindtap="select">
   <view class="section-title">工单 {{item.id}} {{selectedId == item.id ? "· 已选" : ""}}</view>
   <view>{{item.statusLabel}}<text wx:if="{{item.process_reason != 'NONE'}}"> · {{item.reasonLabel}}</text></view>
+</view>
+<view class="card" wx:if="{{selectedId}}">
+  <button class="btn btn-secondary" bindtap="loadInternalHistory" disabled="{{internalHistoryLoading || loading}}">查看报修内容与内部记录</button>
+  <view class="empty">联系或安排前，请核对报修中的时段、联系顺序和上门限制。</view>
+  <view wx:if="{{internalHistoryLoading}}">正在读取处理记录...</view>
+  <view class="error" wx:if="{{internalHistoryError}}">{{internalHistoryError}}</view>
+  <block wx:if="{{internalHistory}}">
+    <view class="section-title">原始报修内容</view>
+    <view wx:if="{{internalHistory.reportText}}"><text selectable="true">报修文字：{{internalHistory.reportText}}</text></view>
+    <view wx:if="{{internalHistory.asrText}}"><text selectable="true">语音转写：{{internalHistory.asrText}}</text></view>
+    <view class="empty" wx:if="{{!internalHistory.reportText && !internalHistory.asrText}}">暂无报修文字或语音转写，请核实报修情况。</view>
+    <view class="section-title">物业内部处理记录</view>
+    <view class="empty">用于接续联系和处理安排；实际参与人员以处理记录为准。</view>
+    <view wx:if="{{internalHistory.notes}}">累计补充与处理说明：{{internalHistory.notes}}</view>
+    <view wx:for="{{internalHistory.logs}}" wx:key="id">
+      <view>{{item.eventLabel}} · {{item.actorLabel}} · {{item.createdAtLabel}}</view>
+      <view wx:if="{{item.reason}}">{{item.reason}}</view>
+    </view>
+  </block>
+  <button class="btn btn-secondary" bindtap="diagnose" disabled="{{diagnosisLoading || loading}}">查看处理诊断</button>
+  <view wx:if="{{diagnosisLoading}}">正在核对处理记录...</view>
+  <view class="error" wx:if="{{diagnosisError}}">{{diagnosisError}}</view>
+  <block wx:if="{{diagnosis}}">
+    <view class="section-title">当前记录与下一步</view>
+    <view wx:for="{{diagnosis.facts}}" wx:key="code">
+      <view>{{item.text}}</view>
+      <view class="empty" wx:if="{{item.recorded_at}}">记录时间：{{item.recordedAtLabel}}</view>
+    </view>
+    <view class="section-title">建议核实</view>
+    <view wx:for="{{diagnosis.suggested_actions}}" wx:key="*this">{{item}}</view>
+  </block>
 </view>
 <work-order-contact id="order-contact" wx:if="{{selectedId}}" work-order-id="{{selectedId}}" />
 <view class="card" wx:if="{{selectedId && canCancel}}">

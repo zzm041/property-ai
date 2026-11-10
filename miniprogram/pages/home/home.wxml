@@ -10,7 +10,7 @@
 <view class="card" wx:if="{{canResident}}">
   <button id="create-work-order" class="btn" data-url="/pages/work-orders/create" bindtap="go">报修</button>
   <button class="btn" data-url="/pages/work-orders/list" bindtap="go">我的工单</button>
-  <button class="btn" data-url="/pages/announcements/list" bindtap="go">公告</button>
+  <button class="btn" data-url="/pages/announcements/list" bindtap="go">住户公告</button>
 </view>
 <view class="card" wx:if="{{canReadKnowledge}}">
   <button class="btn" data-url="/pages/assistant/assistant" bindtap="go">知识助手</button>
@@ -18,6 +18,9 @@
 <view class="card" wx:if="{{canStaff}}">
   <button class="btn" data-url="/pages/attendance/attendance" bindtap="go">今日考勤</button>
   <button class="btn" data-url="/pages/staff-orders/list" bindtap="go">我的任务</button>
+</view>
+<view class="card" wx:if="{{canStaff || canManage}}">
+  <button id="property-announcements" class="btn" data-url="/pages/announcements/list?audience=property" bindtap="go">物业公告</button>
 </view>
 <view class="card" wx:if="{{canManage}}">
   <button class="btn" data-url="/pages/supervisor/queue" bindtap="go">待派工单</button>

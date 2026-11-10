@@ -1,5 +1,4 @@
 <view class="card" id="notification-unread-count">未读 {{unread}}</view>
-<view class="empty">通知时间统一以 UTC 显示</view>
 <view class="loading" wx:if="{{loading}}">加载中...</view>
 <view class="empty" wx:if="{{!loading && !items.length}}">暂无通知</view>
 <view class="card notification-item" wx:for="{{items}}" wx:key="id" id="notification-{{item.id}}" data-id="{{item.id}}" bindtap="open">

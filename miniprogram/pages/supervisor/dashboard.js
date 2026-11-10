@@ -264,7 +264,7 @@ Page({
           throw new Error("统计响应范围与当前选择不一致，请刷新重试");
         }
         this.setData({
-          overview,
+          overview: { ...overview, generatedAtLabel: require("../../utils/date-time").formatBeijingTime(overview.generated_at) },
           workOrderStatuses: labelled(overview.work_orders.by_status),
           workOrderCategories: labelled(overview.work_orders.by_category),
           workOrderPriorities: labelled(overview.work_orders.by_priority),

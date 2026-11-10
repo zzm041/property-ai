@@ -18,6 +18,7 @@
     "pages/attendance/attendance",
     "pages/staff-orders/list",
     "pages/staff-orders/detail",
+    "pages/staff-orders/escalate",
     "pages/supervisor/queue",
     "pages/supervisor/incidents",
     "pages/supervisor/announcements",

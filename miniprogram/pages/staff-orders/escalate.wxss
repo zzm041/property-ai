@@ -1,0 +1,35 @@
+page {
+  font-size: 34rpx;
+  line-height: 1.6;
+}
+
+.section-title {
+  font-size: 36rpx;
+}
+
+.field-label {
+  font-size: 32rpx;
+}
+
+.hint,
+.loading,
+.error {
+  font-size: 30rpx;
+  line-height: 1.6;
+}
+
+.field,
+textarea.field,
+.reason-placeholder {
+  font-size: 34rpx;
+  line-height: 1.6;
+}
+
+textarea.field {
+  height: 320rpx;
+  min-height: 240rpx;
+}
+
+button.btn {
+  font-size: 32rpx;
+}

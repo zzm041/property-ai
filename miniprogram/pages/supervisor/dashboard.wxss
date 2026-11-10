@@ -1,6 +1,6 @@
 .section-title,
 .section-heading {
-  font-size: 32rpx;
+  font-size: 36rpx;
   font-weight: 600;
   margin-bottom: 16rpx;
 }
@@ -12,7 +12,7 @@
 .hint,
 .snapshot {
   color: #667085;
-  font-size: 24rpx;
+  font-size: 30rpx;
   margin-top: 12rpx;
 }
 
@@ -54,7 +54,7 @@
   background: #eef4ff;
   border-radius: 999rpx;
   color: #1849a9;
-  font-size: 24rpx;
+  font-size: 30rpx;
   margin: 6rpx 10rpx 6rpx 0;
   padding: 8rpx 14rpx;
 }

@@ -1,5 +1,6 @@
 // Presentation only. Raw codes/IDs/UTC values still drive existing business actions.
 const businessLabels = require("./business-labels");
+const { formatBeijingTime } = require("./date-time");
 const EVENT = {
   AI_TASK_ATTEMPT: "系统自动分析/恢复尝试",
   AI_TASK_FAILED: "自动处理暂时失败，请等待物业处理",
@@ -23,15 +24,12 @@ function label(values, code, fallback) {
 }
 function statusLabel(code) { return businessLabels.workOrderStatus(code); }
 function utcLabel(value) {
-  if (!value) return "未记录";
-  const date = new Date(value);
-  return Number.isFinite(date.getTime()) ? date.toISOString().slice(0, 19).replace("T", " ") + " UTC" : "时间不可用";
+  return formatBeijingTime(value);
 }
 function presentDetail(item) {
   const display = item.display || {};
   const names = display.assignee_names || {};
-  const times = display.timestamp_labels || {};
-  const at = value => Object.prototype.hasOwnProperty.call(times, value) ? times[value] : utcLabel(value);
+  const at = formatBeijingTime;
   const employee = id => {
     if (id == null) return "未记录处理人员";
     const name = Object.prototype.hasOwnProperty.call(names, id) ? names[id] : "";
@@ -61,4 +59,18 @@ function presentDetail(item) {
     })),
   };
 }
-module.exports = { statusLabel, utcLabel, presentDetail };
+function presentStaffHistory(item, currentUserId) {
+  const diagnosticCodes = new Set(["AUTO_DISPATCH_WAIT", "AI_TASK_ATTEMPT"]);
+  const businessLogs = [], systemLogs = [], groups = new Map();
+  for (const row of presentDetail(item).logs.sort((a, b) => b.id - a.id)) {
+    const log = { ...row, actorLabel: row.actor_user_id != null && row.actor_user_id === currentUserId
+      ? "本人" : row.actor_type === "STAFF" ? "其他工作人员" : row.actorLabel };
+    if (!diagnosticCodes.has(row.event_code)) { businessLogs.push(log); continue; }
+    systemLogs.push(log);
+    const group = groups.get(row.event_code) || { eventCode: row.event_code, label: row.eventLabel, count: 0, latestAtLabel: row.createdAtLabel };
+    group.count += 1;
+    groups.set(row.event_code, group);
+  }
+  return { businessLogs, systemLogs, systemGroups: [...groups.values()] };
+}
+module.exports = { statusLabel, utcLabel, presentDetail, presentStaffHistory };

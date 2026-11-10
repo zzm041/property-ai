@@ -31,7 +31,7 @@
       <checkbox value="{{item.id}}" />{{item.name}}
     </label>
   </checkbox-group>
-  <button class="btn" bindtap="createEmployee">创建并建立当前小区任职</button>
+  <button class="btn" bindtap="createEmployee" disabled="{{actionBusy}}">创建并建立当前小区任职</button>
 </view>
 
 <view class="card" wx:if="{{canEdit}}">
@@ -40,12 +40,12 @@
     <input class="grow input-box" placeholder="职责编码" value="{{dutyCode}}" data-field="dutyCode" bindinput="onTextInput" />
     <input class="grow input-box" placeholder="职责名称" value="{{dutyName}}" data-field="dutyName" bindinput="onTextInput" />
   </view>
-  <button class="btn btn-compact" bindtap="createDuty">新增职责</button>
+  <button class="btn btn-compact" bindtap="createDuty" disabled="{{actionBusy}}">新增职责</button>
   <view class="inline-row">
     <input class="grow input-box" placeholder="技能编码" value="{{skillCode}}" data-field="skillCode" bindinput="onTextInput" />
     <input class="grow input-box" placeholder="技能名称" value="{{skillName}}" data-field="skillName" bindinput="onTextInput" />
   </view>
-  <button class="btn btn-compact" bindtap="createSkill">新增技能</button>
+  <button class="btn btn-compact" bindtap="createSkill" disabled="{{actionBusy}}">新增技能</button>
 </view>
 
 <view class="empty" wx:if="{{!loading && !items.length}}">当前小区暂无任职或历史任职员工</view>
@@ -62,10 +62,27 @@
 <view class="card" wx:if="{{selected}}">
   <view class="section-title">人员详情 · {{selected.employee.employee_no}}</view>
   <view>账号认领：{{selected.employee.user_id ? '已认领' : '未认领'}}</view>
+  <view id="employee-work-history" wx:if="{{canReadHistory}}">
+    <view class="field-title">负责工单履历</view>
+    <view class="hint">仅当前小区。负责人不一定是实际维修人；自报参与不是能力认证。按处理轮次展示，分类和工单状态为当前值，最新反馈不代表完整评价或成功率。</view>
+    <button class="btn btn-compact" bindtap="loadWorkHistory" disabled="{{historyLoading}}">查看负责工单履历</button>
+    <view class="error" wx:if="{{historyError}}">{{historyError}}</view>
+    <view class="loading" wx:if="{{historyLoading}}">履历加载中...</view>
+    <view class="empty" wx:if="{{historyLoaded && !workHistory.length}}">当前小区暂无负责处理记录</view>
+    <view class="history-item" wx:for="{{workHistory}}" wx:key="process_id">
+      <view>工单 #{{item.work_order_id}} · 第 {{item.cycle_no}} 轮 · {{item.categoryText}}</view>
+      <view>当前工单：{{item.statusText}}</view>
+      <view>开始：{{item.startedAtLabel}}</view>
+      <view>{{item.ended_at ? '本轮已结束' : '本轮未结束'}}</view>
+      <view>{{item.receiptText}} · {{item.handlingText}}</view>
+      <view>最新一条住户反馈：{{item.feedbackText}}</view>
+    </view>
+    <button wx:if="{{historyCursor}}" class="btn btn-compact" bindtap="loadMoreHistory" disabled="{{historyLoading}}">查看更早记录</button>
+  </view>
   <view class="field-title">任职历史</view>
   <view class="assignment" wx:for="{{selected.assignments}}" wx:key="id">
     <text>{{item.propertyName}} · {{item.statusText}}</text>
-    <button wx:if="{{canEdit && item.status == 'ACTIVE'}}" class="link inline-button" size="mini" data-id="{{item.id}}" catchtap="endAssignment">结束任职</button>
+    <button wx:if="{{canEdit && item.status == 'ACTIVE'}}" class="link inline-button" size="mini" data-id="{{item.id}}" catchtap="endAssignment" disabled="{{actionBusy}}">结束任职</button>
   </view>
 
   <block wx:if="{{canEdit}}">
@@ -89,20 +106,22 @@
         <checkbox value="{{item.id}}" checked="{{item.assigned}}" disabled="{{item.assigned}}" />{{item.name}}{{item.assigned ? '（已有）' : ''}}
       </label>
     </checkbox-group>
-    <button class="btn" bindtap="updateEmployee">保存资料</button>
+    <button class="btn" bindtap="updateEmployee" disabled="{{actionBusy}}">保存资料</button>
 
+    <block wx:if="{{canInvite && !selected.employee.user_id && selected.employee.status == 'ACTIVE'}}">
     <view class="field-title">邀请本人认领</view>
     <input type="number" placeholder="员工本人手机号" value="{{invitePhone}}" data-field="invitePhone" bindinput="onTextInput" />
-    <button class="btn" bindtap="issueInvite">发出邀请</button>
+    <button class="btn" bindtap="issueInvite" disabled="{{actionBusy}}">发出邀请</button>
     <view class="token" wx:if="{{inviteToken}}">邀请凭证仅显示一次，请安全交给员工本人：{{inviteToken}}</view>
     <button class="btn btn-compact" wx:if="{{inviteToken}}" bindtap="copyInviteToken">复制给员工本人</button>
+    </block>
 
     <block wx:if="{{assignmentProperties.length}}">
       <view class="field-title">增加服务小区</view>
       <picker range="{{assignmentProperties}}" range-key="name" value="{{assignmentPropertyIndex}}" bindchange="onAssignmentPropertyChange">
         <view class="picker">{{assignmentProperties[assignmentPropertyIndex].name}}</view>
       </picker>
-      <button class="btn" bindtap="assignProperty">建立任职</button>
+      <button class="btn" bindtap="assignProperty" disabled="{{actionBusy}}">建立任职</button>
     </block>
   </block>
 </view>

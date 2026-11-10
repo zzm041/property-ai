@@ -9,23 +9,23 @@
 
 <view class="card" wx:if="{{canDraft}}">
   <view class="section-title">公告草稿</view>
-  <input placeholder="标题" value="{{title}}" data-field="title" bindinput="onField" />
-  <textarea placeholder="内容" value="{{content}}" data-field="content" bindinput="onField"></textarea>
-  <picker range="{{scopeOptions}}" range-key="label" value="{{scopeIndex}}" bindchange="onScopeChange">
+  <input disabled="{{loading}}" placeholder="标题" value="{{title}}" data-field="title" bindinput="onField" />
+  <textarea disabled="{{loading}}" placeholder="内容" value="{{content}}" data-field="content" bindinput="onField"></textarea>
+  <picker disabled="{{loading}}" range="{{scopeOptions}}" range-key="label" value="{{scopeIndex}}" bindchange="onScopeChange">
     <view class="picker">定向：{{scopeOptions[scopeIndex].label}}</view>
   </picker>
-  <picker range="{{audienceOptions}}" range-key="label" value="{{audienceIndex}}" bindchange="onAudienceChange">
+  <picker disabled="{{loading}}" range="{{audienceOptions}}" range-key="label" value="{{audienceIndex}}" bindchange="onAudienceChange">
     <view class="picker">人群：{{audienceOptions[audienceIndex].label}}</view>
   </picker>
-  <picker wx:if="{{scopeOptions[scopeIndex].value == 'BUILDING' || scopeOptions[scopeIndex].value == 'UNIT'}}" range="{{buildings}}" range-key="name" value="{{buildingIndex}}" bindchange="onBuildingChange">
+  <picker disabled="{{loading}}" wx:if="{{scopeOptions[scopeIndex].value == 'BUILDING' || scopeOptions[scopeIndex].value == 'UNIT'}}" range="{{buildings}}" range-key="name" value="{{buildingIndex}}" bindchange="onBuildingChange">
     <view class="picker">楼栋：{{buildings[buildingIndex].name || '请选择'}}</view>
   </picker>
-  <picker wx:if="{{scopeOptions[scopeIndex].value == 'UNIT'}}" range="{{units}}" range-key="name" value="{{unitIndex}}" bindchange="onUnitChange">
+  <picker disabled="{{loading}}" wx:if="{{scopeOptions[scopeIndex].value == 'UNIT'}}" range="{{units}}" range-key="name" value="{{unitIndex}}" bindchange="onUnitChange">
     <view class="picker">单元：{{units[unitIndex].name || '请选择'}}</view>
   </picker>
-  <button class="btn" bindtap="create">保存新草稿</button>
-  <button class="btn" wx:if="{{selected && (selected.status == 'DRAFT' || selected.status == 'REJECTED')}}" bindtap="update">保存所选公告修改</button>
-  <button class="btn" wx:if="{{selected && selected.status == 'DRAFT'}}" bindtap="submitReview">提交审核</button>
+  <button disabled="{{loading}}" class="btn" bindtap="create">保存新草稿</button>
+  <button disabled="{{loading}}" class="btn" wx:if="{{selected && (selected.status == 'DRAFT' || selected.status == 'REJECTED')}}" bindtap="update">保存所选公告修改</button>
+  <button disabled="{{loading}}" class="btn" wx:if="{{selected && selected.status == 'DRAFT'}}" bindtap="submitReview">提交审核</button>
 </view>
 <view class="empty" wx:else>当前身份仅可审核或查看此范围公告，不能编辑草稿。</view>
 
@@ -40,18 +40,18 @@
   <view class="section-title">审核与历史 · #{{selected.id}}</view>
   <view>当前状态：{{selected.statusText}}</view>
   <block wx:if="{{canPublish && selected.status == 'PENDING_REVIEW'}}">
-    <textarea placeholder="驳回时必须填写原因" value="{{reviewReason}}" data-field="reviewReason" bindinput="onField"></textarea>
-    <button class="btn" bindtap="approve">人工审核通过并发布</button>
-    <button class="btn" bindtap="reject">驳回</button>
+    <textarea disabled="{{loading}}" placeholder="驳回时必须填写原因" value="{{reviewReason}}" data-field="reviewReason" bindinput="onField"></textarea>
+    <button disabled="{{loading}}" class="btn" bindtap="approve">人工审核通过并发布</button>
+    <button disabled="{{loading}}" class="btn" bindtap="reject">驳回</button>
   </block>
   <view class="field-title">审核记录</view>
   <view wx:for="{{selected.reviews}}" wx:key="id">
-    {{item.created_at}} · {{item.decisionText}} · {{item.reason || '无原因'}}
+    {{item.createdAtLabel}} · {{item.decisionText}} · {{item.reason || '无原因'}}
   </view>
   <view class="field-title">编辑 / 提交 / 发布历史</view>
   <view wx:for="{{selected.history}}" wx:key="id">
-    {{item.created_at}} · {{item.actionText}} · {{item.statusText}}
+    {{item.createdAtLabel}} · {{item.actionText}} · {{item.statusText}}
   </view>
 </view>
 
-<button class="btn" bindtap="load">刷新公告</button>
+<button disabled="{{loading}}" class="btn" bindtap="load">刷新公告</button>

@@ -9,7 +9,7 @@
   <picker range="{{scopeOptions}}" range-key="label" value="{{scopeIndex}}" bindchange="onScopeChange">
     <view class="picker">统计口径：{{scopeOptions[scopeIndex].label || '无可用范围'}}</view>
   </picker>
-  <view class="hint">本页展示数据库中的当前状态快照，不是今日新增或期间绩效报表。</view>
+  <view class="hint">当前在办工单与事件统计。</view>
 </view>
 
 <view class="loading" wx:if="{{loading}}">读取最新状态...</view>
@@ -49,7 +49,7 @@
   <view class="section-heading">按小区分解</view>
   <view class="card property-row" wx:for="{{overview.properties}}" wx:key="property_id">
     <view class="row-title">{{item.property_name}}</view>
-    <view>{{item.timezone}} · 业务日 {{item.business_date}}</view>
+    <view>业务日 {{item.business_date}}</view>
     <view>工单 {{item.work_orders_total}}（未终结 {{item.work_orders_open}} / 已终结 {{item.work_orders_terminal}}）</view>
     <view>事件 {{item.incidents_active}} · SLA 预警 {{item.sla_warning}} / 逾期 {{item.sla_overdue}}</view>
     <view>任职 {{item.active_staff_assignments}} · 在岗 {{item.on_duty}} · 可接单 {{item.available}} · 未上报 {{item.unreported_status}}</view>
@@ -58,12 +58,12 @@
 
   <view class="card">
     <view class="section-title">现有配置入口</view>
-    <view class="hint">以下入口沿用现有业务规则；不会在本页保存另一套配置。目标为上方选中的小区。</view>
+    <view class="hint">管理当前所选小区的业务配置。</view>
     <button class="btn" wx:for="{{configEntries}}" wx:key="path" data-path="{{item.path}}" bindtap="openConfig">{{item.label}}</button>
     <view class="empty" wx:if="{{!configEntries.length}}">当前范围没有可管理的配置入口。</view>
   </view>
 
-  <view class="snapshot">生成时间：{{overview.generated_at}} · 小区数：{{overview.property_count}}</view>
+  <view class="snapshot">生成时间：{{overview.generatedAtLabel}} · 小区数：{{overview.property_count}}</view>
 </block>
 
-<button class="btn" disabled="{{loading}}" bindtap="refresh">刷新当前快照</button>
+<button class="btn" disabled="{{loading}}" bindtap="refresh">刷新统计</button>

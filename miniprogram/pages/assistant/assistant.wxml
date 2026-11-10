@@ -4,11 +4,15 @@
     <view class="picker">{{properties[propertyIndex].name || '请选择小区'}}</view>
   </picker>
   <view class="hint">只显示当前身份具有知识读取权限的小区。</view>
+  <picker wx:if="{{canReadInternal}}" range="{{audienceOptions}}" value="{{audienceIndex}}" bindchange="onAudienceChange">
+    <view class="picker">查询用途：{{audienceOptions[audienceIndex]}}</view>
+  </picker>
+  <view class="hint">{{audience === 'property' ? '物业内部查询，请勿向无权人员展示内部内容。' : '住户知识查询，仅展示对住户公开的资料。'}}</view>
 </view>
 
 <view class="card">
   <input placeholder="例如：装修时间有什么规定？" value="{{question}}" bindinput="onQuestion" />
-  <button class="btn" bindtap="ask">提问</button>
+  <button class="btn" bindtap="ask" disabled="{{loading}}">提问</button>
 </view>
 
 <view class="loading" wx:if="{{loading}}">检索中...</view>

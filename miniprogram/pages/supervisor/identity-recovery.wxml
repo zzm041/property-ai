@@ -6,7 +6,7 @@
   <view class="card">
     <view>申请 {{item.id}} · {{item.purposeText}} · {{item.statusText}}</view>
     <view>号码：{{item.masked_phone}} · 已批准：{{item.approval_count}}/2</view>
-    <view>隔离截止：{{item.quarantine_ends_at}}</view>
+    <view>隔离截止：{{item.quarantineEndsAtLabel}}</view>
     <input placeholder="审核原因" value="{{reasonById[item.id]}}" data-id="{{item.id}}" bindinput="onReason" maxlength="255" />
     <view class="action-row" wx:if="{{item.status === 'PENDING_REVIEW'}}">
       <button class="btn btn-compact" size="mini" data-id="{{item.id}}" data-decision="APPROVE" bindtap="review">批准</button>
