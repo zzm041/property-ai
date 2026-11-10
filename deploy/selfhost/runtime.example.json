@@ -1,0 +1,18 @@
+{
+  "model_root": "models-hf",
+  "bge_python": "bge-env/Scripts/python.exe",
+  "asr_python": "asr-env/Scripts/python.exe",
+  "token_file": "secrets/runtime.token",
+  "ollama_url": "http://127.0.0.1:11435",
+  "ollama_version": "0.34.4",
+  "chat_model": "property-qwen:client-v1",
+  "chat_digest": "REPLACE_WITH_VERIFIED_LOCAL_OLLAMA_DIGEST",
+  "bind": "127.0.0.1",
+  "port": 11439,
+  "timeout_seconds": 180,
+  "max_body_bytes": 15728640,
+  "min_available_ram_mib": 12288,
+  "reserve_ram_mib": 2048,
+  "min_free_gpu_mib": 6000,
+  "resource_wait_seconds": 15
+}

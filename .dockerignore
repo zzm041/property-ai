@@ -11,6 +11,7 @@ secrets/
 miniprogram/
 docs/
 *.md
+!backend/README.md
 backend/.pytest_cache
 backend/**/__pycache__
 backend/.venv

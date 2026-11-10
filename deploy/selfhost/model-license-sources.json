@@ -1,0 +1,26 @@
+[
+  {
+    "name": "bge-m3",
+    "repository": "BAAI/bge-m3",
+    "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+    "files": [],
+    "card_license": "mit",
+    "card_sha256": "0b81ccf9134e5874d620a86e6905062ea999e779c34eb1a7e65eaeb7fe00e450",
+    "status": "NO_ROOT_LICENSE_TEXT"
+  },
+  {
+    "name": "bge-reranker-v2-m3",
+    "status": "FETCH_FAILED",
+    "error_type": "ConnectError"
+  },
+  {
+    "name": "Qwen3-ASR-0.6B",
+    "status": "FETCH_FAILED",
+    "error_type": "ConnectError"
+  },
+  {
+    "name": "qwen-community-gguf",
+    "status": "FETCH_FAILED",
+    "error_type": "ConnectError"
+  }
+]

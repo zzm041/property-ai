@@ -1,11 +1,15 @@
 # scripts
 
+`scripts/selfhost/` 提供随交付包携带的私有 AI 配置、离线模型/依赖预检和受限真实推理入口。使用方式与尚未验证的边界见 `deploy/selfhost/README.md`；不要将旧 `scripts/ops/local_ai_http.py` 的历史验收启动方式当作客户安装流程。
+
 运维脚本（Day 3）与 Day 4 一次性验证。不要对 development `property_ai` 做未经确认的 restore。不要删除 Development Milvus collection。
 
 ```bash
-python scripts/ops/mysql_backup.py --container <mysql> --database property_ai_test --user root --password change-me-test-root --out tmp/backup.sql
-python scripts/ops/mysql_restore.py --container <mysql> --database property_ai_restore_drill --user root --password change-me-test-root --dump tmp/backup.sql --create-database
+python scripts/ops/mysql_backup.py --container <mysql> --database property_ai_test --user root --password-env PROPERTY_AI_MYSQL_PASSWORD --out tmp/backup.sql
+python scripts/ops/mysql_restore.py --container <mysql> --database property_ai_restore_drill --user root --password-env PROPERTY_AI_MYSQL_PASSWORD --dump tmp/backup.sql --create-database
 ```
+
+运行前通过本机秘密管理方式提供 `PROPERTY_AI_MYSQL_PASSWORD`，不要把真实值写进命令、脚本或报告。旧 `--password` 已拒绝，Docker 子进程通过环境变量传递凭证；这不隔离有权限检查进程环境的本机管理员。备份不会覆盖已有文件，失败或中断后保留的文件不能当成完整备份。恢复只接受可信转储，并须先核实 Docker context、容器和可销毁目标；库名校验不限制转储内的 SQL，不能用来沙箱运行不可信 SQL。恢复失败/超时可能已部分执行，须核查后处理，不自动重试。
 
 知识索引重建（在 backend 目录，正确的 APP_ENV / DATABASE_URL / MILVUS_*）：
 

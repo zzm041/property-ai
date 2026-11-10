@@ -56,6 +56,7 @@ miniprogram/config/env.local.js
 docker-compose.override.yml
 .docker/
 deploy/backups/
+deploy/customer-install/
 
 # Cursor / agent local
 .cursor/*.log
@@ -66,3 +67,4 @@ reports/auth-identity-ai-001/release-pack/
 # MP-CURRENT-FULL-REGRESSION-001 secrets and operator backups
 reports/mp-current-full-regression/private/
 reports/mp-current-full-regression/accounts.local.json
+**/controller.lock

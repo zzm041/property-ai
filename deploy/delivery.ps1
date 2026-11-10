@@ -21,8 +21,12 @@ $RagTokenPath = Join-Path (Split-Path -Parent $DeployDir) "tmp\delivery-rag-runt
 $WorkAiRuntime = Join-Path $DeployDir "work-ai-runtime.ps1"
 $WorkAiTokenPath = Join-Path (Split-Path -Parent $DeployDir) "tmp\delivery-work-ai-runtime\internal-token.txt"
 
-if (-not (Test-Path -LiteralPath $EnvFile) -or -not (Test-Path -LiteralPath $BootstrapEnvFile)) {
-    throw "Missing delivery env files; copy both examples and replace every placeholder."
+if (-not (Test-Path -LiteralPath $EnvFile -PathType Leaf)) {
+    throw "Missing delivery env file; copy .env.delivery.example and replace every placeholder."
+}
+$RequiresBootstrap = $Action -in @("init", "media-cycle-migrate")
+if ($RequiresBootstrap -and -not (Test-Path -LiteralPath $BootstrapEnvFile -PathType Leaf)) {
+    throw "Missing .env.delivery.bootstrap; restore initialization credentials for this migration action."
 }
 
 function Invoke-Compose {
@@ -32,7 +36,11 @@ function Invoke-Compose {
     if (Test-Path -LiteralPath $WorkAiTokenPath -PathType Leaf) {
         $env:DELIVERY_WORK_AI_INTERNAL_TOKEN = (Get-Content -Raw -LiteralPath $WorkAiTokenPath).Trim()
     }
-    & docker compose --env-file $EnvFile -f $ComposeFile @args
+    $composeFiles = @("-f", $ComposeFile)
+    if ($RequiresBootstrap) {
+        $composeFiles += @("-f", (Join-Path $DeployDir "docker-compose.bootstrap.yml"))
+    }
+    & docker compose --env-file $EnvFile @composeFiles @args
     if ($LASTEXITCODE -ne 0) { throw "docker compose failed ($LASTEXITCODE)" }
 }
 
@@ -42,8 +50,42 @@ function Read-DeliveryValue([string]$Name) {
     return ($line -split "=", 2)[1].Trim()
 }
 
+function Assert-NoRetainedRollbackContainers {
+    $project = if ($env:COMPOSE_PROJECT_NAME) { $env:COMPOSE_PROJECT_NAME } else { Read-DeliveryValue "COMPOSE_PROJECT_NAME" }
+    if (-not $project) { $project = "property-ai-delivery-check" }
+    $names = & docker ps -a --filter "label=com.docker.compose.project=$project" --format "{{.Names}}"
+    if ($LASTEXITCODE -ne 0) { throw "Cannot verify retained rollback containers; refusing Compose mutation." }
+    if ($names | Where-Object { $_.StartsWith($project + "-") -and $_ -match "-rollback-" }) {
+        throw "Retained rollback containers exist. Use the verified exact-container cutover/recovery procedure in reports/delivery-closeout-20261103/RUNNING-CANDIDATE.md; Compose up/down would affect retained evidence."
+    }
+}
+
+function Get-AiRuntimeSelection {
+    $selectionPath = Join-Path $DeployDir "ai-runtime-selection.json"
+    if (-not (Test-Path -LiteralPath $selectionPath)) { return @{} }
+    $selection = Get-Content -Raw -LiteralPath $selectionPath | ConvertFrom-Json
+    if (
+        $selection.format -ne "property-ai-runtime-selection-v1" -or
+        $selection.manifest -isnot [string] -or
+        [string]::IsNullOrWhiteSpace($selection.manifest) -or
+        $selection.sha256 -isnot [string] -or
+        $selection.sha256 -cnotmatch "^[0-9a-f]{64}$"
+    ) { throw "invalid delivery AI runtime selection; refusing historical fallback" }
+    $repoRoot = [IO.Path]::GetFullPath((Split-Path -Parent $DeployDir))
+    if ([IO.Path]::IsPathRooted($selection.manifest)) { throw "selected manifest must be workspace-relative" }
+    $manifest = [IO.Path]::GetFullPath((Join-Path $repoRoot $selection.manifest))
+    if (-not $manifest.StartsWith($repoRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "selected manifest must stay inside the workspace"
+    }
+    # Each runtime verifies this digest, all artifact files and the paired
+    # backend manifest before it starts. Never fall back after a bad selection.
+    return @{ ArtifactManifest = $manifest; ArtifactSha256 = $selection.sha256 }
+}
+
 function Assert-NoPlaceholders {
-    $unsafe = Select-String -LiteralPath $EnvFile,$BootstrapEnvFile -Pattern "replace-|change-me|<[^>]+>" -SimpleMatch:$false
+    $checkedFiles = @($EnvFile)
+    if ($RequiresBootstrap) { $checkedFiles += $BootstrapEnvFile }
+    $unsafe = Select-String -LiteralPath $checkedFiles -Pattern "replace-|change-me|<[^>]+>" -SimpleMatch:$false
     if ($unsafe) { throw "deploy/.env.delivery still contains placeholder secrets" }
     Invoke-Compose config --quiet
 }
@@ -90,7 +132,8 @@ function Read-BackupManifest([string]$DumpPath, [string]$Database) {
 
 switch ($Action) {
     "work-ai-start" {
-        & $WorkAiRuntime start
+        $runtimeSelection = Get-AiRuntimeSelection
+        & $WorkAiRuntime start @runtimeSelection
         if ($LASTEXITCODE -ne 0) { throw "delivery work AI start failed ($LASTEXITCODE)" }
     }
     "work-ai-stop" {
@@ -117,7 +160,8 @@ switch ($Action) {
     "rag-ollama-stop" { & $RagOllamaRuntime stop; if ($LASTEXITCODE -ne 0) { throw "delivery RAG Ollama stop failed ($LASTEXITCODE)" } }
     "rag-ollama-status" { & $RagOllamaRuntime status; if ($LASTEXITCODE -ne 0) { throw "delivery RAG Ollama status failed ($LASTEXITCODE)" } }
     "rag-start" {
-        & $RagRuntime start
+        $runtimeSelection = Get-AiRuntimeSelection
+        & $RagRuntime start @runtimeSelection
         if ($LASTEXITCODE -ne 0) { throw "delivery RAG start failed ($LASTEXITCODE)" }
     }
     "rag-stop" {
@@ -133,6 +177,7 @@ switch ($Action) {
         Write-Output "delivery configuration is syntactically valid"
     }
     "init" {
+        Assert-NoRetainedRollbackContainers
         Assert-NoPlaceholders
         Invoke-Compose up -d mysql redis rabbitmq etcd minio milvus
         Invoke-Compose --profile tools build migrate
@@ -145,6 +190,7 @@ switch ($Action) {
         Invoke-Compose ps
     }
     "up" {
+        Assert-NoRetainedRollbackContainers
         Assert-NoPlaceholders
         Invoke-Compose up -d mysql redis rabbitmq etcd minio milvus
         Invoke-Compose --profile tools run --rm storage-init
@@ -152,6 +198,7 @@ switch ($Action) {
         Invoke-Compose ps
     }
     "stop" {
+        Assert-NoRetainedRollbackContainers
         Invoke-Compose down
         Write-Output "services stopped; named volumes were retained"
     }

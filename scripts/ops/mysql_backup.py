@@ -2,43 +2,48 @@
 
 from __future__ import annotations
 
-import argparse
 import subprocess
 from pathlib import Path
+from mysql_tool_common import SafeArgumentParser, add_credentials, credential_environment, docker_mysql_command
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="mysqldump a database from a Docker MySQL container")
+    parser = SafeArgumentParser(description="mysqldump a database from a Docker MySQL container")
     parser.add_argument("--container", required=True)
     parser.add_argument("--database", required=True)
     parser.add_argument("--user", default="root")
-    parser.add_argument("--password", required=True)
+    add_credentials(parser)
     parser.add_argument("--out", required=True)
     args = parser.parse_args(argv)
 
-    result = subprocess.run(
-        [
-            "docker",
-            "exec",
-            args.container,
-            "mysqldump",
-            "--single-transaction",
-            "--routines",
-            "--triggers",
-            f"-u{args.user}",
-            f"-p{args.password}",
-            args.database,
-        ],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if result.returncode != 0:
-        print(result.stderr)
-        return result.returncode
+    try:
+        environment = credential_environment(args)
+    except ValueError as exc:
+        print(str(exc))
+        return 2
     out = Path(args.out)
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(result.stdout, encoding="utf-8")
+    if out.exists() or out.is_symlink():
+        print('Refusing to overwrite an existing backup path.')
+        return 2
+    try:
+        result = subprocess.run(
+            docker_mysql_command(args, 'mysqldump') + [
+                '--single-transaction', '--routines', '--triggers', args.database],
+            capture_output=True, check=False, env=environment, timeout=300,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        print('Backup command failed or timed out; no dump written. Details withheld.')
+        return 1
+    if result.returncode != 0:
+        print('Backup command failed; diagnostic content withheld.')
+        return result.returncode
+    try:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        with out.open('xb') as output:
+            output.write(result.stdout)
+    except OSError:
+        print('Backup file could not be completed; an existing or partial file is retained.')
+        return 1
     print(f"Wrote {out} ({out.stat().st_size} bytes)")
     return 0
 

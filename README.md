@@ -1,44 +1,57 @@
 # 智慧物业 AI 运营与工单调度平台
 
-真实物业企业 **Production V1** 后端 + 微信小程序。  
-当前状态：**Stage 0.5 已完成，等待重新生成并确认 Day 1 Task 1~8 计划**。规格与元数据已统一，业务代码尚未开始。
+面向住户与物业工作人员的报修协同系统。住户通过微信原生小程序提交文字、图片或语音，物业完成受理、派单、处理、回执与异常跟进。AI 用于整理非结构化信息、识别风险与辅助知识查询；权限校验和派单决策由业务服务执行。
 
-## 当前不要期望什么
+**项目入口：**[产品介绍](https://zzm041.github.io/property-ai/showcase/) · [安装部署](deploy/CUSTOMER-INSTALL.md) · [接口文档](docs/06-API-CONTRACT.md)。
 
-- 现在没有可登录的 API，也没有可运行的小程序页面。
-- 本期只冻结范围、角色、领域模型、状态机、技术栈和目录。
+系统连接住户、维修人员和物业主管：从报修理解、规则派单到处理回执与异常协调，保留完整工单记录。模型可自托管，业务按租户、小区与角色隔离。
 
-## 文档索引
+## 业务流程
+
+1. 住户注册并完成房屋绑定审核，在有效授权范围内提交报修。
+2. 异步任务提取问题事实、职责、风险和待澄清内容；AI 不可用时保留工单并进入人工处理。
+3. 派单校验服务小区、有效员工关系、签到、职责、特殊技能与容量。普通维修采用空闲与轮转政策，其他分支按规则评分；模型不直接选择员工。
+4. 员工接单、到场、提交处理记录与回执；住户确认或反馈问题，物业处理异常、改派及后续协调。
+5. 住户和物业按角色查看不同字段与附件；内部员工画像、管理信息和历史附件访问受权限约束。
+
+跨范围支援与外部专业维修由物业按需上报、人工联系和记录，不由 AI 自动联系第三方。
+
+## AI 与可靠性
+
+- 多模态报修理解：结构化输出、来源追踪、语义校验、澄清与人工回退。
+- 知识问答：Milvus 检索、bge-m3 向量、重排与引用溯源；按租户、小区和可见性过滤，并检查文档版本和权限。
+- 异步处理：Celery / RabbitMQ、持久任务投递、幂等控制、重试与失败记录。
+- 主管辅助：受限队列 Agent 通过白名单工具读取队列和工单诊断，生成基于业务事实的跟进建议；每次工具调用重新鉴权，输出依据由服务端复核。功能默认关闭，需独立配置后启用，派单与状态变更由主管操作。
+
+## 架构与技术栈
+
+模块化单体 + Worker。Python 3.12、FastAPI、Pydantic v2、SQLAlchemy 2、Alembic、MySQL 8、Redis、RabbitMQ / Celery、Milvus / bge-m3、Qwen 系列模型、微信原生小程序、Docker Compose / Nginx。
+
+数据库事务由 Service 管理，外部短信、模型、语音与存储通过 Provider 接入。Development 实现支持无正式凭证的本地开发。依赖版本见 [backend/pyproject.toml](backend/pyproject.toml)。
+
+## 开发与部署
+
+- [后端说明](backend/README.md)：入口、分层与测试方式。
+- [部署手册](deploy/README.md)：开发环境、隔离演练及持久化交付入口。
+- [客户空库安装](deploy/CUSTOMER-INSTALL.md)与[自托管AI入口](deploy/selfhost/README.md)：独立配置、模型资产核验及现有环境验证范围。
+- [部署规格](docs/09-DEPLOYMENT.md)与[运维手册](docs/11-OPERATIONS.md)：环境、迁移、备份与恢复。
+- 配置从示例文件创建，凭据仅保存在本机环境变量或私密配置中；不要直接对已有数据库运行初始化或降级命令。
+
+## 设计文档
 
 | 文档 | 内容 |
 | --- | --- |
-| [docs/00-PROJECT-SCOPE.md](docs/00-PROJECT-SCOPE.md) | 产品定位、范围、明确不做 |
-| [docs/01-PRD.md](docs/01-PRD.md) | 功能需求 |
-| [docs/02-ROLES-PERMISSIONS.md](docs/02-ROLES-PERMISSIONS.md) | 角色与权限 |
-| [docs/03-DOMAIN-MODEL.md](docs/03-DOMAIN-MODEL.md) | 核心实体与 ER |
-| [docs/04-WORKORDER-STATE-MACHINE.md](docs/04-WORKORDER-STATE-MACHINE.md) | 工单状态机 |
-| [docs/05-AI-DISPATCH-SPEC.md](docs/05-AI-DISPATCH-SPEC.md) | AI 理解与派单 |
-| [docs/06-API-CONTRACT.md](docs/06-API-CONTRACT.md) | API 契约初稿 |
-| [docs/07-SECURITY-PRIVACY.md](docs/07-SECURITY-PRIVACY.md) | 安全与隐私 |
-| [docs/08-NON-FUNCTIONAL.md](docs/08-NON-FUNCTIONAL.md) | 非功能与架构 |
-| [docs/09-DEPLOYMENT.md](docs/09-DEPLOYMENT.md) | 部署与版本冻结 |
-| [docs/10-ACCEPTANCE.md](docs/10-ACCEPTANCE.md) | 验收标准 |
-| [docs/BACKLOG.md](docs/BACKLOG.md) | V1 后 backlog |
+| [项目范围](docs/00-PROJECT-SCOPE.md) | 服务对象、交付范围与排除项 |
+| [产品需求](docs/01-PRD.md) | 住户与物业业务流程 |
+| [角色权限](docs/02-ROLES-PERMISSIONS.md) | 角色、组织范围与所有权 |
+| [领域模型](docs/03-DOMAIN-MODEL.md) | 身份、房产、员工与工单 |
+| [工单状态机](docs/04-WORKORDER-STATE-MACHINE.md) | 状态转换与异常处理 |
+| [AI 与派单](docs/05-AI-DISPATCH-SPEC.md) | 结构化理解与规则调度 |
+| [接口契约](docs/06-API-CONTRACT.md) | API 行为与错误约定 |
+| [安全与隐私](docs/07-SECURITY-PRIVACY.md) | 数据隔离与敏感信息保护 |
+| [非功能要求](docs/08-NON-FUNCTIONAL.md) | 可靠性与架构约束 |
+| [验收标准](docs/10-ACCEPTANCE.md) | 分阶段与产品验收要求 |
+| [业务评测](docs/12-BUSINESS-EVALUATION.md) | 指标、数据分组与证据边界 |
+| [主管跟进建议](docs/13-SUPERVISOR-ASSISTANT.md) | 只读工具循环、页面与验证边界 |
 
-Agent 工作协议见 [AGENTS.md](AGENTS.md)。
-
-## 技术栈（冻结）
-
-Python 3.12 + FastAPI + Pydantic v2 + SQLAlchemy 2 + Alembic + MySQL 8 + Redis + RabbitMQ/Celery + Milvus/bge-m3 + 微信原生小程序 + Docker Compose/Nginx。
-
-版本见 `backend/pyproject.toml` 与 `docs/09-DEPLOYMENT.md`。
-
-## Day 1 前置条件（Stage 0.5 不执行）
-
-1. Windows Host 使用 **Python 3.12.10**，并通过 `python -m venv .venv` 创建同版本项目环境；禁止混用全局包与 `.venv`。
-2. 复制 `.env.example` 为 `.env`。
-3. 重新生成并确认 Day 1 Task 1~8 计划后，从 Task 1 开始逐项实施，不得一次执行全部 Task。
-
-项目兼容范围为 Python `>=3.12,<3.13`。Production Docker Runtime 的具体 Python 3.12 Patch Version 在 Deployment 阶段独立验证并固定明确 tag/digest，不要求与 Windows Host Patch 完全一致。
-
-新的 Day 1 覆盖基础设施、组织房产、Development Auth/RBAC、住户绑定、员工多小区关系、签到、小程序最小纵向链路及完整集成验收。Milvus、RAG、AI、WorkOrder、Incident、SLA、正式微信/短信/实名和 Production Nginx 不属于 Day 1。
+仓库中的历史报告用于追溯，不代表当前运行状态；公开分发前需单独审查配置、附件、报告与 Git 历史。

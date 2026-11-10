@@ -1,7 +1,9 @@
 param(
     [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateSet("start", "stop", "status")]
-    [string]$Action
+    [ValidateSet("start", "stop", "status", "verify-artifact")]
+    [string]$Action,
+    [string]$ArtifactManifest = "",
+    [string]$ArtifactSha256 = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -58,6 +60,27 @@ $AsrPython = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\asr-006-cpu\.venv\Scri
 $ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models-hf"
 $ModelName = "qwen38-27b-q3km-g55:7af3b8f"
 $RuntimeModelName = "qwen38-27b-q3km-g55-ctx8192:7af3b8f"
+$RuntimeArtifact = $null
+if ([bool]$ArtifactManifest -xor [bool]$ArtifactSha256) { throw "artifact manifest and SHA256 must be provided together" }
+if ($ArtifactManifest) {
+    $verifiedJson = & $PythonPath -I -B (Join-Path $RepoRoot "scripts\ops\verify_runtime_artifact.py") --manifest $ArtifactManifest --sha256 $ArtifactSha256
+    if ($LASTEXITCODE -ne 0) { throw "runtime artifact verification failed" }
+    $RuntimeArtifact = $verifiedJson | ConvertFrom-Json
+    $CandidateRoot = $RuntimeArtifact.root
+    $AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
+    $ModelAdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_models.py"
+    $RuntimeControlPath = Join-Path $CandidateRoot "scripts\ops\local_ai_runtime_control.py"
+    $ExpectedAdapterSha256 = $RuntimeArtifact.files.'scripts/ops/local_ai_http.py'
+    $ExpectedModelAdapterSha256 = $RuntimeArtifact.files.'scripts/ops/local_ai_models.py'
+    $ExpectedRuntimeControlSha256 = $RuntimeArtifact.files.'scripts/ops/local_ai_runtime_control.py'
+    $SourceCommit = $null
+    $RuntimeModelName = "qwen38-27b-q3km-g52-ctx8192:7af3b8f"
+}
+if ($Action -eq "verify-artifact") {
+    if ($null -eq $RuntimeArtifact) { throw "verify-artifact requires a pinned artifact" }
+    [ordered]@{artifact_id=$RuntimeArtifact.artifact_id;candidate_image_id=$RuntimeArtifact.candidate_image_id;runtime_model=$RuntimeModelName;services_started=0} | ConvertTo-Json
+    exit 0
+}
 
 function Read-Token {
     if (-not (Test-Path -LiteralPath $SecretPath -PathType Leaf)) { return $null }
@@ -124,6 +147,7 @@ function Assert-Candidate {
         throw "work AI candidate is not frozen"
     }
     if (-not (Test-Path -LiteralPath $CandidateRoot -PathType Container)) {
+        if ($null -ne $RuntimeArtifact) { throw "verified runtime artifact disappeared" }
         New-Item -ItemType Directory -Force -Path $CandidateRoot | Out-Null
         $archive = Join-Path $RuntimeDir "candidate-$SourceCommit.tar"
         if (Test-Path -LiteralPath $archive) { throw "candidate archive path already exists" }
@@ -256,6 +280,9 @@ switch ($Action) {
             $token = Read-Token
             if ($null -eq $state -or -not $token) { throw "unrecorded 11437 listener refused" }
             $null = Assert-CurrentProcess $state
+            if ($state.adapter_sha256 -ne $ExpectedAdapterSha256 -or ($null -ne $RuntimeArtifact -and $state.artifact_id -ne $RuntimeArtifact.artifact_id)) {
+                throw "running work AI uses a different source; drain and stop its exact receipt before replacement"
+            }
             $health = Invoke-Health $token
             if ($health.scope -ne "work_order_only" -or $health.request_active -or $health.accepting_requests -ne $true) {
                 throw "recorded work AI adapter is not idle and accepting"
@@ -330,7 +357,7 @@ switch ($Action) {
         $oldToken=$env:LOCAL_AI_INTERNAL_TOKEN;$oldModel=$env:PROPERTY_AI_LOCAL_QWEN_MODEL;$oldRuntimeModel=$env:PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL
         try {
             $env:LOCAL_AI_INTERNAL_TOKEN=$token;$env:PROPERTY_AI_LOCAL_QWEN_MODEL=$ModelName;$env:PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL=$RuntimeModelName
-            $launcher=Start-Process -FilePath $PythonPath -ArgumentList @("-I","-X","utf8",$AdapterPath,"serve","--config",$ConfigPath) -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
+            $launcher=Start-Process -FilePath $PythonPath -ArgumentList @("-I","-B","-X","utf8",$AdapterPath,"serve","--config",$ConfigPath) -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
         } finally {
             $env:LOCAL_AI_INTERNAL_TOKEN=$oldToken;$env:PROPERTY_AI_LOCAL_QWEN_MODEL=$oldModel;$env:PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL=$oldRuntimeModel
         }
@@ -345,6 +372,7 @@ switch ($Action) {
         $state=[ordered]@{
             format="property-ai-delivery-work-ai-runtime-v1";started_at_utc=[DateTime]::UtcNow.ToString("o")
             source_commit=$SourceCommit;launcher_pid=$launcher.Id;launcher_started_at_utc=$launcher.StartTime.ToUniversalTime().ToString("o")
+            artifact_id=$RuntimeArtifact.artifact_id;candidate_image_id=$RuntimeArtifact.candidate_image_id
             listener_pid=$listenerProcess.Id;listener_started_at_utc=$listenerProcess.StartTime.ToUniversalTime().ToString("o")
             adapter_sha256=$ExpectedAdapterSha256;model_adapter_sha256=$ExpectedModelAdapterSha256;runtime_control_sha256=$ExpectedRuntimeControlSha256
             config_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $ConfigPath).Hash

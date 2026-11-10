@@ -51,6 +51,8 @@ services:
 
   rabbitmq:
     image: rabbitmq:3.13.7-management-alpine@sha256:606d8c0d6b3c18d1da9afc53bc7cdb2a8d5486df91b5a9830e9e07626c9ae281
+    # Preserve the existing Mnesia node identity across container recreation.
+    hostname: df276253ad68
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:?set RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?set RABBITMQ_PASSWORD}
@@ -134,7 +136,6 @@ services:
     profiles: ["tools"]
     env_file:
       - ${DELIVERY_ENV_FILE:-.env.delivery}
-      - ${DELIVERY_BOOTSTRAP_ENV_FILE:-.env.delivery.bootstrap}
     command: ["python", "-m", "app.cli.delivery_migrate"]
     depends_on:
       mysql:
@@ -157,10 +158,11 @@ services:
     <<: *app-image
     env_file: ${DELIVERY_ENV_FILE:-.env.delivery}
     environment:
-      LOCAL_AI_INTERNAL_TOKEN: ${DELIVERY_RAG_INTERNAL_TOKEN:-}
-      LLM_API_KEY: ${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}
-      VLM_API_KEY: ${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}
-      ASR_API_KEY: ${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}
+      LOCAL_AI_INTERNAL_TOKEN: ${LOCAL_AI_INTERNAL_TOKEN:-${DELIVERY_RAG_INTERNAL_TOKEN:-}}
+      LLM_API_KEY: ${LLM_API_KEY:-${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}}
+      VLM_API_KEY: ${VLM_API_KEY:-${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}}
+      ASR_API_KEY: ${ASR_API_KEY:-${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}}
+      DISPATCH_REJECT_COOLDOWN_SECONDS: ${DISPATCH_REJECT_COOLDOWN_SECONDS:-600}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

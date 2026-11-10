@@ -44,22 +44,24 @@ QWEN_CANDIDATES={
     'qwen3.5:9b':('6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7','0.34.3',4096),
     'qwen38-27b-q3km-g55:7af3b8f':('eb18a122286f7a67d36dc8129f9caa1c0f7bb8449d7669a79e3ecb3d81289e0c','0.34.4',8192),
     'qwen38-27b-q3km-g55-ctx8192:7af3b8f':('06385258e076e9b22102da888a1593daef1dd1d679d863e5cc94c7c674ffed86','0.34.4',8192),
+    'qwen38-27b-q3km-g52-ctx8192:7af3b8f':('59f3ff04c8d0909ab0f4f07d2977f71ed93c4e0c6c66240c91d6c4cfb8e82208','0.34.4',8192),
 }
 QWEN_MODEL=os.environ.get('PROPERTY_AI_LOCAL_QWEN_MODEL','qwen3.5:4b')
 QWEN_RUNTIME_MODEL=os.environ.get('PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL',QWEN_MODEL)
 if QWEN_MODEL not in QWEN_CANDIDATES or QWEN_MODEL.endswith('-ctx8192:7af3b8f'):
     raise RuntimeError('UNAPPROVED_QWEN_CANDIDATE')
 if QWEN_RUNTIME_MODEL not in QWEN_CANDIDATES:raise RuntimeError('UNAPPROVED_QWEN_RUNTIME_MODEL')
-if QWEN_RUNTIME_MODEL!=QWEN_MODEL and (QWEN_MODEL,QWEN_RUNTIME_MODEL)!=(
-    'qwen38-27b-q3km-g55:7af3b8f','qwen38-27b-q3km-g55-ctx8192:7af3b8f'
-):raise RuntimeError('UNAPPROVED_QWEN_RUNTIME_BINDING')
+QWEN_RUNTIME_BINDINGS=frozenset({
+    ('qwen38-27b-q3km-g55:7af3b8f','qwen38-27b-q3km-g55-ctx8192:7af3b8f'),
+    ('qwen38-27b-q3km-g55:7af3b8f','qwen38-27b-q3km-g52-ctx8192:7af3b8f'),
+})
+if QWEN_RUNTIME_MODEL!=QWEN_MODEL and (QWEN_MODEL,QWEN_RUNTIME_MODEL) not in QWEN_RUNTIME_BINDINGS:
+    raise RuntimeError('UNAPPROVED_QWEN_RUNTIME_BINDING')
 DIGEST,QWEN_RUNTIME_VERSION,QWEN_CONTEXT_LENGTH=QWEN_CANDIDATES[QWEN_RUNTIME_MODEL]
 QWEN_ENDPOINT=os.environ.get('PROPERTY_AI_LOCAL_QWEN_ENDPOINT','http://127.0.0.1:11435')
 if QWEN_ENDPOINT not in {'http://127.0.0.1:11435','http://127.0.0.1:11438'}:raise RuntimeError('UNAPPROVED_QWEN_ENDPOINT')
 QWEN_INFERENCE_TIMEOUT_SECONDS=(
-    180 if (QWEN_MODEL,QWEN_RUNTIME_MODEL)==(
-        'qwen38-27b-q3km-g55:7af3b8f','qwen38-27b-q3km-g55-ctx8192:7af3b8f'
-    ) else 60
+    180 if (QWEN_MODEL,QWEN_RUNTIME_MODEL) in QWEN_RUNTIME_BINDINGS else 60
 )
 QWEN_RUNNING_RAM_FLOOR_MIB=4500
 QWEN_RUNNING_GPU_FLOOR_MIB=2000
@@ -72,6 +74,7 @@ MAX_MEDIA_BYTES=10*1024*1024
 # for the prompt and JSON Schema while retaining an explicit request ceiling.
 MAX_BODY=15*1024*1024
 WORK_ORDER_PROMPT_VERSION=WORK_ORDER_ANALYSIS_PROMPT_VERSION
+RAG_PROMPT_VERSIONS=frozenset({'rag-answer-v2','rag-answer-v3','rag-answer-v4'})
 WORK_ORDER_RESPONSE_FORMAT=work_order_analysis_response_format()
 VISION_RESPONSE_FORMAT=vision_analysis_response_format()
 SAFE_PRE_RESERVATION_DETAILS=frozenset({
@@ -178,12 +181,12 @@ def decode(path,content_type,body,prompt_version,scope='all'):
             if set(obj)!={'model','query','documents'} or obj['model']!=MODELS['reranker']:raise ValueError('MODEL_OR_FIELDS')
             kind='reranker';value={k:obj[k] for k in ('query','documents')}
         elif path=='/v1/chat/completions':
-            if scope=='rag_only' and prompt_version!='rag-answer-v2':
+            if scope=='rag_only' and prompt_version not in RAG_PROMPT_VERSIONS:
                 raise ValueError('RAG_ONLY_NO_AUTO_AUTHORIZATION')
-            if scope=='work_order_only' and prompt_version=='rag-answer-v2':
+            if scope=='work_order_only' and prompt_version in RAG_PROMPT_VERSIONS:
                 raise ValueError('WORK_ORDER_ONLY_NO_RAG_AUTHORIZATION')
             expected_format=(
-                {'type':'json_object'} if prompt_version=='rag-answer-v2'
+                {'type':'json_object'} if prompt_version in RAG_PROMPT_VERSIONS
                 else WORK_ORDER_RESPONSE_FORMAT if prompt_version==WORK_ORDER_PROMPT_VERSION
                 else VISION_RESPONSE_FORMAT if prompt_version==VISION_ANALYSIS_PROMPT_VERSION
                 else None
@@ -498,7 +501,7 @@ class Runner:
         save(folder/'input.json',{'kind':kind,'value':base64.b64encode(value).decode() if kind=='asr' else value})
         environment='asr_python' if kind=='asr' else 'bge_python'
         job=RequestJob()
-        command=[self.config[environment],'-I','-X','utf8',str(Path(__file__).resolve()),'child','--config',str(self.path),'--input',str(folder/'input.json'),'--job-name',job.name]
+        command=[self.config[environment],'-I','-B','-X','utf8',str(Path(__file__).resolve()),'child','--config',str(self.path),'--input',str(folder/'input.json'),'--job-name',job.name]
         samples=[];events=[];reason=None;start=time.monotonic();phase='load';phase_start=start
         stdout=folder/'stdout.jsonl';stderr=folder/'stderr.txt'
         p=None;owned_exit_confirmed=False;cleanup_error=None

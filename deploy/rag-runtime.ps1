@@ -1,7 +1,9 @@
 param(
     [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateSet("start", "stop", "status")]
-    [string]$Action
+    [ValidateSet("start", "stop", "status", "verify-artifact")]
+    [string]$Action,
+    [string]$ArtifactManifest = "",
+    [string]$ArtifactSha256 = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -22,6 +24,22 @@ $PythonPath = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\bge-142-cpu\.venv\Scr
 $AsrPython = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\asr-006-cpu\.venv\Scripts\python.exe"
 $ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models-hf"
 $QwenEndpoint = "http://127.0.0.1:11438"
+$RuntimeArtifact = $null
+if ([bool]$ArtifactManifest -xor [bool]$ArtifactSha256) { throw "artifact manifest and SHA256 must be provided together" }
+if ($ArtifactManifest) {
+    $verifiedJson = & $PythonPath -I -B (Join-Path $RepoRoot "scripts\ops\verify_runtime_artifact.py") --manifest $ArtifactManifest --sha256 $ArtifactSha256
+    if ($LASTEXITCODE -ne 0) { throw "runtime artifact verification failed" }
+    $RuntimeArtifact = $verifiedJson | ConvertFrom-Json
+    $CandidateRoot = $RuntimeArtifact.root
+    $AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
+    $ExpectedAdapterSha256 = $RuntimeArtifact.files.'scripts/ops/local_ai_http.py'
+    $SourceCommit = $null
+}
+if ($Action -eq "verify-artifact") {
+    if ($null -eq $RuntimeArtifact) { throw "verify-artifact requires a pinned artifact" }
+    [ordered]@{artifact_id=$RuntimeArtifact.artifact_id;candidate_image_id=$RuntimeArtifact.candidate_image_id;services_started=0} | ConvertTo-Json
+    exit 0
+}
 
 function Read-Token {
     if (-not (Test-Path -LiteralPath $SecretPath -PathType Leaf)) { return $null }
@@ -40,6 +58,7 @@ function New-Token {
 
 function Assert-Candidate {
     if (-not (Test-Path -LiteralPath $CandidateRoot -PathType Container)) {
+        if ($null -ne $RuntimeArtifact) { throw "verified runtime artifact disappeared" }
         New-Item -ItemType Directory -Force -Path $CandidateRoot | Out-Null
         $archive=Join-Path $RuntimeDir "candidate-$SourceCommit.tar"
         & git -C $RepoRoot archive --format=tar --output=$archive $SourceCommit backend/app scripts/ops/local_ai_http.py scripts/ops/local_ai_models.py scripts/ops/local_ai_process.py scripts/ops/local_ai_runtime_control.py
@@ -128,6 +147,8 @@ function New-CurrentState([object]$ListenerProcess, [object]$Health, [object]$La
         scope = "rag_only"
         models = $Health.models
         source_commit = $SourceCommit
+        artifact_id = $RuntimeArtifact.artifact_id
+        candidate_image_id = $RuntimeArtifact.candidate_image_id
         inference_on_start = $false
     }
     $receipt = Join-Path $RuntimeDir ("launch-{0}.json" -f ([DateTime]::UtcNow.ToString("yyyyMMddTHHmmssZ")))
@@ -156,6 +177,9 @@ switch ($Action) {
         $existing = @(Get-Listener)
         if ($existing.Count -gt 0) {
             $state = Read-Current
+            if ($null -ne $RuntimeArtifact -and ($null -eq $state -or $state.artifact_id -ne $RuntimeArtifact.artifact_id -or $state.adapter_sha256 -ne $ExpectedAdapterSha256)) {
+                throw "running RAG uses a different source; drain and stop its exact receipt before replacement"
+            }
             $token = Read-Token
             if (-not $token) { throw "11436 is occupied but the delivery RAG token is missing" }
             $health = Invoke-Health $token
@@ -220,7 +244,7 @@ switch ($Action) {
             $env:PROPERTY_AI_LOCAL_QWEN_MODEL = "qwen3.5:4b"
             $env:PROPERTY_AI_LOCAL_QWEN_ENDPOINT = $QwenEndpoint
             $launcher = Start-Process -FilePath $PythonPath -ArgumentList @(
-                "-I", "-X", "utf8", $AdapterPath, "serve", "--config", $ConfigPath
+                "-I", "-B", "-X", "utf8", $AdapterPath, "serve", "--config", $ConfigPath
             ) -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
         } finally {
             $env:LOCAL_AI_INTERNAL_TOKEN = $oldToken
