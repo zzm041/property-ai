@@ -25,7 +25,7 @@ from app.core.errors import (
 from app.core.logging import get_logger
 from app.core.time import current_business_date, utc_now
 from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.ai import WorkOrderAnalysisOutput, capability_filter_reason, category_duty, map_analysis_output, ordinary_maintenance
+from app.domain.ai import FilterReason, WorkOrderAnalysisOutput, capability_filter_reason, category_duty, eligibility_denial_details, map_analysis_output, ordinary_maintenance
 from app.domain.employee import DISPATCH_STAFF_ROLES, AttendanceOnDuty, EmployeeStatus
 from app.domain.iam import OrganizationScope, Principal, ScopeType
 from app.domain.work_order_visibility import resident_media_visible
@@ -3111,22 +3111,36 @@ class WorkOrderService:
         *,
         ignore_capacity: bool = False,
     ) -> AppError | None:
-        denied = AppError(
-            code=WorkOrderErrorCode.EMPLOYEE_NOT_ELIGIBLE,
-            message="Employee is not eligible for dispatch",
-            status_code=409,
-        )
+        # PA-101-A: one shared 409 body used to hide every denial cause, so a
+        # rejected manual dispatch left the operator with no way to tell a skill
+        # gate from attendance or capacity. The code and status stay the same;
+        # only the machine-readable reason is now filled in.
+        required_duty: str | None = None
+        required_skill: str | None = None
+
+        def denied(reason: str) -> AppError:
+            return AppError(
+                code=WorkOrderErrorCode.EMPLOYEE_NOT_ELIGIBLE,
+                message="Employee is not eligible for dispatch",
+                status_code=409,
+                details=eligibility_denial_details(
+                    reason,
+                    required_duty=required_duty,
+                    required_skill=required_skill,
+                ),
+            )
+
         if employee.status != EmployeeStatus.ACTIVE.value:
-            return denied
+            return denied(FilterReason.NOT_ACTIVE.value)
         if employee.tenant_id != record.tenant_id:
-            return denied
+            return denied("TENANT_MISMATCH")
         if employee.user_id is None or self._analysis.get_user_status(employee.user_id) != "ACTIVE":
-            return denied
+            return denied(FilterReason.USER_NOT_ACTIVE.value)
         roles = self._analysis.list_employee_role_codes(
             employee.user_id, tenant_id=record.tenant_id, property_id=record.property_id,
         )
         if not roles & DISPATCH_STAFF_ROLES:
-            return denied
+            return denied(FilterReason.NO_STAFF_ROLE.value)
         now = self._clock()
         assignment = self._employees.find_effective_assignment(
             employee_id=employee.id,
@@ -3134,10 +3148,10 @@ class WorkOrderService:
             now=now,
         )
         if assignment is None:
-            return denied
+            return denied(FilterReason.PROPERTY_NOT_EFFECTIVE.value)
         property_record = self._repository.get_property(record.property_id)
         if property_record is None:
-            return denied
+            return denied(FilterReason.PROPERTY_NOT_EFFECTIVE.value)
         business_date = current_business_date(
             property_record.timezone,
             clock=self._clock,
@@ -3148,33 +3162,35 @@ class WorkOrderService:
             business_date=business_date,
         )
         if daily is None or daily.on_duty != AttendanceOnDuty.ON_DUTY.value:
-            return denied
+            return denied(FilterReason.NOT_ON_DUTY.value)
         attendance = self._analysis.get_attendance(
             employee_id=employee.id,
             property_id=record.property_id,
             business_date=business_date,
         )
         if attendance is None or attendance.check_in_at is None:
-            return denied
+            return denied(FilterReason.NOT_CHECKED_IN.value)
         requirements = self._manual_requirements(record)
         if requirements is None:
-            return denied
+            return denied("ANALYSIS_UNREADABLE")
         required_duty, required_skill = requirements
         # Unknown classification keeps the explicitly retained manual fallback.
-        if required_duty is not None and capability_filter_reason(
-            duty_codes=self._analysis.list_employee_duties(employee.id),
-            skill_codes=self._analysis.list_employee_skills(employee.id),
-            required_duty=required_duty, required_skill=required_skill,
-        ) is not None:
-            return denied
+        if required_duty is not None:
+            capability = capability_filter_reason(
+                duty_codes=self._analysis.list_employee_duties(employee.id),
+                skill_codes=self._analysis.list_employee_skills(employee.id),
+                required_duty=required_duty, required_skill=required_skill,
+            )
+            if capability is not None:
+                return denied(capability.value)
         if not ignore_capacity:
             load = self._repository.employee_global_occupancy(
                 employee_id=employee.id, tenant_id=record.tenant_id, lock=True, collapse_incidents=True,
             )
             if not employee_is_capacity_available(current_load=load, max_capacity=employee.max_capacity):
-                return denied
+                return denied(FilterReason.CAPACITY_FULL.value)
             if ordinary_maintenance(required_duty, required_skill) and load > 0:
-                return denied
+                return denied(FilterReason.BUSY.value)
         return None
 
     def _attach_media(

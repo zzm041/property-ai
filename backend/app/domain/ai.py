@@ -136,10 +136,39 @@ ORDINARY_MAINTENANCE_SKILLS = frozenset({"PLUMBING", "ELECTRICAL", "HVAC", "MAIN
 # answers EMPLOYEE_NOT_ELIGIBLE(409) with no recovery path. Unknown/custom
 # restricted skills still stay hard constraints.
 UNCONSTRAINED_SKILLS = frozenset({"OTHER"})
+# PA-101-A follow-up: "other" on a concrete category is not a rejection, but it
+# must not be silent either -- auto dispatch, the manual gate and the 409 body
+# all have to be able to say why the skill gate stayed open.
+SKILL_UNCONSTRAINED_OTHER = "SKILL_UNCONSTRAINED_OTHER"
 
 
 def ordinary_maintenance(required_duty: str | None, required_skill: str | None) -> bool:
     return required_duty == "MAINTENANCE" and required_skill in ORDINARY_MAINTENANCE_SKILLS
+
+
+def capability_note(*, required_duty: str | None, required_skill: str | None) -> str | None:
+    """Explain a capability decision that opened the gate instead of closing it."""
+    if required_duty is not None and required_skill in UNCONSTRAINED_SKILLS:
+        return SKILL_UNCONSTRAINED_OTHER
+    return None
+
+
+def eligibility_denial_details(
+    reason: str,
+    *,
+    required_duty: str | None = None,
+    required_skill: str | None = None,
+) -> dict[str, str]:
+    """Machine-readable reason for EMPLOYEE_NOT_ELIGIBLE so the caller can recover."""
+    details = {"reason": reason}
+    if required_duty is not None:
+        details["required_duty"] = required_duty
+    if required_skill is not None:
+        details["required_skill"] = required_skill
+    note = capability_note(required_duty=required_duty, required_skill=required_skill)
+    if note is not None:
+        details["capability_note"] = note
+    return details
 
 _DUTY_FOR_CATEGORY = {
     WorkOrderCategory.PLUMBING: "MAINTENANCE",
@@ -322,6 +351,12 @@ def capability_filter_reason(
     *, duty_codes: frozenset[str], skill_codes: frozenset[str],
     required_duty: str | None, required_skill: str | None,
 ) -> FilterReason | None:
+    """Return the rejection reason, or None when the candidate passed the gate.
+
+    Nothing new is filtered here: an unconstrained ``other`` still passes on
+    purpose (PA-101-A). ``capability_note`` carries the explanation instead of a
+    silent None.
+    """
     if required_duty and required_duty not in duty_codes:
         return FilterReason.DUTY_MISMATCH
     if (
