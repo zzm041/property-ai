@@ -144,6 +144,35 @@ def direct(path,body=None,timeout=3):
         def redirect_request(self,*args,**kwargs):return None
     with urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect()).open(request,timeout=timeout) as r:
         return json.loads(r.read(1_100_000))
+# PA-131: a floor/timeout failure says something about THIS request, not about
+# the shared 11435 runtime. Only the two "the runtime may have leaked" reasons
+# may stop it; every other failure leaves it running so the next request meets
+# the same resource guard instead of an identity error it cannot recover from.
+RUNTIME_STOP_REASONS=frozenset({'REMOTE_CLIENT_FAILED','DESCENDANTS_REMAINED_AFTER_LAUNCHER_EXIT'})
+RUNTIME_LEFT_RUNNING_REASONS=frozenset({
+    'RESOURCE_FLOOR','RESOURCE_OBSERVATION_FAILED','INFERENCE_TIMEOUT','LOAD_TIMEOUT',
+    'R2_WINDOW_EXHAUSTED','REMOTE_RESPONSE_INVALID',
+})
+def runtime_stop_required(reason):
+    return reason in RUNTIME_STOP_REASONS
+def request_completion_state(*,kind,reason,success,owned_exit_confirmed,controlled_remote_stop):
+    """Decide whether a failed request left nothing of its own behind.
+
+    A failed Qwen request used to be UNKNOWN unless it had also killed the
+    shared runtime, which forced a shared barrier and blocked every later
+    request. Refusing to stop a healthy runtime is a known state: the owned
+    child is confirmed gone and the runtime is exactly as the launcher left it.
+    """
+    left_running=bool(
+        kind=='qwen' and not success and owned_exit_confirmed
+        and not controlled_remote_stop and reason in RUNTIME_LEFT_RUNNING_REASONS
+    )
+    unknown=bool(
+        not owned_exit_confirmed
+        or (kind=='qwen' and not success and not controlled_remote_stop and not left_running)
+    )
+    return left_running,unknown
+
 def qwen_guard():
     if direct('/api/version').get('version')!=QWEN_RUNTIME_VERSION:raise RuntimeError('QWEN_VERSION_CHANGED')
     tags=direct('/api/tags')['models']
@@ -304,7 +333,7 @@ class Runner:
                 or not 1<=self.shared_lock_wait_seconds<=55):raise ValueError('SHARED_MODEL_LOCK_LIMIT')
         self.continuation=self.config.get('continuation')
         self.resolutions=list(self.config.get('resolutions',[]))
-        self.runtime_binding=None
+        self.runtime_binding=None;self.runtime_binding_invalidated=False
         binding_path=self.config.get('runtime_binding_path')
         if binding_path:
             binding=Path(binding_path).resolve();evidence_root=Path(self.config['evidence_root']).resolve()
@@ -322,6 +351,21 @@ class Runner:
             if set(c.get('limits',{}))!=set(CONTINUATION_MAX) or any(not 0<c['limits'][k]<=CONTINUATION_MAX[k] for k in CONTINUATION_MAX):raise ValueError('CONTINUATION_LIMIT')
             if c.get('asr_start_ram_mib')!=11264:raise ValueError('ASR_ADMISSION_LIMIT')
             self.resolutions.extend(c.get('resolutions',[]))
+    def record_runtime_stopped(self,*,reason,remote_stop):
+        """Invalidate the in-memory binding and leave a receipt next to it.
+
+        The launcher rebuilds the binding and clears ``runtime-binding*.json``
+        on its next ``up``; this marker makes the stop auditable meanwhile and
+        stops this process from re-verifying a pid it just killed.
+        """
+        self.runtime_binding_invalidated=True
+        binding_path=self.config.get('runtime_binding_path')
+        if not binding_path:return
+        marker=Path(binding_path).with_suffix('.stopped.json')
+        save(marker,{
+            'format':'property-ai-runtime-stopped-v1','utc':stamp(),'reason':reason,
+            'binding':str(Path(binding_path).resolve()),'remote_stop':remote_stop,
+        })
     def acquire_request(self):
         with self.state_lock:
             if not self.accepting_requests:return False
@@ -338,6 +382,8 @@ class Runner:
         return hashlib.sha256(Path(path).read_bytes()).hexdigest()
     def verify_qwen_runtime_binding(self):
         if self.runtime_binding is None:raise RuntimeError('QWEN_RUNTIME_BINDING_REQUIRED')
+        if self.runtime_binding_invalidated:
+            raise RuntimeError('QWEN_RUNTIME_STOPPED_RESTART_REQUIRED')
         identity=bound_runtime_identity(self.runtime_binding)
         listener_port=int(QWEN_ENDPOINT.rsplit(':',1)[1])
         if loopback_listener_pid(listener_port)!=int(identity['pid']):
@@ -348,6 +394,11 @@ class Runner:
         detail=str(exc)
         if isinstance(exc,(ValueError,TypeError,KeyError,UnicodeError)):
             return 'VALIDATION_REJECTED'
+        if 'RUNTIME_STOPPED' in detail:
+            # PA-131: the runtime was stopped on purpose after a dirty-runtime
+            # failure, so the next request must say "restart" instead of
+            # "internal error" (which is what a dead binding pid used to yield).
+            return 'RUNTIME_STOPPED_RESTART_REQUIRED'
         if 'IDENTITY' in detail or 'LISTENER' in detail:
             return 'RUNTIME_IDENTITY_MISMATCH'
         if any(value in detail for value in ('QWEN_VERSION_CHANGED','QWEN_DIGEST_CHANGED','QWEN_RESIDENCY_CHANGED')):
@@ -542,7 +593,7 @@ class Runner:
         samples=[];events=[];reason=None;start=time.monotonic();phase='load';phase_start=start
         stdout=folder/'stdout.jsonl';stderr=folder/'stderr.txt'
         p=None;owned_exit_confirmed=False;cleanup_error=None
-        remote_stop=None;remote_stop_error=None
+        remote_stop=None;remote_stop_error=None;runtime_disposition='UNTOUCHED'
         try:
             with stdout.open('xb') as out,stderr.open('xb') as err:
                 p=subprocess.Popen(command,stdout=out,stderr=err,creationflags=subprocess.CREATE_NO_WINDOW,cwd=self.private)
@@ -573,19 +624,19 @@ class Runner:
                         except ValueError:pass
                     if len([event for event in observed if 'result' in event])!=1:
                         reason='REMOTE_RESPONSE_INVALID'
-            if kind=='qwen' and reason in {
-                'RESOURCE_FLOOR','RESOURCE_OBSERVATION_FAILED','INFERENCE_TIMEOUT',
-                'LOAD_TIMEOUT','R2_WINDOW_EXHAUSTED','REMOTE_CLIENT_FAILED',
-                'REMOTE_RESPONSE_INVALID','DESCENDANTS_REMAINED_AFTER_LAUNCHER_EXIT',
-            }:
+            if kind=='qwen' and runtime_stop_required(reason):
                 try:
                     if self.runtime_binding is None:
                         raise RuntimeError('QWEN_RUNTIME_BINDING_REQUIRED')
                     remote_stop=terminate_bound_runtime(
                         self.runtime_binding,listener_port=int(QWEN_ENDPOINT.rsplit(':',1)[1])
                     )
+                    runtime_disposition='STOPPED_DIRTY_RUNTIME'
+                    self.record_runtime_stopped(reason=reason,remote_stop=remote_stop)
                 except Exception as exc:
                     remote_stop_error=type(exc).__name__
+            elif kind=='qwen' and reason in RUNTIME_LEFT_RUNNING_REASONS:
+                runtime_disposition='LEFT_RUNNING'
             try:
                 if not reason and job.active():reason='DESCENDANTS_REMAINED_AFTER_LAUNCHER_EXIT'
                 job.terminate_and_confirm()
@@ -605,18 +656,22 @@ class Runner:
         )
         # A failed Qwen request is known-complete only when both the owned HTTP
         # client and the receipt-bound remote runtime have demonstrably exited.
-        unknown=(
-            not owned_exit_confirmed
-            or (kind=='qwen' and not success and not controlled_remote_stop)
+        left_running,unknown=request_completion_state(
+            kind=kind,reason=reason,success=success,
+            owned_exit_confirmed=owned_exit_confirmed,
+            controlled_remote_stop=controlled_remote_stop,
         )
+        if left_running:runtime_disposition='LEFT_RUNNING'
         result={'status':'SUCCESS' if success else ('UNKNOWN' if unknown else 'FAILED'),'reason':reason,'exit_code':p.returncode,
             'model':MODELS[kind],'revision':DIGEST if kind=='qwen' else MODEL_DIRS[kind][1],
             'events':events,'samples':samples,'total_seconds':time.monotonic()-start,'child_pid':p.pid,
             'request_job':job.name,'owned_exit_confirmed':owned_exit_confirmed,'cleanup_error':cleanup_error,
             'remote_stop':remote_stop,'remote_stop_error':remote_stop_error,
-            'remote_completion':'CONTROLLED_STOP' if controlled_remote_stop else (
-                'UNKNOWN' if kind=='qwen' and not success else 'NOT_UNKNOWN'
-            )}
+            'runtime_disposition':runtime_disposition,
+            'remote_completion':('CONTROLLED_STOP' if controlled_remote_stop
+                else 'LEFT_RUNNING' if left_running
+                else 'UNKNOWN' if unknown
+                else 'NOT_UNKNOWN')}
         save(folder/'result.json',result)
         if unknown:self.record_shared_completion_unknown(folder,result)
         if not success:raise RuntimeError(reason or 'MODEL_REQUEST_FAILED_NO_RETRY')
