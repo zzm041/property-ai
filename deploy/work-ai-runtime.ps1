@@ -371,12 +371,19 @@ switch ($Action) {
         $operationId=[guid]::NewGuid().ToString("N")
         $stdout=Join-Path $RuntimeDir "adapter-$operationId.stdout.log"
         $stderr=Join-Path $RuntimeDir "adapter-$operationId.stderr.log"
+        # PA-116-A-1: the prompt-version selection must travel with the process that
+        # serves requests, not with whatever shell happened to be open.
+        $promptVersionsPath = Join-Path (Join-Path $RepoRoot "deploy") "ai-runtime-prompts.json"
+        $oldPromptVersionsFile=$env:PROPERTY_AI_PROMPT_VERSIONS_FILE
+        if ((Test-Path -LiteralPath $promptVersionsPath -PathType Leaf) -and -not $env:PROPERTY_AI_PROMPT_VERSIONS_FILE) {
+            $env:PROPERTY_AI_PROMPT_VERSIONS_FILE=$promptVersionsPath
+        }
         $oldToken=$env:LOCAL_AI_INTERNAL_TOKEN;$oldModel=$env:PROPERTY_AI_LOCAL_QWEN_MODEL;$oldRuntimeModel=$env:PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL
         try {
             $env:LOCAL_AI_INTERNAL_TOKEN=$token;$env:PROPERTY_AI_LOCAL_QWEN_MODEL=$ModelName;$env:PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL=$RuntimeModelName
             $launcher=Start-Process -FilePath $PythonPath -ArgumentList @("-I","-B","-X","utf8",$AdapterPath,"serve","--config",$ConfigPath) -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
         } finally {
-            $env:LOCAL_AI_INTERNAL_TOKEN=$oldToken;$env:PROPERTY_AI_LOCAL_QWEN_MODEL=$oldModel;$env:PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL=$oldRuntimeModel
+            $env:LOCAL_AI_INTERNAL_TOKEN=$oldToken;$env:PROPERTY_AI_LOCAL_QWEN_MODEL=$oldModel;$env:PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL=$oldRuntimeModel;$env:PROPERTY_AI_PROMPT_VERSIONS_FILE=$oldPromptVersionsFile
         }
         $deadline=[DateTime]::UtcNow.AddSeconds(15)
         do { Start-Sleep -Milliseconds 250;$listener=@(Get-Listener) } until ($listener.Count -eq 1 -or [DateTime]::UtcNow -ge $deadline)

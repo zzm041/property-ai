@@ -16,6 +16,9 @@ param(
 # and a single verify command with explicit assertions.
 
 $ErrorActionPreference = "Stop"
+# System.Net.Http types are not resolvable under [Net.Http.*] until the assembly is
+# loaded; Windows PowerShell 5.1 does not preload it in a fresh -File session.
+try { Add-Type -AssemblyName System.Net.Http -ErrorAction Stop } catch { }
 $DeployDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = Split-Path -Parent $DeployDir
 $RuntimeDir = Join-Path $RepoRoot "tmp\\delivery-work-ai-runtime"
