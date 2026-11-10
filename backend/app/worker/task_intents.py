@@ -278,7 +278,7 @@ def execute_task_intent_task(self, intent_id):
         engine.dispose()
 
 
-def run_publisher(engine, settings, *, ids_supplier, seconds, timing=None, checkpoint=None, stop=None):
+def run_publisher(engine, settings, *, ids_supplier, seconds, timing=None, checkpoint=None, stop=None, heartbeat=None):
     """One supervised process, bounded batches and lifetime; never scan orders."""
     import time
     if not 0 < seconds <= 3600:
@@ -292,4 +292,8 @@ def run_publisher(engine, settings, *, ids_supplier, seconds, timing=None, check
             except SQLAlchemyError:
                 # DB-backed intent remains owed; no fake success or memory-only retry.
                 logger.warning("task_intent_publisher_database_unavailable", db_persisted=False)
+        if heartbeat is not None:
+            # PA-104-D: the container healthcheck reads this file's mtime; a
+            # stalled loop must turn into an unhealthy container.
+            heartbeat()
         time.sleep(min(2, max(0, deadline-time.monotonic())))

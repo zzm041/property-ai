@@ -186,14 +186,24 @@ services:
   worker:
     <<: *application
     command: ["sh", "-c", "exec celery -A app.worker.celery_app.celery_app worker --loglevel=info -Q \"$${CELERY_TASK_QUEUE}\" --concurrency=1"]
+    # PA-104-D: real probe — a worker that stopped consuming must be unhealthy.
     healthcheck:
-      disable: true
+      test: ["CMD", "python", "-m", "app.worker.healthcheck", "worker"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+      start_period: 60s
 
   publisher:
     <<: *application
     command: ["python", "-m", "app.worker.task_intent_publisher", "--seconds", "3600"]
+    # PA-104-D: real probe — heartbeat freshness plus broker reachability.
     healthcheck:
-      disable: true
+      test: ["CMD", "python", "-m", "app.worker.healthcheck", "publisher"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+      start_period: 60s
 
   beat-volume-init:
     <<: *app-image

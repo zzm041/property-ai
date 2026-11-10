@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.dependencies.auth import get_current_principal
 from app.core.config import Settings, get_settings
-from app.core.readiness import check_readiness
+from app.core.readiness import check_readiness, queue_depth
 from app.domain.iam import OrganizationScope, Principal, ScopeType
 from app.schema.common import success_envelope
 from app.service.rbac import RbacService
@@ -55,6 +55,8 @@ def opsz(
             "app_env": settings.app_env,
             "celery_queue": settings.resolved_celery_queue,
             "celery_dlq": settings.resolved_celery_dlq,
+            # PA-104-D: backlog must be visible, not inferred.
+            "celery_queue_depth": queue_depth(settings),
             "milvus_collection": settings.milvus_collection,
             "storage_provider": settings.storage_provider,
             "storage_bucket": settings.storage_bucket or None,
