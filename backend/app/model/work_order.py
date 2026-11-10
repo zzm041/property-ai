@@ -778,7 +778,14 @@ class SlaClock(BigIntPrimaryKeyMixin, TimestampMixin, Base):
 class IdempotencyRecord(BigIntPrimaryKeyMixin, Base):
     __tablename__ = "idempotency_records"
     __table_args__ = (
-        UniqueConstraint("idempotency_key", name="uq_idempotency_records_key"),
+        # D1: the replay lookup is scoped to (user_id, idempotency_key), so the
+        # uniqueness must be scoped the same way. A globally unique key lets any
+        # caller occupy a key it never used and block other users' creations.
+        UniqueConstraint(
+            "user_id",
+            "idempotency_key",
+            name="uq_idempotency_records_user_key",
+        ),
         CheckConstraint(
             "CHAR_LENGTH(TRIM(idempotency_key)) > 0",
             name="idempotency_key_not_blank",

@@ -79,7 +79,10 @@ def test_idempotency_key_is_unique(test_engine: Engine) -> None:
         item["name"]: item["column_names"]
         for item in inspector.get_unique_constraints("idempotency_records")
     }
-    assert uniques["uq_idempotency_records_key"] == ["idempotency_key"]
+    # D1: uniqueness is scoped to the owning user; the replay lookup is
+    # (user_id, idempotency_key) and a global key would let one user block another.
+    assert uniques["uq_idempotency_records_user_key"] == ["user_id", "idempotency_key"]
+    assert "uq_idempotency_records_key" not in uniques
 
 
 def test_work_order_log_is_append_only_model() -> None:

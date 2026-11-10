@@ -147,6 +147,36 @@ def test_idempotent_create_returns_same_work_order(identity_session: Session) ->
     assert conflict.json()["error"]["code"] == WorkOrderErrorCode.IDEMPOTENCY_CONFLICT
 
 
+def test_same_idempotency_key_is_scoped_per_user(identity_session: Session) -> None:
+    """D1: two users may reuse one key; only the same user's replay is deduplicated."""
+
+    graph = create_work_order_graph(identity_session)
+    shared = {"Idempotency-Key": "shared-key-across-users"}
+    with _client() as client:
+        token_a = _token(client, graph.employees.resident_id)
+        token_b = _token(client, graph.resident_b_id)
+        first_a = client.post(
+            "/api/v1/work-orders",
+            json={"house_id": graph.house_1_id, "contact_phone": "13800000000", "text": "Resident A"},
+            headers={**_auth(token_a, "t6-idemp-scope-a"), **shared},
+        )
+        first_b = client.post(
+            "/api/v1/work-orders",
+            json={"house_id": graph.house_2_id, "contact_phone": "13800000001", "text": "Resident B"},
+            headers={**_auth(token_b, "t6-idemp-scope-b"), **shared},
+        )
+        replay_a = client.post(
+            "/api/v1/work-orders",
+            json={"house_id": graph.house_1_id, "contact_phone": "13800000000", "text": "Resident A"},
+            headers={**_auth(token_a, "t6-idemp-scope-a2"), **shared},
+        )
+    assert first_a.status_code == 200
+    assert first_b.status_code == 200
+    assert first_a.json()["data"]["id"] != first_b.json()["data"]["id"]
+    assert replay_a.status_code == 200
+    assert replay_a.json()["data"]["id"] == first_a.json()["data"]["id"]
+
+
 def test_cross_property_house_claim_is_rejected(identity_session: Session) -> None:
     graph = create_work_order_graph(identity_session)
     with _client() as client:

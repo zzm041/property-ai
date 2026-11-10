@@ -160,7 +160,14 @@ def _registration_content_hash(record: FileObject) -> str:
 _ACTIVE_ASSIGNMENT_UNIQUE = frozenset(
     {"uq_work_order_assignments_active_work_order"}
 )
-_IDEMPOTENCY_UNIQUE = frozenset({"uq_idempotency_records_key"})
+_IDEMPOTENCY_UNIQUE = frozenset(
+    {
+        # D1 renamed the constraint when the scope became (user_id, key); both
+        # names are accepted so an unmigrated deployment still maps the race.
+        "uq_idempotency_records_user_key",
+        "uq_idempotency_records_key",
+    }
+)
 _HOUSE_SCOPE_FK = frozenset({"fk_work_orders_house_property_tenant_houses"})
 _QUEUE_STATUSES = tuple(
     status.value for status in PENDING_DISPATCH_STATUSES
