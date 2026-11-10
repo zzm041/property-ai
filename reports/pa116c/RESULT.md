@@ -189,3 +189,49 @@ appuser
 2. **两个契约文件（`domain/ai.py`、`domain/observed_event.py`）未在任何 WIP 清单里**，`git status --porcelain -- <这两个路径>` 为空 ⇒ 对这两个文件，"镜像 == HEAD" 是硬证据，不是推断。
 3. **重建的确定性**：同一命令在同一工作树上重建得到相同 image id（layer cache 命中）；但换一次 `docker build --no-cache` 只能保证内容一致、不能保证 id 一致（基础镜像 manifest 与 pip 解析都可能变）。要 digest 级可复现，需要把 `requirements.delivery.lock` 全部钉成 `pkg==ver --hash=…` 且基础镜像已经 `@sha256` 钉死（后者本轮已做）。
 4. **`deploy/delivery.ps1 release` 本轮仍未用于切换**：它被 `Assert-NoRetainedRollbackContainers` 拦住（项目下保留 **29** 个 `*-rollback-2026xx` 容器——`docker ps -a | grep -ci rollback` = 29，`docker ps -a --filter label=com.docker.compose.project=property-ai-delivery-check | grep -ci rollback` = 29；本文件初版写 21，2026-11-10 20:20 复核时实测更正。`reports/delivery-closeout-20261103/RUNNING-CANDIDATE.md` 明令勿绕过）。A-3 只到"镜像可复现构建 + 内容断言"，容器切换仍走 `reports/pa116-cutover/cutover_delivery.py`（本轮未切换，运行中的四容器仍是 `sha256:69372219582b…`）。
+
+## P3 收口（2026-11-10 20:35 CST，按 7 号复核决定 m01879 执行）
+
+7 号在 PA-116-A 复核里记了两条 P3，并要求并入 PA-116-C、但**不单独为它们重建镜像**——理由成立：`deploy/work-ai-runtime.ps1` 与 `deploy/ai-runtime.ps1` 都不在候选导出集合里（`git archive $SourceCommit backend/app scripts/ops/local_ai_http.py …`），改它们不会让已钉的三个 sha 失效。实测确认：改后 `git cat-file blob 50bcad5:scripts/ops/local_ai_http.py | sha256sum` 仍是 `63ec2054…`、models `faf70cf6…`、runtime-control `b0de6d35…`，与本文件 A-4 节钉的值一致；`git diff --stat HEAD~1..HEAD` 只有 `deploy/work-ai-runtime.ps1`（+18/−3）。
+
+### P3-1 仓库版本文件优先于操作者 env（已改）
+
+修前 `work-ai-runtime.ps1:378` 的条件是 `(Test-Path …) -and -not $env:PROPERTY_AI_PROMPT_VERSIONS_FILE`，即操作者 shell 里留着旧路径时旧路径优先——单入口 `ai-runtime.ps1:218` 会强制覆盖，但绕过单入口直接调 launcher 时这个洞就在。
+
+修后：
+- 仓库文件存在 ⇒ 一律以仓库文件为准；若 `PROPERTY_AI_PROMPT_VERSIONS_FILE` 指向别处，打印 `prompt_versions_env_ignored: … is ignored; the reviewed file '…' is authoritative`，并输出 `prompt_versions_source=<实际生效路径>`。
+- 仓库文件缺失 ⇒ 才回退 env，并打印 `prompt_versions_repo_file_missing: falling back to …`。
+
+实测（正是 7 号指的那个场景：绕过单入口、shell 里带脏 env）：
+```
+> $env:PROPERTY_AI_PROMPT_VERSIONS_FILE='D:\property-ai\tmp\wrong-prompts.json'
+> powershell -File deploy\ollama-runtime.ps1 start
+> powershell -File deploy\work-ai-runtime.ps1 start
+prompt_versions_env_ignored: PROPERTY_AI_PROMPT_VERSIONS_FILE='D:\property-ai\tmp\wrong-prompts.json' is ignored;
+  the reviewed file 'D:\property-ai\deploy\ai-runtime-prompts.json' is authoritative
+prompt_versions_source=D:\property-ai\deploy\ai-runtime-prompts.json
+（日志：reports/pa116c/logs/p3-launcher-only-wrong-env.log）
+```
+随后 `/healthz`：`reservation_gate=READY`、`prompt_versions.source=file:D:\property-ai\deploy\ai-runtime-prompts.json`、`work_order=["wo-analysis-v26-summary-fidelity"]` —— 脏 env 没有生效。
+
+### P3-2 receipt 增加 equiv_scope（已改）
+
+`current.json` 与 `status` 输出新增三字段：
+```
+prompt_versions_file = D:\property-ai\deploy\ai-runtime-prompts.json
+equiv_scope          = ["backend/app","scripts/ops/local_ai_http.py","scripts/ops/local_ai_models.py","scripts/ops/local_ai_runtime_control.py"]
+equiv_scope_note     = "source_commit is equivalent only for equiv_scope; run git rev-parse HEAD for the repo HEAD"
+```
+理由照 7 号原话：receipt 打 `source_commit=50bcad5…`，而仓库 HEAD 已往前走了，读的人会误以为整仓都在 50bcad5。现在 receipt 自己声明等价范围与"整仓 HEAD 请看 `git rev-parse HEAD`"。
+
+### 收尾状态（单入口复原）
+
+```
+> powershell -File deploy\ai-runtime.ps1 down   → exit 0
+> powershell -File deploy\ai-runtime.ps1 up     → exit 0
+> powershell -File deploy\ai-runtime.ps1 status → exit 0
+receipt: source_commit=50bcad5320e1e41033b97e82f0e99da8db4521e0  listener_pid=45628  adapter_sha256=63EC2054…
+         prompt_versions_file=D:\property-ai\deploy\ai-runtime-prompts.json  equiv_scope=[4 项]
+health : reservation_gate=READY  prompt_versions.source=file:D:\property-ai\deploy\ai-runtime-prompts.json
+```
+日志：`reports/pa116c/logs/{p3-down,p3-down2,p3-ollama-start,p3-launcher-only-wrong-env,p3-up2,p3-status2}.log`（该目录被 `.gitignore` 忽略，仅供复核读盘）。提交：`b4017a5`。
