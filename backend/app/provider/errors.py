@@ -21,6 +21,12 @@ class ProviderRateLimitError(ProviderError):
     error_code = "AI.RATE_LIMITED"
 
 
+class ProviderOutputUnverifiableError(ProviderError):
+    """The provider ran but produced no single usable answer (PA-169/F2)."""
+
+    error_code = "AI.OUTPUT_UNVERIFIABLE"
+
+
 class ProviderInputQuarantinedError(ProviderError):
     """PA-169: the adapter refused this exact input, not the budget.
 

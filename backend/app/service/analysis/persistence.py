@@ -413,6 +413,48 @@ class PersistenceMixin:
             )
             self._write_provider_mode(call_log.id, provider_type)
 
+    def _record_rejected_output(
+        self,
+        snapshot: AnalysisSnapshot,
+        *,
+        request_id: str,
+        attempt: int,
+        error_code: str,
+    ) -> None:
+        """Log an unusable model answer against the input that produced it.
+
+        PA-169/F1: the adapter only quarantines what it can see (its own transport
+        failures). The vocabulary/contract rejection happens here, so this is the
+        only place that can leave the ``(work_order_id, input_hash, error_code)``
+        row the quarantine probe reads. Written inside the caller's transaction:
+        ``_apply`` already holds the owned one, and a second one would deadlock on
+        the work order lock.
+        """
+
+        now = utc_now()
+        model_version = str(getattr(self._llm, "model_version", None) or "unknown")
+        self._ai.add_call_log(
+            AiCallLog(
+                tenant_id=snapshot.tenant_id,
+                property_id=snapshot.property_id,
+                work_order_id=snapshot.work_order_id,
+                request_id=request_id,
+                provider_type=ProviderType.LLM.value,
+                operation="payload_validation",
+                biz_type="WORK_ORDER_ANALYSIS",
+                prompt_version=shared.WORK_ORDER_ANALYSIS_PROMPT_VERSION,
+                model_version=model_version[:64],
+                status=AiCallStatus.INVALID.value,
+                started_at=now,
+                finished_at=now,
+                latency_ms=0,
+                attempt=max(int(attempt), 1),
+                error_code=error_code,
+                token_usage=None,
+                input_hash=snapshot.input_hash,
+            )
+        )
+
     def _write_provider_mode(
         self,
         call_log_id: int,
@@ -449,7 +491,6 @@ class PersistenceMixin:
         request_id: str,
         attempt: int,
     ) -> WorkOrderAnalysis | None:
-        del attempt
         try:
             with shared.begin_owned_transaction(self._session):
                 record = self._work_orders.get_work_order_for_update(snapshot.work_order_id)
@@ -504,6 +545,17 @@ class PersistenceMixin:
                 if content is not None and bundle.asr_text:
                     content.asr_text = bundle.asr_text
                 if mapped is None:
+                    if mapped_error in shared.QUARANTINE_ERROR_CODES:
+                        # PA-169/F1: the answer arrived and the contract refused it.
+                        # Record it against the input hash so the next attempt on the
+                        # same text can see the quarantine; without this row the only
+                        # trace is the analysis row, which carries no input hash.
+                        self._record_rejected_output(
+                            snapshot,
+                            request_id=request_id,
+                            attempt=attempt,
+                            error_code=mapped_error,
+                        )
                     analysis.status = AnalysisStatus.FAILED.value
                     analysis.error_code = mapped_error or bundle.error_code or AiErrorCode.PROVIDER_FAILED
                     if snapshot.attachment_completion:
@@ -530,6 +582,7 @@ class PersistenceMixin:
                         analysis,
                         request_id,
                         analysis.error_code,
+                        resource_floor=bundle.resource_floor,
                     )
                     return analysis
                 self._fill_analysis(analysis, mapped)
@@ -885,7 +938,22 @@ class PersistenceMixin:
         analysis: WorkOrderAnalysis,
         request_id: str,
         error_code: str,
+        *,
+        resource_floor: Mapping[str, object] | None = None,
     ) -> None:
+        details = {
+            "work_order_id": record.id,
+            "analysis_id": analysis.id,
+            "status": analysis.status,
+            "error_code": error_code,
+        }
+        # PA-169/F3: the most common refusal (16 of 21) is a resource floor, and
+        # its whole value is the number beside it - short_by_mib.
+        if resource_floor is not None:
+            details["resource_floor"] = dict(resource_floor)
+        forced = getattr(self, "_force_retry_actor", None)
+        if forced is not None:
+            details["forced_retry_actor"] = forced
         self._audit.append(
             action=AuditAction.WORK_ORDER_AI_ANALYSIS_FAILED,
             resource_type=AuditResourceType.WORK_ORDER_ANALYSIS,
@@ -895,12 +963,7 @@ class PersistenceMixin:
             scope_type=ScopeType.PROPERTY,
             tenant_id=record.tenant_id,
             property_id=record.property_id,
-            details={
-                "work_order_id": record.id,
-                "analysis_id": analysis.id,
-                "status": analysis.status,
-                "error_code": error_code,
-            },
+            details=details,
         )
 
 

@@ -124,6 +124,11 @@ from app.service.task_intent import IntentLeaseLost, require_execution_lease
 from app.service.auth import AuthService
 from app.service.rbac import RbacService
 
+# PA-169: the two provider answers that mean "the model produced output the
+# contract cannot use". They are the only failures that may quarantine an
+# input hash; runtime failures must stay retryable.
+QUARANTINE_ERROR_CODES = (AiErrorCode.INVALID_OUTPUT, AiErrorCode.OUTPUT_UNVERIFIABLE)
+
 logger = get_logger(__name__)
 
 
@@ -169,6 +174,10 @@ class ProviderBundle:
     llm_payload: Mapping[str, object] | None
     error_code: str | None
     call_status: str
+    # PA-169/F3: a resource refusal carries the numbers it was refused on
+    # (resource_floor.short_by_mib). Registered here because both the orchestrator
+    # and the persistence mixin read it.
+    resource_floor: Mapping[str, object] | None = None
 
 
 

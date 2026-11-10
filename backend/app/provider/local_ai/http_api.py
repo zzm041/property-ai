@@ -22,6 +22,23 @@ from .runtime_control import (
     stamp,
 )
 
+MAX_FORCE_RETRY_ACTOR=120
+
+
+def force_retry_actor_from_headers(headers):
+    """Read the operator header and say so when it is unusable (PA-169/F4).
+
+    Returns ``(actor, error_code)``. The header is the only place an operator
+    identity can travel: the inference body stays exactly six keys, so silently
+    dropping an over-long actor made a "forced" retry look forced when it was
+    not. One seam, tested directly, instead of a branch buried in the handler.
+    """
+
+    actor=(headers.get('X-Force-Retry-Actor') or '').strip()
+    if len(actor)>MAX_FORCE_RETRY_ACTOR:return '', 'INVALID_FORCE_RETRY_ACTOR'
+    return actor, None
+
+
 def serve(config_path):
     runner=Runner(config_path);token=os.environ.get('LOCAL_AI_INTERNAL_TOKEN','')
     if len(token)<32:raise RuntimeError('INTERNAL_AUTH_REQUIRED')
@@ -57,9 +74,13 @@ def serve(config_path):
             # PA-169: an operator may re-run a quarantined text on purpose. The
             # actor travels in its own header because the inference body stays
             # strictly six keys, and it is written into the reservation.
-            force_actor=(self.headers.get('X-Force-Retry-Actor') or '').strip()
-            force_retry=({'actor':force_actor,'request_binding':request_binding}
-                         if force_actor and len(force_actor)<=120 else None)
+            force_actor,actor_error=force_retry_actor_from_headers(self.headers)
+            # PA-169/F4: an unusable actor used to be dropped silently, so a
+            # "forced" retry looked forced while it was not. Say no instead.
+            if actor_error is not None:
+                runner.record_pre_reservation_failure(ValueError(actor_error),stage='HTTP_ENVELOPE',request_binding=request_binding)
+                return self.reply(400,{'error':actor_error})
+            force_retry=({'actor':force_actor,'request_binding':request_binding} if force_actor else None)
             if self.headers.get('Transfer-Encoding') or len(self.headers.get_all('Content-Length',[]))!=1:
                 runner.record_pre_reservation_failure(ValueError('CONTENT_LENGTH_REQUIRED'),stage='HTTP_ENVELOPE',request_binding=request_binding)
                 return self.reply(400,{'error':'CONTENT_LENGTH_REQUIRED'})

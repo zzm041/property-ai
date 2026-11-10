@@ -14,6 +14,7 @@ from app.core.logging import get_logger, safe_url_for_log
 from app.provider.errors import (
     ProviderInputQuarantinedError,
     ProviderInvalidOutputError,
+    ProviderOutputUnverifiableError,
     ProviderRateLimitError,
     ProviderTimeoutError,
     ProviderUnavailableError,
@@ -34,6 +35,14 @@ def _reason_code(response: httpx.Response) -> str | None:
         return None
     code = payload.get("reason_code")
     return code if isinstance(code, str) else None
+
+
+def _response_json(response: httpx.Response) -> object | None:
+    """Best-effort body read for the fields we are allowed to surface."""
+    try:
+        return response.json()
+    except (ValueError, json.JSONDecodeError):
+        return None
 
 
 def _private_target(url: str) -> bool:
@@ -111,14 +120,33 @@ def request_json(
         _log_failure(provider, operation, "AI.RATE_LIMITED", started_at, url=url)
         raise ProviderRateLimitError("Provider rate limited")
     if response.status_code >= 500:
-        # PA-169: the adapter's 503 covers several very different refusals. When
-        # it says the input itself is quarantined, say so instead of reporting a
-        # generic outage - the caller needs the retry path, not a retry loop.
-        if _reason_code(response) == "INPUT_QUARANTINED":
+        # PA-169: the adapter's 503 covers several very different refusals, so
+        # the body now always names its reason and the caller keeps it.
+        reason = _reason_code(response)
+        if reason == "INPUT_QUARANTINED":
             _log_failure(provider, operation, "AI.INPUT_QUARANTINED", started_at, url=url)
             raise ProviderInputQuarantinedError("Provider quarantined this input")
-        _log_failure(provider, operation, "AI.UNAVAILABLE", started_at, url=url)
-        raise ProviderUnavailableError("Provider is unavailable")
+        if reason == "OUTPUT_UNVERIFIABLE":
+            _log_failure(provider, operation, "AI.OUTPUT_UNVERIFIABLE", started_at, url=url)
+            raise ProviderOutputUnverifiableError("Provider produced no verifiable answer")
+        body = _response_json(response)
+        floor = body.get("resource_floor") if isinstance(body, dict) else None
+        unavailable = ProviderUnavailableError("Provider is unavailable")
+        if isinstance(floor, dict):
+            # PA-169/F3: the numbers the refusal was based on travel with the
+            # error, in the adapter's own shape (resource_floor.short_by_mib), so
+            # the operator sees the same field in the log and in the 503 body.
+            unavailable.resource_floor = floor
+        _log_failure(
+            provider,
+            operation,
+            "AI.UNAVAILABLE",
+            started_at,
+            url=url,
+            reason=reason,
+            short_by_mib=(floor or {}).get("short_by_mib") if isinstance(floor, dict) else None,
+        )
+        raise unavailable
     if response.status_code >= 400:
         _log_failure(provider, operation, "AI.INVALID_OUTPUT", started_at, url=url)
         raise ProviderInvalidOutputError("Provider rejected the request")
@@ -161,6 +189,8 @@ def _log_failure(
     *,
     url: str | None = None,
     exc: BaseException | None = None,
+    reason: str | None = None,
+    short_by_mib: int | None = None,
 ) -> None:
     logger.warning(
         "provider_failed",
@@ -170,4 +200,9 @@ def _log_failure(
         latency_ms=round((time.perf_counter() - started_at) * 1000, 2),
         url=safe_url_for_log(url) if url else None,
         error_type=type(exc).__name__ if exc is not None else None,
+        # PA-169/F3: name the adapter's own reason and, when a floor refused the
+        # request, how far short it was - the two facts that turn "provider
+        # failed" into an actionable line.
+        reason=reason,
+        short_by_mib=short_by_mib,
     )

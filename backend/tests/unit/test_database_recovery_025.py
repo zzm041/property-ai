@@ -160,10 +160,21 @@ def test_saved_analysis_dispatches_outside_apply_and_without_provider_recall():
     s._retry_auto_dispatch_from_existing.assert_called_once()
 
 
-def test_apply_commit_precedes_separate_dispatch():
+def test_apply_commit_precedes_separate_dispatch(monkeypatch):
+    from contextlib import nullcontext
     s = AnalysisService.__new__(AnalysisService)
     order = []
-    s._prepare = MagicMock(return_value=NS(skipped=False))
+    # PA-169/F1: the quarantine probe runs before the provider call, so this
+    # bare service needs the answer (nothing is quarantined here) and the owned
+    # transaction the probe opens around its single bounded read.
+    monkeypatch.setattr(
+        'app.service.analysis.context.begin_owned_transaction',
+        lambda session: nullcontext(),
+    )
+    s._session = MagicMock()
+    s._force_retry_actor = None
+    s._ai = MagicMock(**{"has_quarantined_output.return_value": False})
+    s._prepare = MagicMock(return_value=NS(skipped=False, work_order_id=30, input_hash="d" * 64))
     s._call_providers = MagicMock()
     s._apply = MagicMock(side_effect=lambda **kw: (order.append('apply-committed') or NS(id=7,status='COMPLETED')))
     s._retry_auto_dispatch_from_existing = MagicMock(side_effect=lambda **kw: order.append('dispatch'))

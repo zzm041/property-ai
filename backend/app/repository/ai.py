@@ -1,5 +1,6 @@
 """Persistence helpers for AI analysis, incidents, and announcements."""
 
+from collections.abc import Sequence
 from datetime import datetime
 
 from sqlalchemy import and_, delete, func, or_, select
@@ -111,6 +112,29 @@ class AiRepository:
         self._session.add(record)
         self._session.flush()
         return record
+
+    def has_quarantined_output(
+        self,
+        *,
+        work_order_id: int,
+        input_hash: str,
+        error_codes: Sequence[str],
+    ) -> bool:
+        """Did this work order already fail on this exact input (PA-169/F1)?
+
+        One bounded read: it rides ix_ai_call_logs_work_order_id and stops at the
+        first hit, so a retry costs one index probe rather than a table scan.
+        """
+
+        return self._session.execute(
+            select(AiCallLog.id)
+            .where(
+                AiCallLog.work_order_id == work_order_id,
+                AiCallLog.input_hash == input_hash,
+                AiCallLog.error_code.in_(tuple(error_codes)),
+            )
+            .limit(1)
+        ).first() is not None
 
     def delete_recommendations(self, analysis_id: int) -> None:
         existing = self._session.scalars(

@@ -596,7 +596,8 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
         AuditAction.WORK_ORDER_AI_ANALYSIS_FAILED: AuditActionPolicy(
             resource_type=AuditResourceType.WORK_ORDER_ANALYSIS,
             allowed_detail_keys=frozenset(
-                {"work_order_id", "analysis_id", "status", "error_code"}
+                {"work_order_id", "analysis_id", "status", "error_code",
+                 "resource_floor", "forced_retry_actor"}
             ),
             required_detail_keys=frozenset(
                 {"work_order_id", "analysis_id", "status", "error_code"}

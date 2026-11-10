@@ -107,9 +107,14 @@ from app.service.rbac import RbacService
 
 logger = get_logger(__name__)
 
-
 from . import context as shared
 from .persistence import PersistenceMixin
+
+# PA-169/F1: the failure codes that mean "the model answered, and the answer was
+# unusable". Only these quarantine an input; a floor/timeout/unavailable failure
+# says nothing about the text and must stay retryable. Defined in context.py so
+# persistence.py can record the same set without importing this module.
+QUARANTINE_ERROR_CODES = shared.QUARANTINE_ERROR_CODES
 from .validation import ValidationMixin
 from .vision import VisionMixin
 from .context import AnalysisSnapshot, MediaRef, ProviderBundle
@@ -174,6 +179,52 @@ class AnalysisService(VisionMixin, ValidationMixin, PersistenceMixin):
                 request_id=request_id,
             )
             return self._ai.get_current_analysis(work_order_id)
+        if self._force_retry_actor is None and self._input_is_quarantined(snapshot):
+            # PA-169/F1: the adapter judges transport, so the isolation decision
+            # moved here, to the only layer that knows whether the model answer
+            # was usable. A failed AI.INVALID_OUTPUT row already exists for this
+            # exact input hash, so re-asking the same model buys nothing: keep the
+            # budget, skip the provider, and say why.
+            self._write_call_log(
+                snapshot,
+                provider_type=ProviderType.LLM,
+                operation="structured_completion",
+                status=AiCallStatus.INVALID,
+                started_at=self._clock(),
+                latency_ms=0,
+                request_id=request_id,
+                attempt=attempt,
+                model_version=getattr(self._llm, "model_version", "unknown"),
+                error_code=AiErrorCode.INPUT_QUARANTINED,
+            )
+            logger.warning(
+                "analysis_input_quarantined",
+                request_id=request_id,
+                work_order_id=snapshot.work_order_id,
+                input_hash=snapshot.input_hash,
+                reason_code=AiErrorCode.INPUT_QUARANTINED,
+                skipped="quarantined",
+            )
+            return self._apply(
+                snapshot=snapshot,
+                bundle=ProviderBundle(
+                    asr_text=None,
+                    vision_text=None,
+                    llm_payload=None,
+                    error_code=AiErrorCode.INPUT_QUARANTINED,
+                    call_status=AiCallStatus.INVALID.value,
+                ),
+                request_id=request_id,
+                attempt=attempt,
+            )
+        if self._force_retry_actor is not None:
+            logger.warning(
+                "analysis_input_quarantine_forced",
+                request_id=request_id,
+                work_order_id=snapshot.work_order_id,
+                input_hash=snapshot.input_hash,
+                force_retry_actor=self._force_retry_actor,
+            )
         bundle = self._call_providers(snapshot=snapshot, request_id=request_id, attempt=attempt)
         analysis = self._apply(
             snapshot=snapshot,
@@ -722,6 +773,24 @@ class AnalysisService(VisionMixin, ValidationMixin, PersistenceMixin):
                 skip_reason="duplicate",
             )
 
+    def _input_is_quarantined(self, snapshot: AnalysisSnapshot) -> bool:
+        """One indexed read: did this input already fail as unusable output?
+
+        PA-169/F1: the quarantine lives here because only this layer knows which
+        rows meant "the model answered, and the answer was unusable". The read is
+        bounded by ix_ai_call_logs_work_order_id and stops at the first hit.
+        """
+
+        # The probe needs its own owned transaction: a bare ORM read would leave
+        # SQLAlchemy's autobegin transaction open and _call_providers refuses to
+        # run provider calls while a business transaction is live.
+        with shared.begin_owned_transaction(self._session):
+            return self._ai.has_quarantined_output(
+                work_order_id=snapshot.work_order_id,
+                input_hash=snapshot.input_hash,
+                error_codes=QUARANTINE_ERROR_CODES,
+            )
+
     def _call_providers(
         self,
         *,
@@ -767,6 +836,7 @@ class AnalysisService(VisionMixin, ValidationMixin, PersistenceMixin):
             llm_payload=payload,
             error_code=error_code,
             call_status=call_status,
+            resource_floor=getattr(self, "_llm_resource_floor", None),
         )
 
     def _run_llm(
@@ -899,6 +969,10 @@ class AnalysisService(VisionMixin, ValidationMixin, PersistenceMixin):
             return payload, None, AiCallStatus.SUCCESS.value
         except ProviderError as exc:
             status = _status_for_error(exc)
+            # PA-169/F3: keep the refusal numbers (short_by_mib) long enough to
+            # reach the failure audit instead of dropping them with the exception.
+            floor = getattr(exc, "resource_floor", None)
+            self._llm_resource_floor = floor if isinstance(floor, Mapping) else None
             self._write_call_log(
                 snapshot,
                 provider_type=ProviderType.LLM,

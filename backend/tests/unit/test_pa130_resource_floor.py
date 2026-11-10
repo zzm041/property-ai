@@ -171,9 +171,13 @@ def test_the_503_body_names_the_shortfall_without_changing_the_error(m, monkeypa
     assert body["resource_floor"]["ram"]["short_by_mib"] == 38
     assert body["resource_floor"]["gpu"]["short_by_mib"] == 38
     assert body["resource_floor"]["short_by_mib"] == 38
-    # Any other refusal keeps exactly the old body.
+    # PA-169/F3: every refusal now names its reason, so the floor case carries
+    # the admission code next to the numbers it was refused on.
+    assert body["reason_code"] == "RESOURCE_ADMISSION_REJECTED"
+    # Any other refusal keeps the old keys and still names its own reason.
     assert m.failure_body(RuntimeError("MODEL_REQUEST_FAILED_NO_RETRY")) == {
-        "error": "MODEL_GUARD_OR_REQUEST_FAILED_NO_RETRY"
+        "error": "MODEL_GUARD_OR_REQUEST_FAILED_NO_RETRY",
+        "reason_code": "INTERNAL_PRE_RESERVATION_ERROR",
     }
 
 

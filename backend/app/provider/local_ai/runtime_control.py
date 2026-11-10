@@ -499,7 +499,16 @@ class Runner:
             # PA-169: a quarantined input hash is a model-output verdict, not a
             # budget refusal; reporting it as BUDGET_REJECTED hid the retry path.
             return 'INPUT_QUARANTINED'
-        if any(value in detail for value in ('CALL_LIMIT','WINDOW_EXHAUSTED','BUDGET','PREVIOUS_REQUEST')):
+        if 'PREVIOUS_REQUEST' in detail:
+            # PA-169/F3: "the previous request's completion is unknown" is not a
+            # spent budget. Folding it into BUDGET_REJECTED sent the operator to
+            # the wrong counter, exactly like the quarantine code used to.
+            return 'PREVIOUS_REQUEST_UNKNOWN'
+        if 'REMOTE_RESPONSE_INVALID' in detail:
+            # PA-169/F2: a child that exits without one result line produced no
+            # usable answer; say so instead of "internal error".
+            return 'OUTPUT_UNVERIFIABLE'
+        if any(value in detail for value in ('CALL_LIMIT','WINDOW_EXHAUSTED','BUDGET')):
             return 'BUDGET_REJECTED'
         if isinstance(exc,(TimeoutError,ConnectionError,OSError)):
             return 'REMOTE_UNAVAILABLE'
@@ -662,6 +671,13 @@ class Runner:
                 if r.get('input_hash')==input_hash and r['kind']==kind and result.get('status')!='SUCCESS':failed.append((p,result))
             for p,result in failed:
                 origin=failure_origin(result.get('reason'))
+                # PA-169/F1: this layer can only judge what the adapter itself
+                # concluded, and today it judges transport, not the nine-field
+                # answer - so no MODEL_OUTPUT_* (or REMOTE_RESPONSE_INVALID) row
+                # is ever produced in production. The branch is reserved for an
+                # adapter that does judge output; live isolation runs in
+                # app/service/analysis against AI.INVALID_OUTPUT rows on the same
+                # input_hash. Deleting it would silently unlearn the rule.
                 if origin==FAILURE_ORIGIN_MODEL_OUTPUT:quarantined.append((p,result))
                 else:retried.append({'record':p.parent.name,'reason':result.get('reason'),'origin':origin})
             if quarantined and force_retry:
@@ -867,6 +883,10 @@ MODEL_OUTPUT_FAILURE_REASONS=frozenset({
     'MODEL_OUTPUT_REJECTED',      # the answer failed the nine-field contract
     'MODEL_OUTPUT_INVALID',       # the answer was not parseable
     'MODEL_OUTPUT_SCHEMA_INVALID',# the answer shape was wrong
+    # PA-169/F2: the child ran to completion but emitted no single result line.
+    # Nothing about that says "the machine was busy", so it counts as an unusable
+    # answer and takes the quarantine path instead of the auto-retry path.
+    'REMOTE_RESPONSE_INVALID',
 })
 FAILURE_ORIGIN_RUNTIME='runtime'
 FAILURE_ORIGIN_MODEL_OUTPUT='model_output'
@@ -880,9 +900,10 @@ def failure_body(exc):
     body={'error':'MODEL_GUARD_OR_REQUEST_FAILED_NO_RETRY'}
     snapshot=getattr(exc,'resource_floor',None)
     if snapshot is not None:body['resource_floor']=snapshot
-    # PA-169: the caller must be able to tell a quarantined input from a budget
-    # refusal, so the quarantine carries its own reason code.
-    if Runner._failure_code(exc)=='INPUT_QUARANTINED':body['reason_code']='INPUT_QUARANTINED'
+    # PA-169/F3: every refusal now carries the same code the ledger records.
+    # Only one of the nine reasons used to be visible, so eight of them arrived
+    # at the caller as an indistinguishable 503.
+    body['reason_code']=Runner._failure_code(exc)
     return body
 
 # 子进程入口。包化之前 Runner.run 用 Path(__file__) 把自己当脚本再拉起一次，
