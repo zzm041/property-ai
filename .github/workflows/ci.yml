@@ -1,0 +1,58 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - codex/real-sms-onboarding
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-subset:
+    name: unit subset (py3.12)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache pip wheels
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-py3.12-${{ hashFiles('backend/pyproject.toml', 'deploy/requirements.delivery.lock') }}
+          restore-keys: |
+            pip-${{ runner.os }}-py3.12-
+
+      - name: Install test dependencies
+        # 仓库现有的可选依赖组是 `dev`（没有 `test` extra），所以这里装 backend[dev]。
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e "backend[dev]"
+
+      - name: Run a stable test subset
+        # 只跑不依赖 MySQL/Redis/RabbitMQ/模型运行时的纯单元用例（52 条，本地 0.33s 全绿）。
+        # 未加 --timeout=120：本仓 dev 依赖里没有 pytest-timeout，装了也未配置；
+        # 用 step 级 timeout-minutes + job 级 20 分钟兜住挂死。
+        timeout-minutes: 10
+        run: |
+          python -m pytest \
+            backend/tests/unit/test_pa139_supervisor_shared_token.py \
+            backend/tests/unit/test_pa140_staging_shared_token_gate.py \
+            backend/tests/unit/test_pa137_shared_token_off_host.py \
+            backend/tests/unit/test_ai_barrier_resolve_132.py \
+            -x -q -p no:randomly

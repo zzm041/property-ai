@@ -1,0 +1,56 @@
+name: Bug report
+description: 报告一个问题（行为、接口、部署或文档）
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。请不要在 issue 里粘贴真实住户电话、地址、附件、令牌或 `.env` 内容。
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 发生了什么
+      description: 实际行为，以及你期望的行为。
+      placeholder: 提交报修后工单停在 PENDING_ANALYSIS，日志里是 ...
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      description: 能稳定复现的最小步骤。
+      placeholder: |
+        1. 以住户身份登录
+        2. 提交「卫生间水龙头滴水」
+        3. 观察 /api/v1/work-orders/{id} 的 status
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: 涉及部分
+      options:
+        - 后端 API / 服务
+        - AI 分析 / 派单
+        - 小程序
+        - 部署与运行环境
+        - 文档
+        - 其它
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 版本或提交
+      description: tag（如 v0.1.0）或 `git rev-parse --short HEAD`。
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: 相关日志
+      description: 已脱敏的报错原文（保留 error_code / request_id 这类标识）。
+      render: text
+    validations:
+      required: false

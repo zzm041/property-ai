@@ -55,3 +55,7 @@
 | [主管跟进建议](docs/13-SUPERVISOR-ASSISTANT.md) | 只读工具循环、页面与验证边界 |
 
 仓库中的历史报告用于追溯，不代表当前运行状态；公开分发前需单独审查配置、附件、报告与 Git 历史。
+
+## License
+
+本项目以 MIT 许可证发布，见 [LICENSE](LICENSE)。
