@@ -98,7 +98,7 @@ grep -rn "from app\.repository" backend/app/domain | wc -l               # 期�
 | 分支 | 主干 `codex/real-sms-onboarding`；功能/修复直接在该分支按任务拆分提交，不另开长期分支 |
 | 提交信息 | `<范围>: <做了什么>`，一条提交只做一件事：`D1: scope idempotency keys to the user who sent them`、`PA-168: trust the nginx hop so the client-IP budget is per client`、`pkg: move the local AI adapter into app.provider.local_ai (pure move, no behaviour change)` |
 | 提交粒度 | 纯搬移、行为修复、测试修正分开提交；工作树里他人未提交的改动**不得**被 `git add -A` 夹带（用精确路径） |
-| 测试门槛 | 全量单测红集**不得新增**。当前基线（提交 `7ba9faa`，2026-11-11）：`29 failed / 3003 passed / 14 skipped`。此前流传的「40 failed」是 t125 修测试环境（`APP_ENV=test` 下 `should_enqueue_ai_on_create` 默认 False）之前的旧数，已作废 |
+| 测试门槛 | **红集判据，不是比数字**：`python scripts/ops/unit_gate.py` 判定「本次红集 ⊆ `scripts/ops/known-red.txt`」。出现基线之外的新红 → 逐条 `NEW RED: <nodeid>` 并 exit 1；红集比基线小 → `SHRUNK: n` 并 exit 0（顺手删掉那几行）。`passed/failed/skipped` 只打印、不参与判定。当前基线（`7df6ebf`）：`29 failed / 3003 passed / 14 skipped`；此前流传的「40 failed」是 t125 修测试环境（`APP_ENV=test` 下 `should_enqueue_ai_on_create` 默认 False）之前的旧数，已作废 |
 | 定向测试 | 改哪个模块就跑该模块的测试文件 + 与之相邻的契约测试，再跑全量对比红集 |
 | 评审角色 | 开发（实施 + 自测）→ 复核（只读，独立会话/独立成员，不改工作区）→ 发布（搬迁容器与运行时，由专人执行并留 receipt）。同一人不得把自己的实现判为「复核通过」 |
 
@@ -114,6 +114,31 @@ PYTHONPATH='D:\property-ai;D:\property-ai\backend' \
 
 集成套件多一道 `ALLOW_DESTRUCTIVE_TEST_DATABASE=true`，且测试库必须是独立实例（`TEST_DATABASE_URL`
 与 `DATABASE_URL` 指不同库，否则 `Settings` 直接拒绝启动）。
+
+门禁用同一个环境跑（缺 env 会先被 gate 自己拦下，exit 2）：
+
+```bash
+APP_ENV=test \
+DATABASE_URL='mysql+pymysql://property_test:change-me-test@127.0.0.1:3337/property_ai_scratch?charset=utf8mb4' \
+TEST_DATABASE_URL='mysql+pymysql://property_test:change-me-test@127.0.0.1:3307/property_ai_test?charset=utf8mb4' \
+./.venv/Scripts/python.exe scripts/ops/unit_gate.py
+```
+
+判据示例（真实输出）：`NEW RED: backend/tests/unit/test_x.py::test_y` + exit 1，或
+`SHRUNK: 1` + exit 0。红集文件按文件分组注释，每条都要能说出「产品缺陷 / 测试过时 / 环境缺失」里的哪一种；
+加白不是免罪符，是「已知且已定性」。
+
+提交模板（与 `.github/pull_request_template.md` 对应）：
+
+```text
+<范围>: <做了什么>
+
+<一句话动机；纯搬移写 pure move, no behaviour change>
+
+unit_gate: python scripts/ops/unit_gate.py -> OK（或 SHRUNK: n）
+影响面: <API/服务 | AI 分析与派单 | 小程序 | 部署脚本 | 文档>
+盘查: 没有 .env / 令牌 / 真实住户数据进入 diff
+```
 
 ## 5. 发布与回滚
 

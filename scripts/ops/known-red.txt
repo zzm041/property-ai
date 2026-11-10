@@ -1,0 +1,61 @@
+# 基线红集（known-red）—— 只允许缩小，不允许新增
+#
+# 判据：`scripts/ops/unit_gate.py` 跑全量单测，取失败 nodeid 集合 R，
+#   若 R ⊆ 本文件 → exit 0（R 比本文件小则打印 SHRUNK: n，提示可以删掉已转绿的行）
+#   若 R 含本文件之外的新项 → 打印 NEW RED: <nodeid> 并 exit 1
+#
+# 新增一条红之前必须先定性：是产品缺陷、测试过时、还是环境缺失。
+# 定性之后二选一——修掉它，或者在台账里立单并在本文件加白（加白要写清理由与触发条件）。
+# 计数（29 failed / 3003 passed / 14 skipped）只是观测值，**不参与判定**：红数抖动不再当门槛。
+#
+# 快照：2026-11-11，提交 7df6ebf，`APP_ENV=test` 全量单测实测。
+# 依据：`D:\AI\review\evidence\t125-baseline.md` §4（原生 29 条的分布与成因）。
+
+# --- test_notification_presentation.py（13）------------------------------------
+# 小程序通知页的投影形态断言：期望的字段集/时间基准与当前实现不一致（表现类，未定性为产品缺陷）。
+backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[double-tap]
+backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[paging]
+backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[read-success]
+backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[template0]
+backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[template1]
+backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[template2]
+backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[template3]
+backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[template4]
+backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[template5]
+backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[template6]
+backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[template7]
+backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[time]
+backend/tests/unit/test_notification_presentation.py::test_inbox_template_uses_plain_text_and_explicit_time_basis
+
+# --- test_local_ai_http_027.py（7）--------------------------------------------
+# 适配器「预留前失败」记录的键集断言少了 allowed_prompt_versions / prompt_version；
+# 成因已定性（断言集合落后于实现），属测试待更新，不是运行时缺陷（PA-130/PA-166 都验证过记录本身正确）。
+backend/tests/unit/test_local_ai_http_027.py::test_pre_reservation_failure_records_stable_redacted_reason_without_call[exc0-VALIDATION_REJECTED]
+backend/tests/unit/test_local_ai_http_027.py::test_pre_reservation_failure_records_stable_redacted_reason_without_call[exc1-RUNTIME_IDENTITY_MISMATCH]
+backend/tests/unit/test_local_ai_http_027.py::test_pre_reservation_failure_records_stable_redacted_reason_without_call[exc2-MODEL_RESIDENCY_MISMATCH]
+backend/tests/unit/test_local_ai_http_027.py::test_pre_reservation_failure_records_stable_redacted_reason_without_call[exc3-RESOURCE_ADMISSION_REJECTED]
+backend/tests/unit/test_local_ai_http_027.py::test_pre_reservation_failure_records_stable_redacted_reason_without_call[exc4-BUDGET_REJECTED]
+backend/tests/unit/test_local_ai_http_027.py::test_pre_reservation_failure_records_stable_redacted_reason_without_call[exc5-REMOTE_UNAVAILABLE]
+backend/tests/unit/test_local_ai_http_027.py::test_pre_reservation_failure_records_stable_redacted_reason_without_call[exc6-INTERNAL_PRE_RESERVATION_ERROR]
+
+# --- test_work_order_presentation.py（2）--------------------------------------
+# 工单页「可读投影」保留业务状态的断言，与当前投影实现不一致（表现类）。
+backend/tests/unit/test_work_order_presentation.py::test_readable_page_projection_preserves_business_state[projection]
+backend/tests/unit/test_work_order_presentation.py::test_readable_page_projection_preserves_business_state[unknown]
+
+# --- test_delivery_bootstrap_lifecycle.py（2）---------------------------------
+# 启动器只在迁移时注入 bootstrap overlay 的断言；`init` / `up` 两个参数化的期望值与脚本现状不符。
+backend/tests/unit/test_delivery_bootstrap_lifecycle.py::test_launcher_injects_bootstrap_overlay_only_for_migration[init-True]
+backend/tests/unit/test_delivery_bootstrap_lifecycle.py::test_launcher_injects_bootstrap_overlay_only_for_migration[up-False]
+
+# --- 各 1 条 ------------------------------------------------------------------
+# 健康探针只做 liveness（不含依赖探测）
+backend/tests/unit/test_health.py::test_healthz_is_liveness_only
+# 事故聚合：提交后唤醒既有 pending 成员的锁语义断言
+backend/tests/unit/test_incident_aggregation.py::test_aggregate_locks_property_and_wakes_prior_pending_member_after_commit
+# 统计页只暴露范围内快照与既有配置链接
+backend/tests/unit/test_stats_config_overview.py::test_miniprogram_exposes_only_scoped_snapshot_and_existing_config_links
+# 交付产物：work AI 运行时的冻结/作用域/资源守卫清单断言
+backend/tests/unit/test_delivery_artifact.py::test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded
+# 派单超时升级：staff 页接线断言
+backend/tests/unit/test_auto_reassign_exception.py::test_staff_page_wires_reject_escalate_and_unresolved_receipt

@@ -7,8 +7,12 @@
 <!-- 贴命令与输出摘要，而不是“应该能过”。 -->
 
 ```
-python -m pytest backend/tests/unit/... -q
+python scripts/ops/unit_gate.py
+# unit_gate: OK - red set is a subset of known-red
 ```
+
+判据是**红集 ⊆ `scripts/ops/known-red.txt`**（出现 `NEW RED: <nodeid>` → exit 1；`SHRUNK: n` → exit 0）。
+env 三件（`APP_ENV=test` / `DATABASE_URL` / `TEST_DATABASE_URL`）见 `ENGINEERING.md` §4；缺了 gate 直接 exit 2。
 
 ## 影响面
 
@@ -21,5 +25,5 @@ python -m pytest backend/tests/unit/... -q
 ## 检查清单
 
 - [ ] 没有提交真实住户数据、令牌或 `.env` 内容
-- [ ] 新增行为有对应测试，且失败集与既有基线一致
+- [ ] `unit_gate` 通过：红集 ⊆ `known-red.txt`；新增红要么修掉，要么在 `scripts/ops/known-red.txt` 加白并写清定性理由
 - [ ] 如改变运行契约（接口字段、配置键、错误码），已在文档或 CHANGELOG 里写明
