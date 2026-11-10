@@ -1,6 +1,7 @@
 """Environment-backed application configuration."""
 
 from functools import lru_cache
+import hmac
 from ipaddress import ip_address
 import re
 from typing import Literal
@@ -312,8 +313,10 @@ class Settings(BaseSettings):
                         f" ({', '.join(sorted(LOCAL_AI_ENDPOINT_HOSTS))});"
                         f" LLM_BASE_URL points at {host or '<no host>'}"
                     )
+            self._reject_shared_token_off_host()
         if self.app_env == "production":
             self._require_production_provider_credentials()
+            self._reject_shared_token_off_host()
             if self.file_scanner_provider == "development":
                 raise ValueError(
                     "Production cannot use the Development file scanner"
@@ -343,6 +346,59 @@ class Settings(BaseSettings):
                     "Identity test proof requires exact AUTH001 test isolation and a private signing secret"
                 )
         return self
+
+    def _reject_shared_token_off_host(self) -> None:
+        """Refuse to put the adapter's shared token on a remote connection.
+
+        PA-137: `resolve_local_ai_key` only *withholds* the token from a remote
+        endpoint. A deployment that sets a provider key to the same value as
+        `LOCAL_AI_INTERNAL_TOKEN` (the delivery `.env.delivery` does exactly that)
+        sends the shared secret wherever the endpoint points, and nothing noticed:
+        the credential is neither empty nor obviously the token. Compare what will
+        actually go on the wire, per provider, and refuse off-host.
+        """
+
+        token = self.local_ai_internal_token.get_secret_value()
+        if not token:
+            return
+        providers = (
+            ("LLM", self.llm_provider, self.llm_api_key, self.llm_base_url),
+            (
+                "RAG LLM",
+                self.rag_llm_provider,
+                self.rag_llm_api_key,
+                self.rag_llm_base_url,
+            ),
+            ("VLM", self.vlm_provider, self.vlm_api_key, self.vlm_base_url),
+            ("ASR", self.asr_provider, self.asr_api_key, self.asr_base_url),
+            (
+                "Embedding",
+                self.embedding_provider,
+                self.embedding_api_key,
+                self.embedding_endpoint,
+            ),
+            (
+                "Reranker",
+                self.reranker_provider,
+                self.reranker_api_key,
+                self.reranker_endpoint,
+            ),
+        )
+        for label, provider, explicit, endpoint in providers:
+            if provider != "production":
+                continue
+            resolved = self.resolve_local_ai_key(explicit, endpoint)
+            if not resolved or not hmac.compare_digest(resolved, token):
+                continue
+            host = urlsplit(endpoint).hostname or ""
+            if host in LOCAL_AI_ENDPOINT_HOSTS:
+                continue
+            raise ValueError(
+                f"{label} would send the shared LOCAL_AI_INTERNAL_TOKEN to a remote"
+                " endpoint, and that token is only sent to a local endpoint"
+                f" ({', '.join(sorted(LOCAL_AI_ENDPOINT_HOSTS))});"
+                f" {label} points at {host or '<no host>'}; give this provider its own key"
+            )
 
     def _require_production_provider_credentials(self) -> None:
         if self.llm_provider == "production":
