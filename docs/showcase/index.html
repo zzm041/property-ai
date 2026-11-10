@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="智慧物业 AI：一条报修从提交到派单的真实链路，含一次实测的时间线。含工单 33 的真实分析输出、派单约束与本地部署方式。">
+<meta name="description" content="智慧物业 AI 的一条报修处理记录：住户原文、九个字段的分析结果、派单规则，以及 AI 不可用时的降级。">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; connect-src 'none'">
-<title>智慧物业 AI · 一条报修的处理记录</title>
+<title>智慧物业 AI · 报修处理记录</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,113 +14,107 @@
 <header class="bar">
   <a class="mark" href="#main">智慧物业 AI</a>
   <nav aria-label="页面导航">
-    <a href="#facts">几个硬数字</a>
-    <a href="#record">一条工单</a>
-    <a href="#rules">派单约束</a>
-    <a href="#stack">系统构成</a>
-    <a href="#run">本地运行</a>
+    <a href="#record">处理记录</a>
+    <a href="#failure">失败时</a>
+    <a href="#facts">几个数</a>
+    <a href="https://github.com/zzm041/property-ai">源码</a>
   </nav>
 </header>
 
 <main id="main">
 
-<section class="hero">
-  <div class="hero-text">
-    <h1>一条报修，<br>变成九个字段的<br>工单判定。</h1>
-    <p class="lede">住户用一句话描述问题，AI 把它整理成九个字段的结构化判定，系统按服务范围、职责、签到与技能筛人，再由规则派单。右边这张卡不是截图，是本地库里的真实一行。</p>
-    <p class="links">
-      <a href="https://github.com/zzm041/property-ai">源码</a>
-      <a href="https://github.com/zzm041/property-ai/blob/main/deploy/CUSTOMER-INSTALL.md">部署文档</a>
-    </p>
-  </div>
+<p class="lede">住户用文字、图片或语音报修，AI 把零散描述整理成九个字段的判定，系统按小区、职责、签到、技能与容量筛人，再由规则派单。维修人员处理，主管跟异常，住户看回执。</p>
 
-  <aside class="ticket" aria-label="工单 33 的真实数据">
-    <p class="ticket-id">工单 <b>#33</b> <span class="state">PENDING_ASSIGNMENT</span></p>
-    <p class="quote">厨房水槽下管道接口持续漏水，地面有一小片积水。</p>
-    <dl>
-      <div><dt>category</dt><dd>PLUMBING</dd></div>
-      <div><dt>severity</dt><dd>MEDIUM</dd></div>
-      <div><dt>priority</dt><dd>HIGH</dd></div>
-      <div><dt>required_role</dt><dd>STAFF</dd></div>
-      <div><dt>required_skill</dt><dd>maintenance</dd></div>
-      <div><dt>confidence</dt><dd>0.950</dd></div>
-    </dl>
-    <p class="ticket-foot">提交 <time>00:09:22.122</time> · 判定完成 <time>00:09:45.414</time><br>本机实测一次，模型已驻留，不含首次加载</p>
-  </aside>
+<section id="record" class="trace" aria-labelledby="record-title">
+  <h1 id="record-title">一条报修的处理记录</h1>
+  <p class="trace-note">工单 <b>#33</b>，数据取自本地演示库；时间是这台机器上的一次实测。</p>
+
+  <ol class="entries">
+    <li>
+      <p class="t">00:09:22.122</p>
+      <div>
+        <h2>住户提交</h2>
+        <p>“厨房水槽下管道接口持续漏水，地面有一小片积水。”</p>
+        <p class="meta">租户 5 · 小区 5 · 房屋 1 · 无附件</p>
+      </div>
+    </li>
+    <li>
+      <p class="t">00:09:22.258</p>
+      <div>
+        <h2>工单先落库</h2>
+        <p>此时还没有任何 AI 结论，状态是 <code>PENDING_ANALYSIS</code>。分析失败也不会丢单。</p>
+      </div>
+    </li>
+    <li>
+      <p class="t">00:09:45.414</p>
+      <div>
+        <h2>九个字段的判定写入</h2>
+        <p>模型输出按固定 schema 校验：缺字段或枚举越界即判失败，不落库。</p>
+        <pre><code>{
+  "category": "PLUMBING",
+  "subcategory": null,
+  "severity": "MEDIUM",
+  "priority": "HIGH",
+  "summary": "厨房水槽下管道接口持续漏水，地面有一小片积水。",
+  "risk": "none",
+  "required_role": "STAFF",
+  "required_skill": "maintenance",
+  "confidence": 0.950
+}</code></pre>
+        <p class="meta">prompt wo-analysis-v26-summary-fidelity · 状态转 PENDING_ASSIGNMENT</p>
+      </div>
+    </li>
+    <li>
+      <p class="t">派单</p>
+      <div>
+        <h2>规则决定人选，AI 不点名</h2>
+        <p>先按服务范围、职责、签到状态、技能与在手工单量筛，再由派单策略选人；同一单 600 秒内不会重复派给被拒或超时的人。</p>
+        <p class="meta">候选条件：STAFF · maintenance · 当班 · 容量未满</p>
+      </div>
+    </li>
+  </ol>
 </section>
 
+<section id="failure" class="trace" aria-labelledby="failure-title">
+  <h2 id="failure-title">AI 不可用时，记录长什么样</h2>
+  <p>同一套流程在本地跑过多次失败，库里留着原始错误码。下面两个是真实出现过的：</p>
 
-<dl id="facts" class="facts" aria-label="不随时间变化的几个数">
-  <div><dt>分析输出</dt><dd><b>9</b> 个字段</dd><p>缺一个或越界即判失败，不落库</p></div>
-  <div><dt>派单冷却</dt><dd><b>600</b> 秒</dd><p>被拒或超时的单不重复打扰同一个人</p></div>
-  <div><dt>运行容器</dt><dd><b>11</b> 个</dd><p>api、worker、mysql、redis、mq、milvus 等</p></div>
-  <div><dt>测试总量</dt><dd><b>2,727</b> 条</dd><p>其中 20 条未通过，原因在仓库 reports</p></div>
-</dl>
-
-<section id="record" class="section">
-  <h2>这一次，二十三秒里发生了什么</h2>
-  <table class="timeline">
-    <thead>
-      <tr><th scope="col">时刻</th><th scope="col">动作</th><th scope="col">落点</th></tr>
-    </thead>
-    <tbody>
-      <tr><td><time>00:09:22.122</time></td><td>住户提交，工单先落库，状态 <code>PENDING_ANALYSIS</code></td><td>work_orders</td></tr>
-      <tr><td><time>00:09:22.258</time></td><td>分析记录建立，此时还没有任何 AI 结论</td><td>work_order_analyses</td></tr>
-      <tr><td><time>00:09:45.414</time></td><td>模型返回、结构校验通过，九个字段一次写入</td><td>status = COMPLETED</td></tr>
-      <tr><td>派单</td><td>按小区、职责、签到、技能与容量筛人，规则决定最终人选</td><td>assignments</td></tr>
-    </tbody>
-  </table>
-  <p class="note">时间不是固定值：模型已驻留时二十秒上下，冷启动还要先加载约三十秒，并发排队会更久，所以这里只写这一单的实测值，不写平均耗时。模型只提供问题事实与建议，谁去修由业务规则决定。模型超时或输出不合格时，工单留在库里等人处理，不会丢。</p>
+  <ol class="entries">
+    <li>
+      <p class="t">6.3 – 12.3 秒</p>
+      <div>
+        <h2><code>AI.UNAVAILABLE</code></h2>
+        <p>模型服务连不上或名额不够。工单留在 <code>PENDING_ANALYSIS</code>，进人工队列，不阻塞住户看进度。</p>
+      </div>
+    </li>
+    <li>
+      <p class="t">0.2 – 0.4 秒</p>
+      <div>
+        <h2><code>AI.INVALID_OUTPUT</code></h2>
+        <p>模型返回了内容，但结构校验没过（字段缺失、枚举越界、摘要与原文对不上）。同样不落库，重试或转人工。</p>
+      </div>
+    </li>
+  </ol>
+  <p class="note">失败路径是主流程的一部分：工单先落库，AI 挂掉时仍可创建、仍可人工派单。</p>
 </section>
 
-<section id="rules" class="section">
-  <h2>三个必须成立的约束</h2>
-  <div class="rules">
-    <article>
-      <h3>模型不许编</h3>
-      <p>分析结果按固定 schema 校验：类别、子类、严重度、优先级、摘要、风险、所需角色、所需技能、置信度，缺一个或越界即判失败，不落库。</p>
-      <p class="cite">app/domain/observed_event.py</p>
-    </article>
-    <article>
-      <h3>同一单不重复叫人</h3>
-      <p>派单有 600 秒冷却：被拒或超时的单在窗口内不会再次派给同一个人，避免反复打扰。</p>
-      <p class="cite">app/service/dispatch.py</p>
-    </article>
-    <article>
-      <h3>事务在服务层</h3>
-      <p>状态流转、幂等键、租户与小区校验都在 Service 完成，路由只做参数转换，测试可以直接打服务层。</p>
-      <p class="cite">app/service/work_order.py</p>
-    </article>
-  </div>
-</section>
-
-<section id="stack" class="section">
-  <h2>系统由这些部分组成</h2>
-  <div class="stack">
-    <div class="stack-row"><b>微信原生小程序</b><span>住户 · 维修人员 · 物业主管</span></div>
-    <div class="stack-row"><b>FastAPI 业务服务</b><span>身份权限 · 工单状态 · 规则派单</span></div>
-    <div class="stack-row"><b>Celery Worker</b><span>报修分析 · 知识处理 · 失败重试</span></div>
-    <div class="stack-row"><b>本地模型服务</b><span>Qwen 27B · 语音 · 向量 · 重排，经 Provider 接入</span></div>
-  </div>
-  <p class="note">MySQL 存业务数据，Redis 提供缓存与锁，RabbitMQ 承载异步任务，Milvus 支撑知识检索；十一个容器由 Docker Compose 编排，Nginx 统一入口。</p>
-</section>
-
-<section id="run" class="section">
-  <h2>本地跑起来</h2>
-  <p>依赖离线包与模型权重随交付包提供，按文档填 <code>.env</code> 后一条命令起全部服务；接口没有开放在公网，这里展示的是本地演示库的数据。</p>
-  <p class="links">
-    <a href="https://github.com/zzm041/property-ai/blob/main/deploy/CUSTOMER-INSTALL.md">安装与初始化</a>
-    <a href="https://github.com/zzm041/property-ai/blob/main/deploy/CUSTOMER-OPERATIONS.md">运行与维护</a>
-    <a href="https://github.com/zzm041/property-ai">全部源码</a>
-  </p>
-  <p class="note">测试现状：全量 2,727 条，其中 20 条已知未通过，原因与清单写在仓库的 reports 目录，没有隐藏。</p>
+<section id="facts" class="facts-wrap" aria-labelledby="facts-title">
+  <h2 id="facts-title">几个不随机器状态变的数</h2>
+  <dl class="facts">
+    <div><dt>分析输出</dt><dd><b>9</b> 个字段</dd></div>
+    <div><dt>派单冷却</dt><dd><b>600</b> 秒</dd></div>
+    <div><dt>运行容器</dt><dd><b>11</b> 个</dd></div>
+    <div><dt>测试总量</dt><dd><b>2,727</b> 条，20 条未通过</dd></div>
+  </dl>
+  <p class="note">技术栈：微信原生小程序 · FastAPI · Celery · MySQL · Redis · RabbitMQ · Milvus · Qwen 27B（本地）· Docker Compose · Nginx。</p>
 </section>
 
 </main>
 
 <footer>
-  <span>智慧物业 AI · 报修协同与工单调度</span>
   <a href="https://github.com/zzm041/property-ai">github.com/zzm041/property-ai</a>
+  <a href="https://github.com/zzm041/property-ai/blob/main/deploy/CUSTOMER-INSTALL.md">安装与初始化</a>
+  <a href="https://github.com/zzm041/property-ai/blob/main/deploy/CUSTOMER-OPERATIONS.md">运行与维护</a>
 </footer>
 
 </body>
