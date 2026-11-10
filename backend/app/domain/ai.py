@@ -130,6 +130,12 @@ _SKILL_ALIASES = {
 # Owner requirement MAINTENANCE-CONTACT-DISPATCH-024. Explicit special skills
 # remain hard constraints; ordinary trade labels are not exclusive licenses.
 ORDINARY_MAINTENANCE_SKILLS = frozenset({"PLUMBING", "ELECTRICAL", "HVAC", "MAINTENANCE"})
+# PA-101-A: `other` is the AI contract's "trade undetermined" marker, not an
+# employee skill code (no tenant seeds `OTHER`). Treating it as a hard skill
+# requirement deadlocks the whole order: no auto candidate, and manual dispatch
+# answers EMPLOYEE_NOT_ELIGIBLE(409) with no recovery path. Unknown/custom
+# restricted skills still stay hard constraints.
+UNCONSTRAINED_SKILLS = frozenset({"OTHER"})
 
 
 def ordinary_maintenance(required_duty: str | None, required_skill: str | None) -> bool:
@@ -318,7 +324,12 @@ def capability_filter_reason(
 ) -> FilterReason | None:
     if required_duty and required_duty not in duty_codes:
         return FilterReason.DUTY_MISMATCH
-    if required_skill and not ordinary_maintenance(required_duty, required_skill) and required_skill not in skill_codes:
+    if (
+        required_skill
+        and required_skill not in UNCONSTRAINED_SKILLS
+        and not ordinary_maintenance(required_duty, required_skill)
+        and required_skill not in skill_codes
+    ):
         return FilterReason.SKILL_MISMATCH
     return None
 
