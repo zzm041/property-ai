@@ -220,6 +220,10 @@ class Settings(BaseSettings):
     storage_region: str = "us-east-1"
     storage_presign_ttl_seconds: int = Field(default=300, ge=1, le=600)
     file_scanner_provider: Literal["development", "unavailable", "clamav"] = "unavailable"
+    # D6: the development scanner never examines anything, it just stamps
+    # `skipped_dev`. Treating that as a working pipeline was a silent lie, so an
+    # operator must state the demo intent explicitly outside dev/test.
+    file_scanner_demo_acknowledged: bool = False
     file_scanner_host: str = Field(default="", max_length=253)
     file_scanner_port: int = Field(default=3310, ge=1, le=65535)
     file_scanner_timeout_seconds: float = Field(default=10.0, ge=0.1, le=60, allow_inf_nan=False)
@@ -515,30 +519,70 @@ class Settings(BaseSettings):
         }
 
     def media_pipeline(self) -> dict[str, object]:
-        """Report whether uploaded media can ever become usable here.
+        """Report what the configured scanner actually does to uploaded media.
 
-        PA-163: `FileScannerProvider` fails closed by returning `pending`, and the
-        upload, attach, download and analysis paths all require
-        `scanner_status in {clean, skipped_dev}`. On a deployment that never
-        configures a scanner, every upload therefore stays unusable forever and
-        the only symptom is a blank description suggestion. Readiness states the
-        cause instead of leaving operators to infer it from a silent empty string.
+        PA-163 made the "no scanner" case visible. D6 closes the other half: the
+        `development` stub returns `skipped_dev`, so uploads become *usable*
+        without ever being examined. Reporting that as usable was a silent lie -
+        readiness now says exactly which of three modes is in force:
+
+        * `real`        - clamav verdicts, media is scanned before use;
+        * `demo_stub`   - media moves unverified (development stub);
+        * `unavailable` - fails closed, uploads never leave `pending`.
+
+        Only `real` sets `media_scanned`. A stub on staging/production is a
+        misconfiguration and is named as `unacknowledged` so readiness degrades
+        instead of pretending the pipeline is intact.
         """
 
         provider = self.file_scanner_provider
-        usable = provider in {"clamav", "development"}
+        real_scan = provider == "clamav"
+        stub = provider == "development"
+        acknowledged = bool(stub and self.file_scanner_demo_acknowledged)
+        stub_is_expected = self.app_env in {"development", "test"}
+        unacknowledged = stub and not acknowledged and not stub_is_expected
+        if real_scan:
+            mode, reason = "real", None
+        elif stub:
+            mode = "demo_stub"
+            reason = (
+                "MEDIA_SCAN_STUB_UNACKNOWLEDGED" if unacknowledged else "MEDIA_SCAN_STUB"
+            )
+        else:
+            mode, reason = "unavailable", "MEDIA_SCAN_UNAVAILABLE"
         return {
             "scanner": provider,
-            "media_becomes_usable": usable,
-            "reason_code": None if usable else "MEDIA_SCAN_UNAVAILABLE",
-            "note": (
-                None
-                if usable
-                else "FILE_SCANNER_PROVIDER='unavailable' fails closed: uploads stay"
-                " scanner_status=pending, so they cannot be attached to a work order,"
-                " downloaded, described or analysed until an approved scanner"
-                " (FILE_SCANNER_PROVIDER=clamav) is configured"
-            ),
+            "scan_mode": mode,
+            "media_scanned": real_scan,
+            # Unverified media is not usable media: only a real verdict counts.
+            "media_becomes_usable": real_scan,
+            "demo_stub": stub,
+            "demo_stub_acknowledged": acknowledged,
+            "demo_stub_unacknowledged": unacknowledged,
+            "reason_code": reason,
+            "note": {
+                None: None,
+                "MEDIA_SCAN_STUB": (
+                    "FILE_SCANNER_PROVIDER=development is a demo stub: uploads are"
+                    " accepted as scanner_status=skipped_dev without any scan, so"
+                    " media can be attached but stays unverified. Set"
+                    " FILE_SCANNER_DEMO_ACKNOWLEDGED=true to declare demo mode, or"
+                    " configure FILE_SCANNER_PROVIDER=clamav for real scanning"
+                ),
+                "MEDIA_SCAN_STUB_UNACKNOWLEDGED": (
+                    "FILE_SCANNER_PROVIDER=development is a demo stub and is not"
+                    " acknowledged for this environment: media would move unverified."
+                    " Either configure FILE_SCANNER_PROVIDER=clamav, set"
+                    " FILE_SCANNER_PROVIDER=unavailable to fail closed, or set"
+                    " FILE_SCANNER_DEMO_ACKNOWLEDGED=true to declare demo mode"
+                ),
+                "MEDIA_SCAN_UNAVAILABLE": (
+                    "FILE_SCANNER_PROVIDER='unavailable' fails closed: uploads stay"
+                    " scanner_status=pending, so they cannot be attached to a work"
+                    " order, downloaded, described or analysed until an approved"
+                    " scanner (FILE_SCANNER_PROVIDER=clamav) is configured"
+                ),
+            }[reason],
         }
 
     def resolve_local_ai_key(self, explicit: SecretStr, endpoint: str) -> str:

@@ -37,7 +37,7 @@ def test_unavailable_scanner_is_reported_as_media_that_never_becomes_usable():
     assert "FILE_SCANNER_PROVIDER=clamav" in report["note"]
 
 
-@pytest.mark.parametrize("provider", ["development", "clamav"])
+@pytest.mark.parametrize("provider", ["clamav"])
 def test_a_configured_scanner_reports_media_as_usable(provider):
     overrides = {"file_scanner_provider": provider}
     if provider == "clamav":
@@ -45,8 +45,21 @@ def test_a_configured_scanner_reports_media_as_usable(provider):
     report = settings(**overrides).media_pipeline()
 
     assert report["media_becomes_usable"] is True
+    assert report["media_scanned"] is True
     assert report["reason_code"] is None
     assert report["note"] is None
+
+
+def test_the_development_stub_is_no_longer_reported_as_usable():
+    """D6 supersedes the PA-163 reading: the stub never scans, so it cannot be
+    counted as a working pipeline. See test_d6_scanner_demo_mode.py."""
+
+    report = settings(file_scanner_provider="development").media_pipeline()
+
+    assert report["scan_mode"] == "demo_stub"
+    assert report["media_scanned"] is False
+    assert report["media_becomes_usable"] is False
+    assert report["reason_code"] in {"MEDIA_SCAN_STUB", "MEDIA_SCAN_STUB_UNACKNOWLEDGED"}
 
 
 def test_readiness_payload_carries_the_media_pipeline_report():

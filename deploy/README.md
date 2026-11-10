@@ -141,6 +141,8 @@ docker compose --env-file deploy/.env.delivery -f deploy/docker-compose.delivery
 
 本地 clean-room 排练可以保留 Development 微信/短信/AI Provider。使用真实 MinIO 但尚未接企业文件扫描服务时，必须在本机私密配置中显式设置 `FILE_SCANNER_PROVIDER=development`，保存的状态为 `skipped_dev`，不能写成经过恶意文件扫描；模板默认 `unavailable`，上传内容保持 `pending` 并失败关闭。Production 禁止 Development 文件扫描器。正式激活必须在私密配置中切换到企业通道及自托管 Provider；未配置可信身份 Provider 时，身份接管继续失败关闭。`EMBEDDING_DIMENSIONS=8` 只用于 Development 排练；真实 bge-m3 使用新的 1024 维集合，禁止复用 8 维集合。
 
+D6 起演示桩必须留痕：仅设 `FILE_SCANNER_PROVIDER=development` 而 `APP_ENV=staging/production` 时，`/readyz.media_pipeline` 报 `scan_mode=demo_stub`、`media_scanned=false`、`reason_code=MEDIA_SCAN_STUB_UNACKNOWLEDGED`，整体 `status` 降为 `degraded`（HTTP 仍 200）。要在排练环境里保留未扫描媒体，需同时设置 `FILE_SCANNER_DEMO_ACKNOWLEDGED=true` 声明演示模式；此时 `reason_code=MEDIA_SCAN_STUB`、`status=ready`，但 `media_scanned` 仍是 `false`——报告与回执只能写「演示桩，未扫描」，不得写成已扫描。真实扫描用 `clamav`（`reason_code=null`、`media_scanned=true`），失败关闭用 `unavailable`（`reason_code=MEDIA_SCAN_UNAVAILABLE`）。
+
 知识问答与工单分析具有独立的模型发布门槛。`RAG_LLM_PROVIDER=inherit` 保持旧配置；只有知识问答已经通过而工单分析仍未达标时，可在私密配置中单独设置 `RAG_LLM_PROVIDER=production`、`RAG_LLM_BASE_URL`、`RAG_LLM_MODEL` 和 `RAG_LLM_API_KEY`，同时继续保持 `LLM_PROVIDER=development`。真实知识接线还必须成组设置 1024 维 bge-m3、真实 reranker、`MILVUS_METRIC_TYPE=COSINE`、`EMBEDDING_NORMALIZATION=l2` 以及全新的隔离集合名。该隔离不会授权真实工单 AUTO；两条能力必须分别验收。
 
 Windows 本地 Ollama 服务由 `delivery.ps1 ollama-start|ollama-status|ollama-stop` 管理。它只绑定 loopback 11435，固定已审可执行文件哈希、项目模型目录、单模型单并发、no-cloud 和显存保留配置；启动与状态检查不执行推理。可用 `PROPERTY_AI_OLLAMA_EXE` 覆盖可执行文件位置，但文件哈希仍必须匹配。停止操作只接受当前收据绑定的 PID、启动时间、路径和监听归属，不按进程名批量停止。

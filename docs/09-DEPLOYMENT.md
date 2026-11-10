@@ -104,7 +104,48 @@ Development `DATABASE_URL` 与 Integration Test `TEST_DATABASE_URL` 必须指向
 - 仅环境变量，见仓库根目录 `.env.example`
 - Compose 使用 `env_file`，不把密码写进镜像
 
+### 附件扫描 Provider
+
+附件只有完成可信扫描后才可供业务读取。`FILE_SCANNER_PROVIDER=clamav` 使用部署方内网 clamd 的 INSTREAM 协议传输上传内容，不传文件路径；设置 `FILE_SCANNER_HOST`、`FILE_SCANNER_PORT`（默认 3310）、`FILE_SCANNER_TIMEOUT_SECONDS`（默认 10 秒）。扫描大小上限沿用 `UPLOAD_MAX_MB`。仅完整的 `stream: OK` 响应记 `clean`；发现威胁记 `blocked`；超时、断连、超限和未知响应保持 `pending`，禁止当作扫描通过。扫描请求不自动重试。
+
+`FILE_SCANNER_HOST` 必须是部署方指定的私网或回环数字 IP，不接受 DNS 名称、URL、未指定地址或公网地址。连接/发送/接收共用单次总超时；避免操作系统 DNS 解析和多地址重试突破请求时限。容器部署应使用专用网络固定扫描器 IP 或固定内网主机 IP；不能填写仅在宿主机可达的 127.0.0.1。扫描地址变动需要配置变更后重建应用，不能依赖启动时自动解析域名。
+
+clamd TCP 不提供身份认证或加密，只允许同机受限网络或企业受信内网，禁止开放公网。部署方必须配置和维护病毒库更新、访问限制、StreamMaxLength（不低于上传上限）、MaxFileSize/MaxScanSize 与内容扫描限制；不能将 PING 或端口连通视为文件扫描验收。交付前须针对所选真实引擎验证普通文件、官方 EICAR 测试样本与引擎停机时的失败关闭。当前添加 Provider 源码不表示扫描服务已安装或验证。
+
+`unavailable` 仍默认失败关闭；`development` 仅开发使用且保留 `skipped_dev`，生产禁止。启用真实扫描需要部署方准备服务，不由业务 API 拉起或下载引擎/病毒库。
+
+### 附件扫描的三态与就绪报告（D6）
+
+`/readyz` 的 `media_pipeline` 报告本次部署实际生效的扫描形态，三态互斥：
+
+| `scan_mode` | 条件 | `media_scanned` | `media_becomes_usable` | `reason_code` |
+| --- | --- | --- | --- | --- |
+| `real` | `FILE_SCANNER_PROVIDER=clamav` | `true` | `true` | `null` |
+| `demo_stub` | `FILE_SCANNER_PROVIDER=development` | `false` | `false` | `MEDIA_SCAN_STUB` 或 `MEDIA_SCAN_STUB_UNACKNOWLEDGED` |
+| `unavailable` | `FILE_SCANNER_PROVIDER=unavailable`（默认） | `false` | `false` | `MEDIA_SCAN_UNAVAILABLE` |
+
+规则：
+
+- 只有真实扫描（`clamav`）才允许 `media_becomes_usable=true`。`development` 桩不检查任何字节，只写 `scanner_status=skipped_dev`，因此媒体「能用但未验证」——就绪报告必须说清楚，不得报成 scanned。
+- `development` 在 `development`/`test` 环境是预期形态，只报 `demo_stub`；在 `staging`/`production` 属于配置错误，除非显式声明 `FILE_SCANNER_DEMO_ACKNOWLEDGED=true`，否则 `reason_code=MEDIA_SCAN_STUB_UNACKNOWLEDGED` 且 `/readyz` 的 `status` 降为 `degraded`（HTTP 仍 200，媒体不在存活路径上）。
+- 演示环境要留痕：`deploy/.env.delivery` 同时设置 `FILE_SCANNER_PROVIDER=development` 与 `FILE_SCANNER_DEMO_ACKNOWLEDGED=true`，属于显式声明的演示模式；对外取证时必须按 `demo_stub` 表述，不能写成「附件已扫描」。
+- 复验命令：`curl -s http://<host>:<port>/api/v1/readyz | jq '.data.media_pipeline'`，期望 `scan_mode`、`media_scanned`、`reason_code` 三项与上表一致。
+
+### 媒体模型版本与成功检查点（2026-11-02）
+
+`VLM_MODEL_REVISION`、`ASR_MODEL_REVISION` 可填写已核实的权重 SHA-256（例如 `sha256:<64位摘要>`）或不可变部署发布号。标签最长128字符，仅允许字母、数字、点、下划线、冒号、加号、连字符；禁止凭证或业务内容。实际请求仍使用 `VLM_MODEL` / `ASR_MODEL`，revision 仅进入成功检查点指纹。
+
+同一别名更换权重时同步更改 revision：旧单文件及聚合媒体检查点不再匹配。空值兼容原有指纹，**不能**防止服务端未声明的同名替换。客户端标签不能证明服务端实际制品，部署记录仍须核对模型文件/镜像摘要与服务启动参数。
+
+切换前只读盘点仍在重试或等待的媒体任务、旧指纹数量与预计新增推理预算，保留旧部署可回退依据；本配置不自动重放已完成工单或失败队列。LLM完整分析复用与RAG知识索引版本属于各自契约，不能用本节的媒体指纹宣称它们也已覆盖。
+
 ## 5. 迁移与备份
+
+### 甲方全新空库安装契约
+
+甲方初始化使用单独 `app.cli.customer_install` 入口：`plan` 离线生成不含密码的目标、环境、固定 head 和源码摘要；`apply` 必须提供原清单及操作者核对后的 SHA-256。清单变化、源码变化、目标变化、初始化身份缺失均在连接前拒绝。实际连接后先获取该库安装互斥锁，并确认没有表/视图、事件、触发器或存储过程，才允许按既有迁移执行；只接受 staging/production 的新库，不接受本项目已有开发、验收库及 MySQL 系统库。
+
+此流程不创建数据库、不自动清库、不覆盖既有数据、不做 stamp/create_all。使用同一物理连接执行迁移及初始管理员事务；历史迁移只新增该受控连接内的安装许可分支，原测试/本地交付授权及结构前置检查保持有效，迁移 DDL 不变。失败后保留现场；MySQL DDL 不能保证整体回滚，禁止盲目重跑或自动删除。数据库安装不代表存储、模型、微信、短信或扫描服务已就绪，后续配置与验收独立记录。实际执行持久库安装仍需部署负责人批准。
 
 - 发布流程：备份 → `alembic upgrade head` → 启动 API/Worker → 健康检查
 - 应用与 Alembic 统一使用 PyMySQL；所有 Schema 变化必须通过历史可追踪的 Alembic Migration

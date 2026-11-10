@@ -169,10 +169,15 @@ def check_readiness(
     )
     any_down = any(result["status"] == "down" for result in dependencies.values())
 
+    media_pipeline = settings.media_pipeline()
+    # D6: an unacknowledged demo scanner is a real gap in the media chain, so it
+    # degrades readiness instead of being reported as a healthy pipeline.
+    media_gap = bool(media_pipeline.get("demo_stub_unacknowledged"))
+
     if critical_down:
         status = "not_ready"
         http_status = 503
-    elif any_down:
+    elif any_down or media_gap:
         status = "degraded"
         http_status = 200
     else:
@@ -188,7 +193,9 @@ def check_readiness(
         "ai_credentials": settings.ai_credentials(),
         # PA-163: with no scanner configured media can never become usable, and the
         # only symptom used to be an empty description suggestion. Report the cause.
-        "media_pipeline": settings.media_pipeline(),
+        # D6: the development stub is reported as `demo_stub` (unverified media),
+        # never as a scanned pipeline.
+        "media_pipeline": media_pipeline,
         "dependencies": dependencies,
         "queue": {
             "name": settings.resolved_celery_queue,
