@@ -9,6 +9,7 @@ and every other combination is visible in the readiness payload.
 """
 
 import pytest
+from pydantic import SecretStr
 
 from app.core.config import Settings
 from app.core.readiness import check_readiness
@@ -37,10 +38,20 @@ def test_staging_with_no_ai_credential_at_all_refuses_to_start():
         staging_settings(llm_provider="production")
 
 
-def test_staging_with_only_the_local_token_starts_and_reports_the_missing_key():
+def test_staging_with_only_the_local_token_reports_the_missing_key():
+    # PA-133 makes this combination refuse to start (token + remote endpoint), so the
+    # fixture is built the way an old config or a probe stub would still arrive: past the
+    # validator. The readiness payload must keep saying "LLM_API_KEY missing" for it,
+    # because /readyz also serves objects no validator touched.
     settings = staging_settings(
-        llm_provider="production",
-        local_ai_internal_token="shared-token-0123456789abcdef0123456789abcdef",
+        llm_provider="production", llm_api_key="placeholder-to-pass-validation"
+    ).model_copy(
+        update={
+            "llm_api_key": SecretStr(""),
+            "local_ai_internal_token": SecretStr(
+                "shared-token-0123456789abcdef0123456789abcdef"
+            ),
+        }
     )
 
     credentials = settings.ai_credentials()
@@ -86,8 +97,10 @@ def test_development_provider_needs_no_credential():
         ({"llm_provider": "production", "llm_api_key": "llm-key-0123456789abcdef"}, "configured"),
         (
             {
+                # PA-133 refused this shape at startup, so it reaches /readyz only from a
+                # config that predates the gate; readiness must still describe it.
                 "llm_provider": "production",
-                "local_ai_internal_token": "shared-token-0123456789abcdef0123456789abcdef",
+                "llm_api_key": "placeholder-to-drop",
             },
             "missing",
         ),
@@ -95,6 +108,15 @@ def test_development_provider_needs_no_credential():
 )
 def test_readiness_payload_exposes_the_credential_state(overrides, expected):
     settings = staging_settings(**overrides)
+    if expected == "missing":
+        settings = settings.model_copy(
+            update={
+                "llm_api_key": SecretStr(""),
+                "local_ai_internal_token": SecretStr(
+                    "shared-token-0123456789abcdef0123456789abcdef"
+                ),
+            }
+        )
 
     result, status = check_readiness(
         settings, {"mysql": (True, ok)}, include_queue=False

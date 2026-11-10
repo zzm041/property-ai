@@ -12,6 +12,11 @@ from sqlalchemy.engine import make_url
 
 DEFAULT_APP_SECRET_KEY = "change-me-to-a-long-random-string"
 
+# The shared LOCAL_AI_INTERNAL_TOKEN belongs to this host's adapter, so it is only sent
+# to one of these names. Keep this the single source of truth: startup validation and
+# `resolve_local_ai_key` must agree, or a box validates and then fails at request time.
+LOCAL_AI_ENDPOINT_HOSTS = frozenset({"127.0.0.1", "localhost", "host.docker.internal"})
+
 
 class Settings(BaseSettings):
     """Validated settings shared by the API and infrastructure probes."""
@@ -290,6 +295,20 @@ class Settings(BaseSettings):
                 raise ValueError(
                     "Staging LLM provider requires LLM_API_KEY or LOCAL_AI_INTERNAL_TOKEN"
                 )
+            if not self.llm_api_key.get_secret_value():
+                # PA-133: the local token only ever goes to this host's adapter, so a box
+                # that relies on it cannot point LLM_BASE_URL anywhere else. `resolve_local_ai_key`
+                # already refuses to send the token off-host, which used to surface as an
+                # empty bearer at the first request; refuse the combination at startup with
+                # a message that names the offending host.
+                host = urlsplit(self.llm_base_url).hostname or ""
+                if host not in LOCAL_AI_ENDPOINT_HOSTS:
+                    raise ValueError(
+                        "Staging LLM provider has no LLM_API_KEY and relies on"
+                        " LOCAL_AI_INTERNAL_TOKEN, which is only sent to a local endpoint"
+                        f" ({', '.join(sorted(LOCAL_AI_ENDPOINT_HOSTS))});"
+                        f" LLM_BASE_URL points at {host or '<no host>'}"
+                    )
         if self.app_env == "production":
             self._require_production_provider_credentials()
             if self.file_scanner_provider == "development":
@@ -419,11 +438,10 @@ class Settings(BaseSettings):
         if not local:
             return ""
         parsed = urlsplit(endpoint)
-        if parsed.scheme not in {"http", "https"} or parsed.hostname not in {
-            "127.0.0.1",
-            "localhost",
-            "host.docker.internal",
-        }:
+        if (
+            parsed.scheme not in {"http", "https"}
+            or parsed.hostname not in LOCAL_AI_ENDPOINT_HOSTS
+        ):
             return ""
         return local
 
