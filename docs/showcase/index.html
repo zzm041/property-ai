@@ -14,6 +14,7 @@
 <header class="bar">
   <a class="mark" href="#main">智慧物业 AI</a>
   <nav aria-label="页面导航">
+    <a href="#facts">几个硬数字</a>
     <a href="#record">一条工单</a>
     <a href="#rules">派单约束</a>
     <a href="#stack">系统构成</a>
@@ -46,6 +47,14 @@
     </dl>
     <p class="ticket-foot">提交 <time>00:09:22.122</time> · 判定完成 <time>00:09:45.414</time><br>本机实测一次，模型已驻留，不含首次加载</p>
   </aside>
+</section>
+
+
+<section id="facts" class="facts" aria-label="不随时间变化的几个数">
+  <div><dt>分析输出</dt><dd><b>9</b> 个字段</dd><p>缺一个或越界即判失败，不落库</p></div>
+  <div><dt>派单冷却</dt><dd><b>600</b> 秒</dd><p>被拒或超时的单不重复打扰同一个人</p></div>
+  <div><dt>运行容器</dt><dd><b>11</b> 个</dd><p>api、worker、mysql、redis、mq、milvus 等</p></div>
+  <div><dt>测试总量</dt><dd><b>2,727</b> 条</dd><p>其中 20 条未通过，原因在仓库 reports</p></div>
 </section>
 
 <section id="record" class="section">
