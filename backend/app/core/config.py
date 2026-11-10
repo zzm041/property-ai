@@ -383,6 +383,16 @@ class Settings(BaseSettings):
                 self.reranker_api_key,
                 self.reranker_endpoint,
             ),
+            # PA-139: the supervisor planner builds its own QwenLLMProvider straight
+            # from `supervisor_agent_api_key` / `supervisor_agent_base_url`
+            # (app/provider/supervisor_agent.py:55-57), so it is a seventh family that
+            # can put this token on the wire and it was missing from this list.
+            (
+                "Supervisor agent",
+                self.supervisor_agent_provider,
+                self.supervisor_agent_api_key,
+                self.supervisor_agent_base_url,
+            ),
         )
         for label, provider, explicit, endpoint in providers:
             if provider != "production":
