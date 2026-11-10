@@ -39,7 +39,7 @@ alembic upgrade head
 docker compose -f deploy/docker-compose.prodlike.yml up -d --build
 ```
 
-空库迁移目标：`property_ai_staging` @ `127.0.0.1:3316`。先运行 `alembic heads` 核对交付版本，迁移后 `alembic current` 应一致；当前源码 head 为 `20261003_0015_work_order_media_cycle_links`，不能以旧阶段的 `20260917_0007` 判断完整部署成功。
+空库迁移目标：`property_ai_staging` @ `127.0.0.1:3316`。先运行 `alembic heads` 核对交付版本，迁移后 `alembic current` 应一致；当前源码 head 为 `20261111_0016_idempotency_key_scope`，不能以旧阶段的 `20260917_0007` 判断完整部署成功。
 
 Nginx：`http://127.0.0.1:8081`（`/api/`、`/healthz`、`/readyz`）。
 
@@ -94,7 +94,7 @@ Copy-Item deploy/.env.delivery.bootstrap.example deploy/.env.delivery.bootstrap
 ./deploy/delivery.ps1 up     # 已初始化环境的日常启动；不重新迁移
 ./deploy/delivery.ps1 status
 ./deploy/delivery.ps1 backup
-# 已有 0014 安装升级到 0015：先 backup，再执行固定 revision；不要笼统 upgrade head。
+# 已有 0014 安装先执行下面的 media cycle 固定 revision 升到 0015，再用镜像内 `python -m app.cli.delivery_migrate` 升到 head 0016（20261111_0016_idempotency_key_scope）：先 backup，不要笼统 upgrade head。
 ./deploy/delivery.ps1 media-cycle-migrate property_ai_delivery_check
 ./deploy/delivery.ps1 diagnose
 ./deploy/delivery.ps1 ollama-start # 启动固定 loopback 11435 模型服务；健康检查不加载模型

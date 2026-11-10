@@ -47,7 +47,7 @@ docker compose --env-file deploy/.env.customer -f deploy/docker-compose.delivery
 
 首次启动数据库后应等待 MySQL 健康检查通过再运行 `apply`。不要盲目循环重试。安装器取数据库级互斥锁、核对真实数据库名和空库，再使用同一连接执行现有迁移。管理员从私密 bootstrap 文件读取，只建立初始 SYSTEM_ADMIN 与权限，不注入测试住户、工单或员工。
 
-成功标记为 `CUSTOMER_INSTALL_COMPLETE 20261003_0015_work_order_media_cycle_links`。随后移走主机上的 bootstrap 文件并保存到甲方密钥管理系统；正常应用运行使用基础 Compose 与客户 overlay，不启用 install profile。安装服务不参与普通 `up`。
+成功标记为 `CUSTOMER_INSTALL_COMPLETE 20261111_0016_idempotency_key_scope`。随后移走主机上的 bootstrap 文件并保存到甲方密钥管理系统；正常应用运行使用基础 Compose 与客户 overlay，不启用 install profile。安装服务不参与普通 `up`。
 
 ## 失败与剩余激活步骤
 
