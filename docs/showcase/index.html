@@ -1,43 +1,118 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="智慧物业 AI：多模态报修理解、规则派单、知识问答与主管 Agent，连接报修到回执的完整流程。">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="智慧物业 AI：一条报修从提交到派单的真实链路。含工单 33 的真实分析输出、派单约束与本地部署方式。">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; connect-src 'none'">
-<title>智慧物业 AI · 报修协同与工单调度</title><link rel="stylesheet" href="style.css">
+<title>智慧物业 AI · 一条报修的处理记录</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <a class="skip" href="#main">跳到正文</a>
-<header class="topbar"><a class="brand" href="#main">智慧物业 <span>AI</span></a><nav aria-label="页面导航"><a href="#flow">业务流程</a><a href="#capabilities">AI 能力</a><a href="#architecture">系统架构</a><a href="#deploy">部署与文档</a></nav></header>
+
+<header class="bar">
+  <a class="mark" href="#main">智慧物业 AI</a>
+  <nav aria-label="页面导航">
+    <a href="#record">一条工单</a>
+    <a href="#rules">派单约束</a>
+    <a href="#stack">系统构成</a>
+    <a href="#run">本地运行</a>
+  </nav>
+</header>
+
 <main id="main">
-<section class="hero" aria-labelledby="title">
-<div class="intro"><p class="context">物业报修协同平台</p><h1 id="title">让每一次报修，<br>都有清晰的处理路径。</h1>
-<p class="lead">住户用文字、图片或语音描述问题，AI 整理报修信息，系统按服务范围与人员条件派单。维修人员处理、主管跟进异常、住户查看回执，在同一条工单中完成协作。</p>
-<div class="actions"><a class="button primary" href="#flow">了解处理流程</a><a class="button secondary" href="https://github.com/zzm041/property-ai">查看源码</a></div><p class="caption">微信原生小程序 · 分角色工作台 · 自托管 AI</p></div>
-<aside class="case" aria-label="报修处理流程示意"><div class="case-header"><span>从一个报修开始</span><span class="tag">流程示意</span></div><blockquote>“厨房的灯打开以后不亮，请安排维修。”</blockquote>
-<ol class="case-steps">
-<li><span class="step-dot">1</span><div><strong>识别诉求</strong><p>整理设备、故障现象、位置与联系要求；信息不足时请求补充。</p></div></li>
-<li><span class="step-dot">2</span><div><strong>匹配人员</strong><p>按小区、职责、签到、技能与工作容量筛选，再执行派单规则。</p></div></li>
-<li><span class="step-dot">3</span><div><strong>跟进结果</strong><p>记录处理过程与前后照片，向住户提供回执并接收确认。</p></div></li>
-</ol><p class="case-note">无法处理的情况由维修人员上报，物业主管继续协调。</p></aside>
+
+<section class="hero">
+  <div class="hero-text">
+    <h1>一条报修，<br>二十三秒后<br>变成可派的工单。</h1>
+    <p class="lede">住户用一句话描述问题，AI 把它整理成九个字段的结构化判定，系统按服务范围、职责、签到与技能筛人，再由规则派单。右边这张卡不是截图，是本地库里的真实一行。</p>
+    <p class="links">
+      <a href="https://github.com/zzm041/property-ai">源码</a>
+      <a href="https://github.com/zzm041/property-ai/blob/main/deploy/CUSTOMER-INSTALL.md">部署文档</a>
+    </p>
+  </div>
+
+  <aside class="ticket" aria-label="工单 33 的真实数据">
+    <p class="ticket-id">工单 <b>#33</b> <span class="state">PENDING_ASSIGNMENT</span></p>
+    <p class="quote">厨房水槽下管道接口持续漏水，地面有一小片积水。</p>
+    <dl>
+      <div><dt>category</dt><dd>PLUMBING</dd></div>
+      <div><dt>severity</dt><dd>MEDIUM</dd></div>
+      <div><dt>priority</dt><dd>HIGH</dd></div>
+      <div><dt>required_role</dt><dd>STAFF</dd></div>
+      <div><dt>required_skill</dt><dd>maintenance</dd></div>
+      <div><dt>confidence</dt><dd>0.950</dd></div>
+    </dl>
+    <p class="ticket-foot">提交 <time>00:09:22.122</time> · 判定完成 <time>00:09:45.414</time></p>
+  </aside>
 </section>
-<section id="flow" class="section" aria-labelledby="flow-title"><div class="section-heading"><p>一张工单，连接三个角色</p><h2 id="flow-title">从住户提交，到处理结果确认。</h2></div>
-<div class="feature-grid"><article><h3>住户：描述问题，查看进度</h3><p>提交文字、图片和语音报修，补充现场信息；查看处理回执、前后照片与费用说明，确认解决或继续反馈。</p></article>
-<article><h3>维修人员：接单，处理，回执</h3><p>签到后接收符合职责的工单，记录到场与处理情况。遇到无法解决的问题，通过独立异常页面提交原因。</p></article>
-<article><h3>物业主管：调度与异常跟进</h3><p>查看待派和异常工单，核对诊断依据，进行人工派单、改派或协调；持续保留工单状态与处理记录。</p></article></div></section>
-<section id="capabilities" class="section" aria-labelledby="capabilities-title"><div class="section-heading"><p>AI 参与业务的具体环节</p><h2 id="capabilities-title">理解报修、查找知识、辅助主管决策。</h2></div>
-<div class="evidence-list">
-<article><span class="evidence-type">报修理解</span><div><h3>把零散描述整理成可处理的信息</h3><p>文字、图片与语音进入统一分析流程，提取问题事实、职责、风险和待澄清事项。结构化结果经过校验，供工单展示与规则调度使用。</p></div></article>
-<article><span class="evidence-type">规则派单</span><div><h3>结合实际服务条件安排人员</h3><p>业务服务校验人员所属小区、有效服务关系、签到、职责、技能与容量，再按派单政策选择人员。AI 提供问题信息，人员选择由业务规则执行。</p></div></article>
-<article><span class="evidence-type">知识问答</span><div><h3>从有权限的物业知识中查找依据</h3><p>检索与重排结合，回答带引用来源。知识按租户、小区和可见性过滤，访问时检查权限与文档版本。</p></div></article>
-<article><span class="evidence-type">主管 Agent</span><div><h3>读取队列与诊断，生成有依据的跟进建议</h3><p>通过“查询队列 → 读取工单诊断 → 汇总建议”的受限工具循环辅助主管核实工单。每次读取重新鉴权，建议引用已读取的业务事实，派单和状态变更仍由主管操作。</p><p class="limit">可选功能，默认关闭；启用前需配置独立模型服务与权限。</p></div></article>
-</div></section>
-<section id="architecture" class="section" aria-labelledby="architecture-title"><div class="section-heading"><p>模块化单体与异步处理</p><h2 id="architecture-title">业务记录先保存，AI 分析异步执行。</h2></div>
-<div class="architecture" aria-label="系统架构"><div><strong>微信原生小程序</strong><span>住户 · 员工 · 物业主管</span></div><span class="arrow" aria-hidden="true">→</span><div><strong>FastAPI 业务服务</strong><span>身份权限 · 工单状态 · 规则派单</span></div><span class="arrow" aria-hidden="true">→</span><div><strong>Celery Worker</strong><span>报修分析 · 知识处理 · 重试</span></div></div>
-<p class="supporting">MySQL 保存业务数据，Redis 提供缓存与锁，RabbitMQ 承载异步任务，Milvus 支持知识检索。Qwen 系列模型与语音、向量和重排服务通过 Provider 接入，Docker Compose 与 Nginx 负责部署。</p>
-<div class="feature-grid architecture-notes"><article><h3>异常仍可继续处理</h3><p>模型超时或分析失败时保留原工单。异步任务记录投递、重试与失败状态，物业可通过人工队列继续跟进。</p></article><article><h3>数据按角色隔离</h3><p>租户、小区和资源所有权共同约束访问。住户回执与内部处理记录分别展示，附件访问重新检查权限。</p></article><article><h3>状态变化可追溯</h3><p>工单流转记录业务日志，管理与安全操作写入审计日志。后续补充、异常协调和多轮处理保留上下文。</p></article></div></section>
-<section id="deploy" class="section" aria-labelledby="deploy-title"><div class="section-heading"><p>使用与部署</p><h2 id="deploy-title">查看实现，按环境配置运行。</h2></div>
-<div class="experience-grid"><div><h3>部署文档</h3><p>提供独立配置模板、数据库与对象存储初始化、模型接入，以及启动、备份和恢复说明。</p><ul><li><a href="https://github.com/zzm041/property-ai/blob/main/deploy/CUSTOMER-INSTALL.md">安装与初始化</a></li><li><a href="https://github.com/zzm041/property-ai/blob/main/deploy/selfhost/README.md">自托管模型配置</a></li><li><a href="https://github.com/zzm041/property-ai/blob/main/deploy/CUSTOMER-OPERATIONS.md">运行与维护</a></li></ul></div>
-<aside class="availability"><h3>自托管部署</h3><p>业务服务、数据库、消息队列与模型服务在自有环境中运行。按部署配置连接模型与存储，按角色管理住户、维修人员和物业主管的访问权限。</p><p>微信原生小程序提供业务操作入口，Docker Compose 组织后端服务，Nginx 提供统一访问入口。</p></aside></div></section>
-</main><footer><span>智慧物业 AI · 运营与工单调度平台</span><a href="https://github.com/zzm041/property-ai">GitHub</a></footer>
-</body></html>
+
+<section id="record" class="section">
+  <h2>这二十三秒里发生了什么</h2>
+  <table class="timeline">
+    <thead>
+      <tr><th scope="col">时刻</th><th scope="col">动作</th><th scope="col">落点</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><time>00:09:22.122</time></td><td>住户提交，工单先落库，状态 <code>PENDING_ANALYSIS</code></td><td>work_orders</td></tr>
+      <tr><td><time>00:09:22.258</time></td><td>分析记录建立，此时还没有任何 AI 结论</td><td>work_order_analyses</td></tr>
+      <tr><td><time>00:09:45.414</time></td><td>模型返回、结构校验通过，九个字段一次写入</td><td>status = COMPLETED</td></tr>
+      <tr><td>派单</td><td>按小区、职责、签到、技能与容量筛人，规则决定最终人选</td><td>assignments</td></tr>
+    </tbody>
+  </table>
+  <p class="note">模型只提供问题事实与建议，谁去修由业务规则决定。模型超时或输出不合格时，工单留在库里等人处理，不会丢。</p>
+</section>
+
+<section id="rules" class="section">
+  <h2>三个必须成立的约束</h2>
+  <div class="rules">
+    <article>
+      <h3>模型不许编</h3>
+      <p>分析结果按固定 schema 校验：类别、子类、严重度、优先级、摘要、风险、所需角色、所需技能、置信度，缺一个或越界即判失败，不落库。</p>
+      <p class="cite">app/domain/observed_event.py</p>
+    </article>
+    <article>
+      <h3>同一单不重复叫人</h3>
+      <p>派单有 600 秒冷却：被拒或超时的单在窗口内不会再次派给同一个人，避免反复打扰。</p>
+      <p class="cite">app/service/dispatch.py</p>
+    </article>
+    <article>
+      <h3>事务在服务层</h3>
+      <p>状态流转、幂等键、租户与小区校验都在 Service 完成，路由只做参数转换，测试可以直接打服务层。</p>
+      <p class="cite">app/service/work_order.py</p>
+    </article>
+  </div>
+</section>
+
+<section id="stack" class="section">
+  <h2>系统由这些部分组成</h2>
+  <div class="stack">
+    <div class="stack-row"><b>微信原生小程序</b><span>住户 · 维修人员 · 物业主管</span></div>
+    <div class="stack-row"><b>FastAPI 业务服务</b><span>身份权限 · 工单状态 · 规则派单</span></div>
+    <div class="stack-row"><b>Celery Worker</b><span>报修分析 · 知识处理 · 失败重试</span></div>
+    <div class="stack-row"><b>本地模型服务</b><span>Qwen 27B · 语音 · 向量 · 重排，经 Provider 接入</span></div>
+  </div>
+  <p class="note">MySQL 存业务数据，Redis 提供缓存与锁，RabbitMQ 承载异步任务，Milvus 支撑知识检索；十一个容器由 Docker Compose 编排，Nginx 统一入口。</p>
+</section>
+
+<section id="run" class="section">
+  <h2>本地跑起来</h2>
+  <p>依赖离线包与模型权重随交付包提供，按文档填 <code>.env</code> 后一条命令起全部服务；接口没有开放在公网，这里展示的是本地演示库的数据。</p>
+  <p class="links">
+    <a href="https://github.com/zzm041/property-ai/blob/main/deploy/CUSTOMER-INSTALL.md">安装与初始化</a>
+    <a href="https://github.com/zzm041/property-ai/blob/main/deploy/CUSTOMER-OPERATIONS.md">运行与维护</a>
+    <a href="https://github.com/zzm041/property-ai">全部源码</a>
+  </p>
+  <p class="note">测试现状：全量 2,727 条，其中 20 条已知未通过，原因与清单写在仓库的 reports 目录，没有隐藏。</p>
+</section>
+
+</main>
+
+<footer>
+  <span>智慧物业 AI · 报修协同与工单调度</span>
+  <a href="https://github.com/zzm041/property-ai">github.com/zzm041/property-ai</a>
+</footer>
+
+</body>
+</html>
