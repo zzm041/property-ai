@@ -35,7 +35,10 @@ def test_app_copies_lists_every_importable_app_package() -> None:
     info = buildinfo.build_info()
     copies = info["app_copies"]
     assert isinstance(copies, list)
-    assert str(Path(ai_domain.__file__).parents[1]) in copies
+    # The probe has to be a plain module of the ``app`` package: ``app.domain.ai``
+    # became a package in S3, so its ``__file__`` no longer sits one level below
+    # ``app``.  The assertion is the same: the directory holding ``app`` is listed.
+    assert str(Path(buildinfo.__file__).parents[1]) in copies
     assert len(copies) == len(set(copies))
 
 

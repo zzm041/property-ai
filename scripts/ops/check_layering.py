@@ -87,6 +87,9 @@ SHIMMED_MODULES: dict[str, str] = {
     "app.domain.receipt_handling": "work_order",
     "app.domain.diagnosis": "work_order",
     "app.domain.vision": "work_order",
+    # S3: the analysis domain modules moved into app.domain.ai.
+    "app.domain.ai": "ai",
+    "app.domain.observed_event": "ai",
 }
 
 SHIM_MAX_EFFECTIVE_LINES = 8
