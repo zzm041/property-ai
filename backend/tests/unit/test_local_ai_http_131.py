@@ -14,7 +14,7 @@ from types import SimpleNamespace
 import pytest
 
 ROOT = Path(__file__).resolve().parents[3]
-SPEC = importlib.util.spec_from_file_location('local_ai_http_131', ROOT / 'scripts/ops/local_ai_http.py')
+SPEC = importlib.util.spec_from_file_location('local_ai_http_131', ROOT / 'backend/app/provider/local_ai/runtime_control.py')
 adapter = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(adapter)
 
@@ -124,7 +124,7 @@ def test_runtime_stopped_receipt_is_written_next_to_the_binding(tmp_path: Path) 
 
 
 def test_the_stop_set_is_the_only_gate_in_the_request_loop() -> None:
-    source = (ROOT / 'scripts/ops/local_ai_http.py').read_text(encoding='utf-8')
+    source = (ROOT / 'backend/app/provider/local_ai/runtime_control.py').read_text(encoding='utf-8')
 
     assert "if kind=='qwen' and runtime_stop_required(reason):" in source
     assert "reason in {\n                'RESOURCE_FLOOR'" not in source

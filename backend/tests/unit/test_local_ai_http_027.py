@@ -21,7 +21,7 @@ from app.provider.vector import MilvusKnowledgeStore
 from app.service.retrieval import RetrievalService
 
 ROOT=Path(__file__).resolve().parents[3]
-spec=importlib.util.spec_from_file_location('local_ai_http_027',ROOT/'scripts/ops/local_ai_http.py')
+spec=importlib.util.spec_from_file_location('local_ai_http_027',ROOT/'backend/app/provider/local_ai/runtime_control.py')
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 
 
@@ -32,7 +32,7 @@ def _load_adapter_candidate(monkeypatch, model, runtime_model=None):
     else:
         monkeypatch.setenv('PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL',runtime_model)
     candidate_spec=importlib.util.spec_from_file_location(
-        f'local_ai_http_{model.replace(":", "_")}',ROOT/'scripts/ops/local_ai_http.py'
+        f'local_ai_http_{model.replace(":", "_")}',ROOT/'backend/app/provider/local_ai/runtime_control.py'
     )
     candidate=importlib.util.module_from_spec(candidate_spec)
     candidate_spec.loader.exec_module(candidate)

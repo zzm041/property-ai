@@ -14,7 +14,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[3]
-spec = importlib.util.spec_from_file_location("local_ai_http_pa166", ROOT / "scripts/ops/local_ai_http.py")
+spec = importlib.util.spec_from_file_location("local_ai_http_pa166", ROOT / "backend/app/provider/local_ai/runtime_control.py")
 m = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)
 

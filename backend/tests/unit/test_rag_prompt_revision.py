@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 ROOT=Path(__file__).resolve().parents[3]
-spec=importlib.util.spec_from_file_location('rag_revision_adapter',ROOT/'scripts/ops/local_ai_http.py')
+spec=importlib.util.spec_from_file_location('rag_revision_adapter',ROOT/'backend/app/provider/local_ai/runtime_control.py')
 adapter=importlib.util.module_from_spec(spec);spec.loader.exec_module(adapter)
 
 def payload():

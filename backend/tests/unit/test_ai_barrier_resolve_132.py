@@ -27,7 +27,7 @@ def _load(name: str, relative: str):
     return module
 
 
-adapter = _load("local_ai_http_132", "scripts/ops/local_ai_http.py")
+adapter = _load("local_ai_http_132", "backend/app/provider/local_ai/runtime_control.py")
 barrier_tool = _load("ai_barrier_132", "scripts/ops/ai_barrier.py")
 
 
@@ -172,7 +172,7 @@ def test_cli_reports_success_and_failure_with_distinct_exit_codes(tmp_path: Path
 
 
 def test_adapter_barrier_fields_are_additive_only() -> None:
-    source = (ROOT / "scripts/ops/local_ai_http.py").read_text(encoding="utf-8")
+    source = (ROOT / "backend/app/provider/local_ai/runtime_control.py").read_text(encoding="utf-8")
     # the gate decision must remain "does the file exist", not a parsed field
     assert "if self.shared_completion_barrier_path.exists():\n            return 'BLOCKED_SHARED_REQUEST_COMPLETION_UNKNOWN_NO_REPLAY'" in source
     for field in ("'call_id':folder.name", "'affected_scopes':", "'remediation':{"):
