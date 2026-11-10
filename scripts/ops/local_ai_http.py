@@ -35,6 +35,7 @@ from local_ai_runtime_control import (
     loopback_listener_pid,
     terminate_bound_runtime,
 )
+from app.domain import ai as ai_contract
 from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
 from app.domain.observed_event import work_order_analysis_response_format
 from app.domain.vision import VISION_ANALYSIS_PROMPT_VERSION,vision_analysis_response_format
@@ -75,6 +76,41 @@ MAX_MEDIA_BYTES=10*1024*1024
 MAX_BODY=15*1024*1024
 WORK_ORDER_PROMPT_VERSION=WORK_ORDER_ANALYSIS_PROMPT_VERSION
 RAG_PROMPT_VERSIONS=frozenset({'rag-answer-v2','rag-answer-v3','rag-answer-v4'})
+# PA-116 / PA-116-A-1: the shipped work-order prompt version must live in a
+# versioned file, not only in whatever shell happened to launch this adapter.
+# Resolution order, first hit wins:
+#   1) PROPERTY_AI_ALLOWED_WORK_PROMPT_VERSION  explicit env override (CI / one-off)
+#   2) PROPERTY_AI_PROMPT_VERSIONS_FILE         versioned JSON, ships as deploy/ai-runtime-prompts.json
+#   3) the backend contract module              last-resort fallback, reported as such
+def _prompt_versions_file():
+    raw=os.environ.get('PROPERTY_AI_PROMPT_VERSIONS_FILE','').strip()
+    if raw:return Path(raw)
+    default=Path(__file__).resolve().parents[2]/'deploy'/'ai-runtime-prompts.json'
+    return default if default.is_file() else None
+def _prompt_versions_from_file(path):
+    try:payload=json.loads(Path(path).read_text(encoding='utf-8'))
+    except (OSError,ValueError) as exc:raise RuntimeError('PROMPT_VERSIONS_FILE_INVALID') from exc
+    if not isinstance(payload,dict) or payload.get('format')!='property-ai-runtime-prompts-v1':
+        raise RuntimeError('PROMPT_VERSIONS_FILE_INVALID')
+    values=payload.get('allowed_work_prompt_versions')
+    if not isinstance(values,list) or not values:raise RuntimeError('PROMPT_VERSIONS_FILE_INVALID')
+    if any(not isinstance(v,str) or not v.strip() for v in values):raise RuntimeError('PROMPT_VERSIONS_FILE_INVALID')
+    if len(set(values))!=len(values):raise RuntimeError('PROMPT_VERSIONS_FILE_INVALID')
+    return values
+WORK_ORDER_PROMPT_VERSION_OVERRIDE=os.environ.get('PROPERTY_AI_ALLOWED_WORK_PROMPT_VERSION','').strip()
+PROMPT_VERSIONS_FILE=_prompt_versions_file()
+if WORK_ORDER_PROMPT_VERSION_OVERRIDE:
+    WORK_ORDER_PROMPT_VERSIONS=[WORK_ORDER_PROMPT_VERSION_OVERRIDE]
+    WORK_ORDER_PROMPT_VERSION_SOURCE='env:PROPERTY_AI_ALLOWED_WORK_PROMPT_VERSION'
+elif PROMPT_VERSIONS_FILE:
+    WORK_ORDER_PROMPT_VERSIONS=_prompt_versions_from_file(PROMPT_VERSIONS_FILE)
+    WORK_ORDER_PROMPT_VERSION_SOURCE='file:'+str(PROMPT_VERSIONS_FILE)
+else:
+    WORK_ORDER_PROMPT_VERSIONS=[WORK_ORDER_PROMPT_VERSION]
+    WORK_ORDER_PROMPT_VERSION_SOURCE='backend:'+str(Path(ai_contract.__file__))
+WORK_ORDER_PROMPT_VERSION=WORK_ORDER_PROMPT_VERSIONS[0]
+def allowed_prompt_versions():
+    return {'work_order':list(WORK_ORDER_PROMPT_VERSIONS),'vision':[VISION_ANALYSIS_PROMPT_VERSION],'rag':sorted(RAG_PROMPT_VERSIONS),'source':WORK_ORDER_PROMPT_VERSION_SOURCE}
 WORK_ORDER_RESPONSE_FORMAT=work_order_analysis_response_format()
 VISION_RESPONSE_FORMAT=vision_analysis_response_format()
 SAFE_PRE_RESERVATION_DETAILS=frozenset({
@@ -187,7 +223,7 @@ def decode(path,content_type,body,prompt_version,scope='all'):
                 raise ValueError('WORK_ORDER_ONLY_NO_RAG_AUTHORIZATION')
             expected_format=(
                 {'type':'json_object'} if prompt_version in RAG_PROMPT_VERSIONS
-                else WORK_ORDER_RESPONSE_FORMAT if prompt_version==WORK_ORDER_PROMPT_VERSION
+                else WORK_ORDER_RESPONSE_FORMAT if prompt_version in WORK_ORDER_PROMPT_VERSIONS
                 else VISION_RESPONSE_FORMAT if prompt_version==VISION_ANALYSIS_PROMPT_VERSION
                 else None
             )
@@ -323,7 +359,7 @@ class Runner:
         if isinstance(exc,(TimeoutError,ConnectionError,OSError)):
             return 'REMOTE_UNAVAILABLE'
         return 'INTERNAL_PRE_RESERVATION_ERROR'
-    def record_pre_reservation_failure(self,exc,*,stage,kind=None,input_hash=None,request_binding=None):
+    def record_pre_reservation_failure(self,exc,*,stage,kind=None,input_hash=None,request_binding=None,prompt_version=None):
         reason=self._failure_code(exc)
         detail=str(exc) if str(exc) in SAFE_PRE_RESERVATION_DETAILS else None
         record={
@@ -333,6 +369,7 @@ class Runner:
             'runtime_version':QWEN_RUNTIME_VERSION if kind=='qwen' else None,
             'context_length':QWEN_CONTEXT_LENGTH if kind=='qwen' else None,
             'input_sha256':input_hash,'request_binding_sha256':request_binding,
+            'prompt_version':prompt_version,'allowed_prompt_versions':allowed_prompt_versions(),
             'reservation_created':False,'fail_closed':True,
         }
         self.private.mkdir(parents=True,exist_ok=True)
@@ -601,7 +638,7 @@ def serve(config_path):
         def do_GET(self):
             if not self.authorized():return self.reply(401,{'error':'AUTH_REQUIRED'})
             if self.path!='/healthz':return self.reply(404,{'error':'NOT_FOUND'})
-            return self.reply(200,{'status':'ready','inference':False,'scope':runner.scope,'models':MODELS,'reservation_gate':runner.gate(),**runner.admission()})
+            return self.reply(200,{'status':'ready','inference':False,'scope':runner.scope,'models':MODELS,'reservation_gate':runner.gate(),'prompt_versions':allowed_prompt_versions(),**runner.admission()})
         def do_POST(self):
             if not self.authorized():return self.reply(401,{'error':'AUTH_REQUIRED'})
             if self.path=='/admin/drain':
@@ -623,7 +660,7 @@ def serve(config_path):
                 if len(body)!=size:raise ValueError('INCOMPLETE_BODY')
                 kind,value=decode(self.path,self.headers.get('Content-Type',''),body,self.headers.get('X-Prompt-Version',''),runner.scope)
             except (ValueError,TypeError,KeyError,UnicodeError) as exc:
-                runner.record_pre_reservation_failure(exc,stage='HTTP_DECODE',input_hash=hashlib.sha256(body if 'body' in locals() else b'').hexdigest(),request_binding=request_binding)
+                runner.record_pre_reservation_failure(exc,stage='HTTP_DECODE',input_hash=hashlib.sha256(body if 'body' in locals() else b'').hexdigest(),request_binding=request_binding,prompt_version=self.headers.get('X-Prompt-Version',''))
                 return self.reply(422,{'error':'INVALID_REQUEST'})
             if not runner.acquire_request():return self.reply(503,{'error':'MODEL_DRAINING_OR_BUSY_NO_RETRY'})
             shared=None;shared_ready=False
@@ -639,7 +676,8 @@ def serve(config_path):
                 if shared is not None:runner.release_shared_model_lock(shared)
                 runner.lock.release()
     server=ThreadingHTTPServer((runner.config['host'],runner.config['port']),Handler)
-    print(json.dumps({'pid':os.getpid(),'listen':f"{runner.config['host']}:{runner.config['port']}",'python':sys.executable,'source':str(Path(__file__).resolve()),'utc':stamp(),'health_inference':False}),flush=True)
+    banner={'pid':os.getpid(),'listen':f"{runner.config['host']}:{runner.config['port']}",'python':sys.executable,'source':str(Path(__file__).resolve()),'utc':stamp(),'health_inference':False,'prompt_versions':allowed_prompt_versions()}
+    print(json.dumps(banner,ensure_ascii=False),flush=True)
     server.serve_forever()
 
 if __name__=='__main__':

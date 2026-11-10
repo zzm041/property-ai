@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
 
 from app.api.dependencies.auth import get_current_principal
+from app.core.buildinfo import build_info
 from app.core.config import Settings, get_settings
 from app.core.readiness import check_readiness, queue_depth
 from app.domain.iam import OrganizationScope, Principal, ScopeType
@@ -17,9 +18,13 @@ _OPSZ_PERMISSION = "audit:read"
 
 @router.get("/healthz")
 def healthz(request: Request) -> dict[str, object]:
-    """Liveness only: no external dependency calls."""
+    """Liveness only: no external dependency calls.
 
-    return success_envelope(request, {"status": "ok"})
+    ``build`` is static provenance (baked source commit, resolved package path,
+    contract file digests) so PA-116 drift is visible without exec'ing a shell.
+    """
+
+    return success_envelope(request, {"status": "ok", "build": build_info()})
 
 
 @router.get("/readyz")

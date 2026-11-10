@@ -3,10 +3,16 @@ name: ${COMPOSE_PROJECT_NAME:-property-ai-delivery-check}
 # Reproducible single-host delivery artifact.  Application processes never
 # migrate automatically; run the one-shot `migrate` service explicitly.
 x-app-image: &app-image
-  image: property-ai-delivery:${DELIVERY_IMAGE_TAG:-local}
+  # PA-116: the tag is content-addressed (`src-<12-hex source commit>`) and is
+  # exported by `deploy/delivery.ps1 release`, which refuses a mutable tag and
+  # force-recreates api/worker/beat/publisher together.  A stale container can no
+  # longer keep serving an older image than its siblings.
+  image: property-ai-delivery:${DELIVERY_IMAGE_TAG:-unbuilt}
   build:
     context: ..
     dockerfile: deploy/Dockerfile
+    args:
+      PROPERTY_AI_SOURCE_SHA: ${DELIVERY_SOURCE_SHA:-unknown}
 
 services:
   mysql:

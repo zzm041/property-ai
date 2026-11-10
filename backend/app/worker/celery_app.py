@@ -12,6 +12,7 @@ from celery.signals import (
 from kombu import Exchange, Queue
 from structlog.contextvars import bind_contextvars, clear_contextvars
 
+from app.core.buildinfo import build_info
 from app.core.config import get_settings
 from app.core.logging import configure_logging, get_logger
 
@@ -66,6 +67,8 @@ def create_celery_app() -> Celery:
         timezone="UTC",
         imports=("app.worker.tasks", "app.worker.task_intents"),
     )
+    # PA-116: worker startup must state which source and contract files it runs.
+    logger.info("delivery_build", **build_info())
     return app
 
 

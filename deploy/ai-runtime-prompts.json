@@ -1,0 +1,7 @@
+{
+  "format": "property-ai-runtime-prompts-v1",
+  "allowed_work_prompt_versions": [
+    "wo-analysis-v26-summary-fidelity"
+  ],
+  "note": "交付栈实际下发的工单分析提示词版本。adapter 的 /healthz 会回显 prompt_versions.source=file:<this path>，因此换机器/重开 shell 也不会回落到 backend 模块常量。修改此文件必须同时确认 containers 内 app/domain/ai.py 的 WORK_ORDER_ANALYSIS_PROMPT_VERSION 与之相同。"
+}
