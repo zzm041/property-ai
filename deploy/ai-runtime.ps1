@@ -29,7 +29,12 @@ $OllamaLauncher = Join-Path $DeployDir "ollama-runtime.ps1"
 $Endpoint = "http://127.0.0.1:11437"
 $WorkPort = 11437
 $ManagedPorts = @(11435, 11438)
-$ExpectedSourceCommit = "94367eda50d0a2b09a3ab5afe1cd9ce785ff1f70"
+# The runtime contract commit is defined by the launcher pins; read it from there
+# instead of keeping a second copy in this orchestrator that can drift.
+$ExpectedSourceCommit = $null
+$launcherText = [IO.File]::ReadAllText($WorkAiLauncher, [Text.UTF8Encoding]::new($false))
+if ($launcherText -match '(?m)^\$SourceCommit = "([0-9a-f]{40})"') { $ExpectedSourceCommit = $Matches[1] }
+if (-not $ExpectedSourceCommit) { throw "could not read the pinned runtime source commit from $WorkAiLauncher" }
 $ExpectedQwenModel = "qwen38-27b-q3km-g55:7af3b8f"
 $ExpectedPromptVersionsFormat = "property-ai-runtime-prompts-v1"
 
@@ -50,7 +55,9 @@ function Read-Token {
 
 function Read-Json([string]$Path) {
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { return $null }
-    return Get-Content -Raw -LiteralPath $Path | ConvertFrom-Json
+    # Windows PowerShell 5.1 Get-Content defaults to the ANSI code page, which
+    # corrupts the UTF-8 prompt-version file. Read bytes and decode explicitly.
+    return ([IO.File]::ReadAllText($Path, [Text.UTF8Encoding]::new($false)) | ConvertFrom-Json)
 }
 
 function Invoke-Api([string]$Path, [string]$Method, [string]$Token) {
@@ -93,15 +100,15 @@ function Get-PromptVersionsFile {
 function Stop-StrayPythonListener([int]$Port) {
     $pids = @(Get-PortListenerPids $Port)
     if ($pids.Count -eq 0) { return }
-    foreach ($pid in $pids) {
-        $process = Get-Process -Id $pid -ErrorAction SilentlyContinue
+    foreach ($listenerPid in $pids) {
+        $process = Get-Process -Id $listenerPid -ErrorAction SilentlyContinue
         $name = if ($null -eq $process) { "unknown" } else { $process.ProcessName }
-        Write-Output "stopping stray listener on $Port (pid=$pid, process=$name)"
+        Write-Output "stopping stray listener on $Port (pid=$listenerPid, process=$name)"
         try {
-            Stop-Process -Id $pid -ErrorAction Stop
+            Stop-Process -Id $listenerPid -ErrorAction Stop
         } catch {
-            & taskkill /PID $pid /F | Out-Null
-            if ($LASTEXITCODE -ne 0) { throw "stray listener on $Port (pid=$pid) could not be stopped" }
+            & taskkill /PID $listenerPid /F | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "stray listener on $Port (pid=$listenerPid) could not be stopped" }
         }
     }
     $deadline = [DateTime]::UtcNow.AddSeconds(10)
@@ -165,8 +172,29 @@ function Assert-Health([string]$Token, [object]$Current) {
 switch ($Action) {
     "up" {
         $null = Get-PromptVersionsFile
-        # 1) nothing unmanaged may own a port this runtime is responsible for
-        foreach ($port in $ManagedPorts) { Stop-StrayPythonListener $port }
+        # 1) nothing unmanaged may own a port this runtime is responsible for.
+        # A recorded Ollama runtime is stopped through its launcher first, so the
+        # controlled-stop evidence stays intact; only unrecorded listeners are killed.
+        foreach ($port in $ManagedPorts) {
+            if ($port -eq 11435 -and (Test-Path -LiteralPath $OllamaCurrentPath -PathType Leaf)) {
+                $ollamaReceipt = Read-Json $OllamaCurrentPath
+                $recordedPid = [int]$ollamaReceipt.pid
+                $recordedAlive = $null -ne (Get-CimInstance Win32_Process -Filter "ProcessId=$recordedPid" -ErrorAction SilentlyContinue)
+                if ($recordedAlive -or @(Get-PortListenerPids $port).Count -gt 0) {
+                    Write-Output "stopping the recorded Ollama runtime through its launcher"
+                    & $OllamaLauncher stop
+                    if ($LASTEXITCODE -ne 0) { throw "ollama runtime launcher failed to stop the recorded runtime" }
+                } else {
+                    # the recorded process is gone and its port is free: no execution to
+                    # preserve, so archive the orphan receipt instead of tripping the guard
+                    $orphanName = "retired-orphan-{0}.json" -f $ollamaReceipt.operation_id
+                    $orphanPath = Join-Path $OllamaRuntimeDir $orphanName
+                    Move-Item -LiteralPath $OllamaCurrentPath -Destination $orphanPath -Force
+                    Write-Output "archived orphan Ollama receipt: $orphanName (pid $recordedPid is gone)"
+                }
+            }
+            Stop-StrayPythonListener $port
+        }
         $workPids = @(Get-PortListenerPids $WorkPort)
         if ($workPids.Count -gt 0) {
             if ($null -eq (Read-Json $CurrentPath)) {
@@ -175,6 +203,14 @@ switch ($Action) {
             }
         }
         if (@(Get-PortListenerPids $WorkPort).Count -eq 0) { Clear-WorkAiState }
+        # 1b) ollama-runtime.ps1 pins the reviewed Ollama binary by sha256. On this host
+        # the reviewed build lives in the portable runtime tree, not in the per-user
+        # install directory the launcher falls back to, so point the launcher at it.
+        $PortableOllama = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\ollama-0.34.4-portable\ollama.exe"
+        $previousOllamaExe = $env:PROPERTY_AI_OLLAMA_EXE
+        if (-not $env:PROPERTY_AI_OLLAMA_EXE -and (Test-Path -LiteralPath $PortableOllama -PathType Leaf)) {
+            $env:PROPERTY_AI_OLLAMA_EXE = $PortableOllama
+        }
         # 2) the versioned prompt selection travels with the process tree
         $env:PROPERTY_AI_PROMPT_VERSIONS_FILE = $PromptVersionsPath
         $previousOverride = $env:PROPERTY_AI_ALLOWED_WORK_PROMPT_VERSION
@@ -196,6 +232,7 @@ switch ($Action) {
             Assert-Health $token $current
         } finally {
             $env:PROPERTY_AI_ALLOWED_WORK_PROMPT_VERSION = $previousOverride
+            $env:PROPERTY_AI_OLLAMA_EXE = $previousOllamaExe
         }
     }
     "down" {

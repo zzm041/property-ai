@@ -16,14 +16,14 @@ $SecretPath = Join-Path $RuntimeDir "internal-token.txt"
 $ConfigPath = Join-Path $RuntimeDir "config.json"
 $CurrentPath = Join-Path $RuntimeDir "current.json"
 $OllamaCurrent = Join-Path $RepoRoot "tmp\delivery-ollama-runtime\current.json"
-$SourceCommit = "61b762d9775845c47cf0b43f3003a3f4d1cb5519"
+$SourceCommit = "50bcad5320e1e41033b97e82f0e99da8db4521e0"
 $CandidateRoot = Join-Path $RuntimeDir "candidate-$SourceCommit"
 $AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
 $ModelAdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_models.py"
 $RuntimeControlPath = Join-Path $CandidateRoot "scripts\ops\local_ai_runtime_control.py"
-$ExpectedAdapterSha256 = "70BB10C801D695830FCC33630773DB82986427B86962432354A0726AF3A3C676"
-$ExpectedModelAdapterSha256 = "AD89639C05C18BF6D78FF28F32A62A105EE5B5ECFC9837EB5700B75DFCAAF320"
-$ExpectedRuntimeControlSha256 = "567B325C7130E6AA7047AB957E5C19B442B66C8DBA29F8FAEDA50EE60830C876"
+$ExpectedAdapterSha256 = "63EC2054D85376D4D7C7316B6301152DF0DA5387CEDF4B3B89667E5800A4F288"
+$ExpectedModelAdapterSha256 = "FAF70CF69B8D7058026881D47B90CB20E3B03F6A99E693F16BD06CDA87AC0BB2"
+$ExpectedRuntimeControlSha256 = "B0DE6D3544D8875E0A57CED1A1946744736FC9074AF1ECEA5228A79468C60CFF"
 $ResolutionRoot = Join-Path $RepoRoot "reports"
 $ResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\call-001-resolution.json"
 $ResolutionReviewPath = Join-Path $RepoRoot "reports\codex\REAL-AI-INTEGRATION-027-DELIVERY-AUTO-call001-review-round1.raw.json"
@@ -74,7 +74,7 @@ if ($ArtifactManifest) {
     $ExpectedModelAdapterSha256 = $RuntimeArtifact.files.'scripts/ops/local_ai_models.py'
     $ExpectedRuntimeControlSha256 = $RuntimeArtifact.files.'scripts/ops/local_ai_runtime_control.py'
     $SourceCommit = $null
-    $RuntimeModelName = "qwen38-27b-q3km-g52-ctx8192:7af3b8f"
+    $RuntimeModelName = "qwen38-27b-q3km-g55-ctx8192:7af3b8f"
 }
 if ($Action -eq "verify-artifact") {
     if ($null -eq $RuntimeArtifact) { throw "verify-artifact requires a pinned artifact" }
@@ -146,16 +146,33 @@ function Assert-Candidate {
     if ($SourceCommit -match "^__" -or $ExpectedAdapterSha256 -match "^__" -or $ExpectedModelAdapterSha256 -match "^__" -or $ExpectedRuntimeControlSha256 -match "^__") {
         throw "work AI candidate is not frozen"
     }
+    # A half-populated candidate directory (for example left behind by a failed
+    # extraction) must not be mistaken for a verified one; re-extract from scratch.
+    $candidateAdapterProbe = Join-Path $CandidateRoot "scripts/ops/local_ai_http.py"
+    if ((Test-Path -LiteralPath $CandidateRoot -PathType Container) -and -not (Test-Path -LiteralPath $candidateAdapterProbe -PathType Leaf)) {
+        Remove-Item -LiteralPath $CandidateRoot -Recurse -Force
+    }
     if (-not (Test-Path -LiteralPath $CandidateRoot -PathType Container)) {
         if ($null -ne $RuntimeArtifact) { throw "verified runtime artifact disappeared" }
         New-Item -ItemType Directory -Force -Path $CandidateRoot | Out-Null
         $archive = Join-Path $RuntimeDir "candidate-$SourceCommit.tar"
         if (Test-Path -LiteralPath $archive) { throw "candidate archive path already exists" }
-        & git -C $RepoRoot archive --format=tar --output=$archive $SourceCommit backend/app scripts/ops/local_ai_http.py scripts/ops/local_ai_models.py scripts/ops/local_ai_process.py scripts/ops/local_ai_runtime_control.py
+        # core.autocrlf=true would make archive emit CRLF bytes, so the exported candidate
+        # would never match the pinned git-blob (LF) hashes. Export byte-identical blobs.
+        & git -C $RepoRoot -c core.autocrlf=false archive --format=tar --output=$archive $SourceCommit backend/app scripts/ops/local_ai_http.py scripts/ops/local_ai_models.py scripts/ops/local_ai_process.py scripts/ops/local_ai_runtime_control.py
         if ($LASTEXITCODE -ne 0) { throw "could not export frozen work AI candidate" }
         try {
-            & tar -xf $archive -C $CandidateRoot
+            # Extract with the system bsdtar: a POSIX tar earlier on PATH (MSYS/Git) does
+            # not understand the native Windows path handed to -C and silently unpacks
+            # nothing, which then fails later as a missing candidate file.
+            $tarExe = Join-Path (Join-Path $env:SystemRoot "System32") "tar.exe"
+            if (-not (Test-Path -LiteralPath $tarExe -PathType Leaf)) { $tarExe = "tar" }
+            & $tarExe -xf $archive -C $CandidateRoot
             if ($LASTEXITCODE -ne 0) { throw "could not extract frozen work AI candidate" }
+            $extractedAdapter = Join-Path $CandidateRoot "scripts/ops/local_ai_http.py"
+            if (-not (Test-Path -LiteralPath $extractedAdapter -PathType Leaf)) {
+                throw "frozen work AI candidate extraction produced no adapter"
+            }
         } finally {
             Remove-Item -LiteralPath $archive -Force
         }
