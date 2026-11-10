@@ -23,7 +23,7 @@ a{color:inherit;text-decoration-color:var(--stamp);text-underline-offset:4px}
 a:hover{color:var(--stamp)}
 a:focus-visible,summary:focus-visible{outline:2px solid var(--stamp);outline-offset:4px}
 h1,h2,h3,p,dl,dd{margin:0}
-code{font:0.9em/1 var(--mono);background:rgba(22,35,29,.06);padding:2px 5px}
+code{font:0.9em/1 var(--mono);background:rgba(22,35,29,.06);padding:2px 5px;overflow-wrap:anywhere}
 time{font:0.82em/1 var(--mono);font-variant-numeric:tabular-nums;letter-spacing:.01em}
 
 .skip{position:fixed;top:-80px;left:16px;z-index:9;background:var(--card);padding:10px 14px;border:1px solid var(--rule)}
@@ -74,7 +74,7 @@ h2{font:600 clamp(24px,2.6vw,31px)/1.4 var(--serif);margin-bottom:30px;max-width
 
 .timeline{width:100%;border-collapse:collapse;font-size:15.5px;table-layout:fixed}
 .timeline th:nth-child(1),.timeline td:nth-child(1){width:27%}\n.timeline th:nth-child(2),.timeline td:nth-child(2){width:50%}\n.timeline th:nth-child(3),.timeline td:nth-child(3){width:23%}\n.timeline th{text-align:left;font:12px/1 var(--mono);color:var(--muted);letter-spacing:.04em;padding:0 16px 10px 0}
-.timeline td{padding:15px 16px 15px 0;border-top:1px solid var(--rule);vertical-align:top;color:var(--muted)}
+.timeline td{padding:15px 16px 15px 0;border-top:1px solid var(--rule);vertical-align:top;color:var(--muted);overflow-wrap:anywhere}
 .timeline td:first-child{white-space:nowrap;color:var(--ink)}
 .timeline td:nth-child(2){color:var(--ink)}
 .timeline td:last-child{font:13px/1.7 var(--mono);white-space:nowrap}
