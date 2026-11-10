@@ -1,12 +1,6 @@
-"""Property archive permissions and stable physical-house values."""
+"""Compatibility layer for app.domain.property — delete in phase 2b.
 
-from enum import StrEnum
-
-
-class HouseStatus(StrEnum):
-    ACTIVE = "ACTIVE"
-    INACTIVE = "INACTIVE"
-
-
-PROPERTY_READ = "property:read"
-PROPERTY_MANAGE = "property:manage"
+Content moved to app.domain.identity (models/rules); this module only re-exports.
+"""
+from app.domain.identity import *  # noqa: F401,F403
+from app.domain.identity import __all__ as __all__  # noqa: F401

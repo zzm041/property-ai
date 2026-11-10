@@ -76,7 +76,12 @@ FLAT_MODULE_PACKAGE: dict[str, str] = {
 
 # Legacy module -> package that now owns it. Filled in by S1..S4; an entry here
 # makes --shims require the legacy file to be a thin re-export.
-SHIMMED_MODULES: dict[str, str] = {}
+SHIMMED_MODULES: dict[str, str] = {
+    "app.domain.iam": "identity",
+    "app.domain.phone": "identity",
+    "app.domain.resident": "identity",
+    "app.domain.property": "identity",
+}
 
 SHIM_MAX_EFFECTIVE_LINES = 8
 
