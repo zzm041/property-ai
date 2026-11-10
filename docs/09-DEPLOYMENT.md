@@ -154,6 +154,29 @@ python backend/scripts/ops/prune_work_order_logs.py --days 30 --collapse-daily -
 
 只处理 `--event-code` 指定的重复观测事件（默认仅 `AUTO_DISPATCH_WAIT`）；`CREATE`/`ASSIGN`/`REASSIGN`/`ANALYZE` 等业务事件不在默认清理范围。交付库 30 天 dry-run 结果：26,422 行到期（`--collapse-daily` 合计 105,445 行）。
 
+### 反向代理与按客户端限流（D3 / PA-168）
+
+登录与短信凭据接口有两把限流锁：手机号维度（`SMS_SEND_LIMIT_PER_HOUR`、`SMS_LOGIN_LIMIT_PER_HOUR`）与**客户端 IP 维度**（`SMS_IP_LIMIT_PER_HOUR`，默认 30/小时）。IP 维度只有在拿到真实客户端地址时才有意义。
+
+交付栈是 `nginx → api`：api 的 socket peer 恒为 nginx 容器地址，客户端送来的 `X-Forwarded-For` 属于攻击者可控输入。因此 api 只在**对等地址命中 `TRUSTED_PROXY_CIDRS`** 时才读该头，并从右往左取第一个不属于可信网段的 hop（`deploy/nginx.conf` 用 `$proxy_add_x_forwarded_for` 追加真实地址，因此最右侧才是可信来源）。
+
+**部署时必须设置 `TRUSTED_PROXY_CIDRS`。** `deploy/docker-compose.delivery.yml` 已为 api 提供默认值 `${TRUSTED_PROXY_CIDRS:-172.16.0.0/12}`（覆盖 Docker 默认 bridge/compose 网段）；使用自定义网络时按实际网段收窄：
+
+```bash
+docker network inspect -f '{{range .IPAM.Config}}{{.Subnet}}{{end}}' property-ai-delivery_default
+```
+
+错配后果（两者都严重）：
+
+| 配置 | 现象 |
+| --- | --- |
+| 未设置 `TRUSTED_PROXY_CIDRS` | 全部用户共用 nginx 那一个 IP 桶：**累计 30 次登录/小时即对整站返回 429**（手机号桶还各自新鲜）；伪造 `X-Forwarded-For` 无法逃离该桶 |
+| 设置过宽（如 `0.0.0.0/0`） | 客户端自带 `X-Forwarded-For: <任意地址>` 即被采信，IP 维度可用一行请求头绕过，等于只剩下手机号一把锁 |
+
+实测（2026-11-11，`nginx → api` 同栈拓扑、api 与 nginx 分容器）：未设可信网段时，30 个不同手机号各发一次登录 → 全部 401，第 31 个全新手机号 → `429 AUTH.SMS_RATE_LIMITED`，Redis 键为 `sms:login:ip:172.21.0.14`（nginx 容器地址）；设置 `TRUSTED_PROXY_CIDRS=172.21.0.0/16` 后同一入口按 `X-Forwarded-For` 分桶，键为 `sms:login:ip:203.0.113.7` 与 `sms:login:ip:198.51.100.9`，两个客户端互不影响。
+
+两种维度返回完全相同的 `code`/`message`/空 `details`，调用方无法判断是哪一把锁触发。回归：`backend/tests/integration/test_auth_ip_scope_runtime.py`（HTTP 面：未设可信网段即折叠成单桶、设了之后按客户端分桶、两维度响应逐字节相同）与 `backend/tests/unit/test_pa168_proxy_wiring.py`（锁定 compose 的 `TRUSTED_PROXY_CIDRS` 默认值与 nginx 的 `X-Forwarded-For` 透传）。
+
 ### 媒体模型版本与成功检查点（2026-11-02）
 
 `VLM_MODEL_REVISION`、`ASR_MODEL_REVISION` 可填写已核实的权重 SHA-256（例如 `sha256:<64位摘要>`）或不可变部署发布号。标签最长128字符，仅允许字母、数字、点、下划线、冒号、加号、连字符；禁止凭证或业务内容。实际请求仍使用 `VLM_MODEL` / `ASR_MODEL`，revision 仅进入成功检查点指纹。

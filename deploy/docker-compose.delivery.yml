@@ -169,6 +169,14 @@ services:
       VLM_API_KEY: ${VLM_API_KEY:-${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}}
       ASR_API_KEY: ${ASR_API_KEY:-${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}}
       DISPATCH_REJECT_COOLDOWN_SECONDS: ${DISPATCH_REJECT_COOLDOWN_SECONDS:-600}
+      # D3/PA-168: nginx terminates every request, so the socket peer the api
+      # sees is always the nginx container. Without a trusted proxy CIDR the
+      # per-client-IP credential budget collapses into one bucket: 30 logins an
+      # hour would throttle the whole deployment, and a spoofed
+      # X-Forwarded-For could never be told apart from the real client. Narrow
+      # this to the compose subnet when the deployment uses a custom network
+      # (`docker network inspect -f '{{range .IPAM.Config}}{{.Subnet}}{{end}}' <network>`).
+      TRUSTED_PROXY_CIDRS: ${TRUSTED_PROXY_CIDRS:-172.16.0.0/12}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
