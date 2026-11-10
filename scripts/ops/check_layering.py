@@ -94,6 +94,15 @@ SHIMMED_MODULES: dict[str, str] = {
 
 SHIM_MAX_EFFECTIVE_LINES = 8
 
+# What may live directly under backend/app/domain/. Everything else must be
+# inside one of the packages listed in ALLOWED_DOMAIN_EDGES: a flat module that
+# nobody maps is either a forgotten move or a new dependency shortcut, and both
+# turn the package graph back into the pile of files this split is undoing.
+DOMAIN_TOP_LEVEL_ALLOWED_FILES: frozenset[str] = frozenset(
+    {"__init__.py"} | {f"{name}.py" for name in FLAT_MODULE_PACKAGE}
+)
+DOMAIN_TOP_LEVEL_ALLOWED_PACKAGES: frozenset[str] = frozenset(ALLOWED_DOMAIN_EDGES)
+
 
 def module_name(path: pathlib.Path, backend_root: pathlib.Path | None = None) -> str:
     root = backend_root or (REPO_ROOT / "backend")
@@ -183,6 +192,29 @@ def check_domain_edges(domain_root: pathlib.Path | None = None, backend_root: pa
     return problems
 
 
+def domain_tree_problems(domain_root: pathlib.Path | None = None) -> list[str]:
+    """Entries directly under app/domain/ that no package claims."""
+    root = domain_root or DOMAIN_ROOT
+    problems: list[str] = []
+    for entry in sorted(root.iterdir()):
+        name = entry.name
+        if name == "__pycache__":
+            continue
+        if entry.is_dir():
+            if name not in DOMAIN_TOP_LEVEL_ALLOWED_PACKAGES:
+                problems.append(
+                    f"domain/{name}/: package is not declared in ALLOWED_DOMAIN_EDGES "
+                    f"(declared: {sorted(DOMAIN_TOP_LEVEL_ALLOWED_PACKAGES)})"
+                )
+            continue
+        if name not in DOMAIN_TOP_LEVEL_ALLOWED_FILES:
+            problems.append(
+                f"domain/{name}: unmapped top-level module — move it into a package and "
+                f"register it in FLAT_MODULE_PACKAGE, or the layering gate cannot reason about it"
+            )
+    return problems
+
+
 def check_shims() -> list[str]:
     problems: list[str] = []
     for legacy, package in sorted(SHIMMED_MODULES.items()):
@@ -233,8 +265,11 @@ def self_test() -> int:
         (domain / "knowledge" / "wrong_edge.py").write_text(
             "from app.domain.work_order import rules\n", encoding="utf-8"
         )
+        # planted 3: a flat module no package claims (the gate used to stay green)
+        (domain / "rogue.py").write_text("VALUE = 1\n", encoding="utf-8")
         upward = check_upward(domain, backend)
         edges = check_domain_edges(domain, backend)
+        tree = domain_tree_problems(domain)
 
     ok = (
         len(upward) == 1
@@ -243,8 +278,10 @@ def self_test() -> int:
         and len(edges) == 1
         and "wrong_edge.py" in edges[0]
         and "domain.knowledge -> domain.work_order" in edges[0]
+        and len(tree) == 1
+        and "rogue.py" in tree[0]
     )
-    for problem in upward + edges:
+    for problem in upward + edges + tree:
         print(f"  detected: {problem}")
     print("self-test OK" if ok else "self-test FAILED")
     return 0 if ok else 1
@@ -272,14 +309,8 @@ def report() -> None:
     for source, dest in sorted(edges):
         allowed = "ok" if dest in ALLOWED_DOMAIN_EDGES.get(source, set()) else "VIOLATION"
         print(f"{source:14s} -> {dest:14s} {allowed}")
-    unmapped = sorted(
-        path.stem
-        for path in DOMAIN_ROOT.glob("*.py")
-        if path.stem != "__init__"
-        and (DOMAIN_ROOT / path.stem).is_dir() is False
-        and path.stem not in FLAT_MODULE_PACKAGE
-    )
-    print(f"# unmapped flat modules: {unmapped or 'none'}")
+    unmapped = [p.split(":", 1)[0] for p in domain_tree_problems()]
+    print(f"# unmapped or undeclared domain entries: {unmapped or 'none'}")
     print(f"# shims declared: {len(SHIMMED_MODULES)}")
 
 
@@ -288,6 +319,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--report", action="store_true", help="print the inventory and exit 0")
     parser.add_argument("--domain-edges", action="store_true", help="only check package edges")
     parser.add_argument("--shims", action="store_true", help="only check compat shims")
+    parser.add_argument("--tree", action="store_true", help="only check the domain tree (unmapped modules/packages)")
     parser.add_argument("--self-test", action="store_true", help="plant violations in a temp tree and detect them")
     args = parser.parse_args(argv)
 
@@ -297,15 +329,15 @@ def main(argv: list[str] | None = None) -> int:
         report()
         return 0
 
-    only = args.domain_edges or args.shims
+    only = args.domain_edges or args.shims or args.tree
     problems: list[str] = []
     if not only or args.domain_edges:
-        if not args.shims:
-            problems += check_upward()
-    if not only or args.domain_edges:
+        problems += check_upward()
         problems += check_domain_edges()
     if not only or args.shims:
         problems += check_shims()
+    if not only or args.tree:
+        problems += domain_tree_problems()
 
     if problems:
         for problem in problems:

@@ -114,7 +114,7 @@ git rev-parse HEAD
 
 ```bash
 python scripts/ops/unit_gate.py        # 判据 = 红集 ⊆ scripts/ops/known-red.txt，不比计数
-python scripts/ops/check_layering.py   # 依赖方向静态闸（改 domain 结构前先跑，--report 看基线）
+python scripts/ops/check_layering.py   # 依赖方向静态闸（--report 看基线，--tree 只查 domain 顶层归属）
 ```
 
 env 缺一不可：`APP_ENV=test` + `DATABASE_URL` + `TEST_DATABASE_URL`（两库不同），缺了 gate 直接 exit 2。**`APP_ENV` 坑**：`Settings(_env_file=None)` 仍读进程环境，`APP_ENV=test` 会改 `should_enqueue_ai_on_create`（`backend/app/core/config.py:238-245`）；fixture 须显式声明建模环境，例 `test_durable_tasks_default_104.py::_settings`。

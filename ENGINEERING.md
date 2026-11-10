@@ -91,11 +91,14 @@ grep -rn "from app\.repository" backend/app/domain | wc -l               # 期�
 7. **AI 无最终控制权**：AI 失败时工单仍创建成功并落 `PENDING_ANALYSIS`（`AGENTS.md:62`）；
    派单只接受规则结果（`AGENTS.md:63`，实现见 `service/auto_dispatch.py:116/269`）。
 8. **依赖方向有静态闸**：`python scripts/ops/check_layering.py`（ast 解析，含函数内 import——
-   本仓库有 33 处函数内 service→service 边，grep 会漏）。三条判据：domain 不得 import
+   本仓库有 33 处函数内 service→service 边，grep 会漏）。四条判据：domain 不得 import
    `app.{service,api,schema,repository,worker,cli,model,provider,core}`；domain 包间只允许
    `work_order→identity`、`ai→{identity,work_order}`、`knowledge→identity`、`governance→identity`、
-   `dev→*`；`SHIMMED_MODULES` 里的旧模块必须是 ≤8 行纯 re-export。`--report` 打基线（各包
-   importers 数、包间边、未映射的扁平模块），`--self-test` 用临时树种两条违规证明闸不空转。
+   `dev→*`；`SHIMMED_MODULES` 里的旧模块必须是 ≤8 行纯 re-export；**`app/domain/` 顶层只允许
+   `__init__.py`、`FLAT_MODULE_PACKAGE` 登记过的扁平模块、`ALLOWED_DOMAIN_EDGES` 里的包**——
+   任何未登记的文件或目录直接 exit 1（否则一个 `domain/rogue.py` 就能绕过整张图）。`--report`
+   打基线（各包 importers 数、包间边、未归属条目），`--tree`/`--shims`/`--domain-edges` 单跑，
+   `--self-test` 用临时树种三条违规（含 rogue 模块）证明闸不空转。
 
 ## 4. 变更流程
 
