@@ -177,6 +177,9 @@ services:
       # this to the compose subnet when the deployment uses a custom network
       # (`docker network inspect -f '{{range .IPAM.Config}}{{.Subnet}}{{end}}' <network>`).
       TRUSTED_PROXY_CIDRS: ${TRUSTED_PROXY_CIDRS:-172.16.0.0/12}
+      # D3: per-client-IP credential budget, an hour's window. Exposed here so
+      # an operator can widen or tighten it without rebuilding the image.
+      SMS_IP_LIMIT_PER_HOUR: ${SMS_IP_LIMIT_PER_HOUR:-30}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

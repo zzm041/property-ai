@@ -177,6 +177,8 @@ docker network inspect -f '{{range .IPAM.Config}}{{.Subnet}}{{end}}' property-ai
 
 两种维度返回完全相同的 `code`/`message`/空 `details`，调用方无法判断是哪一把锁触发。回归：`backend/tests/integration/test_auth_ip_scope_runtime.py`（HTTP 面：未设可信网段即折叠成单桶、设了之后按客户端分桶、两维度响应逐字节相同）与 `backend/tests/unit/test_pa168_proxy_wiring.py`（锁定 compose 的 `TRUSTED_PROXY_CIDRS` 默认值与 nginx 的 `X-Forwarded-For` 透传）。
 
+运维说明：`SMS_IP_LIMIT_PER_HOUR` 已在 `deploy/docker-compose.delivery.yml` 暴露为 `${SMS_IP_LIMIT_PER_HOUR:-30}`，改值只需改环境后 `docker compose up -d api`（无需重建镜像）；手机号维度仍由 `SMS_SEND_LIMIT_PER_HOUR` / `SMS_LOGIN_LIMIT_PER_HOUR` 控制。调大 IP 预算前先确认 `TRUSTED_PROXY_CIDRS` 已按实际网段收窄，否则等于给整站共用桶放宽额度。
+
 ### 媒体模型版本与成功检查点（2026-11-02）
 
 `VLM_MODEL_REVISION`、`ASR_MODEL_REVISION` 可填写已核实的权重 SHA-256（例如 `sha256:<64位摘要>`）或不可变部署发布号。标签最长128字符，仅允许字母、数字、点、下划线、冒号、加号、连字符；禁止凭证或业务内容。实际请求仍使用 `VLM_MODEL` / `ASR_MODEL`，revision 仅进入成功检查点指纹。
