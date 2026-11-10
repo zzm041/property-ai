@@ -17,14 +17,20 @@ $ConfigPath = Join-Path $RuntimeDir "config.json"
 $EvidenceRecordsPath = Join-Path $RuntimeDir "evidence-records.txt"
 $CurrentPath = Join-Path $RuntimeDir "current.json"
 $OllamaCurrent = Join-Path $RepoRoot "tmp\delivery-ollama-runtime\current.json"
-$SourceCommit = "90eb1ae334ace82f578ff3d193d4e2812a2cad96"
+$SourceCommit = "9c93ce67563b5c0ccc5a01ac5db455fc176cda32"
 $CandidateRoot = Join-Path $RuntimeDir "candidate-$SourceCommit"
 $AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
 $ModelAdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_models.py"
 $RuntimeControlPath = Join-Path $CandidateRoot "scripts\ops\local_ai_runtime_control.py"
-$ExpectedAdapterSha256 = "6B64C192808566A780989DD2067ADF01EFD5050A7B22CD6C109EB5B38955D5AF"
+$ExpectedAdapterSha256 = "B3820A2C6B4A0DAAC34B83E7300A57C1FA80E551CCA832E7EE552ECFDBEB45BF"
 $ExpectedModelAdapterSha256 = "FAF70CF69B8D7058026881D47B90CB20E3B03F6A99E693F16BD06CDA87AC0BB2"
 $ExpectedRuntimeControlSha256 = "B0DE6D3544D8875E0A57CED1A1946744736FC9074AF1ECEA5228A79468C60CFF"
+# 包化之后适配器的实现不在 scripts/ops/local_ai_http.py（那里只剩 12 行兼容层），而在 app/provider/local_ai/。
+# 只钉兼容层等于没钉住适配器，所以把真正承载逻辑的两个文件一起钉住。
+$ProviderRuntimeControlPath = Join-Path $CandidateRoot "backend\app\provider\local_ai\runtime_control.py"
+$ProviderHttpApiPath = Join-Path $CandidateRoot "backend\app\provider\local_ai\http_api.py"
+$ExpectedProviderRuntimeControlSha256 = "7F604AA086610C8B0095AA177F9767B68E21EEC909088436D5951818FE4B6777"
+$ExpectedProviderHttpApiSha256 = "DFB9F1A7DB0EAD92A9D434569DF88EA8E231E792C1410EB430F96993D0AB0FD5"
 $ResolutionRoot = Join-Path $RepoRoot "reports"
 $ResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\call-001-resolution.json"
 $ResolutionReviewPath = Join-Path $RepoRoot "reports\codex\REAL-AI-INTEGRATION-027-DELIVERY-AUTO-call001-review-round1.raw.json"
@@ -71,9 +77,13 @@ if ($ArtifactManifest) {
     $AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
     $ModelAdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_models.py"
     $RuntimeControlPath = Join-Path $CandidateRoot "scripts\ops\local_ai_runtime_control.py"
+    $ProviderRuntimeControlPath = Join-Path $CandidateRoot "backend\app\provider\local_ai\runtime_control.py"
+    $ProviderHttpApiPath = Join-Path $CandidateRoot "backend\app\provider\local_ai\http_api.py"
     $ExpectedAdapterSha256 = $RuntimeArtifact.files.'scripts/ops/local_ai_http.py'
     $ExpectedModelAdapterSha256 = $RuntimeArtifact.files.'scripts/ops/local_ai_models.py'
     $ExpectedRuntimeControlSha256 = $RuntimeArtifact.files.'scripts/ops/local_ai_runtime_control.py'
+    $ExpectedProviderRuntimeControlSha256 = $RuntimeArtifact.files.'backend/app/provider/local_ai/runtime_control.py'
+    $ExpectedProviderHttpApiSha256 = $RuntimeArtifact.files.'backend/app/provider/local_ai/http_api.py'
     $SourceCommit = $null
     $RuntimeModelName = "qwen38-27b-q3km-g52-ctx8192:7af3b8f"
 }
@@ -186,6 +196,12 @@ function Assert-Candidate {
     }
     if ((Get-FileHash -Algorithm SHA256 -LiteralPath $RuntimeControlPath).Hash -ne $ExpectedRuntimeControlSha256) {
         throw "frozen runtime control hash mismatch"
+    }
+    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $ProviderRuntimeControlPath).Hash -ne $ExpectedProviderRuntimeControlSha256) {
+        throw "frozen provider adapter hash mismatch"
+    }
+    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $ProviderHttpApiPath).Hash -ne $ExpectedProviderHttpApiSha256) {
+        throw "frozen provider http api hash mismatch"
     }
     $reservation = Join-Path $PrivateDir "call-001\reservation.json"
     $result = Join-Path $PrivateDir "call-001\result.json"
@@ -514,6 +530,7 @@ switch ($Action) {
             artifact_id=$RuntimeArtifact.artifact_id;candidate_image_id=$RuntimeArtifact.candidate_image_id
             listener_pid=$listenerProcess.Id;listener_started_at_utc=$listenerProcess.StartTime.ToUniversalTime().ToString("o")
             adapter_sha256=$ExpectedAdapterSha256;model_adapter_sha256=$ExpectedModelAdapterSha256;runtime_control_sha256=$ExpectedRuntimeControlSha256
+            provider_runtime_control_sha256=$ExpectedProviderRuntimeControlSha256;provider_http_api_sha256=$ExpectedProviderHttpApiSha256
             config_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $ConfigPath).Hash
             runtime_binding_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $bindingPath).Hash
             token_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $SecretPath).Hash
