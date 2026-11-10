@@ -131,6 +131,29 @@ clamd TCP 不提供身份认证或加密，只允许同机受限网络或企业�
 - 演示环境要留痕：`deploy/.env.delivery` 同时设置 `FILE_SCANNER_PROVIDER=development` 与 `FILE_SCANNER_DEMO_ACKNOWLEDGED=true`，属于显式声明的演示模式；对外取证时必须按 `demo_stub` 表述，不能写成「附件已扫描」。
 - 复验命令：`curl -s http://<host>:<port>/api/v1/readyz | jq '.data.media_pipeline'`，期望 `scan_mode`、`media_scanned`、`reason_code` 三项与上表一致。
 
+### 工单日志的重复观测与保留策略（D9）
+
+`work_order_logs` 是审计轨，不自动清理。但「等待派单」是可重复观测的状态而不是业务事件：`sweep_waiting_dispatch` 每个 sweep tick（`SLA_SWEEP_INTERVAL_SECONDS`，默认 30s）都会重新评估每个等待中的工单，过去每次评估都插一行 `AUTO_DISPATCH_WAIT`。交付库实测 105,467 / 106,438 行（26 个工单，40 天），平均间隔 196.8s，`request_id` 全库唯一 ⇒ 原有的「同 request_id 不重复写」完全失效。
+
+写入侧（`DISPATCH_WAIT_LOG_WINDOW_SECONDS`，默认 3600，0 = 恢复旧行为）：
+
+- sweep 路径的 `request_id` 在窗口内固定（`dispatch-wait:<work_order>:<窗口序号>`），同一窗口重复 tick 撞同一个 id，不新增行。
+- 同一工单同一 `reason_code` 在窗口内重复观测时，聚合进已有行（日志 `auto_dispatch_wait_aggregated`）；**`reason_code` 变化是状态变化，立刻写一行**（例如 `WAITING_ELIGIBLE` → `WAITING_IDLE`）。
+- 任务驱动的分析（intent 用 `request_id` 关联成功）不加聚合，仍按 attempt 落行。
+
+存量历史用 `backend/scripts/ops/prune_work_order_logs.py` 处理，**默认 dry-run**：
+
+```bash
+# 只算不删（默认）——打印将删除多少行
+python backend/scripts/ops/prune_work_order_logs.py --days 30
+# 真删 30 天以前的 AUTO_DISPATCH_WAIT
+python backend/scripts/ops/prune_work_order_logs.py --days 30 --apply
+# 保留窗口内每个工单每天只留最新一行
+python backend/scripts/ops/prune_work_order_logs.py --days 30 --collapse-daily --apply
+```
+
+只处理 `--event-code` 指定的重复观测事件（默认仅 `AUTO_DISPATCH_WAIT`）；`CREATE`/`ASSIGN`/`REASSIGN`/`ANALYZE` 等业务事件不在默认清理范围。交付库 30 天 dry-run 结果：26,422 行到期（`--collapse-daily` 合计 105,445 行）。
+
 ### 媒体模型版本与成功检查点（2026-11-02）
 
 `VLM_MODEL_REVISION`、`ASR_MODEL_REVISION` 可填写已核实的权重 SHA-256（例如 `sha256:<64位摘要>`）或不可变部署发布号。标签最长128字符，仅允许字母、数字、点、下划线、冒号、加号、连字符；禁止凭证或业务内容。实际请求仍使用 `VLM_MODEL` / `ASR_MODEL`，revision 仅进入成功检查点指纹。

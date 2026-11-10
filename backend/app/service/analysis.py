@@ -237,7 +237,8 @@ class AnalysisService:
             try:
                 outcome = self._retry_auto_dispatch_from_existing(
                     work_order_id=work_order_id, analysis_id=analysis_id,
-                    request_id=f"dispatch-wait:{work_order_id}:{self._clock().isoformat()}",
+                    request_id=self._sweep_request_id(work_order_id),
+                    aggregate_wait_log=True,
                 )
             except SQLAlchemyError:
                 # One transient lock failure must not stop the remaining batch.
@@ -249,12 +250,25 @@ class AnalysisService:
             result["assigned" if outcome == "ASSIGNED" else "waiting"] += 1
         return result
 
+    def _sweep_request_id(self, work_order_id: int) -> str:
+        """One stable request id per work order per aggregation window.
+
+        The sweep is a periodic retry, not a new business attempt. Keeping the
+        id stable means the per-request-id de-duplication and the window
+        aggregation agree, and the tick count no longer becomes row count.
+        """
+        window = max(int(self._settings.dispatch_wait_log_window_seconds), 0)
+        now = self._clock()
+        bucket = int(now.timestamp() // window) if window else now.isoformat()
+        return f"dispatch-wait:{work_order_id}:{bucket}"
+
     def _retry_auto_dispatch_from_existing(
         self,
         *,
         work_order_id: int,
         analysis_id: int,
         request_id: str,
+        aggregate_wait_log: bool = False,
     ) -> str:
         with begin_owned_transaction(self._session):
             record = self._work_orders.get_work_order_for_update(work_order_id)
@@ -284,7 +298,11 @@ class AnalysisService:
 
             dispatcher = AutoDispatchService(self._session, settings=self._settings)
             if mapped is None:
-                dispatcher._record_wait(record, (), request_id, reason_code="INVALID_STORED_ANALYSIS")
+                dispatcher._record_wait(
+                    record, (), request_id,
+                    reason_code="INVALID_STORED_ANALYSIS",
+                    aggregate=aggregate_wait_log,
+                )
                 return "INVALID_ANALYSIS"
 
             outcome = AutoDispatchService(
@@ -294,9 +312,14 @@ class AnalysisService:
                 work_order=record,
                 mapped=mapped,
                 request_id=request_id,
+                aggregate_wait_log=aggregate_wait_log,
             )
             if outcome not in {"ASSIGNED", "NO_ELIGIBLE", "ALREADY_ASSIGNED", "STALE_STATUS"}:
-                dispatcher._record_wait(record, (), request_id, reason_code=outcome)
+                dispatcher._record_wait(
+                    record, (), request_id,
+                    reason_code=outcome,
+                    aggregate=aggregate_wait_log,
+                )
             logger.info(
                 "auto_redispatch_outcome",
                 work_order_id=record.id,

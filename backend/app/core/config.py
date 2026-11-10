@@ -83,6 +83,12 @@ class Settings(BaseSettings):
     )
     celery_task_queue: str = ""
     sla_sweep_interval_seconds: int = Field(default=30, ge=5, le=3600)
+    # A work order that is waiting for dispatch is re-evaluated on every sweep
+    # tick. Recording that observation every time wrote 105,467 of the 106,438
+    # work_order_logs rows (26 work orders, 40 days), so a repeat of the same
+    # reason inside this window is aggregated into the row already recorded.
+    # 0 restores the historical one-row-per-attempt behaviour.
+    dispatch_wait_log_window_seconds: int = Field(default=3600, ge=0, le=86400)
     notification_retry_sweep_interval_seconds: int = Field(
         default=30,
         ge=5,

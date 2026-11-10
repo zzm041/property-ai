@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import UTC, timedelta
 from typing import Any
 
 from sqlalchemy import MetaData, Table, inspect as sa_inspect, insert
@@ -119,7 +119,15 @@ class AutoDispatchService:
         work_order: object,
         mapped: MappedAnalysis,
         request_id: str,
+        aggregate_wait_log: bool = False,
     ) -> str:
+        """Try to assign one work order; ``aggregate_wait_log`` is for sweeps.
+
+        A periodic sweep re-asks the same question about the same work order on
+        every tick, so it must not append an identical AUTO_DISPATCH_WAIT row
+        each time. Task-driven attempts keep the historical per-attempt row
+        because the task intent correlates its success on that request_id.
+        """
         if not self._settings.ai_auto_assign:
             return "DISABLED"
         if mapped.low_confidence:
@@ -142,7 +150,9 @@ class AutoDispatchService:
             return "ALREADY_ASSIGNED"
         ranked, filter_snapshot = self._evaluate_live_candidates(record, mapped)
         if not ranked:
-            self._record_wait(record, filter_snapshot, request_id)
+            self._record_wait(
+                record, filter_snapshot, request_id, aggregate=aggregate_wait_log
+            )
             return "NO_ELIGIBLE"
         for winner, score, reasons in ranked:
             notification_snapshot = _notification_intent_snapshot(self._session)
@@ -192,15 +202,39 @@ class AutoDispatchService:
         # The transactional recheck may have found a new reservation. Refresh
         # the reasons instead of presenting the initial idle snapshot as truth.
         _, refreshed_snapshot = self._evaluate_live_candidates(record, mapped)
-        self._record_wait(record, refreshed_snapshot, request_id)
+        self._record_wait(
+            record, refreshed_snapshot, request_id, aggregate=aggregate_wait_log
+        )
         return "NO_ELIGIBLE"
 
-    def _record_wait(self, record: WorkOrder, snapshot: tuple, request_id: str, *, reason_code: str | None = None) -> None:
-        """Durable scheduling event, not a terminal failure or phone storage."""
+    def _record_wait(
+        self,
+        record: WorkOrder,
+        snapshot: tuple,
+        request_id: str,
+        *,
+        reason_code: str | None = None,
+        aggregate: bool = False,
+    ) -> None:
+        """Durable scheduling event, not a terminal failure or phone storage.
+
+        With ``aggregate`` a repeated observation of the same reason inside
+        ``dispatch_wait_log_window_seconds`` extends the row that is already
+        there instead of appending a new one; a different reason is a state
+        change and is always recorded.
+        """
         if self._work_orders.has_dispatch_wait_attempt(work_order_id=record.id, request_id=request_id):
             return
         reasons = {item.get("filter_reason") for item in snapshot}
         reason = reason_code or ("WAITING_IDLE" if reasons & {"BUSY", "CAPACITY_FULL"} else "WAITING_ELIGIBLE")
+        if aggregate and self._wait_is_inside_window(record, reason):
+            logger.debug(
+                "auto_dispatch_wait_aggregated",
+                work_order_id=record.id,
+                reason_code=reason,
+                request_id=request_id,
+            )
+            return
         self._work_orders.add_log(WorkOrderLog(
             tenant_id=record.tenant_id, property_id=record.property_id,
             work_order_id=record.id, actor_user_id=None, actor_type="SYSTEM",
@@ -209,6 +243,28 @@ class AutoDispatchService:
             request_id=request_id,
             payload_json={"reason_code": reason, "policy_version": "maintenance-group-v1"},
         ))
+
+    def _wait_is_inside_window(self, record: WorkOrder, reason: str) -> bool:
+        """True when the newest wait row already states ``reason`` recently."""
+        window = self._settings.dispatch_wait_log_window_seconds
+        if window <= 0 or self._work_orders is None:
+            return False
+        previous = self._work_orders.latest_dispatch_wait(
+            work_order_id=record.id,
+            tenant_id=record.tenant_id,
+            property_id=record.property_id,
+        )
+        if previous is None:
+            return False
+        recorded = (previous.payload_json or {}).get("reason_code")
+        if recorded != reason:
+            return False
+        created_at = previous.created_at
+        if created_at is None:
+            return False
+        if created_at.tzinfo is None:
+            created_at = created_at.replace(tzinfo=UTC)
+        return (utc_now() - created_at) < timedelta(seconds=window)
 
     def _evaluate_live_candidates(
         self,
