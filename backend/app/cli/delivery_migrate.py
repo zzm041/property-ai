@@ -1,4 +1,4 @@
-"""Guarded clean-delivery migration through the fixed 0015 revision."""
+"""Guarded clean-delivery migration through the fixed 0016 revision."""
 from __future__ import annotations
 
 import os
@@ -11,7 +11,8 @@ from app.cli.bootstrap_system_admin import main as bootstrap_system_admin
 from app.core.config import get_settings
 
 
-HEAD = "20261003_0015_work_order_media_cycle_links"
+HEAD = "20261111_0016_idempotency_key_scope"
+MEDIA_CYCLE_REVISION = "20261003_0015_work_order_media_cycle_links"
 IDENTITY_SLA_REVISION = "20260926_0014_identity_merge_sla_versions"
 PRE_BOOTSTRAP = "20260925_0012_task_intents"
 LIVE_DATABASE = "property_ai_delivery_check"
@@ -81,7 +82,9 @@ def main() -> int:
         if current == HEAD:
             print(f"delivery database already at {HEAD}")
             return 0
-        if current not in {None, PRE_BOOTSTRAP, IDENTITY_SLA_REVISION}:
+        # A database parked on 0015 is the normal upgrade path for D1: resume through
+        # 0016 instead of refusing, but never accept any other unlisted revision.
+        if current not in {None, PRE_BOOTSTRAP, IDENTITY_SLA_REVISION, MEDIA_CYCLE_REVISION}:
             raise RuntimeError(f"delivery migration refuses unexpected revision {current!r}")
         if current is None:
             _alembic(PRE_BOOTSTRAP)
