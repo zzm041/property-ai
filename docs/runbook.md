@@ -118,3 +118,24 @@ python scripts/ops/check_layering.py   # 依赖方向静态闸（改 domain 结�
 ```
 
 env 缺一不可：`APP_ENV=test` + `DATABASE_URL` + `TEST_DATABASE_URL`（两库不同），缺了 gate 直接 exit 2。**`APP_ENV` 坑**：`Settings(_env_file=None)` 仍读进程环境，`APP_ENV=test` 会改 `should_enqueue_ai_on_create`（`backend/app/core/config.py:238-245`）；fixture 须显式声明建模环境，例 `test_durable_tasks_default_104.py::_settings`。
+
+## 6. RAG 运行时：未启用、未验证
+
+现状：**交付栈没有 RAG 运行时**。11436/11438 无监听，`POST /api/v1/assistant/query` 恒返回 `{"status":"knowledge_unavailable"}`，引用与权限过滤因此从未被真实验证（`reports/flow-matrix-20261111.md` 记为阻塞项）。
+
+`deploy/rag-runtime.ps1` 的失败都带稳定码，不静默：
+
+| 现象 | 输出 | 含义 |
+| --- | --- | --- |
+| 无 receipt | `RAG_RUNTIME_DISABLED: … has no current receipt under …` | 本机从未启动过 |
+| 有 receipt 但 11436 无监听 | `RAG_RUNTIME_DISABLED: receipt … exists but nothing listens on 11436` | 上次运行已死，receipt 陈旧 |
+| RAG Ollama receipt 的 pid 不存在 | `RAG_RUNTIME_DISABLED: … records pid <n>, which is not running` | 上游 ollama 已停，绑定无从建立 |
+| 候选文件与钉值不符 | `frozen RAG adapter hash mismatch: pinned=… actual=… path=…` | 钉值是 `git archive` 字节形态（`core.autocrlf=true` 时为 CRLF）；`git show \| sha256sum` 得到 LF 形态，两者永不相等 |
+
+启用前清单（缺一项就别启动；逐项确认后再 `deploy\rag-runtime.ps1 start`）：
+
+1. 11438：`deploy\rag-ollama-runtime.ps1 start` 成功，`tmp\delivery-rag-ollama-runtime\current.json` 的 `pid` 存活、`host=127.0.0.1:11438`、`no_cloud=true`、`context_length=4096`、`concurrency=1`。
+2. 模型：`$ModelRoot` 下有 embedding/reranker 权重，RAG 用的 qwen 与 `api/ps` 里的一致。
+3. 11436：`deploy\rag-runtime.ps1 start` 后 `netstat` 见到 `127.0.0.1:11436 LISTENING`，且 `status` 返回 `rag_enabled=true`。
+4. 端点：`EMBEDDING_ENDPOINT` / `RERANKER_ENDPOINT` 指向 11436，适配器 `/healthz` 的 `models` 三项非空。
+5. 应用侧：`GET /api/v1/readyz` 的 `dependencies` 里 `embedding`/`reranker` 由 `not_checked` 变 `up`，再跑一条 `assistant/query` 看 `citations` 非空、跨租户问题为空。

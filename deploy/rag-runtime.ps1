@@ -19,6 +19,11 @@ $RagOllamaCurrent = Join-Path $RepoRoot "tmp\delivery-rag-ollama-runtime\current
 $SourceCommit = "caa2d21594bb7b78f2dc01e6bdfacc408161ec58"
 $CandidateRoot = Join-Path $RuntimeDir "candidate-$SourceCommit"
 $AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
+# PA-170: this value is the sha256 of the bytes `git archive` emits for
+# $SourceCommit, not of the stored blob. On a repository with
+# core.autocrlf=true the archive carries CRLF, so `git show | sha256sum`
+# (LF) reports 31EC019F... for the very same file. Keep this pin in sync with
+# archive output, and never compare it against a plain `git show` hash.
 $ExpectedAdapterSha256 = "EE9F19900F923461AB8AD0A1DC65806FF96065E074C89B2B2456810B533C7270"
 $PythonPath = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\bge-142-cpu\.venv\Scripts\python.exe"
 $AsrPython = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\asr-006-cpu\.venv\Scripts\python.exe"
@@ -65,7 +70,33 @@ function Assert-Candidate {
         if($LASTEXITCODE -ne 0){throw "could not export frozen RAG candidate"}
         try { & tar -xf $archive -C $CandidateRoot;if($LASTEXITCODE -ne 0){throw "could not extract frozen RAG candidate"} } finally { Remove-Item -LiteralPath $archive -Force }
     }
-    if((Get-FileHash -Algorithm SHA256 -LiteralPath $AdapterPath).Hash -ne $ExpectedAdapterSha256){throw "frozen RAG adapter hash mismatch"}
+    if((Get-FileHash -Algorithm SHA256 -LiteralPath $AdapterPath).Hash -ne $ExpectedAdapterSha256){
+        $actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $AdapterPath).Hash
+        throw ("frozen RAG adapter hash mismatch: pinned={0} actual={1} path={2} (the pin is the git-archive byte form; a plain `git show | sha256sum` reports the LF form and will never match on a core.autocrlf=true checkout)" -f $ExpectedAdapterSha256, $actual, $AdapterPath)
+    }
+}
+
+function Assert-RagConfigured {
+    # PA-170: the RAG runtime has never been started on this host. Say so with a
+    # stable, greppable code instead of a bare "asset is missing", so the caller
+    # can tell "not configured yet" apart from "configured but broken".
+    $missing = @()
+    foreach ($path in @($PythonPath, $AsrPython, $ModelRoot, $RagOllamaCurrent)) {
+        if (-not (Test-Path -LiteralPath $path)) { $missing += "missing asset $path" }
+    }
+    if ($missing.Count -eq 0) {
+        # The adapter binds itself to the RAG Ollama process recorded in that
+        # receipt. A receipt whose process is gone turns into a Python traceback
+        # and a bare "did not acquire 11436" 15 seconds later, which reads like a
+        # networking fault; report the actual state instead.
+        $ollama = Get-Content -Raw -LiteralPath $RagOllamaCurrent | ConvertFrom-Json
+        if ($null -eq $ollama.pid -or -not (Get-Process -Id ([int]$ollama.pid) -ErrorAction SilentlyContinue)) {
+            $missing += ("RAG Ollama receipt {0} records pid {1}, which is not running" -f $RagOllamaCurrent, $ollama.pid)
+        }
+    }
+    if ($missing.Count -gt 0) {
+        throw ("RAG_RUNTIME_DISABLED: the delivery RAG runtime is not configured on this host; {0}. Enable it with `deploy\rag-runtime.ps1 start` only after the checklist in docs/runbook.md §6 passes." -f ($missing -join "; "))
+    }
 }
 
 function Get-Listener {
@@ -169,8 +200,9 @@ function New-RuntimeBinding {
 
 switch ($Action) {
     "start" {
+        Assert-RagConfigured
         Assert-Candidate
-        foreach ($path in @($AdapterPath, $PythonPath, $AsrPython, $ModelRoot, $RagOllamaCurrent)) {
+        foreach ($path in @($AdapterPath)) {
             if (-not (Test-Path -LiteralPath $path)) { throw "required local AI asset is missing: $path" }
         }
         New-Item -ItemType Directory -Force -Path $RuntimeDir,$PrivateDir | Out-Null
@@ -267,14 +299,22 @@ switch ($Action) {
     }
     "status" {
         $state = Read-Current
-        if ($null -eq $state) { throw "delivery RAG runtime has no current receipt" }
+        if ($null -eq $state) {
+            throw ("RAG_RUNTIME_DISABLED: the delivery RAG runtime has no current receipt under {0}; it is not running on this host (see docs/runbook.md §6 for the enable checklist)" -f $RuntimeDir)
+        }
+        if (@(Get-Listener).Count -eq 0) {
+            throw ("RAG_RUNTIME_DISABLED: receipt {0} exists but nothing listens on 11436; the recorded run is stale, so RAG is not usable (see docs/runbook.md §6)" -f $CurrentPath)
+        }
         $null = Assert-CurrentProcess $state
         $health = Invoke-Health (Read-Token)
-        [ordered]@{ state = $state; health = $health } | ConvertTo-Json -Depth 7
+        [ordered]@{ state = $state; health = $health; rag_enabled = $true } | ConvertTo-Json -Depth 7
     }
     "stop" {
         $state = Read-Current
         if ($null -eq $state) { throw "delivery RAG runtime has no current receipt" }
+        if (@(Get-Listener).Count -eq 0) {
+            throw ("RAG_RUNTIME_DISABLED: receipt {0} exists but nothing listens on 11436; there is no delivery RAG process to stop (see docs/runbook.md §6)" -f $CurrentPath)
+        }
         $process = Assert-CurrentProcess $state
         $drain = Invoke-Drain (Read-Token)
         if ($drain.accepting_requests -ne $false) { throw "delivery RAG adapter did not enter drain state" }
