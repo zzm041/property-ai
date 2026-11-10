@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import re
 import sys
-from typing import Any
+from typing import Any, TextIO
 from urllib.parse import urlsplit, urlunsplit
 
 import structlog
@@ -132,7 +132,7 @@ class _RedactingFormatter(logging.Formatter):
         return redact_text(formatted)
 
 
-def configure_logging(*, debug: bool = False, service: str = "api") -> None:
+def configure_logging(*, debug: bool = False, service: str = "api", stream: TextIO | None = None) -> None:
     """Configure application and Uvicorn logs as one JSON stream."""
 
     level = logging.DEBUG if debug else logging.INFO
@@ -174,7 +174,7 @@ def configure_logging(*, debug: bool = False, service: str = "api") -> None:
             structlog.processors.JSONRenderer(),
         ],
     )
-    handler = logging.StreamHandler(sys.stdout)
+    handler = logging.StreamHandler(sys.stdout if stream is None else stream)
     handler.setFormatter(formatter)
 
     root_logger = logging.getLogger()

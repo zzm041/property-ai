@@ -44,6 +44,7 @@ class AssistantQueryRequest(BaseModel):
     question: str = Field(min_length=1, max_length=500)
     property_id: int | None = Field(default=None, gt=0)
     tenant_id: int | None = Field(default=None, gt=0)
+    audience: Literal["resident", "property"] = "resident"
 
 
 class KnowledgeCitationData(BaseModel):

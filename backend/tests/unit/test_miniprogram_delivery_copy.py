@@ -1,5 +1,6 @@
 """Ordinary Mini Program surfaces should use business language."""
 
+import re
 from pathlib import Path
 
 
@@ -44,8 +45,17 @@ def test_service_configuration_failure_is_user_safe() -> None:
 def test_shared_styles_cover_touch_forms_feedback_and_safe_area() -> None:
     styles = (ROOT / "miniprogram" / "app.wxss").read_text(encoding="utf-8")
 
+    # Check the page padding contract, allowing env() inside calc().
+    uncommented_styles = re.sub(r"/\*.*?\*/", "", styles, flags=re.DOTALL)
+    page_rule = re.search(r"(?:^|\})\s*page\s*\{([^{}]*)\}", uncommented_styles)
+    assert page_rule is not None, "Shared styles must define page padding"
+    assert re.search(
+        r"\bpadding-bottom\s*:\s*[^;{}]*"
+        r"\benv\(\s*safe-area-inset-bottom\s*\)[^;{}]*;",
+        page_rule.group(1),
+    ), "Page bottom padding must include the device safe-area inset"
+
     for selector_or_rule in (
-        "padding-bottom: env(safe-area-inset-bottom)",
         "button.btn",
         "input",
         "textarea",

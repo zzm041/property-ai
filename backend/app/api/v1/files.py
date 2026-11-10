@@ -1,6 +1,6 @@
 """File metadata registration and authorized content upload."""
 
-from typing import Annotated, BinaryIO
+from typing import Annotated, BinaryIO, Literal
 
 from fastapi import APIRouter, Depends, File, Request, Response, UploadFile
 
@@ -91,8 +91,9 @@ def download_file_content(
     file_id: int,
     actor: Annotated[Principal, Depends(get_current_principal)],
     service: Annotated[WorkOrderService, Depends(get_work_order_service)],
+    audience: Literal["resident", "property"] = "resident",
 ) -> Response:
-    record, content = service.get_file_content(actor=actor, file_id=file_id)
+    record, content = service.get_file_content(actor=actor, file_id=file_id, audience=audience)
     return Response(
         content=content,
         media_type=record.mime_type,

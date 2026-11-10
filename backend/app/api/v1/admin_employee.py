@@ -27,8 +27,27 @@ from app.schema.employee import (
 )
 from app.service.employee import EmployeeService
 from app.service.employee_identity import EmployeeIdentityService
+from app.service.employee_history import EmployeeHistoryService
 
 router = APIRouter(prefix="/admin", tags=["admin-employees"])
+
+
+@router.get("/employees/{employee_id}/work-history")
+def employee_work_history(
+    employee_id: int,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    session: Annotated[Session, Depends(get_db_session)],
+    tenant_id: Annotated[int, Query(gt=0)],
+    property_id: Annotated[int, Query(gt=0)],
+    before_id: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1,le=20)] = 20,
+    x_property_id: Annotated[str | None, Header(alias="X-Property-Id")] = None,
+) -> dict[str, object]:
+    _reject_header_mismatch(property_id=property_id,x_property_id=x_property_id)
+    result=EmployeeHistoryService(session).list_history(actor=actor,employee_id=employee_id,
+        tenant_id=tenant_id,property_id=property_id,before_id=before_id,limit=limit)
+    return success_envelope(request,result.model_dump(mode="json"))
 
 
 def get_employee_service(

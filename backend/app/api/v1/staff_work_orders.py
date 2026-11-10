@@ -136,6 +136,8 @@ def submit_receipt(
         fee_flag=body.fee_flag,
         unresolved_reason=body.unresolved_reason,
         follow_up=body.follow_up,
+        handling_mode=body.handling_mode,
+        handling_note=body.handling_note,
         before_file_ids=body.before_file_ids,
         after_file_ids=body.after_file_ids,
         file_ids=body.file_ids,

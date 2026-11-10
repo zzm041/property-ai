@@ -1,5 +1,6 @@
 """Bounded durable publication and execution through existing domain Services."""
 import threading
+from time import perf_counter
 
 from kombu.exceptions import OperationalError as BrokerOperationalError
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
@@ -8,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.core.config import get_settings
 from app.core.database import begin_owned_transaction, create_database_engine, retryable_mysql_analysis_error_code
 from app.core.logging import get_logger
+from app.domain.ai import AnalysisStatus
 from app.provider.errors import ProviderTimeoutError, ProviderUnavailableError, ProviderRateLimitError
 from app.repository.task_intent import TaskIntentRepository
 from app.service.task_intent import (
@@ -17,6 +19,53 @@ from app.service.task_intent import (
 from app.worker.celery_app import celery_app
 
 logger = get_logger(__name__)
+
+
+def _diagnostic(level, event, **fields):
+    """Best effort only: observability cannot change durable recovery."""
+    try:
+        getattr(logger, level)(event, **fields)
+    except Exception:
+        pass
+
+
+def _trace_fields(lease):
+    return dict(intent_id=lease["id"], request_id=lease["request_id"],
+                task_id=lease["task_id"], attempt=lease["attempt"])
+
+
+def _analyze_with_trace(session, settings, lease, context):
+    from app.service.analysis import AnalysisService
+    from app.worker.tasks import raise_retryable_analysis_failure, _record_analysis_attempt_outcome
+
+    trace = dict(**_trace_fields(lease), work_order_id=lease["resource_id"], execution_path="durable")
+    started = perf_counter()
+    outcome, analysis_id = "ERROR", None
+    _diagnostic("info", "analysis_task_started", **trace)
+    try:
+        analysis = AnalysisService(session, settings=settings).analyze_work_order(
+            work_order_id=lease["resource_id"], request_id=lease["request_id"],
+            attempt=lease["attempt"], task_context=context)
+        record_id = getattr(analysis, "id", None)
+        analysis_id = record_id if type(record_id) is int and record_id > 0 else None
+        status = getattr(analysis, "status", None)
+        outcome = ("NO_RESULT" if analysis is None else
+                   status if status in {item.value for item in AnalysisStatus} else "UNKNOWN_RESULT")
+        raise_retryable_analysis_failure(analysis)
+        _record_analysis_attempt_outcome(lease["task_id"], analysis)
+        return analysis
+    except (ProviderTimeoutError, ProviderUnavailableError, ProviderRateLimitError):
+        outcome = "PROVIDER_FAILED"
+        raise
+    except SQLAlchemyError:
+        outcome = "DATABASE_FAILED"
+        raise
+    except IntentLeaseLost:
+        outcome = "LEASE_LOST"
+        raise
+    finally:
+        _diagnostic("info", "analysis_task_finished", **trace, analysis_id=analysis_id,
+                    outcome=outcome, duration_ms=round(max(0, perf_counter() - started) * 1000, 3))
 
 
 def publish_due(engine, settings, *, intent_ids=None, timing=None, checkpoint=None):
@@ -87,9 +136,7 @@ def _analysis_claim_for_lease(latest, completion_request, task_id):
 def _run_domain(session, settings, lease):
     session.info[LEASE_KEY] = lease
     if lease["operation"] == ANALYZE:
-        from app.service.analysis import AnalysisService
         from app.repository.work_order import WorkOrderRepository
-        from app.worker.tasks import raise_retryable_analysis_failure, _record_analysis_attempt_outcome
         with begin_owned_transaction(session):
             repo = WorkOrderRepository(session)
             work = repo.get_work_order_for_update(lease["resource_id"])
@@ -115,11 +162,7 @@ def _run_domain(session, settings, lease):
                        and previous.get("task_id") != lease["task_id"]
                    ),
                    "attachment_completion": attachment_completion}
-        analysis = AnalysisService(session, settings=settings).analyze_work_order(
-            work_order_id=lease["resource_id"], request_id=lease["request_id"],
-            attempt=lease["attempt"], task_context=context)
-        raise_retryable_analysis_failure(analysis)
-        _record_analysis_attempt_outcome(lease["task_id"], analysis)
+        analysis = _analyze_with_trace(session, settings, lease, context)
         status = getattr(analysis, "status", None)
         if status in {"COMPLETED", "LOW_CONFIDENCE"}:
             return "SUCCEEDED", None, False
@@ -184,12 +227,17 @@ def execute_intent(engine, settings, intent_id, task_id, *, timing=None, checkpo
     stop = threading.Event()
     heartbeat = threading.Thread(target=_heartbeat, args=(engine, lease, timing, stop), daemon=True)
     heartbeat.start()
+    trace = _trace_fields(lease)
+    started = perf_counter()
+    durable_outcome = "ERROR"
+    _diagnostic("info", "task_intent_started", **trace)
     try:
         try:
             with Session(engine, autoflush=False, expire_on_commit=False) as session:
                 outcome, code, retryable = _run_domain(session, settings, lease)
         except IntentLeaseLost:
-            return "LEASE_LOST"
+            durable_outcome = "LEASE_LOST"
+            return durable_outcome
         except (ProviderTimeoutError, ProviderUnavailableError, ProviderRateLimitError) as exc:
             outcome, code, retryable = "FAILED", exc.error_code, True
         except OperationalError as exc:
@@ -197,7 +245,7 @@ def execute_intent(engine, settings, intent_id, task_id, *, timing=None, checkpo
             outcome, code = "FAILED", "TASK.DATABASE_TRANSIENT" if retryable else "TASK.DATABASE_PERMANENT"
         except Exception as exc:
             outcome, code, retryable = "FAILED", "TASK.PERMANENT_FAILURE", False
-            logger.error("task_intent_permanent_failure", intent_id=intent_id, error_type=type(exc).__name__)
+            _diagnostic("error", "task_intent_permanent_failure", intent_id=intent_id, error_type=type(exc).__name__)
         # New connection/session after every attempt, particularly a broken DB transaction.
         if checkpoint:
             checkpoint("domain_committed_before_intent_finish", intent_id)
@@ -210,9 +258,12 @@ def execute_intent(engine, settings, intent_id, task_id, *, timing=None, checkpo
             checkpoint("result_committed_before_ack", intent_id)
         return durable_outcome
     except SQLAlchemyError:
-        logger.error("task_intent_result_not_persisted", intent_id=intent_id, db_persisted=False)
-        return "DB_UNAVAILABLE_LEASE_RECOVERY_REQUIRED"
+        durable_outcome = "DB_UNAVAILABLE_LEASE_RECOVERY_REQUIRED"
+        _diagnostic("error", "task_intent_result_not_persisted", intent_id=intent_id, db_persisted=False)
+        return durable_outcome
     finally:
+        _diagnostic("info", "task_intent_finished", **trace, outcome=durable_outcome,
+                    duration_ms=round(max(0, perf_counter() - started) * 1000, 3))
         stop.set()
         heartbeat.join(timeout=1)
 

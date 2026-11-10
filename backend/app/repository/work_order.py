@@ -366,6 +366,15 @@ class WorkOrderRepository:
             ).all()
         )
 
+    def latest_dispatch_wait(self, *, work_order_id: int, tenant_id: int, property_id: int) -> WorkOrderLog | None:
+        """Read one recorded attempt; never present it as live eligibility."""
+        return self._session.scalar(select(WorkOrderLog).where(
+            WorkOrderLog.work_order_id == work_order_id,
+            WorkOrderLog.tenant_id == tenant_id,
+            WorkOrderLog.property_id == property_id,
+            WorkOrderLog.event_code == 'AUTO_DISPATCH_WAIT',
+        ).order_by(WorkOrderLog.id.desc()).limit(1))
+
     def list_processes(self, work_order_id: int) -> tuple[WorkOrderProcess, ...]:
         return tuple(
             self._session.scalars(
@@ -847,9 +856,13 @@ class WorkOrderRepository:
         self,
         *,
         employee_id: int,
+        tenant_id: int,
+        property_ids: tuple[int, ...],
         after_id: int = 0,
         limit: int = 50,
     ) -> tuple[WorkOrder, ...]:
+        if not property_ids:
+            return ()
         return tuple(
             self._session.scalars(
                 select(WorkOrder)
@@ -861,6 +874,8 @@ class WorkOrderRepository:
                 )
                 .where(
                     WorkOrderAssignment.employee_id == employee_id,
+                    WorkOrder.tenant_id == tenant_id,
+                    WorkOrder.property_id.in_(property_ids),
                     WorkOrder.id > after_id,
                 )
                 .order_by(WorkOrder.id)

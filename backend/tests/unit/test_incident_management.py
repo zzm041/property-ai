@@ -75,6 +75,7 @@ def _service(*, principal_loader=None) -> IncidentService:
     service._session.begin.return_value = MagicMock()
     service._ai = MagicMock()
     service._employees = MagicMock()
+    service._employees.find_effective_assignment.return_value = object()
     service._work_orders = MagicMock()
     service._audit = MagicMock()
     service._llm = MagicMock()
@@ -105,6 +106,7 @@ def test_staff_list_uses_current_participant_query_before_pagination() -> None:
     service._employees.get_employee_for_user.return_value = SimpleNamespace(
         id=31,
         tenant_id=1,
+        status="ACTIVE",
     )
     service._ai.list_incidents_for_participant.return_value = (record,)
 
@@ -183,6 +185,7 @@ def test_mixed_role_uses_manage_permission_for_the_target_property_only() -> Non
     service._employees.get_employee_for_user.return_value = SimpleNamespace(
         id=31,
         tenant_id=1,
+        status="ACTIVE",
     )
     service._ai.list_incidents_for_participant.return_value = ()
     service._ai.list_incidents.return_value = ()
@@ -201,6 +204,7 @@ def test_staff_detail_rejects_same_property_non_participant() -> None:
     service._employees.get_employee_for_user.return_value = SimpleNamespace(
         id=31,
         tenant_id=1,
+        status="ACTIVE",
     )
     service._ai.is_incident_participant.return_value = False
 
@@ -218,6 +222,7 @@ def test_staff_detail_allows_current_participant_but_not_summary() -> None:
     service._employees.get_employee_for_user.return_value = SimpleNamespace(
         id=31,
         tenant_id=1,
+        status="ACTIVE",
     )
     service._ai.is_incident_participant.return_value = True
 

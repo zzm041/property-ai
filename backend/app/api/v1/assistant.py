@@ -40,6 +40,7 @@ def query_assistant(
         request_id=request_id_for(request),
         property_id=body.property_id,
         claimed_tenant_id=body.tenant_id,
+        audience=body.audience,
     )
     data = AssistantAnswerData(
         status=result.status,

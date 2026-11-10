@@ -50,11 +50,10 @@ def _require_delivery_target() -> tuple[str, str, str]:
     return target, phone, password
 
 
-def main() -> int:
-    database_url, phone, password = _require_delivery_target()
-    engine = create_database_engine(database_url)
+def _bootstrap(database_url: str, phone: str, password: str, *, connection=None) -> int:
+    engine = create_database_engine(database_url) if connection is None else None
     try:
-        with Session(bind=engine, autoflush=False, expire_on_commit=False) as session:
+        with Session(bind=connection if connection is not None else engine, autoflush=False, expire_on_commit=False) as session:
             with begin_owned_transaction(session):
                 revision = session.execute(text("SELECT version_num FROM alembic_version FOR UPDATE")).scalar_one()
                 if revision != "20260925_0012_task_intents":
@@ -125,7 +124,13 @@ def main() -> int:
         print("delivery SYSTEM_ADMIN bootstrapped without emitting credentials")
         return 0
     finally:
-        engine.dispose()
+        if engine is not None:
+            engine.dispose()
+
+
+def main() -> int:
+    database_url, phone, password = _require_delivery_target()
+    return _bootstrap(database_url, phone, password)
 
 
 if __name__ == "__main__":

@@ -16,6 +16,7 @@ import os
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
+from app.cli.customer_install_authority import permits_customer_install
 
 revision: str = "20260919_0009"
 down_revision: str | None = "20260917_0007"
@@ -43,7 +44,7 @@ def _require_isolated_auth_schema() -> None:
         and url.port == 3306
         and name == "property_ai_delivery_check"
     )
-    if name != "property_ai_auth001_test" and not approved_delivery:
+    if name != "property_ai_auth001_test" and not approved_delivery and not permits_customer_install(bind, revision):
         raise RuntimeError(
             "Migration 20260919_0009 requires AUTH001 or an explicit delivery target, "
             f"not {name!r}"

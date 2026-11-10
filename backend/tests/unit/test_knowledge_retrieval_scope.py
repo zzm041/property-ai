@@ -60,6 +60,7 @@ def test_selected_property_uses_its_persisted_tenant_with_mixed_grants() -> None
         actor=actor,
         property_id=200,
         claimed_tenant_id=None,
+        audience="property",
     )
 
     assert acl.tenant_id == 20
@@ -85,6 +86,7 @@ def test_system_grant_resolves_selected_property_tenant() -> None:
         actor=actor,
         property_id=300,
         claimed_tenant_id=None,
+        audience="property",
     )
 
     assert acl.tenant_id == 30
@@ -111,6 +113,7 @@ def test_matching_tenant_admin_keeps_tenant_common_visibility() -> None:
         actor=actor,
         property_id=200,
         claimed_tenant_id=None,
+        audience="property",
     )
 
     assert KnowledgeVisibility.TENANT.value in acl.visibilities

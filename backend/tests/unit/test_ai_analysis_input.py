@@ -260,7 +260,7 @@ def test_versioned_prompt_keeps_context_as_json_evidence_and_usage_separate():
     payload, error, _ = s._run_llm(snapshot(context=context), asr_text=None, vision_text='images', request_id='req', attempt=1)
     assert error is None and dict(payload) == SUCCESS_ANALYSIS
     call = s._llm.structured_completion.call_args.kwargs
-    assert call['prompt_version'] == 'wo-analysis-v14-resistance-not-looseness'
+    assert call['prompt_version'] == WORK_ORDER_ANALYSIS_PROMPT_VERSION
     assert 'summary 必须用简体中文' in call['prompt']
     assert '仅是过去记录' in call['prompt']
     assert '多项普通维修不必拆单或选唯一工种' in call['prompt']

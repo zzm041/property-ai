@@ -7,6 +7,7 @@ import os
 
 from alembic import op
 import sqlalchemy as sa
+from app.cli.customer_install_authority import permits_customer_install
 
 revision = "20260924_0011_contact_phone"
 down_revision = "20260919_0009"
@@ -23,7 +24,7 @@ def upgrade() -> None:
                 and os.environ.get("PROPERTY_AI_APPROVE_DELIVERY_TARGET") == target
                 and os.environ.get("APP_ENV") == "staging" and url.host == "mysql"
                 and url.port == 3306 and url.database == "property_ai_delivery_check")
-    if not auth001 and not delivery:
+    if not auth001 and not delivery and not permits_customer_install(op.get_bind(), revision):
         raise RuntimeError("Contact migration is approved only for isolated AUTH001 test")
     op.add_column("work_orders", sa.Column("contact_phone_e164", sa.String(16), nullable=True))
 

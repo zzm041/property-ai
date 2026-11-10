@@ -85,6 +85,7 @@ def _create_work_order(
         house_id=house_id,
         request_id=f"t7-create-{uuid4().hex[:12]}",
         idempotency_key=f"t7-{uuid4()}",
+        contact_phone="13800000000",
         text=text,
         file_ids=file_ids,
     )

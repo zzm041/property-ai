@@ -3,6 +3,7 @@ import os
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
+from app.cli.customer_install_authority import permits_customer_install
 
 revision = "20260925_0012_task_intents"
 down_revision = "20260924_0011_contact_phone"
@@ -22,7 +23,7 @@ def upgrade():
                 and os.environ.get("APP_ENV") == "staging" and url.drivername == "mysql+pymysql"
                 and url.host == "mysql" and url.port == 3306
                 and url.database == "property_ai_delivery_check")
-    if not auth001 and not delivery:
+    if not auth001 and not delivery and not permits_customer_install(bind, revision):
         raise RuntimeError("0012 approved only for exact AUTH001 test target")
     if bind.execute(sa.text("SELECT version_num FROM alembic_version")).scalar_one() != down_revision:
         raise RuntimeError("0012 requires actual0011; no stamp/backfill permitted")

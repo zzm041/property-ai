@@ -1,6 +1,6 @@
 """Resident WorkOrder create, read, append, cancel, confirm, reopen, and rate."""
 
-from typing import Annotated
+from typing import Annotated, Literal
 from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, Header, Query, Request, Response
@@ -12,6 +12,7 @@ from app.core.config import Settings, get_settings
 from app.core.errors import AppError, WorkOrderErrorCode
 from app.core.time import validate_timezone
 from app.domain.iam import Principal
+from app.domain.work_order_visibility import resident_detail
 from app.schema.common import request_id_for, success_envelope
 from app.schema.work_order import (
     AppendWorkOrderRequest,
@@ -118,6 +119,9 @@ def work_order_display_data(
         timestamp_labels=labels,
         analysis_status=context.get("analysis_status"),
         analysis_message=(
+            "请求已记录，这类事项暂不支持在此办理，请联系物业确认处理渠道；如同时有报修问题，请补充具体情况。"
+            if needs_clarification and context.get("analysis_disposition") == "OUT_OF_SCOPE_REQUEST"
+            else
             "现有信息不足，系统暂不派单；请补充可观察的现场情况后再次分析。"
             if needs_clarification
             else None
@@ -202,6 +206,7 @@ def get_work_order(
     request: Request,
     actor: Annotated[Principal, Depends(get_current_principal)],
     service: Annotated[WorkOrderService, Depends(get_work_order_service)],
+    audience: Literal["resident", "property"] = "resident",
 ) -> dict[str, object]:
     (
         record,
@@ -213,7 +218,7 @@ def get_work_order(
         feedbacks,
         logs,
         display_context,
-    ) = service.get_work_order_detail(actor=actor, work_order_id=work_order_id)
+    ) = service.get_work_order_detail(actor=actor, work_order_id=work_order_id, audience=audience)
     process_by_id = {item.id: item for item in processes}
     detail = WorkOrderDetailData(
         work_order=work_order_data(record, overdue=service.is_overdue(record)),
@@ -303,7 +308,8 @@ def get_work_order(
         ],
     )
     detail.display = work_order_display_data(detail, display_context)
-    return success_envelope(request, detail.model_dump(mode="json"))
+    data = detail.model_dump(mode="json")
+    return success_envelope(request, resident_detail(data) if audience == "resident" else data)
 
 
 @router.post("/work-orders/{work_order_id}/append")

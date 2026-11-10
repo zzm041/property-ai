@@ -1,6 +1,7 @@
 """Reranker Provider. Fake uses lexical overlap; production is HTTP-configured."""
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
+from math import isfinite
 
 from app.provider.errors import ProviderUnavailableError
 
@@ -89,15 +90,24 @@ class HttpRerankerProvider(RerankerProvider):
             provider="reranker",
             operation="rerank",
         )
-        scores = payload.get("scores") or payload.get("results")
+        if not isinstance(payload, Mapping):
+            raise ProviderInvalidOutputError("Reranker returned invalid JSON")
+        scores = payload.get("scores")
+        if scores is None:
+            scores = payload.get("results")
         if not isinstance(scores, list) or len(scores) != len(documents):
             raise ProviderInvalidOutputError("Reranker returned invalid JSON")
         values: list[float] = []
         for item in scores:
             if isinstance(item, dict):
                 item = item.get("score", item.get("relevance_score"))
+            if isinstance(item, bool):
+                raise ProviderInvalidOutputError("Reranker returned invalid JSON")
             try:
-                values.append(float(item))
-            except (TypeError, ValueError) as exc:
+                value = float(item)
+            except (TypeError, ValueError, OverflowError) as exc:
                 raise ProviderInvalidOutputError("Reranker returned invalid JSON") from exc
+            if not isfinite(value):
+                raise ProviderInvalidOutputError("Reranker returned invalid JSON")
+            values.append(value)
         return tuple(values)

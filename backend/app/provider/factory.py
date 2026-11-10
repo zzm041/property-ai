@@ -36,6 +36,7 @@ from app.provider.identity_proof import (
     UnavailableIdentityProofProvider,
 )
 from app.provider.file_scanner import (
+    ClamAVFileScannerProvider,
     DevelopmentFileScannerProvider,
     FileScannerProvider,
     UnavailableFileScannerProvider,
@@ -45,6 +46,13 @@ from app.provider.file_scanner import (
 def build_file_scanner_provider(settings: Settings) -> FileScannerProvider:
     if settings.file_scanner_provider == "development":
         return DevelopmentFileScannerProvider()
+    if settings.file_scanner_provider == "clamav":
+        return ClamAVFileScannerProvider(
+            host=settings.file_scanner_host,
+            port=settings.file_scanner_port,
+            timeout_seconds=settings.file_scanner_timeout_seconds,
+            max_bytes=settings.upload_max_mb * 1024 * 1024,
+        )
     return UnavailableFileScannerProvider()
 
 
@@ -102,6 +110,7 @@ def build_vlm_provider(
         return QwenVLMProvider(
             base_url=settings.vlm_base_url,
             model=settings.vlm_model,
+            model_revision=settings.vlm_model_revision,
             api_key=settings.vlm_api_key.get_secret_value(),
             timeout_seconds=settings.vlm_timeout_seconds,
             disable_thinking=settings.vlm_disable_thinking,
@@ -119,6 +128,7 @@ def build_asr_provider(
         return HttpASRProvider(
             base_url=settings.asr_base_url,
             model=settings.asr_model,
+            model_revision=settings.asr_model_revision,
             api_key=settings.asr_api_key.get_secret_value(),
             timeout_seconds=settings.asr_timeout_seconds,
             storage=storage or build_storage_provider(settings),

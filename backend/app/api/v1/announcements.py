@@ -1,6 +1,6 @@
 """Resident-facing published announcements."""
 
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.orm import Session
@@ -24,12 +24,14 @@ def list_announcements(
     property_id: Annotated[int, Query(gt=0)],
     after_id: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
+    audience: Literal["resident", "property"] = "resident",
 ) -> dict[str, object]:
     records = service.list_published(
         actor=actor,
         property_id=property_id,
         after_id=after_id,
         limit=limit,
+        audience=audience,
     )
     items = [announcement_data(item) for item in records]
     next_cursor = items[-1].id if len(items) == limit else None

@@ -185,6 +185,7 @@ def test_resident_query_returns_citation_and_blocks_other_property(
             json={
                 "question": "内部排班密码是什么？",
                 "property_id": graph.employees.property_1_id,
+                "audience": "property",
             },
             headers=_auth(staff, "t8-staff-ask"),
         )

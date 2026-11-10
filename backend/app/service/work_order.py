@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings, get_settings
 from app.core.database import retryable_mysql_transaction_error_code
 from app.core.errors import (
+    AiErrorCode,
     AppError,
     AuthErrorCode,
     ErrorCode,
@@ -24,8 +25,10 @@ from app.core.errors import (
 from app.core.logging import get_logger
 from app.core.time import current_business_date, utc_now
 from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.employee import AttendanceOnDuty, EmployeeStatus
+from app.domain.ai import WorkOrderAnalysisOutput, capability_filter_reason, category_duty, map_analysis_output, ordinary_maintenance
+from app.domain.employee import DISPATCH_STAFF_ROLES, AttendanceOnDuty, EmployeeStatus
 from app.domain.iam import OrganizationScope, Principal, ScopeType
+from app.domain.work_order_visibility import resident_media_visible
 from app.domain.work_order import (
     WORK_ORDER_CANCEL,
     WORK_ORDER_CREATE,
@@ -470,25 +473,40 @@ class WorkOrderService:
         *,
         actor: Principal,
         file_id: int,
+        audience: str = "resident",
     ) -> tuple[FileObject, bytes]:
         current = self._reload_actor(actor)
         self._require_positive_id(file_id, "file_id")
         record = self._repository.get_file(file_id)
         if record is None:
             self._raise_file_not_found()
-        allowed = record.uploader_user_id == current.user_id
-        if not allowed:
-            for work_order in self._repository.list_work_orders_for_file(record.id):
-                try:
-                    self._authorize_read(current, work_order)
-                except AppError:
-                    continue
-                allowed = True
-                break
-        if not allowed:
+        self._validate_audience(audience)
+        if not self._file_is_visible(current, record, audience=audience):
             self._raise_file_not_found()
-
         return record, self._read_stored_file(record)
+
+    def _file_is_visible(self, current: Principal, record: FileObject, *, audience: str) -> bool:
+        """Metadata-only gate shared by downloads and new media associations."""
+        orders = self._repository.list_work_orders_for_file(record.id)
+        allowed = not orders and record.uploader_user_id == current.user_id
+        for work_order in orders:
+            try:
+                self._authorize_read(current, work_order, allow_reporter=audience == "resident")
+            except AppError:
+                continue
+            if audience == "property":
+                allowed = True
+            else:
+                receipt_ids = {item.id for item in self._repository.list_receipts(work_order.id)}
+                allowed = any(
+                    item.file_id == record.id and resident_media_visible(
+                        phase=item.taken_phase, receipt_id=item.receipt_id, receipt_ids=receipt_ids,
+                    )
+                    for item in self._repository.list_media(work_order.id)
+                )
+            if allowed:
+                break
+        return bool(allowed)
 
     def _read_stored_file(self, record: FileObject) -> bytes:
         if record.scanner_status not in {"clean", "skipped_dev"}:
@@ -670,6 +688,7 @@ class WorkOrderService:
         *,
         actor: Principal,
         work_order_id: int,
+        audience: str = "resident",
     ) -> tuple[
         WorkOrder,
         WorkOrderContent | None,
@@ -681,10 +700,16 @@ class WorkOrderService:
         tuple[WorkOrderLog, ...],
         dict[str, object],
     ]:
+        self._validate_audience(audience)
         record = self.get_work_order(actor=actor, work_order_id=work_order_id)
+        if audience == "property":
+            self._authorize_read(self._reload_actor(actor), record, allow_reporter=False)
         analysis = self._analysis.get_current_analysis(record.id)
         display_context = self._repository.get_display_context(record)
         display_context["analysis_status"] = None if analysis is None else analysis.status
+        if (analysis is not None and analysis.status == "LOW_CONFIDENCE"
+                and getattr(analysis, "error_code", None) == AiErrorCode.OUT_OF_SCOPE):
+            display_context["analysis_disposition"] = "OUT_OF_SCOPE_REQUEST"
         return (
             record,
             self._repository.get_content(record.id),
@@ -696,6 +721,47 @@ class WorkOrderService:
             self._repository.list_logs(record.id),
             display_context,
         )
+
+    def diagnose_work_order(self, *, actor: Principal, work_order_id: int,
+                            property_id: int, version: int):
+        """Read existing evidence only. No inference, mutation, or scheduling."""
+        from app.domain.diagnosis import diagnosis_items
+        from app.schema.work_order import WorkOrderDiagnosisData
+
+        self._require_positive_id(work_order_id, 'work_order_id')
+        self._require_positive_id(property_id, 'property_id')
+        self._require_positive_id(version, 'version')
+        current = self._reload_actor(actor)
+        record = self._repository.get_work_order(work_order_id)
+        if record is None:
+            self._raise_not_found()
+        scope = OrganizationScope(ScopeType.PROPERTY, record.tenant_id, record.property_id)
+        RbacService.require_permission(current, WORK_ORDER_DISPATCH, scope)
+        if record.property_id != property_id:
+            raise AppError(code=WorkOrderErrorCode.SCOPE_MISMATCH, message='Work order scope changed', status_code=422)
+        self._assert_version(record, version)
+        observed_at = self._clock()
+        analysis = self._analysis.get_current_analysis(record.id)
+        process = self._repository.get_current_process(record.id)
+        wait = self._repository.latest_dispatch_wait(work_order_id=record.id,
+            tenant_id=record.tenant_id, property_id=record.property_id)
+        payload = None if wait is None else wait.payload_json
+        wait_reason = payload.get('reason_code') if isinstance(payload, dict) else None
+        if not isinstance(wait_reason, str):
+            wait_reason = None
+        facts, actions = diagnosis_items(status=record.status, process_reason=record.process_reason,
+            analysis_status=None if analysis is None else analysis.status,
+            analysis_error_code=None if analysis is None else getattr(analysis, 'error_code', None),
+            cycle_no=None if process is None else process.cycle_no,
+            wait_reason=wait_reason, overdue=self.is_overdue(record, observed_at))
+        sources = {'work_order': record, 'analysis': analysis,
+                   'work_order_log': wait, 'work_order_process': process}
+        return WorkOrderDiagnosisData(work_order_id=record.id, property_id=record.property_id,
+            version=record.version, observed_at=observed_at,
+            facts=[dict(code=code, text=text, source_type=kind, source_id=sources[kind].id,
+                        recorded_at=getattr(sources[kind], 'updated_at', None) if kind == 'work_order'
+                        else getattr(sources[kind], 'created_at', None)) for code, text, kind in facts],
+            suggested_actions=actions)
 
     def list_supervisor_queue(
         self,
@@ -771,8 +837,24 @@ class WorkOrderService:
     ) -> tuple[WorkOrder, ...]:
         current = self._reload_actor(actor)
         employee = self._require_actor_employee(current)
+        if employee.status != EmployeeStatus.ACTIVE.value:
+            raise AppError(code=IamErrorCode.FORBIDDEN, message="Permission denied", status_code=403)
+        property_ids = tuple(
+            property_id
+            for property_id in self._employees.list_active_property_ids_for_employee(
+                employee_id=employee.id, now=self._clock(),
+            )
+            if current.has_permission(
+                WORK_ORDER_READ,
+                OrganizationScope(ScopeType.PROPERTY, tenant_id=employee.tenant_id, property_id=property_id),
+            )
+        )
+        if not property_ids:
+            return ()
         return self._repository.list_for_assignee(
             employee_id=employee.id,
+            tenant_id=employee.tenant_id,
+            property_ids=property_ids,
             after_id=after_id,
             limit=self._page_limit(limit),
         )
@@ -1067,8 +1149,16 @@ class WorkOrderService:
         after_file_ids: tuple[int, ...] = (),
         file_ids: tuple[int, ...] = (),
         version: int | None = None,
+        handling_mode: str | None = None,
+        handling_note: str | None = None,
     ) -> WorkOrder:
         self._validate_request_id(request_id)
+        from app.domain.receipt_handling import normalize_handling
+
+        try:
+            handling_mode, handling_note = normalize_handling(handling_mode, handling_note)
+        except ValueError as exc:
+            raise AppError(code=WorkOrderErrorCode.INVALID_INPUT, message=str(exc), status_code=422) from exc
         if not problem_type.strip() or not method.strip():
             raise AppError(
                 code=WorkOrderErrorCode.INVALID_INPUT,
@@ -1099,6 +1189,8 @@ class WorkOrderService:
                 before_file_ids=normalized_before_ids,
                 after_file_ids=normalized_after_ids,
                 version=version,
+                handling_mode=handling_mode,
+                handling_note=handling_note,
             )
         )
 
@@ -1474,6 +1566,16 @@ class WorkOrderService:
         # Content mutations participate in optimistic concurrency and make an
         # in-flight analysis snapshot stale before its result can be applied.
         record.version += 1
+        scope_review_invalidated = False
+        if record.status == WorkOrderStatus.PENDING_ANALYSIS.value:
+            analysis = self._analysis.get_current_analysis_for_update(record.id)
+            if (analysis is not None and analysis.status == "LOW_CONFIDENCE"
+                    and analysis.error_code == AiErrorCode.OUT_OF_SCOPE):
+                # A new resident version must not retain an old pure-scope
+                # conclusion while its fresh analysis is queued. The original
+                # reason and success audit remain available for history.
+                analysis.status = "STALE"
+                scope_review_invalidated = True
         self._write_log(
             record,
             actor=current,
@@ -1482,6 +1584,8 @@ class WorkOrderService:
             to_status=WorkOrderStatus(record.status),
             event=WorkOrderEvent.APPEND,
             request_id=request_id,
+            reason_code="SCOPE_REVIEW_INVALIDATED_BY_APPEND" if scope_review_invalidated else None,
+            reason_detail=cleaned,
         )
         self._session.flush()
         return record
@@ -2283,6 +2387,16 @@ class WorkOrderService:
                 message="Feedback is only allowed while processing",
                 status_code=409,
             )
+        current_reason = ProcessReason(record.process_reason)
+        target_reason = current_reason if process_reason is None else self._parse_enum(
+            process_reason, ProcessReason, ProcessReason.NONE, "process_reason",
+        )
+        if target_reason != current_reason:
+            raise AppError(
+                code=WorkOrderErrorCode.INVALID_TRANSITION,
+                message="Use escalation or a supervisor decision to change the processing reason",
+                status_code=409,
+            )
         cleaned = self._optional_text(text)
         if cleaned is not None:
             content = self._repository.get_content(record.id)
@@ -2316,25 +2430,6 @@ class WorkOrderService:
             taken_phase=phase,
             process_id=process_id,
         )
-        target_reason = ProcessReason(record.process_reason)
-        if process_reason is not None:
-            target_reason = self._parse_enum(
-                process_reason,
-                ProcessReason,
-                ProcessReason.NONE,
-                "process_reason",
-            )
-            if target_reason is ProcessReason.INTERNAL_UNRESOLVED:
-                target_reason = ProcessReason.ESCALATED
-        if (
-            ProcessReason(record.process_reason) in WAITING_PROCESS_REASONS
-            and target_reason is ProcessReason.NONE
-        ):
-            raise AppError(
-                code=WorkOrderErrorCode.INVALID_TRANSITION,
-                message="Use a supervisor decision to resume an escalated work order",
-                status_code=409,
-            )
         self._apply_transition(
             record,
             event=WorkOrderEvent.PROCESS_UPDATE,
@@ -2344,6 +2439,7 @@ class WorkOrderService:
             request_id=request_id,
             process_reason=target_reason,
             reason_code=target_reason.value,
+            reason_detail=cleaned,
         )
         self._append_audit(
             action=AuditAction.WORK_ORDER_PROCESS_UPDATED,
@@ -2378,6 +2474,8 @@ class WorkOrderService:
         before_file_ids: tuple[int, ...],
         after_file_ids: tuple[int, ...],
         version: int | None,
+        handling_mode: str | None = None,
+        handling_note: str | None = None,
     ) -> WorkOrder:
         current, record, _assignment, _employee = self._lock_assignee_action(
             actor, work_order_id, version, takeover=True
@@ -2406,6 +2504,16 @@ class WorkOrderService:
                 message="Receipt already exists for this process cycle",
                 status_code=409,
             )
+        from app.domain.receipt_handling import handling_reason
+
+        # A supervisor may submit on behalf of the assignee. SELF refers to
+        # the actual submitter's employee identity, never the assigned worker.
+        participant_id = (self._require_actor_employee(current).id
+                          if handling_mode in {'SELF', 'ASSISTED'} else None)
+        declaration = None if handling_mode is None else dict(
+            process_id=process.id, mode=handling_mode, note=handling_note,
+            reported_participant_employee_id=participant_id,
+        )
         now = self._clock()
         if resolved:
             if not staff_may_submit_resolved_receipt(record.process_reason):
@@ -2456,6 +2564,8 @@ class WorkOrderService:
                 actor_type=self._actor_type(current, record),
                 request_id=request_id,
                 reason_code="RESOLVED",
+                reason_detail=handling_reason(handling_mode, handling_note),
+                receipt_handling=None if declaration is None else dict(declaration, receipt_id=receipt.id),
             )
             self._append_audit(
                 action=AuditAction.WORK_ORDER_RESOLVED,
@@ -2528,6 +2638,8 @@ class WorkOrderService:
                 request_id=request_id,
                 process_reason=target_reason,
                 reason_code=target_reason.value,
+                reason_detail=handling_reason(handling_mode, handling_note),
+                receipt_handling=None if declaration is None else dict(declaration, receipt_id=receipt.id),
             )
             self._append_audit(
                 action=AuditAction.WORK_ORDER_PROCESS_UPDATED,
@@ -2783,6 +2895,7 @@ class WorkOrderService:
         process_reason: ProcessReason | None = None,
         reason_code: str | None = None,
         reason_detail: str | None = None,
+        receipt_handling: dict[str, object] | None = None,
     ) -> None:
         from_status = WorkOrderStatus(record.status)
         try:
@@ -2814,6 +2927,7 @@ class WorkOrderService:
             request_id=request_id,
             reason_code=reason_code,
             reason_detail=reason_detail,
+            receipt_handling=receipt_handling,
         )
         self._session.flush()
 
@@ -2829,12 +2943,15 @@ class WorkOrderService:
         request_id: str,
         reason_code: str | None = None,
         reason_detail: str | None = None,
+        receipt_handling: dict[str, object] | None = None,
     ) -> None:
         payload: dict[str, object] = {"event_code": event.value}
         if reason_code is not None:
             payload["reason_code"] = reason_code
         if reason_detail is not None:
             payload["reason"] = reason_detail
+        if receipt_handling is not None:
+            payload['receipt_handling_v1'] = dict(receipt_handling)
         self._repository.add_log(
             WorkOrderLog(
                 tenant_id=record.tenant_id,
@@ -2959,6 +3076,26 @@ class WorkOrderService:
         daily.current_load = max(daily.current_load + delta, 0)
         self._session.flush()
 
+    def _manual_requirements(self, record: WorkOrder) -> tuple[str | None, str | None] | None:
+        category = WorkOrderCategory(getattr(record, "category", "OTHER"))
+        required_duty = None if category is WorkOrderCategory.OTHER else category_duty(category)
+        required_skill = None if category is WorkOrderCategory.OTHER else category.value
+        analysis = self._analysis.get_current_analysis(record.id)
+        if analysis is not None and analysis.status == "COMPLETED":
+            try:
+                output = WorkOrderAnalysisOutput.model_validate({
+                    field: getattr(analysis, field, None)
+                    for field in WorkOrderAnalysisOutput.model_fields
+                })
+                mapped = map_analysis_output(output, threshold=self._settings.ai_confidence_threshold)
+            except ValueError:
+                # A purportedly completed but malformed requirement must not
+                # silently discard a restriction and permit assignment.
+                return None
+            if mapped.category == category and not mapped.low_confidence:
+                required_duty, required_skill = mapped.required_duty, mapped.required_skill
+        return required_duty, required_skill
+
     def _eligibility_error(
         self,
         record: WorkOrder,
@@ -2974,6 +3111,13 @@ class WorkOrderService:
         if employee.status != EmployeeStatus.ACTIVE.value:
             return denied
         if employee.tenant_id != record.tenant_id:
+            return denied
+        if employee.user_id is None or self._analysis.get_user_status(employee.user_id) != "ACTIVE":
+            return denied
+        roles = self._analysis.list_employee_role_codes(
+            employee.user_id, tenant_id=record.tenant_id, property_id=record.property_id,
+        )
+        if not roles & DISPATCH_STAFF_ROLES:
             return denied
         now = self._clock()
         assignment = self._employees.find_effective_assignment(
@@ -2997,13 +3141,32 @@ class WorkOrderService:
         )
         if daily is None or daily.on_duty != AttendanceOnDuty.ON_DUTY.value:
             return denied
-        if not ignore_capacity and not employee_is_capacity_available(
-            current_load=self._repository.employee_global_occupancy(
-                employee_id=employee.id, tenant_id=record.tenant_id, lock=True, collapse_incidents=True,
-            ),
-            max_capacity=employee.max_capacity,
-        ):
+        attendance = self._analysis.get_attendance(
+            employee_id=employee.id,
+            property_id=record.property_id,
+            business_date=business_date,
+        )
+        if attendance is None or attendance.check_in_at is None:
             return denied
+        requirements = self._manual_requirements(record)
+        if requirements is None:
+            return denied
+        required_duty, required_skill = requirements
+        # Unknown classification keeps the explicitly retained manual fallback.
+        if required_duty is not None and capability_filter_reason(
+            duty_codes=self._analysis.list_employee_duties(employee.id),
+            skill_codes=self._analysis.list_employee_skills(employee.id),
+            required_duty=required_duty, required_skill=required_skill,
+        ) is not None:
+            return denied
+        if not ignore_capacity:
+            load = self._repository.employee_global_occupancy(
+                employee_id=employee.id, tenant_id=record.tenant_id, lock=True, collapse_incidents=True,
+            )
+            if not employee_is_capacity_available(current_load=load, max_capacity=employee.max_capacity):
+                return denied
+            if ordinary_maintenance(required_duty, required_skill) and load > 0:
+                return denied
         return None
 
     def _attach_media(
@@ -3086,6 +3249,11 @@ class WorkOrderService:
                     message="File was not found",
                     status_code=404,
                 )
+            if not self._file_is_visible(
+                actor, file_object,
+                audience="property" if taken_phase is MediaTakenPhase.ON_SITE else "resident",
+            ):
+                self._raise_file_not_found()
             kind = _ALLOWED_MIME.get(file_object.mime_type)
             if kind is None:
                 raise AppError(
@@ -3108,8 +3276,13 @@ class WorkOrderService:
                 )
             )
 
-    def _authorize_read(self, actor: Principal, record: WorkOrder) -> None:
-        if record.reporter_user_id == actor.user_id:
+    @staticmethod
+    def _validate_audience(audience: str) -> None:
+        if audience not in {"resident", "property"}:
+            raise AppError(code=WorkOrderErrorCode.INVALID_INPUT, message="Invalid audience", status_code=422)
+
+    def _authorize_read(self, actor: Principal, record: WorkOrder, *, allow_reporter: bool = True) -> None:
+        if allow_reporter and record.reporter_user_id == actor.user_id:
             return
         scope = self._property_scope(record)
         if actor.has_permission(WORK_ORDER_DISPATCH, scope) or actor.has_permission(
@@ -3124,6 +3297,13 @@ class WorkOrderService:
                 assignment is not None
                 and employee is not None
                 and assignment.employee_id == employee.id
+                and employee.status == EmployeeStatus.ACTIVE.value
+                and employee.tenant_id == record.tenant_id
+                and self._employees.find_effective_assignment(
+                    employee_id=employee.id,
+                    property_id=record.property_id,
+                    now=self._clock(),
+                ) is not None
             ):
                 return
         raise AppError(

@@ -1,6 +1,7 @@
 """Celery tasks delegate to domain services. Duplicate delivery is idempotent."""
 
 from contextlib import suppress
+from time import perf_counter
 from uuid import uuid4
 
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
@@ -27,6 +28,14 @@ from app.worker.celery_app import celery_app
 logger = get_logger(__name__)
 
 
+def _analysis_diagnostic(level: str, event: str, **fields) -> None:
+    """Diagnostics must never replace an analysis outcome or retry exception."""
+    try:
+        getattr(logger, level)(event, **fields)
+    except Exception:
+        pass
+
+
 class AnalysisDatabaseRetryExhausted(Exception):
     error_code = AiErrorCode.DATABASE_RETRY_EXHAUSTED
 
@@ -39,7 +48,7 @@ def _persist_database_exhaustion(engine, settings, work_order_id, request_id, co
                 work_order_id=work_order_id, request_id=request_id, context=context,
             )
     except SQLAlchemyError:
-        logger.error("analysis_failure_state_not_persisted", work_order_id=work_order_id,
+        _analysis_diagnostic("error", "analysis_failure_state_not_persisted", work_order_id=work_order_id,
                      error_code=AiErrorCode.DATABASE_RETRY_EXHAUSTED, db_persisted=False)
         return False
 
@@ -83,7 +92,7 @@ def _record_analysis_attempt_outcome(task_id: str | None, analysis: object | Non
     try:
         complete_attempt(str(task_id), outcome, error_code=error_code)
     except Exception:
-        logger.warning("failed_task_outcome_unavailable", task_id=str(task_id), outcome=outcome)
+        _analysis_diagnostic("warning", "failed_task_outcome_unavailable", task_id=str(task_id), outcome=outcome)
 
 
 @celery_app.task(
@@ -104,6 +113,11 @@ def analyze_work_order_task(self, work_order_id: int, request_id: str) -> None:
         "expected_version": headers.get("analysis_expected_version"),
         "claim": headers.get("analysis_recovery"),
     }
+    trace = dict(request_id=request_id, task_id=context["task_id"],
+                 work_order_id=work_order_id, attempt=context["attempt"])
+    started = perf_counter()
+    outcome, analysis_id = "ERROR", None
+    _analysis_diagnostic("info", "analysis_task_started", **trace)
     try:
         analysis = AnalysisService(session, settings=settings).analyze_work_order(
             work_order_id=work_order_id,
@@ -111,38 +125,49 @@ def analyze_work_order_task(self, work_order_id: int, request_id: str) -> None:
             attempt=int(getattr(self.request, "retries", 0)) + 1,
             task_context=context,
         )
+        # Use only the returned record's fixed metadata, never model/body text.
+        record_id = getattr(analysis, "id", None)
+        analysis_id = record_id if type(record_id) is int and record_id > 0 else None
+        status = getattr(analysis, "status", None)
+        outcome = ("NO_RESULT" if analysis is None else
+                   status if status in {item.value for item in AnalysisStatus} else "UNKNOWN_RESULT")
         raise_retryable_analysis_failure(analysis)
         _record_analysis_attempt_outcome(getattr(self.request, "id", None), analysis)
     except (ProviderTimeoutError, ProviderUnavailableError, ProviderRateLimitError) as exc:
-        logger.warning(
+        outcome = "PROVIDER_FAILED"
+        _analysis_diagnostic("warning",
             "ai_analysis_retry",
-            work_order_id=work_order_id,
+            **trace,
             error_code=exc.error_code,
         )
         retries = int(getattr(self.request, "retries", 0))
         headers["analysis_recovery"] = context.get("claim")
         raise self.retry(exc=exc, countdown=min(2 ** retries, 30), headers=headers)
     except OperationalError as exc:
+        outcome = "DATABASE_FAILED"
         mysql_error_code = retryable_mysql_analysis_error_code(exc)
         if mysql_error_code is None:
             raise
         with suppress(SQLAlchemyError):
             session.invalidate()
-        logger.warning(
+        _analysis_diagnostic("warning",
             "ai_analysis_transaction_retry",
-            work_order_id=work_order_id,
+            **trace,
             mysql_error_code=mysql_error_code,
-            attempt=context["attempt"], task_id=context["task_id"],
         )
         if retries >= self.max_retries:
+            outcome = "DATABASE_RETRY_EXHAUSTED"
             persisted = _persist_database_exhaustion(engine, settings, work_order_id, request_id, context)
-            logger.error("analysis_database_retries_exhausted", work_order_id=work_order_id,
-                         attempt=context["attempt"], db_persisted=persisted,
+            _analysis_diagnostic("error", "analysis_database_retries_exhausted", **trace,
+                         db_persisted=persisted,
                          error_code=AiErrorCode.DATABASE_RETRY_EXHAUSTED)
             raise AnalysisDatabaseRetryExhausted("Analysis database retry budget exhausted") from None
         headers["analysis_recovery"] = context.get("claim")
         raise self.retry(exc=exc, countdown=min(2 ** retries, 30), headers=headers)
     finally:
+        _analysis_diagnostic("info", "analysis_task_finished", **trace,
+                             analysis_id=analysis_id, outcome=outcome,
+                             duration_ms=round(max(0.0, perf_counter() - started) * 1000, 3))
         session.close()
         engine.dispose()
 

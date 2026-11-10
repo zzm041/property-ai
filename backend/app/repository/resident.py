@@ -169,6 +169,25 @@ class ResidentBindingRepository:
             )
         )
 
+    def has_active_property_relation(
+        self, *, user_id: int, tenant_id: int, property_id: int, now: datetime,
+    ) -> bool:
+        """Check the requested scope without truncating a user's relation list."""
+        return self._session.scalar(
+            select(ResidentHouseRelation.id)
+            .join(House, (House.id == ResidentHouseRelation.house_id)
+                  & (House.tenant_id == ResidentHouseRelation.tenant_id)
+                  & (House.property_id == ResidentHouseRelation.property_id))
+            .where(
+                ResidentHouseRelation.user_id == user_id,
+                ResidentHouseRelation.tenant_id == tenant_id,
+                ResidentHouseRelation.property_id == property_id,
+                ResidentHouseRelation.status == "ACTIVE",
+                ResidentHouseRelation.valid_from <= now,
+                or_(ResidentHouseRelation.valid_to.is_(None), ResidentHouseRelation.valid_to > now),
+            ).limit(1)
+        ) is not None
+
     def list_active_relations_for_user(
         self,
         *,

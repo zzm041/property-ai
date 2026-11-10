@@ -1,6 +1,7 @@
 """Environment-backed application configuration."""
 
 from functools import lru_cache
+from ipaddress import ip_address
 import re
 from typing import Literal
 from urllib.parse import urlsplit
@@ -113,7 +114,7 @@ class Settings(BaseSettings):
         le=86400.0,
     )
     dispatch_reject_cooldown_seconds: int = Field(
-        default=1800,
+        default=600,
         ge=0,
         le=86400,
     )
@@ -130,6 +131,11 @@ class Settings(BaseSettings):
     llm_timeout_seconds: float = Field(default=8.0, ge=0.1, le=60.0)
     llm_disable_thinking: bool = False
     llm_max_output_tokens: int | None = Field(default=None, ge=1, le=8192)
+    supervisor_agent_enabled: bool = False
+    supervisor_agent_provider: Literal['development', 'production'] = 'development'
+    supervisor_agent_base_url: str = ''
+    supervisor_agent_model: str = ''
+    supervisor_agent_api_key: SecretStr = SecretStr('')
     # Knowledge answers may use a separately approved self-hosted model while
     # work-order analysis remains on its independently gated provider.  The
     # default preserves the historical single-provider configuration.
@@ -144,6 +150,7 @@ class Settings(BaseSettings):
     vlm_provider: Literal["development", "production"] = "development"
     vlm_base_url: str = ""
     vlm_model: str = "qwen-vl-plus"
+    vlm_model_revision: str = Field(default="", max_length=128, pattern=r"^[A-Za-z0-9._:+-]*$")
     vlm_api_key: SecretStr = SecretStr("")
     vlm_timeout_seconds: float = Field(default=12.0, ge=0.1, le=60.0)
     vlm_disable_thinking: bool = False
@@ -151,6 +158,7 @@ class Settings(BaseSettings):
     asr_provider: Literal["development", "production"] = "development"
     asr_base_url: str = ""
     asr_model: str = "paraformer-realtime-v2"
+    asr_model_revision: str = Field(default="", max_length=128, pattern=r"^[A-Za-z0-9._:+-]*$")
     asr_api_key: SecretStr = SecretStr("")
     asr_timeout_seconds: float = Field(default=20.0, ge=0.1, le=120.0)
     embedding_provider: Literal["development", "production"] = "development"
@@ -185,7 +193,10 @@ class Settings(BaseSettings):
     storage_secret_key: SecretStr = SecretStr("")
     storage_region: str = "us-east-1"
     storage_presign_ttl_seconds: int = Field(default=300, ge=1, le=600)
-    file_scanner_provider: Literal["development", "unavailable"] = "unavailable"
+    file_scanner_provider: Literal["development", "unavailable", "clamav"] = "unavailable"
+    file_scanner_host: str = Field(default="", max_length=253)
+    file_scanner_port: int = Field(default=3310, ge=1, le=65535)
+    file_scanner_timeout_seconds: float = Field(default=10.0, ge=0.1, le=60, allow_inf_nan=False)
 
     @property
     def should_enqueue_ai_on_create(self) -> bool:
@@ -260,6 +271,15 @@ class Settings(BaseSettings):
                 raise ValueError(
                     "Production cannot use the Development file scanner"
                 )
+        if self.file_scanner_provider == "clamav":
+            try:
+                scanner_address = ip_address(self.file_scanner_host)
+            except ValueError as exc:
+                raise ValueError("ClamAV file scanner requires an explicit private IP address") from exc
+            if (not scanner_address.is_private or scanner_address.is_unspecified
+                    or scanner_address.is_multicast or (scanner_address.is_reserved and not scanner_address.is_loopback)
+                    or scanner_address.is_link_local or "%" in self.file_scanner_host):
+                raise ValueError("ClamAV file scanner requires a private unicast or loopback IP address")
         if self.identity_test_proof_enabled:
             target = make_url(self.active_database_url)
             actual_target = f"{target.host}:{target.port or 3306}/{target.database}"

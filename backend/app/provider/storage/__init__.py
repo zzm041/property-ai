@@ -30,6 +30,10 @@ class StoredObject:
     upload_expires_in: int | None = None
 
 
+class StorageBucketConflictError(ProviderUnavailableError):
+    """An explicit fresh-bucket installation lost a create race."""
+
+
 class StorageProvider:
     def register_object(
         self,
@@ -185,6 +189,10 @@ class ProductionStorageProvider(StorageProvider):
 
         self._request("PUT", "", content=b"", content_type="application/octet-stream")
 
+    def create_bucket_strict(self) -> None:
+        """Customer fresh installs must not accept a concurrent/existing bucket."""
+        self._request("PUT", "", allow_existing_bucket=False)
+
     def presign_put(
         self,
         storage_key: str,
@@ -227,6 +235,7 @@ class ProductionStorageProvider(StorageProvider):
         *,
         content: bytes = b"",
         content_type: str = "application/octet-stream",
+        allow_existing_bucket: bool = True,
     ) -> bytes:
         if not self.endpoint or not self._access_key:
             raise ProviderUnavailableError("Object storage is unavailable")
@@ -292,7 +301,9 @@ class ProductionStorageProvider(StorageProvider):
         finally:
             if own_client:
                 http.close()
-        if not storage_key and response.status_code in {200, 201, 204, 409}:
+        if not storage_key and method == "PUT" and response.status_code == 409 and not allow_existing_bucket:
+            raise StorageBucketConflictError("Object storage bucket already exists")
+        if not storage_key and method == "PUT" and response.status_code in {200, 201, 204, 409}:
             return b""
         if response.status_code == 404:
             logger.warning(
@@ -303,7 +314,7 @@ class ProductionStorageProvider(StorageProvider):
                 latency_ms=round((time.perf_counter() - started_at) * 1000, 2),
             )
             raise ProviderInvalidOutputError("Object was not found")
-        if response.status_code >= 400:
+        if response.status_code >= 300:
             logger.warning(
                 "provider_failed",
                 provider="storage",

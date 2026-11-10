@@ -39,6 +39,7 @@ TASK_5_TABLES = (
     "skills",
 )
 TASK_6_TABLES = (
+    "work_order_sla_applications",
     "work_order_feedbacks",
     "work_order_receipts",
     "work_order_processes",
@@ -64,6 +65,7 @@ TASK_7_TABLES = (
 )
 TASK_7_PARENT_TABLES = ("incidents",)
 TASK_8_TABLES = (
+    "task_intents",
     "notification_deliveries",
     "knowledge_chunks",
     "knowledge_ingestion_jobs",

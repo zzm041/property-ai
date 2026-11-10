@@ -2,6 +2,8 @@
 
 from dataclasses import dataclass
 from typing import Protocol
+from hashlib import sha256
+import json
 
 import httpx
 
@@ -36,6 +38,12 @@ class DevelopmentASRProvider:
     def __init__(self, behavior: str = "success") -> None:
         self.behavior = behavior
 
+    @property
+    def checkpoint_fingerprint(self) -> str:
+        value = {"adapter": "development-asr-v1", "model": self.model_version,
+                 "behavior": self.behavior}
+        return sha256(json.dumps(value, sort_keys=True).encode("utf-8")).hexdigest()
+
     def transcribe(self, *, storage_key: str, mime_type: str) -> Transcript:
         del storage_key, mime_type
         if self.behavior == "timeout":
@@ -63,14 +71,25 @@ class HttpASRProvider:
         timeout_seconds: float,
         storage: StorageProvider,
         client: httpx.Client | None = None,
+        model_revision: str = "",
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.model = model
+        self.model_revision = model_revision
         self._api_key = api_key
         self.timeout_seconds = timeout_seconds
         self._storage = storage
         self._client = client
         self.model_version = model or self.model_version
+
+    @property
+    def checkpoint_fingerprint(self) -> str:
+        # A declared deployment revision fences alias replacement; the client
+        # cannot discover a server change that the operator does not declare.
+        value = {"adapter": "http-asr-transcription-v1", "endpoint": self.base_url,
+                 "model": self.model, "model_version": self.model_version,
+                 **({"model_revision": self.model_revision} if self.model_revision else {})}
+        return sha256(json.dumps(value, sort_keys=True).encode("utf-8")).hexdigest()
 
     def transcribe(self, *, storage_key: str, mime_type: str) -> Transcript:
         if not self.base_url or not self._api_key:

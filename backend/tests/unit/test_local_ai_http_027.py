@@ -70,6 +70,20 @@ def test_only_explicit_reviewed_qwen_candidates_can_configure_adapter(monkeypatc
         _load_adapter_candidate(monkeypatch,'qwen3.5:latest')
 
 
+def test_same_weight_52_layer_profile_is_bound_only_to_reviewed_logical_model(monkeypatch):
+    runtime = 'qwen38-27b-q3km-g52-ctx8192:7af3b8f'
+    candidate = _load_adapter_candidate(monkeypatch, 'qwen38-27b-q3km-g55:7af3b8f', runtime)
+    assert candidate.QWEN_RUNTIME_MODEL == runtime
+    assert candidate.DIGEST == '59f3ff04c8d0909ab0f4f07d2977f71ed93c4e0c6c66240c91d6c4cfb8e82208'
+    assert candidate.QWEN_CONTEXT_LENGTH == 8192
+    assert candidate.QWEN_RUNTIME_VERSION == '0.34.4'
+    assert candidate.inference_timeout_seconds('qwen') == 180
+    with pytest.raises(RuntimeError, match='UNAPPROVED_QWEN_RUNTIME_BINDING'):
+        _load_adapter_candidate(monkeypatch, 'qwen3.5:4b', runtime)
+    with pytest.raises(RuntimeError, match='UNAPPROVED_QWEN_CANDIDATE'):
+        _load_adapter_candidate(monkeypatch, runtime, runtime)
+
+
 @pytest.mark.parametrize(('model','expected_context'),[
     ('qwen3.5:4b',4096),
     ('qwen3.5:9b',4096),

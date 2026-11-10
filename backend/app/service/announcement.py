@@ -412,7 +412,12 @@ class AnnouncementService:
         property_id: int,
         after_id: int = 0,
         limit: int = 50,
+        audience: str = "resident",
     ) -> tuple[Announcement, ...]:
+        if audience not in {"resident", "property"}:
+            raise AppError(code=AnnouncementErrorCode.INVALID_INPUT, message="Invalid audience", status_code=422)
+        if actor.status != "ACTIVE":
+            raise AppError(code=IamErrorCode.FORBIDDEN, message="Permission denied", status_code=403)
         property_record = self._work_orders.get_property(property_id)
         if property_record is None:
             raise AppError(
@@ -425,6 +430,7 @@ class AnnouncementService:
             tenant_id=property_record.tenant_id,
             property_id=property_record.id,
         )
+        RbacService.require_permission(actor, ANNOUNCEMENT_READ, scope)
         now = self._clock()
         relations = tuple(
             (relation, house)
@@ -433,12 +439,16 @@ class AnnouncementService:
                 now=now,
                 limit=500,
             )
-            if house.property_id == property_id
+            if house.property_id == property_id and house.tenant_id == property_record.tenant_id
         )
         employee = self._employees.get_employee_for_user(actor.user_id)
         staff_in_property = bool(
             employee is not None
             and employee.status == "ACTIVE"
+            and employee.tenant_id == property_record.tenant_id
+            and any(grant.role_code in {"STAFF", "SUPERVISOR", "PROPERTY_ADMIN", "TENANT_ADMIN"}
+                    and ANNOUNCEMENT_READ in grant.permissions and grant.scope.allows(scope)
+                    for grant in actor.grants)
             and self._employees.find_effective_assignment(
                 employee_id=employee.id,
                 property_id=property_id,
@@ -446,10 +456,14 @@ class AnnouncementService:
             )
         )
         manager_roles = {"SUPERVISOR", "PROPERTY_ADMIN", "TENANT_ADMIN"}
-        manager_read = bool(
-            actor.roles & manager_roles
-            and actor.has_permission(ANNOUNCEMENT_READ, scope)
+        manager_read = any(
+            grant.role_code in manager_roles
+            and ANNOUNCEMENT_READ in grant.permissions
+            and grant.scope.allows(scope)
+            for grant in actor.grants
         )
+        if audience == "property" and not (manager_read or staff_in_property):
+            raise AppError(code=IamErrorCode.FORBIDDEN, message="Permission denied", status_code=403)
         audiences: set[str] = set()
         building_ids: set[int] = set()
         unit_ids: set[int] = set()
@@ -467,9 +481,9 @@ class AnnouncementService:
             if unit is not None:
                 building_ids.add(unit.building_id)
                 unit_ids.add(unit.id)
-        if staff_in_property:
+        if audience == "property" and staff_in_property:
             audiences.add(AnnouncementAudience.STAFF.value)
-        if manager_read:
+        if audience == "property" and manager_read:
             audiences.update(item.value for item in AnnouncementAudience)
         if not audiences:
             raise AppError(

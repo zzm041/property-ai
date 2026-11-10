@@ -14,6 +14,7 @@ import os
 
 from alembic import op
 import sqlalchemy as sa
+from app.cli.customer_install_authority import permits_customer_install
 
 
 revision = "20261003_0015_work_order_media_cycle_links"
@@ -48,7 +49,7 @@ def _execution_guard() -> None:
         url.database == _DRILL_DATABASE
         and os.environ.get("PROPERTY_AI_MEDIA_CYCLE_DRILL") == "approved"
     )
-    if not exact_target or not approved_mode:
+    if (not exact_target or not approved_mode) and not permits_customer_install(bind, revision):
         raise RuntimeError("0015 requires an explicit exact delivery target approval")
 
     current = bind.execute(sa.text("SELECT version_num FROM alembic_version")).scalar_one()

@@ -23,7 +23,7 @@ from app.domain.ai import (
     ordinary_maintenance,
 )
 from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.employee import AttendanceOnDuty, EmployeeStatus
+from app.domain.employee import DISPATCH_STAFF_ROLES, AttendanceOnDuty, EmployeeStatus
 from app.domain.iam import ScopeType
 from app.domain.work_order import (
     AssignmentStatus,
@@ -49,7 +49,7 @@ AUTO_ASSIGN_SCHEMA_COLUMNS = frozenset({"assigned_source", "payload_json"})
 # docs/05 requires a scoped STAFF role *or above*. Supervisors and property /
 # tenant administrators are therefore eligible when every other live employee
 # filter passes; this does not bypass scope, attendance, capability, or load.
-_STAFF_ROLES = frozenset({"STAFF", "SUPERVISOR", "PROPERTY_ADMIN", "TENANT_ADMIN"})
+_STAFF_ROLES = DISPATCH_STAFF_ROLES  # Preserve the existing import contract.
 
 
 def _notification_intent_snapshot(session: Session) -> tuple[list[int], bool, object]:
@@ -279,7 +279,7 @@ class AutoDispatchService:
                 employee_active=employee.status == EmployeeStatus.ACTIVE.value,
                 user_active=self._ai.get_user_status(employee.user_id) == "ACTIVE",
                 property_effective=assignment is not None,
-                has_staff_role=bool(roles & _STAFF_ROLES),
+                has_staff_role=bool(roles & DISPATCH_STAFF_ROLES),
                 checked_in=attendance is not None,
                 check_in_at=None if attendance is None else attendance.check_in_at,
                 same_building_history=self._ai.count_same_building_history(
@@ -437,7 +437,7 @@ class AutoDispatchService:
             employee_active=employee.status == EmployeeStatus.ACTIVE.value,
             user_active=self._ai.get_user_status(employee.user_id) == "ACTIVE",
             property_effective=assignment is not None,
-            has_staff_role=bool(roles & _STAFF_ROLES),
+            has_staff_role=bool(roles & DISPATCH_STAFF_ROLES),
             checked_in=attendance is not None,
             check_in_at=None if attendance is None else attendance.check_in_at,
             primary_incident_handler=incident is not None

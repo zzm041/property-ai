@@ -4,12 +4,13 @@ from dataclasses import dataclass
 from enum import StrEnum
 import hashlib
 import re
+from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, StrictInt
 
 KNOWLEDGE_READ = "knowledge:read"
 KNOWLEDGE_MANAGE = "knowledge:manage"
-RAG_ANSWER_PROMPT_VERSION = "rag-answer-v2"
+RAG_ANSWER_PROMPT_VERSION = "rag-answer-v4"
 DEFAULT_CHUNK_CHARS = 400
 DEFAULT_CHUNK_OVERLAP = 40
 DEFAULT_RETRIEVAL_TOP_K = 8
@@ -66,7 +67,7 @@ class RagAnswerOutput(BaseModel):
 
     status: str = Field(min_length=1, max_length=64)
     answer: str = Field(default="", max_length=4000)
-    citation_chunk_ids: tuple[int, ...] = ()
+    citation_chunk_ids: tuple[Annotated[StrictInt, Field(gt=0)], ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

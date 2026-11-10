@@ -32,6 +32,10 @@ ATTENDANCE_CHECK_IN = "attendance:check_in"
 ATTENDANCE_CHECK_OUT = "attendance:check_out"
 ATTENDANCE_READ = "attendance:read"
 
+# Scoped STAFF or above; role membership never replaces live service,
+# attendance, capability or capacity checks.
+DISPATCH_STAFF_ROLES = frozenset({"STAFF", "SUPERVISOR", "PROPERTY_ADMIN", "TENANT_ADMIN"})
+
 DEV_DUTY_CODES = (
     ("MAINTENANCE", "Maintenance"),
     ("CLEANING", "Cleaning"),

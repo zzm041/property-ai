@@ -1,5 +1,7 @@
 """Build Celery with environment-isolated queues and bounded retries."""
 
+import sys
+
 from celery import Celery
 from celery.signals import (
     task_failure,
@@ -73,7 +75,9 @@ celery_app = create_celery_app()
 @worker_process_init.connect
 def _configure_worker_logging(**_kwargs: object) -> None:
     settings = get_settings()
-    configure_logging(debug=settings.app_debug, service="worker")
+    # Celery may already have replaced sys.stdout with LoggingProxy. Feeding
+    # that proxy back into its own logger silently drops records as recursion.
+    configure_logging(debug=settings.app_debug, service="worker", stream=sys.__stdout__)
     bind_contextvars(service="worker", app_env=settings.app_env)
 
 

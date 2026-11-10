@@ -12,6 +12,7 @@ import os
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
+from app.cli.customer_install_authority import permits_customer_install
 
 revision = "20260926_0014_identity_merge_sla_versions"
 down_revision = "20260925_0012_task_intents"
@@ -45,7 +46,7 @@ def _execution_guard() -> None:
         and url.host == "mysql"
         and url.port == 3306
     )
-    if not auth001 and not delivery:
+    if not auth001 and not delivery and not permits_customer_install(bind, revision):
         raise RuntimeError("0014 requires an explicit exact local target approval")
     current = bind.execute(sa.text("SELECT version_num FROM alembic_version")).scalar_one()
     if current != down_revision:

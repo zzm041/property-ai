@@ -9,6 +9,24 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator, field_valida
 from app.domain.phone import normalize_phone
 
 
+class DiagnosisFact(BaseModel):
+    code: str
+    text: str
+    source_type: Literal['work_order', 'analysis', 'work_order_log', 'work_order_process']
+    source_id: int = Field(gt=0)
+    recorded_at: datetime | None = None
+
+
+class WorkOrderDiagnosisData(BaseModel):
+    work_order_id: int
+    property_id: int
+    version: int
+    observed_at: datetime
+    current_eligibility_checked: Literal[False] = False
+    facts: list[DiagnosisFact]
+    suggested_actions: list[str]
+
+
 class CreateWorkOrderRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -125,6 +143,8 @@ class StaffReceiptRequest(BaseModel):
     resolved: bool
     unresolved_reason: str | None = Field(default=None, max_length=255)
     follow_up: str | None = Field(default=None, max_length=255)
+    handling_mode: Literal['SELF', 'ASSISTED', 'EXTERNAL'] | None = None
+    handling_note: str | None = Field(default=None, max_length=255)
     before_file_ids: tuple[int, ...] = ()
     after_file_ids: tuple[int, ...] = ()
     # Backward-compatible alias for clients that submitted completion media
@@ -134,6 +154,9 @@ class StaffReceiptRequest(BaseModel):
 
     @model_validator(mode="after")
     def validate_fee_record(self) -> Self:
+        from app.domain.receipt_handling import normalize_handling
+
+        self.handling_mode, self.handling_note = normalize_handling(self.handling_mode, self.handling_note)
         if self.fee_flag == "RECORDED" and self.fee_amount is None:
             raise ValueError("fee_amount is required when fee_flag is RECORDED")
         if self.fee_flag == "NONE" and self.fee_amount is not None:

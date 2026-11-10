@@ -1,5 +1,6 @@
 from hashlib import sha256
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 import pytest
@@ -230,12 +231,14 @@ def test_related_work_order_reader_can_read_but_unrelated_actor_gets_not_found()
     work_order.id = 5
     allowed = _service(record)
     allowed._repository.list_work_orders_for_file.return_value = (work_order,)
+    allowed._repository.list_media.return_value = (SimpleNamespace(file_id=record.id, taken_phase="REPORT", receipt_id=None),)
+    allowed._repository.list_receipts.return_value = ()
     allowed._authorize_read = MagicMock()
 
     _, content = allowed.get_file_content(actor=reader, file_id=record.id)
 
     assert content == JPEG
-    allowed._authorize_read.assert_called_once_with(reader, work_order)
+    allowed._authorize_read.assert_called_once_with(reader, work_order, allow_reporter=True)
 
     denied = _service(record)
     denied._repository.list_work_orders_for_file.return_value = ()

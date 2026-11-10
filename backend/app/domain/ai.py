@@ -63,7 +63,25 @@ ANNOUNCEMENT_READ = "announcement:read"
 ANNOUNCEMENT_DRAFT = "announcement:draft"
 ANNOUNCEMENT_PUBLISH = "announcement:publish"
 
-WORK_ORDER_ANALYSIS_PROMPT_VERSION = "wo-analysis-v14-resistance-not-looseness"
+WORK_ORDER_ANALYSIS_PROMPT_VERSION = "wo-analysis-v26-summary-fidelity"
+
+# Preserve the evaluated instruction bytes, including its provenance marker.
+WORK_ORDER_SUMMARY_INSTRUCTION = (
+    "\nSUMMARY_EXPERIMENT: summary-groups-v2\n"
+    "保留前述全部九字段规则。先依据原始证据和既有职责规则确定八个非summary字段，"
+    "再组织summary；摘要分组不改变现象、职责、技能、风险或置信度判断依据。"
+    "summary按有内容的类别写短句：本次；既往；否定/未知；行动/联系；系统处置。"
+    "无依据的类别省略，总长不超过255字；压缩礼貌语和重复表达，不删必要事实。"
+    "本次并列保留每个问题；只有原文明示因果才记录该关系，用户所述不等于现场确诊。"
+    "既往保留本次原文明说的历史修复及此后是否复发，持续未复发不能改成没有提及。"
+    "否定/未知须保留原文说不清的具体内容：不知道是什么对象、说不清什么现象、"
+    "不知道来源、原因或两件事的关系，是不同信息，不得统一改成原因不明。"
+    "行动/联系保留已经做过及明确没有做过的动作、联系时段/顺序和上门前提，"
+    "不把请求写成已完成动作或已约定时间。"
+    "系统处置仅在有范围外请求时记录前述V1边界：本系统未执行该请求，渠道待物业核实；"
+    "这是本系统范围，不表示物业公司不办理。混合报修仍逐项保留范围外请求与实际故障，"
+    "不能只保留其中一项，也不声称已派单、关闭工单或完成缴费。"
+)
 DISPATCH_CONTRACT_VERSION = "category-duty-skill-v1"
 INCIDENT_SUMMARY_PROMPT_VERSION = "incident-summary-v1"
 ANNOUNCEMENT_DRAFT_PROMPT_VERSION = "announcement-draft-v1"
@@ -125,6 +143,10 @@ _DUTY_FOR_CATEGORY = {
     WorkOrderCategory.SECURITY: "SECURITY",
     WorkOrderCategory.OTHER: "MAINTENANCE",
 }
+
+
+def category_duty(category: WorkOrderCategory) -> str:
+    return _DUTY_FOR_CATEGORY[category]
 
 
 class IncidentSummaryOutput(BaseModel):
@@ -233,7 +255,7 @@ def map_analysis_output(
         risk=risk,
         required_role=role,
         required_skill=skill,
-        required_duty=_DUTY_FOR_CATEGORY[category],
+        required_duty=category_duty(category),
         confidence=output.confidence,
         low_confidence=low,
         raw_required_skill=output.required_skill,
@@ -290,6 +312,17 @@ class DispatchWeights:
         )
 
 
+def capability_filter_reason(
+    *, duty_codes: frozenset[str], skill_codes: frozenset[str],
+    required_duty: str | None, required_skill: str | None,
+) -> FilterReason | None:
+    if required_duty and required_duty not in duty_codes:
+        return FilterReason.DUTY_MISMATCH
+    if required_skill and not ordinary_maintenance(required_duty, required_skill) and required_skill not in skill_codes:
+        return FilterReason.SKILL_MISMATCH
+    return None
+
+
 def hard_filter_candidate(
     candidate: DispatchCandidate,
     *,
@@ -308,11 +341,13 @@ def hard_filter_candidate(
         return FilterReason.NOT_ON_DUTY
     if not candidate.has_staff_role:
         return FilterReason.NO_STAFF_ROLE
-    if required_duty and required_duty not in candidate.duty_codes:
-        return FilterReason.DUTY_MISMATCH
+    capability_error = capability_filter_reason(
+        duty_codes=candidate.duty_codes, skill_codes=candidate.skill_codes,
+        required_duty=required_duty, required_skill=required_skill,
+    )
+    if capability_error is not None:
+        return capability_error
     maintenance = ordinary_maintenance(required_duty, required_skill)
-    if required_skill and not maintenance and required_skill not in candidate.skill_codes:
-        return FilterReason.SKILL_MISMATCH
     if candidate.current_load >= candidate.max_capacity and not candidate.incident_follow:
         return FilterReason.CAPACITY_FULL
     if maintenance and candidate.current_load > 0 and not candidate.incident_follow:

@@ -249,7 +249,7 @@ def test_delivery_rag_runtime_is_isolated_bounded_and_not_an_auto_switch() -> No
     runtime = (ROOT / "deploy" / "rag-runtime.ps1").read_text(encoding="utf-8")
     example = (ROOT / "deploy" / ".env.delivery.example").read_text(encoding="utf-8")
 
-    assert "LOCAL_AI_INTERNAL_TOKEN: ${DELIVERY_RAG_INTERNAL_TOKEN:-}" in compose
+    assert "LOCAL_AI_INTERNAL_TOKEN: ${LOCAL_AI_INTERNAL_TOKEN:-${DELIVERY_RAG_INTERNAL_TOKEN:-}}" in compose
     assert "RAG_LLM_API_KEY: ${DELIVERY_RAG_INTERNAL_TOKEN:-}" not in compose
     assert '"host.docker.internal:host-gateway"' in compose
     assert 'scope = "rag_only"' in runtime
@@ -272,9 +272,9 @@ def test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded() -> Non
     assert '$client.Send($request)' not in runtime
     assert '$existing = @(Get-Listener)' in runtime
     assert '$listener=@(Get-Listener)' in runtime
-    assert 'LLM_API_KEY: ${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}' in compose
-    assert 'VLM_API_KEY: ${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}' in compose
-    assert 'ASR_API_KEY: ${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}' in compose
+    assert 'LLM_API_KEY: ${LLM_API_KEY:-${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}}' in compose
+    assert 'VLM_API_KEY: ${VLM_API_KEY:-${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}}' in compose
+    assert 'ASR_API_KEY: ${ASR_API_KEY:-${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}}' in compose
     assert 'scope="work_order_only"' in runtime
     assert 'port=11437' in runtime
     assert 'runtime_binding_sha256=' in runtime

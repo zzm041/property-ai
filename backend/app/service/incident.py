@@ -21,6 +21,7 @@ from app.domain.audit import AuditAction, AuditResourceType
 from app.domain.iam import OrganizationScope, Principal, ScopeType
 from app.domain.incident import IncidentStatus
 from app.model.ai import Incident, IncidentWorkOrder
+from app.model.employee import Employee
 from app.model.work_order import WorkOrder, WorkOrderAssignment
 from app.provider.errors import ProviderError
 from app.provider.factory import build_llm_provider
@@ -246,8 +247,8 @@ class IncidentService:
         )
         RbacService.require_permission(actor, INCIDENT_READ, scope)
         if not actor.has_permission(INCIDENT_MANAGE, scope):
-            employee = self._employees.get_employee_for_user(actor.user_id)
-            if employee is None or employee.tenant_id != property_record.tenant_id:
+            employee = self._eligible_participant(actor, property_record.tenant_id, property_record.id)
+            if employee is None:
                 return ()
             return self._ai.list_incidents_for_participant(
                 tenant_id=property_record.tenant_id,
@@ -280,10 +281,9 @@ class IncidentService:
         )
         RbacService.require_permission(actor, INCIDENT_READ, scope)
         if not actor.has_permission(INCIDENT_MANAGE, scope):
-            employee = self._employees.get_employee_for_user(actor.user_id)
+            employee = self._eligible_participant(actor, incident.tenant_id, incident.property_id)
             if (
                 employee is None
-                or employee.tenant_id != incident.tenant_id
                 or not self._ai.is_incident_participant(
                     incident_id=incident.id,
                     tenant_id=incident.tenant_id,
@@ -297,6 +297,16 @@ class IncidentService:
                     status_code=403,
                 )
         return incident
+
+    def _eligible_participant(self, actor: Principal, tenant_id: int, property_id: int) -> Employee | None:
+        employee = self._employees.get_employee_for_user(actor.user_id)
+        if employee is None or employee.status != "ACTIVE" or employee.tenant_id != tenant_id:
+            return None
+        if self._employees.find_effective_assignment(
+            employee_id=employee.id, property_id=property_id, now=utc_now(),
+        ) is None:
+            return None
+        return employee
 
     def update_status(
         self,

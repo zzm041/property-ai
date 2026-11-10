@@ -130,6 +130,8 @@ def test_resident_append_rejects_non_report_phase_before_mutation() -> None:
 
 def test_resident_append_persists_trimmed_note_and_report_media() -> None:
     service = WorkOrderService.__new__(WorkOrderService)
+    service._analysis = MagicMock()
+    service._analysis.get_current_analysis_for_update.return_value = None
     current = SimpleNamespace(user_id=7)
     record = _record(42)
     content = SimpleNamespace(extra_notes="first note")
@@ -500,7 +502,6 @@ def test_detail_returns_saved_rating_and_cancel_reason() -> None:
         {
             "id": 4,
             "process_id": None,
-            "actor_user_id": 7,
             "confirmed": None,
             "rating": 5,
             "comment": "resolved well",

@@ -231,7 +231,7 @@ def test_detail_serializes_all_receipts_and_feedback_by_actual_process_id():
     )
     request = Request({"type": "http", "headers": []})
     request.state.request_id = "wo014-detail"
-    data = get_work_order(74, request, MagicMock(), service)["data"]
+    data = get_work_order(74, request, MagicMock(), service, audience="property")["data"]
     assert [p["cycle_no"] for p in data["processes"]] == [1, 2]
     assert [r["method"] for r in data["receipts"]] == ["cycle-1-repair", "cycle-2-repair"]
     assert [(r["cycle_no"], r["assignee_id"]) for r in data["receipts"]] == [(1, 46), (2, 47)]
