@@ -44,6 +44,13 @@ class Settings(BaseSettings):
     sms_otp_max_attempts: int = Field(default=5, ge=1, le=10)
     sms_send_limit_per_hour: int = Field(default=5, ge=1, le=20)
     sms_login_limit_per_hour: int = Field(default=10, ge=1, le=30)
+    # Per-client-IP ceiling for the same endpoints. Larger than the per-phone
+    # limits so a shared NAT is not locked out as one caller, small enough that
+    # rotating phone numbers from a single host still stops.
+    sms_ip_limit_per_hour: int = Field(default=30, ge=1, le=500)
+    # Comma separated CIDRs of our own reverse proxies. Only then is
+    # X-Forwarded-For believed; anywhere else the socket peer is used.
+    trusted_proxy_cidrs: str = ""
     sms_aliyun_access_key_id: SecretStr = SecretStr("")
     sms_aliyun_access_key_secret: SecretStr = SecretStr("")
     sms_aliyun_sign_name: str = ""

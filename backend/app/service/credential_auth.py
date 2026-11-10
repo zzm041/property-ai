@@ -13,7 +13,7 @@ from app.core.config import Settings
 from app.core.database import run_owned_transaction
 from app.core.errors import AppError, AuthErrorCode, ErrorCode
 from app.core.passwords import hash_password, require_new_password, verify_password
-from app.core.rate_limit import RateLimiter, RedisRateLimiter
+from app.core.rate_limit import AuthRateLimitGuard, RateLimiter, RedisRateLimiter
 from app.core.security import issue_access_token
 from app.core.time import utc_now
 from app.core.token_hash import generate_invite_token, generate_otp_code, generate_refresh_token, keyed_hash
@@ -73,6 +73,7 @@ class CredentialAuthService:
         audit: AuditService | None = None,
         sms_provider: SmsProvider | None = None,
         rate_limiter: RateLimiter | None = None,
+        client_ip: str | None = None,
         otp_factory: Callable[[], str] = generate_otp_code,
         clock=utc_now,
     ) -> None:
@@ -83,8 +84,25 @@ class CredentialAuthService:
         self._audit = audit or AuditService(session)
         self._sms = sms_provider or build_sms_provider(settings)
         self._limiter = rate_limiter or RedisRateLimiter(settings.redis_url)
+        self._client_ip = client_ip
+        # Phone and IP budgets live in one guard so every credential endpoint
+        # enforces both dimensions through the same code path.
+        self._guard = AuthRateLimitGuard(
+            limiter=self._limiter,
+            phone_limits={
+                "visual": settings.sms_send_limit_per_hour,
+                "sms:send": settings.sms_send_limit_per_hour,
+                "sms:login": settings.sms_login_limit_per_hour,
+            },
+            ip_limit=settings.sms_ip_limit_per_hour,
+        )
         self._otp_factory = otp_factory
         self._clock = clock
+
+    def _enforce_rate_limit(self, *, scope: str, phone_e164: str) -> None:
+        self._guard.enforce(
+            scope=scope, phone=phone_e164, client_ip=self._client_ip
+        )
 
     def issue_visual_challenge(
         self, *, phone: str, purpose: str, request_id: str
@@ -97,16 +115,7 @@ class CredentialAuthService:
                 message="Unsupported SMS purpose",
                 status_code=422,
             )
-        if not self._limiter.hit(
-            f"visual:{phone_e164}:{purpose}",
-            limit=self._settings.sms_send_limit_per_hour,
-            window_seconds=3600,
-        ):
-            raise AppError(
-                code=AuthErrorCode.SMS_RATE_LIMITED,
-                message="Challenge issuing is rate limited",
-                status_code=429,
-            )
+        self._enforce_rate_limit(scope="visual", phone_e164=phone_e164)
         left = secrets.randbelow(9) + 1
         right = secrets.randbelow(9) + 1
         prompt = f"{left} + {right} = ?"
@@ -163,17 +172,7 @@ class CredentialAuthService:
                 message="A visual challenge is required",
                 status_code=401,
             )
-        send_key = f"sms:send:{phone_e164}:{purpose}"
-        if not self._limiter.hit(
-            send_key,
-            limit=self._settings.sms_send_limit_per_hour,
-            window_seconds=3600,
-        ):
-            raise AppError(
-                code=AuthErrorCode.SMS_RATE_LIMITED,
-                message="SMS sending is rate limited",
-                status_code=429,
-            )
+        self._enforce_rate_limit(scope="sms:send", phone_e164=phone_e164)
         code = self._otp_factory()
         now = self._clock()
         expires = now + timedelta(seconds=self._settings.sms_otp_ttl_seconds)
@@ -942,16 +941,7 @@ class CredentialAuthService:
         )
 
     def _hit_login_limit(self, phone_e164: str) -> None:
-        if not self._limiter.hit(
-            f"sms:login:{phone_e164}",
-            limit=self._settings.sms_login_limit_per_hour,
-            window_seconds=3600,
-        ):
-            raise AppError(
-                code=AuthErrorCode.SMS_RATE_LIMITED,
-                message="Login is rate limited",
-                status_code=429,
-            )
+        self._enforce_rate_limit(scope="sms:login", phone_e164=phone_e164)
 
     @staticmethod
     def _require_phone(phone: str) -> str:

@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_principal
+from app.api.dependencies.client_ip import ClientIp
 from app.api.dependencies.db import get_db_session
 from app.core.config import Settings, get_settings
 from app.core.errors import AppError, AuthErrorCode
@@ -34,9 +35,15 @@ router = APIRouter(prefix="/auth", tags=["credential-auth"])
 def get_credential_auth_service(
     session: Annotated[Session, Depends(get_db_session)],
     settings: Annotated[Settings, Depends(get_settings)],
+    client_ip: ClientIp,
 ) -> CredentialAuthService:
     limiter = MemoryRateLimiter() if settings.app_env == "test" else None
-    return CredentialAuthService(session, settings=settings, rate_limiter=limiter)
+    return CredentialAuthService(
+        session,
+        settings=settings,
+        rate_limiter=limiter,
+        client_ip=client_ip,
+    )
 
 
 @router.post("/challenge")
