@@ -136,6 +136,56 @@ adapter 的允许集合解析顺序改为：`PROPERTY_AI_ALLOWED_WORK_PROMPT_VER
 
 ---
 
-## A-3 干净树重建
+## A-3 重建（可复现命令 + 内容断言）
 
-见下节（构建中/结果追加）。
+### A-3.1 构建
+
+```
+> cd D:\property-ai\deploy
+> $env:DELIVERY_IMAGE_TAG="src-$(git rev-parse --short=12 HEAD)-wip"
+> $env:DELIVERY_SOURCE_SHA=$env:DELIVERY_IMAGE_TAG
+> docker compose --env-file .env.delivery -f docker-compose.delivery.yml build api
+#14 naming to docker.io/library/property-ai-delivery:src-62c2551eb43f-wip done
+#13 RUN python -c "... assert not pathlib.Path('/app/app').exists()" -> DONE
+```
+
+注意两条：`--env-file .env.delivery` 必须在 `deploy\` 目录下执行（在仓库根跑会报 `couldn't find env file: D:\property-ai\.env.delivery`）；`DELIVERY_SOURCE_SHA` 与 tag 必须**同时**给，否则镜像 label 会落成 `unknown`。
+
+产物：`property-ai-delivery:src-62c2551eb43f-wip`
+- image id **`sha256:fdb3dac57516228f07da9b410d614c4ad2d6ae6e0703595d92487f1cfef5ddb6`**（907 MB，构建于 `2026-11-10T12:02:32Z`）
+- manifest `sha256:77d4ea77d05bfb81905edf613c2889e62f0b5b0c1e56eca069d305aa665b4d0b`
+- label `property-ai.source-sha=62c2551eb43f-wip`、`Config.User=appuser`
+
+### A-3.2 内容断言（逐条可复跑）
+
+```
+> docker run --rm --entrypoint python property-ai-delivery:src-62c2551eb43f-wip -m app.cli.build_provenance
+{"app_copies": ["/usr/local/lib/python3.12/site-packages/app"],
+ "app_package": "/usr/local/lib/python3.12/site-packages/app",
+ "files": {"domain/ai.py": {"path": ".../site-packages/app/domain/ai.py",
+                            "sha256": "4a0f317116ed40db5579afc24e77ef023834630cfcb7f2270db59282abcaaf9f"},
+           "domain/observed_event.py": {"path": ".../site-packages/app/domain/observed_event.py",
+                            "sha256": "64d364857b85f2b8ffd11c2f9080b8055dd0d461b480e0b22e5138b940a15143"}},
+ "prompt_versions": {"vision": "repair-photo-v7-confidence-scale",
+                     "work_order": "wo-analysis-v26-summary-fidelity"},
+ "shadow_source_tree": null, "source_sha": "62c2551eb43f-wip"}
+
+> docker run --rm --entrypoint sh <img> -lc 'ls -d /app/app || echo no-/app/app; ls /app; id -un'
+no-/app/app
+README.md  alembic  alembic.ini  build  property_ai.egg-info  pyproject.toml  scripts  tests  tmp
+appuser
+```
+
+- **单份 app**：`app_copies` 只有 `site-packages` 一份、`shadow_source_tree=null`、`/app/app` 不存在 ⇒ "cwd 决定导入哪份 app" 的机制在镜像内消失。
+- **契约文件等于 HEAD（CRLF 归一后）**：容器内原始字节 `4a0f3171…`/`64d36485…`（CRLF 工作树口径）；`\r\n→\n` 归一后为 `f1fb4aea320303944c2691433f08b2628a90655c34896d097d6fdca29a8965d6`、`f0db09af1d5a5416eb522e17816cc0e6e1ad66f931d5d512c73ac47e64fa3420`，与 `git cat-file blob HEAD:backend/app/domain/{ai,observed_event}.py | sha256sum` **逐字节一致**。
+- **运行用户**：`appuser`（uid 10001），非 root。
+- **`/app/tests` 在位**（`test_build_provenance.py`、`test_observation_action_limitation.py` 等），供交付方核验；镜像不含 pytest（`importlib.util.find_spec("pytest") → None`），单测在宿主 venv 跑。
+
+### A-3.3 这一条限定的真实边界（不许含糊）
+
+1. **镜像仍不是"从某个 commit 一字不差重建"**：构建输入是工作树而非提交，构建时工作树有 **15 个 tracked 修改**（我的 3 个 deploy 脚本已于 `62c2551`/`cfefa85` 提交，剩余 12 项不是本轮改动）：
+   `backend/app/main.py`、`backend/app/worker/enqueue.py`（PA-104-A-1 的 WIP）、`docs/00-PROJECT-SCOPE.md`、`docs/05-AI-DISPATCH-SPEC.md`、`docs/06-API-CONTRACT.md`、`docs/09-DEPLOYMENT.md`、`docs/10-ACCEPTANCE.md`、`docs/11-OPERATIONS.md`、`reports/codex/AUTH-IDENTITY-AI-001-login-review{,.call}.json`、`reports/real-ai-integration-027/diagnostic-r3-9b/qwen-budget.jsonl`、`reports/real-sms-onboarding-20261005/preflight.md`。
+   其中 `main.py` / `enqueue.py` 是产品代码，**会被打进镜像**。所以 tag 带 `-wip` 后缀、label 写作 `62c2551eb43f-wip` 是诚实标注，不是掩盖。
+2. **两个契约文件（`domain/ai.py`、`domain/observed_event.py`）未在任何 WIP 清单里**，`git status --porcelain -- <这两个路径>` 为空 ⇒ 对这两个文件，"镜像 == HEAD" 是硬证据，不是推断。
+3. **重建的确定性**：同一命令在同一工作树上重建得到相同 image id（layer cache 命中）；但换一次 `docker build --no-cache` 只能保证内容一致、不能保证 id 一致（基础镜像 manifest 与 pip 解析都可能变）。要 digest 级可复现，需要把 `requirements.delivery.lock` 全部钉成 `pkg==ver --hash=…` 且基础镜像已经 `@sha256` 钉死（后者本轮已做）。
+4. **`deploy/delivery.ps1 release` 本轮仍未用于切换**：它被 `Assert-NoRetainedRollbackContainers` 拦住（项目下保留 21 个 `*-rollback-2026xx` 容器，`reports/delivery-closeout-20261103/RUNNING-CANDIDATE.md` 明令勿绕过）。A-3 只到"镜像可复现构建 + 内容断言"，容器切换仍走 `reports/pa116-cutover/cutover_delivery.py`（本轮未切换，运行中的四容器仍是 `sha256:69372219582b…`）。
