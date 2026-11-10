@@ -44,10 +44,21 @@ def touch_publisher_heartbeat() -> None:
 
 
 def _probe_worker(settings: Settings) -> tuple[bool, str]:
+    # PA-122: a live Celery worker with an unusable LLM credential is not a
+    # healthy analysis worker — it answers ping and then fails every draft. The
+    # credential state is the worker's own (only this role calls the model).
+    credentials = settings.ai_credentials()
+    if credentials["status"] == "missing":
+        missing = ",".join(str(item) for item in credentials["missing"]) or "unknown"
+        return False, (
+            f"ai_credentials missing={missing} "
+            f"endpoint={credentials['endpoint'] or '-'} "
+            f"provider={credentials['provider']}"
+        )
     replies = celery_app.control.inspect(timeout=max(1, int(settings.readiness_timeout_seconds))).ping()
     if not replies:
         return False, "no Celery worker answered ping"
-    return True, f"workers={len(replies)}"
+    return True, f"workers={len(replies)} ai_credentials={credentials['status']}"
 
 
 def _probe_publisher(settings: Settings) -> tuple[bool, str]:

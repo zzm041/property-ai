@@ -276,6 +276,14 @@ class Settings(BaseSettings):
             # narrower case (LOCAL_AI_INTERNAL_TOKEN present, LLM_API_KEY empty) is
             # reported by /readyz instead — see ai_credentials() for why crashing
             # api/beat/publisher over a credential only the worker uses is worse.
+            # PA-122: the endpoint is part of the credential. A staging box with a
+            # key but LLM_BASE_URL="" used to start clean and then die in the first
+            # announcement/work-order draft at 0 ms, so staging now checks the same
+            # pair production does (LLM_BASE_URL + a key).
+            if not self.llm_base_url:
+                raise ValueError(
+                    "Staging LLM provider requires LLM_BASE_URL"
+                )
             if not self.llm_api_key.get_secret_value() and not (
                 self.local_ai_internal_token.get_secret_value()
             ):
@@ -367,15 +375,19 @@ class Settings(BaseSettings):
         work_order_key = bool(self.llm_api_key.get_secret_value())
         local_token = bool(self.local_ai_internal_token.get_secret_value())
         resolved = self.resolve_local_ai_key(self.llm_api_key, self.llm_base_url)
+        endpoint = self.llm_base_url
         if self.llm_provider != "production":
             status = "not_required"
             missing: list[str] = []
-        elif resolved:
-            status = "configured"
-            missing = []
         else:
-            status = "missing"
-            missing = ["LLM_API_KEY"]
+            # PA-122: a key without an endpoint cannot reach anything, so the
+            # endpoint is reported as a missing ingredient of its own.
+            missing = []
+            if not endpoint:
+                missing.append("LLM_BASE_URL")
+            if not resolved:
+                missing.append("LLM_API_KEY")
+            status = "missing" if missing else "configured"
         if not resolved:
             resolved_from = "none"
         elif work_order_key:
@@ -386,6 +398,7 @@ class Settings(BaseSettings):
             "provider": self.llm_provider,
             "status": status,
             "missing": missing,
+            "endpoint": endpoint,
             "sources": {
                 "llm_api_key": "configured" if work_order_key else "missing",
                 "local_ai_internal_token": "configured" if local_token else "missing",

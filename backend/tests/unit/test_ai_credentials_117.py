@@ -19,6 +19,10 @@ def staging_settings(**overrides) -> Settings:
         "_env_file": None,
         "app_env": "staging",
         "database_url": "mysql+pymysql://u:p@mysql:3306/property_ai_delivery_check",
+        # PA-122: staging now refuses a production provider without an endpoint, so
+        # the fixture carries the endpoint a real staging box has. Cases here judge
+        # the credential, not the endpoint; test_staging_llm_gate_122 covers the gate.
+        "llm_base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
     }
     values.update(overrides)
     return Settings(**values)
