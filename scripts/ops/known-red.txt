@@ -6,7 +6,7 @@
 #
 # 新增一条红之前必须先定性：是产品缺陷、测试过时、还是环境缺失。
 # 定性之后二选一——修掉它，或者在台账里立单并在本文件加白（加白要写清理由与触发条件）。
-# 计数（29 failed / 3003 passed / 14 skipped）只是观测值，**不参与判定**：红数抖动不再当门槛。
+# 计数（27 failed / 3046 passed / 14 skipped，t150 实测）只是观测值，**不参与判定**：红数抖动不再当门槛。
 #
 # 快照：2026-11-11，提交 7df6ebf，`APP_ENV=test` 全量单测实测。
 # 依据：`D:\AI\review\evidence\t125-baseline.md` §4（原生 29 条的分布与成因）。
@@ -43,10 +43,11 @@ backend/tests/unit/test_local_ai_http_027.py::test_pre_reservation_failure_recor
 backend/tests/unit/test_work_order_presentation.py::test_readable_page_projection_preserves_business_state[projection]
 backend/tests/unit/test_work_order_presentation.py::test_readable_page_projection_preserves_business_state[unknown]
 
-# --- test_delivery_bootstrap_lifecycle.py（2）---------------------------------
-# 启动器只在迁移时注入 bootstrap overlay 的断言；`init` / `up` 两个参数化的期望值与脚本现状不符。
-backend/tests/unit/test_delivery_bootstrap_lifecycle.py::test_launcher_injects_bootstrap_overlay_only_for_migration[init-True]
-backend/tests/unit/test_delivery_bootstrap_lifecycle.py::test_launcher_injects_bootstrap_overlay_only_for_migration[up-False]
+# --- test_delivery_bootstrap_lifecycle.py（0，t150 已转绿） ---------------------
+# 原先这两条红是因为启动器 harness 只复制了 deploy/delivery.ps1，PA-170 加入的
+# source-hash.ps1 没复制、以及 Windows PowerShell 把参数列表序列化成
+# {"value": [...], "Count": n} 而断言直接下标取值。t150 修的是 harness（复制
+# 依赖 + 还原数组），不是启动器行为，所以按「只许缩小」从基线删除。
 
 # --- 各 1 条 ------------------------------------------------------------------
 # 健康探针只做 liveness（不含依赖探测）

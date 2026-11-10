@@ -19,7 +19,7 @@ def test_plan_is_offline_contains_no_credentials_and_binds_source(monkeypatch):
     plan = customer_install.build_plan(settings())
     assert "PRIVATE_VALUE" not in json.dumps(plan)
     assert plan["target"] == "client-mysql:3306/client_property"
-    assert plan["head"] == "20261111_0016_idempotency_key_scope"
+    assert plan["head"] == "20261111_0017_content_fingerprint"
     assert len(plan["source_sha256"]) == 64
 
 

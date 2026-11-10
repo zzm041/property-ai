@@ -1,5 +1,6 @@
 """Bounded operation retry and journal fencing, no database/queue fixtures."""
 from contextlib import nullcontext
+from datetime import UTC, datetime
 from types import SimpleNamespace as NS
 from unittest.mock import MagicMock
 
@@ -172,9 +173,19 @@ def test_apply_commit_precedes_separate_dispatch(monkeypatch):
         lambda session: nullcontext(),
     )
     s._session = MagicMock()
+    s._clock = lambda: datetime.now(UTC)
     s._force_retry_actor = None
-    s._ai = MagicMock(**{"has_quarantined_output.return_value": False})
-    s._prepare = MagicMock(return_value=NS(skipped=False, work_order_id=30, input_hash="d" * 64))
+    s._ai = MagicMock(**{"quarantined_output_for_content.return_value": None})
+    s._prepare = MagicMock(
+        return_value=NS(
+            skipped=False,
+            work_order_id=30,
+            input_hash="d" * 64,
+            text="3号楼2单元楼道灯不亮",
+            images=(),
+            audio=(),
+        )
+    )
     s._call_providers = MagicMock()
     s._apply = MagicMock(side_effect=lambda **kw: (order.append('apply-committed') or NS(id=7,status='COMPLETED')))
     s._retry_auto_dispatch_from_existing = MagicMock(side_effect=lambda **kw: order.append('dispatch'))

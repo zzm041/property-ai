@@ -61,6 +61,7 @@ from app.domain.ai import (
     SKILL_RESOLUTION_UNMAPPED,
     SKILL_VALUE_NOT_NORMALIZED,
     capability_note,
+    content_fingerprint,
     MappedAnalysis,
     ProviderType,
     WorkOrderAnalysisOutput,
@@ -128,6 +129,11 @@ from app.service.rbac import RbacService
 # contract cannot use". They are the only failures that may quarantine an
 # input hash; runtime failures must stay retryable.
 QUARANTINE_ERROR_CODES = (AiErrorCode.INVALID_OUTPUT, AiErrorCode.OUTPUT_UNVERIFIABLE)
+
+# PA-169 (t150): how long a refused report content stays quarantined. The window
+# is content-scoped, so it also bounds how long a resident's re-filed report can
+# be stopped without an operator asking for a retry.
+QUARANTINE_WINDOW_HOURS = 24
 
 logger = get_logger(__name__)
 

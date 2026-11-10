@@ -4,6 +4,8 @@ from copy import deepcopy
 from hashlib import sha256
 import json
 import re
+import unicodedata
+from collections.abc import Iterable
 from datetime import datetime
 from typing import Mapping
 
@@ -1340,3 +1342,40 @@ def rank_candidates(
         )
     )
     return tuple(eligible)
+
+
+# PA-169 (t150): the quarantine must follow the resident, not the work order.
+# Two reports of the same problem in the same words produce different work order
+# ids (and therefore different ``input_hash`` values), so the identity used for
+# "this text already produced an unusable answer" has to come from the content
+# alone: width/case/punctuation-insensitive text plus the sorted attachment
+# digests. Nothing about the work order, tenant or reporter goes in.
+_FINGERPRINT_DROP = re.compile(r"[\s\W_]+", re.UNICODE)
+
+
+def normalize_fingerprint_text(text: str | None) -> str:
+    """Content form used by :func:`content_fingerprint`."""
+
+    if not text:
+        return ""
+    folded = unicodedata.normalize("NFKC", text).casefold()
+    return _FINGERPRINT_DROP.sub("", folded)
+
+
+def content_fingerprint(
+    text: str | None,
+    media_digests: Iterable[str] = (),
+) -> str:
+    """Stable identity of a report's content, independent of where it landed."""
+
+    payload = json.dumps(
+        {
+            "text": normalize_fingerprint_text(text),
+            "media": sorted({digest for digest in media_digests if digest}),
+        },
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return sha256(payload.encode("utf-8")).hexdigest()
+

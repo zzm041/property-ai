@@ -1,4 +1,4 @@
-"""Guarded clean-delivery migration through the fixed 0016 revision."""
+"""Guarded clean-delivery migration through the fixed 0017 revision."""
 from __future__ import annotations
 
 import os
@@ -11,10 +11,22 @@ from app.cli.bootstrap_system_admin import main as bootstrap_system_admin
 from app.core.config import get_settings
 
 
-HEAD = "20261111_0016_idempotency_key_scope"
+HEAD = "20261111_0017_content_fingerprint"
 MEDIA_CYCLE_REVISION = "20261003_0015_work_order_media_cycle_links"
+IDEMPOTENCY_REVISION = "20261111_0016_idempotency_key_scope"
 IDENTITY_SLA_REVISION = "20260926_0014_identity_merge_sla_versions"
 PRE_BOOTSTRAP = "20260925_0012_task_intents"
+
+# Every revision this migrator may resume from: a database parked on any of
+# these is a known upgrade path, anything else is refused.
+RESUMABLE_REVISIONS = frozenset(
+    {
+        PRE_BOOTSTRAP,
+        IDENTITY_SLA_REVISION,
+        MEDIA_CYCLE_REVISION,
+        IDEMPOTENCY_REVISION,
+    }
+)
 LIVE_DATABASE = "property_ai_delivery_check"
 DRILL_DATABASE = "property_ai_delivery_media_cycle_check"
 
@@ -84,7 +96,7 @@ def main() -> int:
             return 0
         # A database parked on 0015 is the normal upgrade path for D1: resume through
         # 0016 instead of refusing, but never accept any other unlisted revision.
-        if current not in {None, PRE_BOOTSTRAP, IDENTITY_SLA_REVISION, MEDIA_CYCLE_REVISION}:
+        if current not in RESUMABLE_REVISIONS:
             raise RuntimeError(f"delivery migration refuses unexpected revision {current!r}")
         if current is None:
             _alembic(PRE_BOOTSTRAP)

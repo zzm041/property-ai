@@ -38,6 +38,8 @@ from .rules import (
     _INFORMATIONAL_LABELS,
     _RESPONSE_FORMAT,
     work_order_analysis_response_format,
+    content_fingerprint,
+    normalize_fingerprint_text,
     observation_family,
     _source_segments,
     _vision_segments,

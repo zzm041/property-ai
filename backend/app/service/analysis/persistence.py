@@ -409,6 +409,7 @@ class PersistenceMixin:
                     error_code=error_code,
                     token_usage=valid_token_count(token_usage),
                     input_hash=input_hash or snapshot.input_hash,
+                    content_fingerprint=self._content_fingerprint(snapshot),
                 )
             )
             self._write_provider_mode(call_log.id, provider_type)
@@ -425,10 +426,11 @@ class PersistenceMixin:
 
         PA-169/F1: the adapter only quarantines what it can see (its own transport
         failures). The vocabulary/contract rejection happens here, so this is the
-        only place that can leave the ``(work_order_id, input_hash, error_code)``
-        row the quarantine probe reads. Written inside the caller's transaction:
-        ``_apply`` already holds the owned one, and a second one would deadlock on
-        the work order lock.
+        only place that can leave the row the quarantine probe reads. Since t150
+        that row is keyed by ``content_fingerprint`` as well, so the same text
+        filed under a new work order is still recognised. Written inside the
+        caller's transaction: ``_apply`` already holds the owned one, and a second
+        one would deadlock on the work order lock.
         """
 
         now = utc_now()
@@ -452,8 +454,23 @@ class PersistenceMixin:
                 error_code=error_code,
                 token_usage=None,
                 input_hash=snapshot.input_hash,
+                content_fingerprint=self._content_fingerprint(snapshot),
             )
         )
+
+    def _content_fingerprint(self, snapshot: AnalysisSnapshot) -> str:
+        """Content identity of this report (PA-169/t150).
+
+        Text plus attachment digests, nothing about the work order. Media rows
+        normally carry the stored content hash; the storage key is a stable
+        fallback for the rows written before hashes were recorded.
+        """
+
+        digests = [
+            ref.content_hash or f"key:{ref.storage_key}"
+            for ref in (*snapshot.images, *snapshot.audio)
+        ]
+        return shared.content_fingerprint(snapshot.text, digests)
 
     def _write_provider_mode(
         self,
@@ -490,6 +507,7 @@ class PersistenceMixin:
         bundle: ProviderBundle,
         request_id: str,
         attempt: int,
+        quarantine: Mapping[str, object] | None = None,
     ) -> WorkOrderAnalysis | None:
         try:
             with shared.begin_owned_transaction(self._session):
@@ -583,6 +601,7 @@ class PersistenceMixin:
                         request_id,
                         analysis.error_code,
                         resource_floor=bundle.resource_floor,
+                        quarantine=quarantine,
                     )
                     return analysis
                 self._fill_analysis(analysis, mapped)
@@ -940,6 +959,7 @@ class PersistenceMixin:
         error_code: str,
         *,
         resource_floor: Mapping[str, object] | None = None,
+        quarantine: Mapping[str, object] | None = None,
     ) -> None:
         details = {
             "work_order_id": record.id,
@@ -951,6 +971,10 @@ class PersistenceMixin:
         # its whole value is the number beside it - short_by_mib.
         if resource_floor is not None:
             details["resource_floor"] = dict(resource_floor)
+        # PA-169 (t150): say where the quarantine came from, not just that it fired.
+        if quarantine is not None:
+            details["quarantined_since"] = quarantine["quarantined_since"]
+            details["previous_work_order_id"] = quarantine["previous_work_order_id"]
         forced = getattr(self, "_force_retry_actor", None)
         if forced is not None:
             details["forced_retry_actor"] = forced

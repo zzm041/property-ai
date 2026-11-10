@@ -179,7 +179,10 @@ class AnalysisService(VisionMixin, ValidationMixin, PersistenceMixin):
                 request_id=request_id,
             )
             return self._ai.get_current_analysis(work_order_id)
-        if self._force_retry_actor is None and self._input_is_quarantined(snapshot):
+        quarantine = (
+            None if self._force_retry_actor is not None else self._quarantine_for(snapshot)
+        )
+        if quarantine is not None:
             # PA-169/F1: the adapter judges transport, so the isolation decision
             # moved here, to the only layer that knows whether the model answer
             # was usable. A failed AI.INVALID_OUTPUT row already exists for this
@@ -202,6 +205,9 @@ class AnalysisService(VisionMixin, ValidationMixin, PersistenceMixin):
                 request_id=request_id,
                 work_order_id=snapshot.work_order_id,
                 input_hash=snapshot.input_hash,
+                content_fingerprint=quarantine["content_fingerprint"],
+                quarantined_since=quarantine["quarantined_since"],
+                previous_work_order_id=quarantine["previous_work_order_id"],
                 reason_code=AiErrorCode.INPUT_QUARANTINED,
                 skipped="quarantined",
             )
@@ -216,6 +222,7 @@ class AnalysisService(VisionMixin, ValidationMixin, PersistenceMixin):
                 ),
                 request_id=request_id,
                 attempt=attempt,
+                quarantine=quarantine,
             )
         if self._force_retry_actor is not None:
             logger.warning(
@@ -773,23 +780,36 @@ class AnalysisService(VisionMixin, ValidationMixin, PersistenceMixin):
                 skip_reason="duplicate",
             )
 
-    def _input_is_quarantined(self, snapshot: AnalysisSnapshot) -> bool:
-        """One indexed read: did this input already fail as unusable output?
+    def _quarantine_for(self, snapshot: AnalysisSnapshot) -> dict[str, object] | None:
+        """Did this report *content* already produce an unusable answer?
 
-        PA-169/F1: the quarantine lives here because only this layer knows which
-        rows meant "the model answered, and the answer was unusable". The read is
-        bounded by ix_ai_call_logs_work_order_id and stops at the first hit.
+        PA-169 (t150): the probe runs on ``content_fingerprint``, not on
+        ``(work_order_id, input_hash)``. Re-filing the same report creates a new
+        work order and therefore a new input hash, and that is exactly the case
+        the guard has to catch. One indexed read on
+        ``ix_ai_call_logs_content_fingerprint``; the window keeps an ancient
+        refusal from stopping a resident forever.
         """
 
+        fingerprint = self._content_fingerprint(snapshot)
+        since = self._clock() - timedelta(hours=shared.QUARANTINE_WINDOW_HOURS)
         # The probe needs its own owned transaction: a bare ORM read would leave
         # SQLAlchemy's autobegin transaction open and _call_providers refuses to
         # run provider calls while a business transaction is live.
         with shared.begin_owned_transaction(self._session):
-            return self._ai.has_quarantined_output(
-                work_order_id=snapshot.work_order_id,
-                input_hash=snapshot.input_hash,
+            hit = self._ai.quarantined_output_for_content(
+                content_fingerprint=fingerprint,
                 error_codes=QUARANTINE_ERROR_CODES,
+                since=since,
             )
+        if hit is None:
+            return None
+        quarantined_at, previous_work_order_id = hit
+        return {
+            "content_fingerprint": fingerprint,
+            "quarantined_since": quarantined_at.isoformat(),
+            "previous_work_order_id": previous_work_order_id,
+        }
 
     def _call_providers(
         self,

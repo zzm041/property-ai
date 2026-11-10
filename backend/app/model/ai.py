@@ -107,6 +107,13 @@ class AiCallLog(BigIntPrimaryKeyMixin, Base):
         CheckConstraint("attempt >= 1", name="attempt_positive"),
         Index("ix_ai_call_logs_work_order_id", "work_order_id", "id"),
         Index("ix_ai_call_logs_request_id", "request_id"),
+        # PA-169 (t150): the quarantine probe follows the report content, so
+        # it needs an index that does not start at work_order_id.
+        Index(
+            "ix_ai_call_logs_content_fingerprint",
+            "content_fingerprint",
+            "created_at",
+        ),
         MYSQL_TABLE_OPTIONS,
     )
 
@@ -127,6 +134,12 @@ class AiCallLog(BigIntPrimaryKeyMixin, Base):
     error_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
     token_usage: Mapped[int | None] = mapped_column(Integer, nullable=True)
     input_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    # PA-169 (t150): identity of the report *content*, independent of the
+    # work order it was filed under. Null for rows written before t150 and
+    # for calls that never saw report text.
+    content_fingerprint: Mapped[str | None] = mapped_column(
+        String(64), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         UTCDateTime(),
         nullable=False,

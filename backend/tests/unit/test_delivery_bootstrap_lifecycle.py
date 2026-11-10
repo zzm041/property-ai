@@ -17,6 +17,9 @@ def test_bootstrap_file_is_only_required_for_initialization(tmp_path, action, su
     deploy = tmp_path / "deploy"
     deploy.mkdir()
     shutil.copy2(ROOT / "deploy/delivery.ps1", deploy / "delivery.ps1")
+    # PA-170 (t147): delivery.ps1 dot-sources the line-ending independent digest
+    # helper, so the temporary tree needs it too.
+    shutil.copy2(ROOT / "deploy/source-hash.ps1", deploy / "source-hash.ps1")
     (deploy / ".env.delivery").write_text("APP_ENV=staging\n", encoding="utf-8")
     harness = tmp_path / "check.ps1"
     harness.write_text('''$ErrorActionPreference = "Stop"
@@ -40,6 +43,7 @@ def test_launcher_injects_bootstrap_overlay_only_for_migration(tmp_path, action,
     deploy = tmp_path / "deploy"
     deploy.mkdir()
     shutil.copy2(ROOT / "deploy/delivery.ps1", deploy / "delivery.ps1")
+    shutil.copy2(ROOT / "deploy/source-hash.ps1", deploy / "source-hash.ps1")
     (deploy / ".env.delivery").write_text("APP_ENV=staging\n", encoding="utf-8")
     (deploy / ".env.delivery.bootstrap").write_text("SYNTHETIC=true\n", encoding="utf-8")
     harness = tmp_path / "check.ps1"
@@ -58,7 +62,10 @@ $global:RecordedCommands | ConvertTo-Json -Depth 5 -Compress | Set-Content (Join
     assert result.returncode == 0
     import json
     calls = json.loads((tmp_path / "commands.json").read_text(encoding="utf-8-sig"))
-    compose_calls = [call for call in calls if call[0] == "compose"]
+    # Windows PowerShell serialises the captured argument list as
+    # {"value": [...], "Count": n}; PowerShell 7 emits a bare array.
+    calls = [call["value"] if isinstance(call, dict) else call for call in calls]
+    compose_calls = [call for call in calls if call and call[0] == "compose"]
     assert compose_calls
     for call in compose_calls:
         overlay = str(deploy / "docker-compose.bootstrap.yml")

@@ -113,28 +113,35 @@ class AiRepository:
         self._session.flush()
         return record
 
-    def has_quarantined_output(
+    def quarantined_output_for_content(
         self,
         *,
-        work_order_id: int,
-        input_hash: str,
+        content_fingerprint: str,
         error_codes: Sequence[str],
-    ) -> bool:
-        """Did this work order already fail on this exact input (PA-169/F1)?
+        since: datetime,
+    ) -> tuple[datetime, int | None] | None:
+        """When did this report content last produce an unusable answer?
 
-        One bounded read: it rides ix_ai_call_logs_work_order_id and stops at the
-        first hit, so a retry costs one index probe rather than a table scan.
+        PA-169 (t150): the lookup runs on ``content_fingerprint`` rather than
+        ``(work_order_id, input_hash)``, because re-filing the same text creates a
+        new work order and therefore a new input hash. One bounded read: it rides
+        ``ix_ai_call_logs_content_fingerprint`` and takes the newest row inside the
+        window, so the caller can report "since when" and "which work order".
         """
 
-        return self._session.execute(
-            select(AiCallLog.id)
+        row = self._session.execute(
+            select(AiCallLog.created_at, AiCallLog.work_order_id)
             .where(
-                AiCallLog.work_order_id == work_order_id,
-                AiCallLog.input_hash == input_hash,
+                AiCallLog.content_fingerprint == content_fingerprint,
                 AiCallLog.error_code.in_(tuple(error_codes)),
+                AiCallLog.created_at >= since,
             )
+            .order_by(AiCallLog.id.desc())
             .limit(1)
-        ).first() is not None
+        ).first()
+        if row is None:
+            return None
+        return row[0], row[1]
 
     def delete_recommendations(self, analysis_id: int) -> None:
         existing = self._session.scalars(

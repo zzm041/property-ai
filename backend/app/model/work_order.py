@@ -269,6 +269,13 @@ class WorkOrder(BigIntPrimaryKeyMixin, TimestampMixin, Base):
             "created_at",
             "id",
         ),
+        # PA-169 (t150): the 10-minute duplicate check reads by house.
+        Index(
+            "ix_work_orders_house_fingerprint_created",
+            "house_id",
+            "content_fingerprint",
+            "created_at",
+        ),
         MYSQL_TABLE_OPTIONS,
     )
 
@@ -286,6 +293,11 @@ class WorkOrder(BigIntPrimaryKeyMixin, TimestampMixin, Base):
     house_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     # Report-time snapshot; never synchronized with account identity changes.
     contact_phone_e164: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    # PA-169 (t150): content identity of the report, so a repeated report can be
+    # recognised without re-reading its text.
+    content_fingerprint: Mapped[str | None] = mapped_column(
+        String(64), nullable=True
+    )
     reporter_user_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey(

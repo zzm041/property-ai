@@ -62,4 +62,4 @@ def test_the_pinned_head_is_a_leaf_and_resumable_from_its_parent() -> None:
     )
     # The delivery migrator must accept the immediate predecessor as a starting
     # point, otherwise a database parked one revision behind can never be resumed.
-    assert delivery_migrate.MEDIA_CYCLE_REVISION == head.down_revision
+    assert head.down_revision in delivery_migrate.RESUMABLE_REVISIONS

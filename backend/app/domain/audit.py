@@ -597,7 +597,8 @@ AUDIT_ACTION_POLICIES: Mapping[AuditAction, AuditActionPolicy] = MappingProxyTyp
             resource_type=AuditResourceType.WORK_ORDER_ANALYSIS,
             allowed_detail_keys=frozenset(
                 {"work_order_id", "analysis_id", "status", "error_code",
-                 "resource_floor", "forced_retry_actor"}
+                 "resource_floor", "forced_retry_actor",
+                 "quarantined_since", "previous_work_order_id"}
             ),
             required_detail_keys=frozenset(
                 {"work_order_id", "analysis_id", "status", "error_code"}
