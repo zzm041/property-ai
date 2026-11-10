@@ -11,10 +11,13 @@ SELECT
     (SELECT COUNT(*) FROM pa167_analysis_skill_backup) AS backup_rows;
 
 -- 1. Restore.
+-- The comparison must be BINARY: required_skill uses the case-insensitive
+-- collation utf8mb4_0900_ai_ci, so `a.required_skill <=> b.required_skill` reports
+-- 'MAINTENANCE' and 'maintenance' as equal and this UPDATE would restore nothing.
 UPDATE work_order_analyses AS a
 JOIN pa167_analysis_skill_backup AS b ON b.analysis_id = a.id
 SET a.required_skill = b.required_skill
-WHERE NOT (a.required_skill <=> b.required_skill);
+WHERE NOT (BINARY a.required_skill <=> BINARY b.required_skill);
 
 SELECT ROW_COUNT() AS restored_rows;
 
