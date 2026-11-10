@@ -12,6 +12,7 @@ import httpx
 
 from app.core.logging import get_logger, safe_url_for_log
 from app.provider.errors import (
+    ProviderInputQuarantinedError,
     ProviderInvalidOutputError,
     ProviderRateLimitError,
     ProviderTimeoutError,
@@ -21,6 +22,18 @@ from app.provider.errors import (
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
 logger = get_logger(__name__)
+
+
+def _reason_code(response: httpx.Response) -> str | None:
+    """Read the adapter's refusal reason without trusting an arbitrary body."""
+    try:
+        payload = response.json()
+    except (ValueError, json.JSONDecodeError):
+        return None
+    if not isinstance(payload, Mapping):
+        return None
+    code = payload.get("reason_code")
+    return code if isinstance(code, str) else None
 
 
 def _private_target(url: str) -> bool:
@@ -98,6 +111,12 @@ def request_json(
         _log_failure(provider, operation, "AI.RATE_LIMITED", started_at, url=url)
         raise ProviderRateLimitError("Provider rate limited")
     if response.status_code >= 500:
+        # PA-169: the adapter's 503 covers several very different refusals. When
+        # it says the input itself is quarantined, say so instead of reporting a
+        # generic outage - the caller needs the retry path, not a retry loop.
+        if _reason_code(response) == "INPUT_QUARANTINED":
+            _log_failure(provider, operation, "AI.INPUT_QUARANTINED", started_at, url=url)
+            raise ProviderInputQuarantinedError("Provider quarantined this input")
         _log_failure(provider, operation, "AI.UNAVAILABLE", started_at, url=url)
         raise ProviderUnavailableError("Provider is unavailable")
     if response.status_code >= 400:

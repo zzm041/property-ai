@@ -495,7 +495,11 @@ class Runner:
             return 'MODEL_RESIDENCY_MISMATCH'
         if any(value in detail for value in ('RESOURCE','RAM_GUARD','SHARED_MODEL_LOCK')):
             return 'RESOURCE_ADMISSION_REJECTED'
-        if any(value in detail for value in ('CALL_LIMIT','WINDOW_EXHAUSTED','BUDGET','PREVIOUS_REQUEST','FAILED_INPUT')):
+        if 'FAILED_INPUT' in detail:
+            # PA-169: a quarantined input hash is a model-output verdict, not a
+            # budget refusal; reporting it as BUDGET_REJECTED hid the retry path.
+            return 'INPUT_QUARANTINED'
+        if any(value in detail for value in ('CALL_LIMIT','WINDOW_EXHAUSTED','BUDGET','PREVIOUS_REQUEST')):
             return 'BUDGET_REJECTED'
         if isinstance(exc,(TimeoutError,ConnectionError,OSError)):
             return 'REMOTE_UNAVAILABLE'
@@ -637,7 +641,7 @@ class Runner:
         except (OSError,ValueError,KeyError,json.JSONDecodeError,RuntimeError):
             return 'BLOCKED_RESOLUTION_INVALID'
         return 'READY'
-    def reserve(self,kind,input_hash=None):
+    def reserve(self,kind,input_hash=None,force_retry=None):
         prior=sorted(self.private.glob('call-*/reservation.json'))
         records=[json.loads(p.read_text()) for p in prior]
         # PA-166: reviewed evidence is present on disk but is not current spend.
@@ -645,27 +649,46 @@ class Runner:
         counted_records=[json.loads(p.read_text()) for p in ledger['counted']]
         if self.gate()!='READY':
             raise RuntimeError('PREVIOUS_REQUEST_COMPLETION_UNKNOWN_NO_REPLAY')
-        replay_of=None
+        # PA-169: only a run in which the model actually answered badly may keep
+        # an input hash quarantined. A runtime-side failure (resource floor,
+        # timeout, reservation refused) never reached the model, so the same
+        # words stay submittable - pinning them forever turned one temporary
+        # hiccup into a permanent 503 that still claimed BUDGET_REJECTED.
+        replay_of=None;forced=None;retried=[];quarantined=[]
         if input_hash:
             failed=[]
             for p,r in zip(prior,records):
                 result=json.loads((p.parent/'result.json').read_text(encoding='utf-8'))
                 if r.get('input_hash')==input_hash and r['kind']==kind and result.get('status')!='SUCCESS':failed.append((p,result))
-            for index,(p,result) in enumerate(failed):
-                resolution=self._resolution(p,result)
-                children=[r for r in records if r.get('replay_of')==p.parent.name]
-                if not resolution or not resolution.get('explicit_same_input_replay',{}).get('authorized'):
-                    raise RuntimeError('FAILED_INPUT_NO_AUTOMATIC_MODEL_RETRY')
-                if index<len(failed)-1:
-                    expected_child=failed[index+1][0].parent.name
-                    if len(children)!=1 or children[0].get('input_hash')!=input_hash or children[0].get('kind')!=kind:
+            for p,result in failed:
+                origin=failure_origin(result.get('reason'))
+                if origin==FAILURE_ORIGIN_MODEL_OUTPUT:quarantined.append((p,result))
+                else:retried.append({'record':p.parent.name,'reason':result.get('reason'),'origin':origin})
+            if quarantined and force_retry:
+                # The operator asked for this exact text anyway; the reservation
+                # records who asked, so the replay is auditable rather than silent.
+                forced={'actor':force_retry.get('actor'),'utc':stamp(),
+                        'request_binding':force_retry.get('request_binding'),
+                        'quarantined':[p.parent.name for p,_ in quarantined]}
+            else:
+                for index,(p,result) in enumerate(quarantined):
+                    resolution=self._resolution(p,result)
+                    children=[r for r in records if r.get('replay_of')==p.parent.name]
+                    if not resolution or not resolution.get('explicit_same_input_replay',{}).get('authorized'):
                         raise RuntimeError('FAILED_INPUT_NO_AUTOMATIC_MODEL_RETRY')
-                    child_path=prior[records.index(children[0])]
-                    if child_path.parent.name!=expected_child:
-                        raise RuntimeError('FAILED_INPUT_NO_AUTOMATIC_MODEL_RETRY')
-                else:
-                    if children:raise RuntimeError('FAILED_INPUT_NO_AUTOMATIC_MODEL_RETRY')
-                    replay_of=p.parent.name
+                    if index<len(quarantined)-1:
+                        expected_child=quarantined[index+1][0].parent.name
+                        if len(children)!=1 or children[0].get('input_hash')!=input_hash or children[0].get('kind')!=kind:
+                            raise RuntimeError('FAILED_INPUT_NO_AUTOMATIC_MODEL_RETRY')
+                        child_path=prior[records.index(children[0])]
+                        if child_path.parent.name!=expected_child:
+                            raise RuntimeError('FAILED_INPUT_NO_AUTOMATIC_MODEL_RETRY')
+                    else:
+                        if children:raise RuntimeError('FAILED_INPUT_NO_AUTOMATIC_MODEL_RETRY')
+                        replay_of=p.parent.name
+        retry_metadata={}
+        if retried:retry_metadata['retried_failures']=retried
+        if forced:retry_metadata['forced_retry']=forced
         now=time.time()
         if self.continuation:
             base=self.continuation['base_count'];new=records[base:]
@@ -673,7 +696,7 @@ class Runner:
             start=(new[0]['window_start_unix'] if new else now);deadline=start+self.continuation['duration_seconds']
             if now>=deadline:raise RuntimeError('R2_WINDOW_EXHAUSTED')
             if sum(r['kind']==kind for r in new)>=self.continuation['limits'][kind]:raise RuntimeError('R2_CALL_LIMIT')
-            metadata={'window':'r2-continuation-01','window_start_unix':start,'incremental_max_calls':self.continuation['limits'][kind],'replay_of':replay_of}
+            metadata={'window':'r2-continuation-01','window_start_unix':start,'incremental_max_calls':self.continuation['limits'][kind],'replay_of':replay_of,**retry_metadata}
         else:
             if self.call_baseline[kind]+sum(r['kind']==kind for r in counted_records)>=self.limits[kind]:
                 raise RuntimeError('R2_CALL_LIMIT')
@@ -692,11 +715,12 @@ class Runner:
                 'cumulative_seconds_before':spent,
                 'budget_counted':True,
                 'evidence_excluded_before':len(ledger['evidence']),
+                **retry_metadata,
             }
         folder=self.private/f'call-{self.next_call_index():03d}';folder.mkdir()
         save(folder/'reservation.json',{'kind':kind,'unix':now,'utc':stamp(),'model':MODELS[kind],'max_calls':self.limits[kind],'input_hash':input_hash,**metadata})
         return folder,deadline
-    def run(self,kind,value,request_binding=None):
+    def run(self,kind,value,request_binding=None,force_retry=None):
         input_hash=hashlib.sha256(value if isinstance(value,bytes) else json.dumps(value,ensure_ascii=False,sort_keys=True).encode()).hexdigest()
         stage='VALIDATION'
         try:
@@ -725,7 +749,7 @@ class Runner:
             if len(samples)>1:
                 with (self.private/'resource-waits.jsonl').open('a',encoding='utf-8') as f:
                     f.write(json.dumps({'utc':stamp(),'kind':kind,'seconds':time.monotonic()-started,'ram_samples_mib':samples,'inference_calls':0})+'\n')
-        try:folder,deadline=self.reserve(kind,input_hash)
+        try:folder,deadline=self.reserve(kind,input_hash,force_retry=force_retry)
         except Exception as exc:
             self.record_pre_reservation_failure(exc,stage='BUDGET_AND_LEDGER',kind=kind,input_hash=input_hash,request_binding=request_binding)
             raise
@@ -812,6 +836,10 @@ class Runner:
         )
         if left_running:runtime_disposition='LEFT_RUNNING'
         result={'status':'SUCCESS' if success else ('UNKNOWN' if unknown else 'FAILED'),'reason':reason,'exit_code':p.returncode,
+            # PA-169: the ledger records how far the request got, so a later
+            # retry of the same input hash can tell "the model answered badly"
+            # apart from "the machine never ran it".
+            'failure_origin':None if success else failure_origin(reason),
             'model':MODELS[kind],'revision':DIGEST if kind=='qwen' else MODEL_DIRS[kind][1],
             'events':events,'samples':samples,'total_seconds':time.monotonic()-start,'child_pid':p.pid,
             'request_job':job.name,'owned_exit_confirmed':owned_exit_confirmed,'cleanup_error':cleanup_error,
@@ -830,12 +858,31 @@ class Runner:
             raise RuntimeError(reason or 'MODEL_REQUEST_FAILED_NO_RETRY')
         return results[0]
 
+# PA-169: which failures mean "the model answered and we rejected the answer".
+# Everything else (resource floor, observation failure, timeout, remote
+# incompleteness, reservation refusals) never reached the model, so it must not
+# quarantine the input hash - the same words have to be submittable again once
+# the machine recovers.
+MODEL_OUTPUT_FAILURE_REASONS=frozenset({
+    'MODEL_OUTPUT_REJECTED',      # the answer failed the nine-field contract
+    'MODEL_OUTPUT_INVALID',       # the answer was not parseable
+    'MODEL_OUTPUT_SCHEMA_INVALID',# the answer shape was wrong
+})
+FAILURE_ORIGIN_RUNTIME='runtime'
+FAILURE_ORIGIN_MODEL_OUTPUT='model_output'
+def failure_origin(reason):
+    """Classify a failed call by how far the request got (PA-169)."""
+    return FAILURE_ORIGIN_MODEL_OUTPUT if reason in MODEL_OUTPUT_FAILURE_REASONS else FAILURE_ORIGIN_RUNTIME
+
 def failure_body(exc):
     """The 503 body: the same error string, plus numbers only when refused on
     resources (PA-130). Readiness codes and status codes are untouched."""
     body={'error':'MODEL_GUARD_OR_REQUEST_FAILED_NO_RETRY'}
     snapshot=getattr(exc,'resource_floor',None)
     if snapshot is not None:body['resource_floor']=snapshot
+    # PA-169: the caller must be able to tell a quarantined input from a budget
+    # refusal, so the quarantine carries its own reason code.
+    if Runner._failure_code(exc)=='INPUT_QUARANTINED':body['reason_code']='INPUT_QUARANTINED'
     return body
 
 # 子进程入口。包化之前 Runner.run 用 Path(__file__) 把自己当脚本再拉起一次，

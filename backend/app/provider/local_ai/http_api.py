@@ -54,6 +54,12 @@ def serve(config_path):
                 return self.reply(200,{'accepting_requests':False,'request_active':active})
             request_id=self.headers.get('X-Request-Id','')
             request_binding=hashlib.sha256(request_id.encode()).hexdigest() if request_id else None
+            # PA-169: an operator may re-run a quarantined text on purpose. The
+            # actor travels in its own header because the inference body stays
+            # strictly six keys, and it is written into the reservation.
+            force_actor=(self.headers.get('X-Force-Retry-Actor') or '').strip()
+            force_retry=({'actor':force_actor,'request_binding':request_binding}
+                         if force_actor and len(force_actor)<=120 else None)
             if self.headers.get('Transfer-Encoding') or len(self.headers.get_all('Content-Length',[]))!=1:
                 runner.record_pre_reservation_failure(ValueError('CONTENT_LENGTH_REQUIRED'),stage='HTTP_ENVELOPE',request_binding=request_binding)
                 return self.reply(400,{'error':'CONTENT_LENGTH_REQUIRED'})
@@ -73,7 +79,7 @@ def serve(config_path):
             try:
                 shared=runner.acquire_shared_model_lock()
                 runner.assert_shared_completion_ready();shared_ready=True
-                return self.reply(200,runner.run(kind,value,request_binding=request_binding))
+                return self.reply(200,runner.run(kind,value,request_binding=request_binding,force_retry=force_retry))
             except Exception as exc:
                 if not shared_ready:
                     runner.record_pre_reservation_failure(exc,stage='SHARED_COMPLETION_BARRIER' if shared is not None else 'SHARED_RESOURCE_LOCK',kind=kind,request_binding=request_binding)

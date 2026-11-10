@@ -150,8 +150,12 @@ class AnalysisService(VisionMixin, ValidationMixin, PersistenceMixin):
         attempt: int = 1,
         actor: Principal | None = None,
         task_context: dict | None = None,
+        force_retry_actor: str | None = None,
     ) -> WorkOrderAnalysis | None:
         self._task_context = task_context
+        # PA-169: the adapter replays a quarantined text only when an operator
+        # asks for it; the id travels to the provider header and its reservation.
+        self._force_retry_actor = force_retry_actor
         snapshot = self._prepare(
             work_order_id=work_order_id,
             request_id=request_id,
@@ -878,6 +882,7 @@ class AnalysisService(VisionMixin, ValidationMixin, PersistenceMixin):
             payload = self._llm.structured_completion(
                 prompt=prompt,
                 prompt_version=shared.WORK_ORDER_ANALYSIS_PROMPT_VERSION,
+                force_retry_actor=getattr(self, "_force_retry_actor", None),
             )
             self._write_call_log(
                 snapshot,

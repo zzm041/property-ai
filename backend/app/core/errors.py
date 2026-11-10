@@ -114,6 +114,9 @@ class AiErrorCode:
     TIMEOUT = "AI.TIMEOUT"
     UNAVAILABLE = "AI.UNAVAILABLE"
     RATE_LIMITED = "AI.RATE_LIMITED"
+    # PA-169: the adapter refused this exact input because the model once
+    # answered it badly; an operator retry is the only way forward.
+    INPUT_QUARANTINED = "AI.INPUT_QUARANTINED"
     PROVIDER_FAILED = "AI.PROVIDER_FAILED"
     STALE_RESULT = "AI.STALE_RESULT"
     LOW_CONFIDENCE = "AI.LOW_CONFIDENCE"
