@@ -665,7 +665,7 @@ class WorkOrderService:
         from app.worker.enqueue import enqueue_celery_task
         from app.worker.tasks import analyze_work_order_task
 
-        enqueue_celery_task(
+        queued = enqueue_celery_task(
             settings=self._settings,
             celery_task=analyze_work_order_task,
             args=(work_order_id, request_id),
@@ -673,6 +673,14 @@ class WorkOrderService:
             extra={"work_order_id": work_order_id},
             headers={"analysis_expected_version": version} if version is not None else None,
         )
+        if not queued and self._settings.app_env == "production":
+            # PA-104-A: never commit business state whose analysis never reached a queue.
+            # RAISE means the owned transaction rolls back; no orphan "DB row / no task" state.
+            raise AppError(
+                code=AiErrorCode.ENQUEUE_FAILED,
+                message="Analysis queue unavailable; request was not committed",
+                status_code=503,
+            )
 
     def get_work_order(self, *, actor: Principal, work_order_id: int) -> WorkOrder:
         self._require_positive_id(work_order_id, "work_order_id")

@@ -118,6 +118,7 @@ class AiErrorCode:
     LOW_CONFIDENCE = "AI.LOW_CONFIDENCE"
     OUT_OF_SCOPE = "AI.OUT_OF_SCOPE"
     NOT_FOUND = "AI.NOT_FOUND"
+    ENQUEUE_FAILED = "AI.ENQUEUE_FAILED"
 
 
 class IncidentErrorCode:
