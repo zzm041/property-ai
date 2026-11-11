@@ -145,7 +145,7 @@ class LangChainSupervisorPlanner:
             self._chain = chain
         self.provider_attempts += 1
         message = chain.invoke({'input': payload})
-        from app.provider.langchain_llm import tool_call_to_command
+        from app.provider.llm.langchain_llm import tool_call_to_command
 
         command = tool_call_to_command(message)
         if command is None:

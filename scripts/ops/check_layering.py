@@ -129,6 +129,15 @@ SHIMMED_SERVICE_MODULES: dict[str, str] = {
 }
 
 
+# Legacy provider modules that S7 replaced with an alias module. `local_ai` and the
+# three packages that kept their own name (supervisor_agent, file_scanner,
+# knowledge_parser) need no entry: the package *is* the old import path.
+SHIMMED_PROVIDER_MODULES: dict[str, str] = {
+    # S7: the LangChain LLM backend moved under its kind, app.provider.llm.
+    "app.provider.langchain_llm": "llm.langchain_llm",
+}
+
+
 # What may live directly under backend/app/domain/. Everything else must be
 # inside one of the packages listed in ALLOWED_DOMAIN_EDGES: a flat module that
 # nobody maps is either a forgotten move or a new dependency shortcut, and both
@@ -288,6 +297,15 @@ def check_shims() -> list[str]:
         problems += _shim_problems(
             legacy, source, expected="sys.modules[__name__] = _module", what="the package module"
         )
+    for legacy in sorted(SHIMMED_PROVIDER_MODULES):
+        path = REPO_ROOT / "backend" / f"{legacy.replace('.', '/')}.py"
+        if not path.exists():
+            problems.append(f"{legacy}: legacy module is missing (expected an alias module)")
+            continue
+        source = path.read_text(encoding="utf-8", errors="replace")
+        problems += _shim_problems(
+            legacy, source, expected="sys.modules[__name__] = _module", what="the kind module"
+        )
     return problems
 
 
@@ -364,7 +382,8 @@ def report() -> None:
     unmapped = [p.split(":", 1)[0] for p in domain_tree_problems()]
     print(f"# unmapped or undeclared domain entries: {unmapped or 'none'}")
     print(f"# shims declared: {len(SHIMMED_MODULES)} domain, "
-          f"{len(SHIMMED_SERVICE_MODULES)} service")
+          f"{len(SHIMMED_SERVICE_MODULES)} service, "
+          f"{len(SHIMMED_PROVIDER_MODULES)} provider")
 
 
 def main(argv: list[str] | None = None) -> int:
