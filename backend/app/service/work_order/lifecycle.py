@@ -2,6 +2,8 @@
 
 S6 moved these methods out of the old single-class module without editing their bodies.
 """
+from sqlalchemy.exc import TimeoutError as PoolTimeoutError
+
 from .context import (
     AiErrorCode, AiRepository, AppError, AssignmentStatus, AuditAction, AuditResourceType,
     AuditService, AuthErrorCode, AuthService, Callable, DUPLICATE_WINDOW_MINUTES,
@@ -323,9 +325,6 @@ class WorkOrderLifecycleMixin:
         claimed_tenant_id: int | None,
         claimed_property_id: int | None,
     ) -> tuple[WorkOrder, bool]:
-        from app.service.identity.identity_write_guard import lock_active_identity
-
-        lock_active_identity(self._session, actor.user_id)
         current = self._reload_actor(actor)
         cleaned_text = self._optional_text(text)
         if cleaned_text is None and not file_ids:
@@ -462,6 +461,15 @@ class WorkOrderLifecycleMixin:
             priority=priority_value,
             complete_minutes=complete_minutes,
         )
+        # PA-199 (t199): `users(id)` is the hottest row in this path - every
+        # report by the same resident takes `for update` on it. Take it across
+        # the write only: the reads above (house relation, RBAC, de-duplication,
+        # SLA policy) do not need it, and holding it across them made twenty
+        # simultaneous reports queue behind each other's read phase until the
+        # driver's 5 s read timeout dropped the connection (HTTP 500).
+        from app.service.identity.identity_write_guard import lock_active_identity
+
+        lock_active_identity(self._session, current.user_id)
         record = self._repository.add_work_order(
             WorkOrder(
                 tenant_id=owned.tenant_id,
@@ -1203,6 +1211,16 @@ class WorkOrderLifecycleMixin:
         except IntegrityError as exc:
             self._map_insert_error(exc)
             raise
+        except PoolTimeoutError as exc:
+            # PA-199 (t199): the pool ran out of connections. That is arrival
+            # rate, not a broken request: answer 503 so the caller retries
+            # instead of reading a 500 as a server fault.
+            raise AppError(
+                code=ErrorCode.OVERLOADED,
+                message="Server is temporarily overloaded",
+                status_code=503,
+                details={"reason": "DB_POOL_EXHAUSTED", "retry_after_seconds": 2},
+            ) from exc
         except OperationalError as exc:
             if retryable_mysql_transaction_error_code(exc) is not None:
                 raise AppError(

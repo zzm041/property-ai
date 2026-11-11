@@ -15,6 +15,7 @@ from sqlalchemy import MetaData, Table, inspect as sa_inspect, update
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.core.buildinfo import code_version
 from app.core.config import Settings, get_settings
 from app.core.database import (
     begin_owned_transaction,
@@ -806,6 +807,11 @@ class AnalysisService(VisionMixin, ValidationMixin, PersistenceMixin):
                 error_codes=QUARANTINE_ERROR_CODES,
                 since=since,
                 property_id=snapshot.property_id,
+                # F-7 (t214): only a refusal from *this* build and *this* prompt
+                # contract may skip the provider. A fix that ships a new build
+                # (or a new prompt) makes the old refusal inapplicable by design.
+                code_version=code_version(),
+                prompt_version=shared.WORK_ORDER_ANALYSIS_PROMPT_VERSION,
             )
         if hit is None:
             return None
@@ -960,6 +966,9 @@ class AnalysisService(VisionMixin, ValidationMixin, PersistenceMixin):
             "summary必须保留先留言再电话、回复后联系、未经确认不上门等明确限制，不虚构预约或允许直接联系。"
             "只有当前证据明确写出‘松动’或‘松了’时才可输出松动。"
             "每项subject必须由该项evidence_id对应原文中支持该项label的具体分句独立确定："
+            "subject是闭集：只能取schema枚举里的值，不接受自造名称（地漏、水槽、弯头这类具体物件名都不合法）；"
+            "示例：「卫生间地漏不下水」subject=排水区域（原文只点名排水部件位置），"
+            "「厨房水槽下方的排水管接头渗水」subject=排水接头（原文点名了接头）；没有可确认的主体线索时填未确定。"
             "同一evidence_id里另一项现象出现了设备名，也不能借给当前现象；"
             "原文出现schema中的主体才选该主体；"
             "原文只说明外壳、气味或其他无法确认枚举主体的现象时必须选未确定，不能借其他证据补成确定设备。"

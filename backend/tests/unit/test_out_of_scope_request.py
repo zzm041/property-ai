@@ -144,8 +144,10 @@ def test_line_breaks_cannot_hide_danger_or_unresolved_facts(source, middle, dang
 def test_actual_resident_update_separator_is_metadata_without_hiding_facts(update, expected):
     text = "请开通门禁。\nResident updates:\n" + update
     evidence = build_evidence_catalog(report_text=text, asr_text=None, vision_text=None)
-    assert evidence["report:2"]["text"] == "Resident updates:"
-    assert evidence["report:3"]["text"] == update
+    # PA-214 (F-6): the separator is a label, not a fact. It must not survive as
+    # its own evidence segment, and the resident's update must still be evidence.
+    assert "Resident updates:" not in [item["text"] for item in evidence.values()]
+    assert update in [item["text"] for item in evidence.values()]
     mapped, error = validate(text)
     if expected == "invalid":
         assert error == "AI.INVALID_OUTPUT" and mapped is None

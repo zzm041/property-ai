@@ -11,6 +11,9 @@ class ErrorCode:
     METHOD_NOT_ALLOWED = "SYS.METHOD_NOT_ALLOWED"
     HTTP_ERROR = "SYS.HTTP_ERROR"
     INTERNAL_ERROR = "SYS.INTERNAL_ERROR"
+    # PA-199 (t199): capacity exhaustion is a retryable condition, not a bug in
+    # the request. Reported as 503 with a reason code instead of 500.
+    OVERLOADED = "SYS.OVERLOADED"
 
 
 class AuthErrorCode:

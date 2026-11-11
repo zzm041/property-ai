@@ -66,6 +66,30 @@ def _app_copies() -> list[str]:
 
 
 @lru_cache(maxsize=1)
+def code_version() -> str:
+    """Which code wrote an audit row, as a single comparable string.
+
+    F-7 (t214): the quarantine probe has to know whether the refusal it finds was
+    produced by *this* code. ``build_info()["source_sha"]`` is baked at image
+    build time and is ``unknown`` outside a built image (tests, a bare venv), so
+    the in-tree digest of the two contract modules is appended as a fallback -
+    otherwise every local run would share one version and the probe could not
+    tell a fixed build from a broken one.
+    """
+
+    info = build_info()
+    sha = str(info.get("source_sha") or UNKNOWN)
+    if sha != UNKNOWN:
+        return sha[:64]
+    files = info.get("files") or {}
+    digest = hashlib.sha256()
+    for name in sorted(files):
+        digest.update(name.encode("utf-8"))
+        digest.update(str(files[name]["sha256"]).encode("utf-8"))
+    return f"tree-{digest.hexdigest()}"[:64]
+
+
+@lru_cache(maxsize=1)
 def build_info() -> dict[str, object]:
     """Static provenance; computed once per process (file reads only)."""
 

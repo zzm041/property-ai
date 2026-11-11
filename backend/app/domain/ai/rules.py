@@ -64,6 +64,54 @@ def observation_family(label: str) -> str:
     return "火花烧损" if label == "冒烟" else label
 
 
+# PA-209 (t209): a wrong label is tolerable only when the evidence supports a
+# *neighbouring* phenomenon of the same fault family.  "排水缓慢" claimed for a
+# sentence that says "渗水" is the same waterside fault named differently; a
+# cosmetic "表面剥落" bolted onto a smoke observation is a different fault, and
+# stays fatal.  One entry per family; labels outside the table are their own
+# family, so nothing is tolerated by accident.
+_OBSERVATION_FAMILY_GROUPS: tuple[frozenset, ...] = (
+    frozenset({"进水扩散", "水渍", "滴渗水", "排水缓慢"}),
+    frozenset({"冒烟", "火花烧损", "烧焦变色"}),
+)
+
+
+def _family_group(label: str) -> frozenset:
+    family = observation_family(label)
+    for group in _OBSERVATION_FAMILY_GROUPS:
+        if family in group:
+            return group
+    return frozenset({family})
+
+
+#: A segment carries evidence only if it has literal content: a CJK ideograph
+#: or a digit. Punctuation alone, and latin-only *labels* ("Resident updates:"),
+#: say nothing a label could bind to.
+_INFORMATIVE = re.compile(r"[0-9\u3400-\u4dbf\u4e00-\u9fff]")
+#: Shape of a section header, not one literal string: a short latin phrase that
+#: ends with a colon and has no content characters.
+_HEADER_SHAPE = re.compile(r"^[A-Za-z][A-Za-z0-9 _'\-/]{0,60}:$")
+
+
+def _is_evidence_segment(value: str) -> bool:
+    """F-6 (t214): keep content, drop the scaffolding around it.
+
+    ``orchestrator`` glues attachments/append notes onto the report with
+    ``"\nResident updates:\n"``. ``_source_segments`` splits on that newline, so
+    the header became its own catalog entry - a zero-information segment the model
+    is allowed to cite (and did: ``report:2``). The check is content-first, so an
+    English report sentence ("The pipe leaks.") still survives; only segments
+    without a single content character *and* shaped like a header are dropped.
+    """
+
+    stripped = value.strip()
+    if not stripped:
+        return False
+    if _INFORMATIVE.search(stripped):
+        return True
+    return not _HEADER_SHAPE.match(stripped)
+
+
 def _source_segments(text: str | None) -> list[tuple[str, list[int]]]:
     """Split only on sentence boundaries and retain offsets in the source."""
     if not text:
@@ -72,7 +120,7 @@ def _source_segments(text: str | None) -> list[tuple[str, list[int]]]:
     for match in re.finditer(r"[^。！？!?；;\r\n]+(?:[。！？!?；;]|\r\n?|\n|$)", text):
         raw = match.group(0)
         value = raw.strip()
-        if value:
+        if value and _is_evidence_segment(value):
             start = match.start() + len(raw) - len(raw.lstrip())
             rows.append((value, [start, start + len(value)]))
     return rows
@@ -159,7 +207,17 @@ PATTERNS = {
     "照明不亮": r"不亮|无法点亮|不能点亮|还是黑的",
     "操作阻力": r"卡涩|卡住|拧不动|转不动|拉不动|推不动|收不回(?:去)?|(?:拧|转|开关)[^，,。；;!?！？]{0,6}费力",
     "闭合失效": r"关不上|合不上|关不齐|扣不住|无法关闭|无法合上",
-    "排水缓慢": r"(?:排水|下水)(?:很|太|非常|特别)?(?:缓慢|慢|不利索)|水[^，,。；;!?！？]{0,12}(?:半天|很久)才下去",
+    # PA-178: residents describe a blocked drain as 堵/不通/流不下去/需要疏通,
+    # not only as 排水慢. Water nouns keep the widened wording from swallowing
+    # unrelated 堵 clauses; certainty rules below still drop history/negation.
+    "排水缓慢": r"(?:排水|下水|水槽|洗手池|洗手盆|马桶|蹲便|坐便|地漏|下水道|管道)"
+                 r"[^，,。；;!?！？]{0,6}堵(?:塞|住|了|死)?"
+                 r"|(?:排水|下水)(?:很|太|非常|特别)?(?:缓慢|慢|不利索)"
+                 r"|水[^，,。；;!?！？]{0,12}(?:半天|很久)才下去"
+                 r"|(?:水|下水|排水)[^，,。；;!?！？]{0,6}(?:流|下|排)不下去"
+                 r"|不(?:下|出)水|(?:下水|排水|放水)(?:很|太|非常|特别)?慢"
+                 r"|(?:排水|下水)[^，,。；;!?！？]{0,6}(?:不通|不畅)"
+                 r"|疏通",
     "部件下垂": r"(?:向|往)(?:左|右)?下方垂|(?:往)?下垂",
     "人员行为观察": r"徘徊|张望|拉(?:动|了)?[^，,。；;!?！？]{0,8}(?:自行车|电动车)",
     "进水扩散": r"进水|水(?:已经|已|正|正在|持续)?扩散|积水|漫水|水漫|水淹|淹水|泡水|返水|倒灌|冒水|涌水|溢水|(?:渗|漏|流|漫)到",
@@ -183,11 +241,11 @@ PATTERNS = {
 
 
 SUBJECT_PATTERNS = {
-    "窗户": r"窗户|纱窗|窗框", "柜门": r"柜门|柜的门", "排水区域": r"排水|下水|地漏|淋浴|洗澡|马桶|蹲便|坐便|洗手池",
+    "窗户": r"窗户|纱窗|窗框", "柜门": r"柜门|柜的门", "排水区域": r"排水|下水|地漏|淋浴|洗澡|马桶|蹲便|坐便|洗手池|水槽|洗菜盆|洗手盆|洗碗池|下水道|排水口|下水口|排水孔|落水口|地漏口|阳台(?=.{0,6}(?:排水|下水|落水|积水|渗水))|洗衣机(?=.{0,8}(?:排水|出水|下水|接口|地漏))",
     "人员": r"人|他|她",
-    "水龙头": r"水龙头|龙头|出水口|水嘴", "排水接头": r"排水|接头|洗手盆|水槽|水管|弯管|立管|横管|管道|管口|下水管|排水管|排污|弯头|存水弯", "天花墙面": r"天花|天花板|墙|墙皮|顶棚|涂层",
+    "水龙头": r"水龙头|龙头|出水口|水嘴", "排水接头": r"排水|接头|洗手盆|水槽|水管|弯管|立管|横管|管道|管口|下水管|排水管|排污|弯头|存水弯|三通|管线接口|管接头", "天花墙面": r"天花|天花板|墙|墙皮|顶棚|涂层",
     "插座": r"插座|插孔|插排|排插", "照明": r"灯|照明", "空调": r"空调", "扶手": r"扶手",
-    "楼道地面": r"楼道|走廊|楼梯口|电梯厅|角落|地面|地板|地上|通道", "房门": r"门", "阀门管道": r"阀|管|软管",
+    "楼道地面": r"楼道|走廊|楼梯口|电梯厅|角落|地面|地板|地上|通道", "房门": r"门", "阀门管道": r"阀|阀门|水阀|角阀|闸阀|球阀|截止阀|管|软管|暗管",
 }
 
 
@@ -956,6 +1014,7 @@ def bind_observations(
         })
     rejected = still_rejected
     effective = [row for row in normalized if row["effective"]]
+    unbound: list[dict[str, object]] = []
     scope_requests = [row for row in normalized if row["label"] == "范围外请求"]
     if scope_requests:
         if not effective and (output.category != "other" or output.required_skill != "other" or output.risk != "none"):
@@ -996,6 +1055,40 @@ def bind_observations(
         action_limitation = (
             row.get("reason_code") == "action_limitation_reported" and bool(effective)
         )
+        # PA-209 (t209): a single mislabelled observation must not erase the
+        # analysis.  The model claimed "排水缓慢" for a phrase that only says
+        # "渗水"; the evidence proves the fault, just not under that label.  Such
+        # rows are *demoted* to unbound_observations (kept verbatim, never
+        # renamed) instead of aborting the payload.  Every other guard stays
+        # fatal: negative/historical/uncertain phrasing, subject_conflict,
+        # unknown evidence, danger omissions and scope-request conflicts are the
+        # checks that stop a fabricated report, and tolerating them here would
+        # be the same as accepting it.
+        # PA-212 (t212): the same demotion covers an unsupported *subject*.
+        # "卫生间地漏不下水" was answered with subject=排水区域; the sentence never
+        # says 排水区域, yet it does prove the drainage fault, and the pairing
+        # (evidence, family) is already accepted.  Keeping the row verbatim in
+        # unbound_observations is honest; failing the whole work order is not.
+        evidence_unsupported = (
+            row.get("reason_code") in {"label_not_matched", "subject_unsupported"}
+            and any(
+                accepted["evidence_id"] == row["evidence_id"]
+                and _family_group(accepted["label"]) is not None
+                and bool(_family_group(accepted["label"]) & _family_group(row["label"]))
+                for accepted in effective
+            )
+        )
+        if evidence_unsupported and not informational_redundancy:
+            unbound.append({
+                **row,
+                "disposition": "NOT_BOUND_TO_EVIDENCE",
+                "unbound_reason": (
+                    "the evidence supports a related phenomenon, but not under this label"
+                    if row.get("reason_code") == "label_not_matched"
+                    else "the phenomenon is supported, but this clause does not name the claimed object"
+                ),
+            })
+            continue
         if (not informational_redundancy and not repeated_current_identity
                 and not noncritical_vision_cosmetic and not action_limitation):
             raise ObservationBindingError(str(row["reason"]),
@@ -1017,6 +1110,13 @@ def bind_observations(
                 else "unsupported noncritical cosmetic observation did not change the accepted electrical danger"
             ),
         })
+    if unbound and not effective and not scope_requests:
+        # PA-209 (t209): every observation was demoted, so there is nothing to
+        # analyse.  Fail here - after the bucket is complete - and name the same
+        # guard the fail-closed path named before, so the audit keeps reading
+        # "label_not_matched" rather than a generic binding error.
+        raise ObservationBindingError(str(unbound[0]["reason"]),
+                                      reason_code=str(unbound[0].get("reason_code") or "binding_invalid"))
     # Deduplicate by danger category, not source id: repeated text/ASR/VLM
     # mentions must not consume the six model observation slots. This does not
     # prove completeness for multiple objects sharing the same danger label.
@@ -1035,6 +1135,7 @@ def bind_observations(
         "effective_observations": effective,
         "informational_observations": [row for row in normalized if not row["effective"]],
         "ignored_observations": ignored,
+        "unbound_observations": unbound,
         "adjusted_observations": adjusted,
         "effective_key": key,
         "raw_model_output": output.model_dump(mode="json"),

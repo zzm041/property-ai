@@ -15,6 +15,7 @@ from sqlalchemy import MetaData, Table, inspect as sa_inspect, update
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.core.buildinfo import code_version
 from app.core.config import Settings, get_settings
 from app.core.database import (
     begin_owned_transaction,
@@ -400,6 +401,9 @@ class PersistenceMixin:
                     operation=operation,
                     biz_type="WORK_ORDER_ANALYSIS",
                     prompt_version=shared.WORK_ORDER_ANALYSIS_PROMPT_VERSION,
+                    # F-7 (t214): the quarantine probe only trusts a refusal from
+                    # the same build, so every row has to say which one wrote it.
+                    code_version=code_version(),
                     model_version=model_version,
                     status=status.value,
                     started_at=started_at,
@@ -445,6 +449,7 @@ class PersistenceMixin:
                 operation="payload_validation",
                 biz_type="WORK_ORDER_ANALYSIS",
                 prompt_version=shared.WORK_ORDER_ANALYSIS_PROMPT_VERSION,
+                code_version=code_version(),
                 model_version=model_version[:64],
                 status=AiCallStatus.INVALID.value,
                 started_at=now,

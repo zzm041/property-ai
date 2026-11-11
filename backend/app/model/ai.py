@@ -112,6 +112,11 @@ class AiCallLog(BigIntPrimaryKeyMixin, Base):
             name="provider_mode",
         ),
         Index("ix_ai_call_logs_work_order_id", "work_order_id", "id"),
+        # PA-201 (t201): request_id correlates the calls of one request and is
+        # deliberately NOT unique - one RAG answer writes embed + rerank +
+        # generate, one analysis writes ASR + VLM + LLM. Counting requests must
+        # go through count(distinct request_id) or scripts/ops/ai_call_reconcile.py,
+        # never through a unique index that would reject the normal fan-out.
         Index("ix_ai_call_logs_request_id", "request_id"),
         # PA-169 (t150): the quarantine probe follows the report content, so
         # it needs an index that does not start at work_order_id.
@@ -153,6 +158,16 @@ class AiCallLog(BigIntPrimaryKeyMixin, Base):
     # for calls that never saw report text.
     content_fingerprint: Mapped[str | None] = mapped_column(
         String(64), nullable=True
+    )
+    # F-7 (t214): *which code* produced this row. The quarantine probe compares
+    # it with the running build, so a refusal written by a broken build cannot
+    # silence the same text after the fix ships. Null on rows written before
+    # 20261112_0021, which therefore never quarantine anything.
+    code_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    # F-7 (t214): operator escape hatch. scripts/ops/ai_quarantine.py stamps this
+    # instead of deleting audit rows, and the probe ignores stamped rows.
+    quarantine_cleared_at: Mapped[datetime | None] = mapped_column(
+        UTCDateTime(), nullable=True
     )
     created_at: Mapped[datetime] = mapped_column(
         UTCDateTime(),

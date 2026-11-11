@@ -5,6 +5,7 @@ from typing import Any
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import TimeoutError as SQLAlchemyPoolTimeoutError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.errors import AppError, ErrorCode
@@ -21,6 +22,7 @@ def _error_response(
     code: str,
     message: str,
     details: dict[str, Any] | None = None,
+    headers: dict[str, str] | None = None,
 ) -> JSONResponse:
     request_id = request_id_for(request)
     content = ErrorEnvelope(
@@ -30,7 +32,7 @@ def _error_response(
     return JSONResponse(
         status_code=status_code,
         content=content,
-        headers={"X-Request-Id": request_id},
+        headers={"X-Request-Id": request_id, **(headers or {})},
     )
 
 
@@ -96,6 +98,28 @@ async def http_error_handler(
     )
 
 
+async def pool_timeout_handler(
+    request: Request, exc: SQLAlchemyPoolTimeoutError
+) -> JSONResponse:
+    # PA-199 (t199): `QueuePool limit ... connection timed out` used to reach the
+    # catch-all handler and answer 500, which reads as "the server is broken".
+    # A saturated connection pool is a retryable overload: say so, and let the
+    # client retry after a short delay.
+    logger.warning(
+        "database_pool_exhausted",
+        error_code=ErrorCode.OVERLOADED,
+        error_reason="DB_POOL_EXHAUSTED",
+    )
+    return _error_response(
+        request,
+        status_code=503,
+        code=ErrorCode.OVERLOADED,
+        message="Server is temporarily overloaded",
+        details={"reason": "DB_POOL_EXHAUSTED", "retry_after_seconds": 2},
+        headers={"Retry-After": "2"},
+    )
+
+
 async def unhandled_error_handler(request: Request, exc: Exception) -> JSONResponse:
     logger.error(
         "unhandled_exception",
@@ -120,5 +144,8 @@ def install_exception_handlers(app: FastAPI) -> None:
     )
     app.add_exception_handler(
         StarletteHTTPException, http_error_handler  # type: ignore[arg-type]
+    )
+    app.add_exception_handler(
+        SQLAlchemyPoolTimeoutError, pool_timeout_handler  # type: ignore[arg-type]
     )
     app.add_exception_handler(Exception, unhandled_error_handler)

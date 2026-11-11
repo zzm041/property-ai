@@ -19,6 +19,10 @@ milvus + 自托管 AI 运行时）。命令在 `D:\property-ai` 下执行；本�
 - ③ 的 `up` 会重写 `tmp\delivery-work-ai-runtime\config.json`（预算与 evidence 清单都在里面），手工改的键下次 `up` 就没了。
 - ④ 必须 `ready`：`degraded` 见 F3，`not_ready` 见 F4。⑤ 必须四容器同 digest、`app_copies` 单份、`shadow_source_tree=null`。
 - 演示前必须有 SUPERVISOR 用户（PA-196）：`/api/v1/supervisor/work-orders/{id}/analyze` 需要 `ai_analysis:review`，而该权限只挂在 SUPERVISOR / PROPERTY_ADMIN / TENANT_ADMIN 上。`python -m app.cli.dev_seed`（`APP_ENV=test`，`TEST_DATABASE_URL` 指向目标库）会幂等补一个 `__DEV_SUPERVISOR__`：手机 `+8613910000001`、密码 `SupervisorDemoPass1`，PROPERTY scope 落在 tenant 5 / property 5（该库没有这两行时退回 seed 自建的 tenant/property）。重复执行只校验不重复插入；`select count(*) from user_roles ur join roles r on r.id=ur.role_id where r.code='SUPERVISOR'` 应恒为 1。
+- 同一账号也是公告审核人（F-4 / t210）：`announcement:publish` 现在挂在 SUPERVISOR 上，迁移
+  `20261112_0020_supervisor_announcement_publish` 幂等补授权（可重复执行，已在的跳过）。判据：
+  `select count(*) from role_permissions rp join roles r on r.id=rp.role_id join permissions p on p.id=rp.permission_id where r.code='SUPERVISOR' and p.code='announcement:publish'` 必须为 1；
+  `scripts/ops/seed_e2e_personas.py` 也会在缺这条时补上并打印 `inserted`。所以「有 SUPERVISOR 账号」= 既能审工单、也能发布公告，不需要再单独准备 PROPERTY_ADMIN。
 
 ## 2. 健康检查怎么读
 

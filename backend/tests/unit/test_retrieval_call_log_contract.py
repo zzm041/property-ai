@@ -106,13 +106,15 @@ def kinds(rows):
     return [(row.provider_type, row.operation) for row in rows]
 
 
-def test_one_successful_retrieval_audits_embedding_and_rerank(context):
+def test_one_successful_retrieval_audits_every_provider_call(context):
     answer = context.query()
 
     assert answer.status == "answered"
+    # PA-200 / t200 added the generate row, so one answer leaves three rows.
     assert kinds(context.rows) == [
         (ProviderType.EMBEDDING.value, "embed"),
         (ProviderType.RERANK.value, "rerank"),
+        (ProviderType.LLM.value, "structured_completion"),
     ]
     for row in context.rows:
         assert row.status == AiCallStatus.SUCCESS.value
@@ -143,7 +145,7 @@ def test_unavailable_reranker_still_leaves_a_failed_row_and_the_fallback(context
     answer = context.query()
 
     assert answer.status == "answered"
-    assert kinds(context.rows) == [
+    assert kinds(context.rows)[:2] == [
         (ProviderType.EMBEDDING.value, "embed"),
         (ProviderType.RERANK.value, "rerank"),
     ]
@@ -175,7 +177,7 @@ def test_audit_write_failure_never_changes_the_answer(context, monkeypatch):
 def test_rerank_input_hash_identifies_evidence_without_storing_it(context):
     context.query()
 
-    embed_hash, rerank_hash = (row.input_hash for row in context.rows)
+    embed_hash, rerank_hash = (row.input_hash for row in context.rows[:2])
     assert embed_hash != rerank_hash
     assert "synthetic" not in rerank_hash
     assert "passage" not in rerank_hash

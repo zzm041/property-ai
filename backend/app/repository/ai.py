@@ -109,9 +109,70 @@ class AiRepository:
         return record
 
     def add_call_log(self, record: AiCallLog) -> AiCallLog:
+        """Insert one provider call row, at most once per call attempt.
+
+        t216: the analysis pipeline and the retrieval pipeline both write through
+        here, and a retried task can reach the same stage twice. The row is the
+        audit trail for one *event*, so the second write of the same event is
+        dropped and the first row is returned instead.
+
+        The event key is ``(request_id, provider_type, operation, status,
+        attempt)``. ``attempt`` belongs in the key: analyses retry with the same
+        request id, and attempt 2 failing the same way as attempt 1 is a second
+        event, not a duplicate write -- dropping it would make the ``attempt``
+        column fiction. Fan-out (EMBEDDING/RERANK/LLM under one request id) is
+        untouched because ``operation`` is part of the key.
+
+        PA-201 still holds: ``request_id`` stays a non-unique index, nothing is
+        deleted, and rows written before t216 keep their history.
+        """
+
+        existing = self._call_log_already_written(record)
+        if existing is not None:
+            return existing
         self._session.add(record)
         self._session.flush()
         return record
+
+    def _call_log_already_written(self, record: AiCallLog) -> AiCallLog | None:
+        """The row this write would duplicate, if it is already recorded."""
+
+        request_id = record.request_id
+        if not request_id:
+            # No request identity means no event identity: keep every row.
+            return None
+        key = (
+            request_id,
+            record.provider_type,
+            record.operation,
+            record.status,
+            int(record.attempt or 0),
+        )
+        for pending in self._session.new:
+            if not isinstance(pending, AiCallLog) or pending is record:
+                continue
+            if (
+                pending.request_id,
+                pending.provider_type,
+                pending.operation,
+                pending.status,
+                int(pending.attempt or 0),
+            ) == key:
+                # Same transaction, not flushed yet (retrieval runs with
+                # autoflush off), so the SELECT below cannot see it.
+                return pending
+        return self._session.scalar(
+            select(AiCallLog)
+            .where(
+                AiCallLog.request_id == request_id,
+                AiCallLog.provider_type == record.provider_type,
+                AiCallLog.operation == record.operation,
+                AiCallLog.status == record.status,
+                AiCallLog.attempt == int(record.attempt or 0),
+            )
+            .order_by(AiCallLog.id)
+            .limit(1)
+        )
 
     def quarantined_output_for_content(
         self,
@@ -121,6 +182,8 @@ class AiRepository:
         error_codes: Sequence[str],
         since: datetime,
         property_id: int | None = None,
+        code_version: str | None = None,
+        prompt_version: str | None = None,
     ) -> tuple[datetime, int | None] | None:
         """When did this report content last produce an unusable answer?
 
@@ -141,7 +204,19 @@ class AiRepository:
         if not tenant_id:
             raise ValueError("quarantine lookup requires a tenant")
 
-        scope = [AiCallLog.tenant_id == tenant_id]
+        scope = [
+            AiCallLog.tenant_id == tenant_id,
+            # F-7 (t214): a refusal only speaks for the build that produced it.
+            # Callers that cannot name a code version get no quarantine at all
+            # (an unversioned refusal is exactly what has to be re-asked).
+            AiCallLog.quarantine_cleared_at.is_(None),
+        ]
+        if code_version:
+            scope.append(AiCallLog.code_version == code_version)
+        else:  # pragma: no cover - defensive: every production caller passes one
+            scope.append(AiCallLog.code_version.is_(None))
+        if prompt_version:
+            scope.append(AiCallLog.prompt_version == prompt_version)
         if property_id is not None:
             scope.append(AiCallLog.property_id == property_id)
 

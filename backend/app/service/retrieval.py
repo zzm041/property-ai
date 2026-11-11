@@ -228,6 +228,7 @@ class RetrievalService:
         request_id: str,
         tenant_id: int | None,
         input_hash: str,
+        prompt_version: str | None = None,
     ) -> object:
         """Run one provider call and audit it, success or failure (F2 / t177).
 
@@ -243,13 +244,14 @@ class RetrievalService:
                 provider_type=provider_type, operation=operation, request_id=request_id,
                 tenant_id=tenant_id, input_hash=input_hash, started_at=started_at,
                 phase=trace.phases[-1], status=_status_for_error(exc),
-                error_code=exc.error_code,
+                error_code=exc.error_code, prompt_version=prompt_version,
             )
             raise
         self._record_call(
             provider_type=provider_type, operation=operation, request_id=request_id,
             tenant_id=tenant_id, input_hash=input_hash, started_at=started_at,
             phase=trace.phases[-1], status=AiCallStatus.SUCCESS, error_code=None,
+            prompt_version=prompt_version,
         )
         return result
 
@@ -265,12 +267,13 @@ class RetrievalService:
         phase: dict[str, object],
         status: AiCallStatus,
         error_code: str | None,
+        prompt_version: str | None = None,
     ) -> None:
         latency_ms = int(max(0.0, float(phase.get("latency_ms") or 0.0)))
         model_version = str(phase.get("model_version") or "unknown")[:64]
         try:
-            with begin_owned_transaction(self._session):
-                record = self._ai.add_call_log(
+            with self._audit_session() as (audit_session, audit_repository):
+                record = audit_repository.add_call_log(
                     AiCallLog(
                         tenant_id=tenant_id,
                         property_id=None,
@@ -279,7 +282,7 @@ class RetrievalService:
                         provider_type=provider_type.value,
                         operation=operation,
                         biz_type=KNOWLEDGE_CALL_LOG_BIZ_TYPE,
-                        prompt_version=None,
+                        prompt_version=prompt_version,
                         model_version=model_version,
                         status=status.value,
                         started_at=started_at,
@@ -291,17 +294,20 @@ class RetrievalService:
                         input_hash=input_hash,
                     )
                 )
-                self._record_provider_mode(record.id, provider_type)
-        except Exception:  # audit must never replace the business result
+                self._record_provider_mode(audit_session, record.id, provider_type)
+        except Exception as exc:  # audit must never replace the business result
             _diagnostic(
                 "warning", "knowledge_call_log_failed", request_id=request_id,
                 provider_type=provider_type.value, operation=operation,
+                error=f"{type(exc).__name__}: {exc}"[:512],
             )
 
-    def _record_provider_mode(self, call_log_id: int, provider_type: ProviderType) -> None:
+    def _record_provider_mode(
+        self, session: Session, call_log_id: int, provider_type: ProviderType
+    ) -> None:
         """Fill the 0009 provenance column when the shared schema has it."""
 
-        bind = self._session.get_bind()
+        bind = session.get_bind()
         if bind is None:
             return
         columns = {column["name"] for column in sa_inspect(bind).get_columns("ai_call_logs")}
@@ -310,12 +316,65 @@ class RetrievalService:
         configured = {
             ProviderType.EMBEDDING: self._settings.embedding_provider,
             ProviderType.RERANK: self._settings.reranker_provider,
+            # `inherit` means the answer used the work-order LLM provider.
+            ProviderType.LLM: (
+                self._settings.llm_provider
+                if str(self._settings.rag_llm_provider) == "inherit"
+                else self._settings.rag_llm_provider
+            ),
         }[provider_type]
         table = Table("ai_call_logs", MetaData(), autoload_with=bind)
-        self._session.execute(
+        session.execute(
             update(table)
             .where(table.c.id == call_log_id)
             .values(provider_mode=str(configured).upper())
+        )
+
+    @contextmanager
+    def _audit_session(self) -> Iterator[tuple[Session, AiRepository]]:
+        """Yield a session that owns the audit transaction (PA-200 / t200).
+
+        The request session is normally idle here, so the audit row joins the
+        request's own transaction. When a read phase left one open, a sibling
+        session on the same bind writes the row instead: `begin_owned_transaction`
+        refuses an open transaction (the t186 `TransactionContractError`), and
+        writing inside the caller's transaction would let a later rollback erase
+        the audit trail.
+        """
+
+        session = self._session
+        if not session.in_transaction():
+            with begin_owned_transaction(session):
+                yield session, self._ai
+            return
+        owned = Session(bind=session.get_bind(), autoflush=False, expire_on_commit=False)
+        try:
+            with begin_owned_transaction(owned):
+                yield owned, AiRepository(owned)
+        finally:
+            owned.close()
+
+    def _record_invalid_generation(
+        self,
+        *,
+        trace: _QueryTrace,
+        request_id: str,
+        tenant_id: int | None,
+        prompt: str,
+    ) -> None:
+        """Audit a generate whose payload failed the answer contract."""
+
+        self._record_call(
+            provider_type=ProviderType.LLM,
+            operation="payload_validation",
+            request_id=request_id,
+            tenant_id=tenant_id,
+            input_hash=self._audit_hash(prompt),
+            started_at=utc_now(),
+            phase=trace.phases[-1],
+            status=AiCallStatus.INVALID,
+            error_code="AI.INVALID_OUTPUT",
+            prompt_version=self._settings.rag_answer_prompt_version,
         )
 
     def _query(
@@ -438,8 +497,20 @@ class RetrievalService:
             question, selected, prompt_version=self._settings.rag_answer_prompt_version
         )
         try:
-            raw = trace.call("generate", llm, llm.structured_completion,
-                prompt=prompt,
+            raw = self._audited_call(
+                trace=trace,
+                stage="generate",
+                provider=llm,
+                method=llm.structured_completion,
+                kwargs={
+                    "prompt": prompt,
+                    "prompt_version": self._settings.rag_answer_prompt_version,
+                },
+                provider_type=ProviderType.LLM,
+                operation="structured_completion",
+                request_id=request_id,
+                tenant_id=initial_acl.tenant_id,
+                input_hash=self._audit_hash(prompt),
                 prompt_version=self._settings.rag_answer_prompt_version,
             )
             parsed = RagAnswerOutput.model_validate(raw)
@@ -449,6 +520,10 @@ class RetrievalService:
         except ValueError:
             trace.reason = "invalid_generation"
             trace.phases[-1].update(status="invalid_output", error_code="AI.INVALID_OUTPUT")
+            self._record_invalid_generation(
+                trace=trace, request_id=request_id,
+                tenant_id=initial_acl.tenant_id, prompt=prompt,
+            )
             return AssistantAnswer(
                 status=KNOWLEDGE_UNAVAILABLE,
                 answer="知识助手暂时不可用",
@@ -458,6 +533,11 @@ class RetrievalService:
             parsed.status == RagAnswerStatus.ANSWERED.value and not parsed.answer.strip()
         ):
             trace.reason = "invalid_generation"
+            trace.phases[-1].update(status="invalid_output", error_code="AI.INVALID_OUTPUT")
+            self._record_invalid_generation(
+                trace=trace, request_id=request_id,
+                tenant_id=initial_acl.tenant_id, prompt=prompt,
+            )
             return AssistantAnswer(status=KNOWLEDGE_UNAVAILABLE,answer="知识助手暂时不可用",citations=())
         if parsed.status == INSUFFICIENT_KNOWLEDGE:
             trace.reason = "model_insufficient_evidence"

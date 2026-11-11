@@ -676,7 +676,16 @@ def test_direct_current_ownership_writers_guard_before_dependent_locks() -> None
     work_orders = (REPO_ROOT / "backend/app/service/work_order/lifecycle.py").read_text(encoding="utf-8")
     create = work_orders[work_orders.index("    def _create_work_order("):]
     create = create[:create.index("\n    def ", 10)]
-    assert create.index("lock_active_identity") < create.index("_reload_actor")
+    # PA-199 (t199): the guard still has to precede every dependent row lock and
+    # the insert, but it no longer has to precede the read phase. Taking
+    # `users(id) for update` across those reads serialised every report by the
+    # same resident and broke a 20-way burst (HTTP 500 at the 5 s driver read
+    # timeout). Lock ORDER is the invariant; read position is not.
+    guard_at = create.index("lock_active_identity")
+    assert "with_for_update" not in create[:guard_at]
+    assert "for_update" not in create[:guard_at]
+    assert create.index("find_duplicate_content") < guard_at
+    assert guard_at < create.index("add_work_order")
 
     employee_identity = (REPO_ROOT / "backend/app/service/employee_identity.py").read_text(encoding="utf-8")
     claim = employee_identity[employee_identity.index("    def claim("):]

@@ -28,10 +28,13 @@ def test_system_admin_has_no_task_7_business_permissions() -> None:
     assert codes.isdisjoint(forbidden)
 
 
-def test_supervisor_can_draft_but_not_publish() -> None:
+def test_supervisor_can_draft_and_publish() -> None:
+    # F-4 / t210: the supervisor is the person who reviews the draft on site, so
+    # announcement:publish moved onto SUPERVISOR. Keeping it off meant every
+    # announcement stayed in PENDING_REVIEW for properties without a PROPERTY_ADMIN.
     codes = set(SEED_ROLE_PERMISSIONS["SUPERVISOR"])
     assert ANNOUNCEMENT_DRAFT in codes
-    assert ANNOUNCEMENT_PUBLISH not in codes
+    assert ANNOUNCEMENT_PUBLISH in codes
     assert INCIDENT_MANAGE in codes
 
 

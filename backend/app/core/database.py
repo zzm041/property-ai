@@ -184,6 +184,7 @@ def create_database_engine(
     pool_size: int | None = None,
     max_overflow: int | None = None,
     pool_recycle: int | None = None,
+    read_timeout: int | None = None,
 ) -> Engine:
     """Create one sync PyMySQL engine whose every connection is explicitly UTC."""
 
@@ -197,8 +198,8 @@ def create_database_engine(
         max_overflow=max_overflow if max_overflow is not None else 10,
         connect_args={
             "connect_timeout": connect_timeout,
-            "read_timeout": connect_timeout,
-            "write_timeout": connect_timeout,
+            "read_timeout": read_timeout if read_timeout is not None else connect_timeout,
+            "write_timeout": read_timeout if read_timeout is not None else connect_timeout,
         },
     )
     event.listen(engine, "connect", _set_utc_session)
@@ -218,6 +219,7 @@ def get_engine(database_url: str, connect_timeout: int = 5) -> Engine:
         pool_size=settings.db_pool_size,
         max_overflow=settings.db_max_overflow,
         pool_recycle=settings.db_pool_recycle_seconds,
+        read_timeout=settings.db_read_timeout_seconds,
     )
 
 
