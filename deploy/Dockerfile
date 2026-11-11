@@ -25,8 +25,11 @@ COPY backend/ /app/
 RUN pip install --no-cache-dir --requirement /requirements.delivery.lock \
     && pip install --no-cache-dir --no-deps . \
     && rm -rf /app/app
-# Fail the build if a second importable copy ever comes back.
-RUN python -c "import pathlib, app.domain.observed_event as m; p = pathlib.Path(m.__file__).resolve(); print(p); assert '/app/app/' not in str(p), p; assert not pathlib.Path('/app/app').exists()"
+# Fail the build if a second importable copy ever comes back. The probe is the
+# package itself, the same probe buildinfo._app_copies() uses: the old probe named
+# app.domain.observed_event, which S8 deleted, so it would have failed the next
+# image build with an ImportError that says nothing about layering.
+RUN python -c "import pathlib, sys, app as m; here = pathlib.Path(m.__file__).resolve(); print(here); copies = sorted({str((pathlib.Path(e) if e else pathlib.Path.cwd()) / 'app') for e in sys.path if ((pathlib.Path(e) if e else pathlib.Path.cwd()) / 'app' / '__init__.py').is_file()}); print(copies); assert copies == [str(here.parent)], copies; assert not pathlib.Path('/app/app').exists()"
 
 USER appuser
 

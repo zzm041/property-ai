@@ -50,28 +50,38 @@ ALLOWED_DOMAIN_EDGES: dict[str, set[str]] = {
     "dev": {"identity", "work_order", "ai", "knowledge", "governance"},
 }
 
-# Future package for every module that is still flat today (S1..S4 target).
-# Once a package exists, `app.domain.<pkg>.<module>` resolves directly and this
-# table only keeps mapping the leftover re-export shims.
-FLAT_MODULE_PACKAGE: dict[str, str] = {
+# PA-173: two different facts were mixed into one table, and a reviewer could
+# not tell which entries still exist. Split them:
+#   * DELETED_FLAT_MODULE_PACKAGE - the flat module is gone; its content now
+#     lives in the named package (S1..S4 moved it, S8 deleted the compat file).
+#   * PACKAGE_OWNED_NAMES - the old flat name IS the package name
+#     (`app.domain.ai` is a package today, not a deleted file); the mapping is
+#     the identity and exists only so `app.domain.<name>` keeps resolving.
+DELETED_FLAT_MODULE_PACKAGE: dict[str, str] = {
     "iam": "identity",
     "phone": "identity",
     "resident": "identity",
     "property": "identity",
-    "work_order": "work_order",
     "work_order_visibility": "work_order",
     "receipt_handling": "work_order",
     "diagnosis": "work_order",
     "vision": "work_order",
     "employee": "work_order",  # assignment/attendance policy; plan table §2 omitted it
-    "ai": "ai",
     "observed_event": "ai",
-    "knowledge": "knowledge",
     "audit": "governance",
     "incident": "governance",
     "announcement": "governance",
     "operations": "governance",
     "dev_seed": "dev",
+}
+
+# Names whose package has the same name as the old flat module. Nothing was
+# deleted for these: `app.domain.ai` etc. are packages that must keep resolving.
+PACKAGE_OWNED_NAMES: frozenset[str] = frozenset({"ai", "knowledge", "work_order"})
+
+FLAT_MODULE_PACKAGE: dict[str, str] = {
+    **DELETED_FLAT_MODULE_PACKAGE,
+    **{name: name for name in sorted(PACKAGE_OWNED_NAMES)},
 }
 
 # Legacy module -> package that now owns it. S1..S4 used this to require a thin

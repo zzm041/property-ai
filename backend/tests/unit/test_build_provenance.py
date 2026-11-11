@@ -9,6 +9,7 @@ from app.core import buildinfo
 from app.domain import ai as ai_domain
 from app.domain.ai import models as ai_models_domain
 from app.domain.ai import rules as ai_rules_domain
+from app.domain.work_order import VISION_ANALYSIS_PROMPT_VERSION
 
 
 def _digest(path: Path) -> str:
@@ -30,6 +31,11 @@ def test_prompt_versions_come_from_the_contract_modules() -> None:
     versions = info["prompt_versions"]
     assert isinstance(versions, dict)
     assert versions["work_order"] == ai_domain.WORK_ORDER_ANALYSIS_PROMPT_VERSION
+    # PA-172: build_info() reads the vision contract inside try/except, so a
+    # broken import there degrades to "unknown" and nothing notices. Assert the
+    # real value: the delivery image advertises this to /healthz and the worker.
+    assert versions["vision"] == VISION_ANALYSIS_PROMPT_VERSION
+    assert versions["vision"] != buildinfo.UNKNOWN
 
 
 def test_app_copies_lists_every_importable_app_package() -> None:
