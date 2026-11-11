@@ -189,6 +189,17 @@ SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
 )
 
 
+# PA-196: 超级管理员角色（SUPERVISOR, role_id=3）之前只有角色与权限、没有任何用户持有它，
+# 所以 /api/v1/supervisor/work-orders/{id}/analyze 对所有人返回 IAM.FORBIDDEN。演示号码用 139 段，
+# 密码走与其他入口相同的 argon2id 流程（app.core.passwords.hash_password）。
+DEV_SUPERVISOR_PHONE = "+8613910000001"
+DEV_SUPERVISOR_PASSWORD = "SupervisorDemoPass1"
+# The demo tenant/property that owns the work orders a reviewer actually looks at.
+# When a database has these rows the supervisor grant lands there; otherwise the
+# seed falls back to the tenant/property it creates itself.
+DEV_SUPERVISOR_TENANT_ID = 5
+DEV_SUPERVISOR_PROPERTY_ID = 5
+
 SEED_USERS = (
     SeedUserDefinition(
         "__DEV_SYSTEM_ADMIN__",
@@ -214,5 +225,14 @@ SEED_USERS = (
         "__DEV_STAFF__",
         "STAFF",
         ScopeType.PROPERTY,
+    ),
+    SeedUserDefinition(
+        "__DEV_SUPERVISOR__",
+        "SUPERVISOR",
+        ScopeType.PROPERTY,
+        phone_e164=DEV_SUPERVISOR_PHONE,
+        password=DEV_SUPERVISOR_PASSWORD,
+        scope_tenant_id=DEV_SUPERVISOR_TENANT_ID,
+        scope_property_id=DEV_SUPERVISOR_PROPERTY_ID,
     ),
 )

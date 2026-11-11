@@ -18,6 +18,7 @@ milvus + 自托管 AI 运行时）。命令在 `D:\property-ai` 下执行；本�
 - ② 之后才有 `/healthz`；mysql/redis 未起时 api 会反复重启，先 `docker ps` 再排。
 - ③ 的 `up` 会重写 `tmp\delivery-work-ai-runtime\config.json`（预算与 evidence 清单都在里面），手工改的键下次 `up` 就没了。
 - ④ 必须 `ready`：`degraded` 见 F3，`not_ready` 见 F4。⑤ 必须四容器同 digest、`app_copies` 单份、`shadow_source_tree=null`。
+- 演示前必须有 SUPERVISOR 用户（PA-196）：`/api/v1/supervisor/work-orders/{id}/analyze` 需要 `ai_analysis:review`，而该权限只挂在 SUPERVISOR / PROPERTY_ADMIN / TENANT_ADMIN 上。`python -m app.cli.dev_seed`（`APP_ENV=test`，`TEST_DATABASE_URL` 指向目标库）会幂等补一个 `__DEV_SUPERVISOR__`：手机 `+8613910000001`、密码 `SupervisorDemoPass1`，PROPERTY scope 落在 tenant 5 / property 5（该库没有这两行时退回 seed 自建的 tenant/property）。重复执行只校验不重复插入；`select count(*) from user_roles ur join roles r on r.id=ur.role_id where r.code='SUPERVISOR'` 应恒为 1。
 
 ## 2. 健康检查怎么读
 

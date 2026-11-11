@@ -5,7 +5,15 @@ from dataclasses import dataclass
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.model.identity import Permission, Role, RolePermission, User, UserRole
+from app.model.identity import (
+    Permission,
+    Role,
+    RolePermission,
+    User,
+    UserPassword,
+    UserPhone,
+    UserRole,
+)
 from app.model.property import Property, Tenant
 
 _BINARY_COLLATION = "utf8mb4_bin"
@@ -127,6 +135,12 @@ class DevSeedRepository:
             for row in self._session.execute(statement)
         )
 
+    def get_tenant(self, tenant_id: int) -> Tenant | None:
+        return self._session.get(Tenant, tenant_id)
+
+    def get_property(self, property_id: int) -> Property | None:
+        return self._session.get(Property, property_id)
+
     def add_tenant(self, tenant: Tenant) -> Tenant:
         self._session.add(tenant)
         self._session.flush()
@@ -151,3 +165,46 @@ class DevSeedRepository:
         self._session.add(user)
         self._session.flush()
         return user
+
+    # PA-196: exact lookups for the demo login the seed maintains, so a second run
+    # verifies instead of inserting.
+
+    def get_active_phone(self, user_id: int) -> UserPhone | None:
+        return self._session.scalars(
+            select(UserPhone)
+            .where(
+                UserPhone.user_id == user_id,
+                UserPhone.status == "ACTIVE",
+            )
+            .order_by(UserPhone.id)
+            .limit(1)
+        ).first()
+
+    def find_phone_owner(self, phone_e164: str) -> UserPhone | None:
+        return self._session.scalars(
+            select(UserPhone)
+            .where(
+                UserPhone.phone_e164.collate(_BINARY_COLLATION) == phone_e164,
+                UserPhone.status == "ACTIVE",
+            )
+            .order_by(UserPhone.id)
+            .limit(1)
+        ).first()
+
+    def get_password(self, user_id: int) -> UserPassword | None:
+        return self._session.scalars(
+            select(UserPassword)
+            .where(UserPassword.user_id == user_id)
+            .order_by(UserPassword.id)
+            .limit(1)
+        ).first()
+
+    def add_phone(self, phone: UserPhone) -> UserPhone:
+        self._session.add(phone)
+        self._session.flush()
+        return phone
+
+    def add_password(self, password: UserPassword) -> UserPassword:
+        self._session.add(password)
+        self._session.flush()
+        return password
