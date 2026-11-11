@@ -101,6 +101,28 @@ SHIMMED_MODULES: dict[str, str] = {
 
 SHIM_MAX_EFFECTIVE_LINES = 8
 
+# Legacy service modules that S5 replaced with an alias module. The alias must
+# stay a pure indirection: `import sys` plus `sys.modules[__name__] = _module`,
+# so `__file__`, `inspect.getsource` and monkeypatching all keep resolving to
+# the single implementation inside `app.service.identity`.
+SHIMMED_SERVICE_MODULES: dict[str, str] = {
+    f"app.service.{name}": name
+    for name in (
+        "auth",
+        "rbac",
+        "rbac_mutation",
+        "credential_auth",
+        "wechat_auth",
+        "identity_recovery",
+        "identity_write_guard",
+        "organization",
+        "resident",
+        "property",
+        "property_admin",
+    )
+}
+
+
 # What may live directly under backend/app/domain/. Everything else must be
 # inside one of the packages listed in ALLOWED_DOMAIN_EDGES: a flat module that
 # nobody maps is either a forgotten move or a new dependency shortcut, and both
@@ -222,6 +244,24 @@ def domain_tree_problems(domain_root: pathlib.Path | None = None) -> list[str]:
     return problems
 
 
+def _shim_problems(legacy: str, source: str, *, expected: str, what: str) -> list[str]:
+    problems: list[str] = []
+    effective = [
+        line
+        for line in source.splitlines()
+        if line.strip() and not line.strip().startswith("#")
+    ]
+    if len(effective) > SHIM_MAX_EFFECTIVE_LINES:
+        problems.append(
+            f"{legacy}: {len(effective)} effective lines > {SHIM_MAX_EFFECTIVE_LINES}, "
+            f"it still carries logic instead of re-exporting {what}"
+        )
+        return problems
+    if expected not in source:
+        problems.append(f"{legacy}: does not re-export {what}")
+    return problems
+
+
 def check_shims() -> list[str]:
     problems: list[str] = []
     for legacy, package in sorted(SHIMMED_MODULES.items()):
@@ -230,19 +270,18 @@ def check_shims() -> list[str]:
             problems.append(f"{legacy}: legacy module is missing (expected a re-export shim)")
             continue
         source = path.read_text(encoding="utf-8", errors="replace")
-        effective = [
-            line
-            for line in source.splitlines()
-            if line.strip() and not line.strip().startswith("#")
-        ]
-        if len(effective) > SHIM_MAX_EFFECTIVE_LINES:
-            problems.append(
-                f"{legacy}: {len(effective)} effective lines > {SHIM_MAX_EFFECTIVE_LINES}, "
-                f"it still carries logic instead of re-exporting {package}"
-            )
+        problems += _shim_problems(
+            legacy, source, expected=f"app.domain.{package}", what=f"app.domain.{package}"
+        )
+    for legacy in sorted(SHIMMED_SERVICE_MODULES):
+        path = REPO_ROOT / "backend" / f"{legacy.replace('.', '/')}.py"
+        if not path.exists():
+            problems.append(f"{legacy}: legacy module is missing (expected an alias module)")
             continue
-        if f"app.domain.{package}" not in source:
-            problems.append(f"{legacy}: does not re-export app.domain.{package}")
+        source = path.read_text(encoding="utf-8", errors="replace")
+        problems += _shim_problems(
+            legacy, source, expected="sys.modules[__name__] = _module", what="the package module"
+        )
     return problems
 
 
@@ -318,7 +357,8 @@ def report() -> None:
         print(f"{source:14s} -> {dest:14s} {allowed}")
     unmapped = [p.split(":", 1)[0] for p in domain_tree_problems()]
     print(f"# unmapped or undeclared domain entries: {unmapped or 'none'}")
-    print(f"# shims declared: {len(SHIMMED_MODULES)}")
+    print(f"# shims declared: {len(SHIMMED_MODULES)} domain, "
+          f"{len(SHIMMED_SERVICE_MODULES)} service")
 
 
 def main(argv: list[str] | None = None) -> int:

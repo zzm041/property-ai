@@ -114,7 +114,7 @@ def test_the_same_report_within_ten_minutes_returns_the_existing_order(monkeypat
     existing = NS(id=39, version=2)
     service, captured = _service(duplicate=existing)
     monkeypatch.setattr(
-        "app.service.identity_write_guard.lock_active_identity", lambda *a, **kw: None
+        "app.service.identity.identity_write_guard.lock_active_identity", lambda *a, **kw: None
     )
     monkeypatch.setattr(
         "app.service.work_order.RbacService.require_permission", lambda *a, **kw: None
@@ -136,7 +136,7 @@ def test_the_same_report_within_ten_minutes_returns_the_existing_order(monkeypat
 def test_a_new_report_stores_its_fingerprint_for_the_next_attempt(monkeypatch):
     service, captured = _service(duplicate=None)
     monkeypatch.setattr(
-        "app.service.identity_write_guard.lock_active_identity", lambda *a, **kw: None
+        "app.service.identity.identity_write_guard.lock_active_identity", lambda *a, **kw: None
     )
     monkeypatch.setattr(
         "app.service.work_order.RbacService.require_permission", lambda *a, **kw: None
@@ -152,7 +152,7 @@ def test_a_new_report_stores_its_fingerprint_for_the_next_attempt(monkeypatch):
 def test_the_fingerprint_covers_attached_media_by_content(monkeypatch):
     service, captured = _service(duplicate=None)
     monkeypatch.setattr(
-        "app.service.identity_write_guard.lock_active_identity", lambda *a, **kw: None
+        "app.service.identity.identity_write_guard.lock_active_identity", lambda *a, **kw: None
     )
     monkeypatch.setattr(
         "app.service.work_order.RbacService.require_permission", lambda *a, **kw: None
@@ -189,7 +189,7 @@ def test_the_window_constant_is_ten_minutes():
 # --------------------------------------------- t154: the two-tier design
 def test_punctuation_does_not_hide_a_repeat(monkeypatch):
     monkeypatch.setattr(
-        "app.service.identity_write_guard.lock_active_identity", lambda *a, **kw: None
+        "app.service.identity.identity_write_guard.lock_active_identity", lambda *a, **kw: None
     )
     monkeypatch.setattr(
         "app.service.work_order.RbacService.require_permission", lambda *a, **kw: None

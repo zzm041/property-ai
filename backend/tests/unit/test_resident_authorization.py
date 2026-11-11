@@ -28,7 +28,7 @@ def test_create_schema_forbids_client_user_id() -> None:
 
 
 def test_review_authorization_is_permission_and_ownership_based() -> None:
-    service = (BACKEND_ROOT / "app" / "service" / "resident.py").read_text(
+    service = (BACKEND_ROOT / "app" / "service" / "identity" / "resident.py").read_text(
         encoding="utf-8"
     )
     repository = (BACKEND_ROOT / "app" / "repository" / "resident.py").read_text(

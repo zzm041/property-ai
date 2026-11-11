@@ -23,7 +23,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 def _service(monkeypatch: pytest.MonkeyPatch) -> CredentialAuthService:
     monkeypatch.setattr(
-        "app.service.credential_auth.run_owned_transaction",
+        "app.service.identity.credential_auth.run_owned_transaction",
         lambda _session, operation: operation(),
     )
     service = CredentialAuthService.__new__(CredentialAuthService)

@@ -87,7 +87,7 @@ def test_public_error_messages_do_not_expose_identity_schema_or_internal_ids() -
     sources = "\n".join(
         (ROOT / path).read_text(encoding="utf-8")
         for path in (
-            "backend/app/service/identity_recovery.py",
+            "backend/app/service/identity/identity_recovery.py",
             "backend/app/api/v1/admin_employee.py",
         )
     )

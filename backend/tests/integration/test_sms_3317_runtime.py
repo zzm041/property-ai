@@ -169,7 +169,7 @@ def test_late_first_send_cannot_activate_or_cancel_second_on_3317(monkeypatch):
 
     provider = DelayedProvider()
     monkeypatch.setattr(
-        "app.service.credential_auth.build_sms_provider", lambda settings: provider
+        "app.service.identity.credential_auth.build_sms_provider", lambda settings: provider
     )
     with TestClient(create_app(_settings())) as client:
         phone = auth_scenario._phone()

@@ -36,10 +36,10 @@ def _service(monkeypatch: pytest.MonkeyPatch, candidates: list[object]):
         return operation()
 
     monkeypatch.setattr(
-        "app.service.wechat_auth.run_owned_transaction", run_transaction
+        "app.service.identity.wechat_auth.run_owned_transaction", run_transaction
     )
     monkeypatch.setattr(
-        "app.service.wechat_auth.build_wechat_auth_provider",
+        "app.service.identity.wechat_auth.build_wechat_auth_provider",
         lambda _settings: SimpleNamespace(
             exchange_code=lambda _code: WeChatSession(
                 appid="wx-dev-app",
@@ -53,7 +53,7 @@ def _service(monkeypatch: pytest.MonkeyPatch, candidates: list[object]):
         SimpleNamespace(phone_e164="+8613800002001")
     )
     monkeypatch.setattr(
-        "app.service.wechat_auth.CredentialRepository",
+        "app.service.identity.wechat_auth.CredentialRepository",
         lambda _session: credential_repository,
     )
     issued = SimpleNamespace(session_id=902)
@@ -68,7 +68,7 @@ def _service(monkeypatch: pytest.MonkeyPatch, candidates: list[object]):
         _issue_session=MagicMock(return_value=issued),
     )
     monkeypatch.setattr(
-        "app.service.wechat_auth.CredentialAuthService",
+        "app.service.identity.wechat_auth.CredentialAuthService",
         lambda *_args, **_kwargs: credential,
     )
     repository = MagicMock()

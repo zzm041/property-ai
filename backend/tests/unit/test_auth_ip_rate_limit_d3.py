@@ -207,7 +207,7 @@ def test_service_enforces_both_dimensions_through_one_guard() -> None:
 
 
 def test_service_builds_the_guard_with_ip_budget_from_settings() -> None:
-    source = (BACKEND / "app" / "service" / "credential_auth.py").read_text(
+    source = (BACKEND / "app" / "service" / "identity" / "credential_auth.py").read_text(
         encoding="utf-8"
     )
     assert "AuthRateLimitGuard(" in source

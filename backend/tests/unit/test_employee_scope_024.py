@@ -17,7 +17,7 @@ def setup(monkeypatch):
     monkeypatch.setattr(mod, 'require_owned_transaction', MagicMock())
     monkeypatch.setattr(mod, 'utc_now', lambda: NOW)
     monkeypatch.setattr(mod, 'RbacMutationRepository', lambda _: repo)
-    monkeypatch.setattr('app.service.rbac_mutation.RbacMutationService', lambda _: mutation)
+    monkeypatch.setattr('app.service.identity.rbac_mutation.RbacMutationService', lambda _: mutation)
     repo.get_role_by_code.return_value = NS(id=7)
     repo.find_user_role_for_update.return_value = None
     employee = NS(id=3, tenant_id=2, user_id=19, status='ACTIVE')
