@@ -166,6 +166,42 @@ def run_script_import_check(verbose: bool) -> int:
     return 0
 
 
+def run_ps1_encoding_check(verbose: bool) -> int:
+    """t186: a BOM-less PowerShell script silently loses the line after a Chinese comment.
+
+    Windows PowerShell 5.1 reads such a file as ANSI, where the trailing bytes of
+    '。' pair with the following newline; `deploy/work-ai-runtime.ps1` lost an
+    assignment that way and the launcher failed with an empty LiteralPath. The
+    tree-level check is cheap and catches the pattern before a launcher does.
+    """
+    script = REPO_ROOT / "scripts" / "ops" / "check_ps1_encoding.py"
+    if not script.is_file():
+        sys.stderr.write(f"unit_gate: ps1 encoding check missing: {script}\n")
+        return 2
+    completed = subprocess.run(
+        [sys.executable, str(script)],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    if verbose:
+        sys.stdout.write(completed.stdout or "")
+        sys.stderr.write(completed.stderr or "")
+    if completed.returncode != 0:
+        sys.stderr.write(completed.stdout or "")
+        sys.stderr.write(completed.stderr or "")
+        sys.stderr.write(
+            "unit_gate: FAILED - a PowerShell script holds non-ASCII text without a UTF-8 BOM "
+            f"(check_ps1_encoding exit {completed.returncode}); re-save it with a BOM "
+            "(`python scripts/ops/check_ps1_encoding.py --fix`).\n"
+        )
+        return 1
+    last = (completed.stdout or "").strip().splitlines()
+    print(f"unit_gate: {last[-1] if last else 'ps1 encoding OK'}")
+    return 0
+
+
 def write_summary(path: str, *, counts: dict[str, int], red: set[str], known: set[str], verdict: str) -> None:
     """Append the run to a markdown summary file (CI job summary).
 
@@ -208,6 +244,11 @@ def main(argv: list[str] | None = None) -> int:
         help="skip the scripts/ import check (S7-3); only for a tree that is mid-edit",
     )
     parser.add_argument(
+        "--skip-ps1-encoding",
+        action="store_true",
+        help="skip the PowerShell BOM check (t186); only for a tree that is mid-edit",
+    )
+    parser.add_argument(
         "--summary-file",
         default=None,
         help=(
@@ -235,6 +276,13 @@ def main(argv: list[str] | None = None) -> int:
         # t183: stay quiet no longer. A log that never mentions the check is
         # indistinguishable from one where it passed silently.
         print("unit_gate: SKIPPED script-import check (--skip-script-imports)")
+
+    if not args.skip_ps1_encoding:
+        ps1_status = run_ps1_encoding_check(args.verbose)
+        if ps1_status != 0:
+            return ps1_status
+    else:
+        print("unit_gate: SKIPPED ps1 encoding check (--skip-ps1-encoding)")
 
     require_environment()
     exit_code, output = run_pytest(args.target, args.pytest_arg, args.verbose)

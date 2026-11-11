@@ -1,4 +1,4 @@
-param(
+﻿param(
     [Parameter(Position = 0, Mandatory = $true)]
     [ValidateSet("start", "stop", "status", "verify-artifact")]
     [string]$Action,
