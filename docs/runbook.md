@@ -186,6 +186,42 @@ schema：0009/0011 只认 AUTH001、delivery 精确目标或 `CustomerInstallAut
   （`threading.BrokenBarrierError`，并发用例自身不稳）。
 逐条证据见 `D:\AI\review\evidence\t171-pa118-test-schema.md` §4/§5。
 
+### 5.2 证据归档 ≠ 放宽限额（PA-179）
+
+适配器的账本只有一把尺子：`calls/call-*/reservation.json` 里 `budget_counted` 的记录累加后
+不得超过 `limits`，够不到就 `BUDGET_REJECTED`。问题在于**评审要的正是这些 call 目录**，于是
+「把证据放回去」和「把预算用光」变成同一个动作——恢复证据直接打爆窗口，而失败对外只表现为
+`AI.UNAVAILABLE`，看起来像模型坏了。
+
+拆账做在**声明**层，不做在限额层：
+
+- `tmp/delivery-work-ai-runtime/evidence-records.txt`（每行一个 `call-NNN`）是权威声明，
+  `deploy/work-ai-runtime.ps1` 每次 `start` 都把它编译进 `config.json` 的 `evidence_records`；
+  直接改 `config.json` 会在下次启动被覆盖。
+- 被声明的 call 仍留在 `calls/` 里（启动闸与评审照旧要读它），只是从 `counted` 移到
+  `evidence_excluded`：`/healthz` 的 `budget` 块同时给 `counted` / `evidence_excluded` /
+  `evidence_records` 三个字段。
+- `limits` 与 `call_baseline` 一个字节都不动。归档不是「多给几次调用」，而是「别把已评审的
+  调用再算一次」。
+
+```powershell
+# 把一次已评审的调用标成 evidence-only，并立刻重启适配器让声明生效
+deploy\ai-runtime.ps1 evidence-archive -Call call-001 -Reason "t165 review evidence"
+
+# 只查账、不写盘
+python scripts/ops/ai_evidence_archive.py --call call-001 --reason "dry run" --dry-run
+python scripts/ops/ai_evidence_archive.py --list
+```
+
+每次归档都会往 `evidence-ledger.jsonl` 追加一行：`archived_at`、`call`、`reason`、三个文件的
+`sha256`（`reservation.json` / `result.json` / `input.json`）、`record_sha256`、以及内容变更时的
+`supersedes`。**工具从不删除或移动 call 目录**——删证据等于消灭审计线索，那是掩盖不是拆账；
+要撤销声明就从 manifest 里删掉那一行（下一次 `start` 生效，账面上它会回到 `counted`）。
+
+演示（隔离运行时 `tmp/t191-demo-runtime`，`limits.qwen=1`，同一请求体三连）：
+`200` → `503 BUDGET_REJECTED` → 归档 `call-001` → 重启 → 同一请求 `200`，且
+`counted.qwen 0 / evidence_excluded 1`。整段日志见 `D:\AI\review\evidence\t191-evidence-ledger.md`。
+
 ## 6. 合并前必须绿（CI 门槛）
 
 `.github/workflows/ci.yml` 有两条必过的 job。**两条都绿才允许合并**（分支保护建议：把

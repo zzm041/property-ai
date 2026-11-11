@@ -1,6 +1,6 @@
 param(
     [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateSet("up", "down", "status", "verify", "resolve-unknown")]
+    [ValidateSet("up", "down", "status", "verify", "resolve-unknown", "evidence-archive")]
     [string]$Action,
     [switch]$KeepOllama,
     # PA-132: which call the shared completion barrier belongs to, and why releasing it is safe.
@@ -36,6 +36,10 @@ $PromptVersionsPath = Join-Path $DeployDir "ai-runtime-prompts.json"
 $BarrierPath = Join-Path $RepoRoot "tmp\\delivery-ai-shared\\completion-unknown.json"
 $BarrierTool = Join-Path $RepoRoot "scripts\\ops\\ai_barrier.py"
 $BarrierPython = Join-Path $RepoRoot "tmp\\selfhost-ai-runtime\\bge-142-cpu\\.venv\\Scripts\\python.exe"
+# PA-179: reviewed evidence and live spend share one calls\ directory, so the budget used
+# to double count archived calls and exhaustion surfaced as AI.UNAVAILABLE. Declaring a call
+# as evidence is an operator action with a receipt (sha256 + reason), not a delete.
+$EvidenceTool = Join-Path $RepoRoot "scripts\ops\ai_evidence_archive.py"
 $WorkAiLauncher = Join-Path $DeployDir "work-ai-runtime.ps1"
 $OllamaLauncher = Join-Path $DeployDir "ollama-runtime.ps1"
 $Endpoint = "http://127.0.0.1:11437"
@@ -322,6 +326,32 @@ switch ($Action) {
         $token = Read-Token
         if (-not $token) { throw "internal token is missing" }
         Assert-Health $token $current
+    }
+    "evidence-archive" {
+        # PA-179: the adapter already excludes declared records from the window (it reads
+        # evidence_records and reports evidence_excluded in /healthz); what was missing was an
+        # operator action that declares one and keeps a receipt. Archiving narrows what the
+        # window counts - it never raises limits or call_baseline.
+        if (-not $Call) { throw "evidence-archive requires -Call <call id> (see: deploy\ai-runtime.ps1 status)" }
+        if (-not $Reason) { throw "evidence-archive requires -Reason '<why this call is evidence>'" }
+        if (-not (Test-Path -LiteralPath $EvidenceTool -PathType Leaf)) { throw "evidence tool is missing: $EvidenceTool" }
+        $python = $BarrierPython
+        if (-not (Test-Path -LiteralPath $python -PathType Leaf)) { $python = "python" }
+        $archived = & $python -I -B -X utf8 $EvidenceTool --runtime-dir $RuntimeDir --call $Call --reason $Reason --json
+        $exitCode = $LASTEXITCODE
+        Write-Output $archived
+        if ($exitCode -ne 0) { throw "the call was not archived (exit $exitCode)" }
+        $receipt = $archived | ConvertFrom-Json
+        if ($receipt.restart_required) {
+            # the config is read once at adapter start, so the declaration only takes effect after
+            # a restart; the restart is loud on purpose instead of looking like a silent no-op.
+            & $WorkAiLauncher stop
+            if ($LASTEXITCODE -ne 0) { throw "work AI runtime launcher failed to stop" }
+            & $WorkAiLauncher start
+            if ($LASTEXITCODE -ne 0) { throw "work AI runtime launcher failed to start" }
+        }
+        Write-Output ("evidence_archive={0} call={1} record_sha256={2} ledger={3} restart={4}" -f `
+            $receipt.status, $receipt.call, $receipt.record_sha256, $receipt.ledger, $receipt.restart_required)
     }
     "resolve-unknown" {
         # PA-132: the shared completion barrier fails closed on purpose. Releasing it used to
