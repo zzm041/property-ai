@@ -636,11 +636,20 @@ class Runner:
         kinds={kind:0 for kind in LIMITS}
         for path in ledger['counted']:
             kinds[json.loads(path.read_text(encoding='utf-8'))['kind']]+=1
+        # PA-179 (t195): a declared record with no call directory is a ghost. It
+        # is invisible in counted/evidence_excluded, yet the launcher rebuilds
+        # config.json from the manifest on every real restart, so a ghost comes
+        # back to the budget later. Report it here so a dirty ledger is visible
+        # before that restart, not after.
+        on_disk={path.parent.name for path in [*ledger['counted'],*ledger['evidence']]}
+        ghosts=sorted(name for name in self.evidence_records if name not in on_disk)
         return {
             'limits':dict(self.limits),'call_baseline':dict(self.call_baseline),
             'counted':kinds,'counted_records':[p.parent.name for p in ledger['counted']],
             'evidence_excluded':len(ledger['evidence']),
             'evidence_records':[p.parent.name for p in ledger['evidence']],
+            'declared_records':len(self.evidence_records),
+            'ghost_records':len(ghosts),'ghost_calls':ghosts,
         }
     def next_call_index(self):
         used=[]

@@ -223,3 +223,66 @@ def test_manifest_lines_must_be_call_ids(tool, runtime):
 
     with pytest.raises(tool.ArchiveRefused):
         tool.read_manifest(runtime)
+
+
+# --------------------------------------------------------------- reconcile (T194-1)
+def test_reconcile_drops_manifest_lines_whose_call_directory_is_gone(tool, runtime):
+    # call-002 exists on disk but is not declared; call-050 does not exist at all.
+    (runtime / "evidence-records.txt").write_text("call-001\ncall-002\ncall-050\n", encoding="utf-8")
+    config = json.loads((runtime / "config.json").read_text(encoding="utf-8"))
+    config["evidence_records"] = ["call-001", "call-002", "call-050"]
+    (runtime / "config.json").write_text(json.dumps(config), encoding="utf-8")
+    counted_before = tool.budget_snapshot(runtime, ["call-001", "call-002", "call-050"])["counted"]
+
+    result = tool.reconcile(runtime=runtime, reason="manifest audit")
+
+    assert result["status"] == "reconciled"
+    assert (result["declared_before"], result["declared_after"], result["on_disk"]) == (3, 2, 2)
+    assert result["ghost_calls"] == ["call-050"]
+    assert (runtime / "evidence-records.txt").read_text(encoding="utf-8").split() == ["call-001", "call-002"]
+    updated = json.loads((runtime / "config.json").read_text(encoding="utf-8"))
+    assert updated["evidence_records"] == ["call-001", "call-002"]
+    # Removing a ghost must not move a single spend counter.
+    assert result["budget_after"]["counted"] == counted_before
+    assert result["budget_after"]["evidence_excluded"] == result["budget_before"]["evidence_excluded"]
+    ledger = [json.loads(line) for line in (runtime / "evidence-ledger.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert len(ledger) == 1
+    assert ledger[0]["event"] == "reconciled"
+    assert ledger[0]["removed"] == ["call-050"]
+    assert ledger[0]["declared_before"] == 3 and ledger[0]["declared_after"] == 2
+
+    assert tool.ledger_summary(runtime) == {"declared": 2, "on_disk": 2, "ghosts": 0}
+
+
+def test_reconcile_is_idempotent_when_the_manifest_is_clean(tool, runtime):
+    (runtime / "evidence-records.txt").write_text("call-001\n", encoding="utf-8")
+
+    first = tool.reconcile(runtime=runtime)
+    second = tool.reconcile(runtime=runtime)
+
+    assert first["status"] == "clean" and first["ghosts"] == 0
+    assert second == first
+    assert not (runtime / "evidence-ledger.jsonl").exists()
+    assert (runtime / "evidence-records.txt").read_text(encoding="utf-8").split() == ["call-001"]
+
+
+def test_reconcile_dry_run_reports_ghosts_without_touching_the_manifest(tool, runtime):
+    (runtime / "evidence-records.txt").write_text("call-001\ncall-077\n", encoding="utf-8")
+
+    result = tool.reconcile(runtime=runtime, dry_run=True)
+
+    assert result["status"] == "dry-run"
+    assert result["ghosts"] == 1 and result["ghost_calls"] == ["call-077"]
+    assert result["config_changed"] is True
+    assert (runtime / "evidence-records.txt").read_text(encoding="utf-8").split() == ["call-001", "call-077"]
+    assert not (runtime / "evidence-ledger.jsonl").exists()
+
+
+def test_cli_reconcile_prints_the_three_numbers(tool, runtime, capsys):
+    (runtime / "evidence-records.txt").write_text("call-001\ncall-404\n", encoding="utf-8")
+
+    assert tool.main(["--runtime-dir", str(runtime), "--reconcile"]) == 0
+    printed = capsys.readouterr().out
+    assert "declared 2 -> 1" in printed
+    assert "on_disk=2" in printed
+    assert "ghosts=1" in printed

@@ -218,6 +218,20 @@ python scripts/ops/ai_evidence_archive.py --list
 `supersedes`。**工具从不删除或移动 call 目录**——删证据等于消灭审计线索，那是掩盖不是拆账；
 要撤销声明就从 manifest 里删掉那一行（下一次 `start` 生效，账面上它会回到 `counted`）。
 
+**重启会把 manifest 抬回 counted，脏账必须先 reconcile。** manifest 与 `calls/` 是两个来源，
+声明了但目录已经不在的行（幽灵声明）在运行期看不出来——`/healthz` 的 `counted` /
+`evidence_excluded` 只统计在盘的 reservation；可一旦真正 `start`，`work-ai-runtime.ps1` 会按
+manifest 重建 `config.json`，那些不存在的 call 就被重新算成 evidence，账面上凭空多出一批声明。
+所以：
+
+- `/healthz` 的 `budget` 额外给 `declared_records`（manifest 声明数）与 `ghost_records`
+  （声明了但盘上没有的条数）；`declared_records` 明显大于 `evidence_excluded` 就是脏账。
+- `python scripts/ops/ai_evidence_archive.py --reconcile` 把 manifest 与 `calls/` 求交，移出幽灵行，
+  并在 `evidence-ledger.jsonl` 追加一条 `event=reconciled`（含被移除的 id 与原因）；`--dry-run` 只报不写，
+  `--list` 末尾固定打印 `declared=… on_disk=… ghosts=…` 三数。
+- `deploy\ai-runtime.ps1 up` 在交给 launcher 之前会自动跑一次对账，`ghosts>0` 时打印 WARNING，
+  不再静默启动。
+
 演示（隔离运行时 `tmp/t191-demo-runtime`，`limits.qwen=1`，同一请求体三连）：
 `200` → `503 BUDGET_REJECTED` → 归档 `call-001` → 重启 → 同一请求 `200`，且
 `counted.qwen 0 / evidence_excluded 1`。整段日志见 `D:\AI\review\evidence\t191-evidence-ledger.md`。

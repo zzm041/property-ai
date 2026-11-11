@@ -264,6 +264,22 @@ switch ($Action) {
             # 3) reviewed launchers do the real work
             $ollama = & $OllamaLauncher start
             if ($LASTEXITCODE -ne 0) { throw "ollama runtime launcher failed" }
+            # PA-179 (t195): work-ai-runtime.ps1 rebuilds config.json from evidence-records.txt
+            # on every real start, so a manifest line whose call directory is gone would be
+            # promoted back into the budget at exactly this moment. Reconcile first; never
+            # quietly start on a dirty ledger.
+            if (-not (Test-Path -LiteralPath $BarrierPython -PathType Leaf)) { throw "evidence python is missing: $BarrierPython" }
+            if (-not (Test-Path -LiteralPath $EvidenceTool -PathType Leaf)) { throw "evidence tool is missing: $EvidenceTool" }
+            $reconcileText = & $BarrierPython $EvidenceTool --reconcile --json 2>&1 | Out-String
+            $reconcile = $null
+            try { $reconcile = $reconcileText | ConvertFrom-Json } catch { $reconcile = $null }
+            if ($null -eq $reconcile) {
+                throw "evidence reconcile did not return JSON: $($reconcileText.Trim())"
+            }
+            Write-Output ("evidence reconcile: declared {0} -> {1} on_disk={2} ghosts={3}" -f $reconcile.declared_before, $reconcile.declared_after, $reconcile.on_disk, $reconcile.ghosts)
+            if ([int]$reconcile.ghosts -gt 0) {
+                Write-Output ("WARNING: evidence-records.txt declared {0} call(s) with no directory on disk; they were removed so the restart cannot promote them into counted. ledger: {1}" -f $reconcile.ghosts, $reconcile.ledger)
+            }
             $work = & $WorkAiLauncher start
             if ($LASTEXITCODE -ne 0) { throw "work AI runtime launcher failed" }
             $current = Read-Json $CurrentPath

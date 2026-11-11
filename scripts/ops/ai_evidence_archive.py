@@ -309,12 +309,121 @@ def archive(
     }
 
 
+def on_disk_calls(runtime: Path) -> list[str]:
+    """Call directories that actually exist: the only evidence the budget can count."""
+
+    calls = runtime / CALLS_DIRNAME
+    if not calls.is_dir():
+        return []
+    return sorted(
+        child.name
+        for child in calls.iterdir()
+        if child.is_dir() and child.name.startswith(CALL_PREFIX)
+    )
+
+
+def reconcile(
+    *,
+    runtime: str | os.PathLike[str] | None = None,
+    dry_run: bool = False,
+    reason: str = "",
+) -> dict[str, Any]:
+    """Drop manifest entries whose call directory is gone (PA-179 / T194-1).
+
+    A stale line is not harmless: every `work-ai-runtime.ps1 start` rebuilds
+    `config.json` from this manifest, so a ghost declaration is promoted back
+    into the budget the next time the adapter really restarts.
+    """
+
+    runtime = runtime_dir(runtime)
+    config = load_config(runtime)
+    declared = declared_calls(runtime, config)
+    on_disk = on_disk_calls(runtime)
+    on_disk_set = set(on_disk)
+    ghosts = sorted(name for name in declared if name not in on_disk_set)
+    kept = sorted(name for name in declared if name in on_disk_set)
+    before = budget_snapshot(runtime, declared)
+    result: dict[str, Any] = {
+        "status": "clean" if not ghosts else ("dry-run" if dry_run else "reconciled"),
+        "declared_before": len(declared),
+        "declared_after": len(kept),
+        "on_disk": len(on_disk),
+        "ghosts": len(ghosts),
+        "ghost_calls": ghosts,
+        "kept_calls": kept,
+        "budget_before": before,
+        "budget_after": before,
+        "config_changed": False,
+        "manifest": str(manifest_path(runtime)),
+        "ledger": str(runtime / LEDGER_NAME),
+        "restart_required": False,
+    }
+    if not ghosts:
+        return result
+
+    after = budget_snapshot(runtime, kept)
+    changed = kept != declared
+    result.update(
+        budget_after=after,
+        config_changed=changed,
+        restart_required=changed,
+    )
+    if dry_run:
+        return result
+
+    entry = {
+        "event": "reconciled",
+        "reconciled_at": _utc_now(),
+        "reason": reason or "manifest entries whose call directory is gone",
+        "declared_before": len(declared),
+        "declared_after": len(kept),
+        "removed": ghosts,
+        "on_disk": on_disk,
+    }
+    if changed:
+        write_manifest(runtime, kept)
+        config["evidence_records"] = kept
+        (runtime / CONFIG_NAME).write_text(
+            json.dumps(config, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
+    result["ledger"] = str(_append_ledger(runtime, entry))
+    return result
+
+
+def ledger_summary(runtime: str | os.PathLike[str] | None = None) -> dict[str, Any]:
+    root = runtime_dir(runtime)
+    config = load_config(root)
+    declared = declared_calls(root, config)
+    on_disk = on_disk_calls(root)
+    on_disk_set = set(on_disk)
+    return {
+        "declared": len(declared),
+        "on_disk": len(on_disk),
+        "ghosts": len([name for name in declared if name not in on_disk_set]),
+    }
+
+
 def list_ledger(runtime: str | os.PathLike[str] | None = None) -> list[dict[str, Any]]:
     root = runtime_dir(runtime)
     config = load_config(root)
     declared = declared_calls(root, config)
     entries = []
     for entry in read_ledger(root):
+        if entry.get("event") == "reconciled":
+            entries.append(
+                {
+                    "event": "reconciled",
+                    "call": None,
+                    "archived_at": entry.get("reconciled_at"),
+                    "reason": entry.get("reason"),
+                    "record_sha256": None,
+                    "input_hash": None,
+                    "kind": None,
+                    "declared": False,
+                    "removed": entry.get("removed"),
+                }
+            )
+            continue
         entries.append(
             {
                 "call": entry.get("call"),
@@ -339,6 +448,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--reason", default=None, help="why this call is evidence (kept in the ledger)")
     parser.add_argument("--dry-run", action="store_true", help="report what would change and write nothing")
     parser.add_argument("--list", action="store_true", help="print the evidence ledger")
+    parser.add_argument(
+        "--reconcile",
+        action="store_true",
+        help="drop manifest entries whose call directory is gone (they would otherwise return to the budget on restart)",
+    )
     parser.add_argument("--json", action="store_true", help="print machine-readable JSON")
     return parser
 
@@ -348,16 +462,44 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.list:
             entries = list_ledger(args.runtime_dir)
+            summary = ledger_summary(args.runtime_dir)
             if args.json:
-                print(json.dumps({"entries": entries}, ensure_ascii=False, indent=2))
+                print(json.dumps({"entries": entries, **summary}, ensure_ascii=False, indent=2))
             else:
                 if not entries:
                     print("evidence ledger is empty")
                 for entry in entries:
+                    if entry["event"] == "reconciled":
+                        removed = entry.get("removed") or []
+                        print(
+                            f"reconciled removed={len(removed)} at={entry['archived_at']} "
+                            f"first={removed[0] if removed else None} reason={entry['reason']}"
+                        )
+                        continue
                     print(
                         f"{entry['call']} kind={entry['kind']} archived_at={entry['archived_at']} "
                         f"record={entry['record_sha256']} declared={entry['declared']} reason={entry['reason']}"
                     )
+                print(
+                    f"declared={summary['declared']} on_disk={summary['on_disk']} ghosts={summary['ghosts']}"
+                )
+            return 0
+        if args.reconcile:
+            result = reconcile(
+                runtime=args.runtime_dir, dry_run=args.dry_run, reason=args.reason or ""
+            )
+            if args.json:
+                print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+            else:
+                print(
+                    f"{result['status']}: declared {result['declared_before']} -> {result['declared_after']} "
+                    f"on_disk={result['on_disk']} ghosts={result['ghosts']} "
+                    f"restart_required={result['restart_required']}"
+                )
+                if result["ghost_calls"]:
+                    print(f"removed: {' '.join(result['ghost_calls'])}")
+                print(f"manifest: {result['manifest']}")
+                print(f"ledger: {result['ledger']}")
             return 0
         if not args.call:
             print("a call id is required: --call call-001", file=sys.stderr)

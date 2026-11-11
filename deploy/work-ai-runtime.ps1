@@ -33,7 +33,7 @@ $ExpectedRuntimeControlSha256 = "B0DE6D3544D8875E0A57CED1A1946744736FC9074AF1ECE
 # 只钉兼容层等于没钉住适配器，所以把真正承载逻辑的两个文件一起钉住。
 $ProviderRuntimeControlPath = Join-Path $CandidateRoot "backend\app\provider\local_ai\runtime_control.py"
 $ProviderHttpApiPath = Join-Path $CandidateRoot "backend\app\provider\local_ai\http_api.py"
-$ExpectedProviderRuntimeControlSha256 = "8A9538C75D8399D65A0B8E8759FB5A1E05EDA67B668C85C3BF35AEA4EC61BBA3"
+$ExpectedProviderRuntimeControlSha256 = "0F5C840BE59957FB624487F67FF76B09CCF49FDF237AD63C9ED9941761A740DA"
 $ExpectedProviderHttpApiSha256 = "2AE1FE1D3E60EF66D2CF877BDA7F2959805CBAABC029623D57B2A72035B33DCB"
 $ResolutionRoot = Join-Path $RepoRoot "reports"
 $ResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\call-001-resolution.json"
