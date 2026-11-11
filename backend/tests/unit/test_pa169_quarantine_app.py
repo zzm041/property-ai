@@ -43,6 +43,7 @@ def test_the_quarantine_read_is_one_bounded_probe():
     assert (
         repository.quarantined_output_for_content(
             content_fingerprint=CONTENT_FINGERPRINT,
+            tenant_id=5,
             error_codes=(AiErrorCode.INVALID_OUTPUT, AiErrorCode.OUTPUT_UNVERIFIABLE),
             since=datetime(2026, 11, 10, tzinfo=UTC),
         )
@@ -62,6 +63,8 @@ def test_the_quarantine_read_is_one_bounded_probe():
     assert "ai_call_logs.input_hash" not in compiled
     assert "ai_call_logs.work_order_id =" not in compiled
     assert "ai_call_logs.work_order_id IN" not in compiled
+    # PA-169 round 4: the content identity is scoped, never global.
+    assert "ai_call_logs.tenant_id" in compiled
 
 
 # ------------------------------------------------------------------- service
@@ -93,7 +96,17 @@ def _service(*, force_retry_actor=None, quarantine=None, snapshot=None):
         quarantined_output_for_content=lambda **_: quarantine,
         get_current_analysis=lambda _id: None,
     )
-    calls = {"logs": [], "applied": [], "providers": 0, "warnings": []}
+    calls = {"logs": [], "applied": [], "providers": 0, "warnings": [], "notes": []}
+    service._work_orders = SimpleNamespace(
+        get_work_order=lambda _id: SimpleNamespace(
+            id=prepared.work_order_id,
+            tenant_id=prepared.tenant_id,
+            property_id=prepared.property_id,
+            status="PENDING_ANALYSIS",
+            process_reason="NONE",
+        ),
+        add_log=lambda record: calls["notes"].append(record) or record,
+    )
 
     def _write_call_log(snapshot, **kwargs):
         calls["logs"].append(kwargs)
@@ -156,6 +169,9 @@ def test_a_quarantined_report_is_refused_before_the_provider_is_asked():
     assert warning["reason_code"] == AiErrorCode.INPUT_QUARANTINED
     assert warning["quarantined_since"].startswith("2026-11-11T03:00")
     assert warning["previous_work_order_id"] == 7
+    # PA-169 round 4 (F4): the quarantine is also a work-order row the queue shows.
+    assert [item.event_code for item in calls["notes"]] == ["AI_QUARANTINE"]
+    assert calls["notes"][0].payload_json["previous_work_order_id"] == 7
 
 
 def test_the_refusal_reaches_a_work_order_that_never_saw_the_text():
@@ -215,6 +231,8 @@ def test_the_quarantine_probe_asks_by_content_inside_a_24h_window():
         AiErrorCode.OUTPUT_UNVERIFIABLE,
     )
     assert seen["since"] == datetime(2026, 11, 10, 12, 0, tzinfo=UTC)
+    assert seen["tenant_id"] == 5
+    assert seen["property_id"] == 5
 
 
 def test_the_probe_reports_when_and_where_the_content_was_refused():

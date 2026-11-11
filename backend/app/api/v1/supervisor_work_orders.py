@@ -95,6 +95,10 @@ def list_supervisor_work_orders(
         view=view,
     )
     items = [work_order_data(item, overdue=service.is_overdue(item)) for item in records]
+    # PA-169 (t152/F4): a quarantined analysis must not be silent in the queue.
+    notes = service.quarantine_notes([item.id for item in items])
+    for item in items:
+        item.system_note = notes.get(item.id)
     next_cursor = items[-1].id if len(items) == limit else None
     return success_envelope(
         request,

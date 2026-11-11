@@ -1,5 +1,6 @@
 """Query/add/flush for WorkOrder aggregates. Service owns commits."""
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
 import json
@@ -19,6 +20,7 @@ from sqlalchemy import (
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.domain.work_order import WorkOrderStatus
 from app.model.property import House, Property
 from app.model.employee import Employee, EmployeeProperty, EmployeeDailyStatus, AttendanceRecord
 from app.model.identity import Permission, RolePermission, User, UserRole
@@ -83,10 +85,51 @@ class WorkOrderRepository:
                 WorkOrder.reporter_user_id == reporter_user_id,
                 WorkOrder.content_fingerprint == content_fingerprint,
                 WorkOrder.created_at >= since,
+                # PA-169 (t152/F3): a finished order is not a duplicate. Answering
+                # a new report with a closed one would tell the resident "we got
+                # it" about work nobody is going to look at again.
+                WorkOrder.status.notin_(
+                    (WorkOrderStatus.CANCELLED.value, WorkOrderStatus.CLOSED.value)
+                ),
             )
             .order_by(WorkOrder.id.desc())
             .limit(1)
         )
+
+    def quarantine_notes(self, work_order_ids: Sequence[int]) -> dict[int, str]:
+        """Supervisor-facing notes for orders whose analysis was quarantined.
+
+        One bounded read per page (PA-169/t152 F4): the newest ``AI_QUARANTINE``
+        row per work order is enough to explain why nothing was analysed.
+        """
+
+        if not work_order_ids:
+            return {}
+        rows = self._session.execute(
+            select(
+                WorkOrderLog.work_order_id,
+                WorkOrderLog.payload_json,
+                WorkOrderLog.created_at,
+            )
+            .where(
+                WorkOrderLog.work_order_id.in_(tuple(work_order_ids)),
+                WorkOrderLog.event_code == "AI_QUARANTINE",
+            )
+            .order_by(WorkOrderLog.id.desc())
+        ).all()
+        notes: dict[int, str] = {}
+        for work_order_id, payload, created_at in rows:
+            if work_order_id in notes:
+                continue
+            body = payload if isinstance(payload, dict) else {}
+            since = body.get("quarantined_since") or created_at.isoformat()
+            previous = body.get("previous_work_order_id")
+            origin = f"工单 {previous}" if previous else "此前的内容"
+            notes[work_order_id] = (
+                f"分析被隔离：同一内容在 24 小时内被 {origin} 判定为不可用"
+                f"（自 {since}）。如确认需要重试，请用 force_retry 重新分析。"
+            )
+        return notes
 
     def get_house(self, house_id: int) -> House | None:
         return self._session.get(House, house_id)

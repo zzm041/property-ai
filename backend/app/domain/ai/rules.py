@@ -1350,16 +1350,45 @@ def rank_candidates(
 # "this text already produced an unusable answer" has to come from the content
 # alone: width/case/punctuation-insensitive text plus the sorted attachment
 # digests. Nothing about the work order, tenant or reporter goes in.
-_FINGERPRINT_DROP = re.compile(r"[\s\W_]+", re.UNICODE)
+#
+# PA-169 (t152/F2): punctuation is a *token boundary*, not something to delete.
+# Dropping it merged `不需要维修` with `不需要，维修`, which say opposite things: the
+# first reports "no repair needed", the second marks a pause and then asks for the
+# repair. Separators keep the two apart, and a negation keeps an explicit boundary
+# so its scope cannot be glued onto the next word either.
+_FINGERPRINT_SEPARATOR = re.compile(r"[\s\W_]+", re.UNICODE)
+_FINGERPRINT_NEGATION_BOUNDARY = "|"
+_FINGERPRINT_NEGATIONS = ("不", "勿", "别", "严", "禁", "没", "未", "無", "无")
+
+
+def _starts_with_negation(token: str) -> bool:
+    return any(token.startswith(item) for item in _FINGERPRINT_NEGATIONS)
 
 
 def normalize_fingerprint_text(text: str | None) -> str:
-    """Content form used by :func:`content_fingerprint`."""
+    """Content form used by :func:`content_fingerprint`.
+
+    Width/case insensitive; whitespace and punctuation become a single boundary,
+    so `不需要，维修` normalises to `不需要|维修` while `不需要维修` stays one token.
+    """
 
     if not text:
         return ""
     folded = unicodedata.normalize("NFKC", text).casefold()
-    return _FINGERPRINT_DROP.sub("", folded)
+    tokens = [
+        token for token in _FINGERPRINT_SEPARATOR.sub(" ", folded).split(" ") if token
+    ]
+    if not tokens:
+        return ""
+    normalized = tokens[0]
+    for previous, token in zip(tokens, tokens[1:]):
+        separator = (
+            _FINGERPRINT_NEGATION_BOUNDARY
+            if _starts_with_negation(previous)
+            else " "
+        )
+        normalized += separator + token
+    return normalized
 
 
 def content_fingerprint(

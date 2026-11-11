@@ -180,6 +180,8 @@ def test_apply_commit_precedes_separate_dispatch(monkeypatch):
         return_value=NS(
             skipped=False,
             work_order_id=30,
+            tenant_id=1,
+            property_id=2,
             input_hash="d" * 64,
             text="3号楼2单元楼道灯不亮",
             images=(),

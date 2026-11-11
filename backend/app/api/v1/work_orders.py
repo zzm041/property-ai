@@ -13,8 +13,9 @@ from app.core.errors import AppError, WorkOrderErrorCode
 from app.core.time import validate_timezone
 from app.domain.iam import Principal
 from app.domain.work_order_visibility import resident_detail
-from app.schema.common import request_id_for, success_envelope
+from app.schema.common import SuccessEnvelope, request_id_for, success_envelope
 from app.schema.work_order import (
+    CreateWorkOrderData,
     AppendWorkOrderRequest,
     CancelWorkOrderRequest,
     ConfirmWorkOrderRequest,
@@ -139,7 +140,7 @@ def work_order_display_data(
     )
 
 
-@router.post("/work-orders")
+@router.post("/work-orders", response_model=SuccessEnvelope[CreateWorkOrderData])
 def create_work_order(
     body: CreateWorkOrderRequest,
     request: Request,
@@ -161,14 +162,14 @@ def create_work_order(
         claimed_tenant_id=body.tenant_id,
         claimed_property_id=body.property_id,
     )
-    payload = work_order_data(record, overdue=service.is_overdue(record)).model_dump(
-        mode="json"
+    # PA-169 (t150/t152): a repeat of the same report inside the window answers
+    # with the work order that already exists, and says so. The content fingerprint
+    # itself stays internal.
+    payload = CreateWorkOrderData(
+        **work_order_data(record, overdue=service.is_overdue(record)).model_dump(),
+        deduplicated=service.last_create_deduplicated,
     )
-    # PA-169 (t150): a repeat of the same report inside the window answers with the
-    # work order that already exists, and says so. The content fingerprint itself
-    # stays internal.
-    payload["deduplicated"] = service.last_create_deduplicated
-    return success_envelope(request, payload)
+    return success_envelope(request, payload.model_dump(mode="json"))
 
 
 @router.post("/work-orders/suggest")

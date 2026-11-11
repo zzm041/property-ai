@@ -321,6 +321,17 @@ class WorkOrderData(BaseModel):
     created_at: datetime
     updated_at: datetime
     sla_overdue: bool = False
+    # PA-169 (t152/F4): what the supervisor needs to know when the analysis was
+    # quarantined instead of run; empty for every other order.
+    system_note: str | None = None
+
+
+class CreateWorkOrderData(WorkOrderData):
+    """Create response: the order plus whether it was folded into an open one."""
+
+    # PA-169 (t152/F5): declared on the schema, not bolted on after model_dump,
+    # so the field shows up in OpenAPI. The content fingerprint stays internal.
+    deduplicated: bool = False
 
 
 class WorkOrderDisplayData(BaseModel):

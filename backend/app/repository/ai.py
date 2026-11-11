@@ -117,8 +117,10 @@ class AiRepository:
         self,
         *,
         content_fingerprint: str,
+        tenant_id: int,
         error_codes: Sequence[str],
         since: datetime,
+        property_id: int | None = None,
     ) -> tuple[datetime, int | None] | None:
         """When did this report content last produce an unusable answer?
 
@@ -127,12 +129,27 @@ class AiRepository:
         new work order and therefore a new input hash. One bounded read: it rides
         ``ix_ai_call_logs_content_fingerprint`` and takes the newest row inside the
         window, so the caller can report "since when" and "which work order".
+
+        PA-169 (t152/F1): the identity of the *content* must not become a global
+        namespace. The predicate is scoped to ``tenant_id`` (and to ``property_id``
+        when the caller knows it), because otherwise one refusal would silence the
+        same wording for every tenant for a whole day - both a cross-tenant leak and
+        a way to poison a competitor's reports. A caller without a tenant is refused
+        rather than allowed to fall back to the unscoped predicate.
         """
+
+        if not tenant_id:
+            raise ValueError("quarantine lookup requires a tenant")
+
+        scope = [AiCallLog.tenant_id == tenant_id]
+        if property_id is not None:
+            scope.append(AiCallLog.property_id == property_id)
 
         row = self._session.execute(
             select(AiCallLog.created_at, AiCallLog.work_order_id)
             .where(
                 AiCallLog.content_fingerprint == content_fingerprint,
+                *scope,
                 AiCallLog.error_code.in_(tuple(error_codes)),
                 AiCallLog.created_at >= since,
             )

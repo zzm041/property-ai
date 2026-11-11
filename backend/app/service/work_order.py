@@ -1372,6 +1372,11 @@ class WorkOrderService:
     def is_overdue(self, record: WorkOrder, now: datetime | None = None) -> bool:
         return sla_is_overdue(due_at=record.sla_due_at, now=now or self._clock())
 
+    def quarantine_notes(self, work_order_ids: Iterable[int]) -> dict[int, str]:
+        """Explain, per work order, why its analysis never ran (PA-169/t152 F4)."""
+
+        return self._repository.quarantine_notes(tuple(work_order_ids))
+
     def _create_work_order(
         self,
         *,

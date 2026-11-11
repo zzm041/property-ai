@@ -200,6 +200,9 @@ class AnalysisService(VisionMixin, ValidationMixin, PersistenceMixin):
                 model_version=getattr(self._llm, "model_version", "unknown"),
                 error_code=AiErrorCode.INPUT_QUARANTINED,
             )
+            self._record_quarantine_note(
+                snapshot, request_id=request_id, quarantine=quarantine
+            )
             logger.warning(
                 "analysis_input_quarantined",
                 request_id=request_id,
@@ -799,8 +802,10 @@ class AnalysisService(VisionMixin, ValidationMixin, PersistenceMixin):
         with shared.begin_owned_transaction(self._session):
             hit = self._ai.quarantined_output_for_content(
                 content_fingerprint=fingerprint,
+                tenant_id=snapshot.tenant_id,
                 error_codes=QUARANTINE_ERROR_CODES,
                 since=since,
+                property_id=snapshot.property_id,
             )
         if hit is None:
             return None
@@ -810,6 +815,45 @@ class AnalysisService(VisionMixin, ValidationMixin, PersistenceMixin):
             "quarantined_since": quarantined_at.isoformat(),
             "previous_work_order_id": previous_work_order_id,
         }
+
+    def _record_quarantine_note(
+        self,
+        snapshot: AnalysisSnapshot,
+        *,
+        request_id: str,
+        quarantine: Mapping[str, object],
+    ) -> None:
+        """Leave a work-order row the supervisor queue can surface (PA-169/t152 F4).
+
+        A logger line is invisible to the person who has to decide what to do with
+        the order, so the quarantine also lands in ``work_order_logs``; the queue
+        renders it as ``system_note``.
+        """
+
+        with shared.begin_owned_transaction(self._session):
+            record = self._work_orders.get_work_order(snapshot.work_order_id)
+            if record is None:
+                return
+            self._work_orders.add_log(
+                WorkOrderLog(
+                    tenant_id=record.tenant_id,
+                    property_id=record.property_id,
+                    work_order_id=record.id,
+                    actor_user_id=None,
+                    actor_type=WorkOrderActorType.SYSTEM.value,
+                    from_status=record.status,
+                    to_status=record.status,
+                    process_reason=record.process_reason,
+                    event_code="AI_QUARANTINE",
+                    request_id=request_id,
+                    payload_json={
+                        "reason_code": AiErrorCode.INPUT_QUARANTINED,
+                        "content_fingerprint": quarantine["content_fingerprint"],
+                        "quarantined_since": quarantine["quarantined_since"],
+                        "previous_work_order_id": quarantine["previous_work_order_id"],
+                    },
+                )
+            )
 
     def _call_providers(
         self,
