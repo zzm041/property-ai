@@ -231,6 +231,10 @@ def main(argv: list[str] | None = None) -> int:
         import_status = run_script_import_check(args.verbose)
         if import_status != 0:
             return import_status
+    else:
+        # t183: stay quiet no longer. A log that never mentions the check is
+        # indistinguishable from one where it passed silently.
+        print("unit_gate: SKIPPED script-import check (--skip-script-imports)")
 
     require_environment()
     exit_code, output = run_pytest(args.target, args.pytest_arg, args.verbose)

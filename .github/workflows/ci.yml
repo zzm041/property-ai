@@ -96,6 +96,15 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e "backend[dev]"
 
+      - name: Static gates (layering + script imports)
+        # 约 1 秒，不需要任何服务：先把目录契约和 scripts/ 的死 import 挡在门外，
+        # 红的时候先看到「结构坏了」，而不是后面数据库步骤的连带失败。
+        # unit_gate 自己也会跑 check_script_imports，但 check_layering 只有这里跑。
+        shell: bash
+        run: |
+          python scripts/ops/check_layering.py
+          python scripts/ops/check_script_imports.py
+
       - name: Migrate the disposable test database (PA-118)
         # 空 schema 会让 integration / app.main 的启动体检直接失败；这一步把库迁到 head，
         # 迁完 schema 数据为空（基线管理员会被删掉）。重跑是幂等的。

@@ -186,9 +186,9 @@ PROVIDER_ALLOWED_EDGES: dict[str, frozenset[str]] = {
 }
 # Targets outside the provider layer are not edges of this graph, so they are
 # always fine: a kind may import app.core.*, app.domain.* and anything else
-# below the provider layer. The two names below are accepted defensively in
-# case a shared provider/core or provider/domain package ever appears.
-PROVIDER_OPEN_DESTINATIONS: frozenset[str] = frozenset({"core", "domain"})
+# below the provider layer, and provider_package() returns None for them.
+# There is deliberately no allow-list of provider/<name> packages here: a new
+# one has to be declared in PROVIDER_ALLOWED_EDGES like every other kind.
 
 
 def provider_package(module: str) -> str | None:
@@ -222,12 +222,11 @@ def check_provider_edges(
                 continue
             if source == PROVIDER_COMPOSITION_ROOT:
                 continue
-            if dest in PROVIDER_SHARED_MODULES or dest in PROVIDER_OPEN_DESTINATIONS:
+            if dest in PROVIDER_SHARED_MODULES:
                 continue
-            if dest == PROVIDER_COMPOSITION_ROOT:
-                # any kind may reach the composition root by name; factory
-                # itself is the one module allowed to import every kind.
-                continue
+            # factory -> any kind is handled by `source == composition root`
+            # above; the reverse (a kind importing factory) is a cycle, so it
+            # falls through to the violation report below.
             if dest in PROVIDER_ALLOWED_EDGES.get(source, frozenset()):
                 continue
             kind = "lazy " if nested else ""
@@ -402,6 +401,13 @@ def self_test() -> int:
         (provider / "llm" / "leak.py").write_text(
             "from app.provider.asr import client  # noqa: F401\n", encoding="utf-8"
         )
+        # planted 6: a kind reaching back into the composition root. factory
+        # may assemble every kind, but the reverse edge is a cycle, so it must
+        # be reported instead of waved through.
+        (provider / "vision" / "to_factory.py").write_text(
+            "from app.provider.factory import build_llm_provider  # noqa: F401\n",
+            encoding="utf-8",
+        )
         # allowed edge: work_order -> identity
         (domain / "work_order" / "allowed.py").write_text(
             "from app.domain.identity import models  # noqa: F401\n", encoding="utf-8"
@@ -434,10 +440,12 @@ def self_test() -> int:
         and "domain.knowledge -> domain.work_order" in edges[0]
         and len(tree) == 1
         and "rogue.py" in tree[0]
-        and len(kind_edges) == 2
+        and len(kind_edges) == 3
         and any("wrong_kind.py" in item and "provider.vision -> provider.llm" in item
                 for item in kind_edges)
         and any("leak.py" in item and "provider.llm -> provider.asr" in item
+                for item in kind_edges)
+        and any("to_factory.py" in item and "provider.vision -> provider.factory" in item
                 for item in kind_edges)
     )
     for problem in upward + edges + tree + kind_edges:
