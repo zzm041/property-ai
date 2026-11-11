@@ -105,6 +105,12 @@ class AiCallLog(BigIntPrimaryKeyMixin, Base):
             name="status",
         ),
         CheckConstraint("attempt >= 1", name="attempt_positive"),
+        # PA-175 (t182): declared in 20260919_0009; the model was missing it,
+        # so autogenerate kept proposing to drop an audit column.
+        CheckConstraint(
+            "BINARY provider_mode IN ('DEVELOPMENT', 'PRODUCTION')",
+            name="provider_mode",
+        ),
         Index("ix_ai_call_logs_work_order_id", "work_order_id", "id"),
         Index("ix_ai_call_logs_request_id", "request_id"),
         # PA-169 (t150): the quarantine probe follows the report content, so
@@ -122,6 +128,14 @@ class AiCallLog(BigIntPrimaryKeyMixin, Base):
     work_order_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     request_id: Mapped[str] = mapped_column(String(128), nullable=False)
     provider_type: Mapped[str] = mapped_column(String(16), nullable=False)
+    # PA-175 (t182): 20260919_0009 added this audit column; see
+    # backend/app/service/analysis/persistence.py for the writer.
+    provider_mode: Mapped[str] = mapped_column(
+        String(16),
+        nullable=False,
+        default="DEVELOPMENT",
+        server_default=text("'DEVELOPMENT'"),
+    )
     operation: Mapped[str] = mapped_column(String(64), nullable=False)
     biz_type: Mapped[str] = mapped_column(String(64), nullable=False)
     prompt_version: Mapped[str | None] = mapped_column(String(64), nullable=True)

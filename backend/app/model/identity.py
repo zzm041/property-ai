@@ -600,7 +600,12 @@ class IdentityRecoveryCase(BigIntPrimaryKeyMixin, TimestampMixin, Base):
     proof_provider: Mapped[str | None] = mapped_column(String(64), nullable=True)
     proof_reference_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
     proof_result_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
-    status: Mapped[str] = mapped_column(String(24), nullable=False, default="PENDING_PROOF")
+    status: Mapped[str] = mapped_column(
+        String(24),
+        nullable=False,
+        default="PENDING_PROOF",
+        server_default=text("'PENDING_PROOF'"),
+    )
     quarantine_started_at: Mapped[datetime] = mapped_column(UTCDateTime(), nullable=False)
     quarantine_ends_at: Mapped[datetime] = mapped_column(UTCDateTime(), nullable=False)
     proof_verified_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
@@ -609,14 +614,28 @@ class IdentityRecoveryCase(BigIntPrimaryKeyMixin, TimestampMixin, Base):
     completed_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
     impact_json: Mapped[dict[str, object] | None] = mapped_column(JSON, nullable=True)
     impact_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
-    attempt_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    attempt_count: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=0,
+        server_default=text("0"),
+    )
+    version: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=1,
+        server_default=text("1"),
+    )
     active_subject_key: Mapped[str | None] = mapped_column(String(16), Computed("CASE WHEN BINARY status IN ('PENDING_PROOF','PENDING_REVIEW','APPROVED') THEN subject_phone_e164 ELSE NULL END", persisted=True), nullable=True)
 
 
 class IdentityRecoveryReview(BigIntPrimaryKeyMixin, Base):
     __tablename__ = "identity_recovery_reviews"
-    __table_args__ = (UniqueConstraint("case_id", "reviewer_user_id", name="uq_identity_recovery_distinct_reviewer"), MYSQL_TABLE_OPTIONS)
+    __table_args__ = (
+        UniqueConstraint("case_id", "reviewer_user_id", name="uq_identity_recovery_distinct_reviewer"),
+        Index("ix_identity_recovery_reviews_case", "case_id", "id"),
+        MYSQL_TABLE_OPTIONS,
+    )
     case_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("identity_recovery_cases.id", ondelete="RESTRICT", onupdate="RESTRICT"), nullable=False)
     reviewer_user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id", ondelete="RESTRICT", onupdate="RESTRICT"), nullable=False)
     decision: Mapped[str] = mapped_column(String(16), nullable=False)
@@ -635,7 +654,12 @@ class PhoneIdentityTombstone(BigIntPrimaryKeyMixin, TimestampMixin, Base):
     phone_e164: Mapped[str] = mapped_column(String(16), nullable=False)
     source_user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id", ondelete="RESTRICT", onupdate="RESTRICT"), nullable=False)
     recovery_case_id: Mapped[int | None] = mapped_column(BigInteger, ForeignKey("identity_recovery_cases.id", ondelete="RESTRICT", onupdate="RESTRICT"), nullable=True)
-    status: Mapped[str] = mapped_column(String(16), nullable=False, default="QUARANTINED")
+    status: Mapped[str] = mapped_column(
+        String(16),
+        nullable=False,
+        default="QUARANTINED",
+        server_default=text("'QUARANTINED'"),
+    )
     quarantine_until: Mapped[datetime] = mapped_column(UTCDateTime(), nullable=False)
     released_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
     claimed_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
@@ -651,13 +675,23 @@ class PhoneIdentityTombstone(BigIntPrimaryKeyMixin, TimestampMixin, Base):
 
 class AccountMerge(BigIntPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "account_merges"
-    __table_args__ = (UniqueConstraint("completed_source_key", name="uq_account_merges_completed_source"), Index("ix_account_merges_target", "target_user_id", "id"), MYSQL_TABLE_OPTIONS)
+    __table_args__ = (
+        UniqueConstraint("completed_source_key", name="uq_account_merges_completed_source"),
+        Index("ix_account_merges_target", "target_user_id", "id"),
+        Index("ix_account_merges_status", "status", "id"),
+        MYSQL_TABLE_OPTIONS,
+    )
     source_user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id", ondelete="RESTRICT", onupdate="RESTRICT"), nullable=False)
     target_user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id", ondelete="RESTRICT", onupdate="RESTRICT"), nullable=False)
     initiated_by_user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id", ondelete="RESTRICT", onupdate="RESTRICT"), nullable=False)
     source_phone_id: Mapped[int | None] = mapped_column(BigInteger, ForeignKey("user_phones.id", ondelete="RESTRICT", onupdate="RESTRICT"), nullable=True)
     recovery_case_id: Mapped[int | None] = mapped_column(BigInteger, ForeignKey("identity_recovery_cases.id", ondelete="RESTRICT", onupdate="RESTRICT"), nullable=True)
-    status: Mapped[str] = mapped_column(String(16), nullable=False, default="COMPLETED")
+    status: Mapped[str] = mapped_column(
+        String(16),
+        nullable=False,
+        default="COMPLETED",
+        server_default=text("'COMPLETED'"),
+    )
     impact_json: Mapped[dict[str, object] | None] = mapped_column(JSON, nullable=True)
     impact_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
     target_reauthenticated_at: Mapped[datetime] = mapped_column(UTCDateTime(), nullable=False)

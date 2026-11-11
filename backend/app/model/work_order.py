@@ -519,6 +519,14 @@ class WorkOrderAssignment(BigIntPrimaryKeyMixin, TimestampMixin, Base):
             "work_order_id",
             "id",
         ),
+        # PA-175 (t182): 20260919_0009 added these two columns and the
+        # source/actor rule; without them autogenerate proposed to drop the
+        # assignment audit trail.
+        CheckConstraint(
+            "(BINARY assigned_source = 'HUMAN' AND assigned_by_user_id IS NOT NULL)"
+            " OR (BINARY assigned_source = 'AUTO' AND assigned_by_user_id IS NULL)",
+            name="source_actor",
+        ),
         MYSQL_TABLE_OPTIONS,
     )
 
@@ -526,7 +534,7 @@ class WorkOrderAssignment(BigIntPrimaryKeyMixin, TimestampMixin, Base):
     property_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     work_order_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     employee_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
-    assigned_by_user_id: Mapped[int] = mapped_column(
+    assigned_by_user_id: Mapped[int | None] = mapped_column(
         BigInteger,
         ForeignKey(
             "users.id",
@@ -534,7 +542,21 @@ class WorkOrderAssignment(BigIntPrimaryKeyMixin, TimestampMixin, Base):
             ondelete="RESTRICT",
             onupdate="RESTRICT",
         ),
+        nullable=True,
+    )
+    # PA-175 (t182): 20260919_0009 line 381; NULL means the dispatcher
+    # assigned automatically.
+    assigned_source: Mapped[str] = mapped_column(
+        String(16),
         nullable=False,
+        default="HUMAN",
+        server_default=text("'HUMAN'"),
+    )
+    # PA-175 (t182): 20260919_0009 line 389. (work_order_logs.payload_json at
+    # 20260917_0005 line 219 is a different table.)
+    payload_json: Mapped[dict[str, object] | None] = mapped_column(
+        JSON,
+        nullable=True,
     )
     status: Mapped[str] = mapped_column(
         String(32),
