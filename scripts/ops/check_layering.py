@@ -162,7 +162,11 @@ _ALL_SHIM_MODULES: frozenset[str] = frozenset(
 PROVIDER_ROOT = REPO_ROOT / "backend" / "app" / "provider"
 PROVIDER_SHARED_MODULES: frozenset[str] = frozenset({"errors", "http", "usage"})
 PROVIDER_COMPOSITION_ROOT = "factory"
-PROVIDER_KIND_EDGES: dict[str, frozenset[str]] = {
+# Allowed kind -> kind edges, and only these. Everything else is forbidden:
+# the kinds are interchangeable adapters, so one of them reaching into another
+# means the abstraction leaked (a reranker that knows about ASR is not a
+# reranker). Cross-cutting modules every kind may import live below.
+PROVIDER_ALLOWED_EDGES: dict[str, frozenset[str]] = {
     # The supervisor planner drives the LLM transport.
     "supervisor_agent": frozenset({"llm"}),
     # asr/vision pull the original bytes out of the storage provider: they are
@@ -170,6 +174,11 @@ PROVIDER_KIND_EDGES: dict[str, frozenset[str]] = {
     "asr": frozenset({"storage"}),
     "vision": frozenset({"storage"}),
 }
+# Targets outside the provider layer are not edges of this graph, so they are
+# always fine: a kind may import app.core.*, app.domain.* and anything else
+# below the provider layer. The two names below are accepted defensively in
+# case a shared provider/core or provider/domain package ever appears.
+PROVIDER_OPEN_DESTINATIONS: frozenset[str] = frozenset({"core", "domain"})
 
 
 def provider_package(module: str) -> str | None:
@@ -201,15 +210,21 @@ def check_provider_edges(
             dest = provider_package(target)
             if dest is None or dest == source:
                 continue
-            if source == PROVIDER_COMPOSITION_ROOT or dest in PROVIDER_SHARED_MODULES:
+            if source == PROVIDER_COMPOSITION_ROOT:
                 continue
-            if dest in PROVIDER_KIND_EDGES.get(source, frozenset()):
+            if dest in PROVIDER_SHARED_MODULES or dest in PROVIDER_OPEN_DESTINATIONS:
+                continue
+            if dest == PROVIDER_COMPOSITION_ROOT:
+                # any kind may reach the composition root by name; factory
+                # itself is the one module allowed to import every kind.
+                continue
+            if dest in PROVIDER_ALLOWED_EDGES.get(source, frozenset()):
                 continue
             kind = "lazy " if nested else ""
             problems.append(
                 f"{path.relative_to(root)}:{line} provider.{source} -> provider.{dest} "
                 f"({kind}import; declared kind edges: "
-                f"{sorted(PROVIDER_KIND_EDGES.get(source, frozenset())) or 'none'})"
+                f"{sorted(PROVIDER_ALLOWED_EDGES.get(source, frozenset())) or 'none'})"
             )
     return problems
 
@@ -356,7 +371,7 @@ def self_test() -> int:
             (domain / package).mkdir(parents=True)
             (domain / package / "__init__.py").write_text("", encoding="utf-8")
         provider = backend / "app" / "provider"
-        for package in ("llm", "vision", "supervisor_agent", "errors"):
+        for package in ("llm", "vision", "asr", "supervisor_agent", "errors"):
             (provider / package).mkdir(parents=True)
             (provider / package / "__init__.py").write_text("", encoding="utf-8")
         # allowed: the planner drives the llm transport, factory assembles kinds
@@ -371,6 +386,11 @@ def self_test() -> int:
         # planted 4: an interchangeable kind grabbing another kind
         (provider / "vision" / "wrong_kind.py").write_text(
             "from app.provider.llm import client  # noqa: F401\n", encoding="utf-8"
+        )
+        # planted 5: the same leak the other way round - the LLM transport must
+        # not know that ASR exists (review's case: provider/llm/leak.py -> asr)
+        (provider / "llm" / "leak.py").write_text(
+            "from app.provider.asr import client  # noqa: F401\n", encoding="utf-8"
         )
         # allowed edge: work_order -> identity
         (domain / "work_order" / "allowed.py").write_text(
@@ -404,9 +424,11 @@ def self_test() -> int:
         and "domain.knowledge -> domain.work_order" in edges[0]
         and len(tree) == 1
         and "rogue.py" in tree[0]
-        and len(kind_edges) == 1
-        and "wrong_kind.py" in kind_edges[0]
-        and "provider.vision -> provider.llm" in kind_edges[0]
+        and len(kind_edges) == 2
+        and any("wrong_kind.py" in item and "provider.vision -> provider.llm" in item
+                for item in kind_edges)
+        and any("leak.py" in item and "provider.llm -> provider.asr" in item
+                for item in kind_edges)
     )
     for problem in upward + edges + tree + kind_edges:
         print(f"  detected: {problem}")
@@ -458,7 +480,7 @@ def report() -> None:
         allowed = (
             source == PROVIDER_COMPOSITION_ROOT
             or dest in PROVIDER_SHARED_MODULES
-            or dest in PROVIDER_KIND_EDGES.get(source, frozenset())
+            or dest in PROVIDER_ALLOWED_EDGES.get(source, frozenset())
         )
         print(f"{source:18s} -> {dest:18s} {'ok' if allowed else 'VIOLATION'}")
 
