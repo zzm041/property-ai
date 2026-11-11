@@ -154,7 +154,7 @@ def prompt_evidence_catalog(catalog: Mapping[str, Mapping[str, object]]) -> list
 
 
 PATTERNS = {
-    "滴渗水": r"滴水|滴|渗水|漏水|漏过|喷水|喷出|流出", "不出水": r"不出水|水[^，,。；;!?！？]{0,4}不出|没有水|没水|停水",
+    "滴渗水": r"滴水|滴|渗水|渗漏|漏水|漏过|漏水点|漏点|喷水|喷出|流出|破裂|爆裂|爆管", "不出水": r"不出水|水[^，,。；;!?！？]{0,4}不出|没有水|没水|停水|水压(?:不足|不够|低|异常|不稳)|出水(?:很小|变小|量小|不足|变细)|水流(?:很小|变小|小)|出水量[^，,。；;!?！？]{0,4}(?:小|不足)",
     "不能供电": r"没电|没有电|无电|不能供电|断电|停电|插座不能用",
     "照明不亮": r"不亮|无法点亮|不能点亮|还是黑的",
     "操作阻力": r"卡涩|卡住|拧不动|转不动|拉不动|推不动|收不回(?:去)?|(?:拧|转|开关)[^，,。；;!?！？]{0,6}费力",
@@ -162,7 +162,7 @@ PATTERNS = {
     "排水缓慢": r"(?:排水|下水)(?:很|太|非常|特别)?(?:缓慢|慢|不利索)|水[^，,。；;!?！？]{0,12}(?:半天|很久)才下去",
     "部件下垂": r"(?:向|往)(?:左|右)?下方垂|(?:往)?下垂",
     "人员行为观察": r"徘徊|张望|拉(?:动|了)?[^，,。；;!?！？]{0,8}(?:自行车|电动车)",
-    "进水扩散": r"进水|水(?:已经|已|正|正在|持续)?扩散",
+    "进水扩散": r"进水|水(?:已经|已|正|正在|持续)?扩散|积水|漫水|水漫|水淹|淹水|泡水|返水|倒灌|冒水|涌水|溢水|(?:渗|漏|流|漫)到",
     "火花烧损": r"火花|冒烟|起火|着火|明火|烧损",
     "冒烟": r"冒烟",
     "不制冷": r"不[制变]?冷|不凉", "噪声": r"声|响", "杂物清扫": r"纸|纸盒|落叶|垃圾|杂物|清扫|包装袋|饭粒|食物残渣",
@@ -183,9 +183,9 @@ PATTERNS = {
 
 
 SUBJECT_PATTERNS = {
-    "窗户": r"窗户|纱窗|窗框", "柜门": r"柜门|柜的门", "排水区域": r"排水|下水|地漏|淋浴|洗澡",
+    "窗户": r"窗户|纱窗|窗框", "柜门": r"柜门|柜的门", "排水区域": r"排水|下水|地漏|淋浴|洗澡|马桶|蹲便|坐便|洗手池",
     "人员": r"人|他|她",
-    "水龙头": r"水龙头|龙头", "排水接头": r"排水|接头|洗手盆|水槽", "天花墙面": r"天花|墙|涂层",
+    "水龙头": r"水龙头|龙头|出水口|水嘴", "排水接头": r"排水|接头|洗手盆|水槽|水管|弯管|立管|横管|管道|管口|下水管|排水管|排污|弯头|存水弯", "天花墙面": r"天花|天花板|墙|墙皮|顶棚|涂层",
     "插座": r"插座|插孔|插排|排插", "照明": r"灯|照明", "空调": r"空调", "扶手": r"扶手",
     "楼道地面": r"楼道|走廊|楼梯口|电梯厅|角落|地面|地板|地上|通道", "房门": r"门", "阀门管道": r"阀|管|软管",
 }
@@ -215,7 +215,10 @@ _POST_RESOLVED = re.compile(r"^(?:的(?:问题|故障))?(?:已经|已|现已)(?:
 _OBSERVABLE_SUBJECT_PREFIX = {
     "照明不亮": re.compile(r"(?:灯|照明)(?P<operation>(?:打开|开启|开)(?:了)?(?:开关)?(?:以后|之后|后))?"
                          r"(?:(?:现在|目前|一直|已经|突然|还是|也|仍然|都|完全|就是|怎么也|始终|又))*$"),
-    "进水扩散": re.compile(r"(?:地面|地板|地上)(?:(?:现在|目前|正在|持续|不断|一直|已经|开始|又|正|已|还在|仍在|上|的))*$"),
+    "进水扩散": re.compile(
+        r"(?:地面|地板|地上)"
+        r"(?:(?:现在|目前|正在|持续|不断|一直|已经|开始|又|正|已|还在|仍在|上|的)"
+        r"|(?:有|积了|存了)?(?:一摊|一片|一层|一地|不少|很多|些))*$"),
 }
 
 
@@ -259,6 +262,50 @@ def _is_leading_uncertain_modifier(text: str) -> bool:
         _UNCERTAIN.fullmatch(core)
         or re.fullmatch(r"(?:说|表示|猜测|据[^，,。；;!?！？]{1,12}说|传闻)", core)
     )
+
+
+# PA-178 (t185): families that only say *where* the fault shows.  A report that
+# names the object in one clause and the symptom in the next is still one
+# report, so a location-only label clause may lean on the neighbouring clause
+# for the object.  Object families (柜门/房门/照明/阀门管道/…) never do.
+_LOCATION_SUBJECTS = frozenset({"楼道地面", "排水区域", "天花墙面"})
+# Clause separators only: a carry never crosses a sentence boundary (。！？).
+_CLAUSE_SPLIT = r"[^，,；;\n。！？!?]+"
+
+# PA-178: the water family only.  A leak on a pipe floods the floor and the
+# report says both; smell/location, burning and socket cases keep the strict
+# "a location word never identifies the object" contract.
+_WATER_LABELS = frozenset({"进水扩散", "水渍", "滴渗水", "排水缓慢"})
+_WATER_OBJECTS = frozenset({"排水接头", "阀门管道", "排水区域", "水龙头"})
+_WATER_RECIPIENTS = frozenset({"楼道地面", "排水区域"})
+
+
+def _water_leak_carry(
+    quote: str, label: str, subject: str, selected_clause: str, clause_subjects: set[str]
+) -> bool:
+    """True when a water label binds to a location clause but the object sits next door."""
+
+    if label not in _WATER_LABELS or subject not in _WATER_OBJECTS:
+        return False
+    if not clause_subjects or not clause_subjects <= _WATER_RECIPIENTS:
+        return False
+    return _subject_named_elsewhere(quote, subject, selected_clause)
+
+
+
+def _subject_named_elsewhere(quote: str, subject: str, selected_clause: str) -> bool:
+    """True when the claimed object is named in another clause of this report."""
+
+    pattern = SUBJECT_PATTERNS.get(subject)
+    if pattern is None:
+        return False
+    selected = selected_clause.strip()
+    for clause in re.findall(_CLAUSE_SPLIT, quote):
+        if clause.strip() == selected:
+            continue
+        if re.search(pattern, clause):
+            return True
+    return False
 
 
 def _supported_subjects(text: str, *, continuation_subject: str | None = None) -> set[str]:
@@ -809,11 +856,20 @@ def bind_observations(
                                   prefix)
                         for subject in clause_subjects
                     )
-                    rejection_kind = (
-                        "subject_conflict" if direct_subject and item.label not in _INFORMATIONAL_LABELS
-                        else "subject_unsupported"
-                    )
-                    raise ValueError("Subject not supported by the selected evidence")
+                    if _water_leak_carry(
+                        quote, item.label, item.subject, selected_clause, clause_subjects
+                    ):
+                        # PA-178 (t185): the label clause only locates the fault
+                        # ("地板已经积水") while the object ("水管") is named in the
+                        # neighbouring clause of the same report.  Accept the pair
+                        # instead of failing the whole work order.
+                        pass
+                    else:
+                        rejection_kind = (
+                            "subject_conflict" if direct_subject and item.label not in _INFORMATIONAL_LABELS
+                            else "subject_unsupported"
+                        )
+                        raise ValueError("Subject not supported by the selected evidence")
         except ValueError as exc:
             rejected.append({
                 **item.model_dump(mode="json"),
