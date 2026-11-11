@@ -170,3 +170,45 @@ def test_object_named_in_the_other_clause_still_binds(text, label, subject):
 def test_carry_does_not_relax_locations_or_other_families(text, label, subject):
     mapped, error = validate(text, label, subject)
     assert mapped is None and error == "AI.INVALID_OUTPUT"
+
+
+# T192-1: standing water without a quantifier is still standing water. The old
+# prefix map demanded "有 + 量词", so the plain phrasing fell through to
+# unconfirmed_current and the whole work order failed.
+WATER_PHRASING = [
+    ("卫生间地面积水", "水渍", "楼道地面"),
+    ("卫生间地面有积水", "水渍", "楼道地面"),
+    ("卫生间地面有一摊积水", "水渍", "楼道地面"),
+    ("卫生间地面有一摊水", "水渍", "楼道地面"),
+    ("厨房地面有积水，水管接头渗水", "进水扩散", "排水接头"),
+]
+
+
+@pytest.mark.parametrize("text,label,subject", WATER_PHRASING)
+def test_standing_water_counts_without_a_quantifier(text, label, subject):
+    mapped, error = validate(text, label, subject)
+    assert error is None
+    rows = mapped.event_trace["effective_observations"]
+    assert [(row["label"], row["subject"]) for row in rows] == [(label, subject)]
+
+
+# The four negatives the reviewer pinned: widening the water wording must not
+# turn any of them into confirmed evidence.
+PINNED_NEGATIVES = [
+    ("插座冒烟，墙面发黑", "冒烟", "插座"),
+    ("插座冒烟，墙面发黑", "焦煳气味", "阀门管道"),
+    ("地漏完全堵死", "排水缓慢", "排水接头"),
+    ("排水很慢", "排水缓慢", "排水接头"),
+]
+
+
+@pytest.mark.parametrize("text,label,subject", PINNED_NEGATIVES)
+def test_pinned_negatives_stay_rejected(text, label, subject):
+    mapped, error = validate(text, label, subject)
+    assert error is not None
+    assert mapped is None
+
+
+def test_negated_standing_water_is_not_confirmed():
+    mapped, error = validate("卫生间没有积水，地面干燥", "水渍", "楼道地面")
+    assert error is not None

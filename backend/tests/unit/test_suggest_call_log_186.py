@@ -9,6 +9,8 @@ importantly, that an audit failure never turns a usable pre-fill into an error.
 
 from contextlib import nullcontext
 from types import SimpleNamespace
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm import Session
 from unittest.mock import MagicMock
 
 import pytest
@@ -253,3 +255,88 @@ def test_unscanned_media_never_reaches_the_provider_or_the_audit():
 
     assert result.text == ""
     assert ai.records == []
+
+
+# ------------------------------------------------- T192-2: the open-transaction branch
+# The fixture above replaces `_audit_transaction` with a nullcontext, which is
+# fine for the shape tests but leaves the branch that t186 actually broke
+# uncovered: a request session that already holds a transaction. The row has to
+# be committed on a session of its own, or a read-only request swallows it.
+REAL_AUDIT_TRANSACTION = DescriptionSuggestionService._audit_transaction
+REAL_BEGIN_OWNED_TRANSACTION = module.begin_owned_transaction
+
+
+def audit_engine(path):
+    """sqlite table shaped from the model, minus the MySQL-only constraints."""
+
+    engine = create_engine(f"sqlite:///{path}")
+    columns = [
+        f'"{column.name}" {column.type.compile(engine.dialect)}'
+        for column in AiCallLog.__table__.columns
+        if column.name != "id"
+    ]
+    statement = (
+        'CREATE TABLE "ai_call_logs" '
+        f'(id INTEGER PRIMARY KEY AUTOINCREMENT, {", ".join(columns)})'
+    )
+    with engine.begin() as connection:
+        connection.execute(text(statement))
+    return engine
+
+
+def test_audit_row_lands_in_its_own_session_when_the_request_transaction_is_open(
+    tmp_path, monkeypatch
+):
+    engine = audit_engine(tmp_path / "audit.db")
+    request_session = Session(bind=engine, autoflush=False, expire_on_commit=False)
+    request_session.execute(text("select 1"))
+    assert request_session.in_transaction() is True
+
+    # Undo the module-wide doubles: this test needs the real branch.
+    monkeypatch.setattr(module, "begin_owned_transaction", REAL_BEGIN_OWNED_TRANSACTION)
+    monkeypatch.setattr(
+        DescriptionSuggestionService, "_audit_transaction", REAL_AUDIT_TRANSACTION
+    )
+
+    service = DescriptionSuggestionService(
+        request_session,
+        settings=Settings(_env_file=None, file_scanner_provider="development"),
+        vlm=StubVLM(),
+        asr=StubASR(),
+        limiter=MemoryRateLimiter(),
+    )
+    service._repository = MagicMock()
+    service._repository.get_file.side_effect = lambda file_id: media(file_id=file_id)
+    recording = RecordingAiRepository()
+    service._ai = recording
+
+    result = service.suggest(
+        actor=resident(), file_ids=(11,), request_id="t192-2-open-transaction"
+    )
+
+    assert result.text
+    # Nothing went through the request session, and it is still open.
+    assert recording.records == []
+    assert request_session.in_transaction() is True
+
+    with Session(bind=engine) as fresh:
+        rows = fresh.execute(
+            text(
+                'select request_id, provider_type, operation, status, biz_type '
+                'from "ai_call_logs"'
+            )
+        ).all()
+    assert rows == [
+        (
+            "t192-2-open-transaction",
+            "VLM",
+            SUGGEST_CALL_LOG_OPERATION,
+            "SUCCESS",
+            SUGGEST_CALL_LOG_BIZ_TYPE,
+        )
+    ]
+
+    # Rolling the request back must not take the audit row with it.
+    request_session.rollback()
+    with Session(bind=engine) as fresh:
+        assert fresh.scalar(text('select count(*) from "ai_call_logs"')) == 1
