@@ -119,6 +119,54 @@ python scripts/ops/check_layering.py   # 依赖方向静态闸（--report 看基
 
 env 缺一不可：`APP_ENV=test` + `DATABASE_URL` + `TEST_DATABASE_URL`（两库不同），缺了 gate 直接 exit 2。**`APP_ENV` 坑**：`Settings(_env_file=None)` 仍读进程环境，`APP_ENV=test` 会改 `should_enqueue_ai_on_create`（`backend/app/core/config.py:238-245`）；fixture 须显式声明建模环境，例 `test_durable_tasks_default_104.py::_settings`。
 
+### 5.1 integration 需要一个**已迁移**的测试库（PA-118）
+
+`deploy/docker-compose.yml` 的 `mysql-test` 服务（profile `test`，tmpfs）只创建空库
+`property_ai_test`，**不跑迁移**。直接跑 integration 的后果是每个用例一条
+`pymysql.err.ProgrammingError: (1146, "Table 'property_ai_test.users' doesn't exist")`，
+API 层则变成 500 `SYS.INTERNAL_ERROR`——看起来像上百个缺陷，实际只是一个没迁移的 schema。
+
+```bash
+# 1) 起一次性测试库（空库）
+docker compose -f deploy/docker-compose.yml --profile test up -d mysql-test
+
+# 2) 建库 → 迁到 head（幂等；--check 只体检，不迁移）
+APP_ENV=test \
+TEST_DATABASE_URL='mysql+pymysql://property_test:change-me-test@127.0.0.1:3307/property_ai_test?charset=utf8mb4' \
+python scripts/ops/prepare_test_database.py
+```
+
+脚本的三段式与 `app.cli.customer_install` 同源，因为裸 `alembic upgrade head` 建不出这个
+schema：0009/0011 只认 AUTH001、delivery 精确目标或 `CustomerInstallAuthority` 三种身份；
+0014 又要求**已经存在** SYSTEM_ADMIN（基线溯源）。所以流程是
+`upgrade → 0012` →（若无 SYSTEM_ADMIN）bootstrap 一个基线管理员 → `upgrade → head`，
+切换完成后删除该管理员，让 schema 回到**数据为空**（integration 的清理 fixture 会删
+`users` 但不删 `user_passwords` 等子表）。
+
+`APP_ENV=test` 的进程（含 pytest 收集）在启动期就会体检：库连不上 → `TEST_DATABASE_UNREACHABLE`；
+连上但缺表 → `TEST_DATABASE_SCHEMA_MISSING`，消息里带目标、缺的表和修复命令。要绕过体检
+（例如你自己在测空 schema 的错误路径）设 `REQUIRE_TEST_DATABASE_SCHEMA=false`。
+
+已知状态（2026-11-11，head = `20261111_0018_content_fingerprint_loose`）：空库从
+`61 failed / 16 passed / 18 skipped / 228 errors` 变成 **`41 failed / 265 passed / 17 skipped /
+0 errors`**（466 s，Redis+Milvus+MinIO 都起）。41 条的定性：
+- **19 条把历史 head 写死**（`test_*_migration.py`、`test_migrations.py`、`test_identity_schema.py`、
+  `test_official_auth_runtime.py` 的 `assert get_current_head() == "20260917_0007"` 一类），与 schema
+  无关，任何环境必红 —— **测试过时**，需要跟着 0018 更新；
+- **13 条真检索**需要 embedding 服务在跑（`test_day4_async_claim.py`、`test_day4_milvus_rebuild_acl.py`、
+  `test_day4_mysql_restore_relations.py`、`test_knowledge_runtime.py`、`test_milvus_rag.py`）——
+  **环境缺件**：Milvus 起了但没有 embedding 服务，索引建不出来；
+- **8 条测试环境默认值**：`FILE_SCANNER_PROVIDER` 默认 `unavailable`（媒体内容 `not ready for use`，
+  `409`），设 `FILE_SCANNER_PROVIDER=development FILE_SCANNER_DEMO_ACKNOWLEDGED=true` 后这 8 条只剩 4 条；
+- **1 条测试过时**：`test_observation_clarification_runtime.py:38` 仍期望 `required_skill="maintenance"`，
+  PA-167 归一化后是 `MAINTENANCE`；
+- **4 条待跟进**（加扫描器后仍红）：`test_stale_result_does_not_override_human_cancel`
+  （analysis 为 None）、`test_human_override_records_recommendation_difference`
+  （`Employee is not eligible for dispatch`）、`test_confirm_closes_and_system_admin_is_denied`
+  （403 vs 期望 409）、`test_concurrent_revoke_has_one_success_and_one_not_found`
+  （`threading.BrokenBarrierError`，并发用例自身不稳）。
+逐条证据见 `D:\AI\review\evidence\t171-pa118-test-schema.md` §4/§5。
+
 ## 6. RAG 运行时：未启用、未验证
 
 现状：**交付栈没有 RAG 运行时**。11436/11438 无监听，`POST /api/v1/assistant/query` 恒返回 `{"status":"knowledge_unavailable"}`，引用与权限过滤因此从未被真实验证（`reports/flow-matrix-20261111.md` 记为阻塞项）。

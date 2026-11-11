@@ -29,8 +29,21 @@ def _settings(**overrides) -> Settings:
 
 def _production(durable: bool) -> Settings:
     # 生产构造器要求企业凭证，这里只切 app_env/durable 两个开关
+    # PA-165: create_app 在生产下拒绝 development 的 RAG 三件，所以顺带把它们
+    # 指到真实端点——本文件只关心 durable 落库与自检，RAG provider 真伪由
+    # test_rag_provider_startup_guard.py 负责。
     return _settings().model_copy(
-        update={"app_env": "production", "durable_tasks_enabled": durable}
+        update={
+            "app_env": "production",
+            "durable_tasks_enabled": durable,
+            "embedding_provider": "production",
+            "embedding_endpoint": "http://host.docker.internal:11436/v1/embeddings",
+            "reranker_provider": "production",
+            "reranker_endpoint": "http://host.docker.internal:11436/v1/rerank",
+            "rag_llm_provider": "production",
+            "rag_llm_base_url": "http://host.docker.internal:11436/v1",
+            "rag_llm_api_key": "test-rag-key",
+        }
     )
 
 

@@ -6,7 +6,7 @@ from functools import lru_cache
 from threading import Lock
 from typing import Any, Iterator, TypeVar
 
-from sqlalchemy import Engine, create_engine, event, text
+from sqlalchemy import Engine, create_engine, event, inspect, text
 from sqlalchemy.engine import Connection, URL, make_url
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session, sessionmaker
@@ -250,6 +250,88 @@ def verify_utc_session(connection: Connection) -> None:
     timezone = connection.execute(text("SELECT @@session.time_zone")).scalar_one()
     if timezone != "+00:00":
         raise RuntimeError("MySQL session timezone must be +00:00")
+
+
+class TestDatabaseSchemaError(RuntimeError):
+    """APP_ENV=test points at a database that is empty or unreachable.
+
+    PA-118: a fresh `mysql-test` container creates the `property_ai_test` database
+    but runs no migration, so every integration test failed one at a time with a raw
+    `Table 'property_ai_test.users' doesn't exist` (or, worse, an API test returned
+    500 SYS.INTERNAL_ERROR). One connection at startup now names the problem, the
+    target and the command that fixes it.
+    """
+
+    # Keep pytest from collecting the error class as a test case.
+    __test__ = False
+
+
+TEST_SCHEMA_MARKER_TABLES = ("alembic_version", "users")
+TEST_SCHEMA_FIX_COMMAND = (
+    "python scripts/ops/prepare_test_database.py"
+)
+
+
+def _database_label(database_url: str) -> str:
+    parsed = make_url(database_url)
+    return f"{parsed.host or '<no host>'}:{parsed.port or 3306}/{parsed.database or '<no db>'}"
+
+
+def missing_test_schema_tables(connection: Connection) -> list[str]:
+    """Return the marker tables a migrated test schema must contain and this one lacks."""
+
+    inspector = inspect(connection)
+    return [name for name in TEST_SCHEMA_MARKER_TABLES if not inspector.has_table(name)]
+
+
+def verify_test_database_schema(
+    settings: Settings,
+    *,
+    database_url: str | None = None,
+    connect_timeout: int = 3,
+) -> None:
+    """Refuse to start an APP_ENV=test process against an empty test database.
+
+    Deliberately a startup check, not a per-request error: the failure mode it
+    replaces was 228 collection-time errors and raw MySQL 1146s spread across the
+    integration suite, which reads like 228 code defects instead of one missing
+    migration. Any environment that is not `test` is left alone: production and
+    staging keep their own readiness probes.
+    """
+
+    if settings.app_env != "test":
+        return
+    if not settings.require_test_database_schema:
+        return
+    target = database_url or settings.test_database_url
+    label = _database_label(target)
+    engine = None
+    try:
+        engine = create_database_engine(target, connect_timeout=connect_timeout)
+        with engine.connect() as connection:
+            missing = missing_test_schema_tables(connection)
+    except OperationalError as exc:
+        raise TestDatabaseSchemaError(
+            f"TEST_DATABASE_UNREACHABLE: APP_ENV=test uses {label}, which refuses"
+            f" connections ({exc.orig})."
+            " Start the disposable database first:"
+            " docker compose -f deploy/docker-compose.yml --profile test up -d mysql-test"
+            f" then {TEST_SCHEMA_FIX_COMMAND}"
+            " (docs/runbook.md section 5, local test runs)."
+        ) from exc
+    finally:
+        if engine is not None:
+            engine.dispose()
+
+    if missing:
+        raise TestDatabaseSchemaError(
+            f"TEST_DATABASE_SCHEMA_MISSING: APP_ENV=test uses {label}, but that database"
+            f" has no application schema (missing tables: {', '.join(missing)})."
+            " Integration tests would fail one by one with \"Table"
+            f" '{make_url(target).database}.users' doesn't exist\"."
+            f" Fix: APP_ENV=test TEST_DATABASE_URL='{target}' {TEST_SCHEMA_FIX_COMMAND}"
+            " (docs/runbook.md section 5, local test runs)."
+        )
 
 
 def assert_disposable_test_database(

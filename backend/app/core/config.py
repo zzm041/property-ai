@@ -77,6 +77,10 @@ class Settings(BaseSettings):
         "property_ai_test?charset=utf8mb4"
     )
     allow_destructive_test_database: bool = False
+    # PA-118: an APP_ENV=test process refuses to start against a disposable database
+    # that was never migrated. Set REQUIRE_TEST_DATABASE_SCHEMA=false only for a
+    # fixture that intentionally points at a database it creates itself.
+    require_test_database_schema: bool = True
     redis_url: str = "redis://127.0.0.1:6379/0"
     celery_broker_url: str = (
         "amqp://property:change-me@127.0.0.1:5672/property_ai"

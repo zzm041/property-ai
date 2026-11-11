@@ -11,6 +11,7 @@ from app.core.database import (
     assert_disposable_test_database,
     create_database_engine,
     get_session_factory,
+    verify_test_database_schema,
     verify_utc_session,
 )
 
@@ -96,6 +97,9 @@ def integration_settings() -> Settings:
 
 @pytest.fixture(scope="session")
 def test_engine(integration_settings: Settings) -> Iterator[Engine]:
+    # PA-118: an unmigrated schema used to surface as one raw MySQL 1146 per test.
+    # Check the marker tables once, so a missing schema is a single readable failure.
+    verify_test_database_schema(integration_settings)
     assert_disposable_test_database(integration_settings)
     engine = create_database_engine(integration_settings.test_database_url)
     with engine.connect() as connection:
