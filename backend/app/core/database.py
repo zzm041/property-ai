@@ -267,8 +267,10 @@ class TestDatabaseSchemaError(RuntimeError):
 
 
 TEST_SCHEMA_MARKER_TABLES = ("alembic_version", "users")
+#: `--yes-i-mean-it` is part of the command on purpose: the helper refuses to migrate
+#: without an explicit confirmation in a non-interactive shell (PA-174).
 TEST_SCHEMA_FIX_COMMAND = (
-    "python scripts/ops/prepare_test_database.py"
+    "python scripts/ops/prepare_test_database.py --yes-i-mean-it"
 )
 
 

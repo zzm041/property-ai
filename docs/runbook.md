@@ -143,8 +143,17 @@ docker compose -f deploy/docker-compose.yml --profile test up -d mysql-test
 # 2) 建库 → 迁到 head（幂等；--check 只体检，不迁移）
 APP_ENV=test \
 TEST_DATABASE_URL='mysql+pymysql://property_test:change-me-test@127.0.0.1:3307/property_ai_test?charset=utf8mb4' \
-python scripts/ops/prepare_test_database.py
+#    非交互环境必须带 --yes-i-mean-it：脚本先确认目标确实是一次性测试库（PA-174）。
+#    目标须为本机 host、名字含 test 且不含 prod/staging/live/delivery 等分段；
+#    远端 host 一律拒（放行请显式给 PREPARE_TEST_DB_ALLOWED_HOSTS=host1,host2）。
+python scripts/ops/prepare_test_database.py --yes-i-mean-it
 ```
+
+库已经存在表但 `alembic_version` 为空（例如手工 `DELETE FROM alembic_version`、或从旧快照恢复）
+时，直接 upgrade 会撞 `(1050, "Table 'tenants' already exists")`。脚本会先判断结构：与 head 模型
+一致就 stamp 到 head，否则按迁移脚本推导出的表集合推断最近 revision 再 stamp，然后照常 upgrade。
+推断不出来时不会猜，而是给两条可执行选项（`down -v` 重建，或 `--stamp <revision>`）；`--check`
+的措辞与真实行为一致，不会再出现「检查说能跑、跑起来就炸」。
 
 脚本的三段式与 `app.cli.customer_install` 同源，因为裸 `alembic upgrade head` 建不出这个
 schema：0009/0011 只认 AUTH001、delivery 精确目标或 `CustomerInstallAuthority` 三种身份；
@@ -203,7 +212,7 @@ ubuntu job 用 service container（`mysql:8.0`）起空库；windows runner 不�
 ```bash
 # 1) 起一个空库并迁到 head（重复跑是幂等的）
 docker run -d --name ci-mysql -p 3337:3306 --tmpfs /var/lib/mysql   -e MYSQL_ROOT_PASSWORD=root-test-pw -e MYSQL_DATABASE=property_ai_test   -e MYSQL_USER=property_test -e MYSQL_PASSWORD=change-me-test mysql:8.0
-APP_ENV=test TEST_DATABASE_URL='mysql+pymysql://property_test:change-me-test@127.0.0.1:3337/property_ai_test?charset=utf8mb4'   python scripts/ops/prepare_test_database.py
+APP_ENV=test TEST_DATABASE_URL='mysql+pymysql://property_test:change-me-test@127.0.0.1:3337/property_ai_test?charset=utf8mb4'   python scripts/ops/prepare_test_database.py --yes-i-mean-it
 
 # 2) 跑与 CI 相同的两道闸
 APP_ENV=test DATABASE_URL='mysql+pymysql://property_test:change-me-test@127.0.0.1:3337/property_ai_scratch?charset=utf8mb4' TEST_DATABASE_URL='mysql+pymysql://property_test:change-me-test@127.0.0.1:3337/property_ai_test?charset=utf8mb4'   python scripts/ops/unit_gate.py --summary-file /tmp/unit-gate.md

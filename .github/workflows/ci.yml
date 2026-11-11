@@ -34,7 +34,8 @@ concurrency:
 # 数据库（CI 需要库就跑 alembic，不手工建表）：
 #   - ubuntu job 用 service container（`mysql:8.0`）起空库；
 #   - windows job 没有 service container，用 `actions-setup-mysql` 装一个本地 MySQL 8；
-#   - 两条路都调**同一个** `scripts/ops/prepare_test_database.py` 把 schema 迁到 head。
+#   - 两条路都调**同一个** `scripts/ops/prepare_test_database.py --yes-i-mean-it` 把 schema 迁到 head
+#     （脚本要求显式确认，CI 非交互必须带这个 flag）。
 #     裸 `alembic upgrade head` 建不出这个 schema（0009/0011 只认 AUTH001 / delivery 精确目标 /
 #     CustomerInstallAuthority；0014 又要求已存在 SYSTEM_ADMIN），脚本的三段式与
 #     `app.cli.customer_install` 同源，见 docs/runbook.md §5.1。
@@ -98,7 +99,7 @@ jobs:
       - name: Migrate the disposable test database (PA-118)
         # 空 schema 会让 integration / app.main 的启动体检直接失败；这一步把库迁到 head，
         # 迁完 schema 数据为空（基线管理员会被删掉）。重跑是幂等的。
-        run: python scripts/ops/prepare_test_database.py
+        run: python scripts/ops/prepare_test_database.py --yes-i-mean-it
 
       - name: Run the unit gate
         # `--summary-file` 在决定退出码之前就把三数写进 summary，所以红的 run 也留得下证据。
@@ -172,7 +173,7 @@ jobs:
           python -m pip install -e "backend[dev]"
 
       - name: Migrate the disposable test database (PA-118)
-        run: python scripts/ops/prepare_test_database.py
+        run: python scripts/ops/prepare_test_database.py --yes-i-mean-it
 
       - name: Run the portable unit subset
         # 不依赖模型运行时/Redis/Milvus 的纯 Python 用例；曾经在 Linux 上采集失败的那组
