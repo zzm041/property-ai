@@ -54,7 +54,10 @@ def test_new_categories_do_not_turn_negation_history_or_hearsay_into_facts(prefi
 @pytest.mark.parametrize("text,label,subject", [
     ("房门开关费力。", "闭合失效", "房门"),
     ("柜门下垂。", "松动", "柜门"),
-    ("地漏完全堵死。", "排水缓慢", "排水区域"),
+    # PA-178 (t202): 地漏完全堵死 used to be rejected as a neighbouring concept.
+    # Residents do mean a blocked drain by it, and rejecting the pair failed the
+    # whole order, so the drain vocabulary now binds it to 排水缓慢
+    # (covered positively in test_drain_blockage_vocab_202.py).
     ("排水很慢。", "排水缓慢", "排水接头"),
     ("窗户已经关闭。", "闭合失效", "窗户"),
     ("黑色灯具完好。", "照明不亮", "照明"),

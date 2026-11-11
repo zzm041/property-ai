@@ -107,6 +107,11 @@ from app.service.identity.rbac import RbacService
 
 logger = get_logger(__name__)
 
+from app.domain.ai.enums import (
+    EnumNormalizationError,
+    normalize_analysis_payload,
+)
+
 
 from . import context as shared
 from .context import AnalysisSnapshot, MediaRef, ProviderBundle
@@ -121,6 +126,20 @@ class ValidationMixin:
         if payload is None:
             return None, None
         try:
+            # PA-202: the 4B model spells enums its own way (PLUMBING,
+            # Water-Supply, HIGH, p0, plumbing). Fold the spelling before the
+            # contract model sees it; an unknown spelling still fails the
+            # payload, it is never guessed from context.
+            payload, enum_normalizations = normalize_analysis_payload(payload)
+            if enum_normalizations:
+                logger.info(
+                    'analysis_enum_normalized',
+                    request_id=request_id,
+                    applied=[
+                        {'field': item.field, 'raw': item.raw, 'normalized': item.normalized}
+                        for item in enum_normalizations
+                    ],
+                )
             trace=None
             if 'observations' in payload:
                 observed=ObservedAnalysisOutput.model_validate(payload)
@@ -171,6 +190,7 @@ class ValidationMixin:
         except (ValidationError, ValueError) as exc:
             if request_id is not None:
                 reason = (exc.reason_code if isinstance(exc, ObservationBindingError)
+                          else 'enum_not_mapped' if isinstance(exc, EnumNormalizationError)
                           else 'schema_invalid' if isinstance(exc, ValidationError)
                           else 'contract_invalid')
                 logger.warning('analysis_payload_rejected', request_id=request_id,

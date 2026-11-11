@@ -4,6 +4,16 @@ The historical flat modules (``observed_event`` and friends) are
 gone: S8 deleted the compatibility layer, so import this package only.
 """
 
+from .enums import (
+    ANALYSIS_ENUM_ALIASES,
+    ANALYSIS_ENUM_FIELDS,
+    EnumNormalization,
+    EnumNormalizationError,
+    enum_key,
+    normalize_analysis_payload,
+    normalize_enum,
+)
+
 from .models import (
     EVENT_CONTRACT,
     Label,
