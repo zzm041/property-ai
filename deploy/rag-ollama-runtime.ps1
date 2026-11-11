@@ -21,7 +21,7 @@ $AuthorizedStaleResolutions = @(
         Sha256 = "A163FD8570FF586EF55F67F0C25F54D5219AC155339953F7A7D988CC11ACD304"
     }
 )
-$ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models"
+$ModelRoot = "E:\ai-models\property-ai\models"
 $OllamaExe = if ($env:PROPERTY_AI_OLLAMA_EXE) { $env:PROPERTY_AI_OLLAMA_EXE } else { "C:\Users\lmj\AppData\Local\Programs\Ollama\ollama.exe" }
 $ExpectedExeSha256 = "D571E4CF0AD4456FCCD33D5B985B6D63BA5669C6E5A812391704083952AAE3D5"
 $ExpectedVersion = "0.34.4"

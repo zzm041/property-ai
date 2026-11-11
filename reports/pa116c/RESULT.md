@@ -338,3 +338,29 @@ f0db09af1d5a5416eb522e17816cc0e6e1ad66f931d5d512c73ac47e64fa3420
 - **未切换运行容器**：四容器仍是 `src-94367eda50d0-wip2`（`sha256:69372219582b…`）。本单只要求"从 commit 可重建"；`delivery.ps1 release` 仍被 `Assert-NoRetainedRollbackContainers`（实测 29 个保留容器）拦着，切换属另一条决策。
 - **PA-116-C 关单 ≠ PA-116 关闭**：B 部分（真实 e2e 复现 PA-001 效果）仍 blocked，`qwen_guard` 4500MiB 与 27B 冷加载 `WinError 10054` 归 PA-002/PA-104。
 - 镜像 tag 用短 sha `src-407e704ebfbc`、构建参数给全 40 位；`delivery.ps1` 的 `Assert-DeliveryImageTag` 要求 `^src-[0-9a-f]{12}(-wip)?$`，与之一致。
+
+### ③-补 最终交付镜像（`source_sha` = 当前 HEAD，三段一致）
+
+③ 的镜像是从**代码提交** `407e704` 构建的；随后证据文档提交 `bbaa099` 只动本文件（+103 行），令 `git rev-parse HEAD` 与 `source_sha` 不再相同——验证者按"HEAD + digest + provenance 三段一致"读会对不上。故在同一个干净克隆里把 HEAD 推进到 `bbaa099` 后重建，作为**最终交付镜像**：
+
+```
+> cd /d/property-ai-clean-407e704 && git fetch origin && git checkout -q bbaa099
+> git rev-parse HEAD
+bbaa0996453c5397accd5a9efa3fa6060aeb0eb7
+> git status --porcelain -uno | wc -l
+0
+> docker build -f deploy/Dockerfile     --build-arg PROPERTY_AI_SOURCE_SHA=bbaa0996453c5397accd5a9efa3fa6060aeb0eb7     -t property-ai-delivery:src-bbaa0996453c .
+
+sha256:10d421b6dca3827a76817f68e28ef5dc84967aff899a5f0ef47693f62d4099d5  property-ai-delivery:src-bbaa0996453c
+
+> docker run --rm --entrypoint python property-ai-delivery:src-bbaa0996453c -m app.cli.build_provenance
+{"app_copies": ["/usr/local/lib/python3.12/site-packages/app"], "app_package": "/usr/local/lib/python3.12/site-packages/app", "files": {"domain/ai.py": {"path": "/usr/local/lib/python3.12/site-packages/app/domain/ai.py", "sha256": "4a0f317116ed40db5579afc24e77ef023834630cfcb7f2270db59282abcaaf9f"}, "domain/observed_event.py": {"path": "/usr/local/lib/python3.12/site-packages/app/domain/observed_event.py", "sha256": "64d364857b85f2b8ffd11c2f9080b8055dd0d461b480e0b22e5138b940a15143"}}, "prompt_versions": {"vision": "repair-photo-v7-confidence-scale", "work_order": "wo-analysis-v26-summary-fidelity"}, "shadow_source_tree": null, "source_sha": "bbaa0996453c5397accd5a9efa3fa6060aeb0eb7"}
+```
+
+现在三段指向同一提交：`git rev-parse HEAD` = `bbaa0996453c5397accd5a9efa3fa6060aeb0eb7` = `provenance.source_sha` = 镜像 tag `src-bbaa0996453c`。仓库 HEAD 就停在这里（本节为本文件的文档增量，不构成新提交，见下）。
+
+两次构建的等价性：`git diff --stat 407e704..bbaa099` 只有 `reports/pa116c/RESULT.md`（+103），而 `.dockerignore` 排除 `*.md`、只留 `backend/README.md` ⇒ 两份镜像内容必然相同，实测也相同（契约 sha、`app_copies`、`shadow_source_tree`、`prompt_versions` 全一致）。这同时说明"文档提交不会改变镜像内容"。
+
+守卫复验（最终镜像内）：`grep -c verify_task_delivery_configuration …/app/main.py` = **2**、`grep -c enqueue_failure_unrecorded …/app/worker/enqueue.py` = **1**、`app/main.py` sha256 仍 = `a1113be8be8e59e0…db99ff`、`/app/app` 不存在、两契约 `tr -d ""` 归一 = HEAD blob。
+
+> 注：本节是为对齐三段而写的文档增量，**没有单独提交**（提交它会让 HEAD 再次前移、重新打破三段一致）。它只改本 `.md`，不进镜像（`.dockerignore` 排除）；`git status --porcelain -uno` 里它显示为 `M reports/pa116c/RESULT.md` 一项，除此之外工作树的 dirty 仍是前面列的 10 项 docs/reports。

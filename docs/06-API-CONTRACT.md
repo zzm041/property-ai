@@ -152,7 +152,7 @@
 | POST | `/staff/work-orders/{id}/accept` | 接单 |
 | POST | `/staff/work-orders/{id}/reject` | 拒单+原因 |
 | POST | `/staff/work-orders/{id}/start` | 开始处理 |
-| POST | `/staff/work-orders/{id}/feedback` | 过程反馈 |
+| POST | `/staff/work-orders/{id}/feedback` | 追加过程反馈，可省略或原样保留 process_reason；变更原因须走异常上报/主管决定，避免绕过通知及决策 |
 | POST | `/staff/work-orders/{id}/receipts` | 正式回执 |
 | POST | `/staff/work-orders/{id}/receipts/{receipt_id}/media` | 待住户确认时补传当前周期回执缺失的处理前/后媒体 |
 | POST | `/staff/work-orders/{id}/escalate` | 无法解决上报 |
@@ -166,11 +166,23 @@
 
 创建成功响应即含 `id` 与 `status=PENDING_ANALYSIS`，不等待 AI。
 
-工单详情中的 assignment 若来自系统自动派单，则 `assigned_by_user_id=null`；人工派单仍返回实际操作者。自动来源必须由服务端持久化的 `assigned_source=AUTO` 与审计/状态日志共同判定，不能由客户端伪造。
+2026-11-01 字段隔离修订：`GET /work-orders/{id}` 接受 `audience=resident|property`，默认 resident；参数只请求视图，不授予权限。property 必须额外具备该工单的合法物业读取资格，报修人本人或双角色账号不能仅凭所有权取得该视图。员工/主管页面显式请求 property。住户保留进度、回执、费用、未解决原因和后续安排；不返回内部派单理由、操作人标识、内部分析日志及混合 extra_notes。AI_TASK_FAILED/AI_TASK_ATTEMPT 只输出必要生命周期状态，不输出诊断正文，以支持失败接管提示。
+
+property 详情中的 assignment 若来自系统自动派单，则 `assigned_by_user_id=null`；人工派单仍返回实际操作者。resident 不返回 assigned_by_user_id，仅保留安全自动派单标记；自动来源须由持久化信息及审计核对，不能由客户端伪造。
+
+resident 的补充文字只从明确住户 APPEND 来源恢复；历史混合备注不猜测归属，不删除原文，property 仍可查阅。公开日志 reason 仅限本人住户 APPEND/REOPEN/CANCEL，主管本人报修的 DECIDE/ESCALATE 不因此公开。
+
+`GET /files/{id}/content` 同样支持上述 audience；关联工单的历史文件不再仅凭上传者身份放行。resident 只读 REPORT 或明确绑定有效回执的 BEFORE/AFTER；ON_SITE 为内部过程资料。新增文件关联也重验来源可见性，不能把不可读历史文件或内部过程文件通过重新关联变成住户附件。未关联任何工单的本人上传保留预览。拒绝沿用 FILE.NOT_FOUND，不读取存储；原始媒体和历史关联不清理。
 
 回执媒体补传仅允许当前负责员工在 `WAIT_CONFIRM` 状态使用，并须携带当前工单 `version`。服务端必须重新锁定当前派单关系，校验 `work-order:resolve` 权限，并确认 `receipt_id` 属于当前处理周期；客户端传入的周期、回执、上传者或组织归属均不得直接信任。补传只新增明确的 `BEFORE` / `AFTER` 关联媒体，不创建新处理周期或回执；媒体关联、工单版本、`WorkOrderLog` 和 `AuditLog` 必须在同一事务内完成。旧周期和历史回执不得改写。
 
-工单详情可附加只读 `display`：`property_timezone`、`timestamp_labels`（以原始 UTC 时间字符串为键，给出该小区时区及实际偏移的展示文字）、`assignee_names`（仅该已授权工单的派单/处理员工当前展示名）。原始 ID、UTC 时间、状态和历史关联不替换；展示名不是历史姓名快照，不返回手机号或凭证。缺少姓名时页面标明员工编号；无合法时区时明确回退 UTC。必须先通过原工单读取授权，不提供人员枚举接口，也不改变状态机和操作权限。
+工单详情可附加只读 `display`：`property_timezone`、`timestamp_labels`（以原始 UTC 时间字符串为键，给出该小区时区及实际偏移的展示文字）、`assignee_names`（仅该已授权工单的派单/处理员工当前展示名）。原始 ID、UTC 时间、状态和历史关联不替换；展示名不是历史姓名快照，不返回手机号或凭证。缺少姓名时页面标明员工编号；接口无合法时区时明确回退 UTC。必须先通过原工单读取授权，不提供人员枚举接口，也不改变状态机和操作权限。
+
+2026-11-06 真机验收展示修订（用户确认）：小程序各页面的时间统一从原始时间值转换为北京时间，显示 `YYYY-MM-DD HH:mm`，不展示秒、小数或时区后缀；不直接渲染上述接口时间标签。数据库 UTC、并发校验原始时间和小区业务日期计算保持不变。员工“无法处理”通过回执后的入口进入独立上报页，沿用现有 escalate 接口、状态与版本校验。
+
+2026-11-02 回执内部实际处理记录：`POST /staff/work-orders/{id}/receipts` 可选 `handling_mode=SELF|ASSISTED|EXTERNAL`、`handling_note`（最多255字符）。省略表示未记录，不推定由负责人处理；协作/外部支援必须填写参与人员或单位及分工。它是提交者自报，不是资格认定或质量评价；不填写私人联系方式。字段仅在本周期首次提交回执时接受，既有权限、版本和一周期一回执约束不变。
+
+同事务 `WorkOrderLog.payload_json.receipt_handling_v1` 保存 `receipt_id/process_id/mode/note/reported_participant_employee_id`；仅 SELF/ASSISTED 关联提交者的员工ID，代理提交不能错误关联原负责人。日志 actor 是记录人，Process.assignee_id 仍是负责人。物业历史显示相应内部 reason；住户白名单不返回该说明或参与信息，仍保留结果、费用、未解决原因和跟进。历史不回填，无数据迁移；现有统计不因此升级为真实参与人质量统计。
 
 ## 7. Incident / 公告 / 知识 / SLA / 通知 / 文件
 
@@ -187,6 +199,10 @@
 | POST | `/admin/announcements/{id}/submit-review` |
 | POST | `/admin/announcements/{id}/publish` | 人工批准或带原因驳回；未审核 409 |
 | GET | `/announcements` | 住户/员工仅获取已发布且命中房屋、任职及人群范围的公告 |
+
+2026-11-01 公告读取增加 `audience=resident|property`，默认 resident。住户用途要求有效房屋关系与目标范围读取权限，仅返回对应住户人群公告；双角色不会自动带出内部公告。物业用途须显式请求，并校验同一授权内的管理角色/权限/范围，或本租户有效员工服务关系及本范围员工读取权限。旧员工调用同步增加 property 参数；参数本身不授予权限。列表/详情切换用途、小区或重新进入时清空历史结果并拒收旧异步响应。个人历史通知保留政策不在本修订中改变。
+
+`GET /supervisor/work-orders/{id}/diagnosis?property_id={id}&version={version}`：主管只读处理诊断。要求当前身份具备工单目标范围的 `work_order:dispatch`，校验声明小区和选中版本。返回读取时刻、带来源ID/时间的固定事实及建议；最后派单等待记录是历史证据，不代表当前资格，`current_eligibility_checked=false`。不返回原始日志/正文/员工画像，不调用模型或更改工单。页面上下文改变或隐藏时清空结果，旧请求不得覆盖新选择。
 | POST | `/assistant/query` | RAG 问答，返回 answer + citations |
 | GET | `/admin/knowledge-documents` | List authorized tenant/property knowledge documents with version and ingestion status |
 | GET | `/admin/knowledge-documents/{id}` | Read one authorized knowledge document and its version history |
@@ -199,9 +215,17 @@
 | POST | `/notifications/{id}/read` |
 | POST | `/files` | 注册文件元数据，取得 `file_id` |
 | POST | `/files/{id}/content` | 上传文件内容；校验声明大小、扩展名、MIME 魔数并记录内容哈希；相同字节重试幂等，不允许替换已上传内容 |
-| GET | `/files/{id}/content` | 鉴权读取已上传内容；仅上传者或可读关联工单的主体可访问 |
+| GET | `/files/{id}/content` | 按 audience、当前工单权限与媒体可见性鉴权；仅未关联工单的本人上传保留上传者预览例外 |
 | GET | `/healthz` | 进程存活 |
 | GET | `/readyz` | 报告 MySQL、Redis、RabbitMQ；非关键依赖可显示 degraded |
+
+`/assistant/query` 的请求 `audience` 为 `resident`（默认）或 `property`。住户用途仅召回 RESIDENT 文档；双角色也不会自动带出内部资料。物业内部查询必须显式传 `property`，服务端按当前角色和有效关系鉴权；旧内部调用需同步加上该字段。小程序默认住户视图，物业账号可显式选择内部用途，切换用途/小区或重新进入时清空结果并丢弃旧异步响应。用途参数本身不能授予权限。
+
+选定小区时，住户角色需匹配目标 knowledge:read 且有该租户/小区的有效房屋关系；普通 STAFF 需匹配角色权限、ACTIVE Employee、同租户与有效服务关系。仅关系或仅残留角色均不能放行。现有 SUPERVISOR/PROPERTY_ADMIN 明确管理授权保留，不要求管理账号额外建立普通员工档案；TENANT_ADMIN/SYSTEM_ADMIN 仍需匹配目标和读取权限。不指定小区的租户级查询仅允许该租户管理员或系统管理员。角色与关系在以下各读取阶段均重验。
+
+`/assistant/query` 在初始鉴权、召回后、生成前和返回有效答案前分别使用独立短读取事务，重新加载账号权限与范围策略；embedding、向量检索、重排与生成不持有查询 Session 事务。调用入口拒绝调用者已开启的事务，不代其提交或回滚。
+
+生成使用不可变证据快照。生成前和返回前复核全部选中片段（含未被最终引用的上下文）的有效状态、当前版本、租户/小区/可见性及正文、标题、定位；发生变更则返回固定 `knowledge_unavailable` 和空引用，权限撤回沿用鉴权错误，不展示旧答案。引用从复核过的快照构造。该保证止于最后一次读取边界，不承诺与网络发送原子化。真实 MySQL 隔离与连接池行为见批次 D 待验证记录；关系/用途边界见批次 E，不以模拟测试替代真实环境验收。
 
 ## 8. 上传校验
 
@@ -224,3 +248,13 @@
 - 按原资源及最新认证主体核对权限：分析使用 `ai_analysis:review`，知识使用 `knowledge:manage`，通知运维使用对应组织的 `property:manage`。不得混拼不同角色/租户的权限与范围。不可见ID统一404 `TASK.NOT_FOUND` 防止枚举；状态冲突409 `TASK.CONFLICT`，未启用409 `TASK.NOT_ENABLED`，非法输入422。
 - 自动投递最多5次（1/2/4/8秒退避），分析/入库执行最多3次、通知4次，不能叠乘Celery重试。执行租约120秒、心跳20秒、单次硬期限900秒；投递租约15秒、确认未领取期限120秒。只有明确操作员接管才创建下一generation；正常重投不增加generation。
 - 系统允许消息重复，业务派单和员工占用不得重复。外部通知在供应商未提供幂等保障时不承诺exactly-once。隔离演练只处理具名新intent清单，不扫描历史工单或消费历史DLQ。
+# 2026-11-02 增量：物业内部负责工单履历
+
+`GET /api/v1/admin/employees/{employee_id}/work-history?tenant_id=&property_id=&before_id=0&limit=20`
+
+要求当前身份对目标小区同时有 `employee:read` 与 `work_order:dispatch`，每次重新核权；员工须属该企业且在该小区有任职历史。`X-Property-Id` 若提供须匹配。游标按处理轮次ID倒序，limit为1—20；返回 `employee_id/tenant_id/property_id/items/next_cursor`。
+
+每项只含 process_id、work_order_id、cycle_no、当前category/current_order_status、started_at/ended_at、receipt_id/receipt_finished_at、reported_resolved、handling_mode、reported_participant_employee_id、declaration_log_id，以及最新同轮反馈 `latest_feedback(id,recorded_at,confirmed,rating,unresolved)`。无回执/声明/反馈保持null；不推断已解决或由负责人亲自完成。声明来源为回执日志，SELF/ASSISTED提交者可能不是负责人，EXTERNAL不归功于负责人。最新一条反馈不是完整统计。分类/状态是当前值，不冒称历史快照。
+
+不返回住户身份、电话、地址、反馈自由文本或日志原文；不改变质量分母、派单分数或容量政策，不承诺覆盖该员工所有协作参与。
+

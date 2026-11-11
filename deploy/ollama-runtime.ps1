@@ -57,7 +57,7 @@ $ControlledStops = @(
         Reason = "RESOURCE_FLOOR"
     }
 )
-$ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models"
+$ModelRoot = "E:\ai-models\property-ai\models"
 # Reviewed build first: the shipped portable runtime next to the repo, then the
 # per-user install. The sha256 pin below still decides whether a candidate is usable,
 # so preferring the repo-local copy only removes "wrong binary on this host" failures.

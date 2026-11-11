@@ -26,7 +26,11 @@
 
 轮换顺序：先准备未写入日志/证据的新本地凭据和连接串；再在各持久服务中变更账号或认证配置；随后原子更新忽略文件中的服务端与消费者字段、受控重启 8093、验证健康及授权访问。不得清库、丢弃卷或只改 `.env.delivery`。轮换前保持手机入口关闭；发生任一步失败时停止实发并按同一成组配置回滚或修复。
 
-## 当前门控
+## 2026-10-05 发送前运行状态（脱敏）
 
-- 未进行凭据轮换，未切换 SMS Provider，未发送短信。
-- 实发前还需完成离线实现与独立复审、必要轮换、手机号码与模板配置检查及负责人手机就绪确认。
+- 已在隔离 8093 栈成组轮换 `APP_SECRET_KEY`、MySQL 业务/root、Redis、RabbitMQ、MinIO root 及对应消费者 URL/密钥；新凭据的服务端认证和各运行容器的 effective-config 一致。3327 数据库记录数与各持久卷挂载在轮换前后相同；未迁移、清库、删除卷或调用模型。
+- RabbitMQ 首次重建因容器默认主机名改变，当前节点曾看不到原 DLQ 的 2 条积压；旧节点数据仍在原卷内。已在 Compose 中固定原 Mnesia 节点身份并恢复该节点，原 DLQ 2 条重新可见，正常业务队列为空。不得把短暂健康状态等同于持久消息验证。
+- API、worker、publisher、beat 使用 `property-ai-delivery:sms-offline-20261005`，实际镜像 ID 为 `sha256:d1b954ea9f66a352ab8bb58b97dc0bc6e35936685ba331bb32dc7536ba4956c4`。运行镜像中的 379 个受跟踪 backend 文件按跨平台行尾规范化后与 `553be14` 全部匹配。`APP_ENV=staging`，`SMS_PROVIDER=production`，Provider 实例为 `AliyunSmsProvider`；无 Development 回退。
+- 本机短信各必填键均已配置且与运行容器一致；模板代码按登录/注册、重置密码、换绑用途分别匹配 100001、100003、100002。唯一大陆手机号 allowlist 格式与错误号码拒绝门槛通过，但不记录号码或签名值。RAM 自定义策略的云端绑定来自负责人声明，本机只读检查不能独立证明该策略确实授予发送动作；不得将其写成已独立验证。
+- Redis AOF 为 `appendonly=yes`、`appendfsync=always`。一次性预算键已建立、无 TTL，状态 `ACTIVE`，发送尝试 0/4、预留费用 0/0.30 元、未知结果 0；运行源码确认 `AutoRetry=0`、SDK `autoretry=False/max_attempts=1` 且应用只有一处 Provider 发送调用。
+- 8093 `/healthz`、`/readyz` 与 Milvus 健康接口均返回 200；MySQL root/业务、Redis、RabbitMQ 新认证可用，MinIO 原桶可读，Milvus 原 collection 可连接且实体数为 2。本人受限手机入口仍关闭，未调用 `SendSmsVerifyCode`，未发送真实短信。下一步仅在负责人再次明确确认手机准备好后，按已授权范围恢复入口并进行首条注册短信；如需云端 RAM 权限独立证明，应先提供可读策略证据或以首发结果作为实际验证，不得提前宣称成功。

@@ -1,8 +1,9 @@
 # 00 — 项目范围
 
 **产品名称：** 智慧物业 AI 运营与工单调度平台  
-**产品类型：** 真实物业企业 Production V1  
-**文档状态：** Stage 0.5 冻结规格统一已完成，等待 Day 1 计划
+**产品类型：** 面向物业企业的 Production V1 产品规格
+
+**文档状态：** 冻结范围；业务已实现并有本地工程验收记录，不表示正式发布或商业上线
 
 **主客户端：** 一个微信原生小程序，按角色展示不同功能
 
@@ -54,14 +55,17 @@
 - AI 是辅助决策，不是控制面。
 - 数据所有权以 `tenant_id` 为第一隔离边界，`property_id` 为小区边界。
 
-## 6. 阶段划分
+## 6. 历史阶段划分
+
+以下保留初始计划用于追溯，其中逐 Task 确认要求是当时约定，不是当前开发限制。Day 1 / Day 2 基线已验收；后续本地交付记录与正式发布验收须分别核对。当前实施边界以仓库协议和最新授权为准。
 
 | 阶段 | 目标 | 状态 |
 | --- | --- | --- |
 | 0 / 1 | 范围、规格、架构、目录骨架 | 已完成 |
 | 0.5 | Frozen Specification Reconciliation：统一旧规格与最新工程决策 | 已完成 |
-| Day 1 | 按 Task 1~8 完成基础设施到小程序纵向链路及完整验收 | **尚未开始，须另行确认计划** |
-| Day 2+ | 后续 Production V1 模块 | 禁止自行进入 |
+| Day 1 | 按 Task 1~8 完成基础设施到小程序纵向链路及完整验收 | 基线已验收 |
+| Day 2 | 后续 Production V1 模块 | 基线已验收 |
+| Day 3 / Day 4 | 部署、可观测、备份与发布验证 | 已有本地交付记录；不等于正式发布验收通过 |
 
 旧的“Day 1 仅做基础设施、身份/房产留到 Day 2+”节奏正式废弃。新的 Day 1 固定拆分：
 
@@ -74,7 +78,7 @@
 7. Task 7：微信原生小程序最小纵向业务链路
 8. Task 8：完整 Integration / Security / Migration / Acceptance
 
-Day 1 不启动 Milvus、RAG、LLM、VLM、ASR，不实现 WorkOrder、AI 派单、Incident、SLA、正式微信/短信/实名或 Production Nginx。每个 Task 仍须单独经过 PLAN → WAIT → IMPLEMENT → TEST → REPORT → STOP。
+历史 Day 1 范围不包含 Milvus、RAG、LLM、VLM、ASR、WorkOrder、AI 派单、Incident、SLA、正式微信/短信/实名或 Production Nginx。这一早期范围不表示这些能力目前尚未实现。
 
 ## 7. 成功标准（产品层）
 
