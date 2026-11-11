@@ -605,7 +605,7 @@ def test_audit_policy_and_miniprogram_wiring_are_explicit() -> None:
     )
     app_json = (REPO_ROOT / "miniprogram/app.json").read_text(encoding="utf-8")
     work_order_service = (
-        REPO_ROOT / "backend/app/service/work_order.py"
+        REPO_ROOT / "backend/app/service/work_order/lifecycle.py"
     ).read_text(encoding="utf-8")
 
     assert 'indexOf("sla:manage")' in page

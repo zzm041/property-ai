@@ -673,7 +673,7 @@ def test_identity_write_guard_refreshes_locked_user_and_rejects_merged() -> None
 
 
 def test_direct_current_ownership_writers_guard_before_dependent_locks() -> None:
-    work_orders = (REPO_ROOT / "backend/app/service/work_order.py").read_text(encoding="utf-8")
+    work_orders = (REPO_ROOT / "backend/app/service/work_order/lifecycle.py").read_text(encoding="utf-8")
     create = work_orders[work_orders.index("    def _create_work_order("):]
     create = create[:create.index("\n    def ", 10)]
     assert create.index("lock_active_identity") < create.index("_reload_actor")
