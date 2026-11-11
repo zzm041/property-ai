@@ -7,7 +7,8 @@ from pathlib import Path
 
 from app.core import buildinfo
 from app.domain import ai as ai_domain
-from app.domain import observed_event as observed_event_domain
+from app.domain.ai import models as ai_models_domain
+from app.domain.ai import rules as ai_rules_domain
 
 
 def _digest(path: Path) -> str:
@@ -18,10 +19,10 @@ def test_contract_digests_match_the_imported_modules() -> None:
     info = buildinfo.build_info()
     files = info["files"]
     assert isinstance(files, dict)
-    assert files["domain/ai.py"]["sha256"] == _digest(Path(ai_domain.__file__))
-    assert files["domain/observed_event.py"]["sha256"] == _digest(
-        Path(observed_event_domain.__file__)
-    )
+    # S4: the flat modules became shims, so the digests follow the package files
+    # that actually carry the contract (see buildinfo.CONTRACT_MODULES).
+    assert files["domain/ai/models.py"]["sha256"] == _digest(Path(ai_models_domain.__file__))
+    assert files["domain/ai/rules.py"]["sha256"] == _digest(Path(ai_rules_domain.__file__))
 
 
 def test_prompt_versions_come_from_the_contract_modules() -> None:
@@ -35,9 +36,8 @@ def test_app_copies_lists_every_importable_app_package() -> None:
     info = buildinfo.build_info()
     copies = info["app_copies"]
     assert isinstance(copies, list)
-    # The probe has to be a plain module of the ``app`` package: ``app.domain.ai``
-    # became a package in S3, so its ``__file__`` no longer sits one level below
-    # ``app``.  The assertion is the same: the directory holding ``app`` is listed.
+    # The probe is ``app/__init__.py`` (S4): it exists in every copy and survives
+    # the shim removal, unlike the old ``app/domain/observed_event.py`` probe.
     assert str(Path(buildinfo.__file__).parents[1]) in copies
     assert len(copies) == len(set(copies))
 

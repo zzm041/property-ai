@@ -18,14 +18,22 @@ from pathlib import Path
 
 import app as app_package
 from app.domain import ai as ai_domain
-from app.domain import observed_event as observed_event_domain
+from app.domain.ai import models as ai_models_domain
+from app.domain.ai import rules as ai_rules_domain
 
 UNKNOWN = "unknown"
 
 #: Files whose content decides the analysis contract; reported by name -> module.
+#:
+#: S4/PA-116: these used to point at the flat ``domain/ai.py`` and
+#: ``domain/observed_event.py`` modules.  Both are now compatibility shims, so a
+#: digest of them says nothing about the contract (and they disappear in phase
+#: two).  Point at the package files that actually carry it: ``models`` holds the
+#: observed-event contract and labels (PA-001), ``rules`` holds the skill aliases,
+#: prompt version and label matching (PA-001 / PA-101-A).
 CONTRACT_MODULES: dict[str, object] = {
-    "domain/ai.py": ai_domain,
-    "domain/observed_event.py": observed_event_domain,
+    "domain/ai/models.py": ai_models_domain,
+    "domain/ai/rules.py": ai_rules_domain,
 }
 
 
@@ -38,14 +46,20 @@ def _sha256(path: Path) -> str:
 
 
 def _app_copies() -> list[str]:
-    """Every importable ``app`` package on ``sys.path`` that ships the contract."""
+    """Every importable ``app`` package on ``sys.path``.
+
+    The probe is ``app/__init__.py``: any copy of the package has it, including
+    the pre-PA-116 ``/app/app`` duplicate, and it survives the shim removal in
+    phase two (the old probe looked for ``app/domain/observed_event.py``, which is
+    a shim today and gone tomorrow).
+    """
 
     copies: list[str] = []
     for entry in sys.path:
         # An empty entry means "current working directory", which is exactly how
         # the pre-PA-116 image let ``/app/app`` win over site-packages.
         base = Path(entry) if entry else Path.cwd()
-        candidate = base / "app" / "domain" / "observed_event.py"
+        candidate = base / "app" / "__init__.py"
         if candidate.is_file():
             copies.append(str(base / "app"))
     return sorted(set(copies))

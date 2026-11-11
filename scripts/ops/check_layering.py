@@ -90,6 +90,13 @@ SHIMMED_MODULES: dict[str, str] = {
     # S3: the analysis domain modules moved into app.domain.ai.
     "app.domain.ai": "ai",
     "app.domain.observed_event": "ai",
+    # S4: knowledge/governance/dev moved into their own packages.
+    "app.domain.knowledge": "knowledge",
+    "app.domain.audit": "governance",
+    "app.domain.incident": "governance",
+    "app.domain.announcement": "governance",
+    "app.domain.operations": "governance",
+    "app.domain.dev_seed": "dev",
 }
 
 SHIM_MAX_EFFECTIVE_LINES = 8
