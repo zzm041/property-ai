@@ -97,13 +97,48 @@ def _vision_segments(value: str | None) -> list[str]:
     return [value.strip()] if value.strip() else []
 
 
+def _asr_segments(value: str | None) -> list[tuple[str, list[int]]]:
+    """Decode the per-audio transcript envelope into one line per audio file.
+
+    `_run_all_asr` stores a JSON array of ``{audio_index, text, error_code,
+    source}`` because the work-order API surfaces it verbatim. Sentence
+    splitting that envelope would hand the model JSON fragments - ``asr:1``
+    would stop mid-string and ``asr:2`` would carry ``error_code``/``source``
+    plumbing - so the transcripts are decoded first. Anything that is not the
+    envelope keeps the plain sentence split.
+    """
+    if not value:
+        return []
+    try:
+        decoded = json.loads(value)
+    except (TypeError, ValueError, json.JSONDecodeError):
+        return []
+    if not isinstance(decoded, list):
+        return []
+    rows: list[tuple[str, list[int]]] = []
+    offset = 0
+    for item in decoded:
+        if not isinstance(item, dict):
+            continue
+        text = item.get("text")
+        if not isinstance(text, str):
+            continue
+        segment = text.strip()
+        if not segment:
+            continue
+        rows.append((segment, [offset, offset + len(segment)]))
+        offset += len(segment) + 1
+    return rows
+
+
 def build_evidence_catalog(
     *, report_text: str | None, asr_text: str | None, vision_text: str | None,
 ) -> dict[str, dict[str, object]]:
     """Create stable per-request ids; history is deliberately not catalogued."""
     catalog: dict[str, dict[str, object]] = {}
     for source, text in (("report", report_text), ("asr", asr_text)):
-        for index, (segment, span) in enumerate(_source_segments(text), 1):
+        segments = _asr_segments(text) if source == "asr" else []
+        for index, (segment, span) in enumerate(segments or _source_segments(text), 1):
             catalog[f"{source}:{index}"] = {"source": source, "text": segment, "span": span}
     for index, segment in enumerate(_vision_segments(vision_text), 1):
         catalog[f"vision:{index}"] = {"source": "vision", "text": segment, "image_index": index}

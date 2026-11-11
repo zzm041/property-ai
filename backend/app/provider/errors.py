@@ -36,3 +36,19 @@ class ProviderInputQuarantinedError(ProviderError):
     """
 
     error_code = "AI.INPUT_QUARANTINED"
+
+
+class ProviderAudioTranscodeError(ProviderError):
+    """The recording could not be turned into the PCM the ASR adapter accepts.
+
+    Raised instead of shipping bytes the adapter answers with ``PCM_REQUIRED``,
+    so the failure names the recording rather than the AI call.
+    """
+
+    error_code = "AI.AUDIO_TRANSCODE_FAILED"
+
+
+class ProviderAudioTranscodeUnavailableError(ProviderUnavailableError):
+    """No audio decoder is installed in this runtime."""
+
+    error_code = "AI.AUDIO_TRANSCODE_UNAVAILABLE"

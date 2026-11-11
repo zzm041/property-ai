@@ -229,10 +229,25 @@ def test_qwen_vlm_reads_only_storage_object() -> None:
     assert insight.labels == ("electrical",)
 
 
+def _pcm_wav(seconds: float = 0.1) -> bytes:
+    """A 16 kHz mono s16 WAV: the shape the ASR adapter accepts unchanged."""
+    import io
+    import wave
+
+    buffer = io.BytesIO()
+    with wave.open(buffer, "wb") as handle:
+        handle.setnchannels(1)
+        handle.setsampwidth(2)
+        handle.setframerate(16000)
+        handle.writeframes(b"\x00\x00" * int(16000 * seconds))
+    return buffer.getvalue()
+
+
 def test_http_asr_returns_text_without_secret() -> None:
     storage = DevelopmentStorageProvider()
-    stored = storage.register_object(mime_type="audio/mpeg", size_bytes=3)
-    storage.put_object(stored.storage_key, b"mp3", "audio/mpeg")
+    payload = _pcm_wav()
+    stored = storage.register_object(mime_type="audio/wav", size_bytes=len(payload))
+    storage.put_object(stored.storage_key, payload, "audio/wav")
 
     def handler(request: httpx.Request) -> httpx.Response:
         assert "sk-asr" not in request.content.decode("latin1", errors="ignore")
@@ -246,7 +261,7 @@ def test_http_asr_returns_text_without_secret() -> None:
         storage=storage,
         client=httpx.Client(transport=httpx.MockTransport(handler)),
     )
-    transcript = provider.transcribe(storage_key=stored.storage_key, mime_type="audio/mpeg")
+    transcript = provider.transcribe(storage_key=stored.storage_key, mime_type="audio/wav")
     assert transcript.text == "kitchen outlet sparking"
     assert "sk-asr" not in transcript.text
 

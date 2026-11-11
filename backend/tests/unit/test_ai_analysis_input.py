@@ -36,6 +36,20 @@ def test_usage_only_retains_measured_nonnegative_database_safe_integer(usage, ex
     assert response_token_usage({'usage': usage}) == expected
 
 
+def _pcm_wav(seconds: float = 0.1) -> bytes:
+    """A 16 kHz mono s16 WAV, the shape the ASR adapter accepts unchanged."""
+    import io
+    import wave
+
+    buffer = io.BytesIO()
+    with wave.open(buffer, "wb") as handle:
+        handle.setnchannels(1)
+        handle.setsampwidth(2)
+        handle.setframerate(16000)
+        handle.writeframes(b"\x00\x00" * int(16000 * seconds))
+    return buffer.getvalue()
+
+
 @pytest.mark.parametrize('kind', ['llm', 'vlm', 'asr'])
 def test_adapter_preserves_usage_without_polluting_structured_output(kind):
     def handler(request):
@@ -45,7 +59,9 @@ def test_adapter_preserves_usage_without_polluting_structured_output(kind):
         return httpx.Response(200, json={'choices': [{'message': {'content': json.dumps(value)}}], 'usage': {'total_tokens': 12}})
     args = {'base_url': 'https://operator.invalid/v1', 'model': 'candidate', 'api_key': 'synthetic-unit-key', 'timeout_seconds': 1, 'client': httpx.Client(transport=httpx.MockTransport(handler))}
     storage = MagicMock()
-    storage.get_object.return_value = b'synthetic bytes'
+    # The ASR adapter only accepts PCM, so the fake storage returns a real
+    # 16 kHz mono s16 WAV instead of arbitrary bytes.
+    storage.get_object.return_value = _pcm_wav() if kind == 'asr' else b'synthetic bytes'
     if kind == 'llm':
         result = QwenLLMProvider(**args).structured_completion(prompt='x', prompt_version=WORK_ORDER_ANALYSIS_PROMPT_VERSION)
         assert dict(result) == SUCCESS_ANALYSIS
@@ -54,7 +70,7 @@ def test_adapter_preserves_usage_without_polluting_structured_output(kind):
         result = QwenVLMProvider(**args, storage=storage).inspect_image(storage_key='authorized-key', mime_type='image/png')
         storage.get_object.assert_called_once_with('authorized-key')
     else:
-        result = HttpASRProvider(**args, storage=storage).transcribe(storage_key='authorized-key', mime_type='audio/mpeg')
+        result = HttpASRProvider(**args, storage=storage).transcribe(storage_key='authorized-key', mime_type='audio/wav')
     assert result.token_usage == 12
 
 
