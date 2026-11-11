@@ -11,10 +11,11 @@ from app.cli.bootstrap_system_admin import main as bootstrap_system_admin
 from app.core.config import get_settings
 
 
-HEAD = "20261111_0018_content_fingerprint_loose"
+HEAD = "20261111_0019_ai_call_log_embedding_rerank"
 MEDIA_CYCLE_REVISION = "20261003_0015_work_order_media_cycle_links"
 IDEMPOTENCY_REVISION = "20261111_0016_idempotency_key_scope"
 CONTENT_FINGERPRINT_REVISION = "20261111_0017_content_fingerprint"
+CONTENT_FINGERPRINT_LOOSE_REVISION = "20261111_0018_content_fingerprint_loose"
 IDENTITY_SLA_REVISION = "20260926_0014_identity_merge_sla_versions"
 PRE_BOOTSTRAP = "20260925_0012_task_intents"
 
@@ -27,6 +28,7 @@ RESUMABLE_REVISIONS = frozenset(
         MEDIA_CYCLE_REVISION,
         IDEMPOTENCY_REVISION,
         CONTENT_FINGERPRINT_REVISION,
+        CONTENT_FINGERPRINT_LOOSE_REVISION,
     }
 )
 LIVE_DATABASE = "property_ai_delivery_check"

@@ -43,7 +43,7 @@ from app.core.database import (  # noqa: E402
 #: is created (same split as `app.cli.customer_install`).
 PRE_BOOTSTRAP = "20260925_0012_task_intents"
 #: Migration whose guard demands that administrator already exist.
-HEAD = "20261111_0018_content_fingerprint_loose"
+HEAD = "20261111_0019_ai_call_log_embedding_rerank"
 #: Fixed identity for the throwaway schema's baseline administrator. Integration tests
 #: wipe `users` between runs, so this is provenance, not an account anybody uses.
 DEFAULT_BOOTSTRAP_PHONE = "13800000000"

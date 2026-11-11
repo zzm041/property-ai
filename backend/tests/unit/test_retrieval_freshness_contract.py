@@ -54,7 +54,7 @@ def context(monkeypatch):
     monkeypatch.setattr(session, "expire_all", expire)
     repo = MagicMock()
     repo.get_chunks_by_ids.side_effect = get_chunks
-    service = retrieval.RetrievalService(session, repository=repo, settings=NS(embedding_dimensions=3))
+    service = retrieval.RetrievalService(session, repository=repo, settings=NS(embedding_dimensions=3, rag_answer_prompt_version='rag-answer-v2'))
     service._principal_loader = load_principal
     monkeypatch.setattr(service, "_acl_for", acl_for)
     embedder, store, reranker, llm = (MagicMock() for _ in range(4))

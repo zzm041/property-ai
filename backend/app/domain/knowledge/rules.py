@@ -14,7 +14,25 @@ KNOWLEDGE_READ = "knowledge:read"
 KNOWLEDGE_MANAGE = "knowledge:manage"
 
 
-RAG_ANSWER_PROMPT_VERSION = "rag-answer-v4"
+# F1 / t177: the delivery RAG adapter is a frozen artifact (deploy/rag-runtime.ps1
+# pins its source commit and sha256). In scope=rag_only it authorizes exactly one
+# X-Prompt-Version value and rejects every other one with
+# RAG_ONLY_NO_AUTO_AUTHORIZATION, so the app must ask for that value instead of
+# whatever text revision happens to be newest in the repository.
+RAG_ANSWER_AUTHORIZED_PROMPT_VERSION = "rag-answer-v2"
+
+# v3 and v4 answer texts are written and kept, but they are NOT authorized by the
+# frozen adapter yet. Enabling one needs deploy/ai-runtime-prompts.json re-frozen
+# with that version and the adapter pin (rag-runtime.ps1 $ExpectedAdapterSha256 /
+# $SourceCommit) recomputed. Never relabel a v4 answer as v2 to get past the check:
+# that would make the audit trail lie about which prompt produced the answer.
+RAG_ANSWER_PROMPT_VERSIONS = (
+    RAG_ANSWER_AUTHORIZED_PROMPT_VERSION,
+    "rag-answer-v3",
+    "rag-answer-v4",
+)
+
+RAG_ANSWER_PROMPT_VERSION = RAG_ANSWER_AUTHORIZED_PROMPT_VERSION
 
 
 DEFAULT_CHUNK_CHARS = 400

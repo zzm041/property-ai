@@ -182,6 +182,10 @@ class Settings(BaseSettings):
     rag_llm_timeout_seconds: float = Field(default=8.0, ge=0.1, le=60.0)
     rag_llm_disable_thinking: bool = False
     rag_llm_max_output_tokens: int | None = Field(default=None, ge=1, le=8192)
+    # F1 / t177: the frozen delivery adapter authorizes one RAG prompt version
+    # (scope=rag_only). Override only after that adapter has been re-frozen with a
+    # new version; an unauthorized value is rejected at request time, never remapped.
+    rag_answer_prompt_version: str = "rag-answer-v2"
     local_ai_internal_token: SecretStr = SecretStr("")
     vlm_provider: Literal["development", "production"] = "development"
     vlm_base_url: str = ""
@@ -268,6 +272,28 @@ class Settings(BaseSettings):
         if development_target == test_target:
             raise ValueError(
                 "TEST_DATABASE_URL must target a different MySQL database or instance"
+            )
+        return self
+
+    @model_validator(mode="after")
+    def validate_rag_answer_prompt_version(self) -> "Settings":
+        """F1 / t177: a version the frozen adapter rejects is a configuration error.
+
+        The adapter answers RAG_ONLY_NO_AUTO_AUTHORIZATION for any X-Prompt-Version
+        it was not frozen with, so an unknown value here would only fail later, at
+        request time, with AI.INVALID_OUTPUT. Reject it while the stack starts.
+        """
+
+        from app.domain.knowledge import RAG_ANSWER_PROMPT_VERSIONS
+
+        if self.rag_answer_prompt_version not in RAG_ANSWER_PROMPT_VERSIONS:
+            raise ValueError(
+                "RAG_ANSWER_PROMPT_VERSION must be one of "
+                f"{', '.join(RAG_ANSWER_PROMPT_VERSIONS)};"
+                f" got {self.rag_answer_prompt_version!r}. The delivery adapter is"
+                " frozen and authorizes only rag-answer-v2 until"
+                " deploy/ai-runtime-prompts.json is re-frozen with a new version and"
+                " the adapter pin in deploy/rag-runtime.ps1 is recomputed"
             )
         return self
 

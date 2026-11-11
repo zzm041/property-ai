@@ -3,11 +3,13 @@
 from dataclasses import dataclass, field
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
+from datetime import timedelta
 import json
 from math import isfinite
 import re
 from time import perf_counter
 
+from sqlalchemy import MetaData, Table, inspect as sa_inspect, update
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings, get_settings
@@ -15,6 +17,7 @@ from app.core.database import begin_owned_transaction
 from app.core.errors import AppError, IamErrorCode, KnowledgeErrorCode
 from app.core.logging import get_logger
 from app.core.time import utc_now
+from app.domain.ai import AiCallStatus, ProviderType
 from app.domain.identity import OrganizationScope, Principal, ScopeType
 from app.domain.knowledge import (
     DEFAULT_MIN_RELEVANCE,
@@ -28,13 +31,17 @@ from app.domain.knowledge import (
     KnowledgeVisibility,
     RagAnswerOutput,
     RagAnswerStatus,
+    hash_content,
     milvus_property_id,
     visibilities_for_principal,
 )
+from app.model.ai import AiCallLog
 from app.model.knowledge import KnowledgeChunk, KnowledgeDocument
 from app.provider.errors import (
     ProviderError,
     ProviderInvalidOutputError,
+    ProviderInvalidOutputError as _ProviderInvalidOutputError,
+    ProviderTimeoutError,
 )
 from app.provider.factory import (
     build_embedding_provider,
@@ -43,6 +50,7 @@ from app.provider.factory import (
     build_reranker_provider,
 )
 from app.provider.usage import valid_token_count
+from app.repository.ai import AiRepository
 from app.repository.employee import EmployeeRepository
 from app.repository.identity import IdentityRepository
 from app.repository.knowledge import KnowledgeRepository
@@ -156,6 +164,19 @@ class _QueryTrace:
             self.phases.append(phase)
 
 
+KNOWLEDGE_CALL_LOG_BIZ_TYPE = "KNOWLEDGE_QUERY"
+
+
+def _status_for_error(error: ProviderError) -> AiCallStatus:
+    """Same mapping the work-order chain uses, so both audits read alike."""
+
+    if isinstance(error, ProviderTimeoutError):
+        return AiCallStatus.TIMEOUT
+    if isinstance(error, _ProviderInvalidOutputError):
+        return AiCallStatus.INVALID
+    return AiCallStatus.FAILED
+
+
 class RetrievalService:
     def __init__(
         self,
@@ -173,6 +194,7 @@ class RetrievalService:
         self._residents = resident_repository or ResidentBindingRepository(session)
         self._employees = employee_repository or EmployeeRepository(session)
         self._settings = settings or get_settings()
+        self._ai = AiRepository(session)
         self._principal_loader = principal_loader or AuthService(
             session, IdentityRepository(session),
         ).load_principal
@@ -206,7 +228,7 @@ class RetrievalService:
             _diagnostic(
                 "info", "knowledge_query_completed", request_id=request_id,
                 audience=audience if audience in {"resident", "property"} else "invalid",
-                prompt_version=RAG_ANSWER_PROMPT_VERSION,
+                prompt_version=self._settings.rag_answer_prompt_version,
                 status=status, error_code=error_code, reason=trace.reason, stage=trace.stage,
                 latency_ms=round(max(0, perf_counter() - started) * 1000, 3),
                 retrieved_count=trace.retrieved_count, visible_count=trace.visible_count,
@@ -214,6 +236,110 @@ class RetrievalService:
                 rerank_fallback=trace.rerank_fallback,
                 rerank_fallback_error_code=trace.rerank_fallback_error_code, phases=trace.phases,
             )
+
+    def _audited_call(
+        self,
+        *,
+        trace: _QueryTrace,
+        stage: str,
+        provider: object,
+        method: Callable[..., object],
+        args: tuple[object, ...] = (),
+        kwargs: dict[str, object] | None = None,
+        provider_type: ProviderType,
+        operation: str,
+        request_id: str,
+        tenant_id: int | None,
+        input_hash: str,
+    ) -> object:
+        """Run one provider call and audit it, success or failure (F2 / t177).
+
+        The row is written in its own transaction: a failed provider must still
+        leave a row, and an audit write must never change the answer.
+        """
+
+        started_at = utc_now()
+        try:
+            result = trace.call(stage, provider, method, *args, **(kwargs or {}))
+        except ProviderError as exc:
+            self._record_call(
+                provider_type=provider_type, operation=operation, request_id=request_id,
+                tenant_id=tenant_id, input_hash=input_hash, started_at=started_at,
+                phase=trace.phases[-1], status=_status_for_error(exc),
+                error_code=exc.error_code,
+            )
+            raise
+        self._record_call(
+            provider_type=provider_type, operation=operation, request_id=request_id,
+            tenant_id=tenant_id, input_hash=input_hash, started_at=started_at,
+            phase=trace.phases[-1], status=AiCallStatus.SUCCESS, error_code=None,
+        )
+        return result
+
+    def _record_call(
+        self,
+        *,
+        provider_type: ProviderType,
+        operation: str,
+        request_id: str,
+        tenant_id: int | None,
+        input_hash: str,
+        started_at,
+        phase: dict[str, object],
+        status: AiCallStatus,
+        error_code: str | None,
+    ) -> None:
+        latency_ms = int(max(0.0, float(phase.get("latency_ms") or 0.0)))
+        model_version = str(phase.get("model_version") or "unknown")[:64]
+        try:
+            with begin_owned_transaction(self._session):
+                record = self._ai.add_call_log(
+                    AiCallLog(
+                        tenant_id=tenant_id,
+                        property_id=None,
+                        work_order_id=None,
+                        request_id=request_id[:128],
+                        provider_type=provider_type.value,
+                        operation=operation,
+                        biz_type=KNOWLEDGE_CALL_LOG_BIZ_TYPE,
+                        prompt_version=None,
+                        model_version=model_version,
+                        status=status.value,
+                        started_at=started_at,
+                        finished_at=started_at + timedelta(milliseconds=latency_ms),
+                        latency_ms=latency_ms,
+                        attempt=1,
+                        error_code=error_code,
+                        token_usage=None,
+                        input_hash=input_hash,
+                    )
+                )
+                self._record_provider_mode(record.id, provider_type)
+        except Exception:  # audit must never replace the business result
+            _diagnostic(
+                "warning", "knowledge_call_log_failed", request_id=request_id,
+                provider_type=provider_type.value, operation=operation,
+            )
+
+    def _record_provider_mode(self, call_log_id: int, provider_type: ProviderType) -> None:
+        """Fill the 0009 provenance column when the shared schema has it."""
+
+        bind = self._session.get_bind()
+        if bind is None:
+            return
+        columns = {column["name"] for column in sa_inspect(bind).get_columns("ai_call_logs")}
+        if "provider_mode" not in columns:
+            return
+        configured = {
+            ProviderType.EMBEDDING: self._settings.embedding_provider,
+            ProviderType.RERANK: self._settings.reranker_provider,
+        }[provider_type]
+        table = Table("ai_call_logs", MetaData(), autoload_with=bind)
+        self._session.execute(
+            update(table)
+            .where(table.c.id == call_log_id)
+            .values(provider_mode=str(configured).upper())
+        )
 
     def _query(
         self, *, actor: Principal, question: str, request_id: str,
@@ -235,7 +361,12 @@ class RetrievalService:
         reranker = build_reranker_provider(settings)
         llm = build_rag_llm_provider(settings)
         try:
-            query_vector = trace.call("embed", embedder, embedder.embed, (question,))[0]
+            query_vector = self._audited_call(
+                trace=trace, stage="embed", provider=embedder, method=embedder.embed,
+                args=((question,),), provider_type=ProviderType.EMBEDDING,
+                operation="embed", request_id=request_id,
+                tenant_id=initial_acl.tenant_id, input_hash=hash_content(question),
+            )[0]
             hits = trace.call("search", store, store.search,
                 vector=query_vector,
                 expr=self._milvus_expr(initial_acl),
@@ -264,9 +395,18 @@ class RetrievalService:
                 citations=(),
             )
         try:
-            scores = trace.call("rerank", reranker, reranker.rerank,
-                query=question,
-                documents=tuple(item.excerpt for item in visible),
+            scores = self._audited_call(
+                trace=trace, stage="rerank", provider=reranker, method=reranker.rerank,
+                kwargs={
+                    "query": question,
+                    "documents": tuple(item.excerpt for item in visible),
+                },
+                provider_type=ProviderType.RERANK, operation="rerank",
+                request_id=request_id, tenant_id=initial_acl.tenant_id,
+                # Evidence ids, not evidence text, identify what was resorted.
+                input_hash=hash_content(
+                    question + "\x00" + ",".join(str(item.id) for item in visible)
+                ),
             )
             try:
                 valid_scores = (
@@ -321,7 +461,7 @@ class RetrievalService:
         try:
             raw = trace.call("generate", llm, llm.structured_completion,
                 prompt=prompt,
-                prompt_version=RAG_ANSWER_PROMPT_VERSION,
+                prompt_version=self._settings.rag_answer_prompt_version,
             )
             parsed = RagAnswerOutput.model_validate(raw)
         except ProviderError:

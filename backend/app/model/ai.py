@@ -97,7 +97,7 @@ class AiCallLog(BigIntPrimaryKeyMixin, Base):
     __tablename__ = "ai_call_logs"
     __table_args__ = (
         CheckConstraint(
-            "BINARY provider_type IN ('LLM', 'VLM', 'ASR')",
+            "BINARY provider_type IN ('LLM', 'VLM', 'ASR', 'EMBEDDING', 'RERANK')",
             name="provider_type",
         ),
         CheckConstraint(

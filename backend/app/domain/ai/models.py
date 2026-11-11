@@ -89,6 +89,11 @@ class ProviderType(StrEnum):
     LLM = "LLM"
     VLM = "VLM"
     ASR = "ASR"
+    # F2 / t177: the knowledge assistant calls an embedding model and a reranker.
+    # They are providers like the other three, so their calls are audited in the
+    # same table instead of only in structured logs.
+    EMBEDDING = "EMBEDDING"
+    RERANK = "RERANK"
 
 
 class AiCallStatus(StrEnum):
