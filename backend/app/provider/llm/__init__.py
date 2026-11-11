@@ -9,7 +9,7 @@ import httpx
 
 from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
 from app.domain.knowledge import RAG_ANSWER_PROMPT_VERSION
-from app.domain.observed_event import work_order_analysis_response_format
+from app.domain.ai import work_order_analysis_response_format
 from app.provider.errors import (
     ProviderInvalidOutputError,
     ProviderTimeoutError,

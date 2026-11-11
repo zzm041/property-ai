@@ -21,11 +21,11 @@ from app.api.v1.work_orders import (
 from app.core.config import Settings
 from app.core.exception_handlers import install_exception_handlers
 from app.core.rate_limit import MemoryRateLimiter
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.provider.asr import Transcript
 from app.provider.errors import ProviderTimeoutError, ProviderUnavailableError
 from app.provider.vision import VisionInsight
-from app.service.description_suggestion import (
+from app.service.work_order.description_suggestion import (
     SUGGEST_TIMEOUT_SECONDS,
     SUGGESTION_REASONS,
     DescriptionSuggestionService,
@@ -322,10 +322,10 @@ def test_the_suggestion_call_is_capped_at_fifteen_seconds(monkeypatch):
         return StubVLM()
 
     monkeypatch.setattr(
-        "app.service.description_suggestion.build_vlm_provider", _capture
+        "app.service.work_order.description_suggestion.build_vlm_provider", _capture
     )
     monkeypatch.setattr(
-        "app.service.description_suggestion.build_asr_provider",
+        "app.service.work_order.description_suggestion.build_asr_provider",
         lambda settings: StubASR(),
     )
     settings = Settings(

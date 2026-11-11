@@ -18,7 +18,7 @@ import pytest
 
 from app.core.errors import AppError
 from app.domain.ai import ANNOUNCEMENT_DRAFT
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.provider.errors import ProviderUnavailableError
 from app.service.announcement import AnnouncementService
 

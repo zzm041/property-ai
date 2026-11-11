@@ -10,7 +10,7 @@ from app.domain.ai import (
     INCIDENT_MANAGE,
     INCIDENT_READ,
 )
-from app.domain.dev_seed import SEED_ROLE_PERMISSIONS
+from app.domain.dev import SEED_ROLE_PERMISSIONS
 
 
 def test_system_admin_has_no_task_7_business_permissions() -> None:

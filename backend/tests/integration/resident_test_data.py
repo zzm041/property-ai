@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from sqlalchemy.orm import Session
 
 from app.model.identity import Permission, Role, RolePermission, User, UserRole
-from app.service.property import PropertyService
+from app.service.identity.property import PropertyService
 
 
 @dataclass(frozen=True, slots=True)

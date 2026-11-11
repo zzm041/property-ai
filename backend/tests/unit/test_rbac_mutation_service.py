@@ -8,13 +8,13 @@ from sqlalchemy.exc import IntegrityError
 
 from app.core.database import OWNED_TXN_KEY, OWNED_TXN_OBJ_KEY
 from app.core.errors import AppError, IamErrorCode
-from app.domain.audit import AuditAction, AuditResourceType, AuditSource
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.governance import AuditAction, AuditResourceType, AuditSource
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.model.identity import Permission, Role, RolePermission, User, UserRole
 from app.repository.property import PropertyRepository
 from app.repository.rbac_mutation import RbacMutationRepository
 from app.service.audit import AuditService
-from app.service.rbac_mutation import RbacMutationService
+from app.service.identity.rbac_mutation import RbacMutationService
 
 
 def _principal(

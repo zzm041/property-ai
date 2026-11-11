@@ -12,8 +12,8 @@ from sqlalchemy.orm import Session
 from app.core.config import get_settings
 from app.core.database import create_database_engine
 from app.core.errors import AppError, DevSeedErrorCode
-from app.domain.audit import AuditAction
-from app.domain.dev_seed import DEV_PROPERTY_NAME
+from app.domain.governance import AuditAction
+from app.domain.dev import DEV_PROPERTY_NAME
 from app.main import create_app
 from app.model.employee import Employee
 from app.model.identity import AuditLog, User

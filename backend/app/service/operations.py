@@ -7,9 +7,9 @@ from sqlalchemy.orm import Session
 
 from app.core.errors import AppError, IamErrorCode, StatsErrorCode
 from app.core.time import to_business_date, utc_now
-from app.domain.iam import OrganizationScope, Principal, ScopeType
-from app.domain.incident import IncidentStatus
-from app.domain.operations import STATS_READ
+from app.domain.identity import OrganizationScope, Principal, ScopeType
+from app.domain.governance import IncidentStatus
+from app.domain.governance import STATS_READ
 from app.domain.work_order import (
     TERMINAL_STATUSES,
     SlaClockState,
@@ -29,7 +29,7 @@ from app.schema.operations import (
     StaffingStatsData,
     WorkOrderStatsData,
 )
-from app.service.rbac import RbacService
+from app.service.identity.rbac import RbacService
 
 
 class OperationsService:

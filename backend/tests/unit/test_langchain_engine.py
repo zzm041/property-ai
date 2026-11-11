@@ -10,7 +10,7 @@ from __future__ import annotations
 import pytest
 
 from app.core.config import Settings
-from app.provider import langchain_llm
+from app.provider.llm import langchain_llm
 from app.provider.errors import ProviderInvalidOutputError, ProviderUnavailableError
 from app.provider.supervisor_agent import LangChainSupervisorPlanner, SupervisorPlanner
 from app.service.supervisor_agent_tools import build_supervisor_planner
@@ -148,7 +148,7 @@ class Blocker:
         return None
 sys.meta_path.insert(0, Blocker())
 from app.core.config import Settings
-from app.provider import langchain_llm
+from app.provider.llm import langchain_llm
 from app.provider.supervisor_agent import LangChainSupervisorPlanner, SupervisorPlanner
 from app.service.supervisor_agent_tools import build_supervisor_planner
 settings = Settings(_env_file=None, app_env='test', supervisor_agent_engine='langchain',

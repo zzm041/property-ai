@@ -5,7 +5,7 @@ from unittest.mock import Mock
 import pytest
 
 from app.domain.ai import AiRisk
-from app.domain.observed_event import build_evidence_catalog
+from app.domain.ai import build_evidence_catalog
 from app.service.analysis import AnalysisService
 
 

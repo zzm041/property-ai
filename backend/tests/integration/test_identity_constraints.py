@@ -13,7 +13,7 @@ from app.model.identity import (
     User,
     UserRole,
 )
-from app.service.property import PropertyService
+from app.service.identity.property import PropertyService
 
 
 def _create_user_and_role(session: Session) -> tuple[User, Role]:

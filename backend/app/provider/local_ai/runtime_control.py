@@ -39,8 +39,8 @@ from local_ai_runtime_control import (
 )
 from app.domain import ai as ai_contract
 from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
-from app.domain.observed_event import work_order_analysis_response_format
-from app.domain.vision import (
+from app.domain.ai import work_order_analysis_response_format
+from app.domain.work_order import (
     VISION_ANALYSIS_PROMPT_VERSION,
     vision_analysis_response_format,
 )

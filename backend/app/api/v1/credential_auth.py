@@ -11,8 +11,8 @@ from app.api.dependencies.db import get_db_session
 from app.core.config import Settings, get_settings
 from app.core.errors import AppError, AuthErrorCode
 from app.core.rate_limit import MemoryRateLimiter
-from app.domain.iam import Principal
-from app.domain.phone import normalize_phone
+from app.domain.identity import Principal
+from app.domain.identity import normalize_phone
 from app.provider.sms import development_sms_inbox
 from app.schema.auth import (
     LogoutRequest,
@@ -27,7 +27,7 @@ from app.schema.auth import (
     VisualChallengeRequest,
 )
 from app.schema.common import request_id_for, success_envelope
-from app.service.credential_auth import CredentialAuthService
+from app.service.identity.credential_auth import CredentialAuthService
 
 router = APIRouter(prefix="/auth", tags=["credential-auth"])
 

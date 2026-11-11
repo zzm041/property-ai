@@ -17,9 +17,9 @@ from app.core.rate_limit import AuthRateLimitGuard, RateLimiter, RedisRateLimite
 from app.core.security import issue_access_token
 from app.core.time import utc_now
 from app.core.token_hash import generate_invite_token, generate_otp_code, generate_refresh_token, keyed_hash
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import ScopeType
-from app.domain.phone import mask_phone, normalize_phone
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import ScopeType
+from app.domain.identity import mask_phone, normalize_phone
 from app.model.identity import (
     AuthSession,
     PasswordResetTicket,

@@ -7,8 +7,8 @@ import pytest
 from sqlalchemy.exc import IntegrityError
 
 from app.core.errors import AppError
-from app.domain.audit import AUDIT_ACTION_POLICIES, AuditAction, AuditResourceType
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.governance import AUDIT_ACTION_POLICIES, AuditAction, AuditResourceType
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.model.identity import UserPhone
 from app.model.property import Property, Tenant
 from app.model.work_order import IdempotencyRecord
@@ -16,8 +16,8 @@ from app.repository.credential import CredentialRepository
 from app.repository.property import PropertyRepository
 from app.schema.organization import CreateOrganizationRequest
 from app.service.audit import AuditService
-from app.service.organization import OrganizationOnboardingService
-from app.service.rbac_mutation import RbacMutationService
+from app.service.identity.organization import OrganizationOnboardingService
+from app.service.identity.rbac_mutation import RbacMutationService
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.api.dependencies.auth import get_current_principal
 from app.api.dependencies.db import get_db_session
 from app.api.v1.admin_announcements import announcement_data, get_announcement_service
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.schema.ai import AnnouncementListData
 from app.schema.common import success_envelope
 from app.service.announcement import AnnouncementService

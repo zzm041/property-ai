@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from app.domain.ai import ANNOUNCEMENT_READ
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.service.announcement import AnnouncementService
 
 

@@ -9,8 +9,8 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.core.errors import AppError, ErrorCode, IamErrorCode
-from app.domain.audit import AuditAction, AuditResourceType, AuditSource
-from app.domain.iam import OrganizationScope, Principal, ScopeType
+from app.domain.governance import AuditAction, AuditResourceType, AuditSource
+from app.domain.identity import OrganizationScope, Principal, ScopeType
 from app.model.identity import Permission, Role, RolePermission, User, UserRole
 from app.repository.identity import IdentityRepository
 from app.repository.property import PropertyRepository

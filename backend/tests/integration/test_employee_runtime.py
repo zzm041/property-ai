@@ -13,7 +13,7 @@ from app.core.config import Settings
 from app.core.database import get_session_factory
 from app.core.errors import AppError, EmployeeErrorCode, IamErrorCode
 from app.core.time import to_business_date, utc_now
-from app.domain.audit import AuditAction
+from app.domain.governance import AuditAction
 from app.main import create_app
 from app.model.employee import (
     AttendanceRecord,
@@ -25,7 +25,7 @@ from app.model.employee import (
 )
 from app.model.identity import AuditLog, Permission, RolePermission, User
 from app.repository.identity import IdentityRepository
-from app.service.auth import AuthService
+from app.service.identity.auth import AuthService
 from app.service.employee import EmployeeService
 from tests.integration.conftest import commit_open_transaction
 from tests.integration.employee_test_data import create_employee_attendance_graph

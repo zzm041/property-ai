@@ -8,12 +8,12 @@ from sqlalchemy.orm import Session
 from app.api.dependencies.auth import get_current_principal
 from app.api.dependencies.db import get_db_session
 from app.core.config import Settings, get_settings
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.repository.identity import IdentityRepository
 from app.schema.auth import ProfileUpdateRequest
 from app.schema.common import request_id_for, success_envelope
 from app.schema.identity import GrantedScopeData, MeData
-from app.service.credential_auth import CredentialAuthService
+from app.service.identity.credential_auth import CredentialAuthService
 
 router = APIRouter(tags=["identity"])
 

@@ -10,7 +10,7 @@ from sqlalchemy.exc import OperationalError
 from app.core.database import retryable_mysql_analysis_error_code
 from app.core.errors import AiErrorCode
 from app.service.analysis import AnalysisService
-from app.service.analysis_attempt import (
+from app.service.work_order.analysis_attempt import (
     accepts_attempt,
     claim_attempt,
     owns_attempt,

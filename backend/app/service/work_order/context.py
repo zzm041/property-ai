@@ -31,11 +31,11 @@ from app.core.errors import (
 from app.core.logging import get_logger
 from .media_scan import admit_scanned_media, log_media_scan_skipped
 from app.core.time import current_business_date, utc_now
-from app.domain.audit import AuditAction, AuditResourceType
+from app.domain.governance import AuditAction, AuditResourceType
 from app.domain.ai import FilterReason, WorkOrderAnalysisOutput, capability_filter_reason, category_duty, content_fingerprint, eligibility_denial_details, loose_content_fingerprint, map_analysis_output, ordinary_maintenance
-from app.domain.employee import DISPATCH_STAFF_ROLES, AttendanceOnDuty, EmployeeStatus
-from app.domain.iam import OrganizationScope, Principal, ScopeType
-from app.domain.work_order_visibility import resident_media_visible
+from app.domain.work_order import DISPATCH_STAFF_ROLES, AttendanceOnDuty, EmployeeStatus
+from app.domain.identity import OrganizationScope, Principal, ScopeType
+from app.domain.work_order import resident_media_visible
 from app.domain.work_order import (
     WORK_ORDER_CANCEL,
     WORK_ORDER_CREATE,
@@ -92,8 +92,8 @@ from app.repository.identity import IdentityRepository
 from app.repository.resident import ResidentBindingRepository
 from app.repository.work_order import WorkOrderRepository
 from app.service.audit import AuditService
-from app.service.auth import AuthService
-from app.service.rbac import RbacService
+from app.service.identity.auth import AuthService
+from app.service.identity.rbac import RbacService
 from .sla import (
     reset_assignment_sla_deadlines,
     reset_response_sla_deadline,

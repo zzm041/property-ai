@@ -16,7 +16,7 @@ from app.core.errors import AiErrorCode
 from app.domain.ai import AnalysisStatus
 from app.domain.work_order import MediaTakenPhase, WorkOrderStatus
 from app.service.analysis import AnalysisService, AnalysisSnapshot, ProviderBundle
-from app.service.rbac import RbacService
+from app.service.identity.rbac import RbacService
 from app.service.work_order import WorkOrderService
 
 

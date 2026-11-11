@@ -10,7 +10,7 @@ from app.api.dependencies.db import get_db_session
 from app.api.v1.work_orders import get_work_order_service, work_order_data
 from app.core.errors import AppError, WorkOrderErrorCode
 from app.core.config import Settings, get_settings
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.schema.common import SuccessEnvelope, request_id_for, success_envelope
 from app.schema.work_order import (
     AssignWorkOrderRequest,

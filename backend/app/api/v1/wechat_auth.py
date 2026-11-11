@@ -8,11 +8,11 @@ from app.api.dependencies.auth import get_current_principal
 from app.core.errors import AppError, IamErrorCode
 from app.core.config import Settings, get_settings
 from app.core.database import get_session_factory
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.schema.auth import WeChatBindRequest, WeChatRebindRequest
 from app.schema.common import request_id_for, success_envelope
 from app.schema.knowledge import AccessTokenWithMethodData, WeChatLoginRequest
-from app.service.wechat_auth import WeChatAuthService
+from app.service.identity.wechat_auth import WeChatAuthService
 
 router = APIRouter(prefix="/auth/wechat", tags=["wechat-auth"])
 

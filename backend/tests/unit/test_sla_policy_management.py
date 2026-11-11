@@ -10,15 +10,15 @@ from pydantic import ValidationError
 from sqlalchemy.dialects import mysql
 
 from app.core.errors import AppError, IamErrorCode, SlaErrorCode
-from app.domain.audit import AUDIT_ACTION_POLICIES, AuditAction, AuditResourceType
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.governance import AUDIT_ACTION_POLICIES, AuditAction, AuditResourceType
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.domain.work_order import SLA_POLICY_MANAGE, sla_warning_lead_minutes
-from app.domain.dev_seed import SEED_ROLE_PERMISSIONS
+from app.domain.dev import SEED_ROLE_PERMISSIONS
 from app.repository.work_order import WorkOrderRepository
 from app.repository.property import PropertyRepository
 from app.schema.sla import PutSlaPolicyRequest
 from app.service.audit import AuditService
-from app.service.sla_policy import SlaPolicyService
+from app.service.work_order.sla_policy import SlaPolicyService
 
 
 NOW = datetime(2026, 9, 21, 9, 0, tzinfo=UTC)

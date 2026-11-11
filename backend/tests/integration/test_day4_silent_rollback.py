@@ -11,8 +11,8 @@ from app.core.database import (
 from app.model.identity import User
 from app.model.resident import ResidentBindRequest, ResidentHouseRelation
 from app.repository.identity import IdentityRepository
-from app.service.auth import AuthService
-from app.service.resident import ResidentBindingService
+from app.service.identity.auth import AuthService
+from app.service.identity.resident import ResidentBindingService
 from tests.integration.conftest import count_independent, fetch_independent
 from tests.integration.resident_test_data import create_resident_binding_graph
 

@@ -74,8 +74,11 @@ FLAT_MODULE_PACKAGE: dict[str, str] = {
     "dev_seed": "dev",
 }
 
-# Legacy module -> package that now owns it. Filled in by S1..S4; an entry here
-# makes --shims require the legacy file to be a thin re-export.
+# Legacy module -> package that now owns it. S1..S4 used this to require a thin
+# re-export; S8 deleted the whole compat layer, so an entry here now means the
+# opposite: the file must NOT exist. Anything reappearing at an old path is a
+# half-finished revert or a new shortcut, and both rebuild the "two names for
+# one module" problem this split removed.
 SHIMMED_MODULES: dict[str, str] = {
     "app.domain.iam": "identity",
     "app.domain.phone": "identity",
@@ -142,9 +145,8 @@ SHIMMED_PROVIDER_MODULES: dict[str, str] = {
 # inside one of the packages listed in ALLOWED_DOMAIN_EDGES: a flat module that
 # nobody maps is either a forgotten move or a new dependency shortcut, and both
 # turn the package graph back into the pile of files this split is undoing.
-DOMAIN_TOP_LEVEL_ALLOWED_FILES: frozenset[str] = frozenset(
-    {"__init__.py"} | {f"{name}.py" for name in FLAT_MODULE_PACKAGE}
-)
+# After S8 nothing but the package marker may sit directly under app/domain/.
+DOMAIN_TOP_LEVEL_ALLOWED_FILES: frozenset[str] = frozenset({"__init__.py"})
 DOMAIN_TOP_LEVEL_ALLOWED_PACKAGES: frozenset[str] = frozenset(ALLOWED_DOMAIN_EDGES)
 
 
@@ -323,55 +325,25 @@ def domain_tree_problems(domain_root: pathlib.Path | None = None) -> list[str]:
     return problems
 
 
-def _shim_problems(legacy: str, source: str, *, expected: str, what: str) -> list[str]:
-    problems: list[str] = []
-    effective = [
-        line
-        for line in source.splitlines()
-        if line.strip() and not line.strip().startswith("#")
-    ]
-    if len(effective) > SHIM_MAX_EFFECTIVE_LINES:
-        problems.append(
-            f"{legacy}: {len(effective)} effective lines > {SHIM_MAX_EFFECTIVE_LINES}, "
-            f"it still carries logic instead of re-exporting {what}"
-        )
-        return problems
-    if expected not in source:
-        problems.append(f"{legacy}: does not re-export {what}")
-    return problems
+def _legacy_present(legacy: str) -> list[str]:
+    """The compat layer is deleted: existence at the old path is the violation."""
+    path = REPO_ROOT / "backend" / f"{legacy.replace('.', '/')}.py"
+    if path.exists():
+        return [
+            f"{legacy}: the compat shim is back — import the package that owns it "
+            f"(the alias layer was deleted in S8)"
+        ]
+    return []
 
 
 def check_shims() -> list[str]:
+    """No legacy path may exist any more (see the note above SHIMMED_MODULES)."""
     problems: list[str] = []
-    for legacy, package in sorted(SHIMMED_MODULES.items()):
-        path = REPO_ROOT / "backend" / f"{legacy.replace('.', '/')}.py"
-        if not path.exists():
-            problems.append(f"{legacy}: legacy module is missing (expected a re-export shim)")
-            continue
-        source = path.read_text(encoding="utf-8", errors="replace")
-        problems += _shim_problems(
-            legacy, source, expected=f"app.domain.{package}", what=f"app.domain.{package}"
-        )
-    for legacy in sorted(SHIMMED_SERVICE_MODULES):
-        path = REPO_ROOT / "backend" / f"{legacy.replace('.', '/')}.py"
-        if not path.exists():
-            problems.append(f"{legacy}: legacy module is missing (expected an alias module)")
-            continue
-        source = path.read_text(encoding="utf-8", errors="replace")
-        problems += _shim_problems(
-            legacy, source, expected="sys.modules[__name__] = _module", what="the package module"
-        )
-    for legacy in sorted(SHIMMED_PROVIDER_MODULES):
-        path = REPO_ROOT / "backend" / f"{legacy.replace('.', '/')}.py"
-        if not path.exists():
-            problems.append(f"{legacy}: legacy module is missing (expected an alias module)")
-            continue
-        source = path.read_text(encoding="utf-8", errors="replace")
-        problems += _shim_problems(
-            legacy, source, expected="sys.modules[__name__] = _module", what="the kind module"
-        )
+    for legacy in sorted(
+        list(SHIMMED_MODULES) + list(SHIMMED_SERVICE_MODULES) + list(SHIMMED_PROVIDER_MODULES)
+    ):
+        problems += _legacy_present(legacy)
     return problems
-
 
 def self_test() -> int:
     """Prove the gate bites: build a throw-away tree with two planted violations."""

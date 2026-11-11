@@ -39,7 +39,7 @@ from app.provider.wechat import (
 )
 from app.provider.asr import DevelopmentASRProvider
 from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
-from app.domain.observed_event import work_order_analysis_response_format
+from app.domain.ai import work_order_analysis_response_format
 
 
 def _settings(**overrides: object) -> Settings:

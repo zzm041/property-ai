@@ -2,7 +2,7 @@
 
 from types import MappingProxyType
 from typing import Mapping
-from app.domain.iam import ScopeType
+from app.domain.identity import ScopeType
 from datetime import datetime, timedelta
 
 from .models import (

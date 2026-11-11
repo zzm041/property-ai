@@ -12,8 +12,8 @@ from app.core.config import get_settings
 from app.core.database import begin_owned_transaction, create_database_engine
 from app.core.passwords import hash_password, require_new_password
 from app.core.time import utc_now
-from app.domain.dev_seed import SEED_PERMISSIONS, SEED_ROLE_PERMISSIONS, SEED_ROLES
-from app.domain.phone import normalize_phone
+from app.domain.dev import SEED_PERMISSIONS, SEED_ROLE_PERMISSIONS, SEED_ROLES
+from app.domain.identity import normalize_phone
 from app.model.identity import (
     AuditLog,
     Permission,

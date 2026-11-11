@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings
 from app.core.database import run_owned_transaction
 from app.core.errors import AppError, AuthErrorCode, ErrorCode, WeChatAuthErrorCode
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import ScopeType
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import ScopeType
 from app.model.identity import UserWechat
 from app.provider.errors import ProviderInvalidOutputError, ProviderUnavailableError
 from app.provider.factory import build_wechat_auth_provider

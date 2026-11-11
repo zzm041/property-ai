@@ -2,7 +2,7 @@
 from types import SimpleNamespace
 import json
 import pytest
-from app.domain.observed_event import build_evidence_catalog
+from app.domain.ai import build_evidence_catalog
 from app.service.analysis import AnalysisService
 
 def validate(text,*,label='现象待核实',subject='未确定',extra_report=None,asr=None,vision=None,**overrides):

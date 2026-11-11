@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from app.domain.iam import ScopeType
+from app.domain.identity import ScopeType
 from app.service import employee_identity as mod
 
 NOW = datetime(2026, 9, 24, tzinfo=UTC)

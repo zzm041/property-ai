@@ -13,7 +13,7 @@ from app.core.config import Settings
 from app.core.database import get_session_factory
 from app.core.errors import AppError, IamErrorCode, WorkOrderErrorCode
 from app.core.time import utc_now
-from app.domain.audit import AuditAction
+from app.domain.governance import AuditAction
 from app.main import create_app
 from app.model.identity import AuditLog
 from app.model.work_order import (
@@ -22,7 +22,7 @@ from app.model.work_order import (
     WorkOrderLog,
 )
 from app.repository.identity import IdentityRepository
-from app.service.auth import AuthService
+from app.service.identity.auth import AuthService
 from app.service.employee import EmployeeService
 from app.service.work_order import WorkOrderService
 from tests.integration.conftest import commit_open_transaction

@@ -64,7 +64,7 @@ def test_scoped_sla_task_does_not_scan_unrelated_dispatch(monkeypatch) -> None:
     monkeypatch.setattr("app.worker.tasks.get_settings", lambda: settings)
     monkeypatch.setattr("app.worker.tasks.create_database_engine", lambda _url: engine)
     monkeypatch.setattr("app.worker.tasks.Session", lambda **_kwargs: session)
-    monkeypatch.setattr("app.service.sla.SlaService", lambda *_args, **_kwargs: service)
+    monkeypatch.setattr("app.service.work_order.sla.SlaService", lambda *_args, **_kwargs: service)
     analysis = MagicMock()
     monkeypatch.setattr("app.worker.tasks.AnalysisService", analysis)
 

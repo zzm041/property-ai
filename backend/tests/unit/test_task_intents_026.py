@@ -208,8 +208,8 @@ def test_retry_schema_cannot_supply_task_scope_or_arbitrary_reason():
 
 @pytest.mark.parametrize('operation',[ANALYZE,INGEST,DELIVER])
 def test_manager_scope_not_composed_from_unrelated_tenant_grants(monkeypatch, operation):
-    from app.domain.iam import Principal, RoleGrant, OrganizationScope, ScopeType
-    from app.service.auth import AuthService
+    from app.domain.identity import Principal, RoleGrant, OrganizationScope, ScopeType
+    from app.service.identity.auth import AuthService
     from app.core.errors import AppError
     permission={ANALYZE:'ai_analysis:review',INGEST:'knowledge:manage',DELIVER:'property:manage'}[operation]
     actor=Principal(4,'ACTIVE','test',(
@@ -223,7 +223,7 @@ def test_manager_scope_not_composed_from_unrelated_tenant_grants(monkeypatch, op
 def test_retry_preserves_failure_and_creates_only_one_generation_with_audit(monkeypatch):
     from app.service.audit import AuditService
     from app.repository.work_order import WorkOrderRepository
-    from app.domain.iam import OrganizationScope,ScopeType
+    from app.domain.identity import OrganizationScope,ScopeType
     r=row(status='FAILED',generation=1,execution_attempt=3,publish_attempt=3)
     s=service(r);s.session.in_transaction.return_value=False
     s._authorize_manager=lambda *a:(NS(user_id=4),OrganizationScope(ScopeType.PROPERTY,tenant_id=7,property_id=9))
@@ -245,7 +245,7 @@ def test_retry_preserves_failure_and_creates_only_one_generation_with_audit(monk
 
 
 def test_attachment_completion_recovery_carries_exact_predecessor_claim(monkeypatch):
-    from app.domain.iam import OrganizationScope, ScopeType
+    from app.domain.identity import OrganizationScope, ScopeType
     from app.repository.work_order import WorkOrderRepository
     from app.service.audit import AuditService
     from app.worker.task_intents import _analysis_claim_for_lease
@@ -314,7 +314,7 @@ def test_attachment_completion_recovery_carries_exact_predecessor_claim(monkeypa
 
 def test_cancelled_completion_retry_uses_only_trusted_direct_predecessor(monkeypatch):
     from app.core.errors import AppError
-    from app.domain.iam import OrganizationScope, ScopeType
+    from app.domain.identity import OrganizationScope, ScopeType
     from app.repository.work_order import WorkOrderRepository
     from app.service.audit import AuditService
 
@@ -373,7 +373,7 @@ def test_cancelled_completion_retry_uses_only_trusted_direct_predecessor(monkeyp
 
 
 def test_cancelled_completion_retry_preserves_original_claim_across_cancelled_chain(monkeypatch):
-    from app.domain.iam import OrganizationScope, ScopeType
+    from app.domain.identity import OrganizationScope, ScopeType
     from app.repository.work_order import WorkOrderRepository
     from app.service.audit import AuditService
 
@@ -415,7 +415,7 @@ def test_cancelled_completion_retry_preserves_original_claim_across_cancelled_ch
 
 
 def test_succeeded_analysis_can_create_only_one_audited_attachment_completion(monkeypatch):
-    from app.domain.iam import OrganizationScope, ScopeType
+    from app.domain.identity import OrganizationScope, ScopeType
     from app.repository.ai import AiRepository
     from app.repository.work_order import WorkOrderRepository
     from app.service.audit import AuditService
@@ -509,8 +509,8 @@ def test_recovery_rejects_new_business_version_and_nonfailed_state(monkeypatch):
 
 def test_recovery_audit_uses_existing_validated_append_only_contract():
     from app.service.audit import AuditService
-    from app.domain.audit import AuditAction,AuditResourceType
-    from app.domain.iam import ScopeType
+    from app.domain.governance import AuditAction,AuditResourceType
+    from app.domain.identity import ScopeType
     repo=MagicMock()
     AuditService(session(),repository=repo).append(action=AuditAction.TASK_INTENT_RETRIED,
         resource_type=AuditResourceType.TASK_INTENT,resource_id=9,actor_user_id=4,
@@ -521,8 +521,8 @@ def test_recovery_audit_uses_existing_validated_append_only_contract():
 
 def test_attachment_completion_audit_accepts_bounded_source_and_attachment_metadata():
     from app.service.audit import AuditService
-    from app.domain.audit import AuditAction, AuditResourceType
-    from app.domain.iam import ScopeType
+    from app.domain.governance import AuditAction, AuditResourceType
+    from app.domain.identity import ScopeType
 
     repo = MagicMock()
     AuditService(session(), repository=repo).append(
@@ -551,8 +551,8 @@ def test_attachment_completion_audit_accepts_bounded_source_and_attachment_metad
 def test_attachment_completion_audit_rejects_invalid_attachment_count(attachment_count):
     from app.core.errors import AppError
     from app.service.audit import AuditService
-    from app.domain.audit import AuditAction, AuditResourceType
-    from app.domain.iam import ScopeType
+    from app.domain.governance import AuditAction, AuditResourceType
+    from app.domain.identity import ScopeType
 
     with pytest.raises(AppError) as error:
         AuditService(session(), repository=MagicMock()).append(

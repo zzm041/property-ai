@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.time import utc_now
-from app.domain.resident import ResidentRelationStatus, ResidentRelationType
+from app.domain.identity import ResidentRelationStatus, ResidentRelationType
 from app.domain.ai import (
     AI_ANALYSIS_READ,
     AI_ANALYSIS_REVIEW,
@@ -34,7 +34,7 @@ from app.domain.work_order import (
 from app.model.identity import Permission, Role, RolePermission, User, UserRole
 from app.model.resident import ResidentHouseRelation
 from app.model.work_order import SlaPolicy
-from app.service.property import PropertyService
+from app.service.identity.property import PropertyService
 from tests.integration.employee_test_data import (
     EmployeeAttendanceGraph,
     create_employee_attendance_graph,

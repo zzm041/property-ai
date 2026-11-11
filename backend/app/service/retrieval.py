@@ -15,7 +15,7 @@ from app.core.database import begin_owned_transaction
 from app.core.errors import AppError, IamErrorCode, KnowledgeErrorCode
 from app.core.logging import get_logger
 from app.core.time import utc_now
-from app.domain.iam import OrganizationScope, Principal, ScopeType
+from app.domain.identity import OrganizationScope, Principal, ScopeType
 from app.domain.knowledge import (
     DEFAULT_MIN_RELEVANCE,
     DEFAULT_RERANK_TOP_K,
@@ -48,8 +48,8 @@ from app.repository.identity import IdentityRepository
 from app.repository.knowledge import KnowledgeRepository
 from app.repository.property import PropertyRepository
 from app.repository.resident import ResidentBindingRepository
-from app.service.rbac import RbacService
-from app.service.auth import AuthService
+from app.service.identity.rbac import RbacService
+from app.service.identity.auth import AuthService
 
 logger = get_logger(__name__)
 

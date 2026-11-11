@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.api.dependencies.auth import get_current_principal
 from app.api.dependencies.db import get_db_session
 from app.core.errors import AppError, ResidentErrorCode
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.model.resident import ResidentBindRequest
 from app.repository.resident import ResidentBindReviewDetails
 from app.schema.common import request_id_for, success_envelope
@@ -23,7 +23,7 @@ from app.schema.property import (
     ResidentRelationAdminData,
     ResidentRelationHistoryData,
 )
-from app.service.resident import ResidentBindingService
+from app.service.identity.resident import ResidentBindingService
 
 router = APIRouter(prefix="/admin", tags=["resident-binding-admin"])
 

@@ -12,8 +12,8 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings
 from app.core.database import begin_owned_transaction, create_database_engine
 from app.core.errors import AppError, DevSeedErrorCode
-from app.domain.audit import AuditAction, AuditResourceType, AuditSource
-from app.domain.dev_seed import (
+from app.domain.governance import AuditAction, AuditResourceType, AuditSource
+from app.domain.dev import (
     DEV_PROPERTY_ADDRESS,
     DEV_PROPERTY_NAME,
     DEV_PROPERTY_TIMEZONE,
@@ -26,12 +26,12 @@ from app.domain.dev_seed import (
     SeedCodeDefinition,
     SeedUserDefinition,
 )
-from app.domain.iam import OrganizationScope, ScopeType
+from app.domain.identity import OrganizationScope, ScopeType
 from app.model.identity import Permission, Role, User
 from app.model.property import Property, Tenant
 from app.repository.dev_seed import DevSeedRepository, SeedUserGrantRecord
 from app.service.audit import AuditService
-from app.service.rbac_mutation import RbacMutationService
+from app.service.identity.rbac_mutation import RbacMutationService
 
 _ALLOWED_ENVIRONMENTS = frozenset({"development", "test"})
 _DUPLICATE_CONSTRAINTS = frozenset(

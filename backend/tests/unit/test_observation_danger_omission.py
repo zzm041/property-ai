@@ -3,7 +3,7 @@ from copy import deepcopy
 
 import pytest
 
-from app.domain.observed_event import (
+from app.domain.ai import (
     ObservationBindingError, ObservedAnalysisOutput, bind_observations, build_evidence_catalog,
 )
 

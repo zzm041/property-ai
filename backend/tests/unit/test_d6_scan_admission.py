@@ -21,12 +21,12 @@ import pytest
 
 from app.core.config import Settings
 from app.core.errors import AppError
-from app.service.description_suggestion import (
+from app.service.work_order.description_suggestion import (
     DescriptionSuggestion,
     DescriptionSuggestionService,
     suggestion_reason,
 )
-from app.service.media_scan import (
+from app.service.work_order.media_scan import (
     REASON_BLOCKED,
     REASON_DEMO_STUB,
     REASON_NOT_READY,

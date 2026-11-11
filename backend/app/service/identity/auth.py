@@ -14,9 +14,9 @@ from app.core.security import (
     decode_development_access_token,
     issue_development_access_token,
 )
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.dev_seed import SEED_USERS
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.dev import SEED_USERS
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 
 _ALLOWED_DEV_SEED_KEYS = frozenset(item.display_name for item in SEED_USERS)
 from app.repository.identity import GrantPermissionRecord, IdentityRepository

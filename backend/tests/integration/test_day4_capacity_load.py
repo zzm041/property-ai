@@ -12,7 +12,7 @@ from app.core.database import get_session_factory
 from app.core.errors import AppError, WorkOrderErrorCode
 from app.core.time import utc_now
 from app.repository.identity import IdentityRepository
-from app.service.auth import AuthService
+from app.service.identity.auth import AuthService
 from app.service.employee import EmployeeService
 from app.service.work_order import WorkOrderService
 from tests.integration.conftest import commit_open_transaction

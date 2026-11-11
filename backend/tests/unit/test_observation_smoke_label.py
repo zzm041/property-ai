@@ -7,7 +7,7 @@ import httpx
 import pytest
 
 from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
-from app.domain.observed_event import (
+from app.domain.ai import (
     ObservationBindingError, ObservedAnalysisOutput, bind_observations,
     build_evidence_catalog, work_order_analysis_response_format,
 )

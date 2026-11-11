@@ -4,7 +4,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from app.domain.observed_event import ObservedAnalysisOutput, bind_observations, build_evidence_catalog
+from app.domain.ai import ObservedAnalysisOutput, bind_observations, build_evidence_catalog
 from app.service.analysis import AnalysisService
 
 

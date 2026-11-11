@@ -9,16 +9,16 @@ from app.core.database import run_owned_transaction, require_owned_transaction
 from app.core.errors import AppError, AuthErrorCode, EmployeeErrorCode, IamErrorCode
 from app.core.time import utc_now
 from app.core.token_hash import generate_invite_token, keyed_hash
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.employee import EMPLOYEE_MANAGE, EmployeeStatus
-from app.domain.iam import OrganizationScope, Principal, ScopeType
-from app.domain.phone import normalize_phone
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.work_order import EMPLOYEE_MANAGE, EmployeeStatus
+from app.domain.identity import OrganizationScope, Principal, ScopeType
+from app.domain.identity import normalize_phone
 from app.model.employee import Employee, EmployeeInvite, EmployeeProperty
 from app.repository.credential import CredentialRepository
 from app.repository.employee import EmployeeRepository
 from app.repository.rbac_mutation import RbacMutationRepository
 from app.service.audit import AuditService
-from app.service.rbac import RbacService
+from app.service.identity.rbac import RbacService
 
 
 def grant_claimed_staff_property(session: Session, *, employee: Employee, assignment,
@@ -28,7 +28,7 @@ def grant_claimed_staff_property(session: Session, *, employee: Employee, assign
     Both callers hold Employee FOR UPDATE and own the transaction. The fixed
     STAFF role is only for this effective Property; duty filtering stays separate.
     """
-    from app.service.rbac_mutation import RbacMutationService
+    from app.service.identity.rbac_mutation import RbacMutationService
     require_owned_transaction(session)
     now = utc_now()
     if (employee.user_id is None or employee.status != "ACTIVE"
@@ -53,7 +53,7 @@ def grant_claimed_staff_property(session: Session, *, employee: Employee, assign
 def revoke_ended_staff_property(session: Session, *, employee: Employee, property_id: int,
                                 actor_user_id: int, request_id: str) -> None:
     """End only this exact work scope; preserve all other roles and history."""
-    from app.service.rbac_mutation import RbacMutationService
+    from app.service.identity.rbac_mutation import RbacMutationService
     require_owned_transaction(session)
     if employee.user_id is None:
         return
@@ -206,7 +206,7 @@ class EmployeeIdentityService:
                     message="Invitation is invalid or expired",
                     status_code=400,
                 )
-            from app.service.identity_write_guard import lock_active_identity
+            from app.service.identity.identity_write_guard import lock_active_identity
 
             lock_active_identity(self._session, actor.user_id)
             employee = self._employees.get_employee_for_update(peeked.employee_id)

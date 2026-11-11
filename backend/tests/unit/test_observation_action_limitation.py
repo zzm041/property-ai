@@ -8,7 +8,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from app.domain.observed_event import ObservedAnalysisOutput, bind_observations, build_evidence_catalog
+from app.domain.ai import ObservedAnalysisOutput, bind_observations, build_evidence_catalog
 from app.service.analysis import AnalysisService
 
 REPORT = '客厅插座冒烟并伴有焦糊味，无法断电。'

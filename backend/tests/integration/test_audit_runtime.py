@@ -7,8 +7,8 @@ import pytest
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import OrganizationScope, ScopeType
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import OrganizationScope, ScopeType
 from app.model.identity import AuditLog, User
 from app.model.property import Property, Tenant
 from app.repository.audit import AuditRepository

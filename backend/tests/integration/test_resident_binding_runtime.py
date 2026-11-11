@@ -14,13 +14,13 @@ from app.core.config import Settings
 from app.core.database import get_session_factory
 from app.core.errors import AppError, IamErrorCode, ResidentErrorCode
 from app.core.time import utc_now
-from app.domain.resident import ResidentRelationStatus
+from app.domain.identity import ResidentRelationStatus
 from app.main import create_app
 from app.model.identity import AuditLog, Permission, Role, RolePermission, User, UserRole
 from app.model.resident import ResidentBindRequest, ResidentHouseRelation
-from app.service.auth import AuthService
+from app.service.identity.auth import AuthService
 from app.repository.identity import IdentityRepository
-from app.service.resident import ResidentBindingService
+from app.service.identity.resident import ResidentBindingService
 from tests.integration.conftest import commit_open_transaction
 from tests.integration.resident_test_data import create_resident_binding_graph
 

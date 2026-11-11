@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from app.api.v1.assistant import get_current_principal, get_retrieval_service, router
 from app.core.errors import AppError
 from app.core.time import utc_now
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.domain.knowledge import KNOWLEDGE_READ
 from app.repository.resident import ResidentBindingRepository
 from app.service import retrieval

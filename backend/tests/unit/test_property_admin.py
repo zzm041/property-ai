@@ -6,16 +6,16 @@ from unittest.mock import MagicMock
 import pytest
 
 from app.core.errors import AppError, IamErrorCode
-from app.domain.audit import AUDIT_ACTION_POLICIES, AuditAction, AuditResourceType
-from app.domain.dev_seed import SEED_PERMISSIONS, SEED_ROLE_PERMISSIONS
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.governance import AUDIT_ACTION_POLICIES, AuditAction, AuditResourceType
+from app.domain.dev import SEED_PERMISSIONS, SEED_ROLE_PERMISSIONS
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.model.property import Building, House, Property, Unit
 from app.model.resident import ResidentHouseRelation
 from app.repository.property import PropertyRepository
 from app.repository.resident import ResidentBindingRepository
 from app.schema.property import HouseImportRow
-from app.service.property_admin import PropertyAdminService
-from app.service.resident import ResidentBindingService
+from app.service.identity.property_admin import PropertyAdminService
+from app.service.identity.resident import ResidentBindingService
 
 
 def _principal(*permissions: str, property_id: int = 10) -> Principal:

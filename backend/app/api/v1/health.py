@@ -7,9 +7,9 @@ from app.api.dependencies.auth import get_current_principal
 from app.core.buildinfo import build_info
 from app.core.config import Settings, get_settings
 from app.core.readiness import check_readiness, queue_depth
-from app.domain.iam import OrganizationScope, Principal, ScopeType
+from app.domain.identity import OrganizationScope, Principal, ScopeType
 from app.schema.common import success_envelope
-from app.service.rbac import RbacService
+from app.service.identity.rbac import RbacService
 
 router = APIRouter(tags=["system"])
 

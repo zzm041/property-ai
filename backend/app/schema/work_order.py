@@ -6,7 +6,7 @@ from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator, field_validator
 
-from app.domain.phone import normalize_phone
+from app.domain.identity import normalize_phone
 
 
 class DiagnosisFact(BaseModel):
@@ -173,7 +173,7 @@ class StaffReceiptRequest(BaseModel):
 
     @model_validator(mode="after")
     def validate_fee_record(self) -> Self:
-        from app.domain.receipt_handling import normalize_handling
+        from app.domain.work_order import normalize_handling
 
         self.handling_mode, self.handling_note = normalize_handling(self.handling_mode, self.handling_note)
         if self.fee_flag == "RECORDED" and self.fee_amount is None:

@@ -10,8 +10,8 @@ from sqlalchemy.orm import Session
 
 from app.core.database import run_owned_transaction
 from app.core.errors import AppError, AuthErrorCode, ErrorCode, IamErrorCode, SlaErrorCode
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import OrganizationScope, Principal, ScopeType
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import OrganizationScope, Principal, ScopeType
 from app.domain.work_order import (
     DEFAULT_SLA_COMPLETE_MINUTES,
     DEFAULT_SLA_RESPOND_MINUTES,
@@ -26,8 +26,8 @@ from app.repository.identity import IdentityRepository
 from app.repository.property import PropertyRepository
 from app.repository.work_order import WorkOrderRepository
 from app.service.audit import AuditService
-from app.service.auth import AuthService
-from app.service.rbac import RbacService
+from app.service.identity.auth import AuthService
+from app.service.identity.rbac import RbacService
 from app.core.time import utc_now
 
 

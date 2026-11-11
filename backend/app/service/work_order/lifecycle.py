@@ -104,7 +104,7 @@ class WorkOrderLifecycleMixin:
         self._require_positive_id(house_id, "house_id")
         self._validate_request_id(request_id)
         self._validate_idempotency_key(idempotency_key)
-        from app.domain.phone import normalize_phone
+        from app.domain.identity import normalize_phone
 
         contact = normalize_phone(contact_phone)
         if contact is None or not contact.isascii():
@@ -323,7 +323,7 @@ class WorkOrderLifecycleMixin:
         claimed_tenant_id: int | None,
         claimed_property_id: int | None,
     ) -> tuple[WorkOrder, bool]:
-        from app.service.identity_write_guard import lock_active_identity
+        from app.service.identity.identity_write_guard import lock_active_identity
 
         lock_active_identity(self._session, actor.user_id)
         current = self._reload_actor(actor)

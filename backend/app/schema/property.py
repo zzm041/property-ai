@@ -4,8 +4,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.domain.property import HouseStatus
-from app.domain.resident import ResidentRelationStatus
+from app.domain.identity import HouseStatus
+from app.domain.identity import ResidentRelationStatus
 
 
 class CreateBuildingRequest(BaseModel):

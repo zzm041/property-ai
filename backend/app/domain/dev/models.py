@@ -1,7 +1,7 @@
 """dev domain models, moved from the flat app.domain modules (pure move)."""
 
 from dataclasses import dataclass
-from app.domain.iam import ScopeType
+from app.domain.identity import ScopeType
 
 @dataclass(frozen=True, slots=True)
 class SeedCodeDefinition:

@@ -26,7 +26,7 @@ from app.core.errors import (
 )
 from app.core.logging import get_logger
 from app.core.rate_limit import MemoryRateLimiter, RateLimiter, RedisRateLimiter
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.domain.work_order import MediaKind
 from app.model.work_order import FileObject
 from app.provider.asr import ASRProvider

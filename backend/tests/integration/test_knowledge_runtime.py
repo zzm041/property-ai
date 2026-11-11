@@ -8,12 +8,12 @@ from sqlalchemy.orm import Session
 
 from app.core.config import Settings
 from app.core.errors import IamErrorCode
-from app.domain.audit import AuditAction
+from app.domain.governance import AuditAction
 from app.main import create_app
 from app.model.identity import AuditLog
 from app.model.knowledge import KnowledgeChunk, KnowledgeIngestionJob
 from app.repository.identity import IdentityRepository
-from app.service.auth import AuthService
+from app.service.identity.auth import AuthService
 from app.service.knowledge import KnowledgeService
 from tests.integration.conftest import commit_open_transaction
 from tests.integration.work_order_test_data import create_work_order_graph

@@ -19,15 +19,15 @@ from app.domain.ai import (
     ANNOUNCEMENT_READ,
     AnnouncementDraftOutput,
 )
-from app.domain.announcement import (
+from app.domain.governance import (
     AnnouncementAudience,
     AnnouncementReviewDecision,
     AnnouncementScopeType,
     AnnouncementStatus,
     can_transition_announcement,
 )
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import OrganizationScope, Principal, ScopeType
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import OrganizationScope, Principal, ScopeType
 from app.model.ai import Announcement, AnnouncementReview, AnnouncementScope
 from app.model.identity import AuditLog
 from app.provider.errors import ProviderError
@@ -40,7 +40,7 @@ from app.repository.property import PropertyRepository
 from app.repository.resident import ResidentBindingRepository
 from app.repository.work_order import WorkOrderRepository
 from app.service.audit import AuditService
-from app.service.rbac import RbacService
+from app.service.identity.rbac import RbacService
 
 
 @dataclass(frozen=True, slots=True)

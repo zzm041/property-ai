@@ -14,9 +14,9 @@ from sqlalchemy.dialects import mysql
 from app.api.dependencies.auth import get_current_principal
 from app.api.v1.admin_operations import get_operations_service, router
 from app.core.errors import AppError, IamErrorCode, StatsErrorCode
-from app.domain.dev_seed import SEED_ROLE_PERMISSIONS
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
-from app.domain.operations import STATS_READ
+from app.domain.dev import SEED_ROLE_PERMISSIONS
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.governance import STATS_READ
 from app.domain.work_order import WorkOrderStatus
 from app.repository.operations import OperationsRepository
 from app.schema.operations import (

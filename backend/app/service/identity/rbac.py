@@ -1,7 +1,7 @@
 """Default-deny permission and organization-scope authorization."""
 
 from app.core.errors import AppError, IamErrorCode
-from app.domain.iam import OrganizationScope, Principal
+from app.domain.identity import OrganizationScope, Principal
 
 
 class RbacService:

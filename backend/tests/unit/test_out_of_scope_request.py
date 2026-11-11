@@ -7,8 +7,8 @@ from unittest.mock import MagicMock
 import pytest
 
 from app.api.v1.work_orders import work_order_display_data
-from app.domain.observed_event import build_evidence_catalog
-from app.domain.diagnosis import diagnosis_items
+from app.domain.ai import build_evidence_catalog
+from app.domain.work_order import diagnosis_items
 from app.schema.work_order import WorkOrderData, WorkOrderDetailData
 from app.service.analysis import AnalysisService
 from app.service.work_order import WorkOrderService

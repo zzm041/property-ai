@@ -18,7 +18,7 @@ from app.provider.usage import StructuredCompletion, response_token_usage
 from app.provider.vision import VisionInsight, QwenVLMProvider
 from app.repository.ai import AiRepository
 from app.service.analysis import AnalysisService, AnalysisSnapshot, MediaRef
-from app.service.analysis_attempt import media_checkpoint_payload, read_media_checkpoint
+from app.service.work_order.analysis_attempt import media_checkpoint_payload, read_media_checkpoint
 
 NOW = datetime(2026, 9, 23, tzinfo=UTC)
 

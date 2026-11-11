@@ -49,16 +49,16 @@ from app.domain.ai import (
     map_analysis_output,
     rank_candidates,
 )
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.observed_event import (
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.ai import (
     ObservationBindingError,
     ObservedAnalysisOutput,
     bind_observations,
     build_evidence_catalog,
     prompt_evidence_catalog,
 )
-from app.domain.employee import AttendanceOnDuty, EmployeeStatus
-from app.domain.iam import OrganizationScope, Principal, ScopeType
+from app.domain.work_order import AttendanceOnDuty, EmployeeStatus
+from app.domain.identity import OrganizationScope, Principal, ScopeType
 from app.domain.work_order import (
     MediaKind,
     WorkOrderActorType,
@@ -92,7 +92,7 @@ from app.repository.ai import AiRepository
 from app.repository.identity import IdentityRepository
 from app.repository.work_order import WorkOrderRepository
 from app.service.audit import AuditService
-from app.service.analysis_attempt import (
+from app.service.work_order.analysis_attempt import (
     accepts_attempt,
     claim_attempt,
     media_checkpoint_payload,
@@ -102,8 +102,8 @@ from app.service.analysis_attempt import (
     read_provider_checkpoint,
 )
 from app.service.task_intent import IntentLeaseLost, require_execution_lease
-from app.service.auth import AuthService
-from app.service.rbac import RbacService
+from app.service.identity.auth import AuthService
+from app.service.identity.rbac import RbacService
 
 logger = get_logger(__name__)
 

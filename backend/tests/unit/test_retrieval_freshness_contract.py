@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import TransactionContractError
 from app.core.errors import AppError, IamErrorCode
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.domain.knowledge import KNOWLEDGE_READ, KNOWLEDGE_UNAVAILABLE
 from app.service import retrieval
 

@@ -10,9 +10,9 @@ import pytest
 
 from app.core.config import Settings
 from app.core.errors import AppError, AuditErrorCode, AuthErrorCode
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import ScopeType
-from app.service.credential_auth import CredentialAuthService
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import ScopeType
+from app.service.identity.credential_auth import CredentialAuthService
 from app.service.audit import AuditService
 from app.repository.credential import CredentialRepository
 

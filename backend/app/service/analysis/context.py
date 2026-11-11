@@ -8,8 +8,8 @@ from app.core.database import begin_owned_transaction
 from app.core.logging import get_logger
 from app.core.time import utc_now
 from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
-from app.domain.observed_event import bind_observations
-from app.service.analysis_attempt import owns_attempt
+from app.domain.ai import bind_observations
+from app.service.work_order.analysis_attempt import owns_attempt
 from app.service.task_intent import require_execution_lease
 
 
@@ -69,16 +69,16 @@ from app.domain.ai import (
     map_analysis_output,
     rank_candidates,
 )
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.observed_event import (
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.ai import (
     ObservationBindingError,
     ObservedAnalysisOutput,
     bind_observations,
     build_evidence_catalog,
     prompt_evidence_catalog,
 )
-from app.domain.employee import AttendanceOnDuty, EmployeeStatus
-from app.domain.iam import OrganizationScope, Principal, ScopeType
+from app.domain.work_order import AttendanceOnDuty, EmployeeStatus
+from app.domain.identity import OrganizationScope, Principal, ScopeType
 from app.domain.work_order import (
     MediaKind,
     WorkOrderActorType,
@@ -112,7 +112,7 @@ from app.repository.ai import AiRepository
 from app.repository.identity import IdentityRepository
 from app.repository.work_order import WorkOrderRepository
 from app.service.audit import AuditService
-from app.service.analysis_attempt import (
+from app.service.work_order.analysis_attempt import (
     accepts_attempt,
     claim_attempt,
     media_checkpoint_payload,
@@ -122,8 +122,8 @@ from app.service.analysis_attempt import (
     read_provider_checkpoint,
 )
 from app.service.task_intent import IntentLeaseLost, require_execution_lease
-from app.service.auth import AuthService
-from app.service.rbac import RbacService
+from app.service.identity.auth import AuthService
+from app.service.identity.rbac import RbacService
 
 # PA-169: the two provider answers that mean "the model produced output the
 # contract cannot use". They are the only failures that may quarantine an

@@ -1,8 +1,7 @@
 """Analysis domain package: models, rules, and the one domain-local error.
 
-The historical flat modules (``app.domain.ai`` and
-``app.domain.observed_event``) are compatibility shims that re-export this
-package.
+The historical flat modules (``app.domain.observed_event`` and friends) are
+gone: S8 deleted the compatibility layer, so import this package only.
 """
 
 from .models import (

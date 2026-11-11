@@ -15,8 +15,8 @@ from app.core.config import Settings
 from app.provider.errors import ProviderInvalidOutputError,ProviderUnavailableError
 from app.provider.llm import QwenLLMProvider
 from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
-from app.domain.observed_event import work_order_analysis_response_format
-from app.domain.vision import VISION_ANALYSIS_PROMPT_VERSION, vision_analysis_response_format
+from app.domain.ai import work_order_analysis_response_format
+from app.domain.work_order import VISION_ANALYSIS_PROMPT_VERSION, vision_analysis_response_format
 from app.provider.vector import MilvusKnowledgeStore
 from app.service.retrieval import RetrievalService
 

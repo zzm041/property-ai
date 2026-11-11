@@ -159,7 +159,7 @@ def test_warning_sink_failure_preserves_safe_business_result(context, trace_log,
     ('reranker', 'pre_generation_access', 3), ('llm', 'pre_response_access', 4),
 ])
 def test_actual_read_phase_revocation_has_trace(context, trace_log, stage, expected, count):
-    from app.domain.iam import Principal
+    from app.domain.identity import Principal
     c = context
     def revoke():
         c.state['actor'] = Principal(5, 'ACTIVE', 'synthetic', ())

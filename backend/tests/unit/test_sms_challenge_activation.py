@@ -10,7 +10,7 @@ from sqlalchemy.exc import OperationalError
 from app.core.config import Settings
 from app.core.errors import AppError
 from app.provider.sms import SmsSendResult
-from app.service.credential_auth import CredentialAuthService
+from app.service.identity.credential_auth import CredentialAuthService
 
 
 class FakeRepo:

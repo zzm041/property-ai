@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.errors import AppError
 from app.model.property import Building, House, Property, Unit
-from app.service.property import DUPLICATE_RESOURCE, PropertyService
+from app.service.identity.property import DUPLICATE_RESOURCE, PropertyService
 
 BUSINESS_TABLES = {"tenants", "properties", "buildings", "units", "houses"}
 

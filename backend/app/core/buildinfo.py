@@ -80,11 +80,9 @@ def build_info() -> dict[str, object]:
         "work_order": getattr(ai_domain, "WORK_ORDER_ANALYSIS_PROMPT_VERSION", UNKNOWN),
     }
     try:  # vision/rag contracts are optional for the analysis worker
-        from app.domain import vision as vision_domain
+        from app.domain.work_order import VISION_ANALYSIS_PROMPT_VERSION
 
-        prompt_versions["vision"] = getattr(
-            vision_domain, "VISION_ANALYSIS_PROMPT_VERSION", UNKNOWN
-        )
+        prompt_versions["vision"] = VISION_ANALYSIS_PROMPT_VERSION
     except Exception:  # pragma: no cover - optional dependency surface
         prompt_versions["vision"] = UNKNOWN
 

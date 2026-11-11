@@ -17,9 +17,9 @@ from app.domain.ai import (
     INCIDENT_SUMMARY_PROMPT_VERSION,
     IncidentSummaryOutput,
 )
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import OrganizationScope, Principal, ScopeType
-from app.domain.incident import IncidentStatus
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import OrganizationScope, Principal, ScopeType
+from app.domain.governance import IncidentStatus
 from app.model.ai import Incident, IncidentWorkOrder
 from app.model.employee import Employee
 from app.model.work_order import WorkOrder, WorkOrderAssignment
@@ -30,9 +30,9 @@ from app.repository.ai import AiRepository
 from app.repository.employee import EmployeeRepository
 from app.repository.identity import IdentityRepository
 from app.repository.work_order import WorkOrderRepository
-from app.service.auth import AuthService
+from app.service.identity.auth import AuthService
 from app.service.audit import AuditService
-from app.service.rbac import RbacService
+from app.service.identity.rbac import RbacService
 
 
 class IncidentService:

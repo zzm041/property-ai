@@ -152,7 +152,7 @@ def test_water_electrical_hvac_all_open_with_other(category_skill: str) -> None:
 import types
 from datetime import UTC, datetime
 
-from app.domain.employee import AttendanceOnDuty, EmployeeStatus
+from app.domain.work_order import AttendanceOnDuty, EmployeeStatus
 from app.service.work_order import WorkOrderService
 
 

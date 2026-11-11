@@ -54,7 +54,7 @@ class WorkOrderMediaMixin:
         stored_holder: dict[str, object] = {}
 
         def _persist() -> FileObject:
-            from app.service.identity_write_guard import lock_active_identity
+            from app.service.identity.identity_write_guard import lock_active_identity
 
             lock_active_identity(self._session, actor.user_id)
             resolved_property_id = property_id
@@ -340,7 +340,7 @@ class WorkOrderMediaMixin:
         handling_note: str | None = None,
     ) -> WorkOrder:
         self._validate_request_id(request_id)
-        from app.domain.receipt_handling import normalize_handling
+        from app.domain.work_order import normalize_handling
 
         try:
             handling_mode, handling_note = normalize_handling(handling_mode, handling_note)
@@ -427,7 +427,7 @@ class WorkOrderMediaMixin:
                 message="Receipt already exists for this process cycle",
                 status_code=409,
             )
-        from app.domain.receipt_handling import handling_reason
+        from app.domain.work_order import handling_reason
 
         # A supervisor may submit on behalf of the assignee. SELF refers to
         # the actual submitter's employee identity, never the assigned worker.

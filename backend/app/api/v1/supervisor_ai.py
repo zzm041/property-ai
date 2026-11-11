@@ -9,7 +9,7 @@ from app.api.dependencies.auth import get_current_principal
 from app.api.dependencies.db import get_db_session
 from app.api.v1.work_orders import work_order_data
 from app.core.config import Settings, get_settings
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.schema.ai import (
     DispatchRecommendationData,
     DispatchRecommendationListData,

@@ -6,11 +6,11 @@ import pytest
 
 from app.core.config import Settings
 from app.core.errors import AppError, AuthErrorCode
-from app.domain.iam import ScopeType
+from app.domain.identity import ScopeType
 from app.model.identity import User
 from app.repository.identity import GrantPermissionRecord, IdentityRepository
 from app.service.audit import AuditService
-from app.service.auth import AuthService
+from app.service.identity.auth import AuthService
 
 
 def _settings() -> Settings:

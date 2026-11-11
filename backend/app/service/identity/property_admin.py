@@ -7,9 +7,9 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.core.errors import AppError, ErrorCode, IamErrorCode
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import OrganizationScope, Principal, ScopeType
-from app.domain.property import HouseStatus, PROPERTY_MANAGE, PROPERTY_READ
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import OrganizationScope, Principal, ScopeType
+from app.domain.identity import HouseStatus, PROPERTY_MANAGE, PROPERTY_READ
 from app.model.property import Building, House, Property, Unit
 from app.repository.identity import IdentityRepository
 from app.repository.property import PropertyRepository

@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from app.core.errors import AppError, KnowledgeErrorCode
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.domain.knowledge import KNOWLEDGE_READ, KnowledgeVisibility
 from app.service.retrieval import RetrievalService
 

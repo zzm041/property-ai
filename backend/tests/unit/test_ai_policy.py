@@ -15,7 +15,7 @@ from app.domain.ai import (
     map_analysis_output,
     rank_candidates,
 )
-from app.domain.announcement import AnnouncementStatus, can_transition_announcement
+from app.domain.governance import AnnouncementStatus, can_transition_announcement
 from app.domain.work_order import WorkOrderCategory, WorkOrderPriority
 from app.provider.errors import ProviderTimeoutError
 from app.provider.llm import DevelopmentLLMProvider

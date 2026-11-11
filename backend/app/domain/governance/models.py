@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import Mapping
-from app.domain.iam import OrganizationScope, ScopeType
+from app.domain.identity import OrganizationScope, ScopeType
 
 class AuditAction(StrEnum):
     TASK_INTENT_RETRIED = "TASK_INTENT_RETRIED"

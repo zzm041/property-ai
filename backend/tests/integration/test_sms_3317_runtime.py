@@ -16,7 +16,7 @@ from app.core.database import begin_owned_transaction, get_session_factory
 from app.main import create_app
 from app.model.identity import Permission, Role, RolePermission, SmsChallenge, User, UserRole
 from app.provider.sms import SmsSendResult
-from app.service.property import PropertyService
+from app.service.identity.property import PropertyService
 
 from backend.tests.integration import test_isolated_auth_runtime as auth_scenario
 
@@ -208,7 +208,7 @@ def test_late_first_send_cannot_activate_or_cancel_second_on_3317(monkeypatch):
 def test_activation_commit_failure_rolls_back_and_code_stays_unusable_on_3317(
     monkeypatch,
 ):
-    from app.service import credential_auth
+    from app.service.identity import credential_auth
 
     original_transaction = credential_auth.run_owned_transaction
 

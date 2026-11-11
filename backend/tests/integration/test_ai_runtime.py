@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import Settings
 from app.core.errors import IamErrorCode
-from app.domain.audit import AuditAction
+from app.domain.governance import AuditAction
 from app.main import create_app
 from app.model.ai import AiCallLog, DispatchRecommendation, Incident, WorkOrderAnalysis
 from app.model.identity import AuditLog
@@ -18,7 +18,7 @@ from app.provider.llm import DevelopmentLLMProvider
 from app.provider.vision import DevelopmentVLMProvider
 from app.repository.identity import IdentityRepository
 from app.service.analysis import AnalysisService
-from app.service.auth import AuthService
+from app.service.identity.auth import AuthService
 from app.service.employee import EmployeeService
 from app.service.work_order import WorkOrderService
 from tests.integration.conftest import commit_open_transaction

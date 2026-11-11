@@ -22,7 +22,7 @@ from app.cli.customer_install_authority import CustomerInstallAuthority
 from app.core.config import get_settings
 from app.core.database import create_database_engine
 from app.core.passwords import require_new_password
-from app.domain.phone import normalize_phone
+from app.domain.identity import normalize_phone
 
 
 BACKEND = Path(__file__).resolve().parents[2]

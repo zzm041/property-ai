@@ -11,7 +11,7 @@ import pytest
 from app.core.config import Settings
 from app.core.errors import AppError, WorkOrderErrorCode
 from app.domain.ai import AnalysisStatus
-from app.domain.employee import AttendanceOnDuty, EmployeeStatus
+from app.domain.work_order import AttendanceOnDuty, EmployeeStatus
 from app.domain.work_order import AssignmentStatus, ProcessReason
 from app.model.work_order import WorkOrder
 from app.service.analysis import AnalysisService

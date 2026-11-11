@@ -7,9 +7,9 @@ import pytest
 from pydantic import ValidationError
 
 from app.core.config import Settings
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import OrganizationScope, ScopeType
-from app.domain.observed_event import (
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import OrganizationScope, ScopeType
+from app.domain.ai import (
     ObservedAnalysisOutput,
     bind_observations,
     build_evidence_catalog,

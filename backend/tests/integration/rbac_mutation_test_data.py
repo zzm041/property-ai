@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from sqlalchemy.orm import Session
 
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.model.identity import Permission, Role, RolePermission, User, UserRole
 from app.model.property import Property, Tenant
 

@@ -11,7 +11,7 @@ from app.core.database import get_session_factory, verify_utc_session
 from app.core.errors import AppError
 from app.model.property import Property, Tenant
 from app.repository.property import PropertyRepository
-from app.service.property import DUPLICATE_RESOURCE, PropertyService
+from app.service.identity.property import DUPLICATE_RESOURCE, PropertyService
 
 
 def test_sync_session_uses_pymysql_and_utc(

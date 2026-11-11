@@ -175,7 +175,7 @@ class WorkOrderQueriesMixin:
     def diagnose_work_order(self, *, actor: Principal, work_order_id: int,
                             property_id: int, version: int):
         """Read existing evidence only. No inference, mutation, or scheduling."""
-        from app.domain.diagnosis import diagnosis_items
+        from app.domain.work_order import diagnosis_items
         from app.schema.work_order import WorkOrderDiagnosisData
 
         self._require_positive_id(work_order_id, 'work_order_id')
@@ -214,7 +214,7 @@ class WorkOrderQueriesMixin:
             suggested_actions=actions)
     def get_contact(self, *, actor: Principal, work_order_id: int, reveal: bool, request_id: str) -> dict:
         """Explicit, scoped plaintext access; never returned by common list DTOs."""
-        from app.domain.phone import mask_phone
+        from app.domain.identity import mask_phone
 
         self._require_positive_id(work_order_id, "work_order_id")
         self._validate_request_id(request_id)

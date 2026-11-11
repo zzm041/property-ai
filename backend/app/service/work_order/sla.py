@@ -8,8 +8,8 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings, get_settings
 from app.core.database import begin_owned_transaction
 from app.core.time import current_business_date, utc_now
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import ScopeType
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import ScopeType
 from app.domain.work_order import (
     AssignmentStatus,
     SlaClockState,

@@ -11,8 +11,8 @@ from app.api.dependencies.db import get_db_session
 from app.core.config import Settings, get_settings
 from app.core.errors import AppError, WorkOrderErrorCode
 from app.core.time import validate_timezone
-from app.domain.iam import Principal
-from app.domain.work_order_visibility import resident_detail
+from app.domain.identity import Principal
+from app.domain.work_order import resident_detail
 from app.schema.common import SuccessEnvelope, request_id_for, success_envelope
 from app.schema.work_order import (
     CreateWorkOrderData,
@@ -35,7 +35,7 @@ from app.schema.work_order import (
     WorkOrderProcessData,
     WorkOrderReceiptData,
 )
-from app.service.description_suggestion import DescriptionSuggestionService
+from app.service.work_order.description_suggestion import DescriptionSuggestionService
 from app.service.work_order import WorkOrderService
 
 router = APIRouter(tags=["work-orders"])

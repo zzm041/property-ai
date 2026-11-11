@@ -11,16 +11,16 @@ from pydantic import ValidationError
 
 from app.core.config import Settings
 from app.core.errors import AppError, IdentityRecoveryErrorCode
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.model.identity import IdentityRecoveryCase
 from app.provider.identity_proof import IdentityProofResult, IsolatedTestIdentityProofProvider
 from app.repository.identity_recovery import IdentityCompletionRows
 from app.schema.identity_recovery import CompleteIdentityRecoveryCaseRequest
-from app.service.identity_recovery import IdentityRecoveryService
-from app.service.identity_write_guard import lock_active_identity
-from app.service.credential_auth import CredentialAuthService
-from app.service import credential_auth as credential_auth_module
-from app.service import identity_recovery as identity_recovery_module
+from app.service.identity.identity_recovery import IdentityRecoveryService
+from app.service.identity.identity_write_guard import lock_active_identity
+from app.service.identity.credential_auth import CredentialAuthService
+from app.service.identity import credential_auth as credential_auth_module
+from app.service.identity import identity_recovery as identity_recovery_module
 
 
 NOW = datetime(2026, 9, 25, 6, 0, tzinfo=timezone.utc)
@@ -707,7 +707,7 @@ def test_resident_bind_request_lock_forces_identity_map_refresh() -> None:
 
 def test_resident_approval_rejects_request_changed_while_waiting_for_user_lock() -> None:
     from app.core.errors import ResidentErrorCode
-    from app.service.resident import ResidentBindingService
+    from app.service.identity.resident import ResidentBindingService
 
     item = ResidentBindingService.__new__(ResidentBindingService)
     item._repository = MagicMock()

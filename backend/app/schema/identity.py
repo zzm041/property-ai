@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel
 
-from app.domain.iam import ScopeType
+from app.domain.identity import ScopeType
 
 
 class GrantedScopeData(BaseModel):

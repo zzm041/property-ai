@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from app.core.errors import AppError
-from app.domain.iam import Principal, RoleGrant, OrganizationScope, ScopeType
+from app.domain.identity import Principal, RoleGrant, OrganizationScope, ScopeType
 from app.domain.work_order import WORK_ORDER_READ, WORK_ORDER_DISPATCH
 from app.service.work_order import WorkOrderService
 

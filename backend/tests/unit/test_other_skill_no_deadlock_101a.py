@@ -85,7 +85,7 @@ def test_stored_analysis_keeps_raw_other_marker():
     [("客厅插座没有冒烟。", "冒烟", "插座"), ("水龙头没有滴水。", "滴渗水", "水龙头")],
 )
 def test_pa001_negatives_still_rejected(text, label, subject):
-    from app.domain.observed_event import (
+    from app.domain.ai import (
         ObservedAnalysisOutput,
         bind_observations,
         build_evidence_catalog,

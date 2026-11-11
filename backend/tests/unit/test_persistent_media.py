@@ -7,7 +7,7 @@ import pytest
 
 from app.core.config import Settings
 from app.core.errors import AppError, FileErrorCode
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.domain.work_order import MediaTakenPhase
 from app.model.work_order import FileObject, WorkOrder
 from app.provider.errors import ProviderInvalidOutputError

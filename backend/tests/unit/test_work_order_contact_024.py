@@ -11,7 +11,7 @@ from sqlalchemy.engine import make_url
 from app.core.config import Settings
 from app.core.errors import AppError
 from app.core.logging import redact_text
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.model.work_order import WorkOrder
 from app.schema.work_order import CreateWorkOrderRequest, WorkOrderData
 from app.service.work_order import WorkOrderService

@@ -8,8 +8,8 @@ from sqlalchemy.orm import Session
 from app.api.dependencies.auth import get_current_principal
 from app.api.dependencies.db import get_db_session
 from app.core.config import Settings, get_settings
-from app.domain.iam import Principal
-from app.domain.phone import mask_phone
+from app.domain.identity import Principal
+from app.domain.identity import mask_phone
 from app.repository.identity import IdentityRepository
 from app.schema.common import request_id_for, success_envelope
 from app.schema.identity_recovery import (
@@ -20,8 +20,8 @@ from app.schema.identity_recovery import (
     IdentityRecoveryCaseData,
     ReviewIdentityRecoveryCaseRequest,
 )
-from app.service.auth import AuthService
-from app.service.identity_recovery import IdentityRecoveryService
+from app.service.identity.auth import AuthService
+from app.service.identity.identity_recovery import IdentityRecoveryService
 from app.provider.factory import build_identity_proof_provider
 
 

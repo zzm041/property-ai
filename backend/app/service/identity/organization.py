@@ -10,8 +10,8 @@ from sqlalchemy.orm import Session
 
 from app.core.errors import AppError, ErrorCode, IamErrorCode
 from app.core.time import validate_timezone
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import OrganizationScope, Principal, ScopeType
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import OrganizationScope, Principal, ScopeType
 from app.model.property import Property, Tenant
 from app.model.work_order import IdempotencyRecord
 from app.repository.credential import CredentialRepository

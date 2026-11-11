@@ -10,7 +10,7 @@ from app.core.config import Settings, get_settings
 from app.core.errors import AppError, IamErrorCode, NotificationErrorCode
 from app.core.logging import get_logger
 from app.core.time import utc_now
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.model.ai import Notification
 from app.model.knowledge import NotificationDelivery
 from app.provider.errors import (
@@ -56,7 +56,7 @@ class NotificationService:
         resource_type: str,
         resource_id: int,
     ) -> Notification:
-        from app.service.identity_write_guard import lock_active_identity
+        from app.service.identity.identity_write_guard import lock_active_identity
 
         lock_active_identity(self._session, user_id)
         record = self._repository.add_notification(

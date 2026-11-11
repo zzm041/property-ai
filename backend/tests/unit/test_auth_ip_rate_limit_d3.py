@@ -18,7 +18,7 @@ from app.core.rate_limit import (
     parse_trusted_proxies,
     resolve_client_ip,
 )
-from app.service.credential_auth import CredentialAuthService
+from app.service.identity.credential_auth import CredentialAuthService
 
 BACKEND = Path(__file__).resolve().parents[2]
 

@@ -17,9 +17,9 @@ from app.core.database import run_owned_transaction
 from app.core.errors import AppError, IdentityRecoveryErrorCode, IamErrorCode
 from app.core.passwords import hash_password, require_new_password, verify_password
 from app.core.time import utc_now
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import OrganizationScope, Principal, ScopeType
-from app.domain.phone import normalize_phone
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import OrganizationScope, Principal, ScopeType
+from app.domain.identity import normalize_phone
 from app.model.identity import (
     AccountMerge,
     IdentityRecoveryCase,

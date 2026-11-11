@@ -8,11 +8,11 @@ import pytest
 
 from app.core.config import Settings
 from app.core.errors import AppError, AuditErrorCode, AuthErrorCode
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import ScopeType
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import ScopeType
 from app.provider.wechat import WeChatSession
 from app.service.audit import AuditService
-from app.service.wechat_auth import WeChatAuthService
+from app.service.identity.wechat_auth import WeChatAuthService
 
 
 REPO_ROOT = Path(__file__).resolve().parents[3]

@@ -15,7 +15,7 @@ import pytest
 from app.core.config import Settings
 from app.core.errors import AppError
 from app.core.readiness import check_readiness
-from app.service.description_suggestion import (
+from app.service.work_order.description_suggestion import (
     SUGGESTION_REASON_FALLBACK,
     SUGGESTION_REASONS,
     suggestion_reason,

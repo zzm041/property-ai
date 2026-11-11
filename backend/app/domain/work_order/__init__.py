@@ -1,9 +1,10 @@
 """Work order domain package: enums, rules, visibility and response contracts.
 
-The historical flat modules (``app.domain.work_order``,
-``app.domain.work_order_visibility``, ``app.domain.receipt_handling``,
-``app.domain.diagnosis``, ``app.domain.vision``) are compatibility shims that
-re-export this package.
+``models`` holds the status/media contracts, ``rules`` the transition table and
+SLA policy, ``contracts`` the vision prompt contract, ``employee`` the
+assignment/attendance policy. The historical flat modules (``work_order_
+visibility``, ``receipt_handling``, ``diagnosis``, ``vision``, ``employee``) were
+folded in here and their compatibility shims deleted in S8: import this package.
 """
 
 from .models import (
@@ -58,6 +59,22 @@ from .rules import (
     _WAIT,
     _PROCESS,
     diagnosis_items,
+)
+
+from .employee import (
+    ATTENDANCE_CHECK_IN,
+    ATTENDANCE_CHECK_OUT,
+    ATTENDANCE_READ,
+    AttendanceOnDuty,
+    AttendanceSource,
+    DEV_DUTY_CODES,
+    DEV_SKILL_CODES,
+    DISPATCH_STAFF_ROLES,
+    EMPLOYEE_MANAGE,
+    EMPLOYEE_READ,
+    EmployeePropertyStatus,
+    EmployeeStatus,
+    assignment_is_currently_effective,
 )
 
 from .contracts import (
@@ -118,4 +135,17 @@ __all__ = [
     "sla_windows_for_priority",
     "staff_may_submit_resolved_receipt",
     "vision_analysis_response_format",
+    "ATTENDANCE_CHECK_IN",
+    "ATTENDANCE_CHECK_OUT",
+    "ATTENDANCE_READ",
+    "AttendanceOnDuty",
+    "AttendanceSource",
+    "DEV_DUTY_CODES",
+    "DEV_SKILL_CODES",
+    "DISPATCH_STAFF_ROLES",
+    "EMPLOYEE_MANAGE",
+    "EMPLOYEE_READ",
+    "EmployeePropertyStatus",
+    "EmployeeStatus",
+    "assignment_is_currently_effective",
 ]

@@ -3,7 +3,7 @@
 from sqlalchemy.orm import Session
 
 from app.core.errors import AppError, ErrorCode, IamErrorCode
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.model.property import Building, House, Property, Tenant, Unit
 from app.repository.property import PropertyRepository
 

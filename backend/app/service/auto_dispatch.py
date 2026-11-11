@@ -23,9 +23,9 @@ from app.domain.ai import (
     rank_candidates,
     ordinary_maintenance,
 )
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.employee import DISPATCH_STAFF_ROLES, AttendanceOnDuty, EmployeeStatus
-from app.domain.iam import ScopeType
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.work_order import DISPATCH_STAFF_ROLES, AttendanceOnDuty, EmployeeStatus
+from app.domain.identity import ScopeType
 from app.domain.work_order import (
     AssignmentStatus,
     WorkOrderActorType,
@@ -39,7 +39,7 @@ from app.repository.employee import EmployeeRepository
 from app.repository.work_order import WorkOrderRepository
 from app.service.audit import AuditService
 from app.service.notification import NotificationService
-from app.service.sla import reset_assignment_sla_deadlines
+from app.service.work_order.sla import reset_assignment_sla_deadlines
 
 logger = get_logger(__name__)
 

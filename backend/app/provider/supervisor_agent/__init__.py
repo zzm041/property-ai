@@ -79,7 +79,7 @@ class LangChainSupervisorPlanner:
         self._chain_factory = chain_factory
         if self._chain is None and self._chain_factory is None:
             # Fail here, not on the first turn, so the factory can fall back and log why.
-            from app.provider import langchain_llm
+            from app.provider.llm import langchain_llm
 
             if not langchain_llm.optional_dependencies_available():
                 raise langchain_llm.LangChainUnavailable(
@@ -111,7 +111,7 @@ class LangChainSupervisorPlanner:
         return [queue, diagnose, finish]
 
     def _build_chain(self, *, timeout_seconds):
-        from app.provider import langchain_llm
+        from app.provider.llm import langchain_llm
 
         settings = self.settings
         model = langchain_llm.build_langchain_chat_model(

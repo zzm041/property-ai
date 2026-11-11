@@ -10,7 +10,7 @@ import pytest
 from app.api.v1.admin_employee import _reject_direct_user_id
 from app.core.config import Settings
 from app.core.errors import AppError, EmployeeErrorCode, IamErrorCode
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.core.passwords import hash_password, verify_password
 from app.core.rate_limit import MemoryRateLimiter, RedisRateLimiter
 from app.core.security import (
@@ -19,7 +19,7 @@ from app.core.security import (
     issue_access_token,
 )
 from app.core.token_hash import keyed_hash
-from app.domain.phone import mask_phone, normalize_phone
+from app.domain.identity import mask_phone, normalize_phone
 from app.provider.sms import DevelopmentSmsProvider
 
 

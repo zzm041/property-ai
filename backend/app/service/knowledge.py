@@ -18,8 +18,8 @@ from app.core.errors import (
 )
 from app.core.logging import get_logger
 from app.core.time import utc_now
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import OrganizationScope, Principal, ScopeType
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import OrganizationScope, Principal, ScopeType
 from app.domain.knowledge import (
     KNOWLEDGE_MANAGE,
     KnowledgeDocumentStatus,
@@ -44,8 +44,8 @@ from app.repository.identity import IdentityRepository
 from app.repository.knowledge import KnowledgeRepository
 from app.repository.property import PropertyRepository
 from app.service.audit import AuditService
-from app.service.auth import AuthService
-from app.service.rbac import RbacService
+from app.service.identity.auth import AuthService
+from app.service.identity.rbac import RbacService
 from app.service.task_intent import require_execution_lease
 
 T = TypeVar("T")
