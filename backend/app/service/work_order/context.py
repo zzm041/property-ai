@@ -29,7 +29,7 @@ from app.core.errors import (
     WorkOrderErrorCode,
 )
 from app.core.logging import get_logger
-from app.service.media_scan import admit_scanned_media, log_media_scan_skipped
+from .media_scan import admit_scanned_media, log_media_scan_skipped
 from app.core.time import current_business_date, utc_now
 from app.domain.audit import AuditAction, AuditResourceType
 from app.domain.ai import FilterReason, WorkOrderAnalysisOutput, capability_filter_reason, category_duty, content_fingerprint, eligibility_denial_details, loose_content_fingerprint, map_analysis_output, ordinary_maintenance
@@ -94,7 +94,7 @@ from app.repository.work_order import WorkOrderRepository
 from app.service.audit import AuditService
 from app.service.auth import AuthService
 from app.service.rbac import RbacService
-from app.service.sla import (
+from .sla import (
     reset_assignment_sla_deadlines,
     reset_response_sla_deadline,
 )

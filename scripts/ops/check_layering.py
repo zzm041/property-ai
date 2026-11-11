@@ -119,6 +119,12 @@ SHIMMED_SERVICE_MODULES: dict[str, str] = {
         "resident",
         "property",
         "property_admin",
+        # S6: the work_order service group moved into app.service.work_order/.
+        "sla",
+        "sla_policy",
+        "description_suggestion",
+        "media_scan",
+        "analysis_attempt",
     )
 }
 
