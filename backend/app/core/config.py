@@ -98,8 +98,18 @@ class Settings(BaseSettings):
         ge=5,
         le=3600,
     )
-    db_pool_size: int = Field(default=5, ge=1, le=32)
-    db_max_overflow: int = Field(default=10, ge=0, le=32)
+    # PA-199 (t199): 5 + 10 connections could not absorb a 40-way burst; the
+    # 16th simultaneous report waited out the 30 s pool timeout and surfaced as
+    # SYS.INTERNAL_ERROR. 20 + 20 covers a 40-way burst with one connection per
+    # request (MySQL max_connections is 151 on the delivery instance).
+    db_pool_size: int = Field(default=20, ge=1, le=32)
+    db_max_overflow: int = Field(default=20, ge=0, le=32)
+    # PA-199 (t199): the socket read timeout used to equal `connect_timeout`
+    # (5 s), so a statement that waited on a row lock longer than five seconds
+    # lost the connection and surfaced as SYS.INTERNAL_ERROR. Keep it above
+    # MySQL's own `innodb_lock_wait_timeout` (50 s) so lock contention is
+    # answered by the server (1205) instead of a dead socket (2013).
+    db_read_timeout_seconds: int = Field(default=60, ge=5, le=300)
     db_pool_recycle_seconds: int = Field(default=1800, ge=60, le=7200)
 
     readiness_timeout_seconds: float = Field(default=2.0, ge=0.1, le=10.0)
