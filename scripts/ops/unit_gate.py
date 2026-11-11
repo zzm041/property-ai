@@ -131,12 +131,52 @@ def parse_counts(output: str) -> dict[str, int]:
     return counts
 
 
+def run_script_import_check(verbose: bool) -> int:
+    """S7-3: every `app.*` import under scripts/ must resolve to a real module.
+
+    pytest never imports `scripts/`, so a renamed module leaves a dead import in
+    a runbook script that nobody executes until the day it is needed. Run this
+    before the suite so the failure is attributed to the tree rather than
+    surfacing as a mysterious collection error much later.
+    """
+    script = REPO_ROOT / "scripts" / "ops" / "check_script_imports.py"
+    if not script.is_file():
+        sys.stderr.write(f"unit_gate: script import check missing: {script}\n")
+        return 2
+    completed = subprocess.run(
+        [sys.executable, str(script)],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    if verbose:
+        sys.stdout.write(completed.stdout or "")
+        sys.stderr.write(completed.stderr or "")
+    if completed.returncode != 0:
+        sys.stderr.write(completed.stdout or "")
+        sys.stderr.write(completed.stderr or "")
+        sys.stderr.write(
+            "unit_gate: FAILED - scripts/ holds an app.* import with no module behind it "
+            f"(check_script_imports exit {completed.returncode}); fix the import or the path.\n"
+        )
+        return 1
+    last = (completed.stdout or "").strip().splitlines()
+    print(f"unit_gate: {last[-1] if last else 'script imports OK'}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Red-set gate against scripts/ops/known-red.txt")
     parser.add_argument("--target", default=DEFAULT_TARGET, help="pytest target (default: backend/tests/unit)")
     parser.add_argument("--known-red", default=str(DEFAULT_KNOWN_RED), help="baseline file")
     parser.add_argument("--pytest-arg", action="append", default=[], help="extra pytest arg (repeatable)")
     parser.add_argument("--verbose", action="store_true", help="echo the pytest command and full output length")
+    parser.add_argument(
+        "--skip-script-imports",
+        action="store_true",
+        help="skip the scripts/ import check (S7-3); only for a tree that is mid-edit",
+    )
     args = parser.parse_args(argv)
 
     known_path = Path(args.known_red)
@@ -147,6 +187,11 @@ def main(argv: list[str] | None = None) -> int:
     if not known:
         sys.stderr.write(f"unit_gate: known-red file is empty: {known_path}\n")
         return 2
+
+    if not args.skip_script_imports:
+        import_status = run_script_import_check(args.verbose)
+        if import_status != 0:
+            return import_status
 
     require_environment()
     exit_code, output = run_pytest(args.target, args.pytest_arg, args.verbose)

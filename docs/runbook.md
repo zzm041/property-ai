@@ -117,6 +117,16 @@ python scripts/ops/unit_gate.py        # 判据 = 红集 ⊆ scripts/ops/known-r
 python scripts/ops/check_layering.py   # 依赖方向静态闸（--report 看基线，--tree 只查 domain 顶层归属）
 ```
 
+`unit_gate.py` 现在先跑 `scripts/ops/check_script_imports.py`（S7-3）：`scripts/` 下每个 `app.*`
+import 都必须真能 `find_spec` 到，否则 gate 直接 exit 1（`--skip-script-imports` 只给正在改树的
+人用）。pytest 从不 import `scripts/`，所以这条以前没人管：包结构一动，runbook 脚本里的死
+import 要等到真用它那天才炸。单独跑它也是自检清单的一项：
+
+```bash
+python scripts/ops/check_script_imports.py            # imports checked N failures 0
+python scripts/ops/check_script_imports.py --self-test # 造 app.service.gone，必须报 no spec
+```
+
 env 缺一不可：`APP_ENV=test` + `DATABASE_URL` + `TEST_DATABASE_URL`（两库不同），缺了 gate 直接 exit 2。**`APP_ENV` 坑**：`Settings(_env_file=None)` 仍读进程环境，`APP_ENV=test` 会改 `should_enqueue_ai_on_create`（`backend/app/core/config.py:238-245`）；fixture 须显式声明建模环境，例 `test_durable_tasks_default_104.py::_settings`。
 
 ### 5.1 integration 需要一个**已迁移**的测试库（PA-118）
