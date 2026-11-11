@@ -47,7 +47,7 @@ $ExpectedSourceCommit = $null
 $launcherText = [IO.File]::ReadAllText($WorkAiLauncher, [Text.UTF8Encoding]::new($false))
 if ($launcherText -match '(?m)^\$SourceCommit = "([0-9a-f]{40})"') { $ExpectedSourceCommit = $Matches[1] }
 if (-not $ExpectedSourceCommit) { throw "could not read the pinned runtime source commit from $WorkAiLauncher" }
-$ExpectedQwenModel = "qwen38-27b-q3km-g55:7af3b8f"
+$ExpectedQwenModel = "qwen3.5:4b"
 $ExpectedPromptVersionsFormat = "property-ai-runtime-prompts-v1"
 
 function Get-PortListenerPids([int]$Port) {

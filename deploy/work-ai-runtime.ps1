@@ -1,4 +1,4 @@
-param(
+﻿param(
     [Parameter(Position = 0, Mandatory = $true)]
     [ValidateSet("start", "stop", "status", "verify-artifact")]
     [string]$Action,
@@ -33,7 +33,7 @@ $ExpectedRuntimeControlSha256 = "B0DE6D3544D8875E0A57CED1A1946744736FC9074AF1ECE
 # 只钉兼容层等于没钉住适配器，所以把真正承载逻辑的两个文件一起钉住。
 $ProviderRuntimeControlPath = Join-Path $CandidateRoot "backend\app\provider\local_ai\runtime_control.py"
 $ProviderHttpApiPath = Join-Path $CandidateRoot "backend\app\provider\local_ai\http_api.py"
-$ExpectedProviderRuntimeControlSha256 = "FAB4D7D316370FCD899515D9FFD1E8F13611A13DFA401F1E502A5392A440E29C"
+$ExpectedProviderRuntimeControlSha256 = "8A9538C75D8399D65A0B8E8759FB5A1E05EDA67B668C85C3BF35AEA4EC61BBA3"
 $ExpectedProviderHttpApiSha256 = "2AE1FE1D3E60EF66D2CF877BDA7F2959805CBAABC029623D57B2A72035B33DCB"
 $ResolutionRoot = Join-Path $RepoRoot "reports"
 $ResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\call-001-resolution.json"
@@ -69,8 +69,8 @@ $ExpectedNativeMediaReplayResultSha256 = "95F9A3B51A6447796D6318321390562B424A90
 $PythonPath = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\bge-142-cpu\.venv\Scripts\python.exe"
 $AsrPython = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\asr-006-cpu\.venv\Scripts\python.exe"
 $ModelRoot = "E:\ai-models\property-ai\models-hf"
-$ModelName = "qwen38-27b-q3km-g55:7af3b8f"
-$RuntimeModelName = "qwen38-27b-q3km-g52-ctx8192:7af3b8f"
+$ModelName = "qwen3.5:4b"
+$RuntimeModelName = "qwen3.5:4b-ctx8192"
 $RuntimeArtifact = $null
 if ([bool]$ArtifactManifest -xor [bool]$ArtifactSha256) { throw "artifact manifest and SHA256 must be provided together" }
 if ($ArtifactManifest) {
@@ -89,7 +89,7 @@ if ($ArtifactManifest) {
     $ExpectedProviderRuntimeControlSha256 = $RuntimeArtifact.files.'backend/app/provider/local_ai/runtime_control.py'
     $ExpectedProviderHttpApiSha256 = $RuntimeArtifact.files.'backend/app/provider/local_ai/http_api.py'
     $SourceCommit = $null
-    $RuntimeModelName = "qwen38-27b-q3km-g52-ctx8192:7af3b8f"
+    $RuntimeModelName = "qwen3.5:4b-ctx8192"
 }
 if ($Action -eq "verify-artifact") {
     if ($null -eq $RuntimeArtifact) { throw "verify-artifact requires a pinned artifact" }

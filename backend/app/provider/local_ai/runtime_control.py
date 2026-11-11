@@ -48,8 +48,13 @@ from app.domain.work_order import (
     vision_analysis_response_format,
 )
 
+# t174: the image chain runs on the 4B vision model. ollama takes the context
+# window from the *tag* (the adapter never sends num_ctx), so the reviewed
+# runtime tag is a derived one that pins num_ctx=8192; the base tag stays
+# unloadable-by-accident because its resident context does not match.
 QWEN_CANDIDATES={
     'qwen3.5:4b':('2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd','0.34.4',4096),
+    'qwen3.5:4b-ctx8192':('8fe4cfca7858deb875d79f6124e879f4523d81a4b7827d8efb258945876b602a','0.34.4',8192),
     'qwen3.5:9b':('6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7','0.34.3',4096),
     'qwen38-27b-q3km-g55:7af3b8f':('eb18a122286f7a67d36dc8129f9caa1c0f7bb8449d7669a79e3ecb3d81289e0c','0.34.4',8192),
     'qwen38-27b-q3km-g55-ctx8192:7af3b8f':('06385258e076e9b22102da888a1593daef1dd1d679d863e5cc94c7c674ffed86','0.34.4',8192),
@@ -61,6 +66,7 @@ if QWEN_MODEL not in QWEN_CANDIDATES or QWEN_MODEL.endswith('-ctx8192:7af3b8f'):
     raise RuntimeError('UNAPPROVED_QWEN_CANDIDATE')
 if QWEN_RUNTIME_MODEL not in QWEN_CANDIDATES:raise RuntimeError('UNAPPROVED_QWEN_RUNTIME_MODEL')
 QWEN_RUNTIME_BINDINGS=frozenset({
+    ('qwen3.5:4b','qwen3.5:4b-ctx8192'),
     ('qwen38-27b-q3km-g55:7af3b8f','qwen38-27b-q3km-g55-ctx8192:7af3b8f'),
     ('qwen38-27b-q3km-g55:7af3b8f','qwen38-27b-q3km-g52-ctx8192:7af3b8f'),
 })
