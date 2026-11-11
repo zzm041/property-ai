@@ -25,11 +25,11 @@ from sqlalchemy.orm import Session
 
 from app.core.config import Settings
 from app.core.database import begin_owned_transaction
-from app.domain.audit import AuditAction, AuditResourceType, AuditSource
-from app.domain.iam import OrganizationScope, ScopeType
+from app.domain.governance import AuditAction, AuditResourceType, AuditSource
+from app.domain.identity import OrganizationScope, ScopeType
 from app.model.identity import Role, User
 from app.service.audit import AuditService
-from app.service.rbac_mutation import RbacMutationService
+from app.service.identity.rbac_mutation import RbacMutationService
 
 DATABASE = "property_ai_auth001_test"
 BEFORE = "20260925_0012_task_intents"

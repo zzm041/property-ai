@@ -44,20 +44,33 @@ grep -rn "from app\.repository" backend/app/domain | wc -l               # 期�
 最常见的方式是「图省事在 domain 里调 service 做校验」——需要校验就把规则搬到 domain，由 service
 调用它，不要反向。
 
+目录形状本身也是契约（S1–S7 的包化结果，由 `scripts/ops/check_layering.py` 强制）：
+
+| 层 | 目录形状 | 举例 | 闸 |
+| --- | --- | --- | --- |
+| `domain/` | 只有六个包 + 尚未迁完的扁平 shim | `domain/identity/`、`domain/work_order/`、`domain/ai/`、`domain/knowledge/`、`domain/governance/`、`domain/dev/` | `check_layering.py`（顶层白名单 + 包间允许边 + shim 行数上限） |
+| `service/` | 按业务切成包，扁平模块只能是 4 行别名 | `service/identity/`、`service/work_order/`、`service/analysis/` | `check_layering.py --shims` |
+| `provider/` | 每种外部系统一个 `<kind>/` 包 | `provider/llm/`、`provider/local_ai/`、`provider/file_scanner/` | `check_layering.py --shims`（provider 段） |
+| `scripts/ops/` | 不依赖任何 shim，只 import 真实包路径 | `scripts/ops/unit_gate.py`、`scripts/ops/check_layering.py` | 人工复核（见 §4 提交模板） |
+
+包与同名模块不能共存（Python 语义）：`service/work_order.py`、`provider/file_scanner.py` 这类名字
+一旦包化，旧路径就是包本身，没有额外 shim；只有搬到别的包里的模块（`provider/langchain_llm.py`
+→ `provider/llm/langchain_llm.py`）才留 4 行 `sys.modules` 别名，S8 统一删除。
+
 ## 2. 模块职责表
 
 后端在 `backend/app/`（下列行数取自当前提交，便于判断该往哪加代码）：
 
 | 包 | 行数 | 职责 | 关键文件 |
 | --- | --- | --- | --- |
-| `api/` | 4285 | HTTP 面：路由、鉴权依赖、错误码出口 | `api/v1/work_orders.py`、`api/v1/health.py`（healthz/readyz）、`api/dependencies/client_ip.py`（D3 客户端 IP 解析） |
-| `service/` | 22929 | 事务边界 + 业务流程编排 | `service/work_order.py`、`service/analysis/`（拆包后：`orchestrator.py` / `vision.py` / `validation.py` / `persistence.py`）、`service/auto_dispatch.py` |
-| `domain/` | 3533 | 纯规则：状态机、枚举、错误码取值、AI 字段契约 | `domain/work_order.py`、`domain/ai.py`（`FilterReason:43`、`normalize_skill:146`、`rank_candidates:500`）、`domain/iam.py` |
-| `provider/` | 3692 | 外部系统适配（每个都有 development 实现） | `provider/factory.py:46-223`、`provider/llm/`、`provider/local_ai/`（自托管适配器拆包：`runtime_control.py` / `http_api.py`）、`provider/file_scanner.py` |
+| `api/` | 4303 | HTTP 面：路由、鉴权依赖、错误码出口 | `api/v1/work_orders.py`、`api/v1/health.py`（healthz/readyz）、`api/dependencies/client_ip.py`（D3 客户端 IP 解析） |
+| `service/` | 23338 | 事务边界 + 业务流程编排 | `service/work_order/`（`lifecycle.py` / `assign.py` / `media.py` / `queries.py`）、`service/analysis/`（`orchestrator.py` / `vision.py` / `validation.py` / `persistence.py`）、`service/auto_dispatch.py` |
+| `domain/` | 4497 | 纯规则：状态机、枚举、错误码取值、AI 字段契约 | `domain/work_order/`（`models.py` / `rules.py` / `contracts.py`）、`domain/ai/`（`models.py:102` `FilterReason`、`rules.py:1055` `normalize_skill`、`rules.py:1299` `rank_candidates`）、`domain/identity/` |
+| `provider/` | 3885 | 外部系统适配（每个都有 development 实现） | `provider/factory.py:46-223`、`provider/llm/`（含 `langchain_llm.py`）、`provider/local_ai/`（`runtime_control.py` / `http_api.py`）、`provider/file_scanner/`、`provider/supervisor_agent/` |
 | `worker/` | 1794 | Celery 任务、beat 调度、enqueue 契约 | `worker/celery_app.py:57-61`（`sla-sweep` 调度）、`worker/tasks.py:335/361`、`worker/enqueue.py` |
-| `cli/` | 2187 | 运维入口：安装、迁移、provenance、种子 | `cli/customer_install.py`、`cli/delivery_migrate.py`、`cli/build_provenance.py` |
+| `cli/` | 2201 | 运维入口：安装、迁移、provenance、种子 | `cli/customer_install.py`、`cli/delivery_migrate.py`、`cli/build_provenance.py` |
 | `repository/` | 16 个文件 | SQLAlchemy 查询，强制带 `tenant_id` / `property_id` | `repository/__init__.py:1`（口径声明）、`repository/employee.py:37` `get_employee_in_tenant` |
-| `model/` | 10 个文件 | ORM 表与外键、唯一约束 | `model/work_order.py:778` `IdempotencyRecord`、`:787` 复合唯一 |
+| `model/` | 10 个文件 | ORM 表与外键、唯一约束 | `model/work_order.py:802` `IdempotencyRecord`、`:811` `uq_idempotency_records_user_key`（D1）、`:content_fingerprint` 双列（PA-169） |
 | `schema/` | 16 个文件 | Pydantic 请求/响应模型 | `schema/work_order.py:31` 起 `extra="forbid"` |
 | `core/` | 15 个文件 | 配置、事务契约、错误码、就绪探针、日志 | `core/config.py`、`core/database.py:107/146`、`core/errors.py:6-189`、`core/readiness.py` |
 

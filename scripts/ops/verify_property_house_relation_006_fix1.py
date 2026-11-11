@@ -23,9 +23,9 @@ for candidate in (BACKEND, OPS):
         sys.path.insert(0, str(candidate))
 
 from app.core.database import run_owned_transaction  # noqa: E402
-from app.domain.iam import OrganizationScope, ScopeType  # noqa: E402
+from app.domain.identity import OrganizationScope, ScopeType  # noqa: E402
 from app.service.dev_seed import run_development_seed  # noqa: E402
-from app.service.rbac_mutation import RbacMutationService  # noqa: E402
+from app.service.identity.rbac_mutation import RbacMutationService  # noqa: E402
 from auth001_isolated_runtime import build_isolated_settings  # noqa: E402
 from verify_property_house_relation_006 import (  # noqa: E402
     API,

@@ -24,9 +24,9 @@ for candidate in (BACKEND, OPS):
 from app.core.database import get_session_factory  # noqa: E402
 from app.core.errors import AppError, AuthErrorCode  # noqa: E402
 from app.core.rate_limit import MemoryRateLimiter  # noqa: E402
-from app.domain.phone import normalize_phone  # noqa: E402
+from app.domain.identity import normalize_phone  # noqa: E402
 from app.provider.sms import development_sms_inbox  # noqa: E402
-from app.service.credential_auth import CredentialAuthService  # noqa: E402
+from app.service.identity.credential_auth import CredentialAuthService  # noqa: E402
 from auth001_isolated_runtime import build_isolated_settings  # noqa: E402
 
 

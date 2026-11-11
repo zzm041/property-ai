@@ -24,8 +24,8 @@ for candidate in (BACKEND, OPS):
 
 from app.repository.identity import IdentityRepository  # noqa: E402
 from app.repository.property import PropertyRepository  # noqa: E402
-from app.service.auth import AuthService  # noqa: E402
-from app.service.property_admin import PropertyAdminService  # noqa: E402
+from app.service.identity.auth import AuthService  # noqa: E402
+from app.service.identity.property_admin import PropertyAdminService  # noqa: E402
 from auth001_isolated_runtime import build_isolated_settings  # noqa: E402
 from verify_property_house_relation_006 import (  # noqa: E402
     API,
