@@ -30,7 +30,9 @@ def test_allowed_citations_are_database_ids_not_locator_ordinals():
         visibility='RESIDENT', version=3, excerpt=text, source_locator=locator, title='合成规定')
         for cid, doc, text, locator in [(97, 5, '登记时段为工作日。', '规定#chunk-1'),
                                       (4002, 9, '申请前须登记。', '流程#chunk-2')])
-    prompt = RetrievalService._prompt('什么时候登记？', chunks)
+    prompt = RetrievalService._prompt(
+        '什么时候登记？', chunks, prompt_version=RAG_ANSWER_PROMPT_VERSION
+    )
     assert 'Allowed citation_chunk_ids: [97, 4002]' in prompt
     assert 'not document positions or the chunk numbers inside locators' in prompt
     # The development adapter must still receive only the actual evidence text;

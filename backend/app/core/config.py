@@ -182,10 +182,15 @@ class Settings(BaseSettings):
     rag_llm_timeout_seconds: float = Field(default=8.0, ge=0.1, le=60.0)
     rag_llm_disable_thinking: bool = False
     rag_llm_max_output_tokens: int | None = Field(default=None, ge=1, le=8192)
-    # F1 / t177: the frozen delivery adapter authorizes one RAG prompt version
-    # (scope=rag_only). Override only after that adapter has been re-frozen with a
-    # new version; an unauthorized value is rejected at request time, never remapped.
+    # t188: the frozen delivery adapter authorizes exactly one RAG prompt version
+    # (scope=rag_only), and this build ships exactly one body for it. Override only
+    # after that adapter has been re-frozen with a new version and its pin
+    # recomputed; anything else is refused at startup instead of being remapped.
     rag_answer_prompt_version: str = "rag-answer-v2"
+    # t187-2: audit rows hash the question so the log never carries report text.
+    # An unsalted sha256 of a short question is reversible, so the salt is a
+    # deployment secret; production runs warn once when it is left empty.
+    audit_hash_salt: SecretStr = SecretStr("")
     local_ai_internal_token: SecretStr = SecretStr("")
     vlm_provider: Literal["development", "production"] = "development"
     vlm_base_url: str = ""
@@ -288,12 +293,13 @@ class Settings(BaseSettings):
 
         if self.rag_answer_prompt_version not in RAG_ANSWER_PROMPT_VERSIONS:
             raise ValueError(
-                "RAG_ANSWER_PROMPT_VERSION must be one of "
-                f"{', '.join(RAG_ANSWER_PROMPT_VERSIONS)};"
-                f" got {self.rag_answer_prompt_version!r}. The delivery adapter is"
-                " frozen and authorizes only rag-answer-v2 until"
-                " deploy/ai-runtime-prompts.json is re-frozen with a new version and"
-                " the adapter pin in deploy/rag-runtime.ps1 is recomputed"
+                "RAG_ANSWER_PROMPT_VERSION must be "
+                f"{', '.join(RAG_ANSWER_PROMPT_VERSIONS)} (the only version this"
+                " build ships a body for and the only one the frozen adapter"
+                f" authorizes); got {self.rag_answer_prompt_version!r}. Publishing a"
+                " new version means shipping its body, re-freezing"
+                " deploy/ai-runtime-prompts.json and recomputing the adapter pin in"
+                " deploy/rag-runtime.ps1; never relabel an unshipped draft an unshipped draft"
             )
         return self
 

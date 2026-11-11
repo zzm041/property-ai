@@ -15,6 +15,7 @@ from app.core.config import Settings
 from app.provider.errors import ProviderInvalidOutputError,ProviderUnavailableError
 from app.provider.llm import QwenLLMProvider
 from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
+from app.domain.knowledge import RAG_ANSWER_PROMPT_VERSION
 from app.domain.ai import work_order_analysis_response_format
 from app.domain.work_order import VISION_ANALYSIS_PROMPT_VERSION, vision_analysis_response_format
 from app.provider.vector import MilvusKnowledgeStore
@@ -837,7 +838,7 @@ def test_real_provider_marks_prompt_and_rejects_truncation():
     assert seen[0].headers['X-Prompt-Version']=='rag-answer-v2'
 
 def test_rag_prompt_states_real_output_contract_not_fake_provider_assumption():
-    prompt=RetrievalService._prompt('领取时间？',(SimpleNamespace(id=7,source_locator='规则#1',excerpt='领取时间为下午三点。'),))
+    prompt=RetrievalService._prompt('领取时间？',(SimpleNamespace(id=7,source_locator='规则#1',excerpt='领取时间为下午三点。'),),prompt_version=RAG_ANSWER_PROMPT_VERSION)
     assert all(s in prompt for s in ('status, answer, citation_chunk_ids','simplified Chinese','chunk-id:7','下午三点'))
 
 @pytest.mark.parametrize('drift',['dim','metric','revision'])
