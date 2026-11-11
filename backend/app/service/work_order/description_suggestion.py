@@ -9,6 +9,7 @@ Model access goes through the existing VLM/ASR providers (same contracts the
 post-submit analysis uses); this module adds no new model call path.
 """
 
+from contextlib import contextmanager
 from dataclasses import dataclass, replace
 from hashlib import sha256
 from time import perf_counter
@@ -16,7 +17,10 @@ from typing import Sequence
 
 from sqlalchemy.orm import Session
 
+from sqlalchemy import MetaData, Table, inspect as sa_inspect, update
+
 from app.core.config import Settings
+from app.core.database import begin_owned_transaction
 from app.core.errors import (
     AppError,
     AuthErrorCode,
@@ -27,8 +31,12 @@ from app.core.errors import (
 from app.core.logging import get_logger
 from app.core.rate_limit import MemoryRateLimiter, RateLimiter, RedisRateLimiter
 from app.domain.identity import Principal
-from app.domain.work_order import MediaKind
+from app.domain.ai import AiCallStatus, ProviderType
+from app.domain.work_order import VISION_ANALYSIS_PROMPT_VERSION, MediaKind
+from app.model.ai import AiCallLog
 from app.model.work_order import FileObject
+from app.core.time import utc_now
+from app.repository.ai import AiRepository
 from app.provider.asr import ASRProvider
 from app.provider.errors import ProviderError
 from app.provider.factory import build_asr_provider, build_vlm_provider
@@ -54,6 +62,11 @@ SUGGESTIBLE_MIME = {
 MAX_SUGGESTED_TEXT = 200
 RESIDENT_ROLE = "RESIDENT"
 SUGGEST_TEXT_KIND = {"vlm": "image", "asr": "audio"}
+#: PA-178 (t186): the suggest call is auditable per request, exactly like the
+#: post-submit analysis, so "which model call produced this pre-fill" is a
+#: query on ai_call_logs instead of a guess from app logs.
+SUGGEST_CALL_LOG_BIZ_TYPE = "WORK_ORDER_SUGGEST"
+SUGGEST_CALL_LOG_OPERATION = "suggest_description"
 #: PA-163: a machine code alone leaves the reporter staring at an empty box, so
 #: every returned ``reason_code`` carries an operator/reporter readable sentence.
 #: The wording never claims a scan happened; it only states what to do next.
@@ -111,6 +124,7 @@ class DescriptionSuggestionService:
         self._session = session
         self._settings = settings
         self._repository = WorkOrderRepository(session)
+        self._ai = AiRepository(session)
         # The analysis path keeps its own (longer) deadlines; only this call is
         # bounded by SUGGEST_TIMEOUT_SECONDS.
         bounded = settings.model_copy(
@@ -152,7 +166,9 @@ class DescriptionSuggestionService:
                 DescriptionSuggestion(text="", source="none", reason_code="MEDIA_NOT_READY")
             )
         record, source = target
-        return self._explained(self._suggest_from(record, source))
+        return self._explained(
+            self._suggest_from(record, source, request_id=request_id)
+        )
 
     @staticmethod
     def _explained(result: DescriptionSuggestion) -> DescriptionSuggestion:
@@ -270,7 +286,9 @@ class DescriptionSuggestionService:
         return any(grant.scope.tenant_id == tenant_id for grant in actor.grants)
 
     # ----------------------------------------------------------------- calling
-    def _suggest_from(self, record: FileObject, source: str) -> DescriptionSuggestion:
+    def _suggest_from(
+        self, record: FileObject, source: str, *, request_id: str | None = None
+    ) -> DescriptionSuggestion:
         # D6: never treat an unscanned file as ready; the shared rule names both
         # the verdict and the reason a reporter should be told.
         admission = admit_scanned_media(record.scanner_status, self._settings)
@@ -285,18 +303,47 @@ class DescriptionSuggestionService:
                 text="", source="none", reason_code="MEDIA_NOT_READY"
             )
         started = perf_counter()
+        started_at = utc_now()
         try:
             text = self._read_text(record, source)
         except ProviderError as exc:
             self._log_call(record, source, exc.error_code, started, 0)
+            self._record_call_log(
+                record,
+                source,
+                request_id=request_id,
+                started=started,
+                started_at=started_at,
+                error=exc,
+                error_code=exc.error_code,
+            )
             return DescriptionSuggestion(text="", source="none", reason_code=exc.error_code)
         cleaned = self._clean(text)
         if not cleaned:
             self._log_call(record, source, "AI.INVALID_OUTPUT", started, 0)
+            self._record_call_log(
+                record,
+                source,
+                request_id=request_id,
+                started=started,
+                started_at=started_at,
+                error=None,
+                error_code="AI.INVALID_OUTPUT",
+                status=AiCallStatus.INVALID,
+            )
             return DescriptionSuggestion(
                 text="", source="none", reason_code="AI.INVALID_OUTPUT"
             )
         self._log_call(record, source, None, started, len(cleaned))
+        self._record_call_log(
+            record,
+            source,
+            request_id=request_id,
+            started=started,
+            started_at=started_at,
+            error=None,
+            error_code=None,
+        )
         return DescriptionSuggestion(text=cleaned, source=source)
 
     def _read_text(self, record: FileObject, source: str) -> str:
@@ -338,4 +385,157 @@ class DescriptionSuggestionService:
             media_digest=sha256(
                 f"{record.id}|{record.mime_type}|{record.content_hash}".encode("utf-8")
             ).hexdigest()[:16],
+        )
+
+    @contextmanager
+    def _audit_transaction(self):
+        """Yield the session that owns the audit row's transaction.
+
+        The request path already read through this session, so its implicit
+        transaction is still open and a writer-owned boundary cannot start on
+        it. In that case the row lives on a short, separate session: an audit
+        row that only commits with somebody else's transaction would vanish on
+        a read-only request, which is exactly what t186 measured.
+        """
+
+        session = self._session
+        if not session.in_transaction():
+            with begin_owned_transaction(session):
+                yield session
+            return
+        bind = session.get_bind()
+        owned = Session(bind=bind, autoflush=False, expire_on_commit=False)
+        try:
+            with begin_owned_transaction(owned):
+                yield owned
+        finally:
+            owned.close()
+
+    def _ai_for(self, session):
+        """Reuse the injected repository when the audit session is the request's."""
+
+        return self._ai if session is self._session else AiRepository(session)
+
+    def _record_call_log(
+        self,
+        record: FileObject,
+        source: str,
+        *,
+        request_id: str | None,
+        started: float,
+        started_at,
+        error: ProviderError | None,
+        error_code: str | None,
+        status: AiCallStatus | None = None,
+    ) -> None:
+        """Write the one ai_call_logs row this suggestion owes.
+
+        Same shape as the analysis writer: provider type, operation, model,
+        latency and request id, so a suggestion can be reconciled per request.
+        The suggestion must stay a pre-fill even when auditing fails, so a
+        database problem is logged and swallowed instead of turning a usable
+        text into an error.
+        """
+
+        # The audit row is keyed by request; without one there is nothing to
+        # reconcile, and inventing an id would poison that key.
+        if request_id is None:
+            return
+
+        provider = self._vlm if source == "vlm" else self._asr
+        provider_type = ProviderType.VLM if source == "vlm" else ProviderType.ASR
+        resolved_status = status or self._status_for(error)
+        finished_at = utc_now()
+        latency_ms = max(int(round((perf_counter() - started) * 1000)), 0)
+        try:
+            with self._audit_transaction() as audit_session:
+                call_log = self._ai_for(audit_session).add_call_log(
+                    AiCallLog(
+                        tenant_id=record.tenant_id,
+                        property_id=record.property_id,
+                        work_order_id=None,
+                        request_id=request_id,
+                        provider_type=provider_type.value,
+                        operation=SUGGEST_CALL_LOG_OPERATION,
+                        biz_type=SUGGEST_CALL_LOG_BIZ_TYPE,
+                        prompt_version=self._prompt_version(source),
+                        model_version=str(
+                            getattr(provider, "model_version", None) or "unknown"
+                        )[:64],
+                        status=resolved_status.value,
+                        started_at=started_at,
+                        finished_at=finished_at,
+                        latency_ms=latency_ms,
+                        attempt=1,
+                        error_code=error_code,
+                        token_usage=None,
+                        input_hash=sha256(
+                            f"{record.id}|{record.mime_type}|{record.content_hash}".encode(
+                                "utf-8"
+                            )
+                        ).hexdigest(),
+                        # PA-169 keys quarantine on report text; a suggestion is
+                        # media-only, so it must not seed that probe.
+                        content_fingerprint=None,
+                    )
+                )
+                self._write_provider_mode(
+                    call_log.id, provider_type, session=audit_session
+                )
+        except Exception as exc:  # pragma: no cover - audit must never break the form
+            logger.warning(
+                "work_order_suggestion_call_log_failed",
+                file_id=record.id,
+                provider_type=provider_type.value,
+                reason_code=error_code,
+                # Without the driver's message this warning is useless when the
+                # row fails on a constraint, which is exactly how t186 found it.
+                error=f"{type(exc).__name__}: {exc}"[:512],
+            )
+
+    @staticmethod
+    def _status_for(error: ProviderError | None) -> AiCallStatus:
+        if error is None:
+            return AiCallStatus.SUCCESS
+        name = type(error).__name__
+        if "Timeout" in name:
+            return AiCallStatus.TIMEOUT
+        if "InvalidOutput" in name:
+            return AiCallStatus.INVALID
+        return AiCallStatus.FAILED
+
+    @staticmethod
+    def _prompt_version(source: str) -> str | None:
+        if source == "vlm":
+            return VISION_ANALYSIS_PROMPT_VERSION
+        return None
+
+    def _write_provider_mode(
+        self,
+        call_log_id: int,
+        provider_type: ProviderType,
+        *,
+        session: Session | None = None,
+    ) -> None:
+        """Fill the 0009 provenance column without mapping it on shared 0007."""
+
+        target = session if session is not None else self._session
+        bind = target.get_bind()
+        if bind is None:
+            return
+        columns = {
+            column["name"]
+            for column in sa_inspect(bind).get_columns("ai_call_logs")
+        }
+        if "provider_mode" not in columns:
+            return
+        configured = {
+            ProviderType.VLM: self._settings.vlm_provider,
+            ProviderType.ASR: self._settings.asr_provider,
+        }[provider_type]
+        table = Table("ai_call_logs", MetaData(), autoload_with=bind)
+        target.execute(
+            update(table)
+            .where(table.c.id == call_log_id)
+            .values(provider_mode=configured.upper())
         )
