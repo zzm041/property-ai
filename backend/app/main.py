@@ -12,7 +12,10 @@ from app.core.database import dispose_database_engines
 from app.core.exception_handlers import install_exception_handlers
 from app.core.logging import configure_logging, get_logger
 from app.core.request_context import RequestContextMiddleware
-from app.core.startup import verify_task_delivery_configuration
+from app.core.startup import (
+    verify_rag_providers_are_real,
+    verify_task_delivery_configuration,
+)
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -24,6 +27,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # PA-104-A-1: assembly-time self-check; a production misconfiguration must
     # fail here instead of degrading into silent enqueue loss at request time.
     verify_task_delivery_configuration(resolved_settings)
+    # t165: same contract for the RAG chain — a production app may not answer
+    # knowledge questions from a development provider that never calls a model.
+    verify_rag_providers_are_real(resolved_settings)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
