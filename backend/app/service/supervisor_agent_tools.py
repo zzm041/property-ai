@@ -3,7 +3,7 @@ from contextlib import contextmanager
 
 from app.core.database import get_session_factory
 from app.core.logging import get_logger
-from app.provider.langchain_llm import LangChainUnavailable
+from app.provider.llm.langchain_llm import LangChainUnavailable
 from app.provider.supervisor_agent import LangChainSupervisorPlanner, SupervisorPlanner
 from app.service.supervisor_agent import SupervisorAgentService
 from app.service.work_order import WorkOrderService

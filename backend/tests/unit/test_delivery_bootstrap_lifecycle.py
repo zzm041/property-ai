@@ -24,6 +24,9 @@ def test_bootstrap_file_is_only_required_for_initialization(tmp_path, action, su
     harness = tmp_path / "check.ps1"
     harness.write_text('''$ErrorActionPreference = "Stop"
 function docker { $global:LASTEXITCODE = 0 }
+# `status` ends by printing /healthz and /readyz; stub the probe so this test
+# does not need a delivery stack listening on 127.0.0.1:8093.
+function Invoke-RestMethod { param([string]$Uri, [int]$TimeoutSec) @{ status = "probe-stub" } }
 try { & (Join-Path $env:TEST_DELIVERY_ROOT "deploy/delivery.ps1") $env:TEST_DELIVERY_ACTION; exit 0 }
 catch { Write-Output $_.Exception.Message; exit 1 }
 ''', encoding="utf-8")

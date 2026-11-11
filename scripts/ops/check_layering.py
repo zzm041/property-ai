@@ -148,6 +148,70 @@ DOMAIN_TOP_LEVEL_ALLOWED_FILES: frozenset[str] = frozenset(
 DOMAIN_TOP_LEVEL_ALLOWED_PACKAGES: frozenset[str] = frozenset(ALLOWED_DOMAIN_EDGES)
 
 
+# What may import what *inside* backend/app/provider/. `factory` is the
+# composition root and may assemble any kind; a kind may use the shared
+# transport/infrastructure modules (flattened on purpose: they sit below every
+# kind) and otherwise only the kinds declared here. A new kind->kind edge has to
+# be written down, because that is the shortcut that turns a set of
+# interchangeable providers into a hierarchy nobody can test in isolation.
+_ALL_SHIM_MODULES: frozenset[str] = frozenset(
+    list(SHIMMED_MODULES) + list(SHIMMED_SERVICE_MODULES) + list(SHIMMED_PROVIDER_MODULES)
+)
+PROVIDER_ROOT = REPO_ROOT / "backend" / "app" / "provider"
+PROVIDER_SHARED_MODULES: frozenset[str] = frozenset({"errors", "http", "usage"})
+PROVIDER_COMPOSITION_ROOT = "factory"
+PROVIDER_KIND_EDGES: dict[str, frozenset[str]] = {
+    # The supervisor planner drives the LLM transport.
+    "supervisor_agent": frozenset({"llm"}),
+    # asr/vision pull the original bytes out of the storage provider: they are
+    # consumers of a store, not layers on top of it.
+    "asr": frozenset({"storage"}),
+    "vision": frozenset({"storage"}),
+}
+
+
+def provider_package(module: str) -> str | None:
+    """app.provider.<kind>[.<rest>] -> <kind>"""
+    parts = module.split(".")
+    if len(parts) < 3 or parts[0] != "app" or parts[1] != "provider":
+        return None
+    return parts[2]
+
+
+def check_provider_edges(
+    provider_root: pathlib.Path | None = None,
+    backend_root: pathlib.Path | None = None,
+) -> list[str]:
+    root = backend_root or (REPO_ROOT / "backend")
+    problems: list[str] = []
+    for path in sorted((provider_root or PROVIDER_ROOT).rglob("*.py")):
+        if "__pycache__" in path.parts:
+            continue
+        importer = module_name(path, root)
+        if importer in _ALL_SHIM_MODULES:
+            # An alias module is indirection, not an edge: it re-exports the real
+            # package and is deleted with the rest of the compat layer.
+            continue
+        source = provider_package(importer)
+        if source is None:
+            continue
+        for target, line, nested in imports_of(parse(path), importer):
+            dest = provider_package(target)
+            if dest is None or dest == source:
+                continue
+            if source == PROVIDER_COMPOSITION_ROOT or dest in PROVIDER_SHARED_MODULES:
+                continue
+            if dest in PROVIDER_KIND_EDGES.get(source, frozenset()):
+                continue
+            kind = "lazy " if nested else ""
+            problems.append(
+                f"{path.relative_to(root)}:{line} provider.{source} -> provider.{dest} "
+                f"({kind}import; declared kind edges: "
+                f"{sorted(PROVIDER_KIND_EDGES.get(source, frozenset())) or 'none'})"
+            )
+    return problems
+
+
 def module_name(path: pathlib.Path, backend_root: pathlib.Path | None = None) -> str:
     root = backend_root or (REPO_ROOT / "backend")
     rel = path.relative_to(root)
@@ -319,6 +383,23 @@ def self_test() -> int:
         for package in ("identity", "work_order", "knowledge"):
             (domain / package).mkdir(parents=True)
             (domain / package / "__init__.py").write_text("", encoding="utf-8")
+        provider = backend / "app" / "provider"
+        for package in ("llm", "vision", "supervisor_agent", "errors"):
+            (provider / package).mkdir(parents=True)
+            (provider / package / "__init__.py").write_text("", encoding="utf-8")
+        # allowed: the planner drives the llm transport, factory assembles kinds
+        (provider / "supervisor_agent" / "ok.py").write_text(
+            "from app.provider.llm import client  # noqa: F401\n", encoding="utf-8"
+        )
+        (provider / "factory.py").write_text(
+            "from app.provider.vision import client  # noqa: F401\n"
+            "from app.provider.errors import ProviderError  # noqa: F401\n",
+            encoding="utf-8",
+        )
+        # planted 4: an interchangeable kind grabbing another kind
+        (provider / "vision" / "wrong_kind.py").write_text(
+            "from app.provider.llm import client  # noqa: F401\n", encoding="utf-8"
+        )
         # allowed edge: work_order -> identity
         (domain / "work_order" / "allowed.py").write_text(
             "from app.domain.identity import models  # noqa: F401\n", encoding="utf-8"
@@ -340,6 +421,7 @@ def self_test() -> int:
         upward = check_upward(domain, backend)
         edges = check_domain_edges(domain, backend)
         tree = domain_tree_problems(domain)
+        kind_edges = check_provider_edges(provider, backend)
 
     ok = (
         len(upward) == 1
@@ -350,8 +432,11 @@ def self_test() -> int:
         and "domain.knowledge -> domain.work_order" in edges[0]
         and len(tree) == 1
         and "rogue.py" in tree[0]
+        and len(kind_edges) == 1
+        and "wrong_kind.py" in kind_edges[0]
+        and "provider.vision -> provider.llm" in kind_edges[0]
     )
-    for problem in upward + edges + tree:
+    for problem in upward + edges + tree + kind_edges:
         print(f"  detected: {problem}")
     print("self-test OK" if ok else "self-test FAILED")
     return 0 if ok else 1
@@ -384,6 +469,26 @@ def report() -> None:
     print(f"# shims declared: {len(SHIMMED_MODULES)} domain, "
           f"{len(SHIMMED_SERVICE_MODULES)} service, "
           f"{len(SHIMMED_PROVIDER_MODULES)} provider")
+    kind_edges: set[tuple[str, str]] = set()
+    for path in sorted(PROVIDER_ROOT.rglob("*.py")):
+        if "__pycache__" in path.parts:
+            continue
+        importer = module_name(path)
+        source = provider_package(importer)
+        if source is None:
+            continue
+        for target, _line, _nested in imports_of(parse(path), importer):
+            dest = provider_package(target)
+            if dest and dest != source:
+                kind_edges.add((source, dest))
+    print("# provider kind edges")
+    for source, dest in sorted(kind_edges):
+        allowed = (
+            source == PROVIDER_COMPOSITION_ROOT
+            or dest in PROVIDER_SHARED_MODULES
+            or dest in PROVIDER_KIND_EDGES.get(source, frozenset())
+        )
+        print(f"{source:18s} -> {dest:18s} {'ok' if allowed else 'VIOLATION'}")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -392,6 +497,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--domain-edges", action="store_true", help="only check package edges")
     parser.add_argument("--shims", action="store_true", help="only check compat shims")
     parser.add_argument("--tree", action="store_true", help="only check the domain tree (unmapped modules/packages)")
+    parser.add_argument("--provider-edges", action="store_true", help="only check provider kind edges")
     parser.add_argument("--self-test", action="store_true", help="plant violations in a temp tree and detect them")
     args = parser.parse_args(argv)
 
@@ -401,7 +507,7 @@ def main(argv: list[str] | None = None) -> int:
         report()
         return 0
 
-    only = args.domain_edges or args.shims or args.tree
+    only = args.domain_edges or args.shims or args.tree or args.provider_edges
     problems: list[str] = []
     if not only or args.domain_edges:
         problems += check_upward()
@@ -410,6 +516,8 @@ def main(argv: list[str] | None = None) -> int:
         problems += check_shims()
     if not only or args.tree:
         problems += domain_tree_problems()
+    if not only or args.provider_edges:
+        problems += check_provider_edges()
 
     if problems:
         for problem in problems:
