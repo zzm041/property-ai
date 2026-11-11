@@ -160,7 +160,7 @@ schema：0009/0011 只认 AUTH001、delivery 精确目标或 `CustomerInstallAut
 已知状态（2026-11-11，head = `20261111_0018_content_fingerprint_loose`）：空库从
 `61 failed / 16 passed / 18 skipped / 228 errors` 变成 **`41 failed / 265 passed / 17 skipped /
 0 errors`**（466 s，Redis+Milvus+MinIO 都起）。41 条的定性：
-- **19 条把历史 head 写死**（`test_*_migration.py`、`test_migrations.py`、`test_identity_schema.py`、
+- **19 条把历史 head 写死**（`test_ai_migration.py`、`test_employee_migration.py`、`test_migrations.py`、`test_identity_schema.py`、
   `test_official_auth_runtime.py` 的 `assert get_current_head() == "20260917_0007"` 一类），与 schema
   无关，任何环境必红 —— **测试过时**，需要跟着 0018 更新；
 - **13 条真检索**需要 embedding 服务在跑（`test_day4_async_claim.py`、`test_day4_milvus_rebuild_acl.py`、
@@ -177,7 +177,43 @@ schema：0009/0011 只认 AUTH001、delivery 精确目标或 `CustomerInstallAut
   （`threading.BrokenBarrierError`，并发用例自身不稳）。
 逐条证据见 `D:\AI\review\evidence\t171-pa118-test-schema.md` §4/§5。
 
-## 6. RAG 运行时：未启用、未验证
+## 6. 合并前必须绿（CI 门槛）
+
+`.github/workflows/ci.yml` 有两条必过的 job。**两条都绿才允许合并**（分支保护建议：把
+`unit gate (windows, red ⊆ known-red)` 与 `cross-platform checks (ubuntu)` 都设为 required status check，
+并禁止自行审批自己的 PR——合并权在复核人手上）。
+
+| job | runner | 守什么 | 红了怎么读 |
+| --- | --- | --- | --- |
+| `unit gate (windows, red ⊆ known-red)` | `windows-latest` | 全量单测的红集必须 ⊆ `scripts/ops/known-red.txt`；`scripts/` 里每个 `app.*` import 必须能解析 | 新红逐条打在 `NEW RED:`，并汇总进 job summary（passed/failed/skipped/errors + red 与基线数）；gate 无法解析结果时 fail-closed，exit 2 |
+| `cross-platform checks (ubuntu)` | `ubuntu-latest` | 4 个纯 Python 用例在 POSIX 上可跑、`check_script_imports.py` 全通、`check_layering.py` 通过 | 采集失败说明有模块在顶层 import 了 Windows-only 模块（t173 的 `msvcrt` 就是这样被抓到的） |
+
+为什么 gate 跑 Windows 而不是 ubuntu：`known-red.txt` 的基线是在 Windows 上采集的，
+ubuntu 上另有 35 条「只在 Windows 成立」的用例（`msvcrt.locking` 句柄锁、`GlobalMemoryStatusEx`
+资源地板、PowerShell 自托管栈、`winreg`）必然失败。把它们放进 gate 只会逼人加白，
+于是闸门退化成「跟环境差异比大小」。便携性单独由上面第二个 job 守。
+
+两条 job 都需要一个**已迁移**的 MySQL（`app.main` 在 `APP_ENV=test` 下启动即体检 schema）：
+ubuntu job 用 service container（`mysql:8.0`）起空库；windows runner 不支持 service container，
+改用 `actions-setup-mysql` 装本地 MySQL 8。两者随后都跑同一个 `scripts/ops/prepare_test_database.py`
+（三段式，见 §5.1），**不手工建表、不 `stamp` 到某个中间版本**。
+
+本地等价模拟（不想等 CI 时）：
+
+```bash
+# 1) 起一个空库并迁到 head（重复跑是幂等的）
+docker run -d --name ci-mysql -p 3337:3306 --tmpfs /var/lib/mysql   -e MYSQL_ROOT_PASSWORD=root-test-pw -e MYSQL_DATABASE=property_ai_test   -e MYSQL_USER=property_test -e MYSQL_PASSWORD=change-me-test mysql:8.0
+APP_ENV=test TEST_DATABASE_URL='mysql+pymysql://property_test:change-me-test@127.0.0.1:3337/property_ai_test?charset=utf8mb4'   python scripts/ops/prepare_test_database.py
+
+# 2) 跑与 CI 相同的两道闸
+APP_ENV=test DATABASE_URL='mysql+pymysql://property_test:change-me-test@127.0.0.1:3337/property_ai_scratch?charset=utf8mb4' TEST_DATABASE_URL='mysql+pymysql://property_test:change-me-test@127.0.0.1:3337/property_ai_test?charset=utf8mb4'   python scripts/ops/unit_gate.py --summary-file /tmp/unit-gate.md
+python scripts/ops/check_script_imports.py && python scripts/ops/check_layering.py
+```
+
+`--summary-file` 会在决定退出码**之前**写摘要，所以红的 run 也留得下三数——CI 里传的是
+`$GITHUB_STEP_SUMMARY`，本地想看就传任意路径。
+
+## 7. RAG 运行时：未启用、未验证
 
 现状：**交付栈没有 RAG 运行时**。11436/11438 无监听，`POST /api/v1/assistant/query` 恒返回 `{"status":"knowledge_unavailable"}`，引用与权限过滤因此从未被真实验证（`reports/flow-matrix-20261111.md` 记为阻塞项）。
 
@@ -198,7 +234,7 @@ schema：0009/0011 只认 AUTH001、delivery 精确目标或 `CustomerInstallAut
 4. 端点：`EMBEDDING_ENDPOINT` / `RERANKER_ENDPOINT` 指向 11436，适配器 `/healthz` 的 `models` 三项非空。
 5. 应用侧：`GET /api/v1/readyz` 的 `dependencies` 里 `embedding`/`reranker` 由 `not_checked` 变 `up`，再跑一条 `assistant/query` 看 `citations` 非空、跨租户问题为空。
 
-## 7. 内容指纹的两层口径（PA-169）
+## 8. 内容指纹的两层口径（PA-169）
 
 报修内容有两条身份，用途不同，**不要混用**（`backend/app/domain/ai/rules.py`）：
 

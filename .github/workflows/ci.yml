@@ -16,11 +16,38 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# 两个 job 的分工（合并前必须绿的清单写在 docs/runbook.md §6）：
+#
+#   unit-gate      —— 合并门槛。判据是**集合**不是计数：本次失败 nodeid 集合必须 ⊆
+#                     `scripts/ops/known-red.txt`；出现基线之外的新红、或 gate 无法解析结果
+#                     （fail-closed）都 exit ≠ 0，job 红。三数（passed/failed/red）写进 job summary。
+#                     跑 windows-latest 是有原因的：基线是在 Windows 上采集的，ubuntu 上另有
+#                     35 条「只在 Windows 成立」的用例必红（`msvcrt.locking` 句柄锁、
+#                     `GlobalMemoryStatusEx` 资源地板、PowerShell 自托管栈），放到 ubuntu
+#                     会把这些环境差异当成新增红，闸门就失去意义。
+#
+#   cross-platform —— ubuntu 上的便携性闸：4 个纯 Python 用例 + `scripts/` 的 import 检查 +
+#                     分层检查。这一组以前在 Linux 上**采集就失败**（
+#                     `app/provider/local_ai/runtime_control.py` 顶层 `import msvcrt`），t173
+#                     把它改成平台守卫后两条路都能跑。
+#
+# 数据库（CI 需要库就跑 alembic，不手工建表）：
+#   - ubuntu job 用 service container（`mysql:8.0`）起空库；
+#   - windows job 没有 service container，用 `actions-setup-mysql` 装一个本地 MySQL 8；
+#   - 两条路都调**同一个** `scripts/ops/prepare_test_database.py` 把 schema 迁到 head。
+#     裸 `alembic upgrade head` 建不出这个 schema（0009/0011 只认 AUTH001 / delivery 精确目标 /
+#     CustomerInstallAuthority；0014 又要求已存在 SYSTEM_ADMIN），脚本的三段式与
+#     `app.cli.customer_install` 同源，见 docs/runbook.md §5.1。
+
 jobs:
-  unit-subset:
-    name: unit subset (py3.12)
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+  unit-gate:
+    name: unit gate (windows, red ⊆ known-red)
+    runs-on: windows-latest
+    timeout-minutes: 60
+    env:
+      APP_ENV: test
+      DATABASE_URL: mysql+pymysql://property_test:change-me-test@127.0.0.1:3306/property_ai_scratch?charset=utf8mb4
+      TEST_DATABASE_URL: mysql+pymysql://property_test:change-me-test@127.0.0.1:3306/property_ai_test?charset=utf8mb4
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,17 +65,118 @@ jobs:
           restore-keys: |
             pip-${{ runner.os }}-py3.12-
 
+      - name: Install MySQL 8 (Windows runners have no service containers)
+        # 没走 service container 的原因见文件头：windows-latest 不支持 `services:`。
+        # 装的是本机 MySQL 8.0，root 密码与临时测试库一致口径。
+        uses: shogo82148/actions-setup-mysql@v1
+        with:
+          mysql-version: "8.0"
+          root-password: root-test-pw
+
+      - name: Create the two disposable databases
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+            if mysqladmin ping -h127.0.0.1 -P3306 -uroot -proot-test-pw --silent; then break; fi
+            sleep 2
+          done
+          mysql -h127.0.0.1 -P3306 -uroot -proot-test-pw -e "
+            CREATE DATABASE IF NOT EXISTS property_ai_scratch CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+            CREATE DATABASE IF NOT EXISTS property_ai_test CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+            CREATE USER IF NOT EXISTS 'property_test'@'%' IDENTIFIED BY 'change-me-test';
+            GRANT ALL PRIVILEGES ON property_ai_scratch.* TO 'property_test'@'%';
+            GRANT ALL PRIVILEGES ON property_ai_test.* TO 'property_test'@'%';
+            FLUSH PRIVILEGES;"
+
       - name: Install test dependencies
-        # 仓库现有的可选依赖组是 `dev`（没有 `test` extra），所以这里装 backend[dev]。
+        # 仓库现有的可选依赖组是 `dev`（没有 `test` extra）。
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e "backend[dev]"
 
-      - name: Run a stable test subset
-        # 只跑不依赖 MySQL/Redis/RabbitMQ/模型运行时的纯单元用例（52 条，本地 0.33s 全绿）。
-        # 未加 --timeout=120：本仓 dev 依赖里没有 pytest-timeout，装了也未配置；
-        # 用 step 级 timeout-minutes + job 级 20 分钟兜住挂死。
-        timeout-minutes: 10
+      - name: Migrate the disposable test database (PA-118)
+        # 空 schema 会让 integration / app.main 的启动体检直接失败；这一步把库迁到 head，
+        # 迁完 schema 数据为空（基线管理员会被删掉）。重跑是幂等的。
+        run: python scripts/ops/prepare_test_database.py
+
+      - name: Run the unit gate
+        # `--summary-file` 在决定退出码之前就把三数写进 summary，所以红的 run 也留得下证据。
+        # `set -o pipefail` 是为了 tee 不吃掉 gate 的退出码。
+        shell: bash
+        run: |
+          set -o pipefail
+          python scripts/ops/unit_gate.py --verbose --summary-file "$GITHUB_STEP_SUMMARY" 2>&1 | tee unit-gate.log
+
+      - name: Upload the gate log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-gate-log-windows
+          path: unit-gate.log
+          if-no-files-found: ignore
+
+  cross-platform:
+    name: cross-platform checks (ubuntu)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      mysql:
+        # 空库即可：schema 由 prepare_test_database.py 迁到 head，不在 compose/init 里建表。
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root-test-pw
+          MYSQL_DATABASE: property_ai_test
+          MYSQL_USER: property_test
+          MYSQL_PASSWORD: change-me-test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h127.0.0.1 -uroot -proot-test-pw"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+    env:
+      APP_ENV: test
+      DATABASE_URL: mysql+pymysql://property_test:change-me-test@127.0.0.1:3306/property_ai_scratch?charset=utf8mb4
+      TEST_DATABASE_URL: mysql+pymysql://property_test:change-me-test@127.0.0.1:3306/property_ai_test?charset=utf8mb4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache pip wheels
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-py3.12-${{ hashFiles('backend/pyproject.toml', 'deploy/requirements.delivery.lock') }}
+          restore-keys: |
+            pip-${{ runner.os }}-py3.12-
+
+      - name: Create the scratch database
+        # service container 只建了 MYSQL_DATABASE=property_ai_test；DATABASE_URL 指向的
+        # scratch 库由这一步补上（Settings 要求两个库不同）。
+        run: |
+          mysql -h127.0.0.1 -P3306 -uroot -proot-test-pw -e "
+            CREATE DATABASE IF NOT EXISTS property_ai_scratch CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+            GRANT ALL PRIVILEGES ON property_ai_scratch.* TO 'property_test'@'%';
+            FLUSH PRIVILEGES;"
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e "backend[dev]"
+
+      - name: Migrate the disposable test database (PA-118)
+        run: python scripts/ops/prepare_test_database.py
+
+      - name: Run the portable unit subset
+        # 不依赖模型运行时/Redis/Milvus 的纯 Python 用例；曾经在 Linux 上采集失败的那组
+        # （runtime_control 顶层 import msvcrt）就在这里守着。
         run: |
           python -m pytest \
             backend/tests/unit/test_pa139_supervisor_shared_token.py \
@@ -56,3 +184,9 @@ jobs:
             backend/tests/unit/test_pa137_shared_token_off_host.py \
             backend/tests/unit/test_ai_barrier_resolve_132.py \
             -x -q -p no:randomly
+
+      - name: Every scripts/ app.* import resolves
+        run: python scripts/ops/check_script_imports.py
+
+      - name: Layering contract
+        run: python scripts/ops/check_layering.py

@@ -12,7 +12,10 @@ import hashlib
 import io
 import json
 import math
-import msvcrt
+try:  # POSIX has no msvcrt; the shared model lock is a Windows-host guarantee.
+    import msvcrt
+except ModuleNotFoundError:  # pragma: no cover - Linux CI imports this module for real
+    msvcrt = None
 import os
 from pathlib import Path
 import subprocess
@@ -535,6 +538,10 @@ class Runner:
         return reason
     def acquire_shared_model_lock(self):
         self.shared_lock_path.parent.mkdir(parents=True,exist_ok=True)
+        if msvcrt is None:
+            # The shared model lock is an msvcrt byte-range lock: it only exists on Windows,
+            # and pretending it was taken on POSIX would let two hosts write the same model.
+            raise RuntimeError('SHARED_MODEL_LOCK_REQUIRES_WINDOWS')
         handle=self.shared_lock_path.open('a+b');handle.seek(0)
         if handle.tell()==0:handle.write(b'0');handle.flush()
         deadline=time.monotonic()+self.shared_lock_wait_seconds
@@ -547,7 +554,9 @@ class Runner:
                 time.sleep(.1)
     @staticmethod
     def release_shared_model_lock(handle):
-        handle.seek(0);msvcrt.locking(handle.fileno(),msvcrt.LK_UNLCK,1);handle.close()
+        if msvcrt is not None:
+            handle.seek(0);msvcrt.locking(handle.fileno(),msvcrt.LK_UNLCK,1)
+        handle.close()
     def assert_shared_completion_ready(self):
         if self.shared_completion_barrier_path.exists():
             raise RuntimeError('SHARED_PREVIOUS_REQUEST_COMPLETION_UNKNOWN')

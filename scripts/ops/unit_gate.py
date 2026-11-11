@@ -166,6 +166,36 @@ def run_script_import_check(verbose: bool) -> int:
     return 0
 
 
+def write_summary(path: str, *, counts: dict[str, int], red: set[str], known: set[str], verdict: str) -> None:
+    """Append the run to a markdown summary file (CI job summary).
+
+    Written before the exit code is chosen: a gate that fails is exactly the run whose
+    numbers a reviewer needs, so "publish" cannot be conditional on "passed".
+    """
+    target = Path(path)
+    new_red = sorted(red - known)
+    lines = [
+        "### unit gate",
+        "",
+        f"- verdict: **{verdict}**",
+        f"- passed: {counts['passed']}",
+        f"- failed: {counts['failed']}",
+        f"- skipped: {counts['skipped']}",
+        f"- errors: {counts['errors']}",
+        f"- red: {len(red)} (known-red baseline: {len(known)})",
+        "",
+    ]
+    if new_red:
+        lines.append(f"<details><summary>NEW RED ({len(new_red)})</summary>")
+        lines.append("")
+        lines.extend(f"- `{nodeid}`" for nodeid in new_red)
+        lines.append("")
+        lines.append("</details>")
+        lines.append("")
+    with target.open("a", encoding="utf-8") as handle:
+        handle.write("\n".join(lines) + "\n")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Red-set gate against scripts/ops/known-red.txt")
     parser.add_argument("--target", default=DEFAULT_TARGET, help="pytest target (default: backend/tests/unit)")
@@ -176,6 +206,15 @@ def main(argv: list[str] | None = None) -> int:
         "--skip-script-imports",
         action="store_true",
         help="skip the scripts/ import check (S7-3); only for a tree that is mid-edit",
+    )
+    parser.add_argument(
+        "--summary-file",
+        default=None,
+        help=(
+            "append a markdown summary of this run to PATH "
+            "(CI passes $GITHUB_STEP_SUMMARY; written before the exit code is decided, "
+            "so a failing gate still leaves its numbers in the job summary)"
+        ),
     )
     args = parser.parse_args(argv)
 
@@ -209,12 +248,28 @@ def main(argv: list[str] | None = None) -> int:
 
     if not red and exit_code not in (0, 1):
         # 5 = 没收集到用例；其它非 0/1 是 pytest 自己崩了 —— 不能当成「零红」放行
+        if args.summary_file:
+            write_summary(
+                args.summary_file,
+                counts=counts,
+                red=red,
+                known=known,
+                verdict=f"FAIL-CLOSED - pytest exit {exit_code} with no parsable result",
+            )
         sys.stderr.write(
             "unit_gate: pytest produced no red and no usable summary "
             f"(exit {exit_code}); refusing to pass. Re-run with --verbose.\n"
         )
         return 2
     if exit_code == 1 and not red:
+        if args.summary_file:
+            write_summary(
+                args.summary_file,
+                counts=counts,
+                red=red,
+                known=known,
+                verdict="FAIL-CLOSED - pytest exit 1 without a parsable FAILED/ERROR line",
+            )
         sys.stderr.write(
             "unit_gate: pytest failed but no FAILED/ERROR line could be parsed; "
             "refusing to pass. Re-run with --verbose.\n"
@@ -230,6 +285,15 @@ def main(argv: list[str] | None = None) -> int:
         print(f"SHRUNK: {len(shrunk)}")
         for nodeid in shrunk:
             print(f"  now green (可以删掉这一行): {nodeid}")
+
+    if args.summary_file:
+        write_summary(
+            args.summary_file,
+            counts=counts,
+            red=red,
+            known=known,
+            verdict=f"FAILED - {len(new_red)} new red outside known-red" if new_red else "OK - red \u2286 known-red",
+        )
 
     if new_red:
         print(
