@@ -112,6 +112,11 @@ class AiCallLog(BigIntPrimaryKeyMixin, Base):
             name="provider_mode",
         ),
         Index("ix_ai_call_logs_work_order_id", "work_order_id", "id"),
+        # PA-201 (t201): request_id correlates the calls of one request and is
+        # deliberately NOT unique - one RAG answer writes embed + rerank +
+        # generate, one analysis writes ASR + VLM + LLM. Counting requests must
+        # go through count(distinct request_id) or scripts/ops/ai_call_reconcile.py,
+        # never through a unique index that would reject the normal fan-out.
         Index("ix_ai_call_logs_request_id", "request_id"),
         # PA-169 (t150): the quarantine probe follows the report content, so
         # it needs an index that does not start at work_order_id.
