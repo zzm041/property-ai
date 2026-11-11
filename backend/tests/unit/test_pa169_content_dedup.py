@@ -11,7 +11,7 @@ from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace as NS
 from unittest.mock import MagicMock
 
-from app.domain.ai import content_fingerprint
+from app.domain.ai import content_fingerprint, loose_content_fingerprint
 from app.repository.work_order import WorkOrderRepository
 from app.service import work_order as wo
 from app.service.work_order import DUPLICATE_WINDOW_MINUTES, WorkOrderService
@@ -19,6 +19,7 @@ from app.service.work_order import DUPLICATE_WINDOW_MINUTES, WorkOrderService
 NOW = datetime(2026, 11, 11, 9, 0, tzinfo=UTC)
 REPORT_TEXT = "3号楼2单元楼道灯不亮"
 FINGERPRINT = content_fingerprint(REPORT_TEXT)
+LOOSE_FINGERPRINT = loose_content_fingerprint(REPORT_TEXT)
 
 
 # --------------------------------------------------------------- repository
@@ -37,6 +38,7 @@ def test_the_duplicate_lookup_is_one_indexed_scoped_read():
             house_id=1,
             reporter_user_id=6,
             content_fingerprint=FINGERPRINT,
+            content_fingerprint_loose=LOOSE_FINGERPRINT,
             since=NOW - timedelta(minutes=DUPLICATE_WINDOW_MINUTES),
         )
         is None
@@ -91,14 +93,14 @@ def _service(*, duplicate=None, fingerprint_of=None):
     return service, captured
 
 
-def _create(service):
+def _create(service, *, text=REPORT_TEXT):
     return service._create_work_order(
         actor=NS(user_id=6),
         house_id=1,
         request_id="req-150",
         idempotency_key="idem-150",
         contact_phone="+8613800000006",
-        text=REPORT_TEXT,
+        text=text,
         file_ids=(),
         category=None,
         priority=None,
@@ -182,3 +184,74 @@ def test_the_fingerprint_covers_attached_media_by_content(monkeypatch):
 
 def test_the_window_constant_is_ten_minutes():
     assert wo.DUPLICATE_WINDOW_MINUTES == 10
+
+
+# --------------------------------------------- t154: the two-tier design
+def test_punctuation_does_not_hide_a_repeat(monkeypatch):
+    monkeypatch.setattr(
+        "app.service.identity_write_guard.lock_active_identity", lambda *a, **kw: None
+    )
+    monkeypatch.setattr(
+        "app.service.work_order.RbacService.require_permission", lambda *a, **kw: None
+    )
+    service, captured = _service(duplicate=NS(id=88))
+
+    duplicate, created = _create(service, text="厨房水管，漏水")
+
+    assert (duplicate.id, created) == (88, False)
+    # The strict form keeps the comma, the loose form is the one a differing
+    # comma still satisfies - both are handed to the single lookup.
+    assert captured["seen"]["content_fingerprint"] == content_fingerprint("厨房水管，漏水")
+    assert captured["seen"]["content_fingerprint_loose"] == loose_content_fingerprint(
+        "厨房水管漏水"
+    )
+    assert captured["seen"]["content_fingerprint"] != content_fingerprint("厨房水管漏水")
+
+    service_2, captured_2 = _service(duplicate=None)
+    _create(service_2, text="厨房水管，漏水")
+    assert captured_2["order"].content_fingerprint == content_fingerprint("厨房水管，漏水")
+    assert (
+        captured_2["order"].content_fingerprint_loose
+        == loose_content_fingerprint("厨房水管漏水")
+    )
+
+
+def test_the_quarantine_keeps_the_strict_form_so_opposites_stay_apart():
+    from app.domain.ai import content_fingerprint as strict
+
+    assert strict("不需要维修") != strict("不需要，维修")
+    assert loose_content_fingerprint("不需要维修") == loose_content_fingerprint(
+        "不需要，维修"
+    )
+    # Isolation reads the strict column only.
+    import inspect
+
+    from app.service.analysis import orchestrator as orch
+
+    source = inspect.getsource(orch.AnalysisService._quarantine_for)
+    assert "loose" not in source
+
+
+def test_the_negation_table_is_gone():
+    import inspect
+
+    from app.domain import ai as ai_domain
+
+    source = inspect.getsource(ai_domain.rules) if hasattr(ai_domain, "rules") else ""
+    if not source:
+        from app.domain.ai import rules as rules_module
+
+        source = inspect.getsource(rules_module)
+    assert "_FINGERPRINT_NEGATIONS" not in source
+    assert "_starts_with_negation" not in source
+    assert "_FINGERPRINT_TOKEN_BOUNDARY" in source
+
+
+def test_the_queue_endpoint_publishes_system_note():
+    from app.main import app
+
+    spec = app.openapi()
+    operation = spec["paths"]["/api/v1/supervisor/work-orders"]["get"]
+    response = operation["responses"]["200"]["content"]["application/json"]["schema"]
+    assert "SuccessEnvelope" in str(response.get("$ref", ""))
+    assert "system_note" in spec["components"]["schemas"]["WorkOrderData"]["properties"]

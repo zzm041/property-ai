@@ -11,7 +11,7 @@ from app.api.v1.work_orders import get_work_order_service, work_order_data
 from app.core.errors import AppError, WorkOrderErrorCode
 from app.core.config import Settings, get_settings
 from app.domain.iam import Principal
-from app.schema.common import request_id_for, success_envelope
+from app.schema.common import SuccessEnvelope, request_id_for, success_envelope
 from app.schema.work_order import (
     AssignWorkOrderRequest,
     DecideWorkOrderRequest,
@@ -73,7 +73,7 @@ def _reject_header_mismatch(*, property_id: int, x_property_id: str | None) -> N
         )
 
 
-@router.get("/work-orders")
+@router.get("/work-orders", response_model=SuccessEnvelope[WorkOrderListData])
 def list_supervisor_work_orders(
     request: Request,
     actor: Annotated[Principal, Depends(get_current_principal)],

@@ -276,6 +276,14 @@ class WorkOrder(BigIntPrimaryKeyMixin, TimestampMixin, Base):
             "content_fingerprint",
             "created_at",
         ),
+        # PA-169 (t154): the same 10-minute window, keyed on the boundary-free
+        # form, so a stray comma cannot hide a repeat submission.
+        Index(
+            "ix_work_orders_house_loose_created",
+            "house_id",
+            "content_fingerprint_loose",
+            "created_at",
+        ),
         MYSQL_TABLE_OPTIONS,
     )
 
@@ -296,6 +304,10 @@ class WorkOrder(BigIntPrimaryKeyMixin, TimestampMixin, Base):
     # PA-169 (t150): content identity of the report, so a repeated report can be
     # recognised without re-reading its text.
     content_fingerprint: Mapped[str | None] = mapped_column(
+        String(64), nullable=True
+    )
+    # PA-169 (t154): boundary-free identity, used only by the duplicate window.
+    content_fingerprint_loose: Mapped[str | None] = mapped_column(
         String(64), nullable=True
     )
     reporter_user_id: Mapped[int] = mapped_column(

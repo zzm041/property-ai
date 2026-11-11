@@ -39,6 +39,8 @@ from .rules import (
     _RESPONSE_FORMAT,
     work_order_analysis_response_format,
     content_fingerprint,
+    loose_content_fingerprint,
+    loose_fingerprint_text,
     normalize_fingerprint_text,
     observation_family,
     _source_segments,

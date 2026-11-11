@@ -1354,41 +1354,68 @@ def rank_candidates(
 # PA-169 (t152/F2): punctuation is a *token boundary*, not something to delete.
 # Dropping it merged `不需要维修` with `不需要，维修`, which say opposite things: the
 # first reports "no repair needed", the second marks a pause and then asks for the
-# repair. Separators keep the two apart, and a negation keeps an explicit boundary
-# so its scope cannot be glued onto the next word either.
+# repair. Keeping every boundary keeps the two apart, so the negation semantics are
+# carried by the punctuation itself - there is deliberately no negation word list
+# here (t154: such a table changed no comparison and was removed).
 _FINGERPRINT_SEPARATOR = re.compile(r"[\s\W_]+", re.UNICODE)
-_FINGERPRINT_NEGATION_BOUNDARY = "|"
-_FINGERPRINT_NEGATIONS = ("不", "勿", "别", "严", "禁", "没", "未", "無", "无")
-
-
-def _starts_with_negation(token: str) -> bool:
-    return any(token.startswith(item) for item in _FINGERPRINT_NEGATIONS)
+_FINGERPRINT_TOKEN_BOUNDARY = "|"
 
 
 def normalize_fingerprint_text(text: str | None) -> str:
     """Content form used by :func:`content_fingerprint`.
 
-    Width/case insensitive; whitespace and punctuation become a single boundary,
-    so `不需要，维修` normalises to `不需要|维修` while `不需要维修` stays one token.
+    Width/case insensitive; every whitespace/punctuation run becomes one token
+    boundary, so `不需要，维修` normalises to `不需要|维修` while `不需要维修` stays a
+    single token.
+    """
+
+    return _FINGERPRINT_TOKEN_BOUNDARY.join(_fingerprint_tokens(text))
+
+
+def _fingerprint_tokens(text: str | None) -> list[str]:
+    if not text:
+        return []
+    folded = unicodedata.normalize("NFKC", text).casefold()
+    return [
+        token for token in _FINGERPRINT_SEPARATOR.sub(" ", folded).split(" ") if token
+    ]
+
+
+def loose_fingerprint_text(text: str | None) -> str:
+    """Deduplication form: every boundary removed, so punctuation cannot hide a repeat.
+
+    `厨房水管，漏水` and `厨房水管漏水` are the same report to a resident, but the
+    strict form above keeps them apart. This form is only used to answer "was this
+    the same report just now?" (t154); the quarantine still uses the strict form so
+    opposite meanings are never merged.
     """
 
     if not text:
         return ""
     folded = unicodedata.normalize("NFKC", text).casefold()
-    tokens = [
-        token for token in _FINGERPRINT_SEPARATOR.sub(" ", folded).split(" ") if token
-    ]
-    if not tokens:
-        return ""
-    normalized = tokens[0]
-    for previous, token in zip(tokens, tokens[1:]):
-        separator = (
-            _FINGERPRINT_NEGATION_BOUNDARY
-            if _starts_with_negation(previous)
-            else " "
-        )
-        normalized += separator + token
-    return normalized
+    return _FINGERPRINT_SEPARATOR.sub("", folded)
+
+
+def loose_content_fingerprint(
+    text: str | None,
+    media_digests: Iterable[str] = (),
+) -> str:
+    """Secondary identity used for de-duplication only (t154).
+
+    Same attachment digests as :func:`content_fingerprint`, but the text has every
+    boundary removed so a stray comma cannot hide a repeat submission.
+    """
+
+    payload = json.dumps(
+        {
+            "text": loose_fingerprint_text(text),
+            "media": sorted({digest for digest in media_digests if digest}),
+        },
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return sha256(payload.encode("utf-8")).hexdigest()
 
 
 def content_fingerprint(

@@ -139,3 +139,17 @@ env 缺一不可：`APP_ENV=test` + `DATABASE_URL` + `TEST_DATABASE_URL`（两�
 3. 11436：`deploy\rag-runtime.ps1 start` 后 `netstat` 见到 `127.0.0.1:11436 LISTENING`，且 `status` 返回 `rag_enabled=true`。
 4. 端点：`EMBEDDING_ENDPOINT` / `RERANKER_ENDPOINT` 指向 11436，适配器 `/healthz` 的 `models` 三项非空。
 5. 应用侧：`GET /api/v1/readyz` 的 `dependencies` 里 `embedding`/`reranker` 由 `not_checked` 变 `up`，再跑一条 `assistant/query` 看 `citations` 非空、跨租户问题为空。
+
+## 7. 内容指纹的两层口径（PA-169）
+
+报修内容有两条身份，用途不同，**不要混用**（`backend/app/domain/ai/rules.py`）：
+
+| 口径 | 归一化 | 存哪 | 谁在读 |
+| --- | --- | --- | --- |
+| 严格 | 标点/空白=词边界（`厨房水管，漏水` → `厨房水管\|漏水`） | `work_orders.content_fingerprint`、`ai_call_logs.content_fingerprint` | **隔离判定**（`AI.INPUT_QUARANTINED`，24h 窗口，按租户） |
+| 松散 | 标点/空白全删（`厨房水管，漏水` → `厨房水管漏水`） | `work_orders.content_fingerprint_loose` | **仅去重**（10 分钟内同住户同 house 视为同一单） |
+
+- 隔离用严格口径：`不需要维修` 与 `不需要，维修` 语义相反，合并会误伤（t152 反例）。
+- 去重用松散口径：同一句换个逗号仍是同一份报修，严格口径会让住户绕过重复窗口（t154）。
+- 否定词不靠词表：语义由「标点=边界」保证；`_FINGERPRINT_NEGATIONS` 这类词表在 t154 删除（对任何比较都不生效，属死代码）。
+- 历史行两列为 `NULL` 不回填：去重窗口只有 10 分钟、隔离窗口 24 小时，回填无收益且要在 SQL 里复刻 NFKC。

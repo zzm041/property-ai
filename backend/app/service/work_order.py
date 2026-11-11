@@ -26,7 +26,7 @@ from app.core.logging import get_logger
 from app.service.media_scan import admit_scanned_media, log_media_scan_skipped
 from app.core.time import current_business_date, utc_now
 from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.ai import FilterReason, WorkOrderAnalysisOutput, capability_filter_reason, category_duty, content_fingerprint, eligibility_denial_details, map_analysis_output, ordinary_maintenance
+from app.domain.ai import FilterReason, WorkOrderAnalysisOutput, capability_filter_reason, category_duty, content_fingerprint, eligibility_denial_details, loose_content_fingerprint, map_analysis_output, ordinary_maintenance
 from app.domain.employee import DISPATCH_STAFF_ROLES, AttendanceOnDuty, EmployeeStatus
 from app.domain.iam import OrganizationScope, Principal, ScopeType
 from app.domain.work_order_visibility import resident_media_visible
@@ -297,15 +297,24 @@ class WorkOrderService:
         self,
         text: str | None,
         file_ids: tuple[int, ...],
-    ) -> str:
-        """Content identity of a report being created (PA-169/t150)."""
+    ) -> tuple[str, str]:
+        """Content identities of a report being created.
+
+        Returns ``(strict, loose)``: the strict form keeps punctuation as a token
+        boundary (PA-169/t150), the loose one drops every boundary so a resident
+        who types the same sentence with a different comma is still recognised as
+        repeating themselves (PA-169/t154).
+        """
 
         digests = []
         for file_id in file_ids:
             stored = self._repository.get_file(file_id)
             if stored is not None and stored.content_hash:
                 digests.append(stored.content_hash)
-        return content_fingerprint(text, digests)
+        return (
+            content_fingerprint(text, digests),
+            loose_content_fingerprint(text, digests),
+        )
 
     def register_file(
         self,
@@ -1476,11 +1485,14 @@ class WorkOrderService:
         # PA-169 (t150): a resident who re-files the same report within the window
         # gets the work order they already have. Scoped to this resident and this
         # house: two residents reporting the same thing are two reports.
-        fingerprint = self._content_fingerprint(cleaned_text, file_ids)
+        fingerprint, loose_fingerprint = self._content_fingerprint(
+            cleaned_text, file_ids
+        )
         duplicate = self._repository.find_duplicate_content(
             house_id=owned.id,
             reporter_user_id=current.user_id,
             content_fingerprint=fingerprint,
+            content_fingerprint_loose=loose_fingerprint,
             since=self._clock() - timedelta(minutes=DUPLICATE_WINDOW_MINUTES),
         )
         if duplicate is not None:
@@ -1537,6 +1549,7 @@ class WorkOrderService:
                 reporter_user_id=current.user_id,
                 contact_phone_e164=contact_phone,
                 content_fingerprint=fingerprint,
+                content_fingerprint_loose=loose_fingerprint,
                 status=WorkOrderStatus.PENDING_ANALYSIS.value,
                 process_reason=ProcessReason.NONE.value,
                 category=category_value.value,

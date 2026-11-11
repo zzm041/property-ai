@@ -28,7 +28,7 @@ from app.domain.phone import normalize_phone
 BACKEND = Path(__file__).resolve().parents[2]
 PRE_BOOTSTRAP = "20260925_0012_task_intents"
 IDENTITY = "20260926_0014_identity_merge_sla_versions"
-HEAD = "20261111_0017_content_fingerprint"
+HEAD = "20261111_0018_content_fingerprint_loose"
 PROTECTED = frozenset({
     "mysql", "sys", "information_schema", "performance_schema", "property_ai",
     "property_ai_test", "property_ai_staging", "property_ai_day4", "property_ai_auth001_test",

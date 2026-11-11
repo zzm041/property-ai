@@ -8,7 +8,11 @@ from types import SimpleNamespace
 import pytest
 
 from app.core.errors import AiErrorCode
-from app.domain.ai import content_fingerprint, normalize_fingerprint_text
+from app.domain.ai import (
+    content_fingerprint,
+    loose_content_fingerprint,
+    normalize_fingerprint_text,
+)
 from app.repository.ai import AiRepository
 from app.repository.work_order import WorkOrderRepository
 from app.service.analysis import AnalysisService
@@ -145,6 +149,7 @@ def test_a_finished_report_is_not_offered_as_a_duplicate():
         house_id=1,
         reporter_user_id=6,
         content_fingerprint=content_fingerprint(REPORT_TEXT),
+        content_fingerprint_loose=loose_content_fingerprint(REPORT_TEXT),
         since=datetime(2026, 11, 11, 11, 50, tzinfo=UTC),
     )
 

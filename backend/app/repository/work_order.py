@@ -69,11 +69,12 @@ class WorkOrderRepository:
         house_id: int,
         reporter_user_id: int,
         content_fingerprint: str,
+        content_fingerprint_loose: str,
         since: datetime,
     ) -> WorkOrder | None:
         """A report the same resident already filed under this house (PA-169/t150).
 
-        One indexed read on ``ix_work_orders_house_fingerprint_created``. The
+        One indexed read on the house/fingerprint/created indexes. The
         reporter is part of the predicate on purpose: the duplicate window must not
         merge two different residents reporting the same problem.
         """
@@ -83,7 +84,13 @@ class WorkOrderRepository:
             .where(
                 WorkOrder.house_id == house_id,
                 WorkOrder.reporter_user_id == reporter_user_id,
-                WorkOrder.content_fingerprint == content_fingerprint,
+                # PA-169 (t154): the strict form catches the same words; the
+                # boundary-free form catches the same words with different
+                # punctuation. Either one is "the report we just took".
+                or_(
+                    WorkOrder.content_fingerprint == content_fingerprint,
+                    WorkOrder.content_fingerprint_loose == content_fingerprint_loose,
+                ),
                 WorkOrder.created_at >= since,
                 # PA-169 (t152/F3): a finished order is not a duplicate. Answering
                 # a new report with a closed one would tell the resident "we got
