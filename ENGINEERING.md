@@ -48,14 +48,16 @@ grep -rn "from app\.repository" backend/app/domain | wc -l               # 期�
 
 | 层 | 目录形状 | 举例 | 闸 |
 | --- | --- | --- | --- |
-| `domain/` | 只有六个包 + 尚未迁完的扁平 shim | `domain/identity/`、`domain/work_order/`、`domain/ai/`、`domain/knowledge/`、`domain/governance/`、`domain/dev/` | `check_layering.py`（顶层白名单 + 包间允许边 + shim 行数上限） |
-| `service/` | 按业务切成包，扁平模块只能是 4 行别名 | `service/identity/`、`service/work_order/`、`service/analysis/` | `check_layering.py --shims` |
-| `provider/` | 每种外部系统一个 `<kind>/` 包 | `provider/llm/`、`provider/local_ai/`、`provider/file_scanner/` | `check_layering.py --shims`（provider 段） |
+| `domain/` | 只有六个包；顶层除 `__init__.py` 外不放任何模块 | `domain/identity/`、`domain/work_order/`、`domain/ai/`、`domain/knowledge/`、`domain/governance/`、`domain/dev/` | `check_layering.py`（顶层白名单 + 包间允许边 + 旧路径不得复活） |
+| `service/` | 按业务切成包，包内按职责拆子模块 | `service/identity/`、`service/work_order/`、`service/analysis/` | `check_layering.py --shims`（旧扁平路径必须不存在） |
+| `provider/` | 每种外部系统一个 `<kind>/` 包 | `provider/llm/`、`provider/local_ai/`、`provider/file_scanner/` | `check_layering.py --shims` / `--provider-edges` |
 | `scripts/ops/` | 不依赖任何 shim，只 import 真实包路径 | `scripts/ops/unit_gate.py`、`scripts/ops/check_layering.py` | 人工复核（见 §4 提交模板） |
 
 包与同名模块不能共存（Python 语义）：`service/work_order.py`、`provider/file_scanner.py` 这类名字
 一旦包化，旧路径就是包本身，没有额外 shim；只有搬到别的包里的模块（`provider/langchain_llm.py`
-→ `provider/llm/langchain_llm.py`）才留 4 行 `sys.modules` 别名，S8 统一删除。
+→ `provider/llm/langchain_llm.py`）才需要别名。**S8 已把 34 个别名层全部删掉**：现在任何旧路径
+重新出现都是违规（`check_layering.py --shims` 会指名道姓），引用一律写真实包路径——
+domain 可 `from app.domain.identity import X`，service 必须写到子模块 `from app.service.identity.auth import X`。
 
 ## 2. 模块职责表
 
@@ -90,28 +92,30 @@ grep -rn "from app\.repository" backend/app/domain | wc -l               # 期�
    单引号写法 `schema/supervisor_agent.py:6`；例：`schema/work_order.py:31/55/72/81/88`）。
    多传字段直接 422，避免「客户端以为生效」的静默偏差。
 5. **幂等键按用户维度**：`IdempotencyRecord` 的唯一约束是
-   `(user_id, idempotency_key)`（`model/work_order.py:787`，迁移
+   `(user_id, idempotency_key)`（`model/work_order.py:811`，迁移
    `backend/alembic/versions/20261111_0016_idempotency_key_scope.py:32`）；读路径按用户隔离
    （`repository/work_order.py:206` `get_idempotency`、`repository/property.py:43`），写入在
-   `service/work_order.py:1382 / :1555`，唯一冲突由 `:164 _IDEMPOTENCY_UNIQUE` 归类。
+   `service/work_order/lifecycle.py:538`（`IdempotencyRecord(`），唯一冲突由
+   `service/work_order/lifecycle.py:1236` 按 `service/work_order/context.py:175` `_IDEMPOTENCY_UNIQUE` 归类。
    理由见 `docs/adr/ADR-004`。
 6. **租户隔离三层**：
    - 存储层：所有租户表带 `tenant_id`，小区级再带 `property_id`（`AGENTS.md:52`）；
    - 查询层：repository 强制把 `tenant_id` 写进 `WHERE`（例：`repository/work_order.py:74/82/86/92`）；
-   - 授权层：`OrganizationScope` + `ScopeType`（`domain/iam.py:7`）在 service 内逐资源校验
-     （例：`service/work_order.py:818/875/929`）；跨租户与不存在的资源返回同一 error 子树
+   - 授权层：`OrganizationScope` + `ScopeType`（`domain/identity/models.py:12`）在 service 内逐资源校验
+     （例：`service/work_order/queries.py:298` `_authorize_read`、`service/work_order/lifecycle.py:400`）；跨租户与不存在的资源返回同一 error 子树
      （`service/employee.py` 的 `get_employee_in_tenant` 路径）。
 7. **AI 无最终控制权**：AI 失败时工单仍创建成功并落 `PENDING_ANALYSIS`（`AGENTS.md:62`）；
    派单只接受规则结果（`AGENTS.md:63`，实现见 `service/auto_dispatch.py:116/269`）。
 8. **依赖方向有静态闸**：`python scripts/ops/check_layering.py`（ast 解析，含函数内 import——
-   本仓库有 33 处函数内 service→service 边，grep 会漏）。四条判据：domain 不得 import
+   本仓库有 33 处函数内 service→service 边，grep 会漏）。四条判据（外加 provider 的 kind↔kind 边）：domain 不得 import
    `app.{service,api,schema,repository,worker,cli,model,provider,core}`；domain 包间只允许
    `work_order→identity`、`ai→{identity,work_order}`、`knowledge→identity`、`governance→identity`、
-   `dev→*`；`SHIMMED_MODULES` 里的旧模块必须是 ≤8 行纯 re-export；**`app/domain/` 顶层只允许
-   `__init__.py`、`FLAT_MODULE_PACKAGE` 登记过的扁平模块、`ALLOWED_DOMAIN_EDGES` 里的包**——
+   `dev→*`；`SHIMMED_*` 注册表里的旧模块**必须不存在**（S8 删掉了 34 个别名层，闸现在是反向的）；
+   **`app/domain/` 顶层只允许 `__init__.py`**——
    任何未登记的文件或目录直接 exit 1（否则一个 `domain/rogue.py` 就能绕过整张图）。`--report`
-   打基线（各包 importers 数、包间边、未归属条目），`--tree`/`--shims`/`--domain-edges` 单跑，
-   `--self-test` 用临时树种三条违规（含 rogue 模块）证明闸不空转。
+   打基线（各包 importers 数、包间边、未归属条目），`--tree`/`--shims`/`--provider-edges`/`--domain-edges` 单跑，
+   `--self-test` 用临时树种四条违规（含 rogue 模块与非法 kind 边）证明闸不空转；
+   `scripts/ops/check_script_imports.py` 再校验 `scripts/` 里每个 `app.*` import 都真有 spec。
 
 ## 4. 变更流程
 

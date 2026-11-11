@@ -1,6 +1,6 @@
 """Analysis domain package: models, rules, and the one domain-local error.
 
-The historical flat modules (``app.domain.observed_event`` and friends) are
+The historical flat modules (``observed_event`` and friends) are
 gone: S8 deleted the compatibility layer, so import this package only.
 """
 
