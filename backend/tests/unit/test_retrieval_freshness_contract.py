@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import TransactionContractError
 from app.core.errors import AppError, IamErrorCode
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.domain.knowledge import KNOWLEDGE_READ, KNOWLEDGE_UNAVAILABLE
 from app.service import retrieval
 
@@ -54,7 +54,7 @@ def context(monkeypatch):
     monkeypatch.setattr(session, "expire_all", expire)
     repo = MagicMock()
     repo.get_chunks_by_ids.side_effect = get_chunks
-    service = retrieval.RetrievalService(session, repository=repo, settings=NS(embedding_dimensions=3))
+    service = retrieval.RetrievalService(session, repository=repo, settings=NS(embedding_dimensions=3, rag_answer_prompt_version='rag-answer-v2'))
     service._principal_loader = load_principal
     monkeypatch.setattr(service, "_acl_for", acl_for)
     embedder, store, reranker, llm = (MagicMock() for _ in range(4))

@@ -39,7 +39,7 @@ alembic upgrade head
 docker compose -f deploy/docker-compose.prodlike.yml up -d --build
 ```
 
-空库迁移目标：`property_ai_staging` @ `127.0.0.1:3316`。先运行 `alembic heads` 核对交付版本，迁移后 `alembic current` 应一致；当前源码 head 为 `20261003_0015_work_order_media_cycle_links`，不能以旧阶段的 `20260917_0007` 判断完整部署成功。
+空库迁移目标：`property_ai_staging` @ `127.0.0.1:3316`。先运行 `alembic heads` 核对交付版本，迁移后 `alembic current` 应一致；当前源码 head 为 `20261111_0016_idempotency_key_scope`，不能以旧阶段的 `20260917_0007` 判断完整部署成功。
 
 Nginx：`http://127.0.0.1:8081`（`/api/`、`/healthz`、`/readyz`）。
 
@@ -94,7 +94,7 @@ Copy-Item deploy/.env.delivery.bootstrap.example deploy/.env.delivery.bootstrap
 ./deploy/delivery.ps1 up     # 已初始化环境的日常启动；不重新迁移
 ./deploy/delivery.ps1 status
 ./deploy/delivery.ps1 backup
-# 已有 0014 安装升级到 0015：先 backup，再执行固定 revision；不要笼统 upgrade head。
+# 已有 0014 安装先执行下面的 media cycle 固定 revision 升到 0015，再用镜像内 `python -m app.cli.delivery_migrate` 升到 head 0016（20261111_0016_idempotency_key_scope）：先 backup，不要笼统 upgrade head。
 ./deploy/delivery.ps1 media-cycle-migrate property_ai_delivery_check
 ./deploy/delivery.ps1 diagnose
 ./deploy/delivery.ps1 ollama-start # 启动固定 loopback 11435 模型服务；健康检查不加载模型
@@ -140,6 +140,8 @@ docker compose --env-file deploy/.env.delivery -f deploy/docker-compose.delivery
 ```
 
 本地 clean-room 排练可以保留 Development 微信/短信/AI Provider。使用真实 MinIO 但尚未接企业文件扫描服务时，必须在本机私密配置中显式设置 `FILE_SCANNER_PROVIDER=development`，保存的状态为 `skipped_dev`，不能写成经过恶意文件扫描；模板默认 `unavailable`，上传内容保持 `pending` 并失败关闭。Production 禁止 Development 文件扫描器。正式激活必须在私密配置中切换到企业通道及自托管 Provider；未配置可信身份 Provider 时，身份接管继续失败关闭。`EMBEDDING_DIMENSIONS=8` 只用于 Development 排练；真实 bge-m3 使用新的 1024 维集合，禁止复用 8 维集合。
+
+D6 起演示桩必须留痕：仅设 `FILE_SCANNER_PROVIDER=development` 而 `APP_ENV=staging/production` 时，`/readyz.media_pipeline` 报 `scan_mode=demo_stub`、`media_scanned=false`、`reason_code=MEDIA_SCAN_STUB_UNACKNOWLEDGED`，整体 `status` 降为 `degraded`（HTTP 仍 200）。要在排练环境里保留未扫描媒体，需同时设置 `FILE_SCANNER_DEMO_ACKNOWLEDGED=true` 声明演示模式；此时 `reason_code=MEDIA_SCAN_STUB`、`status=ready`，但 `media_scanned` 仍是 `false`——报告与回执只能写「演示桩，未扫描」，不得写成已扫描。真实扫描用 `clamav`（`reason_code=null`、`media_scanned=true`），失败关闭用 `unavailable`（`reason_code=MEDIA_SCAN_UNAVAILABLE`）。
 
 知识问答与工单分析具有独立的模型发布门槛。`RAG_LLM_PROVIDER=inherit` 保持旧配置；只有知识问答已经通过而工单分析仍未达标时，可在私密配置中单独设置 `RAG_LLM_PROVIDER=production`、`RAG_LLM_BASE_URL`、`RAG_LLM_MODEL` 和 `RAG_LLM_API_KEY`，同时继续保持 `LLM_PROVIDER=development`。真实知识接线还必须成组设置 1024 维 bge-m3、真实 reranker、`MILVUS_METRIC_TYPE=COSINE`、`EMBEDDING_NORMALIZATION=l2` 以及全新的隔离集合名。该隔离不会授权真实工单 AUTO；两条能力必须分别验收。
 

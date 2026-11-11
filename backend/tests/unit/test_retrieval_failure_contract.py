@@ -48,7 +48,9 @@ def query_context(monkeypatch, request):
     repository = MagicMock()
     repository.get_chunks_by_ids.side_effect = lambda ids: tuple(chunks[key] for key in ids)
     service = retrieval.RetrievalService(
-        session, repository=repository, settings=SimpleNamespace(embedding_dimensions=3),
+        session, repository=repository, settings=SimpleNamespace(
+            embedding_dimensions=3, rag_answer_prompt_version='rag-answer-v2',
+        ),
         principal_loader=lambda _: actor,
     )
     monkeypatch.setattr(service, "_acl_for", lambda **_: retrieval.RetrievalAcl(

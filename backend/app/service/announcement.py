@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings, get_settings
 from app.core.database import begin_owned_transaction
 from app.core.errors import AnnouncementErrorCode, AppError, IamErrorCode
+from app.core.logging import get_logger
 from app.core.time import utc_now
 from app.domain.ai import (
     ANNOUNCEMENT_DRAFT,
@@ -18,17 +19,18 @@ from app.domain.ai import (
     ANNOUNCEMENT_READ,
     AnnouncementDraftOutput,
 )
-from app.domain.announcement import (
+from app.domain.governance import (
     AnnouncementAudience,
     AnnouncementReviewDecision,
     AnnouncementScopeType,
     AnnouncementStatus,
     can_transition_announcement,
 )
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import OrganizationScope, Principal, ScopeType
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import OrganizationScope, Principal, ScopeType
 from app.model.ai import Announcement, AnnouncementReview, AnnouncementScope
 from app.model.identity import AuditLog
+from app.provider.errors import ProviderError
 from app.provider.factory import build_llm_provider
 from app.provider.llm import LLMProvider
 from app.repository.ai import AiRepository
@@ -38,7 +40,7 @@ from app.repository.property import PropertyRepository
 from app.repository.resident import ResidentBindingRepository
 from app.repository.work_order import WorkOrderRepository
 from app.service.audit import AuditService
-from app.service.rbac import RbacService
+from app.service.identity.rbac import RbacService
 
 
 @dataclass(frozen=True, slots=True)
@@ -55,6 +57,9 @@ AnnouncementDetail = tuple[
     tuple[AnnouncementReview, ...],
     tuple[AuditLog, ...],
 ]
+
+
+logger = get_logger(__name__)
 
 
 class AnnouncementService:
@@ -157,7 +162,31 @@ class AnnouncementService:
                 output = AnnouncementDraftOutput.model_validate(payload)
                 draft_title = draft_title or output.title
                 draft_content = draft_content or output.content
-            except (ValidationError, ValueError, Exception):
+            except ProviderError as exc:
+                # PA-123: an unusable provider is not "the model wrote something
+                # odd" — it must be visible as itself, not flattened into the
+                # generic notice, or operators read a broken deployment as a
+                # bland announcement.
+                logger.error(
+                    "announcement_draft_provider_failed",
+                    error_code=exc.error_code,
+                    error=type(exc).__name__,
+                    incident_id=resolved_incident_id,
+                )
+                raise AppError(
+                    code=AnnouncementErrorCode.DRAFT_PROVIDER_FAILED,
+                    message="Announcement draft provider is unavailable",
+                    status_code=503,
+                ) from exc
+            except (ValidationError, ValueError) as exc:
+                # The model answered, the answer is unusable: fall back to the
+                # neutral notice on purpose (previous behaviour for this case).
+                logger.warning(
+                    "announcement_draft_unusable_output",
+                    error=type(exc).__name__,
+                    detail=str(exc)[:200],
+                    incident_id=resolved_incident_id,
+                )
                 draft_title = draft_title or "Incident notice"
                 draft_content = (
                     draft_content

@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from app.core.errors import AppError
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from test_announcement_scope_contract import context, grant
 
 

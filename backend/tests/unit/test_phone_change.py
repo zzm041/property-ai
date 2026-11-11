@@ -10,9 +10,9 @@ import pytest
 
 from app.core.config import Settings
 from app.core.errors import AppError, AuditErrorCode, AuthErrorCode
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import ScopeType
-from app.service.credential_auth import CredentialAuthService
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import ScopeType
+from app.service.identity.credential_auth import CredentialAuthService
 from app.service.audit import AuditService
 from app.repository.credential import CredentialRepository
 
@@ -22,7 +22,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 def _service(monkeypatch: pytest.MonkeyPatch) -> CredentialAuthService:
     monkeypatch.setattr(
-        "app.service.credential_auth.run_owned_transaction",
+        "app.service.identity.credential_auth.run_owned_transaction",
         lambda _session, operation: operation(),
     )
     service = CredentialAuthService.__new__(CredentialAuthService)
@@ -179,7 +179,7 @@ def test_change_phone_commits_invalid_otp_attempt_before_raising(
         return result
 
     monkeypatch.setattr(
-        "app.service.credential_auth.run_owned_transaction", run_transaction
+        "app.service.identity.credential_auth.run_owned_transaction", run_transaction
     )
 
     with pytest.raises(AppError) as captured:
@@ -240,7 +240,7 @@ def test_change_phone_rejects_same_number_without_consuming_codes(
 
 def test_change_phone_uses_change_phone_otp_with_login_visual_challenge() -> None:
     service_source = (
-        REPO_ROOT / "backend/app/service/credential_auth.py"
+        REPO_ROOT / "backend/app/service/identity/credential_auth.py"
     ).read_text(encoding="utf-8")
     schema_source = (REPO_ROOT / "backend/app/schema/auth.py").read_text(
         encoding="utf-8"

@@ -27,7 +27,7 @@ from app.provider.embedding import DevelopmentEmbeddingProvider
 from app.provider.notification import NotificationProvider
 from app.repository.identity import IdentityRepository
 from app.repository.knowledge import KnowledgeRepository
-from app.service.auth import AuthService
+from app.service.identity.auth import AuthService
 from app.service.knowledge import KnowledgeService
 from app.service.notification import NotificationService
 from tests.integration.conftest import commit_open_transaction, fetch_independent

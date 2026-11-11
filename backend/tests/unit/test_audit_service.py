@@ -5,8 +5,8 @@ from unittest.mock import MagicMock
 import pytest
 
 from app.core.errors import AppError, AuditErrorCode
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import ScopeType
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import ScopeType
 from app.model.identity import AuditLog
 from app.repository.audit import AuditRepository
 from app.service.audit import AuditService

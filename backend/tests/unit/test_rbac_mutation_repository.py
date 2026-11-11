@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 from sqlalchemy.dialects import mysql
 
-from app.domain.iam import OrganizationScope, ScopeType
+from app.domain.identity import OrganizationScope, ScopeType
 from app.model.identity import RolePermission, UserRole
 from app.repository.rbac_mutation import RbacMutationRepository
 

@@ -8,7 +8,7 @@ import pytest
 from pydantic import ValidationError
 
 from app.core.errors import AppError, WorkOrderErrorCode
-from app.domain.audit import AuditAction, AuditResourceType
+from app.domain.governance import AuditAction, AuditResourceType
 from app.domain.work_order import (
     MediaTakenPhase,
     WorkOrderActorType,
@@ -16,7 +16,7 @@ from app.domain.work_order import (
     WorkOrderStatus,
 )
 from app.schema.work_order import StaffReceiptMediaRequest
-from app.service.rbac import RbacService
+from app.service.identity.rbac import RbacService
 from app.service.work_order import WorkOrderService
 
 

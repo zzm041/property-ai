@@ -1,9 +1,11 @@
 """Shared API response envelopes."""
 
-from typing import Any
+from typing import Any, Generic, TypeVar
 
 from fastapi import Request
 from pydantic import BaseModel, Field
+
+DataT = TypeVar("DataT")
 
 
 class ErrorDetail(BaseModel):
@@ -15,6 +17,13 @@ class ErrorDetail(BaseModel):
 class ErrorEnvelope(BaseModel):
     request_id: str
     error: ErrorDetail
+
+
+class SuccessEnvelope(BaseModel, Generic[DataT]):
+    """The frozen success shape, typed so OpenAPI can show ``data``."""
+
+    request_id: str
+    data: DataT
 
 
 def request_id_for(request: Request) -> str:

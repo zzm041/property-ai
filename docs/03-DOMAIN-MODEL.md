@@ -181,7 +181,7 @@ SlaPolicy 1 ── * WorkOrder
 - `work_orders(property_id, status, created_at)`
 - `work_orders(incident_id)`
 - `audit_logs(tenant_id, created_at)`
-- `idempotency_records(key)` UNIQUE
+- `idempotency_records(user_id, key)` UNIQUE（D1：键的作用域是提交人；全局唯一会让一个用户占用键并挡住别人建单）
 
 ## 6. 明确不建的表（V1）
 

@@ -10,7 +10,7 @@ from app.provider.factory import build_llm_provider, build_vlm_provider
 from app.provider.llm import QwenLLMProvider
 from app.provider.vision import QwenVLMProvider
 from app.provider.storage import DevelopmentStorageProvider
-from app.domain.vision import VISION_ANALYSIS_PROMPT_VERSION, vision_analysis_response_format
+from app.domain.work_order import VISION_ANALYSIS_PROMPT_VERSION, vision_analysis_response_format
 
 
 @pytest.mark.parametrize("vision", [False, True])

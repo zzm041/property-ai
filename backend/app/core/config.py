@@ -1,6 +1,7 @@
 """Environment-backed application configuration."""
 
 from functools import lru_cache
+import hmac
 from ipaddress import ip_address
 import re
 from typing import Literal
@@ -11,6 +12,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import make_url
 
 DEFAULT_APP_SECRET_KEY = "change-me-to-a-long-random-string"
+
+# The shared LOCAL_AI_INTERNAL_TOKEN belongs to this host's adapter, so it is only sent
+# to one of these names. Keep this the single source of truth: startup validation and
+# `resolve_local_ai_key` must agree, or a box validates and then fails at request time.
+LOCAL_AI_ENDPOINT_HOSTS = frozenset({"127.0.0.1", "localhost", "host.docker.internal"})
 
 
 class Settings(BaseSettings):
@@ -38,6 +44,13 @@ class Settings(BaseSettings):
     sms_otp_max_attempts: int = Field(default=5, ge=1, le=10)
     sms_send_limit_per_hour: int = Field(default=5, ge=1, le=20)
     sms_login_limit_per_hour: int = Field(default=10, ge=1, le=30)
+    # Per-client-IP ceiling for the same endpoints. Larger than the per-phone
+    # limits so a shared NAT is not locked out as one caller, small enough that
+    # rotating phone numbers from a single host still stops.
+    sms_ip_limit_per_hour: int = Field(default=30, ge=1, le=500)
+    # Comma separated CIDRs of our own reverse proxies. Only then is
+    # X-Forwarded-For believed; anywhere else the socket peer is used.
+    trusted_proxy_cidrs: str = ""
     sms_aliyun_access_key_id: SecretStr = SecretStr("")
     sms_aliyun_access_key_secret: SecretStr = SecretStr("")
     sms_aliyun_sign_name: str = ""
@@ -64,12 +77,22 @@ class Settings(BaseSettings):
         "property_ai_test?charset=utf8mb4"
     )
     allow_destructive_test_database: bool = False
+    # PA-118: an APP_ENV=test process refuses to start against a disposable database
+    # that was never migrated. Set REQUIRE_TEST_DATABASE_SCHEMA=false only for a
+    # fixture that intentionally points at a database it creates itself.
+    require_test_database_schema: bool = True
     redis_url: str = "redis://127.0.0.1:6379/0"
     celery_broker_url: str = (
         "amqp://property:change-me@127.0.0.1:5672/property_ai"
     )
     celery_task_queue: str = ""
     sla_sweep_interval_seconds: int = Field(default=30, ge=5, le=3600)
+    # A work order that is waiting for dispatch is re-evaluated on every sweep
+    # tick. Recording that observation every time wrote 105,467 of the 106,438
+    # work_order_logs rows (26 work orders, 40 days), so a repeat of the same
+    # reason inside this window is aggregated into the row already recorded.
+    # 0 restores the historical one-row-per-attempt behaviour.
+    dispatch_wait_log_window_seconds: int = Field(default=3600, ge=0, le=86400)
     notification_retry_sweep_interval_seconds: int = Field(
         default=30,
         ge=5,
@@ -81,6 +104,9 @@ class Settings(BaseSettings):
 
     readiness_timeout_seconds: float = Field(default=2.0, ge=0.1, le=10.0)
     upload_max_mb: int = Field(default=10, ge=1, le=50)
+    # Pre-fill suggestions reuse the shared model runtime, so one resident is
+    # capped per hour: the report form must never become a model proxy.
+    wo_suggest_limit_per_hour: int = Field(default=12, ge=1, le=200)
     llm_provider_behavior: Literal[
         "success", "timeout", "invalid", "low_confidence", "unavailable"
     ] = "success"
@@ -98,8 +124,13 @@ class Settings(BaseSettings):
     ai_context_recent_orders_limit: int = Field(default=5, ge=0, le=20)
     ai_context_recent_days: int = Field(default=30, ge=1, le=365)
     ai_enqueue_on_create: bool = False
-    # Staged rollout: opt in only after0012, never silently detect/create tables.
-    durable_tasks_enabled: bool = False
+    # PA-104: the durable task chain (business row + task intent in one
+    # transaction, the publisher hands off) is the safe default. With it off an
+    # enqueue failure after commit either loses the analysis or answers 503, and
+    # production refuses to assemble without it (PA-104-A-1). The switch stays
+    # for rollback: DURABLE_TASKS_ENABLED=false. Requires the task_intents table
+    # (migration 0012+) and the intent publisher/beat to be running.
+    durable_tasks_enabled: bool = True
     ai_auto_assign: bool = False
     dispatch_weight_duty: float = Field(default=0.25, ge=0, le=1)
     dispatch_weight_skill: float = Field(default=0.20, ge=0, le=1)
@@ -136,6 +167,11 @@ class Settings(BaseSettings):
     supervisor_agent_base_url: str = ''
     supervisor_agent_model: str = ''
     supervisor_agent_api_key: SecretStr = SecretStr('')
+    # PA-165: which engine orchestrates the supervisor's tool calls. `direct` keeps the
+    # reviewed single-shot JSON planner (unchanged behaviour); `langchain` routes the same
+    # prompt and the same server-side tool contract through a LangChain tool-calling chain
+    # and falls back to `direct` — with the reason logged — when the optional extra is absent.
+    supervisor_agent_engine: Literal['direct', 'langchain'] = 'direct'
     # Knowledge answers may use a separately approved self-hosted model while
     # work-order analysis remains on its independently gated provider.  The
     # default preserves the historical single-provider configuration.
@@ -146,6 +182,15 @@ class Settings(BaseSettings):
     rag_llm_timeout_seconds: float = Field(default=8.0, ge=0.1, le=60.0)
     rag_llm_disable_thinking: bool = False
     rag_llm_max_output_tokens: int | None = Field(default=None, ge=1, le=8192)
+    # t188: the frozen delivery adapter authorizes exactly one RAG prompt version
+    # (scope=rag_only), and this build ships exactly one body for it. Override only
+    # after that adapter has been re-frozen with a new version and its pin
+    # recomputed; anything else is refused at startup instead of being remapped.
+    rag_answer_prompt_version: str = "rag-answer-v2"
+    # t187-2: audit rows hash the question so the log never carries report text.
+    # An unsalted sha256 of a short question is reversible, so the salt is a
+    # deployment secret; production runs warn once when it is left empty.
+    audit_hash_salt: SecretStr = SecretStr("")
     local_ai_internal_token: SecretStr = SecretStr("")
     vlm_provider: Literal["development", "production"] = "development"
     vlm_base_url: str = ""
@@ -194,6 +239,10 @@ class Settings(BaseSettings):
     storage_region: str = "us-east-1"
     storage_presign_ttl_seconds: int = Field(default=300, ge=1, le=600)
     file_scanner_provider: Literal["development", "unavailable", "clamav"] = "unavailable"
+    # D6: the development scanner never examines anything, it just stamps
+    # `skipped_dev`. Treating that as a working pipeline was a silent lie, so an
+    # operator must state the demo intent explicitly outside dev/test.
+    file_scanner_demo_acknowledged: bool = False
     file_scanner_host: str = Field(default="", max_length=253)
     file_scanner_port: int = Field(default=3310, ge=1, le=65535)
     file_scanner_timeout_seconds: float = Field(default=10.0, ge=0.1, le=60, allow_inf_nan=False)
@@ -232,6 +281,29 @@ class Settings(BaseSettings):
         return self
 
     @model_validator(mode="after")
+    def validate_rag_answer_prompt_version(self) -> "Settings":
+        """F1 / t177: a version the frozen adapter rejects is a configuration error.
+
+        The adapter answers RAG_ONLY_NO_AUTO_AUTHORIZATION for any X-Prompt-Version
+        it was not frozen with, so an unknown value here would only fail later, at
+        request time, with AI.INVALID_OUTPUT. Reject it while the stack starts.
+        """
+
+        from app.domain.knowledge import RAG_ANSWER_PROMPT_VERSIONS
+
+        if self.rag_answer_prompt_version not in RAG_ANSWER_PROMPT_VERSIONS:
+            raise ValueError(
+                "RAG_ANSWER_PROMPT_VERSION must be "
+                f"{', '.join(RAG_ANSWER_PROMPT_VERSIONS)} (the only version this"
+                " build ships a body for and the only one the frozen adapter"
+                f" authorizes); got {self.rag_answer_prompt_version!r}. Publishing a"
+                " new version means shipping its body, re-freezing"
+                " deploy/ai-runtime-prompts.json and recomputing the adapter pin in"
+                " deploy/rag-runtime.ps1; never relabel an unshipped draft an unshipped draft"
+            )
+        return self
+
+    @model_validator(mode="after")
     def validate_security_configuration(self) -> "Settings":
         if self.sms_provider == "production":
             required = (
@@ -265,12 +337,53 @@ class Settings(BaseSettings):
                 raise ValueError("Production WeChat login requires WECHAT_APP_ID")
             if not self.wechat_app_secret.get_secret_value():
                 raise ValueError("Production WeChat login requires WECHAT_APP_SECRET")
+        if self.app_env == "staging" and self.llm_provider == "production":
+            # PA-117: a box with no credential anywhere can never serve analysis in
+            # any role, so it fails at startup instead of at the first request. The
+            # narrower case (LOCAL_AI_INTERNAL_TOKEN present, LLM_API_KEY empty) is
+            # reported by /readyz instead — see ai_credentials() for why crashing
+            # api/beat/publisher over a credential only the worker uses is worse.
+            # PA-122: the endpoint is part of the credential. A staging box with a
+            # key but LLM_BASE_URL="" used to start clean and then die in the first
+            # announcement/work-order draft at 0 ms, so staging now checks the same
+            # pair production does (LLM_BASE_URL + a key).
+            if not self.llm_base_url:
+                raise ValueError(
+                    "Staging LLM provider requires LLM_BASE_URL"
+                )
+            if not self.llm_api_key.get_secret_value() and not (
+                self.local_ai_internal_token.get_secret_value()
+            ):
+                raise ValueError(
+                    "Staging LLM provider requires LLM_API_KEY or LOCAL_AI_INTERNAL_TOKEN"
+                )
+            if not self.llm_api_key.get_secret_value():
+                # PA-133: the local token only ever goes to this host's adapter, so a box
+                # that relies on it cannot point LLM_BASE_URL anywhere else. `resolve_local_ai_key`
+                # already refuses to send the token off-host, which used to surface as an
+                # empty bearer at the first request; refuse the combination at startup with
+                # a message that names the offending host.
+                host = urlsplit(self.llm_base_url).hostname or ""
+                if host not in LOCAL_AI_ENDPOINT_HOSTS:
+                    raise ValueError(
+                        "Staging LLM provider has no LLM_API_KEY and relies on"
+                        " LOCAL_AI_INTERNAL_TOKEN, which is only sent to a local endpoint"
+                        f" ({', '.join(sorted(LOCAL_AI_ENDPOINT_HOSTS))});"
+                        f" LLM_BASE_URL points at {host or '<no host>'}"
+                    )
         if self.app_env == "production":
             self._require_production_provider_credentials()
             if self.file_scanner_provider == "development":
                 raise ValueError(
                     "Production cannot use the Development file scanner"
                 )
+        # PA-140: the shared-token gate is a property of the credentials, not of the
+        # environment or of the main LLM. It used to sit inside
+        # `app_env == "staging" and llm_provider == "production"`, so a staging box with
+        # LLM_PROVIDER=development but VLM_PROVIDER=production sailed through and sent the
+        # adapter token to whatever VLM_BASE_URL pointed at. Call it unconditionally: it
+        # already skips every family whose provider is not "production".
+        self._reject_shared_token_off_host()
         if self.file_scanner_provider == "clamav":
             try:
                 scanner_address = ip_address(self.file_scanner_host)
@@ -296,6 +409,69 @@ class Settings(BaseSettings):
                     "Identity test proof requires exact AUTH001 test isolation and a private signing secret"
                 )
         return self
+
+    def _reject_shared_token_off_host(self) -> None:
+        """Refuse to put the adapter's shared token on a remote connection.
+
+        PA-137: `resolve_local_ai_key` only *withholds* the token from a remote
+        endpoint. A deployment that sets a provider key to the same value as
+        `LOCAL_AI_INTERNAL_TOKEN` (the delivery `.env.delivery` does exactly that)
+        sends the shared secret wherever the endpoint points, and nothing noticed:
+        the credential is neither empty nor obviously the token. Compare what will
+        actually go on the wire, per provider, and refuse off-host.
+        """
+
+        token = self.local_ai_internal_token.get_secret_value()
+        if not token:
+            return
+        providers = (
+            ("LLM", self.llm_provider, self.llm_api_key, self.llm_base_url),
+            (
+                "RAG LLM",
+                self.rag_llm_provider,
+                self.rag_llm_api_key,
+                self.rag_llm_base_url,
+            ),
+            ("VLM", self.vlm_provider, self.vlm_api_key, self.vlm_base_url),
+            ("ASR", self.asr_provider, self.asr_api_key, self.asr_base_url),
+            (
+                "Embedding",
+                self.embedding_provider,
+                self.embedding_api_key,
+                self.embedding_endpoint,
+            ),
+            (
+                "Reranker",
+                self.reranker_provider,
+                self.reranker_api_key,
+                self.reranker_endpoint,
+            ),
+            # PA-139: the supervisor planner builds its own QwenLLMProvider straight
+            # from `supervisor_agent_api_key` / `supervisor_agent_base_url`
+            # (app/provider/supervisor_agent.py:55-57), so it is a seventh family that
+            # can put this token on the wire and it was missing from this list.
+            (
+                "Supervisor agent",
+                self.supervisor_agent_provider,
+                self.supervisor_agent_api_key,
+                self.supervisor_agent_base_url,
+            ),
+        )
+        for label, provider, explicit, endpoint in providers:
+            if provider != "production":
+                continue
+            resolved = self.resolve_local_ai_key(explicit, endpoint)
+            if not resolved or not hmac.compare_digest(resolved, token):
+                continue
+            host = urlsplit(endpoint).hostname or ""
+            if host in LOCAL_AI_ENDPOINT_HOSTS:
+                continue
+            raise ValueError(
+                f"{label} would send the shared LOCAL_AI_INTERNAL_TOKEN to a remote"
+                " endpoint, and that token is only sent to a local endpoint"
+                f" ({', '.join(sorted(LOCAL_AI_ENDPOINT_HOSTS))});"
+                f" {label} points at {host or '<no host>'}; give this provider its own key"
+            )
 
     def _require_production_provider_credentials(self) -> None:
         if self.llm_provider == "production":
@@ -336,6 +512,121 @@ class Settings(BaseSettings):
             if not self.wechat_app_secret.get_secret_value():
                 raise ValueError("Production WeChat provider requires WECHAT_APP_SECRET")
 
+    def ai_credentials(self) -> dict[str, object]:
+        """Report whether this process holds a credential the work-order LLM can use.
+
+        PA-117 opened this probe because `build_llm_provider` sent `LLM_API_KEY`
+        verbatim while the RAG/embedding/reranker builders already fell back to
+        `LOCAL_AI_INTERNAL_TOKEN`. PA-128 closed that gap, so the report now
+        describes what `build_llm_provider` will actually put on the wire:
+        `resolve_local_ai_key` decides, explicit key first. Secrets are never
+        included.
+        """
+
+        work_order_key = bool(self.llm_api_key.get_secret_value())
+        local_token = bool(self.local_ai_internal_token.get_secret_value())
+        resolved = self.resolve_local_ai_key(self.llm_api_key, self.llm_base_url)
+        endpoint = self.llm_base_url
+        if self.llm_provider != "production":
+            status = "not_required"
+            missing: list[str] = []
+        else:
+            # PA-122: a key without an endpoint cannot reach anything, so the
+            # endpoint is reported as a missing ingredient of its own.
+            missing = []
+            if not endpoint:
+                missing.append("LLM_BASE_URL")
+            if not resolved:
+                missing.append("LLM_API_KEY")
+            status = "missing" if missing else "configured"
+        if not resolved:
+            resolved_from = "none"
+        elif work_order_key:
+            resolved_from = "llm_api_key"
+        else:
+            resolved_from = "local_ai_internal_token"
+        return {
+            "provider": self.llm_provider,
+            "status": status,
+            "missing": missing,
+            "endpoint": endpoint,
+            "sources": {
+                "llm_api_key": "configured" if work_order_key else "missing",
+                "local_ai_internal_token": "configured" if local_token else "missing",
+                "resolved_from": resolved_from,
+            },
+            # Fact, not policy: PA-128 makes the work-order path use the same
+            # local-token fallback as RAG/embedding/reranker.
+            "fallback_to_local_token": resolved_from == "local_ai_internal_token",
+        }
+
+    def media_pipeline(self) -> dict[str, object]:
+        """Report what the configured scanner actually does to uploaded media.
+
+        PA-163 made the "no scanner" case visible. D6 closes the other half: the
+        `development` stub returns `skipped_dev`, so uploads become *usable*
+        without ever being examined. Reporting that as usable was a silent lie -
+        readiness now says exactly which of three modes is in force:
+
+        * `real`        - clamav verdicts, media is scanned before use;
+        * `demo_stub`   - media moves unverified (development stub);
+        * `unavailable` - fails closed, uploads never leave `pending`.
+
+        Only `real` sets `media_scanned`. A stub on staging/production is a
+        misconfiguration and is named as `unacknowledged` so readiness degrades
+        instead of pretending the pipeline is intact.
+        """
+
+        provider = self.file_scanner_provider
+        real_scan = provider == "clamav"
+        stub = provider == "development"
+        acknowledged = bool(stub and self.file_scanner_demo_acknowledged)
+        stub_is_expected = self.app_env in {"development", "test"}
+        unacknowledged = stub and not acknowledged and not stub_is_expected
+        if real_scan:
+            mode, reason = "real", None
+        elif stub:
+            mode = "demo_stub"
+            reason = (
+                "MEDIA_SCAN_STUB_UNACKNOWLEDGED" if unacknowledged else "MEDIA_SCAN_STUB"
+            )
+        else:
+            mode, reason = "unavailable", "MEDIA_SCAN_UNAVAILABLE"
+        return {
+            "scanner": provider,
+            "scan_mode": mode,
+            "media_scanned": real_scan,
+            # Unverified media is not usable media: only a real verdict counts.
+            "media_becomes_usable": real_scan,
+            "demo_stub": stub,
+            "demo_stub_acknowledged": acknowledged,
+            "demo_stub_unacknowledged": unacknowledged,
+            "reason_code": reason,
+            "note": {
+                None: None,
+                "MEDIA_SCAN_STUB": (
+                    "FILE_SCANNER_PROVIDER=development is a demo stub: uploads are"
+                    " accepted as scanner_status=skipped_dev without any scan, so"
+                    " media can be attached but stays unverified. Set"
+                    " FILE_SCANNER_DEMO_ACKNOWLEDGED=true to declare demo mode, or"
+                    " configure FILE_SCANNER_PROVIDER=clamav for real scanning"
+                ),
+                "MEDIA_SCAN_STUB_UNACKNOWLEDGED": (
+                    "FILE_SCANNER_PROVIDER=development is a demo stub and is not"
+                    " acknowledged for this environment: media would move unverified."
+                    " Either configure FILE_SCANNER_PROVIDER=clamav, set"
+                    " FILE_SCANNER_PROVIDER=unavailable to fail closed, or set"
+                    " FILE_SCANNER_DEMO_ACKNOWLEDGED=true to declare demo mode"
+                ),
+                "MEDIA_SCAN_UNAVAILABLE": (
+                    "FILE_SCANNER_PROVIDER='unavailable' fails closed: uploads stay"
+                    " scanner_status=pending, so they cannot be attached to a work"
+                    " order, downloaded, described or analysed until an approved"
+                    " scanner (FILE_SCANNER_PROVIDER=clamav) is configured"
+                ),
+            }[reason],
+        }
+
     def resolve_local_ai_key(self, explicit: SecretStr, endpoint: str) -> str:
         """Use the shared token only for this host's explicitly local adapter."""
 
@@ -346,11 +637,10 @@ class Settings(BaseSettings):
         if not local:
             return ""
         parsed = urlsplit(endpoint)
-        if parsed.scheme not in {"http", "https"} or parsed.hostname not in {
-            "127.0.0.1",
-            "localhost",
-            "host.docker.internal",
-        }:
+        if (
+            parsed.scheme not in {"http", "https"}
+            or parsed.hostname not in LOCAL_AI_ENDPOINT_HOSTS
+        ):
             return ""
         return local
 

@@ -8,7 +8,7 @@ from app.api.dependencies.auth import get_auth_service
 from app.core.config import Settings, get_settings
 from app.schema.auth import AccessTokenData, DevelopmentTokenRequest
 from app.schema.common import request_id_for, success_envelope
-from app.service.auth import AuthService
+from app.service.identity.auth import AuthService
 
 router = APIRouter(prefix="/auth/dev", tags=["development-auth"])
 

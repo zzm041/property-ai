@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import Settings
 from app.core.errors import AppError, DevSeedErrorCode
-from app.domain.dev_seed import (
+from app.domain.dev import (
     DEV_PROPERTY_NAME,
     DEV_SEED_LOCK_NAME,
     DEV_TENANT_NAME,

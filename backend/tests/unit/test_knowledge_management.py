@@ -4,8 +4,8 @@ from unittest.mock import MagicMock
 import pytest
 
 from app.core.errors import AppError, IamErrorCode, KnowledgeErrorCode
-from app.domain.audit import AUDIT_ACTION_POLICIES, AuditAction, AuditResourceType
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.governance import AUDIT_ACTION_POLICIES, AuditAction, AuditResourceType
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.domain.knowledge import (
     KNOWLEDGE_MANAGE,
     KnowledgeDocumentStatus,

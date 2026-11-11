@@ -55,7 +55,7 @@ def enqueue_celery_task(
     except Exception:
         from app.worker.failed_tasks import record_failed_task
 
-        record_failed_task(
+        record_id = record_failed_task(
             settings,
             task_id=None,
             operation=getattr(celery_task, "name", None) or event,
@@ -63,6 +63,17 @@ def enqueue_celery_task(
             extra={**payload, "enqueue_event": event},
             args=tuple(args),
         )
+        if not record_id:
+            # PA-104-A-1: neither Redis nor the DLQ accepted the record, so the
+            # enqueue failure is not enumerable anywhere. Say so loudly instead
+            # of leaving an unexplained "DB row, no task, no record" state.
+            logger.error(
+                "enqueue_failure_unrecorded",
+                reason="failed task record unavailable (redis and dlq both failed)",
+                orphan="committed business row has no queued task and no failed-task record",
+                operation=getattr(celery_task, "name", None) or event,
+                **payload,
+            )
         if settings.app_env == "production":
             logger.error(event, **payload)
             return False

@@ -269,6 +269,21 @@ class WorkOrder(BigIntPrimaryKeyMixin, TimestampMixin, Base):
             "created_at",
             "id",
         ),
+        # PA-169 (t150): the 10-minute duplicate check reads by house.
+        Index(
+            "ix_work_orders_house_fingerprint_created",
+            "house_id",
+            "content_fingerprint",
+            "created_at",
+        ),
+        # PA-169 (t154): the same 10-minute window, keyed on the boundary-free
+        # form, so a stray comma cannot hide a repeat submission.
+        Index(
+            "ix_work_orders_house_loose_created",
+            "house_id",
+            "content_fingerprint_loose",
+            "created_at",
+        ),
         MYSQL_TABLE_OPTIONS,
     )
 
@@ -286,6 +301,15 @@ class WorkOrder(BigIntPrimaryKeyMixin, TimestampMixin, Base):
     house_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     # Report-time snapshot; never synchronized with account identity changes.
     contact_phone_e164: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    # PA-169 (t150): content identity of the report, so a repeated report can be
+    # recognised without re-reading its text.
+    content_fingerprint: Mapped[str | None] = mapped_column(
+        String(64), nullable=True
+    )
+    # PA-169 (t154): boundary-free identity, used only by the duplicate window.
+    content_fingerprint_loose: Mapped[str | None] = mapped_column(
+        String(64), nullable=True
+    )
     reporter_user_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey(
@@ -495,6 +519,14 @@ class WorkOrderAssignment(BigIntPrimaryKeyMixin, TimestampMixin, Base):
             "work_order_id",
             "id",
         ),
+        # PA-175 (t182): 20260919_0009 added these two columns and the
+        # source/actor rule; without them autogenerate proposed to drop the
+        # assignment audit trail.
+        CheckConstraint(
+            "(BINARY assigned_source = 'HUMAN' AND assigned_by_user_id IS NOT NULL)"
+            " OR (BINARY assigned_source = 'AUTO' AND assigned_by_user_id IS NULL)",
+            name="source_actor",
+        ),
         MYSQL_TABLE_OPTIONS,
     )
 
@@ -502,7 +534,7 @@ class WorkOrderAssignment(BigIntPrimaryKeyMixin, TimestampMixin, Base):
     property_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     work_order_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     employee_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
-    assigned_by_user_id: Mapped[int] = mapped_column(
+    assigned_by_user_id: Mapped[int | None] = mapped_column(
         BigInteger,
         ForeignKey(
             "users.id",
@@ -510,7 +542,21 @@ class WorkOrderAssignment(BigIntPrimaryKeyMixin, TimestampMixin, Base):
             ondelete="RESTRICT",
             onupdate="RESTRICT",
         ),
+        nullable=True,
+    )
+    # PA-175 (t182): 20260919_0009 line 381; NULL means the dispatcher
+    # assigned automatically.
+    assigned_source: Mapped[str] = mapped_column(
+        String(16),
         nullable=False,
+        default="HUMAN",
+        server_default=text("'HUMAN'"),
+    )
+    # PA-175 (t182): 20260919_0009 line 389. (work_order_logs.payload_json at
+    # 20260917_0005 line 219 is a different table.)
+    payload_json: Mapped[dict[str, object] | None] = mapped_column(
+        JSON,
+        nullable=True,
     )
     status: Mapped[str] = mapped_column(
         String(32),
@@ -778,7 +824,14 @@ class SlaClock(BigIntPrimaryKeyMixin, TimestampMixin, Base):
 class IdempotencyRecord(BigIntPrimaryKeyMixin, Base):
     __tablename__ = "idempotency_records"
     __table_args__ = (
-        UniqueConstraint("idempotency_key", name="uq_idempotency_records_key"),
+        # D1: the replay lookup is scoped to (user_id, idempotency_key), so the
+        # uniqueness must be scoped the same way. A globally unique key lets any
+        # caller occupy a key it never used and block other users' creations.
+        UniqueConstraint(
+            "user_id",
+            "idempotency_key",
+            name="uq_idempotency_records_user_key",
+        ),
         CheckConstraint(
             "CHAR_LENGTH(TRIM(idempotency_key)) > 0",
             name="idempotency_key_not_blank",

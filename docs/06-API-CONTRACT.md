@@ -162,7 +162,7 @@
 
 小区队列保留默认 `view=dispatch`；`view=unstarted` 仅列出当前冻结 FSM 允许 CANCEL 的未开工状态（PENDING_ANALYSIS/PENDING_ASSIGNMENT/ASSIGNED/ACCEPTED），沿用 `property_id/tenant_id/after_id/limit` 和服务端 Scope 校验。撤销仍复用原 `/work-orders/{id}/cancel` 与 `version`：住户只能撤销本人未派单工单，其他报修人只能由该小区具备管理及撤销权限的人员操作；不开放 PROCESSING/WAIT_CONFIRM 撤销。结束派单、释放或转移共同事件容量、停止 SLA、日志/审计及通知属于同一业务事务。
 
-创建工单：`Idempotency-Key` 必填（客户端生成）。重复键返回同一工单，不建第二条。
+创建工单：`Idempotency-Key` 必填（客户端生成）。重复键返回同一工单，不建第二条。键的作用域是提交人：`(user_id, key)` 唯一，两个用户各自使用相同字符串互不影响；同一用户同键异体请求仍返回 409。
 
 创建成功响应即含 `id` 与 `status=PENDING_ANALYSIS`，不等待 AI。
 

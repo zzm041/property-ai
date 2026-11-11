@@ -8,7 +8,7 @@ import json
 
 import httpx
 
-from app.domain.vision import VISION_ANALYSIS_PROMPT_VERSION, vision_analysis_response_format
+from app.domain.work_order import VISION_ANALYSIS_PROMPT_VERSION, vision_analysis_response_format
 from app.provider.errors import (
     ProviderInvalidOutputError,
     ProviderTimeoutError,

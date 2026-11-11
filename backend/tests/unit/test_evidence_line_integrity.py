@@ -1,7 +1,7 @@
 """Line-delimited resident facts must survive source segmentation exactly."""
 import pytest
 
-from app.domain.observed_event import build_evidence_catalog
+from app.domain.ai import build_evidence_catalog
 
 
 @pytest.mark.parametrize("source", ["report", "asr"])

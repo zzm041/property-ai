@@ -20,6 +20,17 @@ def _production_settings(**overrides: object) -> Settings:
         "app_env": "production",
         "app_secret_key": "delivery-secret-longer-than-default",
         "wechat_login_enabled": False,
+        # PA-165: create_app refuses to assemble production on the development
+        # RAG providers, so a realistic production shape points the three RAG
+        # providers at a real endpoint. test_rag_provider_startup_guard.py owns
+        # the rejection cases; here they are only scenery.
+        "embedding_provider": "production",
+        "embedding_endpoint": "http://host.docker.internal:11436/v1/embeddings",
+        "reranker_provider": "production",
+        "reranker_endpoint": "http://host.docker.internal:11436/v1/rerank",
+        "rag_llm_provider": "production",
+        "rag_llm_base_url": "http://host.docker.internal:11436/v1",
+        "rag_llm_api_key": "test-rag-key",
     }
     values.update(overrides)
     return Settings(**values)
@@ -87,7 +98,7 @@ def test_public_error_messages_do_not_expose_identity_schema_or_internal_ids() -
     sources = "\n".join(
         (ROOT / path).read_text(encoding="utf-8")
         for path in (
-            "backend/app/service/identity_recovery.py",
+            "backend/app/service/identity/identity_recovery.py",
             "backend/app/api/v1/admin_employee.py",
         )
     )

@@ -7,10 +7,10 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings
 from app.core.database import get_session_factory
 from app.core.errors import AppError, IamErrorCode
-from app.domain.iam import OrganizationScope, ScopeType
+from app.domain.identity import OrganizationScope, ScopeType
 from app.model.identity import AuditLog, UserRole
-from app.service.auth import AuthService
-from app.service.rbac_mutation import RbacMutationService
+from app.service.identity.auth import AuthService
+from app.service.identity.rbac_mutation import RbacMutationService
 from tests.integration.rbac_mutation_test_data import (
     create_rbac_mutation_graph,
     identity_only_principal,

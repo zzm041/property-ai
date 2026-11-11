@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from app.api.v1.assistant import get_current_principal, get_retrieval_service, router
 from app.core.errors import AppError
 from app.core.time import utc_now
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.domain.knowledge import KNOWLEDGE_READ
 from app.repository.resident import ResidentBindingRepository
 from app.service import retrieval
@@ -44,7 +44,8 @@ def case(monkeypatch):
         monkeypatch.setattr(session, "get", lambda *args: document)
         service = retrieval.RetrievalService(session, repository=repository, resident_repository=residents,
                     employee_repository=employees, property_repository=properties,
-                    settings=NS(embedding_dimensions=3), principal_loader=lambda _: actor)
+                    settings=NS(embedding_dimensions=3, rag_answer_prompt_version='rag-answer-v2'),
+                    principal_loader=lambda _: actor)
         providers = [MagicMock() for _ in range(4)]
         embedder, store, reranker, llm = providers
         embedder.embed.return_value = ((0.1, 0.2, 0.3),)

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.api.dependencies.auth import get_current_principal
 from app.api.dependencies.db import get_db_session
 from app.core.errors import AppError, EmployeeErrorCode
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.schema.common import request_id_for, success_envelope
 from app.schema.employee import (
     AttendanceActionRequest,

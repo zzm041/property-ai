@@ -14,10 +14,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.database import create_database_engine, run_owned_transaction
-from app.domain.dev_seed import SEED_PERMISSIONS, SEED_ROLE_PERMISSIONS
+from app.domain.dev import SEED_PERMISSIONS, SEED_ROLE_PERMISSIONS
 from app.main import create_app
 from app.model.identity import Permission, Role, RolePermission, UserRole
-from app.service.property import PropertyService
+from app.service.identity.property import PropertyService
 from tests.integration.test_isolated_auth_runtime import (
     ISOLATED_URL,
     _error,

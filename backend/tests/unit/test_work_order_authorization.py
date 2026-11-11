@@ -1,7 +1,7 @@
 """WorkOrder permission matrix: no SELF scope, SYSTEM_ADMIN not auto-granted."""
 
-from app.domain.dev_seed import SEED_ROLE_PERMISSIONS
-from app.domain.iam import ScopeType
+from app.domain.dev import SEED_ROLE_PERMISSIONS
+from app.domain.identity import ScopeType
 from app.domain.work_order import (
     WORK_ORDER_CANCEL,
     WORK_ORDER_CREATE,

@@ -1,6 +1,6 @@
 param(
     [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateSet("config", "init", "up", "stop", "status", "backup", "restore-check", "media-cycle-migrate", "diagnose", "ollama-start", "ollama-stop", "ollama-status", "rag-ollama-start", "rag-ollama-stop", "rag-ollama-status", "rag-start", "rag-stop", "rag-status", "work-ai-start", "work-ai-stop", "work-ai-status")]
+    [ValidateSet("config", "init", "up", "stop", "status", "backup", "restore-check", "media-cycle-migrate", "diagnose", "ollama-start", "ollama-stop", "ollama-status", "rag-ollama-start", "rag-ollama-stop", "rag-ollama-status", "rag-start", "rag-stop", "rag-status", "work-ai-start", "work-ai-stop", "work-ai-status", "release", "verify-image")]
     [string]$Action,
     [Parameter(Position = 1)]
     [string]$Argument,
@@ -10,6 +10,11 @@ param(
 
 $ErrorActionPreference = "Stop"
 $DeployDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+# PA-170: source pins are compared with the line-ending independent digest in
+# source-hash.ps1; a plain Get-FileHash would make the pin depend on whether this
+# checkout (or the git archive export) happens to carry CRLF.
+. (Join-Path $DeployDir "source-hash.ps1")
+$RepoRoot = Split-Path -Parent $DeployDir
 $ComposeFile = Join-Path $DeployDir "docker-compose.delivery.yml"
 $EnvFile = Join-Path $DeployDir ".env.delivery"
 $BootstrapEnvFile = Join-Path $DeployDir ".env.delivery.bootstrap"
@@ -88,6 +93,118 @@ function Assert-NoPlaceholders {
     $unsafe = Select-String -LiteralPath $checkedFiles -Pattern "replace-|change-me|<[^>]+>" -SimpleMatch:$false
     if ($unsafe) { throw "deploy/.env.delivery still contains placeholder secrets" }
     Invoke-Compose config --quiet
+}
+
+function Resolve-DeliverySource {
+    # PA-116: the image tag is derived from the source commit, never a mutable
+    # label, so a rebuilt tree can never silently reuse an older image.
+    $sha = (& git -C $RepoRoot rev-parse --short=12 HEAD | Out-String).Trim()
+    if ($LASTEXITCODE -ne 0 -or $sha -notmatch "^[0-9a-f]{12}$") {
+        throw "cannot resolve the delivery source commit"
+    }
+    $dirty = (& git -C $RepoRoot status --porcelain --untracked-files=no | Out-String).Trim()
+    if ($LASTEXITCODE -ne 0) { throw "cannot verify the delivery worktree state" }
+    $tag = if ($dirty) { "$sha-wip" } else { $sha }
+    return [pscustomobject]@{ Sha = $sha; Tag = $tag; Dirty = [bool]$dirty }
+}
+
+function Assert-DeliveryImageTag([string]$Tag) {
+    if ($Tag -notmatch "^src-[0-9a-f]{12}(-wip)?$") {
+        throw "DELIVERY_IMAGE_TAG must be content-addressed (src-<12-hex commit>); '$Tag' is a mutable tag (PA-116)"
+    }
+}
+
+function Get-DeliveryProjectName {
+    $project = if ($env:COMPOSE_PROJECT_NAME) { $env:COMPOSE_PROJECT_NAME } else { Read-DeliveryValue "COMPOSE_PROJECT_NAME" }
+    if (-not $project) { $project = "property-ai-delivery-check" }
+    return $project
+}
+
+function Get-DeliveryServiceContainer([string]$Service) {
+    $project = Get-DeliveryProjectName
+    $output = & docker ps --filter "label=com.docker.compose.project=$project" --filter "label=com.docker.compose.service=$Service" --format "{{.Names}}"
+    if ($LASTEXITCODE -ne 0) { throw "cannot list delivery containers; refusing an unverified stack" }
+    $names = @($output | Where-Object { $_ })
+    if ($names.Count -ne 1) {
+        throw "delivery service '$Service' must have exactly one running container (found $($names.Count))"
+    }
+    return $names[0]
+}
+
+function Get-DeliveryImageFacts([string]$Service) {
+    $container = Get-DeliveryServiceContainer $Service
+    $image = (& docker inspect --format "{{.Image}}" $container | Out-String).Trim()
+    if ($LASTEXITCODE -ne 0 -or $image -notmatch "^sha256:[0-9a-f]{64}$") {
+        throw "cannot resolve the image id of delivery service '$Service'"
+    }
+    $sourceSha = (& docker inspect --format '{{index .Config.Labels "property-ai.source-sha"}}' $image | Out-String).Trim()
+    return [pscustomobject]@{ Service = $Service; Container = $container; Image = $image; SourceSha = $sourceSha }
+}
+
+function Assert-DeliveryImageDigest {
+    $facts = @(foreach ($service in @("api", "worker", "beat", "publisher")) { Get-DeliveryImageFacts $service })
+    $digests = @($facts.Image | Sort-Object -Unique)
+    if ($digests.Count -ne 1) {
+        $detail = ($facts | ForEach-Object { "$($_.Service)=$($_.Image)" }) -join ", "
+        throw "delivery services run different images ($detail); recreate api/worker/beat/publisher together (PA-116)"
+    }
+    $sources = @($facts.SourceSha | Sort-Object -Unique | Where-Object { $_ -and $_ -ne "unknown" })
+    if ($sources.Count -ne 1) {
+        $detail = ($facts | ForEach-Object { "$($_.Service)=$($_.SourceSha)" }) -join ", "
+        throw "delivery image does not carry a single baked source commit ($detail)"
+    }
+    return $facts
+}
+
+function Assert-DeliveryImageContent([object[]]$Facts) {
+    $source = Resolve-DeliverySource
+    $baked = @($Facts.SourceSha | Sort-Object -Unique)[0]
+    if (-not $baked.StartsWith($source.Sha)) {
+        throw "delivery image was built from $baked but HEAD is $($source.Sha)"
+    }
+    $contract = [ordered]@{
+        "ai.py" = "backend/app/domain/ai.py"
+        "observed_event.py" = "backend/app/domain/observed_event.py"
+    }
+    foreach ($row in $Facts) {
+        $provenance = (Invoke-Compose exec -T $row.Service python -m app.cli.build_provenance | Out-String) | ConvertFrom-Json
+        if ($provenance.shadow_source_tree) {
+            throw "$($row.Service) still carries a second app copy at $($provenance.shadow_source_tree) (PA-116)"
+        }
+        $copies = @($provenance.app_copies)
+        if ($copies.Count -ne 1) {
+            throw "$($row.Service) resolves $($copies.Count) app copies; exactly one is allowed"
+        }
+        foreach ($name in $contract.Keys) {
+            $relative = $contract[$name]
+            $drift = (& git -C $RepoRoot status --porcelain -- $relative | Out-String).Trim()
+            if ($drift) { throw "contract file $relative differs from HEAD; refusing to pin an image to a commit" }
+            # PA-170: compare the source file with the line-ending independent digest;
+            # the image reports LF bytes, a CRLF checkout would otherwise never match.
+            $expected = (Get-CanonicalSha256 -LiteralPath (Join-Path $RepoRoot $relative)).ToLower()
+            $actual = $provenance.files.PSObject.Properties[$name].Value.sha256
+            if (-not $actual) { throw "$($row.Service) does not report $name provenance" }
+            if ($actual -ne $expected) {
+                throw "$($row.Service) runs $($name)=$actual but HEAD is $expected"
+            }
+        }
+    }
+    return $baked
+}
+
+function Invoke-DeliveryRelease([object]$Source) {
+    $tag = "src-$($Source.Tag)"
+    Assert-DeliveryImageTag $tag
+    $env:DELIVERY_SOURCE_SHA = $Source.Tag
+    $env:DELIVERY_IMAGE_TAG = $tag
+    Invoke-Compose --profile tools build migrate
+    # Every application service is recreated from the freshly built image; a bare
+    # `restart` is what let worker drift three days behind api.
+    Invoke-Compose up -d --force-recreate api worker publisher beat nginx
+    $facts = Assert-DeliveryImageDigest
+    $baked = Assert-DeliveryImageContent $facts
+    if ($baked -ne $Source.Tag) { throw "built image reports source $baked, expected $($Source.Tag)" }
+    return $facts
 }
 
 function Resolve-BackupPath([string]$Value, [bool]$MustExist) {
@@ -188,6 +305,25 @@ switch ($Action) {
         Invoke-Compose --profile tools run --rm storage-init
         Invoke-Compose up -d api worker publisher beat nginx
         Invoke-Compose ps
+    }
+    "release" {
+        Assert-NoRetainedRollbackContainers
+        Assert-NoPlaceholders
+        $source = Resolve-DeliverySource
+        $facts = Invoke-DeliveryRelease $source
+        $tag = "src-$($source.Tag)"
+        foreach ($row in $facts) {
+            Write-Output ("{0}`t{1}`t{2}`tsource={3}" -f $row.Service, $row.Container, $row.Image, $row.SourceSha)
+        }
+        Write-Output ("delivery image property-ai-delivery:{0} is the single image behind api/worker/beat/publisher (source {1})" -f $tag, $source.Sha)
+    }
+    "verify-image" {
+        $facts = Assert-DeliveryImageDigest
+        $baked = Assert-DeliveryImageContent $facts
+        foreach ($row in $facts) {
+            Write-Output ("{0}`t{1}`t{2}`tsource={3}" -f $row.Service, $row.Container, $row.Image, $row.SourceSha)
+        }
+        Write-Output "delivery image digest is uniform and matches source $baked"
     }
     "up" {
         Assert-NoRetainedRollbackContainers

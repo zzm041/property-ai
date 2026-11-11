@@ -19,3 +19,36 @@ class ProviderInvalidOutputError(ProviderError):
 
 class ProviderRateLimitError(ProviderError):
     error_code = "AI.RATE_LIMITED"
+
+
+class ProviderOutputUnverifiableError(ProviderError):
+    """The provider ran but produced no single usable answer (PA-169/F2)."""
+
+    error_code = "AI.OUTPUT_UNVERIFIABLE"
+
+
+class ProviderInputQuarantinedError(ProviderError):
+    """PA-169: the adapter refused this exact input, not the budget.
+
+    Raised only when the adapter's 503 says ``INPUT_QUARANTINED``: the model
+    once answered this same text badly, so re-sending it needs an operator's
+    explicit retry. Reporting it as unavailable or rate limited hid that path.
+    """
+
+    error_code = "AI.INPUT_QUARANTINED"
+
+
+class ProviderAudioTranscodeError(ProviderError):
+    """The recording could not be turned into the PCM the ASR adapter accepts.
+
+    Raised instead of shipping bytes the adapter answers with ``PCM_REQUIRED``,
+    so the failure names the recording rather than the AI call.
+    """
+
+    error_code = "AI.AUDIO_TRANSCODE_FAILED"
+
+
+class ProviderAudioTranscodeUnavailableError(ProviderUnavailableError):
+    """No audio decoder is installed in this runtime."""
+
+    error_code = "AI.AUDIO_TRANSCODE_UNAVAILABLE"

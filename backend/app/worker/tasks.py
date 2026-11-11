@@ -320,7 +320,7 @@ def sweep_sla_task(work_order_id: int | None = None) -> dict[str, int]:
     engine = create_database_engine(settings.active_database_url)
     session = Session(bind=engine, autoflush=False, expire_on_commit=False)
     try:
-        from app.service.sla import SlaService
+        from app.service.work_order.sla import SlaService
 
         service = SlaService(session, settings=settings)
         completion = service.sweep_due(work_order_id=work_order_id).as_dict()
@@ -356,7 +356,7 @@ def retry_waiting_dispatch_task() -> dict[str, int]:
     engine = create_database_engine(settings.active_database_url)
     session = Session(bind=engine, autoflush=False, expire_on_commit=False)
     try:
-        from app.service.sla import SlaService
+        from app.service.work_order.sla import SlaService
         unavailable = SlaService(session, settings=settings).sweep_unavailable_assignments()
         result = AnalysisService(session, settings=settings).sweep_waiting_dispatch(availability_changed=True)
         return {**result, "unavailable_reassigned": unavailable}

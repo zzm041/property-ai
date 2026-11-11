@@ -7,7 +7,7 @@ import pytest
 from app.core.errors import AppError
 from app.model.property import Building, Property, Tenant
 from app.repository.property import PropertyRepository
-from app.service.property import (
+from app.service.identity.property import (
     HIERARCHY_NOT_FOUND,
     INVALID_INPUT,
     PropertyService,

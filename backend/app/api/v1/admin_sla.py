@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_principal
 from app.api.dependencies.db import get_db_session
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.schema.common import request_id_for, success_envelope
 from app.schema.sla import (
     EffectiveSlaPolicyData,
@@ -15,7 +15,7 @@ from app.schema.sla import (
     SlaPolicyData,
     SlaPolicyListData,
 )
-from app.service.sla_policy import SlaPolicyListing, SlaPolicyService
+from app.service.work_order.sla_policy import SlaPolicyListing, SlaPolicyService
 
 router = APIRouter(prefix="/admin", tags=["admin-sla"])
 

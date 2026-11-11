@@ -9,7 +9,7 @@ import httpx
 
 from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
 from app.domain.knowledge import RAG_ANSWER_PROMPT_VERSION
-from app.domain.observed_event import work_order_analysis_response_format
+from app.domain.ai import work_order_analysis_response_format
 from app.provider.errors import (
     ProviderInvalidOutputError,
     ProviderTimeoutError,
@@ -58,6 +58,7 @@ class LLMProvider(Protocol):
         *,
         prompt: str,
         prompt_version: str,
+        force_retry_actor: str | None = None,
     ) -> Mapping[str, object]:
         """Return a JSON-compatible mapping. Never return prose as control."""
 
@@ -75,7 +76,9 @@ class DevelopmentLLMProvider:
         *,
         prompt: str,
         prompt_version: str,
+        force_retry_actor: str | None = None,
     ) -> Mapping[str, object]:
+        del force_retry_actor  # PA-169: the fake never quarantines an input.
         if self.behavior == "timeout":
             raise ProviderTimeoutError("LLM timed out")
         if self.behavior == "unavailable":
@@ -146,6 +149,7 @@ class QwenLLMProvider:
         *,
         prompt: str,
         prompt_version: str,
+        force_retry_actor: str | None = None,
     ) -> Mapping[str, object]:
         if not self.base_url or not self._api_key:
             raise ProviderUnavailableError("LLM is unavailable")
@@ -157,6 +161,9 @@ class QwenLLMProvider:
                 "Authorization": f"Bearer {self._api_key}",
                 "Content-Type": "application/json",
                 "X-Prompt-Version": prompt_version,
+                # PA-169: only an explicit operator retry may replay a text the
+                # adapter quarantined; the header carries who asked for it.
+                **({"X-Force-Retry-Actor": force_retry_actor} if force_retry_actor else {}),
             },
             json_body={
                 "model": self.model,

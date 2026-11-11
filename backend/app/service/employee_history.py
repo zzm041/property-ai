@@ -2,14 +2,14 @@
 from collections.abc import Callable
 from sqlalchemy.orm import Session
 from app.core.errors import AppError,EmployeeErrorCode,IamErrorCode
-from app.domain.employee import EMPLOYEE_READ
-from app.domain.iam import Principal,OrganizationScope,ScopeType
+from app.domain.work_order import EMPLOYEE_READ
+from app.domain.identity import Principal,OrganizationScope,ScopeType
 from app.domain.work_order import WORK_ORDER_DISPATCH
 from app.repository.employee import EmployeeRepository
 from app.repository.employee_history import EmployeeHistoryRepository
 from app.schema.employee_history import EmployeeHistoryData,EmployeeHistoryItem,EmployeeHistoryFeedback
-from app.service.auth import AuthService
-from app.service.rbac import RbacService
+from app.service.identity.auth import AuthService
+from app.service.identity.rbac import RbacService
 
 
 def _forbidden():

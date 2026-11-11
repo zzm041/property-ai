@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, File, Request, Response, UploadFile
 from app.api.dependencies.auth import get_current_principal
 from app.api.v1.work_orders import get_work_order_service
 from app.core.errors import AppError, FileErrorCode
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.schema.common import request_id_for, success_envelope
 from app.schema.work_order import FileObjectData, RegisterFileRequest
 from app.service.work_order import WorkOrderService

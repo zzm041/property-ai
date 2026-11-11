@@ -9,7 +9,7 @@ from app.cli.rebuild_knowledge_index import main as rebuild_main
 from app.core.config import Settings
 from app.main import create_app
 from app.repository.identity import IdentityRepository
-from app.service.auth import AuthService
+from app.service.identity.auth import AuthService
 from app.service.knowledge import KnowledgeService
 from tests.integration.conftest import commit_open_transaction
 from tests.integration.work_order_test_data import create_work_order_graph

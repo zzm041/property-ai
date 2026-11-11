@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from sqlalchemy import func, select
 
-from app.domain.audit import AuditAction, AuditResourceType
+from app.domain.governance import AuditAction, AuditResourceType
 from app.model.ai import AiCallLog, DispatchRecommendation, WorkOrderAnalysis
 from app.model.employee import EmployeeDailyStatus
 from app.model.identity import AuditLog

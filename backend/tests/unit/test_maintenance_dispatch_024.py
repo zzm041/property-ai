@@ -135,7 +135,7 @@ def test_waiting_scan_uses_stored_analysis_without_provider_or_new_queue(monkeyp
     service._ai.list_waiting_dispatch.return_value = [(41, 7), (42, 8)]
     service._retry_auto_dispatch_from_existing = MagicMock(side_effect=['NO_ELIGIBLE', 'ASSIGNED'])
     service._call_providers = MagicMock()
-    monkeypatch.setattr('app.service.analysis.begin_owned_transaction', lambda _: nullcontext())
+    monkeypatch.setattr('app.service.analysis.context.begin_owned_transaction', lambda _: nullcontext())
     assert service.sweep_waiting_dispatch() == {'scanned': 2, 'assigned': 1, 'waiting': 1}
     service._call_providers.assert_not_called()
     assert service._retry_auto_dispatch_from_existing.call_args_list[0].kwargs['analysis_id'] == 7

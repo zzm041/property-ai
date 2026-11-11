@@ -5,8 +5,8 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from app.domain.dev_seed import SEED_ROLE_PERMISSIONS
-from app.domain.iam import ScopeType
+from app.domain.dev import SEED_ROLE_PERMISSIONS
+from app.domain.identity import ScopeType
 from app.schema.employee import AttendanceActionRequest, CreateEmployeeRequest
 
 
@@ -47,7 +47,11 @@ def test_employee_authorization_is_permission_and_ownership_based() -> None:
     repository = (BACKEND_ROOT / "app" / "repository" / "employee.py").read_text(
         encoding="utf-8"
     )
-    domain = (BACKEND_ROOT / "app" / "domain" / "iam.py").read_text(encoding="utf-8")
+    # The IAM domain is a package now: keep looking at the whole domain, not one file.
+    domain = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in sorted((BACKEND_ROOT / "app" / "domain" / "identity").glob("*.py"))
+    )
 
     assert "PROPERTY_ADMIN" not in service
     assert "TENANT_ADMIN" not in service

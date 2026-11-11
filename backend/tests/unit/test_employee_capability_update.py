@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 from sqlalchemy.exc import IntegrityError
 
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.model.employee import Duty, Employee
 from app.service.employee import EmployeeService
 

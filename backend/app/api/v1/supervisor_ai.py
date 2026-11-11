@@ -2,14 +2,14 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_principal
 from app.api.dependencies.db import get_db_session
 from app.api.v1.work_orders import work_order_data
 from app.core.config import Settings, get_settings
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.schema.ai import (
     DispatchRecommendationData,
     DispatchRecommendationListData,
@@ -53,11 +53,22 @@ def analyze_work_order(
     request: Request,
     actor: Annotated[Principal, Depends(get_current_principal)],
     service: Annotated[AnalysisService, Depends(get_analysis_service)],
+    force_retry: Annotated[
+        bool,
+        Query(
+            description=(
+                "PA-169: re-run a text the adapter quarantined. The caller is "
+                "recorded in the adapter reservation."
+            )
+        ),
+    ] = False,
 ) -> dict[str, object]:
     record = service.analyze_work_order(
         work_order_id=work_order_id,
         request_id=request_id_for(request),
         actor=actor,
+        # PA-169: an operator retry is attributed, never anonymous.
+        force_retry_actor=f"user:{actor.user_id}" if force_retry else None,
     )
     work_order = service._work_orders.get_work_order(work_order_id)
     return success_envelope(

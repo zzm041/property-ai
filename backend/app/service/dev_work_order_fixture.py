@@ -9,8 +9,8 @@ from app.core.config import Settings
 from app.core.database import create_database_engine
 from app.core.errors import AppError, DevSeedErrorCode
 from app.core.time import utc_now
-from app.domain.dev_seed import DEV_PROPERTY_NAME, DEV_TENANT_NAME
-from app.domain.resident import ResidentRelationStatus, ResidentRelationType
+from app.domain.dev import DEV_PROPERTY_NAME, DEV_TENANT_NAME
+from app.domain.identity import ResidentRelationStatus, ResidentRelationType
 from app.domain.work_order import (
     DEFAULT_SLA_COMPLETE_MINUTES,
     DEFAULT_SLA_RESPOND_MINUTES,

@@ -27,6 +27,10 @@ dependencies = [
   "orjson==3.10.15",
   "structlog==24.4.0",
   "alibabacloud-dypnsapi20170525==2.0.0",
+  # Voice chain: the ASR adapter only reads 16 kHz mono PCM WAV, so recordings
+  # from the phone (mp3/m4a/webm) are normalised in the app. PyAV's wheel
+  # carries FFmpeg, so the image needs no system codec package.
+  "av==19.0.2",
 ]
 
 [project.optional-dependencies]
@@ -34,6 +38,13 @@ dev = [
   "pytest==8.3.4",
   "pytest-asyncio==0.25.2",
   "pytest-cov==6.0.0",
+]
+# PA-165: optional LangChain tool-orchestration layer for the supervisor agent.
+# Nothing imports these at startup, so a base install keeps working unchanged
+# (`pip install -e "backend[langchain]"` opts in).
+langchain = [
+  "langchain-core==0.3.29",
+  "langchain-openai==0.2.14",
 ]
 
 [build-system]

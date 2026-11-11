@@ -15,13 +15,14 @@ from app.core.config import Settings
 from app.provider.errors import ProviderInvalidOutputError,ProviderUnavailableError
 from app.provider.llm import QwenLLMProvider
 from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
-from app.domain.observed_event import work_order_analysis_response_format
-from app.domain.vision import VISION_ANALYSIS_PROMPT_VERSION, vision_analysis_response_format
+from app.domain.knowledge import RAG_ANSWER_PROMPT_VERSION
+from app.domain.ai import work_order_analysis_response_format
+from app.domain.work_order import VISION_ANALYSIS_PROMPT_VERSION, vision_analysis_response_format
 from app.provider.vector import MilvusKnowledgeStore
 from app.service.retrieval import RetrievalService
 
 ROOT=Path(__file__).resolve().parents[3]
-spec=importlib.util.spec_from_file_location('local_ai_http_027',ROOT/'scripts/ops/local_ai_http.py')
+spec=importlib.util.spec_from_file_location('local_ai_http_027',ROOT/'backend/app/provider/local_ai/runtime_control.py')
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 
 
@@ -32,7 +33,7 @@ def _load_adapter_candidate(monkeypatch, model, runtime_model=None):
     else:
         monkeypatch.setenv('PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL',runtime_model)
     candidate_spec=importlib.util.spec_from_file_location(
-        f'local_ai_http_{model.replace(":", "_")}',ROOT/'scripts/ops/local_ai_http.py'
+        f'local_ai_http_{model.replace(":", "_")}',ROOT/'backend/app/provider/local_ai/runtime_control.py'
     )
     candidate=importlib.util.module_from_spec(candidate_spec)
     candidate_spec.loader.exec_module(candidate)
@@ -549,7 +550,7 @@ def continuation_runner(tmp_path,valid_review=True):
     for i in range(1,30):
         folder=private/f'call-{i:03d}';folder.mkdir()
         m.save(folder/'reservation.json',{'kind':'asr' if i==22 else 'embedding','unix':float(i),'input_hash':input_hash if i==22 else f'input-{i}'})
-        m.save(folder/'result.json',{'status':'FAILED','reason':'RESOURCE_FLOOR'} if i==22 else {'status':'SUCCESS'})
+        m.save(folder/'result.json',{'status':'FAILED','reason':'MODEL_OUTPUT_REJECTED'} if i==22 else {'status':'SUCCESS'})
     reservation=private/'call-022/reservation.json';result=private/'call-022/result.json'
     reservation_hash=hashlib.sha256(reservation.read_bytes()).hexdigest()
     result_hash=hashlib.sha256(result.read_bytes()).hexdigest()
@@ -575,7 +576,7 @@ def test_reviewed_resolution_starts_one_continuation_window_without_new_ledger(t
     assert folder.name=='call-030' and deadline==1900
     assert record['window']=='r2-continuation-01' and record['window_start_unix']==1000
     assert record['replay_of']=='call-022' and record['incremental_max_calls']==1
-    m.save(folder/'result.json',{'status':'FAILED','owned_exit_confirmed':True})
+    m.save(folder/'result.json',{'status':'FAILED','reason':'MODEL_OUTPUT_REJECTED','owned_exit_confirmed':True})
     with pytest.raises(RuntimeError,match='FAILED_INPUT'):
         r.reserve('asr',input_hash)
 
@@ -591,7 +592,7 @@ def test_reviewed_unknown_resolution_unblocks_one_exact_replay_without_continuat
     folder=private/'call-001';folder.mkdir();input_hash='same-work-order-input'
     reservation=folder/'reservation.json';result=folder/'result.json'
     m.save(reservation,{'kind':'qwen','unix':1.,'input_hash':input_hash})
-    m.save(result,{'status':'UNKNOWN','reason':'RESOURCE_FLOOR','owned_exit_confirmed':True,'total_seconds':1.0})
+    m.save(result,{'status':'UNKNOWN','reason':'MODEL_OUTPUT_REJECTED','owned_exit_confirmed':True,'total_seconds':1.0})
     reservation_hash=hashlib.sha256(reservation.read_bytes()).hexdigest()
     result_hash=hashlib.sha256(result.read_bytes()).hexdigest()
     resolution=evidence/'resolution.json'
@@ -611,7 +612,7 @@ def test_reviewed_unknown_resolution_unblocks_one_exact_replay_without_continuat
     replay,_=runner.reserve('qwen',input_hash)
     record=json.loads((replay/'reservation.json').read_text())
     assert replay.name=='call-002' and record['replay_of']=='call-001'
-    m.save(replay/'result.json',{'status':'FAILED','owned_exit_confirmed':True})
+    m.save(replay/'result.json',{'status':'FAILED','reason':'MODEL_OUTPUT_REJECTED','owned_exit_confirmed':True})
     with pytest.raises(RuntimeError,match='FAILED_INPUT'):
         runner.reserve('qwen',input_hash)
 
@@ -626,7 +627,7 @@ def test_reviewed_failed_replay_chain_allows_only_the_unconsumed_terminal_once(t
         record={'kind':'qwen','unix':float(number),'input_hash':input_hash}
         if parent:record['replay_of']=parent
         m.save(reservation,record)
-        m.save(result,{'status':'FAILED','reason':'REMOTE_CLIENT_FAILED','owned_exit_confirmed':True,'total_seconds':1.0})
+        m.save(result,{'status':'FAILED','reason':'MODEL_OUTPUT_REJECTED','owned_exit_confirmed':True,'total_seconds':1.0})
         reservation_hash=hashlib.sha256(reservation.read_bytes()).hexdigest()
         result_hash=hashlib.sha256(result.read_bytes()).hexdigest()
         resolution=evidence/f'resolution-{number}.json'
@@ -645,7 +646,7 @@ def test_reviewed_failed_replay_chain_allows_only_the_unconsumed_terminal_once(t
     replay,_=runner.reserve('qwen',input_hash)
     replay_record=json.loads((replay/'reservation.json').read_text())
     assert replay.name=='call-003' and replay_record['replay_of']=='call-002'
-    m.save(replay/'result.json',{'status':'FAILED','owned_exit_confirmed':True,'total_seconds':1.0})
+    m.save(replay/'result.json',{'status':'FAILED','reason':'MODEL_OUTPUT_REJECTED','owned_exit_confirmed':True,'total_seconds':1.0})
     with pytest.raises(RuntimeError,match='FAILED_INPUT'):
         runner.reserve('qwen',input_hash)
 
@@ -654,9 +655,9 @@ def test_reviewed_replay_chain_rejects_an_unreviewed_terminal(tmp_path,monkeypat
     private=tmp_path/'run';evidence=tmp_path/'evidence';private.mkdir();evidence.mkdir()
     first=private/'call-001';second=private/'call-002';first.mkdir();second.mkdir();input_hash='chain-with-gap'
     m.save(first/'reservation.json',{'kind':'qwen','unix':1.,'input_hash':input_hash})
-    m.save(first/'result.json',{'status':'FAILED','owned_exit_confirmed':True,'total_seconds':1.})
+    m.save(first/'result.json',{'status':'FAILED','reason':'MODEL_OUTPUT_REJECTED','owned_exit_confirmed':True,'total_seconds':1.})
     m.save(second/'reservation.json',{'kind':'qwen','unix':2.,'input_hash':input_hash,'replay_of':'call-001'})
-    m.save(second/'result.json',{'status':'FAILED','owned_exit_confirmed':True,'total_seconds':1.})
+    m.save(second/'result.json',{'status':'FAILED','reason':'MODEL_OUTPUT_REJECTED','owned_exit_confirmed':True,'total_seconds':1.})
     reservation_hash=hashlib.sha256((first/'reservation.json').read_bytes()).hexdigest()
     result_hash=hashlib.sha256((first/'result.json').read_bytes()).hexdigest();resolution=evidence/'resolution.json'
     m.save(resolution,{'record':'call-001','original':{'status':'FAILED','historical_immediate_exit_confirmed':'UNKNOWN',
@@ -721,7 +722,7 @@ def test_cpu_guard_waits_without_call_and_keeps_threshold(tmp_path,monkeypatch):
     r=runner(tmp_path);samples=iter([7600,8191,8192]);sleeps=[]
     monkeypatch.setattr(m,'ram',lambda:next(samples))
     monkeypatch.setattr(m.time,'sleep',lambda seconds:sleeps.append(seconds))
-    def reserved(kind,input_hash):raise RuntimeError('REACHED_RESERVATION')
+    def reserved(kind,input_hash,force_retry=None):raise RuntimeError('REACHED_RESERVATION')
     monkeypatch.setattr(r,'reserve',reserved)
     with pytest.raises(RuntimeError,match='REACHED_RESERVATION'):
         r.run('embedding',['测试'])
@@ -760,10 +761,14 @@ def test_unknown_or_legacy_unproved_failure_blocks_all_new_inputs(tmp_path,recor
     assert len(list(r.private.glob('call-*')))==1
 
 
-@pytest.mark.parametrize('kind,cleanup_fails,remote_stops,expected',[
-    ('embedding',False,False,'FAILED'),('embedding',True,False,'UNKNOWN'),
-    ('qwen',False,False,'UNKNOWN'),('qwen',False,True,'FAILED')])
-def test_resource_stop_confirms_job_or_persists_unknown(tmp_path,monkeypatch,kind,cleanup_fails,remote_stops,expected):
+# PA-131: a resource floor is no longer a reason to stop the shared runtime, so
+# the qwen rows assert that no stop is attempted and that an owned child which
+# is confirmed gone counts as a known state (LEFT_RUNNING) instead of UNKNOWN.
+@pytest.mark.parametrize('kind,cleanup_fails,remote_stops,expected,completion',[
+    ('embedding',False,False,'FAILED','NOT_UNKNOWN'),('embedding',True,False,'UNKNOWN','UNKNOWN'),
+    ('qwen',False,False,'FAILED','LEFT_RUNNING'),('qwen',False,True,'FAILED','LEFT_RUNNING'),
+    ('qwen',True,False,'UNKNOWN','UNKNOWN')])
+def test_resource_stop_confirms_job_or_persists_unknown(tmp_path,monkeypatch,kind,cleanup_fails,remote_stops,expected,completion):
     r=runner(tmp_path);r.config['bge_python']='dummy-not-executed';started=[False];terminated=[]
     if kind=='qwen':
         r.runtime_binding={'pid':42,'executable':'fixed','launched_at_utc':'fixed'}
@@ -783,7 +788,9 @@ def test_resource_stop_confirms_job_or_persists_unknown(tmp_path,monkeypatch,kin
     monkeypatch.setattr(m,'qwen_guard',lambda:None);monkeypatch.setattr(m,'validate',lambda *a:None)
     monkeypatch.setattr(m,'ram',lambda:1000 if started[0] else 10000)
     monkeypatch.setattr(m,'gpu',lambda:7000);monkeypatch.setattr(m.time,'sleep',lambda n:None)
+    stop_calls=[]
     def stop_runtime(*args,**kwargs):
+        stop_calls.append(True)
         if not remote_stops:raise RuntimeError('stop failed')
         return {'stopped':{'tree_exit_confirmed':True,'listener_exit_confirmed':True}}
     monkeypatch.setattr(m,'terminate_bound_runtime',stop_runtime)
@@ -792,7 +799,9 @@ def test_resource_stop_confirms_job_or_persists_unknown(tmp_path,monkeypatch,kin
     assert saved['status']==expected and terminated==[True]
     assert saved['owned_exit_confirmed'] is (not cleanup_fails)
     if kind=='qwen':
-        assert saved['remote_completion']==('CONTROLLED_STOP' if remote_stops else 'UNKNOWN')
+        assert stop_calls==[], 'RESOURCE_FLOOR must not stop the shared runtime'
+        assert saved['remote_completion']==completion
+        assert saved['remote_stop'] is None
     if expected=='UNKNOWN':
         with pytest.raises(RuntimeError,match='COMPLETION_UNKNOWN'):m.Runner(r.path).reserve('reranker','different')
 
@@ -829,7 +838,7 @@ def test_real_provider_marks_prompt_and_rejects_truncation():
     assert seen[0].headers['X-Prompt-Version']=='rag-answer-v2'
 
 def test_rag_prompt_states_real_output_contract_not_fake_provider_assumption():
-    prompt=RetrievalService._prompt('领取时间？',(SimpleNamespace(id=7,source_locator='规则#1',excerpt='领取时间为下午三点。'),))
+    prompt=RetrievalService._prompt('领取时间？',(SimpleNamespace(id=7,source_locator='规则#1',excerpt='领取时间为下午三点。'),),prompt_version=RAG_ANSWER_PROMPT_VERSION)
     assert all(s in prompt for s in ('status, answer, citation_chunk_ids','simplified Chinese','chunk-id:7','下午三点'))
 
 @pytest.mark.parametrize('drift',['dim','metric','revision'])

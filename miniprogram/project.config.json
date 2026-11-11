@@ -1,7 +1,7 @@
 {
   "miniprogramRoot": "./",
   "projectname": "property-ai",
-  "appid": "touristappid",
+  "appid": "wxcfa5fd7dc03cac56",
   "compileType": "miniprogram",
   "setting": {
     "es6": true,

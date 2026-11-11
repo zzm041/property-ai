@@ -64,7 +64,7 @@ TLS 私钥只放主机 `/etc/nginx/certs/privkey.pem`，仓库只有 `deploy/ngi
 
 1. Infrastructure：MySQL、Redis、RabbitMQ、etcd、MinIO、Milvus
 2. Verify MySQL：`mysqladmin ping`，确认目标库为空或已备份
-3. `cd backend && alembic heads` 核对交付版本的迁移目标，再在已确认空库或已备份的目标库执行 `alembic upgrade head`。当前源码单一 head 为 `20261003_0015_work_order_media_cycle_links`；升级后 `alembic current` 必须与该交付版本一致。
+3. `cd backend && alembic heads` 核对交付版本的迁移目标，再在已确认空库或已备份的目标库执行 `alembic upgrade head`。当前源码单一 head 为 `20261111_0016_idempotency_key_scope`；升级后 `alembic current` 必须与该交付版本一致。
 4. Start API（不要 migrate，不要 seed）
 5. Start Worker（`-Q property_ai.{env}`）
 6. Start Nginx
@@ -88,7 +88,7 @@ alembic upgrade head
 alembic current
 ```
 
-期望与本交付版本 `alembic heads` 一致；当前为 `20261003_0015_work_order_media_cycle_links`。旧 `20260917_0007` 仅是历史阶段版本，不能作为当前完整部署成功标准。
+期望与本交付版本 `alembic heads` 一致；当前为 `20261111_0016_idempotency_key_scope`。旧 `20260917_0007` 仅是历史阶段版本，不能作为当前完整部署成功标准。
 
 Development 栈继续用 `deploy/docker-compose.yml`。`docker compose down`（无 `-v`）只停容器，保留 `mysql_data`。
 

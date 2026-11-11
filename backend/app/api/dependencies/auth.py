@@ -9,9 +9,9 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from app.core.config import Settings, get_settings
 from app.core.database import get_session_factory
 from app.core.errors import AppError, AuthErrorCode
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.repository.identity import IdentityRepository
-from app.service.auth import AuthService
+from app.service.identity.auth import AuthService
 
 bearer_scheme = HTTPBearer(auto_error=False)
 

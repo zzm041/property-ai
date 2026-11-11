@@ -10,7 +10,7 @@ import pytest
 from app.api.v1.admin_employee import _reject_direct_user_id
 from app.core.config import Settings
 from app.core.errors import AppError, EmployeeErrorCode, IamErrorCode
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.core.passwords import hash_password, verify_password
 from app.core.rate_limit import MemoryRateLimiter, RedisRateLimiter
 from app.core.security import (
@@ -19,7 +19,7 @@ from app.core.security import (
     issue_access_token,
 )
 from app.core.token_hash import keyed_hash
-from app.domain.phone import mask_phone, normalize_phone
+from app.domain.identity import mask_phone, normalize_phone
 from app.provider.sms import DevelopmentSmsProvider
 
 
@@ -140,7 +140,7 @@ def test_wechat_bind_requires_sms_or_password_session() -> None:
 
 def test_wechat_login_issues_refresh_session() -> None:
     source = (
-        Path(__file__).resolve().parents[2] / "app" / "service" / "wechat_auth.py"
+        Path(__file__).resolve().parents[2] / "app" / "service" / "identity" / "wechat_auth.py"
     ).read_text(encoding="utf-8")
     assert "_issue_session" in source
     assert 'auth_method="wechat"' in source
@@ -156,7 +156,7 @@ def test_wechat_token_with_session_decodes() -> None:
 
 def test_otp_failure_is_raised_after_owned_transaction() -> None:
     source = (
-        Path(__file__).resolve().parents[2] / "app" / "service" / "credential_auth.py"
+        Path(__file__).resolve().parents[2] / "app" / "service" / "identity" / "credential_auth.py"
     ).read_text(encoding="utf-8")
     assert "self._raise_otp(otp_status[\"value\"])" in source
     login_pos = source.index("def login_sms")
@@ -366,7 +366,7 @@ def test_new_password_policy_rejects_weak_and_login_does_not_use_it() -> None:
     assert not verify_password(digest, "Goodpass1")
 
     source = (
-        Path(__file__).resolve().parents[2] / "app" / "service" / "credential_auth.py"
+        Path(__file__).resolve().parents[2] / "app" / "service" / "identity" / "credential_auth.py"
     ).read_text(encoding="utf-8")
     login_pos = source.index("def login_password")
     change_pos = source.index("def change_password")
@@ -499,7 +499,7 @@ def test_isolated_auth_guard_rejects_shared_schemas_and_port_only() -> None:
 
 def test_send_sms_requires_server_challenge_and_does_not_return_code() -> None:
     source = (
-        Path(__file__).resolve().parents[2] / "app" / "service" / "credential_auth.py"
+        Path(__file__).resolve().parents[2] / "app" / "service" / "identity" / "credential_auth.py"
     ).read_text(encoding="utf-8")
     send_pos = source.index("def send_sms")
     login_pos = source.index("def login_sms")

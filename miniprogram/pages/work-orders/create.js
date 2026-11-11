@@ -34,6 +34,7 @@ Page({
     contactConfirmed: false,
     fileIds: [],
     mediaHint: "",
+    suggestNote: "",
     recording: false,
     recordingBusy: false,
     recordingHint: "",
@@ -115,7 +116,10 @@ Page({
     wx.navigateTo({ url: "/pages/houses/houses" });
   },
   onText(e) {
-    this.setData({ text: e.detail.value });
+    const text = e.detail.value;
+    // Anything the resident types wins over the suggestion, permanently.
+    this.textEdited = true;
+    this.setData({ text, suggestNote: "" });
   },
   chooseImage() {
     if (this.data.loading || this.data.houseLoading || this.data.recordingBusy) return;
@@ -368,9 +372,38 @@ Page({
             fileIds,
             mediaHint: `已添加 ${fileIds.length} 个附件`,
           });
+          this._suggest(file.id, mimeType);
           if (onUploaded) onUploaded(file);
         })
     ).catch(() => {});
+  },
+  // Pre-fill only: the resident may accept, edit, or ignore the suggestion, and
+  // a failed suggestion must never stop the form from being submitted by hand.
+  _suggest(fileId, mimeType) {
+    const api = require("../../services/api");
+    const attempt = (this.suggestRequest || 0) + 1;
+    this.suggestRequest = attempt;
+    if (!this.unloaded) this.setData({ suggestNote: "正在根据附件生成描述…" });
+    return Promise.resolve(api.suggestWorkOrderDescription([fileId]))
+      .then((data) => {
+        if (this.unloaded || attempt !== this.suggestRequest) return;
+        const text = String((data && data.text) || "").trim();
+        if (!text) {
+          const reason = data && data.reason_code ? `（${data.reason_code}）` : "";
+          this.setData({ suggestNote: `未生成描述${reason}，请手动填写` });
+          return;
+        }
+        if (this.textEdited && this.data.text.trim()) {
+          this.setData({ suggestNote: `AI 建议：${text}` });
+          return;
+        }
+        this.setData({ text, suggestNote: "AI 预填，可修改" });
+      })
+      .catch(() => {
+        if (!this.unloaded && attempt === this.suggestRequest) {
+          this.setData({ suggestNote: "未生成描述，请手动填写" });
+        }
+      });
   },
   async submit() {
     if (this.data.loading || this.data.houseLoading || this.data.recording || this.data.recordingBusy || this.unloaded) return;

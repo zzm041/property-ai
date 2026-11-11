@@ -15,7 +15,7 @@ from app.main import create_app
 from app.model.identity import AuditLog
 from app.repository.identity import IdentityRepository
 from app.service.audit import AuditService
-from app.service.auth import AuthService
+from app.service.identity.auth import AuthService
 from tests.integration.iam_test_data import create_iam_test_graph
 
 TEST_SECRET = "c3-token-audit-secret-that-is-not-production"

@@ -8,7 +8,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from app.core.errors import AppError, EmployeeErrorCode
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.model.employee import Employee, EmployeeProperty
 from app.service.employee import EmployeeService
 

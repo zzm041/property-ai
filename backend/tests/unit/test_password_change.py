@@ -11,11 +11,11 @@ from pydantic import ValidationError
 from app.core.config import Settings
 from app.core.errors import AppError, AuthErrorCode
 from app.core.passwords import hash_password, verify_password
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import ScopeType
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import ScopeType
 from app.repository.credential import CredentialRepository
 from app.schema.auth import PasswordChangeRequest
-from app.service.credential_auth import CredentialAuthService
+from app.service.identity.credential_auth import CredentialAuthService
 
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -23,7 +23,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 def _service(monkeypatch: pytest.MonkeyPatch) -> CredentialAuthService:
     monkeypatch.setattr(
-        "app.service.credential_auth.run_owned_transaction",
+        "app.service.identity.credential_auth.run_owned_transaction",
         lambda _session, operation: operation(),
     )
     service = CredentialAuthService.__new__(CredentialAuthService)

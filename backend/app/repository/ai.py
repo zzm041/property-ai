@@ -1,5 +1,6 @@
 """Persistence helpers for AI analysis, incidents, and announcements."""
 
+from collections.abc import Sequence
 from datetime import datetime
 
 from sqlalchemy import and_, delete, func, or_, select
@@ -111,6 +112,53 @@ class AiRepository:
         self._session.add(record)
         self._session.flush()
         return record
+
+    def quarantined_output_for_content(
+        self,
+        *,
+        content_fingerprint: str,
+        tenant_id: int,
+        error_codes: Sequence[str],
+        since: datetime,
+        property_id: int | None = None,
+    ) -> tuple[datetime, int | None] | None:
+        """When did this report content last produce an unusable answer?
+
+        PA-169 (t150): the lookup runs on ``content_fingerprint`` rather than
+        ``(work_order_id, input_hash)``, because re-filing the same text creates a
+        new work order and therefore a new input hash. One bounded read: it rides
+        ``ix_ai_call_logs_content_fingerprint`` and takes the newest row inside the
+        window, so the caller can report "since when" and "which work order".
+
+        PA-169 (t152/F1): the identity of the *content* must not become a global
+        namespace. The predicate is scoped to ``tenant_id`` (and to ``property_id``
+        when the caller knows it), because otherwise one refusal would silence the
+        same wording for every tenant for a whole day - both a cross-tenant leak and
+        a way to poison a competitor's reports. A caller without a tenant is refused
+        rather than allowed to fall back to the unscoped predicate.
+        """
+
+        if not tenant_id:
+            raise ValueError("quarantine lookup requires a tenant")
+
+        scope = [AiCallLog.tenant_id == tenant_id]
+        if property_id is not None:
+            scope.append(AiCallLog.property_id == property_id)
+
+        row = self._session.execute(
+            select(AiCallLog.created_at, AiCallLog.work_order_id)
+            .where(
+                AiCallLog.content_fingerprint == content_fingerprint,
+                *scope,
+                AiCallLog.error_code.in_(tuple(error_codes)),
+                AiCallLog.created_at >= since,
+            )
+            .order_by(AiCallLog.id.desc())
+            .limit(1)
+        ).first()
+        if row is None:
+            return None
+        return row[0], row[1]
 
     def delete_recommendations(self, analysis_id: int) -> None:
         existing = self._session.scalars(

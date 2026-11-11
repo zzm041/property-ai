@@ -231,7 +231,7 @@ def test_new_resident_supplement_saves_recoverable_source(access):
 
 @pytest.mark.parametrize("tenant,property_id,allowed", [(4, 9, True), (4, 10, False), (5, 9, False)])
 def test_dual_role_property_view_uses_actual_scope(access, tenant, property_id, allowed):
-    from app.domain.iam import Principal, RoleGrant, OrganizationScope, ScopeType
+    from app.domain.identity import Principal, RoleGrant, OrganizationScope, ScopeType
     s, _ = access
     actor = Principal(7, "ACTIVE", "synthetic", (
         RoleGrant("PROPERTY_ADMIN", OrganizationScope(ScopeType.PROPERTY, tenant, property_id),

@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 from app.api.dependencies.auth import get_current_principal
 from app.api.v1.supervisor_work_orders import router, get_work_order_service
 from app.core.errors import AppError
-from app.domain.iam import Principal, RoleGrant, OrganizationScope, ScopeType
+from app.domain.identity import Principal, RoleGrant, OrganizationScope, ScopeType
 from app.domain.work_order import WorkOrderStatus
 from app.service.work_order import WorkOrderService
 

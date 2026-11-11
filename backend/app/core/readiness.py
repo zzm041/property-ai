@@ -69,6 +69,33 @@ def probe_rabbitmq(settings: Settings) -> None:
         )
 
 
+def queue_depth(settings: Settings) -> int | None:
+    """Pending messages on the analysis queue, or None when it is unreachable.
+
+    PA-104-D: a degraded broker used to be invisible (readyz said 200/degraded
+    with no depth anywhere). Depth is published next to the probe result so a
+    backlog is observable without opening RabbitMQ.
+    """
+
+    try:
+        with Connection(
+            settings.celery_broker_url,
+            connect_timeout=settings.readiness_timeout_seconds,
+        ) as connection:
+            queue = connection.default_channel.queue_declare(
+                queue=settings.resolved_celery_queue,
+                passive=True,
+            )
+            return int(queue.message_count)
+    except Exception as exc:  # noqa: BLE001 - dependency clients raise many families
+        logger.warning(
+            "queue_depth_unavailable",
+            queue=settings.resolved_celery_queue,
+            error_type=type(exc).__name__,
+        )
+        return None
+
+
 def _run_probe(name: str, critical: bool, probe: Probe | object, settings: Settings) -> dict[str, Any]:
     if probe is NOT_CHECKED:
         return {
@@ -108,13 +135,18 @@ def _run_probe(name: str, critical: bool, probe: Probe | object, settings: Setti
 def check_readiness(
     settings: Settings,
     probes: dict[str, tuple[bool, Any]] | None = None,
+    *,
+    include_queue: bool = True,
 ) -> tuple[dict[str, Any], int]:
     """Return dependency details and the HTTP status dictated by criticality."""
 
     selected_probes = probes or {
         "mysql": (True, probe_mysql),
-        "redis": (False, probe_redis),
-        "rabbitmq": (False, probe_rabbitmq),
+        # PA-104-D: the analysis queue and its cache are on the business path.
+        # While they were non-critical the endpoint answered 200/degraded, so a
+        # load balancer kept routing to an instance that could not enqueue work.
+        "redis": (True, probe_redis),
+        "rabbitmq": (True, probe_rabbitmq),
         "llm": (False, NOT_CHECKED),
         "vlm": (False, NOT_CHECKED),
         "asr": (False, NOT_CHECKED),
@@ -137,14 +169,36 @@ def check_readiness(
     )
     any_down = any(result["status"] == "down" for result in dependencies.values())
 
+    media_pipeline = settings.media_pipeline()
+    # D6: an unacknowledged demo scanner is a real gap in the media chain, so it
+    # degrades readiness instead of being reported as a healthy pipeline.
+    media_gap = bool(media_pipeline.get("demo_stub_unacknowledged"))
+
     if critical_down:
         status = "not_ready"
         http_status = 503
-    elif any_down:
+    elif any_down or media_gap:
         status = "degraded"
         http_status = 200
     else:
         status = "ready"
         http_status = 200
 
-    return {"status": status, "dependencies": dependencies}, http_status
+    return {
+        "status": status,
+        # PA-117: a missing work-order credential used to be invisible until the
+        # first analysis call failed; readiness now states it. Secrets are not
+        # included, and the overall status is untouched: api/beat/publisher never
+        # call the model, so degrading their readiness would be a false alarm.
+        "ai_credentials": settings.ai_credentials(),
+        # PA-163: with no scanner configured media can never become usable, and the
+        # only symptom used to be an empty description suggestion. Report the cause.
+        # D6: the development stub is reported as `demo_stub` (unverified media),
+        # never as a scanned pipeline.
+        "media_pipeline": media_pipeline,
+        "dependencies": dependencies,
+        "queue": {
+            "name": settings.resolved_celery_queue,
+            "depth": queue_depth(settings) if include_queue else None,
+        },
+    }, http_status

@@ -11,12 +11,12 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings
 from app.core.database import get_session_factory
 from app.core.errors import AppError, IamErrorCode
-from app.domain.audit import AuditAction
-from app.domain.iam import OrganizationScope, ScopeType
+from app.domain.governance import AuditAction
+from app.domain.identity import OrganizationScope, ScopeType
 from app.model.identity import AuditLog, RolePermission, UserRole
 from app.repository.rbac_mutation import RbacMutationRepository
 from app.service.audit import AuditService
-from app.service.rbac_mutation import RbacMutationService
+from app.service.identity.rbac_mutation import RbacMutationService
 from tests.integration.rbac_mutation_test_data import (
     RbacMutationGraph,
     create_rbac_mutation_graph,

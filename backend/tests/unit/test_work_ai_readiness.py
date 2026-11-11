@@ -21,7 +21,7 @@ def helper():
 def probe():
     digest = hashlib.sha256(b'synthetic-local-token-for-test-only').hexdigest()
     return {'provider': 'production', 'base_url': 'http://host.docker.internal:11437/v1',
-            'model': 'qwen38-27b-q3km-g55:7af3b8f', 'key_present': True, 'key_sha256': digest}
+            'model': 'qwen3.5:4b', 'key_present': True, 'key_sha256': digest}
 
 
 def test_wo23_missing_credential_is_rejected_before_phone_entry():

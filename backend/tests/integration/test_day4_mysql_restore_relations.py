@@ -9,7 +9,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.repository.identity import IdentityRepository
-from app.service.auth import AuthService
+from app.service.identity.auth import AuthService
 from app.service.employee import EmployeeService
 from app.service.work_order import WorkOrderService
 from tests.integration.test_day3_backup_restore import (
@@ -46,6 +46,7 @@ def test_mysql_restore_preserves_relations_orders_and_audit(
     created = WorkOrderService(identity_session).create_work_order(
         actor=principal,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
         request_id="d4-restore-wo",
         idempotency_key=str(uuid4()),
         text="Restore drill work order",

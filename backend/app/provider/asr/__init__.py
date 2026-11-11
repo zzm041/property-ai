@@ -7,6 +7,8 @@ import json
 
 import httpx
 
+from app.core.logging import get_logger
+from app.provider.asr.pcm import PCM_SAMPLE_RATE, to_pcm_wav
 from app.provider.errors import (
     ProviderInvalidOutputError,
     ProviderTimeoutError,
@@ -15,6 +17,8 @@ from app.provider.errors import (
 from app.provider.http import request_json
 from app.provider.storage import StorageProvider
 from app.provider.usage import response_token_usage
+
+logger = get_logger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -95,14 +99,24 @@ class HttpASRProvider:
         if not self.base_url or not self._api_key:
             raise ProviderUnavailableError("ASR is unavailable")
         content = self._storage.get_object(storage_key)
-        extension = mime_type.split("/", 1)[-1] or "bin"
+        # The adapter only reads PCM WAV; phones record mp3/m4a/webm.
+        audio = to_pcm_wav(content, mime_type)
+        if audio.transcoded:
+            logger.info(
+                "asr_audio_transcoded",
+                source_mime_type=mime_type,
+                source_bytes=audio.source_bytes,
+                pcm_bytes=len(audio.content),
+                duration_seconds=round(audio.duration_seconds, 3),
+                sample_rate=PCM_SAMPLE_RATE,
+            )
         payload = request_json(
             method="POST",
             url=f"{self.base_url}/audio/transcriptions",
             timeout_seconds=self.timeout_seconds,
             headers={"Authorization": f"Bearer {self._api_key}"},
             data={"model": self.model},
-            files={"file": (f"audio.{extension}", content, mime_type)},
+            files={"file": ("audio.wav", audio.content, "audio/wav")},
             client=self._client,
             provider="asr",
             operation="transcribe",

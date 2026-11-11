@@ -7,9 +7,9 @@ import pytest
 from pydantic import ValidationError
 
 from app.core.config import Settings
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.iam import OrganizationScope, ScopeType
-from app.domain.observed_event import (
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.identity import OrganizationScope, ScopeType
+from app.domain.ai import (
     ObservedAnalysisOutput,
     bind_observations,
     build_evidence_catalog,
@@ -44,6 +44,13 @@ def bind(value, *, report=None, asr=None, vision=None):
 def saved_case(relative_path, case_id):
     record = json.loads((Path(__file__).resolve().parents[3] / relative_path).read_text(encoding="utf-8"))
     return next(row for row in record["results"] if row["id"] == case_id)
+
+
+FIXTURE_DIR = Path(__file__).resolve().parents[1] / "fixtures/observed_event_027"
+# t145: the original artifact lives under reports/real-ai-integration-027/, which
+# is not part of the repository, so a clean clone failed this test. The fixture
+# keeps the one row the test reads (id + raw_payload) and nothing else.
+LEGACY_QUOTE_FIXTURE = FIXTURE_DIR / "r3-9b-candidate-02-photo-002.json"
 
 
 def test_server_builds_stable_current_source_ids_without_history():
@@ -531,7 +538,7 @@ def test_visible_pooled_water_uses_existing_water_stain_event():
 
 
 def test_old_model_authored_quote_protocol_is_not_silently_rewritten():
-    record = json.loads((Path(__file__).resolve().parents[3] / "reports/real-ai-integration-027/diagnostic-r3-9b/candidate-02/fixed.json").read_text(encoding="utf-8"))
+    record = json.loads(LEGACY_QUOTE_FIXTURE.read_text(encoding="utf-8"))
     original = next(row for row in record["results"] if row["id"] == "PHOTO-002")["raw_payload"]
     with pytest.raises(ValidationError):
         ObservedAnalysisOutput.model_validate(original)

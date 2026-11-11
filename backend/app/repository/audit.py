@@ -5,7 +5,7 @@ from collections.abc import Sequence
 from sqlalchemy import Select, select
 from sqlalchemy.orm import Session
 
-from app.domain.iam import OrganizationScope, ScopeType
+from app.domain.identity import OrganizationScope, ScopeType
 from app.model.identity import AuditLog
 
 

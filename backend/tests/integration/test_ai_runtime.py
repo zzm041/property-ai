@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import Settings
 from app.core.errors import IamErrorCode
-from app.domain.audit import AuditAction
+from app.domain.governance import AuditAction
 from app.main import create_app
 from app.model.ai import AiCallLog, DispatchRecommendation, Incident, WorkOrderAnalysis
 from app.model.identity import AuditLog
@@ -18,7 +18,7 @@ from app.provider.llm import DevelopmentLLMProvider
 from app.provider.vision import DevelopmentVLMProvider
 from app.repository.identity import IdentityRepository
 from app.service.analysis import AnalysisService
-from app.service.auth import AuthService
+from app.service.identity.auth import AuthService
 from app.service.employee import EmployeeService
 from app.service.work_order import WorkOrderService
 from tests.integration.conftest import commit_open_transaction
@@ -77,15 +77,16 @@ def _create_work_order(
     *,
     user_id: int,
     house_id: int,
+    contact_phone: str = "13800000000",
     text: str = "Kitchen outlet is sparking",
     file_ids: tuple[int, ...] = (),
 ) -> WorkOrder:
     return WorkOrderService(session, settings=_settings()).create_work_order(
         actor=_principal(session, user_id),
         house_id=house_id,
+        contact_phone=contact_phone,
         request_id=f"t7-create-{uuid4().hex[:12]}",
         idempotency_key=f"t7-{uuid4()}",
-        contact_phone="13800000000",
         text=text,
         file_ids=file_ids,
     )
@@ -110,6 +111,7 @@ def test_successful_analysis_advances_to_pending_assignment(identity_session: Se
         identity_session,
         user_id=graph.employees.resident_id,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
     )
     assert record.status == "PENDING_ANALYSIS"
     analysis = _analyze(identity_session, record.id)
@@ -136,6 +138,7 @@ def test_create_does_not_fail_when_llm_times_out(identity_session: Session) -> N
         identity_session,
         user_id=graph.employees.resident_id,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
     )
     settings = _settings(llm_provider_behavior="timeout")
     analysis = AnalysisService(
@@ -157,6 +160,7 @@ def test_invalid_llm_output_does_not_mutate_work_order(identity_session: Session
         identity_session,
         user_id=graph.employees.resident_id,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
     )
     analysis = AnalysisService(
         identity_session,
@@ -176,6 +180,7 @@ def test_low_confidence_keeps_manual_queue(identity_session: Session) -> None:
         identity_session,
         user_id=graph.employees.resident_id,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
     )
     analysis = AnalysisService(
         identity_session,
@@ -194,6 +199,7 @@ def test_duplicate_analysis_is_idempotent(identity_session: Session) -> None:
         identity_session,
         user_id=graph.employees.resident_id,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
     )
     first = _analyze(identity_session, record.id)
     second = _analyze(identity_session, record.id)
@@ -211,6 +217,7 @@ def test_stale_result_does_not_override_human_cancel(identity_session: Session) 
         identity_session,
         user_id=graph.employees.resident_id,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
     )
     WorkOrderService(identity_session).cancel(
         actor=_principal(identity_session, graph.employees.resident_id),
@@ -244,6 +251,7 @@ def test_asr_failure_still_creates_and_analyzes_text(identity_session: Session) 
     record = service.create_work_order(
         actor=actor,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
         request_id="t7-create-audio",
         idempotency_key=f"t7-{uuid4()}",
         text="Sparking outlet",
@@ -284,6 +292,7 @@ def test_vlm_failure_does_not_block_llm_analysis(identity_session: Session) -> N
     record = service.create_work_order(
         actor=actor,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
         request_id="t7-create-image",
         idempotency_key=f"t7-{uuid4()}",
         text="Sparking outlet",
@@ -309,6 +318,7 @@ def test_supervisor_can_assign_after_ai_failure(identity_session: Session) -> No
         identity_session,
         user_id=graph.employees.resident_id,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
     )
     AnalysisService(
         identity_session,
@@ -344,6 +354,7 @@ def test_human_override_records_recommendation_difference(
         identity_session,
         user_id=graph.employees.resident_id,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
     )
     _analyze(identity_session, record.id)
     assigned = WorkOrderService(identity_session).assign(
@@ -365,17 +376,20 @@ def test_incident_aggregates_same_property_only(identity_session: Session) -> No
         identity_session,
         user_id=graph.employees.resident_id,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
         text="Spark 1",
     )
     second = _create_work_order(
         identity_session,
         user_id=graph.employees.resident_id,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
         text="Spark 2",
     )
     other = WorkOrderService(identity_session, settings=_settings()).create_work_order(
         actor=_principal(identity_session, graph.resident_b_id),
         house_id=graph.house_2_id,
+        contact_phone="13800000000",
         request_id="t7-create-p2",
         idempotency_key=f"t7-{uuid4()}",
         text="Spark other property",
@@ -402,12 +416,14 @@ def test_mysql_rejects_cross_scope_incident_work_order(
         identity_session,
         user_id=graph.employees.resident_id,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
         text="Spark 1",
     )
     second = _create_work_order(
         identity_session,
         user_id=graph.employees.resident_id,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
         text="Spark 2",
     )
     _analyze(identity_session, first.id)
@@ -416,6 +432,7 @@ def test_mysql_rejects_cross_scope_incident_work_order(
     other = WorkOrderService(identity_session, settings=_settings()).create_work_order(
         actor=_principal(identity_session, graph.resident_b_id),
         house_id=graph.house_2_id,
+        contact_phone="13800000000",
         request_id="t7-cross",
         idempotency_key=f"t7-{uuid4()}",
         text="Other property",
@@ -512,6 +529,7 @@ def test_ai_call_log_has_no_secrets(identity_session: Session) -> None:
         identity_session,
         user_id=graph.employees.resident_id,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
     )
     _analyze(identity_session, record.id)
     logs = identity_session.scalars(select(AiCallLog)).all()
@@ -528,6 +546,7 @@ def test_system_admin_cannot_read_analysis(identity_session: Session) -> None:
         identity_session,
         user_id=graph.employees.resident_id,
         house_id=graph.house_1_id,
+        contact_phone="13800000000",
     )
     _analyze(identity_session, record.id)
     client = _client()

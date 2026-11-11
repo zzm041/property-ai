@@ -10,7 +10,7 @@ from sqlalchemy.dialects import mysql
 
 from app.core.errors import AiErrorCode, AppError, IamErrorCode, IncidentErrorCode
 from app.domain.ai import INCIDENT_MANAGE, INCIDENT_READ
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.provider.errors import ProviderTimeoutError
 from app.repository.ai import AiRepository
 from app.service.incident import IncidentService

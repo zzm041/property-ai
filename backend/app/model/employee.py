@@ -10,6 +10,7 @@ from sqlalchemy import (
     ForeignKey,
     ForeignKeyConstraint,
     Index,
+    Integer,
     SmallInteger,
     String,
     UniqueConstraint,
@@ -497,13 +498,13 @@ class EmployeeInvite(BigIntPrimaryKeyMixin, TimestampMixin, Base):
     )
     expires_at: Mapped[datetime] = mapped_column(UTCDateTime(), nullable=False)
     attempts: Mapped[int] = mapped_column(
-        SmallInteger,
+        Integer,
         nullable=False,
         default=0,
         server_default=text("0"),
     )
     max_attempts: Mapped[int] = mapped_column(
-        SmallInteger,
+        Integer,
         nullable=False,
         default=5,
         server_default=text("5"),

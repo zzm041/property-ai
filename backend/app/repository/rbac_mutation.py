@@ -3,7 +3,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.domain.iam import OrganizationScope
+from app.domain.identity import OrganizationScope
 from app.model.identity import Permission, Role, RolePermission, User, UserRole
 
 _BINARY_COLLATION = "utf8mb4_bin"

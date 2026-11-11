@@ -6,14 +6,14 @@ import re
 from sqlalchemy.orm import Session
 
 from app.core.errors import AppError, AuditErrorCode
-from app.domain.audit import (
+from app.domain.governance import (
     AUDIT_ACTION_POLICIES,
     AuditAction,
     AuditEvent,
     AuditResourceType,
     AuditSource,
 )
-from app.domain.iam import OrganizationScope, ScopeType
+from app.domain.identity import OrganizationScope, ScopeType
 from app.model.identity import AuditLog
 from app.repository.audit import AuditRepository
 

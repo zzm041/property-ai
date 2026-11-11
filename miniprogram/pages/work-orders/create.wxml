@@ -13,6 +13,7 @@
   <button class="btn btn-secondary btn-compact" bindtap="manageHouses" disabled="{{loading || houseLoading || recordingBusy}}">我的房屋 / 申请绑定</button>
   <view wx:if="{{selectedHouseLabel}}">报修地址：{{selectedHouseLabel}}</view>
   <textarea id="work-order-description" placeholder="报修说明" value="{{text}}" bindinput="onText" disabled="{{loading}}"></textarea>
+  <view id="work-order-suggestion" class="empty" wx:if="{{suggestNote}}">{{suggestNote}}</view>
   <view>本次联系电话（必填）</view>
   <input id="work-order-contact" value="{{contactPhone}}" bindinput="onContact" maxlength="40" disabled="{{loading}}" placeholder="手机号，或 +国家区号 的固定/移动电话" />
   <view class="empty">默认本人当前手机号，可改为本次实际联系号码。不会修改登录号码。</view>

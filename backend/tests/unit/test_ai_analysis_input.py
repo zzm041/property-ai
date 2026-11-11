@@ -18,7 +18,7 @@ from app.provider.usage import StructuredCompletion, response_token_usage
 from app.provider.vision import VisionInsight, QwenVLMProvider
 from app.repository.ai import AiRepository
 from app.service.analysis import AnalysisService, AnalysisSnapshot, MediaRef
-from app.service.analysis_attempt import media_checkpoint_payload, read_media_checkpoint
+from app.service.work_order.analysis_attempt import media_checkpoint_payload, read_media_checkpoint
 
 NOW = datetime(2026, 9, 23, tzinfo=UTC)
 
@@ -36,6 +36,20 @@ def test_usage_only_retains_measured_nonnegative_database_safe_integer(usage, ex
     assert response_token_usage({'usage': usage}) == expected
 
 
+def _pcm_wav(seconds: float = 0.1) -> bytes:
+    """A 16 kHz mono s16 WAV, the shape the ASR adapter accepts unchanged."""
+    import io
+    import wave
+
+    buffer = io.BytesIO()
+    with wave.open(buffer, "wb") as handle:
+        handle.setnchannels(1)
+        handle.setsampwidth(2)
+        handle.setframerate(16000)
+        handle.writeframes(b"\x00\x00" * int(16000 * seconds))
+    return buffer.getvalue()
+
+
 @pytest.mark.parametrize('kind', ['llm', 'vlm', 'asr'])
 def test_adapter_preserves_usage_without_polluting_structured_output(kind):
     def handler(request):
@@ -45,7 +59,9 @@ def test_adapter_preserves_usage_without_polluting_structured_output(kind):
         return httpx.Response(200, json={'choices': [{'message': {'content': json.dumps(value)}}], 'usage': {'total_tokens': 12}})
     args = {'base_url': 'https://operator.invalid/v1', 'model': 'candidate', 'api_key': 'synthetic-unit-key', 'timeout_seconds': 1, 'client': httpx.Client(transport=httpx.MockTransport(handler))}
     storage = MagicMock()
-    storage.get_object.return_value = b'synthetic bytes'
+    # The ASR adapter only accepts PCM, so the fake storage returns a real
+    # 16 kHz mono s16 WAV instead of arbitrary bytes.
+    storage.get_object.return_value = _pcm_wav() if kind == 'asr' else b'synthetic bytes'
     if kind == 'llm':
         result = QwenLLMProvider(**args).structured_completion(prompt='x', prompt_version=WORK_ORDER_ANALYSIS_PROMPT_VERSION)
         assert dict(result) == SUCCESS_ANALYSIS
@@ -54,7 +70,7 @@ def test_adapter_preserves_usage_without_polluting_structured_output(kind):
         result = QwenVLMProvider(**args, storage=storage).inspect_image(storage_key='authorized-key', mime_type='image/png')
         storage.get_object.assert_called_once_with('authorized-key')
     else:
-        result = HttpASRProvider(**args, storage=storage).transcribe(storage_key='authorized-key', mime_type='audio/mpeg')
+        result = HttpASRProvider(**args, storage=storage).transcribe(storage_key='authorized-key', mime_type='audio/wav')
     assert result.token_usage == 12
 
 
@@ -337,7 +353,7 @@ def test_missing_scoped_house_does_not_query_other_relations_or_history():
 
 
 def test_call_log_uses_existing_column_and_never_invents_missing_usage(monkeypatch):
-    monkeypatch.setattr('app.service.analysis.begin_owned_transaction', lambda _: nullcontext())
+    monkeypatch.setattr('app.service.analysis.context.begin_owned_transaction', lambda _: nullcontext())
     s = service()
     s._ai = MagicMock()
     s._write_provider_mode = MagicMock()
@@ -348,7 +364,7 @@ def test_call_log_uses_existing_column_and_never_invents_missing_usage(monkeypat
 
 
 def test_retry_of_old_failed_analysis_updates_prompt_provenance_and_context_hash(monkeypatch):
-    monkeypatch.setattr('app.service.analysis.begin_owned_transaction', lambda _: nullcontext())
+    monkeypatch.setattr('app.service.analysis.context.begin_owned_transaction', lambda _: nullcontext())
     s = service()
     s._session.info = {}  # This direct legacy prepare fixture has no durable lease.
     s._work_orders = MagicMock()

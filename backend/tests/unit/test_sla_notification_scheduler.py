@@ -15,7 +15,7 @@ from app.service.notification import (
     NotificationService,
     delivery_retry_delay_seconds,
 )
-from app.service.sla import (
+from app.service.work_order.sla import (
     SlaService,
     reset_assignment_sla_deadlines,
     reset_response_sla_deadline,
@@ -94,7 +94,7 @@ def test_sla_warning_then_overdue_is_idempotent(monkeypatch) -> None:
     )
     repository = _SlaRepository(clock, work_order)
     _Notifier.calls = []
-    monkeypatch.setattr("app.service.sla.NotificationService", _Notifier)
+    monkeypatch.setattr("app.service.work_order.sla.NotificationService", _Notifier)
     service = SlaService(_session(), repository=repository)
 
     warning = service.sweep_due(now=now)
@@ -144,7 +144,7 @@ def test_sla_sweep_stops_terminal_order_without_notification(monkeypatch) -> Non
     )
     repository = _SlaRepository(clock, work_order)
     _Notifier.calls = []
-    monkeypatch.setattr("app.service.sla.NotificationService", _Notifier)
+    monkeypatch.setattr("app.service.work_order.sla.NotificationService", _Notifier)
 
     result = SlaService(_session(), repository=repository).sweep_due(now=now)
 
@@ -197,7 +197,7 @@ def test_assignment_accept_timeout_releases_load_and_enqueues_once(monkeypatch) 
     employee_repository.get_daily_status_for_update.return_value = daily
     audit = MagicMock()
     _Notifier.calls = []
-    monkeypatch.setattr("app.service.sla.NotificationService", _Notifier)
+    monkeypatch.setattr("app.service.work_order.sla.NotificationService", _Notifier)
     service = SlaService(
         _session(),
         repository=repository,
@@ -269,7 +269,7 @@ def test_response_timeout_escalates_once_without_reassignment(monkeypatch) -> No
     repository.list_sla_management_user_ids.return_value = (20, 21)
     repository.get_active_assignee_user_id.return_value = 21
     _Notifier.calls = []
-    monkeypatch.setattr("app.service.sla.NotificationService", _Notifier)
+    monkeypatch.setattr("app.service.work_order.sla.NotificationService", _Notifier)
     service = SlaService(_session(), repository=repository)
 
     first = service.sweep_assignment_deadlines(now=now)
@@ -429,7 +429,7 @@ def test_response_escalation_waits_for_versioned_grace(monkeypatch) -> None:
     repository.list_sla_management_user_ids.return_value = (20,)
     repository.get_active_assignee_user_id.return_value = None
     _Notifier.calls = []
-    monkeypatch.setattr("app.service.sla.NotificationService", _Notifier)
+    monkeypatch.setattr("app.service.work_order.sla.NotificationService", _Notifier)
     service = SlaService(_session(), repository=repository)
 
     assert service._escalate_response_timeout(

@@ -9,7 +9,7 @@ import pytest
 from sqlalchemy.dialects import mysql
 
 from app.repository.property import PropertyRepository
-from app.service.resident import ResidentBindingService
+from app.service.identity.resident import ResidentBindingService
 
 ROOT = Path(__file__).resolve().parents[3]
 SCRIPT = r'''

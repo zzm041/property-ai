@@ -9,7 +9,7 @@ from pydantic import ValidationError
 from app.core.errors import AppError
 from app.domain.work_order import WorkOrderActorType
 from app.schema.work_order import StaffReceiptRequest
-from app.service.rbac import RbacService
+from app.service.identity.rbac import RbacService
 from app.service.work_order import WorkOrderService
 
 BASE=dict(problem_type='PLUMBING',method='synthetic repair',resolved=True)

@@ -3,7 +3,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from app.domain.observed_event import build_evidence_catalog
+from app.domain.ai import build_evidence_catalog
 from app.service.analysis import AnalysisService
 
 
@@ -90,11 +90,11 @@ def test_new_request_version_changes_hash_and_same_version_is_stable(monkeypatch
     from app.domain.ai import WORK_ORDER_ANALYSIS_PROMPT_VERSION
     from app.model.work_order import WorkOrder
 
-    monkeypatch.setattr("app.service.analysis.begin_owned_transaction", lambda _: nullcontext())
+    monkeypatch.setattr("app.service.analysis.context.begin_owned_transaction", lambda _: nullcontext())
     hashes = []
     for version in ["wo-analysis-v15-observable-operations", "wo-analysis-v16-observation-coverage", WORK_ORDER_ANALYSIS_PROMPT_VERSION,
                     WORK_ORDER_ANALYSIS_PROMPT_VERSION]:
-        monkeypatch.setattr("app.service.analysis.WORK_ORDER_ANALYSIS_PROMPT_VERSION", version)
+        monkeypatch.setattr("app.service.analysis.context.WORK_ORDER_ANALYSIS_PROMPT_VERSION", version)
         s = service()
         s._session.info = {}
         s._work_orders = MagicMock()
@@ -117,7 +117,7 @@ def test_saved_legacy_event_is_read_without_rebinding_or_rekeying(monkeypatch):
     from app.provider.llm import SUCCESS_ANALYSIS
     def forbidden(*args, **kwargs):
         raise AssertionError("Historical analysis must not be reinterpreted")
-    monkeypatch.setattr("app.service.analysis.bind_observations", forbidden)
+    monkeypatch.setattr("app.service.analysis.context.bind_observations", forbidden)
     service = object.__new__(AnalysisService)
     service._settings = Settings(_env_file=None, app_env="test")
     record = SimpleNamespace(**{**SUCCESS_ANALYSIS, "subcategory": "evt2:legacy-original"})

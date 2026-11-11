@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 
 from sqlalchemy.orm import Session
 
-from app.domain.employee import EmployeePropertyStatus, EmployeeStatus
+from app.domain.work_order import EmployeePropertyStatus, EmployeeStatus
 from app.model.employee import (
     Department,
     Duty,
@@ -17,7 +17,7 @@ from app.model.employee import (
     Skill,
 )
 from app.model.identity import Permission, Role, RolePermission, User, UserRole
-from app.service.property import PropertyService
+from app.service.identity.property import PropertyService
 
 
 @dataclass(frozen=True, slots=True)

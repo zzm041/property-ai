@@ -20,7 +20,7 @@ for candidate in (BACKEND, OPS):
     if str(candidate) not in sys.path:
         sys.path.insert(0, str(candidate))
 
-from app.domain.phone import mask_phone  # noqa: E402
+from app.domain.identity import mask_phone  # noqa: E402
 from auth001_isolated_runtime import build_isolated_settings  # noqa: E402
 from verify_announcement_governance_007 import _expect_error  # noqa: E402
 from verify_property_house_relation_006 import _request, _sms_login  # noqa: E402

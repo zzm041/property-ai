@@ -16,8 +16,8 @@ from app.core.errors import (
     IamErrorCode,
 )
 from app.core.time import current_business_date, to_business_date, utc_now
-from app.domain.audit import AuditAction, AuditResourceType
-from app.domain.employee import (
+from app.domain.governance import AuditAction, AuditResourceType
+from app.domain.work_order import (
     ATTENDANCE_CHECK_IN,
     ATTENDANCE_CHECK_OUT,
     ATTENDANCE_READ,
@@ -29,7 +29,7 @@ from app.domain.employee import (
     EmployeeStatus,
     assignment_is_currently_effective,
 )
-from app.domain.iam import OrganizationScope, Principal, ScopeType
+from app.domain.identity import OrganizationScope, Principal, ScopeType
 from app.model.employee import (
     AttendanceRecord,
     Department,
@@ -46,8 +46,8 @@ from app.repository.employee import EmployeeRepository
 from app.repository.identity import IdentityRepository
 from app.repository.work_order import WorkOrderRepository
 from app.service.audit import AuditService
-from app.service.auth import AuthService
-from app.service.rbac import RbacService
+from app.service.identity.auth import AuthService
+from app.service.identity.rbac import RbacService
 
 T = TypeVar("T")
 _ACTIVE_ASSIGNMENT_UNIQUE = frozenset({"uq_employee_properties_active_property"})
@@ -521,7 +521,7 @@ class EmployeeService:
         )
         resolved_user_id = None
         if user_id is not None:
-            from app.service.identity_write_guard import lock_active_identity
+            from app.service.identity.identity_write_guard import lock_active_identity
 
             try:
                 user = lock_active_identity(self._session, user_id)

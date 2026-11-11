@@ -22,7 +22,7 @@ for candidate in (BACKEND, OPS):
     if str(candidate) not in sys.path:
         sys.path.insert(0, str(candidate))
 
-from app.domain.phone import mask_phone, normalize_phone  # noqa: E402
+from app.domain.identity import mask_phone, normalize_phone  # noqa: E402
 from auth001_isolated_runtime import build_isolated_settings  # noqa: E402
 
 API = "http://127.0.0.1:8083/api/v1"

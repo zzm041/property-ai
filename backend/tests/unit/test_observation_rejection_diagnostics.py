@@ -4,7 +4,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from app.domain.observed_event import ObservedAnalysisOutput, bind_observations, build_evidence_catalog
+from app.domain.ai import ObservedAnalysisOutput, bind_observations, build_evidence_catalog
 from app.service.analysis import AnalysisService
 
 
@@ -40,7 +40,7 @@ def test_invalid_catalog_has_separate_reason():
 
 @pytest.mark.parametrize('invalid_schema', [False, True])
 def test_service_logs_request_and_reason_without_raw_content(monkeypatch, invalid_schema):
-    import app.service.analysis as module
+    import app.service.analysis.validation as module
     logger = Mock()
     monkeypatch.setattr(module, 'logger', logger)
     service = object.__new__(AnalysisService)

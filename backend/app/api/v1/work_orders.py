@@ -11,16 +11,18 @@ from app.api.dependencies.db import get_db_session
 from app.core.config import Settings, get_settings
 from app.core.errors import AppError, WorkOrderErrorCode
 from app.core.time import validate_timezone
-from app.domain.iam import Principal
-from app.domain.work_order_visibility import resident_detail
-from app.schema.common import request_id_for, success_envelope
+from app.domain.identity import Principal
+from app.domain.work_order import resident_detail
+from app.schema.common import SuccessEnvelope, request_id_for, success_envelope
 from app.schema.work_order import (
+    CreateWorkOrderData,
     AppendWorkOrderRequest,
     CancelWorkOrderRequest,
     ConfirmWorkOrderRequest,
     CreateWorkOrderRequest,
     RateWorkOrderRequest,
     ReopenWorkOrderRequest,
+    SuggestWorkOrderDescriptionRequest,
     WorkOrderAssignmentData,
     WorkOrderData,
     WorkOrderDetailData,
@@ -28,10 +30,12 @@ from app.schema.work_order import (
     WorkOrderFeedbackData,
     WorkOrderListData,
     WorkOrderLogData,
+    WorkOrderDescriptionSuggestionData,
     WorkOrderMediaData,
     WorkOrderProcessData,
     WorkOrderReceiptData,
 )
+from app.service.work_order.description_suggestion import DescriptionSuggestionService
 from app.service.work_order import WorkOrderService
 
 router = APIRouter(tags=["work-orders"])
@@ -42,6 +46,13 @@ def get_work_order_service(
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> WorkOrderService:
     return WorkOrderService(session, settings=settings)
+
+
+def get_description_suggestion_service(
+    session: Annotated[Session, Depends(get_db_session)],
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> DescriptionSuggestionService:
+    return DescriptionSuggestionService(session, settings=settings)
 
 
 def work_order_data(record, *, overdue: bool = False) -> WorkOrderData:
@@ -129,7 +140,7 @@ def work_order_display_data(
     )
 
 
-@router.post("/work-orders")
+@router.post("/work-orders", response_model=SuccessEnvelope[CreateWorkOrderData])
 def create_work_order(
     body: CreateWorkOrderRequest,
     request: Request,
@@ -151,12 +162,47 @@ def create_work_order(
         claimed_tenant_id=body.tenant_id,
         claimed_property_id=body.property_id,
     )
-    return success_envelope(
-        request,
-        work_order_data(record, overdue=service.is_overdue(record)).model_dump(
-            mode="json"
-        ),
+    # PA-169 (t150/t152): a repeat of the same report inside the window answers
+    # with the work order that already exists, and says so. The content fingerprint
+    # itself stays internal.
+    payload = CreateWorkOrderData(
+        **work_order_data(record, overdue=service.is_overdue(record)).model_dump(),
+        deduplicated=service.last_create_deduplicated,
     )
+    return success_envelope(request, payload.model_dump(mode="json"))
+
+
+@router.post("/work-orders/suggest")
+def suggest_work_order_description(
+    body: SuggestWorkOrderDescriptionRequest,
+    request: Request,
+    actor: Annotated[Principal, Depends(get_current_principal)],
+    service: Annotated[
+        DescriptionSuggestionService, Depends(get_description_suggestion_service)
+    ],
+) -> dict[str, object]:
+    """Pre-fill the report form from one uploaded photo or voice note.
+
+    AI-side failures answer 200 with empty text and a reason code: the form must
+    stay usable, so nothing here may block creating a WorkOrder by hand.
+    """
+
+    suggestion = service.suggest(
+        actor=actor,
+        file_ids=body.file_ids,
+        request_id=request_id_for(request),
+    )
+    payload = WorkOrderDescriptionSuggestionData(
+        text=suggestion.text,
+        source=suggestion.source,
+        reason_code=suggestion.reason_code,
+        reason=suggestion.reason,
+    ).model_dump(mode="json")
+    if payload["reason"] is None:
+        # PA-163 keeps the success payload byte-identical to the original
+        # contract: only a non-empty suggestion has nothing to explain.
+        payload.pop("reason")
+    return success_envelope(request, payload)
 
 
 @router.get("/work-orders")

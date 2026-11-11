@@ -11,6 +11,7 @@ from app.core.database import (
     assert_disposable_test_database,
     create_database_engine,
     get_session_factory,
+    verify_test_database_schema,
     verify_utc_session,
 )
 
@@ -39,12 +40,14 @@ TASK_5_TABLES = (
     "skills",
 )
 TASK_6_TABLES = (
+    # 0015 binds work_order_media to its process/receipt cycle through composite
+    # foreign keys, so media rows must go before the cycle rows they reference.
+    "work_order_media",
     "work_order_sla_applications",
     "work_order_feedbacks",
     "work_order_receipts",
     "work_order_processes",
     "work_order_logs",
-    "work_order_media",
     "work_order_assignments",
     "sla_clocks",
     "work_order_contents",
@@ -94,6 +97,9 @@ def integration_settings() -> Settings:
 
 @pytest.fixture(scope="session")
 def test_engine(integration_settings: Settings) -> Iterator[Engine]:
+    # PA-118: an unmigrated schema used to surface as one raw MySQL 1146 per test.
+    # Check the marker tables once, so a missing schema is a single readable failure.
+    verify_test_database_schema(integration_settings)
     assert_disposable_test_database(integration_settings)
     engine = create_database_engine(integration_settings.test_database_url)
     with engine.connect() as connection:

@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from app.domain.phone import normalize_phone
+from app.domain.identity import normalize_phone
 
 
 class CreateOrganizationRequest(BaseModel):

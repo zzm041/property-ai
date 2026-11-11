@@ -2,9 +2,13 @@
 from contextlib import contextmanager
 
 from app.core.database import get_session_factory
-from app.provider.supervisor_agent import SupervisorPlanner
+from app.core.logging import get_logger
+from app.provider.llm.langchain_llm import LangChainUnavailable
+from app.provider.supervisor_agent import LangChainSupervisorPlanner, SupervisorPlanner
 from app.service.supervisor_agent import SupervisorAgentService
 from app.service.work_order import WorkOrderService
+
+logger = get_logger(__name__)
 
 
 class SupervisorReadTools:
@@ -41,7 +45,29 @@ class SupervisorReadTools:
                 'work_order_id', 'property_id', 'version', 'facts', 'suggested_actions')}
 
 
+def build_supervisor_planner(settings):
+    """PA-165: pick the planning engine, falling back to `direct` with a logged reason.
+
+    `SUPERVISOR_AGENT_ENGINE` defaults to `direct`, so behaviour is unchanged unless someone
+    opts in. When `langchain` is requested but the optional extra is missing, the agent keeps
+    working on the reviewed direct planner and the reason lands in the log instead of being
+    swallowed.
+    """
+
+    engine = getattr(settings, 'supervisor_agent_engine', 'direct')
+    if engine != 'langchain':
+        return SupervisorPlanner(settings)
+    try:
+        planner = LangChainSupervisorPlanner(settings)
+    except LangChainUnavailable as exc:
+        logger.error('supervisor_agent_engine_unavailable', engine='langchain',
+                     reason=str(exc), fallback_engine='direct')
+        return SupervisorPlanner(settings)
+    logger.info('supervisor_agent_engine_selected', engine='langchain', mode=planner.mode)
+    return planner
+
+
 def build_supervisor_agent(*, actor, property_id, settings):
     tools = SupervisorReadTools(session_factory=get_session_factory(settings.active_database_url),
                                 settings=settings, actor=actor, property_id=property_id)
-    return SupervisorAgentService(tools=tools, planner=SupervisorPlanner(settings))
+    return SupervisorAgentService(tools=tools, planner=build_supervisor_planner(settings))

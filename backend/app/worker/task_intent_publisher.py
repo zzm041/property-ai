@@ -24,7 +24,12 @@ def serve(*, seconds: int = 3600, settings: Settings | None = None) -> None:
             signal.signal(getattr(signal, name), request_stop)
     engine = create_database_engine(active.active_database_url)
     try:
-        run_publisher(engine, active, ids_supplier=lambda: None, seconds=seconds, stop=stop)
+        from app.worker.healthcheck import touch_publisher_heartbeat
+
+        run_publisher(
+            engine, active, ids_supplier=lambda: None, seconds=seconds, stop=stop,
+            heartbeat=touch_publisher_heartbeat,
+        )
     finally:
         engine.dispose()
 

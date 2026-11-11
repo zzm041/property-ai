@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.core.errors import AppError
 from app.repository.property import PropertyRepository
-from app.service.property import HIERARCHY_NOT_FOUND, PropertyService
+from app.service.identity.property import HIERARCHY_NOT_FOUND, PropertyService
 
 
 def test_repository_queries_require_matching_tenant_scope(

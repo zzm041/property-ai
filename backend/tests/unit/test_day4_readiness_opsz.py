@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from app.api.dependencies.auth import get_current_principal
 from app.core.config import Settings
 from app.core.readiness import NOT_CHECKED, check_readiness
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.main import create_app
 
 

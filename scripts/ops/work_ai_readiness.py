@@ -8,7 +8,7 @@ import subprocess
 
 WORK_KEYS = frozenset({'LLM_API_KEY', 'VLM_API_KEY', 'ASR_API_KEY'})
 BASE_URL = 'http://host.docker.internal:11437/v1'
-MODEL = 'qwen38-27b-q3km-g55:7af3b8f'
+MODEL = 'qwen3.5:4b'
 
 
 def require_credentials(probe, expected_sha):

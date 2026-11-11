@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings
 from app.core.database import create_database_engine
 from app.core.errors import AppError, DevSeedErrorCode
-from app.domain.dev_seed import DEV_PROPERTY_NAME, DEV_TENANT_NAME
+from app.domain.dev import DEV_PROPERTY_NAME, DEV_TENANT_NAME
 from app.model.employee import Employee, EmployeeSkill, Skill
 from app.model.identity import User
 from app.model.property import Property, Tenant

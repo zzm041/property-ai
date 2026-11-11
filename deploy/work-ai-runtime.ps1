@@ -1,4 +1,4 @@
-param(
+﻿param(
     [Parameter(Position = 0, Mandatory = $true)]
     [ValidateSet("start", "stop", "status", "verify-artifact")]
     [string]$Action,
@@ -9,21 +9,32 @@ param(
 $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.Net.Http
 $DeployDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+# PA-170: source pins are compared with the line-ending independent digest in
+# source-hash.ps1; a plain Get-FileHash would make the pin depend on whether this
+# checkout (or the git archive export) happens to carry CRLF.
+. (Join-Path $DeployDir "source-hash.ps1")
 $RepoRoot = Split-Path -Parent $DeployDir
 $RuntimeDir = Join-Path $RepoRoot "tmp\delivery-work-ai-runtime"
 $PrivateDir = Join-Path $RuntimeDir "calls"
 $SecretPath = Join-Path $RuntimeDir "internal-token.txt"
 $ConfigPath = Join-Path $RuntimeDir "config.json"
+$EvidenceRecordsPath = Join-Path $RuntimeDir "evidence-records.txt"
 $CurrentPath = Join-Path $RuntimeDir "current.json"
 $OllamaCurrent = Join-Path $RepoRoot "tmp\delivery-ollama-runtime\current.json"
-$SourceCommit = "61b762d9775845c47cf0b43f3003a3f4d1cb5519"
+$SourceCommit = "2560dfc64e1bead483210a87d34bb24f35d3d7dc"
 $CandidateRoot = Join-Path $RuntimeDir "candidate-$SourceCommit"
 $AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
 $ModelAdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_models.py"
 $RuntimeControlPath = Join-Path $CandidateRoot "scripts\ops\local_ai_runtime_control.py"
-$ExpectedAdapterSha256 = "70BB10C801D695830FCC33630773DB82986427B86962432354A0726AF3A3C676"
-$ExpectedModelAdapterSha256 = "AD89639C05C18BF6D78FF28F32A62A105EE5B5ECFC9837EB5700B75DFCAAF320"
-$ExpectedRuntimeControlSha256 = "567B325C7130E6AA7047AB957E5C19B442B66C8DBA29F8FAEDA50EE60830C876"
+$ExpectedAdapterSha256 = "B3820A2C6B4A0DAAC34B83E7300A57C1FA80E551CCA832E7EE552ECFDBEB45BF"
+$ExpectedModelAdapterSha256 = "FAF70CF69B8D7058026881D47B90CB20E3B03F6A99E693F16BD06CDA87AC0BB2"
+$ExpectedRuntimeControlSha256 = "B0DE6D3544D8875E0A57CED1A1946744736FC9074AF1ECEA5228A79468C60CFF"
+# 包化之后适配器的实现不在 scripts/ops/local_ai_http.py（那里只剩 12 行兼容层），而在 app/provider/local_ai/。
+# 只钉兼容层等于没钉住适配器，所以把真正承载逻辑的两个文件一起钉住。
+$ProviderRuntimeControlPath = Join-Path $CandidateRoot "backend\app\provider\local_ai\runtime_control.py"
+$ProviderHttpApiPath = Join-Path $CandidateRoot "backend\app\provider\local_ai\http_api.py"
+$ExpectedProviderRuntimeControlSha256 = "0F5C840BE59957FB624487F67FF76B09CCF49FDF237AD63C9ED9941761A740DA"
+$ExpectedProviderHttpApiSha256 = "2AE1FE1D3E60EF66D2CF877BDA7F2959805CBAABC029623D57B2A72035B33DCB"
 $ResolutionRoot = Join-Path $RepoRoot "reports"
 $ResolutionPath = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-auto-8093\call-001-resolution.json"
 $ResolutionReviewPath = Join-Path $RepoRoot "reports\codex\REAL-AI-INTEGRATION-027-DELIVERY-AUTO-call001-review-round1.raw.json"
@@ -57,9 +68,9 @@ $ExpectedNativeMediaReplayReservationSha256 = "FDAEADEAE1F83160C0EB21FA0495F8DFD
 $ExpectedNativeMediaReplayResultSha256 = "95F9A3B51A6447796D6318321390562B424A90A96277CA2595EAC4C8CE90CE4B"
 $PythonPath = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\bge-142-cpu\.venv\Scripts\python.exe"
 $AsrPython = Join-Path $RepoRoot "tmp\selfhost-ai-runtime\asr-006-cpu\.venv\Scripts\python.exe"
-$ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models-hf"
-$ModelName = "qwen38-27b-q3km-g55:7af3b8f"
-$RuntimeModelName = "qwen38-27b-q3km-g55-ctx8192:7af3b8f"
+$ModelRoot = "E:\ai-models\property-ai\models-hf"
+$ModelName = "qwen3.5:4b"
+$RuntimeModelName = "qwen3.5:4b-ctx8192"
 $RuntimeArtifact = $null
 if ([bool]$ArtifactManifest -xor [bool]$ArtifactSha256) { throw "artifact manifest and SHA256 must be provided together" }
 if ($ArtifactManifest) {
@@ -70,11 +81,15 @@ if ($ArtifactManifest) {
     $AdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_http.py"
     $ModelAdapterPath = Join-Path $CandidateRoot "scripts\ops\local_ai_models.py"
     $RuntimeControlPath = Join-Path $CandidateRoot "scripts\ops\local_ai_runtime_control.py"
+    $ProviderRuntimeControlPath = Join-Path $CandidateRoot "backend\app\provider\local_ai\runtime_control.py"
+    $ProviderHttpApiPath = Join-Path $CandidateRoot "backend\app\provider\local_ai\http_api.py"
     $ExpectedAdapterSha256 = $RuntimeArtifact.files.'scripts/ops/local_ai_http.py'
     $ExpectedModelAdapterSha256 = $RuntimeArtifact.files.'scripts/ops/local_ai_models.py'
     $ExpectedRuntimeControlSha256 = $RuntimeArtifact.files.'scripts/ops/local_ai_runtime_control.py'
+    $ExpectedProviderRuntimeControlSha256 = $RuntimeArtifact.files.'backend/app/provider/local_ai/runtime_control.py'
+    $ExpectedProviderHttpApiSha256 = $RuntimeArtifact.files.'backend/app/provider/local_ai/http_api.py'
     $SourceCommit = $null
-    $RuntimeModelName = "qwen38-27b-q3km-g52-ctx8192:7af3b8f"
+    $RuntimeModelName = "qwen3.5:4b-ctx8192"
 }
 if ($Action -eq "verify-artifact") {
     if ($null -eq $RuntimeArtifact) { throw "verify-artifact requires a pinned artifact" }
@@ -146,28 +161,51 @@ function Assert-Candidate {
     if ($SourceCommit -match "^__" -or $ExpectedAdapterSha256 -match "^__" -or $ExpectedModelAdapterSha256 -match "^__" -or $ExpectedRuntimeControlSha256 -match "^__") {
         throw "work AI candidate is not frozen"
     }
+    # A half-populated candidate directory (for example left behind by a failed
+    # extraction) must not be mistaken for a verified one; re-extract from scratch.
+    $candidateAdapterProbe = Join-Path $CandidateRoot "scripts/ops/local_ai_http.py"
+    if ((Test-Path -LiteralPath $CandidateRoot -PathType Container) -and -not (Test-Path -LiteralPath $candidateAdapterProbe -PathType Leaf)) {
+        Remove-Item -LiteralPath $CandidateRoot -Recurse -Force
+    }
     if (-not (Test-Path -LiteralPath $CandidateRoot -PathType Container)) {
         if ($null -ne $RuntimeArtifact) { throw "verified runtime artifact disappeared" }
         New-Item -ItemType Directory -Force -Path $CandidateRoot | Out-Null
         $archive = Join-Path $RuntimeDir "candidate-$SourceCommit.tar"
         if (Test-Path -LiteralPath $archive) { throw "candidate archive path already exists" }
-        & git -C $RepoRoot archive --format=tar --output=$archive $SourceCommit backend/app scripts/ops/local_ai_http.py scripts/ops/local_ai_models.py scripts/ops/local_ai_process.py scripts/ops/local_ai_runtime_control.py
+        # core.autocrlf=true would make archive emit CRLF bytes, so the exported candidate
+        # would never match the pinned git-blob (LF) hashes. Export byte-identical blobs.
+        & git -C $RepoRoot -c core.autocrlf=false archive --format=tar --output=$archive $SourceCommit backend/app scripts/ops/local_ai_http.py scripts/ops/local_ai_models.py scripts/ops/local_ai_process.py scripts/ops/local_ai_runtime_control.py
         if ($LASTEXITCODE -ne 0) { throw "could not export frozen work AI candidate" }
         try {
-            & tar -xf $archive -C $CandidateRoot
+            # Extract with the system bsdtar: a POSIX tar earlier on PATH (MSYS/Git) does
+            # not understand the native Windows path handed to -C and silently unpacks
+            # nothing, which then fails later as a missing candidate file.
+            $tarExe = Join-Path (Join-Path $env:SystemRoot "System32") "tar.exe"
+            if (-not (Test-Path -LiteralPath $tarExe -PathType Leaf)) { $tarExe = "tar" }
+            & $tarExe -xf $archive -C $CandidateRoot
             if ($LASTEXITCODE -ne 0) { throw "could not extract frozen work AI candidate" }
+            $extractedAdapter = Join-Path $CandidateRoot "scripts/ops/local_ai_http.py"
+            if (-not (Test-Path -LiteralPath $extractedAdapter -PathType Leaf)) {
+                throw "frozen work AI candidate extraction produced no adapter"
+            }
         } finally {
             Remove-Item -LiteralPath $archive -Force
         }
     }
-    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $AdapterPath).Hash -ne $ExpectedAdapterSha256) {
+    if ((Get-CanonicalSha256 -LiteralPath $AdapterPath) -ne $ExpectedAdapterSha256) {
         throw "frozen work AI adapter hash mismatch"
     }
-    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $ModelAdapterPath).Hash -ne $ExpectedModelAdapterSha256) {
+    if ((Get-CanonicalSha256 -LiteralPath $ModelAdapterPath) -ne $ExpectedModelAdapterSha256) {
         throw "frozen work AI model adapter hash mismatch"
     }
-    if ((Get-FileHash -Algorithm SHA256 -LiteralPath $RuntimeControlPath).Hash -ne $ExpectedRuntimeControlSha256) {
+    if ((Get-CanonicalSha256 -LiteralPath $RuntimeControlPath) -ne $ExpectedRuntimeControlSha256) {
         throw "frozen runtime control hash mismatch"
+    }
+    if ((Get-CanonicalSha256 -LiteralPath $ProviderRuntimeControlPath) -ne $ExpectedProviderRuntimeControlSha256) {
+        throw "frozen provider adapter hash mismatch"
+    }
+    if ((Get-CanonicalSha256 -LiteralPath $ProviderHttpApiPath) -ne $ExpectedProviderHttpApiSha256) {
+        throw "frozen provider http api hash mismatch"
     }
     $reservation = Join-Path $PrivateDir "call-001\reservation.json"
     $result = Join-Path $PrivateDir "call-001\result.json"
@@ -230,23 +268,95 @@ function Assert-Candidate {
     }
 }
 
-function New-RuntimeBinding {
+function Get-ExpectedRuntimeBinding {
+    # PA-130: the binding is a statement about the *live* Ollama process, so it is derived
+    # from the launcher's receipt every time it is checked instead of being frozen at start.
     if (-not (Test-Path -LiteralPath $OllamaCurrent -PathType Leaf)) { throw "delivery Ollama receipt is missing" }
     $ollama = Get-Content -Raw -LiteralPath $OllamaCurrent | ConvertFrom-Json
     if ($ollama.host -ne "127.0.0.1:11435" -or $ollama.no_cloud -ne $true -or [int]$ollama.concurrency -ne 1) {
         throw "delivery Ollama receipt does not match the approved runtime"
     }
-    $bindingPath = Join-Path $RuntimeDir ("runtime-binding-{0}.json" -f ([DateTime]::UtcNow.ToString("yyyyMMddTHHmmssZ")))
-    if (Test-Path -LiteralPath $bindingPath) { throw "runtime binding already exists" }
-    $binding = [ordered]@{
+    [ordered]@{
         pid = [int]$ollama.pid
         executable = [string]$ollama.executable
         launched_at_utc = ([DateTimeOffset]$ollama.started_at_utc).UtcDateTime.ToString("o")
         listener = "127.0.0.1:11435"
         source_receipt_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $OllamaCurrent).Hash
     }
+}
+
+function Test-RuntimeBinding([string]$Path, [object]$Expected) {
+    # Returns $null when there is no usable binding, otherwise { ok, mismatched, actual }.
+    # The comparison mirrors local_ai_runtime_control.bound_runtime_identity: pid and
+    # executable exactly, launched_at_utc within one second.
+    if (-not $Path -or -not (Test-Path -LiteralPath $Path -PathType Leaf)) { return $null }
+    try {
+        $actual = Get-Content -Raw -LiteralPath $Path | ConvertFrom-Json
+    } catch {
+        return [pscustomobject]@{ ok = $false; mismatched = @("unreadable"); actual = $null }
+    }
+    $mismatched = New-Object System.Collections.Generic.List[string]
+    if ([int]$actual.pid -ne [int]$Expected.pid) { $mismatched.Add("pid") }
+    if ([string]$actual.executable -ne [string]$Expected.executable) { $mismatched.Add("executable") }
+    $actualLaunched = $null
+    try { $actualLaunched = [DateTimeOffset]$actual.launched_at_utc } catch { $mismatched.Add("launched_at_utc") }
+    if ($null -ne $actualLaunched) {
+        $expectedLaunched = [DateTimeOffset]$Expected.launched_at_utc
+        if ([Math]::Abs(($actualLaunched - $expectedLaunched).TotalMilliseconds) -gt 1000) { $mismatched.Add("launched_at_utc") }
+    }
+    if ([string]$actual.source_receipt_sha256 -ne [string]$Expected.source_receipt_sha256) { $mismatched.Add("source_receipt_sha256") }
+    [pscustomobject]@{ ok = ($mismatched.Count -eq 0); mismatched = @($mismatched); actual = $actual }
+}
+
+function Read-ConfiguredBindingPath {
+    if (-not (Test-Path -LiteralPath $ConfigPath -PathType Leaf)) { return $null }
+    try {
+        $config = Get-Content -Raw -LiteralPath $ConfigPath | ConvertFrom-Json
+    } catch {
+        return $null
+    }
+    $path = [string]$config.runtime_binding_path
+    if (-not $path) { return $null }
+    return $path
+}
+
+function Read-EvidenceRecords {
+    # PA-166: reviewed evidence lives in calls/ (the startup gate needs it) but must not be
+    # charged against limits/call_baseline, otherwise restoring the evidence reopens the gate
+    # and immediately trips R2_CALL_LIMIT. The corpus is named explicitly in this manifest so
+    # the split stays auditable; a missing manifest simply means "no evidence designations".
+    if (-not (Test-Path -LiteralPath $EvidenceRecordsPath -PathType Leaf)) { return @() }
+    $names = @()
+    foreach ($line in (Get-Content -LiteralPath $EvidenceRecordsPath)) {
+        $name = $line.Trim()
+        if ($name -and $name -match "^call-[0-9]{3}$") { $names += $name }
+    }
+    return $names
+}
+
+function New-RuntimeBinding {
+    $bindingPath = Join-Path $RuntimeDir ("runtime-binding-{0}.json" -f ([DateTime]::UtcNow.ToString("yyyyMMddTHHmmssZ")))
+    if (Test-Path -LiteralPath $bindingPath) { throw "runtime binding already exists" }
+    $binding = Get-ExpectedRuntimeBinding
     [IO.File]::WriteAllText($bindingPath, ($binding | ConvertTo-Json), [Text.UTF8Encoding]::new($false))
     return $bindingPath
+}
+
+function Stop-RecordedAdapter([object]$State) {
+    # Same drain-then-exact-pid contract as the "stop" action, reused by the PA-130
+    # convergence path so a stale binding is repaired without going through "down".
+    $null = Assert-CurrentProcess $State
+    $drain = Invoke-Drain (Read-Token)
+    if ($drain.accepting_requests -ne $false -or $drain.request_active) { throw "work AI adapter is not safely drainable" }
+    try {
+        Stop-Process -Id ([int]$State.listener_pid) -ErrorAction Stop
+    } catch {
+        & taskkill /PID ([int]$State.listener_pid) /F | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw "exact work AI adapter process could not be stopped" }
+    }
+    $deadline = [DateTime]::UtcNow.AddSeconds(10)
+    do { Start-Sleep -Milliseconds 100 } until (@(Get-Listener).Count -eq 0 -or [DateTime]::UtcNow -ge $deadline)
+    if (@(Get-Listener).Count -ne 0) { throw "11437 did not release after exact adapter stop" }
 }
 
 function Read-Current {
@@ -275,6 +385,7 @@ switch ($Action) {
         New-Item -ItemType Directory -Force -Path $RuntimeDir,$PrivateDir | Out-Null
         Assert-Candidate
         $existing = @(Get-Listener)
+        $converge = $false
         if ($existing.Count -gt 0) {
             $state = Read-Current
             $token = Read-Token
@@ -287,8 +398,38 @@ switch ($Action) {
             if ($health.scope -ne "work_order_only" -or $health.request_active -or $health.accepting_requests -ne $true) {
                 throw "recorded work AI adapter is not idle and accepting"
             }
-            [ordered]@{ state=$state; health=$health } | ConvertTo-Json -Depth 7
-            break
+            # PA-130: "up" means "converge to a ready runtime", not "report whatever is running".
+            # The adapter freezes the binding it loaded at startup, and the reviewed Ollama
+            # runtime is restarted by the orchestrator on every up, so an adapter that survived
+            # a restart keeps verifying a dead pid and fails every request at RUNTIME_IDENTITY.
+            # If the configured binding no longer describes the live Ollama process the only
+            # convergence is: stop this adapter through its receipt, then start it again on a
+            # freshly derived binding (the start path below rewrites config + receipt).
+            $expectedBinding = Get-ExpectedRuntimeBinding
+            $bindingPath = Read-ConfiguredBindingPath
+            $bindingState = Test-RuntimeBinding $bindingPath $expectedBinding
+            if ($null -ne $bindingState -and $bindingState.ok) {
+                Write-Output ("runtime_binding=ok path={0} pid={1} executable={2}" -f $bindingPath, $expectedBinding.pid, $expectedBinding.executable)
+                [ordered]@{
+                    state = $state
+                    health = $health
+                    runtime_binding = [ordered]@{ status = "ok"; path = $bindingPath; pid = $expectedBinding.pid; adapter_restarted = $false }
+                } | ConvertTo-Json -Depth 7
+                break
+            }
+            $mismatchedText = if ($null -eq $bindingState) { "missing" } else { ($bindingState.mismatched -join ",") }
+            $previousPid = if ($null -eq $bindingState -or $null -eq $bindingState.actual) { "none" } else { [string]$bindingState.actual.pid }
+            Write-Output ("runtime_binding=rewritten reason={0} previous={1} previous_pid={2} expected_pid={3}" -f $mismatchedText, $bindingPath, $previousPid, $expectedBinding.pid)
+            Write-Output "the recorded adapter verifies the binding it loaded at startup; stopping it so it can be restarted on the refreshed binding"
+            Stop-RecordedAdapter $state
+            # keep exactly one live binding in the runtime directory: the stale one is evidence,
+            # not configuration, so retire it under a name nothing reads back.
+            if ($bindingPath -and (Test-Path -LiteralPath $bindingPath -PathType Leaf)) {
+                $superseded = Join-Path $RuntimeDir ("superseded-{0}-{1}" -f ([DateTime]::UtcNow.ToString("yyyyMMddTHHmmssZ")), [IO.Path]::GetFileName($bindingPath))
+                Move-Item -LiteralPath $bindingPath -Destination $superseded -Force
+                Write-Output ("superseded stale binding: {0}" -f [IO.Path]::GetFileName($superseded))
+            }
+            $converge = $true
         }
         $token = Read-Token
         if (-not $token) {
@@ -303,6 +444,7 @@ switch ($Action) {
             call_baseline=[ordered]@{asr=1;embedding=6;reranker=2;qwen=46}
             duration_seconds=4336;duration_baseline_seconds=535.483
             asr_start_ram_mib=11264;evidence_root=$RuntimeDir
+            evidence_records=@(Read-EvidenceRecords)
             shared_model_lock_path=(Join-Path $RepoRoot "tmp\delivery-ai-shared\model.lock")
             shared_model_lock_wait_seconds=55
             resolution_root=$ResolutionRoot
@@ -354,12 +496,29 @@ switch ($Action) {
         $operationId=[guid]::NewGuid().ToString("N")
         $stdout=Join-Path $RuntimeDir "adapter-$operationId.stdout.log"
         $stderr=Join-Path $RuntimeDir "adapter-$operationId.stderr.log"
+        # PA-116-A-1 / P3-1: the prompt-version selection must travel with the process that
+        # serves requests, not with whatever shell happened to be open. The reviewed file that
+        # ships in the repo is authoritative; an operator-supplied path is only honoured when
+        # that file is missing, and a diverging value is reported instead of silently winning.
+        $promptVersionsPath = Join-Path (Join-Path $RepoRoot "deploy") "ai-runtime-prompts.json"
+        $promptVersionsSource = $promptVersionsPath
+        $oldPromptVersionsFile=$env:PROPERTY_AI_PROMPT_VERSIONS_FILE
+        if (Test-Path -LiteralPath $promptVersionsPath -PathType Leaf) {
+            if ($env:PROPERTY_AI_PROMPT_VERSIONS_FILE -and ($env:PROPERTY_AI_PROMPT_VERSIONS_FILE -ne $promptVersionsPath)) {
+                Write-Warning ("prompt_versions_env_ignored: PROPERTY_AI_PROMPT_VERSIONS_FILE='{0}' is ignored; the reviewed file '{1}' is authoritative" -f $env:PROPERTY_AI_PROMPT_VERSIONS_FILE, $promptVersionsPath)
+            }
+            $env:PROPERTY_AI_PROMPT_VERSIONS_FILE=$promptVersionsPath
+        } elseif ($env:PROPERTY_AI_PROMPT_VERSIONS_FILE) {
+            $promptVersionsSource = $env:PROPERTY_AI_PROMPT_VERSIONS_FILE
+            Write-Warning ("prompt_versions_repo_file_missing: falling back to PROPERTY_AI_PROMPT_VERSIONS_FILE='{0}'" -f $env:PROPERTY_AI_PROMPT_VERSIONS_FILE)
+        }
+        Write-Output ("prompt_versions_source={0}" -f $promptVersionsSource)
         $oldToken=$env:LOCAL_AI_INTERNAL_TOKEN;$oldModel=$env:PROPERTY_AI_LOCAL_QWEN_MODEL;$oldRuntimeModel=$env:PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL
         try {
             $env:LOCAL_AI_INTERNAL_TOKEN=$token;$env:PROPERTY_AI_LOCAL_QWEN_MODEL=$ModelName;$env:PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL=$RuntimeModelName
             $launcher=Start-Process -FilePath $PythonPath -ArgumentList @("-I","-B","-X","utf8",$AdapterPath,"serve","--config",$ConfigPath) -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
         } finally {
-            $env:LOCAL_AI_INTERNAL_TOKEN=$oldToken;$env:PROPERTY_AI_LOCAL_QWEN_MODEL=$oldModel;$env:PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL=$oldRuntimeModel
+            $env:LOCAL_AI_INTERNAL_TOKEN=$oldToken;$env:PROPERTY_AI_LOCAL_QWEN_MODEL=$oldModel;$env:PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL=$oldRuntimeModel;$env:PROPERTY_AI_PROMPT_VERSIONS_FILE=$oldPromptVersionsFile
         }
         $deadline=[DateTime]::UtcNow.AddSeconds(15)
         do { Start-Sleep -Milliseconds 250;$listener=@(Get-Listener) } until ($listener.Count -eq 1 -or [DateTime]::UtcNow -ge $deadline)
@@ -375,13 +534,29 @@ switch ($Action) {
             artifact_id=$RuntimeArtifact.artifact_id;candidate_image_id=$RuntimeArtifact.candidate_image_id
             listener_pid=$listenerProcess.Id;listener_started_at_utc=$listenerProcess.StartTime.ToUniversalTime().ToString("o")
             adapter_sha256=$ExpectedAdapterSha256;model_adapter_sha256=$ExpectedModelAdapterSha256;runtime_control_sha256=$ExpectedRuntimeControlSha256
+            provider_runtime_control_sha256=$ExpectedProviderRuntimeControlSha256;provider_http_api_sha256=$ExpectedProviderHttpApiSha256
             config_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $ConfigPath).Hash
             runtime_binding_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $bindingPath).Hash
             token_sha256=(Get-FileHash -Algorithm SHA256 -LiteralPath $SecretPath).Hash
             stdout=$stdout;stderr=$stderr
             endpoint="http://127.0.0.1:11437";scope="work_order_only";models=$health.models;runtime_qwen_model=$RuntimeModelName;inference_on_start=$false
+            prompt_versions_file=$promptVersionsSource
+            # P3-2: source_commit guarantees equivalence only for the paths the candidate export
+            # takes. Anyone reading this receipt must not assume the whole repo is at that commit.
+            equiv_scope=@("backend/app","scripts/ops/local_ai_http.py","scripts/ops/local_ai_models.py","scripts/ops/local_ai_runtime_control.py")
+            equiv_scope_note="source_commit is equivalent only for equiv_scope; run git rev-parse HEAD for the repo HEAD"
         }
         [IO.File]::WriteAllText($CurrentPath, ($state | ConvertTo-Json -Depth 6), [Text.UTF8Encoding]::new($false))
+        # PA-130 self-check: whatever path got here, the runtime must leave behind a binding
+        # that describes the Ollama process it will actually talk to.
+        $verifiedBindingPath = Read-ConfiguredBindingPath
+        $verifiedExpected = Get-ExpectedRuntimeBinding
+        $verifiedBinding = Test-RuntimeBinding $verifiedBindingPath $verifiedExpected
+        if ($null -eq $verifiedBinding -or -not $verifiedBinding.ok) {
+            $detail = if ($null -eq $verifiedBinding) { "missing" } else { ($verifiedBinding.mismatched -join ",") }
+            throw "runtime binding did not converge after start: $detail"
+        }
+        Write-Output ("runtime_binding=ok path={0} pid={1} executable={2}" -f $verifiedBindingPath, $verifiedExpected.pid, $verifiedExpected.executable)
         $state | ConvertTo-Json -Depth 6
     }
     "status" {

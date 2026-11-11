@@ -5,14 +5,14 @@ from pydantic import ValidationError
 
 from app.core.config import Settings
 from app.core.errors import AppError, IamErrorCode
-from app.domain.iam import (
+from app.domain.identity import (
     OrganizationScope,
     Principal,
     RoleGrant,
     ScopeType,
 )
 from app.main import create_app
-from app.service.rbac import RbacService
+from app.service.identity.rbac import RbacService
 
 
 def _principal(*grants: RoleGrant) -> Principal:

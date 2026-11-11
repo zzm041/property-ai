@@ -114,6 +114,133 @@ clamd TCP 不提供身份认证或加密，只允许同机受限网络或企业�
 
 `unavailable` 仍默认失败关闭；`development` 仅开发使用且保留 `skipped_dev`，生产禁止。启用真实扫描需要部署方准备服务，不由业务 API 拉起或下载引擎/病毒库。
 
+### 附件扫描的三态与就绪报告（D6）
+
+`/readyz` 的 `media_pipeline` 报告本次部署实际生效的扫描形态，三态互斥：
+
+| `scan_mode` | 条件 | `media_scanned` | `media_becomes_usable` | `reason_code` |
+| --- | --- | --- | --- | --- |
+| `real` | `FILE_SCANNER_PROVIDER=clamav` | `true` | `true` | `null` |
+| `demo_stub` | `FILE_SCANNER_PROVIDER=development` | `false` | `false` | `MEDIA_SCAN_STUB` 或 `MEDIA_SCAN_STUB_UNACKNOWLEDGED` |
+| `unavailable` | `FILE_SCANNER_PROVIDER=unavailable`（默认） | `false` | `false` | `MEDIA_SCAN_UNAVAILABLE` |
+
+规则：
+
+- 只有真实扫描（`clamav`）才允许 `media_becomes_usable=true`。`development` 桩不检查任何字节，只写 `scanner_status=skipped_dev`，因此媒体「能用但未验证」——就绪报告必须说清楚，不得报成 scanned。
+- `development` 在 `development`/`test` 环境是预期形态，只报 `demo_stub`；在 `staging`/`production` 属于配置错误，除非显式声明 `FILE_SCANNER_DEMO_ACKNOWLEDGED=true`，否则 `reason_code=MEDIA_SCAN_STUB_UNACKNOWLEDGED` 且 `/readyz` 的 `status` 降为 `degraded`（HTTP 仍 200，媒体不在存活路径上）。
+- 演示环境要留痕：`deploy/.env.delivery` 同时设置 `FILE_SCANNER_PROVIDER=development` 与 `FILE_SCANNER_DEMO_ACKNOWLEDGED=true`，属于显式声明的演示模式；对外取证时必须按 `demo_stub` 表述，不能写成「附件已扫描」。
+- 复验命令：`curl -s http://<host>:<port>/api/v1/readyz | jq '.data.media_pipeline'`，期望 `scan_mode`、`media_scanned`、`reason_code` 三项与上表一致。
+
+### 工单日志的重复观测与保留策略（D9）
+
+`work_order_logs` 是审计轨，不自动清理。但「等待派单」是可重复观测的状态而不是业务事件：`sweep_waiting_dispatch` 每个 sweep tick（`SLA_SWEEP_INTERVAL_SECONDS`，默认 30s）都会重新评估每个等待中的工单，过去每次评估都插一行 `AUTO_DISPATCH_WAIT`。交付库实测 105,467 / 106,438 行（26 个工单，40 天），平均间隔 196.8s，`request_id` 全库唯一 ⇒ 原有的「同 request_id 不重复写」完全失效。
+
+写入侧（`DISPATCH_WAIT_LOG_WINDOW_SECONDS`，默认 3600，0 = 恢复旧行为）：
+
+- sweep 路径的 `request_id` 在窗口内固定（`dispatch-wait:<work_order>:<窗口序号>`），同一窗口重复 tick 撞同一个 id，不新增行。
+- 同一工单同一 `reason_code` 在窗口内重复观测时，聚合进已有行（日志 `auto_dispatch_wait_aggregated`）；**`reason_code` 变化是状态变化，立刻写一行**（例如 `WAITING_ELIGIBLE` → `WAITING_IDLE`）。
+- 任务驱动的分析（intent 用 `request_id` 关联成功）不加聚合，仍按 attempt 落行。
+
+存量历史用 `backend/scripts/ops/prune_work_order_logs.py` 处理，**默认 dry-run**：
+
+```bash
+# 只算不删（默认）——打印将删除多少行
+python backend/scripts/ops/prune_work_order_logs.py --days 30
+# 真删 30 天以前的 AUTO_DISPATCH_WAIT
+python backend/scripts/ops/prune_work_order_logs.py --days 30 --apply
+# 保留窗口内每个工单每天只留最新一行
+python backend/scripts/ops/prune_work_order_logs.py --days 30 --collapse-daily --apply
+```
+
+只处理 `--event-code` 指定的重复观测事件（默认仅 `AUTO_DISPATCH_WAIT`）；`CREATE`/`ASSIGN`/`REASSIGN`/`ANALYZE` 等业务事件不在默认清理范围。交付库 30 天 dry-run 结果：26,422 行到期（`--collapse-daily` 合计 105,445 行）。
+
+### 反向代理与按客户端限流（D3 / PA-168）
+
+登录与短信凭据接口有两把限流锁：手机号维度（`SMS_SEND_LIMIT_PER_HOUR`、`SMS_LOGIN_LIMIT_PER_HOUR`）与**客户端 IP 维度**（`SMS_IP_LIMIT_PER_HOUR`，默认 30/小时）。IP 维度只有在拿到真实客户端地址时才有意义。
+
+交付栈是 `nginx → api`：api 的 socket peer 恒为 nginx 容器地址，客户端送来的 `X-Forwarded-For` 属于攻击者可控输入。因此 api 只在**对等地址命中 `TRUSTED_PROXY_CIDRS`** 时才读该头，并从右往左取第一个不属于可信网段的 hop（`deploy/nginx.conf` 用 `$proxy_add_x_forwarded_for` 追加真实地址，因此最右侧才是可信来源）。
+
+**部署时必须设置 `TRUSTED_PROXY_CIDRS`。** `deploy/docker-compose.delivery.yml` 已为 api 提供默认值 `${TRUSTED_PROXY_CIDRS:-172.16.0.0/12}`（覆盖 Docker 默认 bridge/compose 网段）；使用自定义网络时按实际网段收窄：
+
+```bash
+docker network inspect -f '{{range .IPAM.Config}}{{.Subnet}}{{end}}' property-ai-delivery_default
+```
+
+错配后果（两者都严重）：
+
+| 配置 | 现象 |
+| --- | --- |
+| 未设置 `TRUSTED_PROXY_CIDRS` | 全部用户共用 nginx 那一个 IP 桶：**累计 30 次登录/小时即对整站返回 429**（手机号桶还各自新鲜）；伪造 `X-Forwarded-For` 无法逃离该桶 |
+| 设置过宽（如 `0.0.0.0/0`） | 客户端自带 `X-Forwarded-For: <任意地址>` 即被采信，IP 维度可用一行请求头绕过，等于只剩下手机号一把锁 |
+
+实测（2026-11-11，`nginx → api` 同栈拓扑、api 与 nginx 分容器）：未设可信网段时，30 个不同手机号各发一次登录 → 全部 401，第 31 个全新手机号 → `429 AUTH.SMS_RATE_LIMITED`，Redis 键为 `sms:login:ip:172.21.0.14`（nginx 容器地址）；设置 `TRUSTED_PROXY_CIDRS=172.21.0.0/16` 后同一入口按 `X-Forwarded-For` 分桶，键为 `sms:login:ip:203.0.113.7` 与 `sms:login:ip:198.51.100.9`，两个客户端互不影响。
+
+两种维度返回完全相同的 `code`/`message`/空 `details`，调用方无法判断是哪一把锁触发。回归：`backend/tests/integration/test_auth_ip_scope_runtime.py`（HTTP 面：未设可信网段即折叠成单桶、设了之后按客户端分桶、两维度响应逐字节相同）与 `backend/tests/unit/test_pa168_proxy_wiring.py`（锁定 compose 的 `TRUSTED_PROXY_CIDRS` 默认值与 nginx 的 `X-Forwarded-For` 透传）。
+
+运维说明：`SMS_IP_LIMIT_PER_HOUR` 已在 `deploy/docker-compose.delivery.yml` 暴露为 `${SMS_IP_LIMIT_PER_HOUR:-30}`，改值只需改环境后 `docker compose up -d api`（无需重建镜像）；手机号维度仍由 `SMS_SEND_LIMIT_PER_HOUR` / `SMS_LOGIN_LIMIT_PER_HOUR` 控制。调大 IP 预算前先确认 `TRUSTED_PROXY_CIDRS` 已按实际网段收窄，否则等于给整站共用桶放宽额度。
+
+### 本地 AI 适配器的预算与评审证据（PA-166）
+
+适配器（`scripts/ops/local_ai_http.py`）在 `private` 目录里给每次推理调用写一个 `call-NNN/`（`reservation.json` + `result.json`），累计预算按「`call_baseline` + 已计数调用数 < `limits`」判定。评审证据（`call-001` 等被 `resolutions` 复核过的资产）与线上调用**同目录**，重启时若把归档证据拷回 `calls/`，它会被当成新花费，出现「恢复证据即打爆预算」——对外恒为 `MODEL_GUARD_OR_REQUEST_FAILED_NO_RETRY`，`detail_code` 全空。
+
+现在预算只计**未被声明为证据**的调用：
+
+| 配置键 | 作用 |
+| --- | --- |
+| `evidence_records` | 声明 `calls/` 下属于历史证据的目录名（`["call-001", …]`）。这些目录仍须存在（`work-ai-runtime.ps1 up` 会校验若干条），但**不进入**当前窗口的调用数与时长。`resolutions` 里列出的 `record` 自动计入，无需重复声明 |
+| `call_baseline` / `limits` | 语义不变：窗口前已在预算外花掉的调用数 + 本窗口已计数调用数 必须小于 `limits` |
+
+`GET /healthz` 的 `budget` 字段会回显 `limits`、`call_baseline`、`counted`（本窗口计数）、`counted_records`、`evidence_excluded` 与 `evidence_records`，用来判断「还剩多少」和「哪些被当成证据」。每次 `reservation.json` 也会记 `budget_counted: true` 与 `evidence_excluded_before`，事后可复算。
+
+判定不变的部分：完成屏障、失败输入不自动重放、证据缺失/漂移仍然 fail-closed（`gate()` 仍遍历**全部**调用，包含证据）。改配置后需重启适配器才生效；重启与单入口回归由 `deploy/ai-runtime.ps1 up` 负责。
+
+`up` 每次都会重写 `config.json`（`deploy/work-ai-runtime.ps1` 的 `$config` 块是唯一来源），所以手工往里加的键会在下一次 `up` 时消失。`evidence_records` 因此走**清单文件**：`tmp\delivery-work-ai-runtime\evidence-records.txt`，每行一个 `call-NNN`，`up` 读它写进配置（缺文件＝没有证据声明）。改清单同样要 `up` 一次才生效。
+
+### 运行时的单一入口（只允许 `ai-runtime.ps1 up|down`）
+
+`deploy/ai-runtime.ps1 up|down|status|verify|resolve-unknown` 是 Ollama 与工单适配器的唯一入口。**禁止手工起适配器**（`python scripts/ops/local_ai_http.py serve --config …`）：手工进程不会被 receipt 记录，`ai-runtime.ps1 status` 会继续显示旧 receipt 的 `launcher_pid` / `listener_pid`，`config_sha256`、`runtime_binding_sha256` 与实际运行的东西脱钩，出问题时无法判断「跑的是哪份代码」。
+
+对账三步（每次收口后都做）：
+
+1. `deploy\ai-runtime.ps1 status` 的 `receipt.launcher_pid` / `receipt.listener_pid` 必须与 `netstat -ano | findstr :11437` 的 pid、以及 `python.exe … local_ai_http.py serve` 的父子进程一致；
+2. `receipt.source_commit` 必须等于当前要跑的提交（它只对 `equiv_scope` 有效，仓库 HEAD 用 `git rev-parse HEAD` 看），`receipt.adapter_sha256` 等于 `git show <commit>:scripts/ops/local_ai_http.py` 的 sha256；
+3. `GET /healthz`（带 `internal-token.txt` 里的 Bearer）返回 `status=ready`、`reservation_gate=READY`、`accepting_requests=true`，且 `GET http://127.0.0.1:8093/api/v1/readyz` 的 `ai_credentials.status=configured`。
+
+改了 `scripts/ops/local_ai_http.py` 之后，`up` 会因为钉住的 `$ExpectedAdapterSha256` 对不上而**拒绝启动**——这是设计使然：必须先在 `deploy/work-ai-runtime.ps1` 里同时更新 `$SourceCommit` 与 `$ExpectedAdapterSha256`（按 `git show <commit>:<path>` 的 LF 字节算 sha256，与 `Get-FileHash` 口径一致），再 `up`。不要绕过校验直接手起适配器。
+
+### 资源地板：可观测、可覆盖（PA-130）
+
+适配器在每次 Qwen 调用前后比较宿主剩余内存与显卡空闲显存，低于地板即拒绝（`QWEN_RESOURCE_GUARD` → 对外 `RESOURCE_ADMISSION_REJECTED`）。地板过去是三个写死的字面量，只能报「拒了」；现在它们可观测、可覆盖，默认值不变：
+
+| 环境变量 | 默认 | 含义 |
+| --- | --- | --- |
+| `LOCAL_AI_RAM_FLOOR_MIB` | 4500 | 请求期间要求的最小可用内存（MiB） |
+| `LOCAL_AI_GPU_FLOOR_MIB` | 2000 | 模型常驻时要求的最小空闲显存（MiB） |
+| `LOCAL_AI_COLD_START_GPU_FLOOR_MIB` | 6000 | 模型**未常驻**、本次请求要现场加载时要求的最小空闲显存（MiB） |
+
+规则：
+
+- 非法值（非整数、`≤0`、`>262144`）在**进程启动时**就抛 `ValueError: INVALID_FLOOR_MIB:<变量名>:<原值>`，不会带着没选过的地板接请求；空值等同未设置，用默认值。
+- `GET /healthz` 与 `GET /readyz`（同一载荷）新增两块：`floors` 回显三者生效值与来源（`default` / `env:<变量名>`），`resource_floor` 给出 `floor_mib` / `observed_mib` / `short_by_mib`（正数＝还差多少）以及 `ram` / `gpu` 分项与 `observation_error`（`nvidia-smi` 不可用时不会把就绪探针变成 500）。
+- 资源拒绝时，`POST` 的 503 体与 `pre-reservation-failures.jsonl` 记录都会带上同一份 `resource_floor`；错误串与非资源类状态码不变，`detail_code` 语义不变（仍只回显白名单内的原因，`QWEN_RESOURCE_GUARD` 不在名单里，仍为 `null`）。
+- 启动 banner 会多打一行 `resource floors: {...}`，写明三个生效值与可覆盖的变量名。
+
+**32GB / 16GB 机器的现实**：27B（q3）常驻时实测空闲显存 1941–1962 MiB、宿主可用内存 4417–4777 MiB，而默认地板是 2000 / 4500，也就是说**每次加载都会贴地板、差几十 MiB**。这时报 `short_by_mib: 38~59` 属于**容量问题**，不是代码回归：机器在 27B + 视觉这条路上本来就没有余量。可选路径（按代价从小到大，均需另行评审，本文只记录）：
+
+1. **降上下文**：把 `PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL` 指向更小 ctx 的已批准变体（如 `…-g52-ctx8192`），减少 KV cache 占用；
+2. **只跑文本**：关闭图片/视觉调用，省掉 VLM 那一轮常驻与显存峰值；
+3. **换小模型**：改用更小的已批准模型，重跑能力回归后替换——这会改变对外承诺的模型口径，必须走评审，不能由运维直接改。
+
+覆盖示例（仅用于临时排查，需在部署记录里写明原因与时长）：
+
+```powershell
+$env:LOCAL_AI_RAM_FLOOR_MIB      = "4450"
+$env:LOCAL_AI_COLD_START_GPU_FLOOR_MIB = "1950"
+deploy\ai-runtime.ps1 up
+```
+
+覆盖后必须能从 `GET /readyz` 的 `floors.source` 看出「是 env 覆盖，不是默认值」；排查结束后恢复默认并重启，否则这台机器上的地板就再也没人校验过。
+
 ### 媒体模型版本与成功检查点（2026-11-02）
 
 `VLM_MODEL_REVISION`、`ASR_MODEL_REVISION` 可填写已核实的权重 SHA-256（例如 `sha256:<64位摘要>`）或不可变部署发布号。标签最长128字符，仅允许字母、数字、点、下划线、冒号、加号、连字符；禁止凭证或业务内容。实际请求仍使用 `VLM_MODEL` / `ASR_MODEL`，revision 仅进入成功检查点指纹。

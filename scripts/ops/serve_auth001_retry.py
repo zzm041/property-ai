@@ -39,8 +39,8 @@ def _install_identity_test_clock(application, settings) -> None:
     from app.api.v1.identity_recovery import get_identity_recovery_service
     from app.provider.identity_proof import IsolatedTestIdentityProofProvider
     from app.repository.identity import IdentityRepository
-    from app.service.auth import AuthService
-    from app.service.identity_recovery import IdentityRecoveryService
+    from app.service.identity.auth import AuthService
+    from app.service.identity.identity_recovery import IdentityRecoveryService
 
     def fixed_service(session=Depends(get_db_session)) -> IdentityRecoveryService:
         provider = IsolatedTestIdentityProofProvider(

@@ -8,8 +8,8 @@ import pytest
 
 from app.core.errors import AnnouncementErrorCode, AppError, IamErrorCode
 from app.domain.ai import ANNOUNCEMENT_DRAFT, ANNOUNCEMENT_PUBLISH, ANNOUNCEMENT_READ
-from app.domain.audit import AUDIT_ACTION_POLICIES, AuditAction, AuditResourceType
-from app.domain.iam import OrganizationScope, Principal, RoleGrant, ScopeType
+from app.domain.governance import AUDIT_ACTION_POLICIES, AuditAction, AuditResourceType
+from app.domain.identity import OrganizationScope, Principal, RoleGrant, ScopeType
 from app.model.ai import Announcement, AnnouncementScope
 from app.model.property import Building, House, Property, Unit
 from app.model.resident import ResidentHouseRelation

@@ -21,8 +21,11 @@ ANALYZE_TASK = "app.worker.tasks.analyze_work_order_task.apply_async"
 
 
 def _production() -> Settings:
-    # 只为取 app_env：用开发配置构造再切环境（生产构造器要求企业凭证）
-    return Settings(_env_file=None).model_copy(update={"app_env": "production"})
+    # 只为取 app_env：用开发配置构造再切环境（生产构造器要求企业凭证）。
+    # PA-104 起 durable 链默认开启，而本文件考的是**关闭时**的直投路径，故显式关掉。
+    return Settings(_env_file=None).model_copy(
+        update={"app_env": "production", "durable_tasks_enabled": False}
+    )
 
 
 def _service(session: Session, settings: Settings) -> WorkOrderService:
@@ -93,7 +96,12 @@ def test_non_production_keeps_previous_log_only_behaviour():
     engine = _engine()
     recorded: list[dict] = []
     with Session(engine) as session:
-        service = _service(session, Settings(_env_file=None))  # development
+        service = _service(
+            session,
+            # 直投路径只在非 test 环境成立（test 环境还要 AI_ENQUEUE_ON_CREATE），
+            # 所以这里显式声明 development，不继承 pytest 进程的 APP_ENV。
+            Settings(_env_file=None, app_env="development", durable_tasks_enabled=False),
+        )
         with patch("app.worker.enqueue.running_under_pytest", lambda: False), \
                 patch(ANALYZE_TASK, _boom), \
                 patch("app.worker.failed_tasks.record_failed_task", lambda *a, **k: recorded.append(k)):

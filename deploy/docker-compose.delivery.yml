@@ -3,10 +3,16 @@ name: ${COMPOSE_PROJECT_NAME:-property-ai-delivery-check}
 # Reproducible single-host delivery artifact.  Application processes never
 # migrate automatically; run the one-shot `migrate` service explicitly.
 x-app-image: &app-image
-  image: property-ai-delivery:${DELIVERY_IMAGE_TAG:-local}
+  # PA-116: the tag is content-addressed (`src-<12-hex source commit>`) and is
+  # exported by `deploy/delivery.ps1 release`, which refuses a mutable tag and
+  # force-recreates api/worker/beat/publisher together.  A stale container can no
+  # longer keep serving an older image than its siblings.
+  image: property-ai-delivery:${DELIVERY_IMAGE_TAG:-unbuilt}
   build:
     context: ..
     dockerfile: deploy/Dockerfile
+    args:
+      PROPERTY_AI_SOURCE_SHA: ${DELIVERY_SOURCE_SHA:-unknown}
 
 services:
   mysql:
@@ -163,6 +169,17 @@ services:
       VLM_API_KEY: ${VLM_API_KEY:-${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}}
       ASR_API_KEY: ${ASR_API_KEY:-${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}}
       DISPATCH_REJECT_COOLDOWN_SECONDS: ${DISPATCH_REJECT_COOLDOWN_SECONDS:-600}
+      # D3/PA-168: nginx terminates every request, so the socket peer the api
+      # sees is always the nginx container. Without a trusted proxy CIDR the
+      # per-client-IP credential budget collapses into one bucket: 30 logins an
+      # hour would throttle the whole deployment, and a spoofed
+      # X-Forwarded-For could never be told apart from the real client. Narrow
+      # this to the compose subnet when the deployment uses a custom network
+      # (`docker network inspect -f '{{range .IPAM.Config}}{{.Subnet}}{{end}}' <network>`).
+      TRUSTED_PROXY_CIDRS: ${TRUSTED_PROXY_CIDRS:-172.16.0.0/12}
+      # D3: per-client-IP credential budget, an hour's window. Exposed here so
+      # an operator can widen or tighten it without rebuilding the image.
+      SMS_IP_LIMIT_PER_HOUR: ${SMS_IP_LIMIT_PER_HOUR:-30}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
@@ -186,14 +203,24 @@ services:
   worker:
     <<: *application
     command: ["sh", "-c", "exec celery -A app.worker.celery_app.celery_app worker --loglevel=info -Q \"$${CELERY_TASK_QUEUE}\" --concurrency=1"]
+    # PA-104-D: real probe — a worker that stopped consuming must be unhealthy.
     healthcheck:
-      disable: true
+      test: ["CMD", "python", "-m", "app.worker.healthcheck", "worker"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+      start_period: 60s
 
   publisher:
     <<: *application
     command: ["python", "-m", "app.worker.task_intent_publisher", "--seconds", "3600"]
+    # PA-104-D: real probe — heartbeat freshness plus broker reachability.
     healthcheck:
-      disable: true
+      test: ["CMD", "python", "-m", "app.worker.healthcheck", "publisher"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+      start_period: 60s
 
   beat-volume-init:
     <<: *app-image

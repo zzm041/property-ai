@@ -57,11 +57,18 @@ $ControlledStops = @(
         Reason = "RESOURCE_FLOOR"
     }
 )
-$ModelRoot = Join-Path $RepoRoot "tmp\selfhost-ai-local\models"
+$ModelRoot = "E:\ai-models\property-ai\models"
+# Reviewed build first: the shipped portable runtime next to the repo, then the
+# per-user install. The sha256 pin below still decides whether a candidate is usable,
+# so preferring the repo-local copy only removes "wrong binary on this host" failures.
+$SelfhostRoot = Join-Path (Join-Path $RepoRoot "tmp") "selfhost-ai-runtime"
+$PortableOllamaExe = Join-Path $SelfhostRoot "ollama-0.34.4-portable/ollama.exe"
 $OllamaExe = if ($env:PROPERTY_AI_OLLAMA_EXE) {
     $env:PROPERTY_AI_OLLAMA_EXE
+} elseif (Test-Path -LiteralPath $PortableOllamaExe -PathType Leaf) {
+    $PortableOllamaExe
 } else {
-    "C:\Users\lmj\AppData\Local\Programs\Ollama\ollama.exe"
+    "C:/Users/lmj/AppData/Local/Programs/Ollama/ollama.exe"
 }
 $ExpectedExeSha256 = "D571E4CF0AD4456FCCD33D5B985B6D63BA5669C6E5A812391704083952AAE3D5"
 $ExpectedVersion = "0.34.4"

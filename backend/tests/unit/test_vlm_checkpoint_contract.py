@@ -16,8 +16,8 @@ def provider(**kwargs):
 
 @pytest.fixture
 def checkpoint(monkeypatch):
-    monkeypatch.setattr('app.service.analysis.require_execution_lease', lambda session: None)
-    monkeypatch.setattr('app.service.analysis.owns_attempt', lambda *args: True)
+    monkeypatch.setattr('app.service.analysis.context.require_execution_lease', lambda session: None)
+    monkeypatch.setattr('app.service.analysis.context.owns_attempt', lambda *args: True)
     s = AnalysisService.__new__(AnalysisService)
     s._session = MagicMock()
     s._session.in_transaction.return_value = False
@@ -72,7 +72,7 @@ def test_checkpoint_lookup_still_requires_current_attempt(checkpoint, monkeypatc
     from app.service.task_intent import IntentLeaseLost
     s, snap, media, logs = checkpoint
     s._save_media_checkpoint(snap, 'VLM', media, 'observation', 'request')
-    monkeypatch.setattr('app.service.analysis.owns_attempt', lambda *args: False)
+    monkeypatch.setattr('app.service.analysis.context.owns_attempt', lambda *args: False)
     with pytest.raises(IntentLeaseLost):
         s._load_media_checkpoint(snap, 'VLM', media)
     with pytest.raises(IntentLeaseLost):

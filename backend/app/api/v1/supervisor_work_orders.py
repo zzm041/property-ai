@@ -10,8 +10,8 @@ from app.api.dependencies.db import get_db_session
 from app.api.v1.work_orders import get_work_order_service, work_order_data
 from app.core.errors import AppError, WorkOrderErrorCode
 from app.core.config import Settings, get_settings
-from app.domain.iam import Principal
-from app.schema.common import request_id_for, success_envelope
+from app.domain.identity import Principal
+from app.schema.common import SuccessEnvelope, request_id_for, success_envelope
 from app.schema.work_order import (
     AssignWorkOrderRequest,
     DecideWorkOrderRequest,
@@ -73,7 +73,7 @@ def _reject_header_mismatch(*, property_id: int, x_property_id: str | None) -> N
         )
 
 
-@router.get("/work-orders")
+@router.get("/work-orders", response_model=SuccessEnvelope[WorkOrderListData])
 def list_supervisor_work_orders(
     request: Request,
     actor: Annotated[Principal, Depends(get_current_principal)],
@@ -95,6 +95,10 @@ def list_supervisor_work_orders(
         view=view,
     )
     items = [work_order_data(item, overdue=service.is_overdue(item)) for item in records]
+    # PA-169 (t152/F4): a quarantined analysis must not be silent in the queue.
+    notes = service.quarantine_notes([item.id for item in items])
+    for item in items:
+        item.system_note = notes.get(item.id)
     next_cursor = items[-1].id if len(items) == limit else None
     return success_envelope(
         request,

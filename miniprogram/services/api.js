@@ -364,6 +364,14 @@ module.exports = {
       data: body,
       headers: { "Idempotency-Key": idempotencyKey || `mp-${Date.now()}-${Math.random().toString(16).slice(2)}` },
     }),
+  // Best effort pre-fill for the report form; never blocks creating an order.
+  suggestWorkOrderDescription: (fileIds) =>
+    request({
+      path: "/work-orders/suggest",
+      method: "POST",
+      data: { file_ids: fileIds },
+      unauthorizedBusinessCodes: ["IAM.FORBIDDEN"],
+    }),
   listWorkOrders: (afterId, limit = 20) =>
     request({
       path: `/work-orders?limit=${limit}${afterId ? `&after_id=${afterId}` : ""}`,

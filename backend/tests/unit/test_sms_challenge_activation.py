@@ -10,7 +10,7 @@ from sqlalchemy.exc import OperationalError
 from app.core.config import Settings
 from app.core.errors import AppError
 from app.provider.sms import SmsSendResult
-from app.service.credential_auth import CredentialAuthService
+from app.service.identity.credential_auth import CredentialAuthService
 
 
 class FakeRepo:
@@ -45,7 +45,7 @@ class FakeProvider:
 
 
 def _service(monkeypatch, repo, provider):
-    monkeypatch.setattr("app.service.credential_auth.run_owned_transaction", lambda session, fn: fn())
+    monkeypatch.setattr("app.service.identity.credential_auth.run_owned_transaction", lambda session, fn: fn())
     settings = Settings(
         _env_file=None, app_env="test", dev_auth_enabled=True,
         app_secret_key="test-challenge-activation-secret",

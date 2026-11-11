@@ -18,7 +18,7 @@ from app.api.v1.notifications import (
     router,
 )
 from app.core.errors import AppError, IamErrorCode, NotificationErrorCode
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.repository.knowledge import KnowledgeRepository
 from app.service.notification import NotificationService
 from app.service.work_order import WorkOrderService

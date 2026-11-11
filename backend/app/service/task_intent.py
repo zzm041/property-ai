@@ -290,12 +290,12 @@ class TaskIntentService:
 
     def _authorize_manager(self, row, actor):
         from app.core.errors import AppError
-        from app.domain.iam import OrganizationScope, ScopeType
+        from app.domain.identity import OrganizationScope, ScopeType
         from app.domain.ai import AI_ANALYSIS_REVIEW
         from app.domain.knowledge import KNOWLEDGE_MANAGE
-        from app.domain.property import PROPERTY_MANAGE
+        from app.domain.identity import PROPERTY_MANAGE
         from app.repository.identity import IdentityRepository
-        from app.service.auth import AuthService
+        from app.service.identity.auth import AuthService
         if row is None:
             raise AppError(code="TASK.NOT_FOUND", message="Task not found", status_code=404)
         current = AuthService(self.session, IdentityRepository(self.session)).load_principal(actor.user_id)
@@ -325,7 +325,7 @@ class TaskIntentService:
         from app.model.work_order import WorkOrder
         from app.model.knowledge import KnowledgeIngestionJob, KnowledgeDocument, NotificationDelivery
         from app.service.audit import AuditService
-        from app.domain.audit import AuditAction, AuditResourceType
+        from app.domain.governance import AuditAction, AuditResourceType
         if reason_code not in {"DEPENDENCY_RECOVERED", "OPERATOR_VERIFIED"}:
             raise AppError(code="TASK.INVALID_INPUT", message="Use a supported recovery reason", status_code=422)
         with begin_owned_transaction(self.session):
@@ -495,7 +495,7 @@ class TaskIntentService:
         from app.repository.ai import AiRepository
         from app.repository.work_order import WorkOrderRepository
         from app.service.audit import AuditService
-        from app.domain.audit import AuditAction, AuditResourceType
+        from app.domain.governance import AuditAction, AuditResourceType
 
         if reason_code != "ATTACHMENT_COMPLETION":
             raise AppError(

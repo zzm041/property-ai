@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Query, Request
 
 from app.api.dependencies.auth import get_current_principal
 from app.api.dependencies.db import get_db_session
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.schema.common import success_envelope
 from app.service.property_catalog import PropertyCatalogService
 from sqlalchemy.orm import Session

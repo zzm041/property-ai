@@ -1,0 +1,119 @@
+"""Work order enums shared by the domain, service, and API layers."""
+
+from enum import StrEnum
+
+
+class WorkOrderStatus(StrEnum):
+    PENDING_ANALYSIS = "PENDING_ANALYSIS"
+    PENDING_ASSIGNMENT = "PENDING_ASSIGNMENT"
+    ASSIGNED = "ASSIGNED"
+    ACCEPTED = "ACCEPTED"
+    PROCESSING = "PROCESSING"
+    WAIT_CONFIRM = "WAIT_CONFIRM"
+    COMPLETED = "COMPLETED"
+    CANCELLED = "CANCELLED"
+    CLOSED = "CLOSED"
+
+
+class ProcessReason(StrEnum):
+    NONE = "NONE"
+    WAITING_OWNER = "WAITING_OWNER"
+    WAITING_PARTS = "WAITING_PARTS"
+    INTERNAL_UNRESOLVED = "INTERNAL_UNRESOLVED"
+    ESCALATED = "ESCALATED"
+    EXTERNAL_COORDINATION = "EXTERNAL_COORDINATION"
+    REASSIGN_REQUIRED = "REASSIGN_REQUIRED"
+
+
+class WorkOrderEvent(StrEnum):
+    CREATE = "CREATE"
+    ANALYZE = "ANALYZE"
+    ASSIGN = "ASSIGN"
+    REASSIGN = "REASSIGN"
+    ACCEPT = "ACCEPT"
+    REJECT = "REJECT"
+    START = "START"
+    PROCESS_UPDATE = "PROCESS_UPDATE"
+    RECEIPT_RESOLVED = "RECEIPT_RESOLVED"
+    RECEIPT_UNRESOLVED = "RECEIPT_UNRESOLVED"
+    RECEIPT_MEDIA_APPENDED = "RECEIPT_MEDIA_APPENDED"
+    ESCALATE = "ESCALATE"
+    DECIDE = "DECIDE"
+    CONFIRM = "CONFIRM"
+    REOPEN = "REOPEN"
+    CANCEL = "CANCEL"
+    ARCHIVE = "ARCHIVE"
+    RATE = "RATE"
+    APPEND = "APPEND"
+    SLA_WARNING = "SLA_WARNING"
+    SLA_OVERDUE = "SLA_OVERDUE"
+    SLA_RESPONSE_TIMEOUT = "SLA_RESPONSE_TIMEOUT"
+
+
+class WorkOrderCategory(StrEnum):
+    PLUMBING = "PLUMBING"
+    ELECTRICAL = "ELECTRICAL"
+    HVAC = "HVAC"
+    CLEANING = "CLEANING"
+    SECURITY = "SECURITY"
+    OTHER = "OTHER"
+
+
+class WorkOrderPriority(StrEnum):
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
+    URGENT = "URGENT"
+
+
+class WorkOrderSeverity(StrEnum):
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
+
+
+class AssignmentStatus(StrEnum):
+    ACTIVE = "ACTIVE"
+    ENDED = "ENDED"
+    REJECTED = "REJECTED"
+    REASSIGNED = "REASSIGNED"
+
+
+class MediaKind(StrEnum):
+    IMAGE = "IMAGE"
+    AUDIO = "AUDIO"
+
+
+class MediaTakenPhase(StrEnum):
+    REPORT = "REPORT"
+    BEFORE = "BEFORE"
+    AFTER = "AFTER"
+    ON_SITE = "ON_SITE"
+
+
+class SlaClockState(StrEnum):
+    OPEN = "OPEN"
+    WARNING = "WARNING"
+    OVERDUE = "OVERDUE"
+    STOPPED = "STOPPED"
+
+
+class SlaPolicyStatus(StrEnum):
+    ACTIVE = "ACTIVE"
+    DISABLED = "DISABLED"
+
+
+class WorkOrderActorType(StrEnum):
+    RESIDENT = "RESIDENT"
+    STAFF = "STAFF"
+    SUPERVISOR = "SUPERVISOR"
+    ADMIN = "ADMIN"
+    SYSTEM = "SYSTEM"
+
+
+class SupervisorDecision(StrEnum):
+    REASSIGN = "REASSIGN"
+    WAIT_PARTS = "WAIT_PARTS"
+    WAIT_OWNER = "WAIT_OWNER"
+    EXTERNAL_COORDINATION = "EXTERNAL_COORDINATION"
+    CONTINUE = "CONTINUE"

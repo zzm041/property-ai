@@ -9,11 +9,11 @@ from sqlalchemy.orm import Session
 from app.api.dependencies.auth import get_current_principal
 from app.core.config import Settings
 from app.core.database import get_engine
-from app.domain.iam import OrganizationScope, Principal, ScopeType
+from app.domain.identity import OrganizationScope, Principal, ScopeType
 from app.main import create_app
 from app.model.identity import RolePermission, UserRole
 from app.schema.common import success_envelope
-from app.service.rbac import RbacService
+from app.service.identity.rbac import RbacService
 from tests.integration.iam_test_data import IamTestGraph, create_iam_test_graph
 
 TEST_SECRET = "gate-b-rbac-secret-that-is-not-production"

@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Query, Request
 
 from app.api.dependencies.auth import get_current_principal
 from app.api.v1.work_orders import get_work_order_service, work_order_data
-from app.domain.iam import Principal
+from app.domain.identity import Principal
 from app.schema.common import request_id_for, success_envelope
 from app.schema.work_order import (
     RejectWorkOrderRequest,

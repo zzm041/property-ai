@@ -4,7 +4,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.domain.resident import ResidentBindStatus, ResidentRelationType
+from app.domain.identity import ResidentBindStatus, ResidentRelationType
 
 
 class CreateResidentBindRequest(BaseModel):

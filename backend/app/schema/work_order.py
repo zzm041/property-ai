@@ -6,7 +6,7 @@ from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator, field_validator
 
-from app.domain.phone import normalize_phone
+from app.domain.identity import normalize_phone
 
 
 class DiagnosisFact(BaseModel):
@@ -47,6 +47,25 @@ class CreateWorkOrderRequest(BaseModel):
         if phone is None or not phone.isascii():
             raise ValueError("A valid report contact telephone is required")
         return phone
+
+
+class SuggestWorkOrderDescriptionRequest(BaseModel):
+    """Already-uploaded media the resident wants turned into draft text."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    file_ids: tuple[int, ...] = Field(min_length=1, max_length=4)
+
+
+class WorkOrderDescriptionSuggestionData(BaseModel):
+    """Draft text for the report form. Empty text is a normal, non-error answer."""
+
+    text: str
+    source: Literal["vlm", "asr", "none"]
+    reason_code: str | None = None
+    # PA-163: the machine code never reached the reporter, so a deployment whose
+    # media can never be used looked like "the AI had nothing to say".
+    reason: str | None = None
 
 
 class AppendWorkOrderRequest(BaseModel):
@@ -154,7 +173,7 @@ class StaffReceiptRequest(BaseModel):
 
     @model_validator(mode="after")
     def validate_fee_record(self) -> Self:
-        from app.domain.receipt_handling import normalize_handling
+        from app.domain.work_order import normalize_handling
 
         self.handling_mode, self.handling_note = normalize_handling(self.handling_mode, self.handling_note)
         if self.fee_flag == "RECORDED" and self.fee_amount is None:
@@ -302,6 +321,17 @@ class WorkOrderData(BaseModel):
     created_at: datetime
     updated_at: datetime
     sla_overdue: bool = False
+    # PA-169 (t152/F4): what the supervisor needs to know when the analysis was
+    # quarantined instead of run; empty for every other order.
+    system_note: str | None = None
+
+
+class CreateWorkOrderData(WorkOrderData):
+    """Create response: the order plus whether it was folded into an open one."""
+
+    # PA-169 (t152/F5): declared on the schema, not bolted on after model_dump,
+    # so the field shows up in OpenAPI. The content fingerprint stays internal.
+    deduplicated: bool = False
 
 
 class WorkOrderDisplayData(BaseModel):

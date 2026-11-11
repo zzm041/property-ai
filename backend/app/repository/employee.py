@@ -39,13 +39,20 @@ class EmployeeRepository:
         *,
         tenant_id: int,
         employee_id: int,
+        for_update: bool = False,
     ) -> Employee | None:
-        return self._session.scalar(
-            select(Employee).where(
-                Employee.id == employee_id,
-                Employee.tenant_id == tenant_id,
-            )
+        statement = select(Employee).where(
+            Employee.id == employee_id,
+            Employee.tenant_id == tenant_id,
         )
+        if for_update:
+            # PA-134: the tenant predicate sits inside the locking read, so a
+            # foreign row is never loaded and the caller cannot tell it apart
+            # from an id that does not exist at all.
+            statement = statement.with_for_update().execution_options(
+                populate_existing=True
+            )
+        return self._session.scalar(statement)
 
     def get_employee_for_user(self, user_id: int) -> Employee | None:
         return self._session.scalar(

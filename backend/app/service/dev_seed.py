@@ -12,8 +12,10 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings
 from app.core.database import begin_owned_transaction, create_database_engine
 from app.core.errors import AppError, DevSeedErrorCode
-from app.domain.audit import AuditAction, AuditResourceType, AuditSource
-from app.domain.dev_seed import (
+from app.core.passwords import hash_password, require_new_password, verify_password
+from app.core.time import utc_now
+from app.domain.governance import AuditAction, AuditResourceType, AuditSource
+from app.domain.dev import (
     DEV_PROPERTY_ADDRESS,
     DEV_PROPERTY_NAME,
     DEV_PROPERTY_TIMEZONE,
@@ -26,12 +28,12 @@ from app.domain.dev_seed import (
     SeedCodeDefinition,
     SeedUserDefinition,
 )
-from app.domain.iam import OrganizationScope, ScopeType
-from app.model.identity import Permission, Role, User
+from app.domain.identity import OrganizationScope, ScopeType
+from app.model.identity import Permission, Role, User, UserPassword, UserPhone
 from app.model.property import Property, Tenant
 from app.repository.dev_seed import DevSeedRepository, SeedUserGrantRecord
 from app.service.audit import AuditService
-from app.service.rbac_mutation import RbacMutationService
+from app.service.identity.rbac_mutation import RbacMutationService
 
 _ALLOWED_ENVIRONMENTS = frozenset({"development", "test"})
 _DUPLICATE_CONSTRAINTS = frozenset(
@@ -360,6 +362,7 @@ class DevSeedService:
             grants = self._repository.list_user_grants(user.id)
             if grants != (expected,):
                 self._raise_conflict()
+            self._ensure_credentials(user, definition)
             return
         user = User(status="ACTIVE", display_name=definition.display_name)
         self._add_record(lambda: self._repository.add_user(user))
@@ -382,9 +385,66 @@ class DevSeedService:
             scope=scope,
             request_id=request_id,
         )
+        self._ensure_credentials(user, definition)
 
-    @staticmethod
+    def _ensure_credentials(
+        self,
+        user: User,
+        definition: SeedUserDefinition,
+    ) -> None:
+        """PA-196: bind the demo login a definition declares, idempotently.
+
+        A definition without a phone or password stays identity-only. When one is
+        declared, a second seed run verifies the existing rows instead of writing
+        new ones, and any drift (phone already owned by another user, a different
+        hash) fails closed as a seed conflict rather than silently re-binding.
+        """
+
+        phone_e164 = definition.phone_e164
+        password = definition.password
+        if phone_e164 is None and password is None:
+            return
+        if phone_e164 is None or password is None:
+            self._raise_conflict()
+        require_new_password(password)
+
+        owner = self._repository.find_phone_owner(phone_e164)
+        existing_phone = self._repository.get_active_phone(user.id)
+        if owner is not None and owner.user_id != user.id:
+            self._raise_conflict()
+        if existing_phone is None:
+            if owner is not None:
+                self._raise_conflict()
+            self._add_record(
+                lambda: self._repository.add_phone(
+                    UserPhone(
+                        user_id=user.id,
+                        phone_e164=phone_e164,
+                        status="ACTIVE",
+                        verified_at=utc_now(),
+                    )
+                )
+            )
+        elif existing_phone.phone_e164 != phone_e164:
+            self._raise_conflict()
+
+        stored = self._repository.get_password(user.id)
+        if stored is None:
+            self._add_record(
+                lambda: self._repository.add_password(
+                    UserPassword(
+                        user_id=user.id,
+                        password_hash=hash_password(password),
+                        password_algo="argon2id",
+                    )
+                )
+            )
+            return
+        if not verify_password(stored.password_hash, password):
+            self._raise_conflict()
+
     def _scope_for(
+        self,
         definition: SeedUserDefinition,
         tenant: Tenant,
         property_record: Property,
@@ -393,6 +453,36 @@ class DevSeedService:
             return OrganizationScope(ScopeType.SYSTEM)
         if definition.scope_type is ScopeType.TENANT:
             return OrganizationScope(ScopeType.TENANT, tenant_id=tenant.id)
+        declared = self._declared_property_scope(definition)
+        if declared is not None:
+            return declared
+        return OrganizationScope(
+            ScopeType.PROPERTY,
+            tenant_id=tenant.id,
+            property_id=property_record.id,
+        )
+
+    def _declared_property_scope(
+        self,
+        definition: SeedUserDefinition,
+    ) -> OrganizationScope | None:
+        """PA-196: honour an explicit tenant/property scope when both rows exist.
+
+        A database without those rows keeps seeding against its own dev property, so
+        the same definition works on a fresh test database and on the delivery check
+        database that actually holds the demo work orders.
+        """
+
+        tenant_id = definition.scope_tenant_id
+        property_id = definition.scope_property_id
+        if tenant_id is None or property_id is None:
+            return None
+        tenant = self._repository.get_tenant(tenant_id)
+        property_record = self._repository.get_property(property_id)
+        if tenant is None or property_record is None:
+            return None
+        if property_record.tenant_id != tenant.id:
+            return None
         return OrganizationScope(
             ScopeType.PROPERTY,
             tenant_id=tenant.id,

@@ -11,7 +11,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from app.core.errors import AppError, IamErrorCode, WorkOrderErrorCode
-from app.service.rbac import RbacService
+from app.service.identity.rbac import RbacService
 from app.service.work_order import WorkOrderService
 
 

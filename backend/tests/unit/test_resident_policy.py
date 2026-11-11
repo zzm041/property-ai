@@ -2,7 +2,7 @@
 
 from datetime import UTC, datetime, timedelta
 
-from app.domain.resident import relation_is_currently_effective
+from app.domain.identity import relation_is_currently_effective
 
 
 NOW = datetime(2026, 9, 16, 12, 0, tzinfo=UTC)
