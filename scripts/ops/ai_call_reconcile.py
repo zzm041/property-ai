@@ -39,7 +39,8 @@ from dataclasses import dataclass, field
 DEFAULT_DSN_ENV = "DATABASE_URL"
 
 SUMMARY_SQL = """
-select request_id, provider_type, operation, status, latency_ms, input_hash, id
+select request_id, provider_type, operation, status, latency_ms, input_hash,
+       attempt, id
 from ai_call_logs
 """
 
@@ -60,8 +61,14 @@ class Summary:
     fan_out: dict[int, int] = field(default_factory=dict)
     retried_calls: int = 0
     retried_requests: list[str] = field(default_factory=list)
+    # t216: a repeat *write* is the same event recorded twice -- same request,
+    # provider, operation, status and attempt. Rows that only differ by attempt
+    # are the retry trail, and are counted separately so a retry is never
+    # reported as a duplicate.
     repeated_write_rows: int = 0
     repeated_write_requests: int = 0
+    retry_write_rows: int = 0
+    retry_write_requests: int = 0
 
     @property
     def rows_per_request(self) -> float:
@@ -80,6 +87,8 @@ class Summary:
             "retried_requests": self.retried_requests,
             "repeated_write_rows": self.repeated_write_rows,
             "repeated_write_requests": self.repeated_write_requests,
+            "retry_write_rows": self.retry_write_rows,
+            "retry_write_requests": self.retry_write_requests,
         }
 
 
@@ -89,6 +98,7 @@ def summarize(rows: Iterable[Mapping[str, object]]) -> Summary:
     per_request: dict[str, int] = defaultdict(int)
     per_call: Counter[tuple[str, str, str]] = Counter()
     per_write: Counter[tuple[str, str, str, str, object, str]] = Counter()
+    per_event: Counter[tuple[str, str, str, str, int]] = Counter()
     summary = Summary()
     for row in rows:
         summary.calls += 1
@@ -100,16 +110,22 @@ def summarize(rows: Iterable[Mapping[str, object]]) -> Summary:
         provider_type = str(row.get("provider_type") or "")
         operation = str(row.get("operation") or "")
         per_call[(request_id, provider_type, operation)] += 1
-        per_write[
-            (
-                request_id,
-                provider_type,
-                operation,
-                str(row.get("status") or ""),
-                row.get("latency_ms"),
-                str(row.get("input_hash") or ""),
-            )
-        ] += 1
+        status = str(row.get("status") or "")
+        per_write[(
+            request_id,
+            provider_type,
+            operation,
+            status,
+            row.get("latency_ms"),
+            str(row.get("input_hash") or ""),
+        )] += 1
+        per_event[(
+            request_id,
+            provider_type,
+            operation,
+            status,
+            int(row.get("attempt") or 0),
+        )] += 1
     summary.requests = len(per_request)
     histogram: Counter[int] = Counter(per_request.values())
     summary.fan_out = dict(sorted(histogram.items()))
@@ -121,10 +137,19 @@ def summarize(rows: Iterable[Mapping[str, object]]) -> Summary:
     )
     summary.retried_requests = retried[:20]
     repeated = {
-        key[0]: count for key, count in per_write.items() if count > 1
+        key: count for key, count in per_event.items() if count > 1
     }
     summary.repeated_write_rows = sum(count for count in repeated.values())
-    summary.repeated_write_requests = len(repeated)
+    summary.repeated_write_requests = len({key[0] for key in repeated})
+    retry_only = {
+        key[0]: count
+        for key, count in per_write.items()
+        if count > 1 and per_event.get((key[0], key[1], key[2], key[3], 0), 0) == 0
+    }
+    summary.retry_write_rows = sum(
+        count - 1 for key, count in per_write.items() if key[0] in retry_only
+    )
+    summary.retry_write_requests = len(retry_only)
     return summary
 
 
