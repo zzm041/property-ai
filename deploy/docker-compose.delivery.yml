@@ -168,6 +168,11 @@ services:
       LLM_API_KEY: ${LLM_API_KEY:-${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}}
       VLM_API_KEY: ${VLM_API_KEY:-${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}}
       ASR_API_KEY: ${ASR_API_KEY:-${DELIVERY_WORK_AI_INTERNAL_TOKEN:-}}
+      # The knowledge-answer runtime (11436) mints its own token; embedding,
+      # reranker and RAG generation must not reuse the work-order token.
+      EMBEDDING_API_KEY: ${EMBEDDING_API_KEY:-${DELIVERY_RAG_INTERNAL_TOKEN:-}}
+      RERANKER_API_KEY: ${RERANKER_API_KEY:-${DELIVERY_RAG_INTERNAL_TOKEN:-}}
+      RAG_LLM_API_KEY: ${RAG_LLM_API_KEY:-${DELIVERY_RAG_INTERNAL_TOKEN:-}}
       DISPATCH_REJECT_COOLDOWN_SECONDS: ${DISPATCH_REJECT_COOLDOWN_SECONDS:-600}
       # D3/PA-168: nginx terminates every request, so the socket peer the api
       # sees is always the nginx container. Without a trusted proxy CIDR the

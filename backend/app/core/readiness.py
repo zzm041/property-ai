@@ -1,10 +1,14 @@
 """Bounded readiness probes with Critical/Degraded classification."""
 
 import time
+import urllib.error
+import urllib.request
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
+from functools import partial
 from typing import Any
+from urllib.parse import urlsplit
 
 import redis
 from kombu import Connection
@@ -16,8 +20,74 @@ from app.core.logging import get_logger
 
 logger = get_logger(__name__)
 
-Probe = Callable[[Settings], None]
+Probe = Callable[[Settings], Any]
 NOT_CHECKED = object()
+AI_PROVIDER_NOT_CONFIGURED = "not_configured"
+# t221: /readyz used to answer `ready` with the frozen AI adapter stopped, because
+# every model provider was registered as NOT_CHECKED (`live_vendor_not_probed`).
+# A probe now answers ok|down|not_configured for each *configured* provider; a
+# configured provider that cannot be reached degrades readiness with a reason.
+AI_PROVIDER_TIMEOUT_SECONDS = 2.0
+AI_PROVIDER_TARGETS: dict[str, tuple[str, str, str]] = {
+    "llm": ("llm_provider", "llm_base_url", "llm_api_key"),
+    "vlm": ("vlm_provider", "vlm_base_url", "vlm_api_key"),
+    "asr": ("asr_provider", "asr_base_url", "asr_api_key"),
+    "embedding": ("embedding_provider", "embedding_endpoint", "embedding_api_key"),
+    "rerank": ("reranker_provider", "reranker_endpoint", "reranker_api_key"),
+}
+
+
+def ai_provider_endpoint(settings: Settings, name: str) -> tuple[str, str]:
+    """Return (endpoint, bearer token) for a *configured* provider, else ("", "").
+
+    `development` providers never leave the process, so they are not configured
+    endpoints and must not be reported as down (that would be a false alarm).
+    """
+
+    provider_attr, endpoint_attr, key_attr = AI_PROVIDER_TARGETS[name]
+    provider = getattr(settings, provider_attr)
+    endpoint = str(getattr(settings, endpoint_attr) or "").strip()
+    if provider != "production" or not endpoint:
+        return "", ""
+    key = settings.resolve_local_ai_key(getattr(settings, key_attr), endpoint)
+    return endpoint, key
+
+
+def ai_health_url(endpoint: str) -> str:
+    """Map a provider endpoint to the launcher's /healthz route.
+
+    Endpoints are configured per *operation*, not per host: the reranker points at
+    ``…:11436/v1/rerank`` while the embedder points at ``…:11436/v1``. The health
+    route belongs to the origin, so take scheme + authority and drop any path.
+    """
+
+    parts = urlsplit(endpoint.strip())
+    if not parts.scheme or not parts.netloc:
+        return ""
+    return f"{parts.scheme}://{parts.netloc}/healthz"
+
+
+def _dependency_name(name: str) -> str:
+    """Public provider name -> probe table key (only `rerank` differs)."""
+
+    return "reranker" if name == "rerank" else name
+
+
+def probe_ai_endpoint(settings: Settings, name: str) -> str:
+    """ok | not_configured for the ready path; raises when a configured one is down."""
+
+    endpoint, key = ai_provider_endpoint(settings, name)
+    if not endpoint:
+        return AI_PROVIDER_NOT_CONFIGURED
+    request = urllib.request.Request(ai_health_url(endpoint), method="GET")
+    if key:
+        request.add_header("Authorization", f"Bearer {key}")
+    with urllib.request.urlopen(
+        request, timeout=AI_PROVIDER_TIMEOUT_SECONDS
+    ) as response:
+        if response.status >= 400:
+            raise RuntimeError(f"health probe returned {response.status}")
+    return "up"
 
 
 def probe_mysql(settings: Settings) -> None:
@@ -107,7 +177,7 @@ def _run_probe(name: str, critical: bool, probe: Probe | object, settings: Setti
     started_at = time.perf_counter()
     checked_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     try:
-        probe(settings)  # type: ignore[misc]
+        outcome = probe(settings)  # type: ignore[misc]
     except Exception as exc:  # Dependency clients raise different exception families.
         latency_ms = round((time.perf_counter() - started_at) * 1000, 2)
         logger.warning(
@@ -124,8 +194,10 @@ def _run_probe(name: str, critical: bool, probe: Probe | object, settings: Setti
             "checked_at": checked_at,
         }
 
+    # A probe may vote `not_configured` instead of pretending to be up.
+    status = outcome if isinstance(outcome, str) else "up"
     return {
-        "status": "up",
+        "status": status,
         "critical": critical,
         "latency_ms": round((time.perf_counter() - started_at) * 1000, 2),
         "checked_at": checked_at,
@@ -147,11 +219,13 @@ def check_readiness(
         # load balancer kept routing to an instance that could not enqueue work.
         "redis": (True, probe_redis),
         "rabbitmq": (True, probe_rabbitmq),
-        "llm": (False, NOT_CHECKED),
-        "vlm": (False, NOT_CHECKED),
-        "asr": (False, NOT_CHECKED),
-        "embedding": (False, NOT_CHECKED),
-        "reranker": (False, NOT_CHECKED),
+        # t221: probing a configured endpoint is what makes `ready` truthful;
+        # an unconfigured provider reports `not_configured`, never `up`.
+        "llm": (False, partial(probe_ai_endpoint, name="llm")),
+        "vlm": (False, partial(probe_ai_endpoint, name="vlm")),
+        "asr": (False, partial(probe_ai_endpoint, name="asr")),
+        "embedding": (False, partial(probe_ai_endpoint, name="embedding")),
+        "reranker": (False, partial(probe_ai_endpoint, name="rerank")),
         "storage": (False, NOT_CHECKED),
         "milvus": (False, probe_milvus),
     }
@@ -173,6 +247,37 @@ def check_readiness(
     # D6: an unacknowledged demo scanner is a real gap in the media chain, so it
     # degrades readiness instead of being reported as a healthy pipeline.
     media_gap = bool(media_pipeline.get("demo_stub_unacknowledged"))
+
+    # t221: `ai_providers` is the honest one-line answer per provider.
+    ai_providers: dict[str, str] = {}
+    ai_provider_details: dict[str, dict[str, Any]] = {}
+    degraded_reasons: list[str] = []
+    for name in AI_PROVIDER_TARGETS:
+        # `rerank` is the public provider name; the dependency probe is `reranker`.
+        entry = dependencies.get(name) or dependencies.get(_dependency_name(name))
+        if entry is None:
+            continue
+        state = "ok" if entry["status"] == "up" else entry["status"]
+        if state not in {"ok", AI_PROVIDER_NOT_CONFIGURED}:
+            state = "down"
+        ai_providers[name] = state
+        detail: dict[str, Any] = {"status": state}
+        if "latency_ms" in entry:
+            detail["latency_ms"] = entry["latency_ms"]
+        if entry.get("reason"):
+            detail["reason"] = entry["reason"]
+        ai_provider_details[name] = detail
+        if state == "down":
+            degraded_reasons.append(f"ai_provider_down:{name}")
+
+    ai_dependency_names = {_dependency_name(provider) for provider in AI_PROVIDER_TARGETS}
+    for name, entry in dependencies.items():
+        if name in ai_dependency_names or name in AI_PROVIDER_TARGETS:
+            continue
+        if entry["status"] == "down":
+            degraded_reasons.append(f"dependency_down:{name}")
+    if media_gap:
+        degraded_reasons.append("media_pipeline:demo_stub_unacknowledged")
 
     if critical_down:
         status = "not_ready"
@@ -197,6 +302,10 @@ def check_readiness(
         # never as a scanned pipeline.
         "media_pipeline": media_pipeline,
         "dependencies": dependencies,
+        # t221: one line per model provider (ok|down|not_configured).
+        "ai_providers": ai_providers,
+        "ai_provider_details": ai_provider_details,
+        "degraded_reasons": degraded_reasons,
         "queue": {
             "name": settings.resolved_celery_queue,
             "depth": queue_depth(settings) if include_queue else None,

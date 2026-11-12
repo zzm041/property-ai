@@ -1,5 +1,5 @@
 {
-  "status": "SYNCED_20261112b",
+  "status": "SYNCED_20261112c",
   "files": {
     ".dockerignore": "7d1b0e2ba89527cdc61f5622afc6a2e9443c8d5d8596bd86b1a7be290b7f457e",
     ".env.example": "02144f940776882f76982e41633c19a504718c9a052eb150920468224f3cc8e7",
@@ -13,7 +13,7 @@
     "CHANGELOG.md": "c5704ad4cfc024afbe4af4ccc191bc8e4ac2256d46e8601a0d6be94430836c11",
     "ENGINEERING.md": "43545ffcece323334564001fd798ebd6cd4728df71afc268edb9ab386ab54210",
     "LICENSE": "ae54f8fea109b4a5e767ec496e22cd4ec38e7b475bdadf9b607599050bcd4494",
-    "README.md": "ff705a066a3e9323ae29319efcc9d8fc4dc9a66e18fdedb8671c56c39c914304",
+    "README.md": "c91cdbaabdb9a0bc8e4539b61586a2ebe67df76e0c314fa4ceb7eab04d4a5dab",
     "V1-FINAL-ACCEPTANCE.md": "4e11734e01a86b725d2b0e73b66597885ce5cec4a81a8a5084bb877b04fd6fae",
     "backend/README.md": "c63722aa9e024487b047410c98af33d51bed2dd9ef103ca071bc3c280a415d4a",
     "backend/alembic.ini": "a815fed7639e09c44a2a1a17d550537111b2f357d74ba521d5cf0ab1afd3f725",
@@ -106,7 +106,7 @@
     "backend/app/core/logging.py": "54dc24464a42361de444def9b44bc90561476f8af4321a35fa18c5473f476baf",
     "backend/app/core/passwords.py": "44741ef44d28a06215a04b79ed85536c4b5acf6b2e5fa704ca5b56d8f6cbbb65",
     "backend/app/core/rate_limit.py": "b012f46eaa5c7968231380bc2ae5787fa7a6954bf4afabad4430e56d5528dcb2",
-    "backend/app/core/readiness.py": "1e643b3099dcc3ac09a5da567c65a7d177cf73d88ec7c6dea0001784ce88796d",
+    "backend/app/core/readiness.py": "c1ca886fd84ef9838f9ee7062fce7345a107654727841dfb61b5a8383847b09e",
     "backend/app/core/request_context.py": "018d8905e56564716b74b7d04382266b2db381e8d3946bc38eac1b4d6dda8e2b",
     "backend/app/core/security.py": "5c079388512fd4b0a91ada96fb66b103e2248fc29110e548f87f499f2ad8bd44",
     "backend/app/core/startup.py": "bb0d0bf02d34c1b3d86da30b7302e32ed763fc994f8a5198c55380f21bd3709d",
@@ -510,11 +510,13 @@
     "backend/tests/unit/test_rag_prompt_revision.py": "0e087ce6cc463d1c5b99a57f17460f7e8ec51b72388c966ae94d68fbe141bf36",
     "backend/tests/unit/test_rag_prompt_version_188.py": "cd5ea6eba849e3b8aaf28bd2c5648d155e4eba3ac5cc796b52d42fa39c6ef3ce",
     "backend/tests/unit/test_rag_provider_startup_guard.py": "4e08310748e12ddfd9ea5465c146a7a708eed322913d75ea38ed0518a1fdb883",
+    "backend/tests/unit/test_rag_receipt_auto_retire_223.py": "a2c01292afa0d8a1b393b7342cd9d2589d4a3ebfa11382b106d9b14408f6aa0b",
     "backend/tests/unit/test_rbac.py": "18a7f90564dc74086074748c834635e85c9d50aab92dc4f61a575fd2b4dd515f",
     "backend/tests/unit/test_rbac_mutation_repository.py": "3a10742c0d9fb76a0797e654df7988def93ea4946bc4d2e2492ba78a91d9f2ff",
     "backend/tests/unit/test_rbac_mutation_service.py": "a2742e482cecd20e15a40d331e99f1bef124cec97a80044324b11dbb95c799bf",
     "backend/tests/unit/test_readiness.py": "b32a67723718583f9ed8f0d93da90b6ac74fa605fc57a273cb85748e4815b91e",
     "backend/tests/unit/test_readiness_observability_104d.py": "b44ce57a070640779e8b11e6ec9b25247d43c2abb9337c56f5d0ccbdfdde8503",
+    "backend/tests/unit/test_readyz_ai_providers_221.py": "dcdcd36e88b5d7413d3a944c0b2689a96d4b6e06e37c9941975c1ebd779791ce",
     "backend/tests/unit/test_receipt_handling.py": "8be11ae67e9fa88feb1a182f5eef8c1b25a07fa06bb9eec1a84e55ab2044f2d4",
     "backend/tests/unit/test_recovery_snapshot_guard.py": "4c5189b05af47adcf89b3489770e9ed0ce3f495b47466d94384535acea0f7b10",
     "backend/tests/unit/test_release_pack.py": "a64895040dca465096ca50c4cc5bc63e164d64487db27ead7b89181809c09661",
@@ -576,7 +578,7 @@
     "deploy/.env.customer.example": "41ee961e71c8846f0fc3d35ca772864ae3956551f07a9533578e635c07ef5e42",
     "deploy/.env.customer.storage-bootstrap.example": "b1f2eee3bf40f46728e4312f8b8c01236bceabf2d03d51ddae72fccc3499eae4",
     "deploy/.env.delivery.bootstrap.example": "37d8c3c5bc15fe17efbfebf9a87827bb5a8543e84d2f86921529b3b15e2f8208",
-    "deploy/.env.delivery.example": "0c0d924a7156b03132ceb9d900968458270d48d9dbeca4183f2f6b6994ec96fb",
+    "deploy/.env.delivery.example": "2ae7b4c5b1e9c75658f552c4cc27759c073da6763c1b83f7d897a7121af86c02",
     "deploy/CUSTOMER-INSTALL.md": "2e410f9d6745f639022b9c242e0c52b1f3ab3542bdabc5bcd65fc24d2686c825",
     "deploy/CUSTOMER-OPERATIONS.md": "4b338a58a609dcd69651b55845ca586e20e87ab2945abdecd7168df25c6d251c",
     "deploy/CUSTOMER-SCANNER.md": "7b27b721434a3e8650475179a700234b469ad6adc8dcfcf98256ee9cad2ad8e0",
@@ -590,7 +592,7 @@
     "deploy/docker-compose.bootstrap.yml": "a9bf042c1fa640b4a107e66e1c3fa617a1e6a4a887779e07f96f965c69cf3e51",
     "deploy/docker-compose.customer.yml": "a01add014b55bb3be13021d5c2f14aef59ce778f1cc8ee5f245b07c2d083fcd6",
     "deploy/docker-compose.day4.yml": "4c814dc43a8ce597d4942dc5f2c0e12fc661b1957d2e410e0db709711a9487e8",
-    "deploy/docker-compose.delivery.yml": "6ae380939798cf60b2341f03e218208972039606cd6fbf85c1b94c3c4153d2b6",
+    "deploy/docker-compose.delivery.yml": "644385d2adbd0476a5dc76f4b03cca7905dbd981c6ff23dcfd45adde7f40892f",
     "deploy/docker-compose.prodlike.yml": "2dbaf769d94106dcd39f9749fd73346a8b8ea84a4c8c22826bb870c981483b31",
     "deploy/docker-compose.yml": "e98f07e74baeff614155b0734035608aea136ba3852e3afb1f67ad063ea724e9",
     "deploy/nginx-day4.conf": "aa6626604c8dad35e127dc9cbe09559e55d897ca3cc8400991590e712110e75e",
@@ -606,7 +608,8 @@
     "deploy/online-demo/web/app.js": "0deb141de9b6eef0ec8d67f546cc8e40575427e6e414ac5f2b96ec2a5a742488",
     "deploy/online-demo/web/index.html": "458f979c936bf3b2c12c990565c9711ed7c25c0577d856b95452e94197f006af",
     "deploy/online-demo/web/style.css": "1f4cdcb6d5eaf86dbcae681345874d2929733e03649135f1c33f944a747715f8",
-    "deploy/rag-ollama-runtime.ps1": "7c8fe8008c9ea8837e957883773e7af35ae071a90700fac2db24514bb6a77a25",
+    "deploy/rag-ollama-runtime.ps1": "eb80d4b6717db4e4b4b27f5a179d398ced984ed8a0e9690119022a23bc415b57",
+    "deploy/rag-receipt-decision.ps1": "dc45e252a083006401f06e6cf4eb379ed12c4398a999cf89fbf5d841dc5cabe4",
     "deploy/rag-runtime.ps1": "1210cd2a1cc4d9dba1e0625b2b176a7b676bdceab7aaa379bf0ff2070f556de1",
     "deploy/requirements.delivery.lock": "545334321c7823ad9e50849753247d1fe8415c94fd7005391261aaeb42079e90",
     "deploy/selfhost/INSTALL-WINDOWS.md": "90854097adcf7c202df588c4b66304ff576086f9ef2c72e1a78830511c0ba268",
@@ -893,5 +896,5 @@
     "scripts/verify_business_ai.py": "e43eceb54fe35ef108808da5a09e3b58d140b625f54dd505fbcb6452e69b91e2",
     "skills-lock.json": "d510584205fd08aaa14600ca325f56a15639b827cc8c884b260c292caecee494"
   },
-  "note": "Hashes recomputed after syncing main with the development tree; files removed from this tree are dropped. Development head: 9360c73. Presentation assets (README.md, docs/showcase) stay curated on main."
+  "note": "Hashes recomputed after syncing the t223 release subset (readyz truthfulness, RAG receipt auto-retire, delivery token wiring) and correcting the README knowledge-answer claim. Existing entries are kept even when a path is not in this tree; removed paths are not dropped by this update."
 }
