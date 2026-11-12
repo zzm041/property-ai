@@ -334,6 +334,25 @@ DAY3_PRODLIKE_BASE_URL=http://127.0.0.1:8081
 
 可跑 `tests/integration/test_day3_prodlike_e2e.py` 的 live 段。默认 pytest 不要求该环境。
 
+### 15.1 小程序 UI E2E 的确定性窗口（sweep 竞态）
+
+`sweep_sla_task` 按 `SLA_SWEEP_INTERVAL_SECONDS`（默认 30 秒）把 `PENDING_ASSIGNMENT` 工单派给
+「在岗 + 零在手单」的员工。UI E2E 的人工派单/改派要「选卡片 → 铸零负载员工 → 选员工 → 点派单」，
+中间几十次 automator 往返；sweep 只要在这个窗口里跑一次，员工就被占成 BUSY（api `409
+WO.EMPLOYEE_NOT_ELIGIBLE`、`error_reason=BUSY`）。这不是缺陷，是设计。跑 E2E 前后开关窗口：
+
+```
+python scripts/ops/e2e_window.py --open     # 只重建 beat，SLA_SWEEP_INTERVAL_SECONDS=3600
+python scripts/ops/e2e_window.py --status   # 读 beat 容器里的当前周期
+python scripts/ops/e2e_window.py --close    # 恢复 deploy/.env.delivery 的值（30 秒）
+```
+
+默认值永远不动：`--open` 只是给 beat 加一个临时 compose override。harness 侧
+（`D:\AI\runtime\mpauto\e2e\lib\window.js`）在派单/改派用例开头读这个值，窗口没开直接失败，
+不靠重试撞运气。`--open`/`--close` 之后若宿主 `:8093` 不通，`docker restart
+property-ai-delivery-check-nginx-1`（compose 会连带拉起 `*-rollback-*` 克隆容器并抢网络别名，
+见 16 节）。
+
 ---
 
 ## 16. Day 4 disposable cross-process stack
