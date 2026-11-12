@@ -163,6 +163,9 @@ SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
             "incident:manage",
             "announcement:read",
             "announcement:draft",
+            # F-4 / t210: 主管就是现场审核人。没有这条权限时，公告能提审却永远停
+            # 在 PENDING_REVIEW（页面的「人工审核通过并发布」只在 canPublish 时渲染）。
+            "announcement:publish",
             "knowledge:read",
         ),
         "STAFF": (

@@ -86,12 +86,17 @@
 | 查看 Incident | 参与者 | Y | Y | Y |
 | 处置 Incident 主事件 | N | Y | Y | Y |
 | 创建公告草稿 | N | Y | Y | Y |
-| 审核发布公告 | N | N | Y | Y |
+| 审核发布公告 | N | Y | Y | Y |
 | 管理知识库 | N | N | Y | Y |
 | 配置 SLA 策略 | N | N | Y | Y |
 | 查看当前运营统计 | N | N | Y | Y |
 
 住户：只读已发布且命中范围的公告；知识助手只检索对本住户可见的知识。
+
+公告审核链：创建草稿 `announcement:draft` → 提交审核 → 审核发布 `announcement:publish`（可驳回，驳回需填理由）。
+F-4 / t210：`announcement:publish` 原先只挂 PROPERTY_ADMIN 及以上，小区只配主管时公告永远停在
+`PENDING_REVIEW`。现按上表把发布权给 SUPERVISOR（主管就是现场审核人），迁移
+`20261112_0020_supervisor_announcement_publish` 幂等补授权；`PROPERTY_ADMIN` / `TENANT_ADMIN` 保留原权限。
 
 ## 5. 数据隔离
 

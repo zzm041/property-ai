@@ -95,9 +95,9 @@ SKILL_CODE = "MAINTENANCE"
 
 # The supervisor queue and the manual dispatch endpoint both accept SUPERVISOR
 # (role 3) and PROPERTY_ADMIN (role 4); SUPERVISOR is the "物业主管" persona and
-# is what the miniprogram's supervisor page is written for. PROPERTY_ADMIN adds
-# announcement:publish, which SUPERVISOR deliberately does not have (F-4), so it
-# stays opt-in via --supervisor-role.
+# is what the miniprogram's supervisor page is written for. Since F-4 / t210 the
+# supervisor also carries announcement:publish, so one login can draft, submit
+# and publish; --supervisor-role still lets a drill pin PROPERTY_ADMIN instead.
 DEFAULT_SUPERVISOR_ROLES = ("SUPERVISOR",)
 
 
@@ -187,6 +187,12 @@ class PersonaSeeder:
             dry_run=self._dry_run,
         )
         roles = self._ensure_roles(report)
+        for role_code in self._supervisor_roles:
+            self._ensure_role_grant(
+                report,
+                role_code=role_code,
+                permission_code="announcement:publish",
+            )
         resident = self._ensure_person(
             report,
             user_id=DEFAULT_RESIDENT_USER_ID,
@@ -273,6 +279,60 @@ class PersonaSeeder:
             raise SystemExit(f"roles missing from the database: {', '.join(missing)}")
         report.facts["role_ids"] = roles
         return roles
+
+    def _ensure_role_grant(
+        self,
+        report: SeedReport,
+        *,
+        role_code: str,
+        permission_code: str,
+    ) -> None:
+        """Make sure a role actually carries a permission (F-4 / t210).
+
+        Binding a user to SUPERVISOR is not enough: the announcement review button
+        and the publish endpoint both read `announcement:publish` off the role's
+        permission set. A database migrated before 0019-style seeds can carry the
+        role without the grant, and then the announcement chain dead-ends in
+        PENDING_REVIEW. Insert the grant when it is missing, leave it alone when it
+        is already there, so the seeder stays idempotent.
+        """
+        present = self._scalar(
+            "select count(*) from role_permissions rp"
+            " join roles r on r.id = rp.role_id"
+            " join permissions p on p.id = rp.permission_id"
+            " where r.code = :role and p.code = :permission",
+            role=role_code,
+            permission=permission_code,
+        )
+        if present:
+            report.record(
+                "role_permissions",
+                f"{role_code}:{permission_code}",
+                "unchanged",
+                "grant already present",
+            )
+            return
+        if self._dry_run:
+            report.record(
+                "role_permissions",
+                f"{role_code}:{permission_code}",
+                "planned",
+                "grant would be inserted",
+            )
+            return
+        self._execute(
+            "insert into role_permissions (role_id, permission_id, created_at)"
+            " select r.id, p.id, current_timestamp(6) from roles r, permissions p"
+            " where r.code = :role and p.code = :permission",
+            role=role_code,
+            permission=permission_code,
+        )
+        report.record(
+            "role_permissions",
+            f"{role_code}:{permission_code}",
+            "inserted",
+            "grant was missing",
+        )
 
     def _house_ids(self, resident_user_id: int) -> list[int]:
         return [
