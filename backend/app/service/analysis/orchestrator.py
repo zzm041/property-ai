@@ -15,6 +15,7 @@ from sqlalchemy import MetaData, Table, inspect as sa_inspect, update
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.core.buildinfo import code_version
 from app.core.config import Settings, get_settings
 from app.core.database import (
     begin_owned_transaction,
@@ -806,6 +807,11 @@ class AnalysisService(VisionMixin, ValidationMixin, PersistenceMixin):
                 error_codes=QUARANTINE_ERROR_CODES,
                 since=since,
                 property_id=snapshot.property_id,
+                # F-7 (t214): only a refusal from *this* build and *this* prompt
+                # contract may skip the provider. A fix that ships a new build
+                # (or a new prompt) makes the old refusal inapplicable by design.
+                code_version=code_version(),
+                prompt_version=shared.WORK_ORDER_ANALYSIS_PROMPT_VERSION,
             )
         if hit is None:
             return None

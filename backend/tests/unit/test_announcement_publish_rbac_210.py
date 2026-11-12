@@ -184,4 +184,7 @@ def test_delivery_migrator_can_resume_from_the_previous_head() -> None:
     module = _migration_module()
     assert module.down_revision == "20261111_0019_ai_call_log_embedding_rerank"
     assert module.down_revision in delivery_migrate.RESUMABLE_REVISIONS
-    assert delivery_migrate.HEAD == module.revision
+    # t214 stacked 20261112_0021 on top, so this migration is no longer HEAD. What
+    # the migrator has to keep is the ability to *resume from it*: a database
+    # parked here must upgrade instead of being refused as an unknown target.
+    assert module.revision in delivery_migrate.RESUMABLE_REVISIONS

@@ -121,6 +121,8 @@ class AiRepository:
         error_codes: Sequence[str],
         since: datetime,
         property_id: int | None = None,
+        code_version: str | None = None,
+        prompt_version: str | None = None,
     ) -> tuple[datetime, int | None] | None:
         """When did this report content last produce an unusable answer?
 
@@ -141,7 +143,19 @@ class AiRepository:
         if not tenant_id:
             raise ValueError("quarantine lookup requires a tenant")
 
-        scope = [AiCallLog.tenant_id == tenant_id]
+        scope = [
+            AiCallLog.tenant_id == tenant_id,
+            # F-7 (t214): a refusal only speaks for the build that produced it.
+            # Callers that cannot name a code version get no quarantine at all
+            # (an unversioned refusal is exactly what has to be re-asked).
+            AiCallLog.quarantine_cleared_at.is_(None),
+        ]
+        if code_version:
+            scope.append(AiCallLog.code_version == code_version)
+        else:  # pragma: no cover - defensive: every production caller passes one
+            scope.append(AiCallLog.code_version.is_(None))
+        if prompt_version:
+            scope.append(AiCallLog.prompt_version == prompt_version)
         if property_id is not None:
             scope.append(AiCallLog.property_id == property_id)
 

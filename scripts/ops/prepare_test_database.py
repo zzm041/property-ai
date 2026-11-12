@@ -60,7 +60,7 @@ PRE_BOOTSTRAP = "20260925_0012_task_intents"
 #: Migration whose guard demands that administrator already exist.
 IDENTITY = "20260926_0014_identity_merge_sla_versions"
 #: Migration head this checkout expects a prepared test schema to sit at.
-HEAD = "20261112_0020_supervisor_announcement_publish"
+HEAD = "20261112_0021_ai_call_log_quarantine_scope"
 #: Fixed identity for the throwaway schema's baseline administrator. Integration tests
 #: wipe `users` between runs, so this is provenance, not an account anybody uses.
 DEFAULT_BOOTSTRAP_PHONE = "13800000000"

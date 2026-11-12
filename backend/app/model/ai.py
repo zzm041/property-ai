@@ -159,6 +159,16 @@ class AiCallLog(BigIntPrimaryKeyMixin, Base):
     content_fingerprint: Mapped[str | None] = mapped_column(
         String(64), nullable=True
     )
+    # F-7 (t214): *which code* produced this row. The quarantine probe compares
+    # it with the running build, so a refusal written by a broken build cannot
+    # silence the same text after the fix ships. Null on rows written before
+    # 20261112_0021, which therefore never quarantine anything.
+    code_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    # F-7 (t214): operator escape hatch. scripts/ops/ai_quarantine.py stamps this
+    # instead of deleting audit rows, and the probe ignores stamped rows.
+    quarantine_cleared_at: Mapped[datetime | None] = mapped_column(
+        UTCDateTime(), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         UTCDateTime(),
         nullable=False,

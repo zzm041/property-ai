@@ -1,11 +1,16 @@
 param(
     [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateSet("up", "down", "status", "verify", "resolve-unknown", "evidence-archive")]
+    [ValidateSet("up", "down", "status", "verify", "resolve-unknown", "evidence-archive", "quarantine")]
     [string]$Action,
     [switch]$KeepOllama,
     # PA-132: which call the shared completion barrier belongs to, and why releasing it is safe.
     [string]$Call,
-    [string]$Reason
+    [string]$Reason,
+    # F-7 (t214): `quarantine` filters. One of -OlderThan / -Fingerprint is required so a
+    # cleanup can never be a blanket "clear everything" by accident.
+    [string]$OlderThan,
+    [string]$Fingerprint,
+    [switch]$DryRun
 )
 
 # PA-116-A-4: one entry point for the local work-AI runtime.
@@ -40,6 +45,10 @@ $BarrierPython = Join-Path $RepoRoot "tmp\\selfhost-ai-runtime\\bge-142-cpu\\.ve
 # to double count archived calls and exhaustion surfaced as AI.UNAVAILABLE. Declaring a call
 # as evidence is an operator action with a receipt (sha256 + reason), not a delete.
 $EvidenceTool = Join-Path $RepoRoot "scripts\ops\ai_evidence_archive.py"
+# F-7 (t214): content quarantine used to silence a text for 24h regardless of which build
+# refused it. The tool stamps quarantine_cleared_at (it never deletes) and writes an audit row.
+$QuarantineTool = Join-Path $RepoRoot "scripts\ops\ai_quarantine.py"
+$RepoPython = Join-Path $RepoRoot ".venv\Scripts\python.exe"
 $WorkAiLauncher = Join-Path $DeployDir "work-ai-runtime.ps1"
 $OllamaLauncher = Join-Path $DeployDir "ollama-runtime.ps1"
 $Endpoint = "http://127.0.0.1:11437"
@@ -368,6 +377,32 @@ switch ($Action) {
         }
         Write-Output ("evidence_archive={0} call={1} record_sha256={2} ledger={3} restart={4}" -f `
             $receipt.status, $receipt.call, $receipt.record_sha256, $receipt.ledger, $receipt.restart_required)
+    }
+    "quarantine" {
+        # F-7 (t214): PA-169 quarantined report content for 24h on a content fingerprint alone,
+        # so a text refused by a build that has since been fixed kept short-circuiting to
+        # AI.INPUT_QUARANTINED with a 0 ms provider call. Clearing never deletes an audit row:
+        # it stamps quarantine_cleared_at and writes an audit_logs row naming the fingerprint,
+        # the build that refused it, and the operator's cut-off.
+        if (-not $OlderThan -and -not $Fingerprint) {
+            throw "quarantine requires -OlderThan <dur> (30m/24h/7d) and/or -Fingerprint <hex>"
+        }
+        if (-not (Test-Path -LiteralPath $QuarantineTool -PathType Leaf)) { throw "quarantine tool is missing: $QuarantineTool" }
+        $python = $RepoPython
+        if (-not (Test-Path -LiteralPath $python -PathType Leaf)) { $python = "python" }
+        $toolArgs = @($QuarantineTool)
+        if ($OlderThan) { $toolArgs += @("--older-than", $OlderThan) }
+        if ($Fingerprint) { $toolArgs += @("--content-fingerprint", $Fingerprint) }
+        if ($Reason) { $toolArgs += @("--reason", $Reason) }
+        if ($DryRun) { $toolArgs += @("--dry-run") }
+        $toolArgs += @("--json")
+        $output = & $python -I -B -X utf8 @toolArgs
+        $exitCode = $LASTEXITCODE
+        Write-Output $output
+        if ($exitCode -ne 0) { throw "quarantine clear failed (exit $exitCode)" }
+        $receipt = $output | ConvertFrom-Json
+        Write-Output ("quarantine_clear selected={0} cleared={1} dry_run={2} fingerprints={3}" -f `
+            $receipt.selected, $receipt.cleared, $receipt.dry_run, ($receipt.fingerprints -join ","))
     }
     "resolve-unknown" {
         # PA-132: the shared completion barrier fails closed on purpose. Releasing it used to

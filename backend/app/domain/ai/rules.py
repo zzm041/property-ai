@@ -84,6 +84,34 @@ def _family_group(label: str) -> frozenset:
     return frozenset({family})
 
 
+#: A segment carries evidence only if it has literal content: a CJK ideograph
+#: or a digit. Punctuation alone, and latin-only *labels* ("Resident updates:"),
+#: say nothing a label could bind to.
+_INFORMATIVE = re.compile(r"[0-9\u3400-\u4dbf\u4e00-\u9fff]")
+#: Shape of a section header, not one literal string: a short latin phrase that
+#: ends with a colon and has no content characters.
+_HEADER_SHAPE = re.compile(r"^[A-Za-z][A-Za-z0-9 _'\-/]{0,60}:$")
+
+
+def _is_evidence_segment(value: str) -> bool:
+    """F-6 (t214): keep content, drop the scaffolding around it.
+
+    ``orchestrator`` glues attachments/append notes onto the report with
+    ``"\nResident updates:\n"``. ``_source_segments`` splits on that newline, so
+    the header became its own catalog entry - a zero-information segment the model
+    is allowed to cite (and did: ``report:2``). The check is content-first, so an
+    English report sentence ("The pipe leaks.") still survives; only segments
+    without a single content character *and* shaped like a header are dropped.
+    """
+
+    stripped = value.strip()
+    if not stripped:
+        return False
+    if _INFORMATIVE.search(stripped):
+        return True
+    return not _HEADER_SHAPE.match(stripped)
+
+
 def _source_segments(text: str | None) -> list[tuple[str, list[int]]]:
     """Split only on sentence boundaries and retain offsets in the source."""
     if not text:
@@ -92,7 +120,7 @@ def _source_segments(text: str | None) -> list[tuple[str, list[int]]]:
     for match in re.finditer(r"[^。！？!?；;\r\n]+(?:[。！？!?；;]|\r\n?|\n|$)", text):
         raw = match.group(0)
         value = raw.strip()
-        if value:
+        if value and _is_evidence_segment(value):
             start = match.start() + len(raw) - len(raw.lstrip())
             rows.append((value, [start, start + len(value)]))
     return rows

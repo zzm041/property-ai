@@ -45,6 +45,6 @@ def test_delivery_migrator_targets_the_fixed_revision_not_generic_head() -> None
         ROOT / "backend" / "app" / "cli" / "delivery_migrate.py"
     ).read_text(encoding="utf-8")
     # The migrator always names a revision: never the moving `head`.
-    assert 'HEAD = "20261112_0020_supervisor_announcement_publish"' in source
+    assert 'HEAD = "20261112_0021_ai_call_log_quarantine_scope"' in source
     assert "_alembic(HEAD)" in source
     assert '_alembic("head")' not in source
