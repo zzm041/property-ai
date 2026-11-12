@@ -307,16 +307,14 @@ class PersonaSeeder:
         if present:
             report.record(
                 "role_permissions",
-                f"{role_code}:{permission_code}",
-                "unchanged",
+                f"{role_code}:{permission_code} unchanged",
                 "grant already present",
             )
             return
         if self._dry_run:
             report.record(
                 "role_permissions",
-                f"{role_code}:{permission_code}",
-                "planned",
+                f"{role_code}:{permission_code} planned",
                 "grant would be inserted",
             )
             return
@@ -329,8 +327,7 @@ class PersonaSeeder:
         )
         report.record(
             "role_permissions",
-            f"{role_code}:{permission_code}",
-            "inserted",
+            f"{role_code}:{permission_code} inserted",
             "grant was missing",
         )
 

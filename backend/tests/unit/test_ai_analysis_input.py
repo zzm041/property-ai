@@ -285,6 +285,8 @@ def test_versioned_prompt_keeps_context_as_json_evidence_and_usage_separate():
     assert '发黑、焦黑、熏黑用烧焦变色' in call['prompt']
     assert '没有明确燃气字样不得标疑似燃气气味' in call['prompt']
     assert '每项subject必须由该项evidence_id对应原文中支持该项label的具体分句独立确定' in call['prompt']
+    assert 'subject是闭集：只能取schema枚举里的值' in call['prompt']
+    assert '「卫生间地漏不下水」subject=排水区域' in call['prompt']
     assert '不能因三项在同一个evidence_id就把后两项也写成插座' in call['prompt']
     assert '不能借其他证据补成确定设备' in call['prompt']
     assert '不能一律填未确定' in call['prompt']

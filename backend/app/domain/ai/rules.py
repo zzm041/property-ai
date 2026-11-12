@@ -187,6 +187,7 @@ PATTERNS = {
                  r"|(?:排水|下水)(?:很|太|非常|特别)?(?:缓慢|慢|不利索)"
                  r"|水[^，,。；;!?！？]{0,12}(?:半天|很久)才下去"
                  r"|(?:水|下水|排水)[^，,。；;!?！？]{0,6}(?:流|下|排)不下去"
+                 r"|不(?:下|出)水|(?:下水|排水|放水)(?:很|太|非常|特别)?慢"
                  r"|(?:排水|下水)[^，,。；;!?！？]{0,6}(?:不通|不畅)"
                  r"|疏通",
     "部件下垂": r"(?:向|往)(?:左|右)?下方垂|(?:往)?下垂",
@@ -212,11 +213,11 @@ PATTERNS = {
 
 
 SUBJECT_PATTERNS = {
-    "窗户": r"窗户|纱窗|窗框", "柜门": r"柜门|柜的门", "排水区域": r"排水|下水|地漏|淋浴|洗澡|马桶|蹲便|坐便|洗手池|水槽|洗菜盆|洗手盆|洗碗池|下水道",
+    "窗户": r"窗户|纱窗|窗框", "柜门": r"柜门|柜的门", "排水区域": r"排水|下水|地漏|淋浴|洗澡|马桶|蹲便|坐便|洗手池|水槽|洗菜盆|洗手盆|洗碗池|下水道|排水口|下水口|排水孔|落水口|地漏口|阳台(?=.{0,6}(?:排水|下水|落水|积水|渗水))|洗衣机(?=.{0,8}(?:排水|出水|下水|接口|地漏))",
     "人员": r"人|他|她",
-    "水龙头": r"水龙头|龙头|出水口|水嘴", "排水接头": r"排水|接头|洗手盆|水槽|水管|弯管|立管|横管|管道|管口|下水管|排水管|排污|弯头|存水弯", "天花墙面": r"天花|天花板|墙|墙皮|顶棚|涂层",
+    "水龙头": r"水龙头|龙头|出水口|水嘴", "排水接头": r"排水|接头|洗手盆|水槽|水管|弯管|立管|横管|管道|管口|下水管|排水管|排污|弯头|存水弯|三通|管线接口|管接头", "天花墙面": r"天花|天花板|墙|墙皮|顶棚|涂层",
     "插座": r"插座|插孔|插排|排插", "照明": r"灯|照明", "空调": r"空调", "扶手": r"扶手",
-    "楼道地面": r"楼道|走廊|楼梯口|电梯厅|角落|地面|地板|地上|通道", "房门": r"门", "阀门管道": r"阀|管|软管",
+    "楼道地面": r"楼道|走廊|楼梯口|电梯厅|角落|地面|地板|地上|通道", "房门": r"门", "阀门管道": r"阀|阀门|水阀|角阀|闸阀|球阀|截止阀|管|软管|暗管",
 }
 
 
@@ -1035,8 +1036,13 @@ def bind_observations(
         # unknown evidence, danger omissions and scope-request conflicts are the
         # checks that stop a fabricated report, and tolerating them here would
         # be the same as accepting it.
+        # PA-212 (t212): the same demotion covers an unsupported *subject*.
+        # "卫生间地漏不下水" was answered with subject=排水区域; the sentence never
+        # says 排水区域, yet it does prove the drainage fault, and the pairing
+        # (evidence, family) is already accepted.  Keeping the row verbatim in
+        # unbound_observations is honest; failing the whole work order is not.
         evidence_unsupported = (
-            row.get("reason_code") == "label_not_matched"
+            row.get("reason_code") in {"label_not_matched", "subject_unsupported"}
             and any(
                 accepted["evidence_id"] == row["evidence_id"]
                 and _family_group(accepted["label"]) is not None
@@ -1050,6 +1056,8 @@ def bind_observations(
                 "disposition": "NOT_BOUND_TO_EVIDENCE",
                 "unbound_reason": (
                     "the evidence supports a related phenomenon, but not under this label"
+                    if row.get("reason_code") == "label_not_matched"
+                    else "the phenomenon is supported, but this clause does not name the claimed object"
                 ),
             })
             continue
