@@ -155,6 +155,9 @@ def test_default_probe_table_no_longer_skips_model_providers() -> None:
         ("http://host.docker.internal:11437/v1/", "http://host.docker.internal:11437/healthz"),
         ("http://127.0.0.1:11436", "http://127.0.0.1:11436/healthz"),
         ("  http://127.0.0.1:8000/v1  ", "http://127.0.0.1:8000/healthz"),
+        # the reranker is configured per operation, not per host (t223)
+        ("http://host.docker.internal:11436/v1/rerank", "http://host.docker.internal:11436/healthz"),
+        ("", ""),
     ],
 )
 def test_health_url_maps_provider_base_urls(endpoint: str, expected: str) -> None:

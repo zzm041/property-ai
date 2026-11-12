@@ -11,6 +11,8 @@ $RepoRoot = Split-Path -Parent $DeployDir
 $RuntimeDir = Join-Path $RepoRoot "tmp\delivery-rag-ollama-runtime"
 $StatePath = Join-Path $RuntimeDir "current.json"
 $StartLockPath = Join-Path $RuntimeDir "start.lock"
+. (Join-Path $DeployDir "rag-receipt-decision.ps1")
+$ReceiptAuditPath = Join-Path $RuntimeDir "receipt-audit.jsonl"
 $AuthorizedStaleResolutions = @(
     @{
         Path = Join-Path $RepoRoot "reports\real-ai-integration-027\delivery-rag-8093\rag-ollama-stale-receipt-resolution-20261002.json"
@@ -97,6 +99,31 @@ function Assert-State([object]$State) {
     return $process
 }
 
+function Retire-AutomaticStaleReceipt([object]$State) {
+    # The three conditions are evaluated by deploy/rag-receipt-decision.ps1; the
+    # helper is pure so its verdict is unit tested without starting a model.
+    $decision = Get-StaleReceiptDecision -State $State `
+        -RecordedPidExists ($null -ne (Get-CimProcessOrNull ([int]$State.pid))) `
+        -ListenerCount (@(Get-LoopbackListenerPids 11438).Count) `
+        -CurrentExecutableSha256 (Get-FileHash -Algorithm SHA256 -LiteralPath $OllamaExe).Hash `
+        -ExpectedExecutableSha256 $ExpectedExeSha256
+    if (-not $decision.retire) {
+        return [pscustomobject]@{ retired = $false; reasons = $decision.reasons; archive = $null }
+    }
+    $archive = Join-Path $RuntimeDir ("retired-automatic-stale-{0}.json" -f [string]$State.operation_id)
+    if (Test-Path -LiteralPath $archive) { throw "automatic stale RAG receipt archive already exists" }
+    Move-Item -LiteralPath $StatePath -Destination $archive
+    $line = [pscustomobject]@{
+        event = "RAG_OLLAMA_RECEIPT_AUTO_RETIRED"
+        at_utc = (Get-Date).ToUniversalTime().ToString("o")
+        receipt = $decision.evidence
+        archive = $archive
+        conditions = "recorded pid absent AND no listener on the RAG port AND executable sha256 unchanged"
+    }
+    Add-Content -LiteralPath $ReceiptAuditPath -Value ($line | ConvertTo-Json -Depth 6 -Compress) -Encoding UTF8
+    return [pscustomobject]@{ retired = $true; reasons = @(); archive = $archive }
+}
+
 function Retire-AuthorizedStaleReceipt([object]$State) {
     foreach ($binding in $AuthorizedStaleResolutions) {
         if (-not (Test-Path -LiteralPath $binding.Path -PathType Leaf)) { continue }
@@ -151,7 +178,18 @@ switch ($Action) {
                 $state | ConvertTo-Json -Depth 6
                 return
             }
-            if ($null -ne $state -and -not (Retire-AuthorizedStaleReceipt $state)) { throw "stale RAG Ollama receipt requires explicit evidence; start refused" }
+            if ($null -ne $state) {
+                # A receipt with nothing behind it is a deadlock, not a guard: retire it
+                # automatically once the machine proves the three conditions, and keep
+                # the explicit authorized resolution as the fallback for anything else.
+                $automatic = Retire-AutomaticStaleReceipt $state
+                if (-not $automatic.retired) {
+                    if (-not (Retire-AuthorizedStaleReceipt $state)) {
+                        $missing = ($automatic.reasons -join "; ")
+                        throw ("stale RAG Ollama receipt requires explicit evidence; start refused (automatic retire missing: {0})" -f $missing)
+                    }
+                }
+            }
             $id = [guid]::NewGuid().ToString("N")
             $stdout = Join-Path $RuntimeDir "server-$id.stdout.log"
             $stderr = Join-Path $RuntimeDir "server-$id.stderr.log"

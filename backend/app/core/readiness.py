@@ -54,12 +54,17 @@ def ai_provider_endpoint(settings: Settings, name: str) -> tuple[str, str]:
 
 
 def ai_health_url(endpoint: str) -> str:
-    """Map a provider base URL (…/v1) to the launcher's /healthz route."""
+    """Map a provider endpoint to the launcher's /healthz route.
 
-    base = endpoint.strip().rstrip("/")
-    if base.endswith("/v1"):
-        base = base[: -len("/v1")]
-    return f"{base}/healthz"
+    Endpoints are configured per *operation*, not per host: the reranker points at
+    ``…:11436/v1/rerank`` while the embedder points at ``…:11436/v1``. The health
+    route belongs to the origin, so take scheme + authority and drop any path.
+    """
+
+    parts = urlsplit(endpoint.strip())
+    if not parts.scheme or not parts.netloc:
+        return ""
+    return f"{parts.scheme}://{parts.netloc}/healthz"
 
 
 def _dependency_name(name: str) -> str:
