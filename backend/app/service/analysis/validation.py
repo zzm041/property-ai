@@ -160,6 +160,27 @@ class ValidationMixin:
                     raise ObservationBindingError('Gas observation conflicts with risk category',
                                                   reason_code='risk_observation_conflict')
                 trace['raw_model_output']=dict(payload)
+                if trace.get('unbound_observations'):
+                    # PA-209 (t209): the analysis continues on the observations
+                    # the evidence does support, and the ones it does not are
+                    # kept - never dropped - both here and in the stored
+                    # event_evidence payload.  Silence would make a mislabel
+                    # invisible; failing the order made it fatal.
+                    logger.warning(
+                        'analysis_observation_unbound',
+                        request_id=request_id,
+                        count=len(trace['unbound_observations']),
+                        observations=[
+                            {
+                                'label': item.get('label'),
+                                'subject': item.get('subject'),
+                                'evidence_id': item.get('evidence_id'),
+                                'reason_code': item.get('reason_code'),
+                            }
+                            for item in trace['unbound_observations']
+                        ],
+                        effective_count=len(trace['effective_observations']),
+                    )
                 output=WorkOrderAnalysisOutput.model_validate({**observed.model_dump(exclude={'observations'}),'subcategory':key})
             else:
                 if self._settings.llm_provider!='development':raise ValueError('V10 observable evidence required')

@@ -64,6 +64,26 @@ def observation_family(label: str) -> str:
     return "火花烧损" if label == "冒烟" else label
 
 
+# PA-209 (t209): a wrong label is tolerable only when the evidence supports a
+# *neighbouring* phenomenon of the same fault family.  "排水缓慢" claimed for a
+# sentence that says "渗水" is the same waterside fault named differently; a
+# cosmetic "表面剥落" bolted onto a smoke observation is a different fault, and
+# stays fatal.  One entry per family; labels outside the table are their own
+# family, so nothing is tolerated by accident.
+_OBSERVATION_FAMILY_GROUPS: tuple[frozenset, ...] = (
+    frozenset({"进水扩散", "水渍", "滴渗水", "排水缓慢"}),
+    frozenset({"冒烟", "火花烧损", "烧焦变色"}),
+)
+
+
+def _family_group(label: str) -> frozenset:
+    family = observation_family(label)
+    for group in _OBSERVATION_FAMILY_GROUPS:
+        if family in group:
+            return group
+    return frozenset({family})
+
+
 def _source_segments(text: str | None) -> list[tuple[str, list[int]]]:
     """Split only on sentence boundaries and retain offsets in the source."""
     if not text:
@@ -965,6 +985,7 @@ def bind_observations(
         })
     rejected = still_rejected
     effective = [row for row in normalized if row["effective"]]
+    unbound: list[dict[str, object]] = []
     scope_requests = [row for row in normalized if row["label"] == "范围外请求"]
     if scope_requests:
         if not effective and (output.category != "other" or output.required_skill != "other" or output.risk != "none"):
@@ -1005,6 +1026,33 @@ def bind_observations(
         action_limitation = (
             row.get("reason_code") == "action_limitation_reported" and bool(effective)
         )
+        # PA-209 (t209): a single mislabelled observation must not erase the
+        # analysis.  The model claimed "排水缓慢" for a phrase that only says
+        # "渗水"; the evidence proves the fault, just not under that label.  Such
+        # rows are *demoted* to unbound_observations (kept verbatim, never
+        # renamed) instead of aborting the payload.  Every other guard stays
+        # fatal: negative/historical/uncertain phrasing, subject_conflict,
+        # unknown evidence, danger omissions and scope-request conflicts are the
+        # checks that stop a fabricated report, and tolerating them here would
+        # be the same as accepting it.
+        evidence_unsupported = (
+            row.get("reason_code") == "label_not_matched"
+            and any(
+                accepted["evidence_id"] == row["evidence_id"]
+                and _family_group(accepted["label"]) is not None
+                and bool(_family_group(accepted["label"]) & _family_group(row["label"]))
+                for accepted in effective
+            )
+        )
+        if evidence_unsupported and not informational_redundancy:
+            unbound.append({
+                **row,
+                "disposition": "NOT_BOUND_TO_EVIDENCE",
+                "unbound_reason": (
+                    "the evidence supports a related phenomenon, but not under this label"
+                ),
+            })
+            continue
         if (not informational_redundancy and not repeated_current_identity
                 and not noncritical_vision_cosmetic and not action_limitation):
             raise ObservationBindingError(str(row["reason"]),
@@ -1026,6 +1074,13 @@ def bind_observations(
                 else "unsupported noncritical cosmetic observation did not change the accepted electrical danger"
             ),
         })
+    if unbound and not effective and not scope_requests:
+        # PA-209 (t209): every observation was demoted, so there is nothing to
+        # analyse.  Fail here - after the bucket is complete - and name the same
+        # guard the fail-closed path named before, so the audit keeps reading
+        # "label_not_matched" rather than a generic binding error.
+        raise ObservationBindingError(str(unbound[0]["reason"]),
+                                      reason_code=str(unbound[0].get("reason_code") or "binding_invalid"))
     # Deduplicate by danger category, not source id: repeated text/ASR/VLM
     # mentions must not consume the six model observation slots. This does not
     # prove completeness for multiple objects sharing the same danger label.
@@ -1044,6 +1099,7 @@ def bind_observations(
         "effective_observations": effective,
         "informational_observations": [row for row in normalized if not row["effective"]],
         "ignored_observations": ignored,
+        "unbound_observations": unbound,
         "adjusted_observations": adjusted,
         "effective_key": key,
         "raw_model_output": output.model_dump(mode="json"),
