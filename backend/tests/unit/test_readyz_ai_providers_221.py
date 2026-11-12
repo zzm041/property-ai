@@ -172,7 +172,11 @@ def test_probe_reports_up_against_a_live_adapter() -> None:
             llm_base_url=f"http://127.0.0.1:{port}/v1",
             llm_api_key="probe-key",
         )
-        assert probe_ai_endpoint(settings, "llm") == "up"
+        # t227: a live adapter may also publish its runtime block, so the probe
+        # answers either the bare verdict or `{"status": "up", "runtime": {...}}`.
+        outcome = probe_ai_endpoint(settings, "llm")
+        status = outcome["status"] if isinstance(outcome, dict) else outcome
+        assert status == "up"
     finally:
         server.shutdown()
         server.server_close()

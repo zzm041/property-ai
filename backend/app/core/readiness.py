@@ -1,5 +1,6 @@
 """Bounded readiness probes with Critical/Degraded classification."""
 
+import json
 import time
 import urllib.error
 import urllib.request
@@ -28,6 +29,19 @@ AI_PROVIDER_NOT_CONFIGURED = "not_configured"
 # A probe now answers ok|down|not_configured for each *configured* provider; a
 # configured provider that cannot be reached degrades readiness with a reason.
 AI_PROVIDER_TIMEOUT_SECONDS = 2.0
+# t227 (R2-1): a 200 from the adapter is not the same as `can serve`. The
+# frozen launcher reports `reservation_gate` and `accepting_requests` in the
+# healthz body; both must allow work before a provider counts as ok.
+AI_RUNTIME_READY = "READY"
+AI_RUNTIME_KEYS = (
+    "scope",
+    "status",
+    "inference",
+    "reservation_gate",
+    "accepting_requests",
+    "request_active",
+    "models",
+)
 AI_PROVIDER_TARGETS: dict[str, tuple[str, str, str]] = {
     "llm": ("llm_provider", "llm_base_url", "llm_api_key"),
     "vlm": ("vlm_provider", "vlm_base_url", "vlm_api_key"),
@@ -73,8 +87,38 @@ def _dependency_name(name: str) -> str:
     return "reranker" if name == "rerank" else name
 
 
-def probe_ai_endpoint(settings: Settings, name: str) -> str:
-    """ok | not_configured for the ready path; raises when a configured one is down."""
+def ai_runtime_snapshot(payload: Any) -> dict[str, Any]:
+    """Pick the runtime fields the launcher publishes, ignoring everything else."""
+
+    if not isinstance(payload, dict):
+        return {}
+    return {
+        key: payload[key]
+        for key in AI_RUNTIME_KEYS
+        if key in payload
+    }
+
+
+def _reject_unusable(payload: dict[str, Any]) -> None:
+    """Raise when the launcher is reachable but refuses to serve work."""
+
+    gate = payload.get("reservation_gate")
+    if isinstance(gate, str) and gate and gate != AI_RUNTIME_READY:
+        raise RuntimeError(f"reservation gate {gate}")
+    if payload.get("accepting_requests") is False:
+        raise RuntimeError("adapter is not accepting requests")
+    state = payload.get("status")
+    if isinstance(state, str) and state and state != "ready":
+        raise RuntimeError(f"adapter status {state}")
+
+
+def probe_ai_endpoint(settings: Settings, name: str) -> Any:
+    """ok | not_configured for the ready path; raises when a configured one is down.
+
+    A configured endpoint that answers 200 but reports a blocking runtime state is
+    down: that is the difference between "the port is open" and "a query would be
+    served" (t227 R2-1).
+    """
 
     endpoint, key = ai_provider_endpoint(settings, name)
     if not endpoint:
@@ -87,7 +131,17 @@ def probe_ai_endpoint(settings: Settings, name: str) -> str:
     ) as response:
         if response.status >= 400:
             raise RuntimeError(f"health probe returned {response.status}")
-    return "up"
+        body = response.read(4096)
+    try:
+        payload = json.loads(body.decode("utf-8")) if body else {}
+    except (ValueError, UnicodeDecodeError):
+        # A non-JSON body is still a live endpoint; there is just nothing to read.
+        return "up"
+    if not isinstance(payload, dict):
+        return "up"
+    _reject_unusable(payload)
+    runtime = ai_runtime_snapshot(payload)
+    return {"status": "up", "runtime": runtime} if runtime else "up"
 
 
 def probe_mysql(settings: Settings) -> None:
@@ -194,13 +248,20 @@ def _run_probe(name: str, critical: bool, probe: Probe | object, settings: Setti
             "checked_at": checked_at,
         }
 
-    # A probe may vote `not_configured` instead of pretending to be up.
-    status = outcome if isinstance(outcome, str) else "up"
+    # A probe may vote `not_configured` instead of pretending to be up, and it may
+    # return a dict to publish extra observations next to the verdict (t227).
+    extra: dict[str, Any] = {}
+    if isinstance(outcome, dict):
+        status = str(outcome.get("status") or "up")
+        extra = {key: value for key, value in outcome.items() if key != "status"}
+    else:
+        status = outcome if isinstance(outcome, str) else "up"
     return {
         "status": status,
         "critical": critical,
         "latency_ms": round((time.perf_counter() - started_at) * 1000, 2),
         "checked_at": checked_at,
+        **extra,
     }
 
 
@@ -270,6 +331,16 @@ def check_readiness(
         if state == "down":
             degraded_reasons.append(f"ai_provider_down:{name}")
 
+    # t227 (R2-1): the adapter publishes its own runtime state; surface it once so a
+    # gate that blocks requests is visible in the payload, not only as a `down`.
+    ai_runtime: dict[str, Any] = {}
+    for name in AI_PROVIDER_TARGETS:
+        entry = dependencies.get(name) or dependencies.get(_dependency_name(name))
+        runtime = (entry or {}).get("runtime")
+        if runtime:
+            ai_runtime = dict(runtime)
+            break
+
     ai_dependency_names = {_dependency_name(provider) for provider in AI_PROVIDER_TARGETS}
     for name, entry in dependencies.items():
         if name in ai_dependency_names or name in AI_PROVIDER_TARGETS:
@@ -305,6 +376,8 @@ def check_readiness(
         # t221: one line per model provider (ok|down|not_configured).
         "ai_providers": ai_providers,
         "ai_provider_details": ai_provider_details,
+        # t227 (R2-1): what the launcher says about itself (gate, admission, models).
+        "ai_runtime": ai_runtime,
         "degraded_reasons": degraded_reasons,
         "queue": {
             "name": settings.resolved_celery_queue,
