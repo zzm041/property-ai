@@ -984,7 +984,7 @@ class AnalysisService(VisionMixin, ValidationMixin, PersistenceMixin):
             "粗糙背景、修补痕迹或外观附加描述只有在明确支持正式label且确需处置时才列入observations；"
             "不得让附加外观描述替代或扩大核心主诉与风险。服务端据合法现象和对象生成事件子类。\n"
             "3. 普通维修由实际MAINTENANCE维修组统筹，required_skill填maintenance。"
-            "水、电、空调、墙面和一般设施按可观察现象保留category；"
+            "给排水现象（水槽、下水道、马桶、龙头、管道、漏水、堵塞、积水、返味）一律water_supply；照明、插座、开关、跳闸一律electrical；空调暖气hvac；墙面门窗地面等一般设施other；"
             "多项普通维修不必拆单或选唯一工种，summary用中文分项完整列出所有当前问题，"
             "不遗漏次要事项，混合或一般设施使用other/maintenance。"
             "内部原因未知不等于不能分流；事实矛盾须保留不确定性，不自行确诊。"
