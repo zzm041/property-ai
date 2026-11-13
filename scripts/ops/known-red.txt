@@ -11,27 +11,6 @@
 # 快照：2026-11-11，提交 7df6ebf，`APP_ENV=test` 全量单测实测。
 # 依据：`D:\AI\review\evidence\t125-baseline.md` §4（原生 29 条的分布与成因）。
 
-# --- test_notification_presentation.py（13）------------------------------------
-# 小程序通知页的投影形态断言：期望的字段集/时间基准与当前实现不一致（表现类，未定性为产品缺陷）。
-backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[double-tap]
-backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[paging]
-backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[read-success]
-backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[template0]
-backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[template1]
-backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[template2]
-backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[template3]
-backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[template4]
-backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[template5]
-backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[template6]
-backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[template7]
-backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[time]
-backend/tests/unit/test_notification_presentation.py::test_inbox_template_uses_plain_text_and_explicit_time_basis
-
-# --- test_work_order_presentation.py（2）--------------------------------------
-# 工单页「可读投影」保留业务状态的断言，与当前投影实现不一致（表现类）。
-backend/tests/unit/test_work_order_presentation.py::test_readable_page_projection_preserves_business_state[projection]
-backend/tests/unit/test_work_order_presentation.py::test_readable_page_projection_preserves_business_state[unknown]
-
 # --- test_delivery_bootstrap_lifecycle.py（0，t150 已转绿） ---------------------
 # 原先这两条红是因为启动器 harness 只复制了 deploy/delivery.ps1，PA-170 加入的
 # source-hash.ps1 没复制、以及 Windows PowerShell 把参数列表序列化成
