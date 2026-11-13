@@ -22,7 +22,8 @@ COPY backend/ /app/
 # Install the wheel, then drop the source tree: before PA-116 both copies
 # existed and `sys.path[0]=''` (cwd=/app) made /app/app shadow site-packages,
 # which is how a three-day-old image silently kept running pre-fix code.
-RUN pip install --no-cache-dir --requirement /requirements.delivery.lock \
+ARG PIP_INDEX_URL=https://pypi.org/simple
+RUN pip install --no-cache-dir --index-url "$PIP_INDEX_URL" --requirement /requirements.delivery.lock \
     && pip install --no-cache-dir --no-deps . \
     && rm -rf /app/app
 # Fail the build if a second importable copy ever comes back. The probe is the
