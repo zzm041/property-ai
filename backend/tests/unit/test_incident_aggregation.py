@@ -222,6 +222,11 @@ def test_aggregate_locks_property_and_wakes_prior_pending_member_after_commit() 
         app_env="test",
         incident_threshold=3,
         incident_window_minutes=10,
+        # 本用例断言的是「提交后再派发」的 session.info 通道，属于 PA-104 之前
+        # 的兼容分支；durable 分支要求真正的 WorkOrder 行
+        # （backend/app/service/task_intent.py:79 拒绝非持久化资源），
+        # 而这里的簇成员是 SimpleNamespace，故显式走兼容分支。
+        durable_tasks_enabled=False,
     )
     service = IncidentService(session, settings=settings, llm=MagicMock())
     service._ai = MagicMock()

@@ -1,0 +1,6 @@
+# 临时演示端口覆盖（未入库）：只给 api 加宿主端口，别的服务一律不动。
+# 用法：docker compose -f docker-compose.delivery.yml -f docker-compose.demo-port.yml up -d api
+services:
+  api:
+    ports:
+      - "127.0.0.1:${API_HOST_PORT:-8094}:8000"

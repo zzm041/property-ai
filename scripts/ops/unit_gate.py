@@ -59,6 +59,21 @@ def normalise(nodeid: str) -> str:
     return nodeid.replace("\\", "/").strip()
 
 
+EMPTY_BASELINE_MARKER = "# baseline: empty"
+
+
+def declares_empty_baseline(path: Path) -> bool:
+    """A zero-entry baseline must say so out loud.
+
+    Truncating the file by accident must stay a hard error, so an empty baseline is
+    only accepted when the file carries the marker line.
+    """
+    return any(
+        line.strip().startswith(EMPTY_BASELINE_MARKER)
+        for line in path.read_text(encoding="utf-8").splitlines()
+    )
+
+
 def load_known_red(path: Path) -> set[str]:
     known: set[str] = set()
     for raw in path.read_text(encoding="utf-8").splitlines():
@@ -264,8 +279,12 @@ def main(argv: list[str] | None = None) -> int:
         sys.stderr.write(f"unit_gate: known-red file not found: {known_path}\n")
         return 2
     known = load_known_red(known_path)
-    if not known:
-        sys.stderr.write(f"unit_gate: known-red file is empty: {known_path}\n")
+    if not known and not declares_empty_baseline(known_path):
+        sys.stderr.write(
+            f"unit_gate: known-red file is empty: {known_path}\n"
+            f"  基线可以为 0 条，但必须写一行 `{EMPTY_BASELINE_MARKER}`，\n"
+            "  以免把「被误清空」当成「已全部转绿」。\n"
+        )
         return 2
 
     if not args.skip_script_imports:
