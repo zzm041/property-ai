@@ -478,7 +478,15 @@ def test_pre_reservation_failure_records_stable_redacted_reason_without_call(tmp
     assert record['reservation_created'] is False and record['fail_closed'] is True
     assert set(record)=={'utc','stage','reason_code','detail_code','scope','kind','model','model_digest',
         'runtime_version','context_length','input_sha256','request_binding_sha256',
+        # PA-166: the record states which prompt contract was in force, and which
+        # versions the launcher would accept, so a refusal can be replayed.
+        'prompt_version','allowed_prompt_versions',
+        # PA-130: resource refusals carry the measured numbers beside the code.
+        'resource_floor',
         'reservation_created','fail_closed'}
+    assert record['prompt_version'] is None  # none was supplied to this call
+    assert record['allowed_prompt_versions']==m.allowed_prompt_versions()
+    assert record['resource_floor'] is None  # these exceptions carry no snapshot
     assert not list(scoped.private.glob('call-*'))
 
 

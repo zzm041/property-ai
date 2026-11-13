@@ -27,17 +27,6 @@ backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_pr
 backend/tests/unit/test_notification_presentation.py::test_inbox_presentation_preserves_original_data_and_actions[time]
 backend/tests/unit/test_notification_presentation.py::test_inbox_template_uses_plain_text_and_explicit_time_basis
 
-# --- test_local_ai_http_027.py（7）--------------------------------------------
-# 适配器「预留前失败」记录的键集断言少了 allowed_prompt_versions / prompt_version；
-# 成因已定性（断言集合落后于实现），属测试待更新，不是运行时缺陷（PA-130/PA-166 都验证过记录本身正确）。
-backend/tests/unit/test_local_ai_http_027.py::test_pre_reservation_failure_records_stable_redacted_reason_without_call[exc0-VALIDATION_REJECTED]
-backend/tests/unit/test_local_ai_http_027.py::test_pre_reservation_failure_records_stable_redacted_reason_without_call[exc1-RUNTIME_IDENTITY_MISMATCH]
-backend/tests/unit/test_local_ai_http_027.py::test_pre_reservation_failure_records_stable_redacted_reason_without_call[exc2-MODEL_RESIDENCY_MISMATCH]
-backend/tests/unit/test_local_ai_http_027.py::test_pre_reservation_failure_records_stable_redacted_reason_without_call[exc3-RESOURCE_ADMISSION_REJECTED]
-backend/tests/unit/test_local_ai_http_027.py::test_pre_reservation_failure_records_stable_redacted_reason_without_call[exc4-BUDGET_REJECTED]
-backend/tests/unit/test_local_ai_http_027.py::test_pre_reservation_failure_records_stable_redacted_reason_without_call[exc5-REMOTE_UNAVAILABLE]
-backend/tests/unit/test_local_ai_http_027.py::test_pre_reservation_failure_records_stable_redacted_reason_without_call[exc6-INTERNAL_PRE_RESERVATION_ERROR]
-
 # --- test_work_order_presentation.py（2）--------------------------------------
 # 工单页「可读投影」保留业务状态的断言，与当前投影实现不一致（表现类）。
 backend/tests/unit/test_work_order_presentation.py::test_readable_page_projection_preserves_business_state[projection]
