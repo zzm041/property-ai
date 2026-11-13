@@ -29,7 +29,13 @@ def test_healthz_is_liveness_only(client: TestClient) -> None:
     response = client.get("/api/v1/healthz")
 
     assert response.status_code == 200
-    assert response.json()["data"] == {"status": "ok"}
+    data = response.json()["data"]
+    # healthz 是 liveness：只回答「进程活着」，因此除了 PA-116 的构建溯源块
+    # （backend/app/api/v1/health.py 的 build_info，用于确认线上的 source_sha）
+    # 不得出现任何依赖探测结论——那是 readyz 的职责。
+    assert data["status"] == "ok"
+    assert "build" in data and data["build"]["source_sha"]
+    assert "dependencies" not in data and "ai_providers" not in data
     assert response.headers["x-request-id"] == response.json()["request_id"]
 
 

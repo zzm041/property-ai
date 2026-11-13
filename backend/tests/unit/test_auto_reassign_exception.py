@@ -376,12 +376,21 @@ def test_staff_page_wires_reject_escalate_and_unresolved_receipt() -> None:
     ).read_text(encoding="utf-8")
 
     assert ".rejectWorkOrder(" in source
-    assert ".escalateWorkOrder(" in source
+    # 2026-10 起「无法处理 → 上报主管」改成独立页面承接（detail 只负责跳转，
+    # pages/staff-orders/detail.js:251 navigateTo(escalate)），submit 在 escalate.js:52。
+    assert "/pages/staff-orders/escalate?" in source
+    escalate = (
+        REPO_ROOT / "miniprogram/pages/staff-orders/escalate.js"
+    ).read_text(encoding="utf-8")
+    assert ".escalateWorkOrder(" in escalate
     assert "unresolved_reason" in source
     assert "wx.getImageInfo" in source
     assert "拒单并自动改派" in template
-    assert "提交主管处理" in template
     assert "提交未解决回执并上报" in template
+    # 「提交主管处理」随上报流程迁到独立页面（escalate.wxml:11）。
+    assert "提交主管处理" in (
+        REPO_ROOT / "miniprogram/pages/staff-orders/escalate.wxml"
+    ).read_text(encoding="utf-8")
 
 
 def test_supervisor_page_wires_all_frozen_exception_decisions() -> None:

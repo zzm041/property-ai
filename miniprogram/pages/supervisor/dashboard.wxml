@@ -9,7 +9,7 @@
   <picker range="{{scopeOptions}}" range-key="label" value="{{scopeIndex}}" bindchange="onScopeChange">
     <view class="picker">统计口径：{{scopeOptions[scopeIndex].label || '无可用范围'}}</view>
   </picker>
-  <view class="hint">当前在办工单与事件统计。</view>
+  <view class="hint">当前状态快照，不是今日新增或期间绩效报表。</view>
 </view>
 
 <view class="loading" wx:if="{{loading}}">读取最新状态...</view>
@@ -58,7 +58,7 @@
 
   <view class="card">
     <view class="section-title">现有配置入口</view>
-    <view class="hint">管理当前所选小区的业务配置。</view>
+    <view class="hint">管理当前所选小区的业务配置；不会在本页保存另一套配置。</view>
     <button class="btn" wx:for="{{configEntries}}" wx:key="path" data-path="{{item.path}}" bindtap="openConfig">{{item.label}}</button>
     <view class="empty" wx:if="{{!configEntries.length}}">当前范围没有可管理的配置入口。</view>
   </view>

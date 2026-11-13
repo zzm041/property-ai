@@ -10,21 +10,17 @@
 #
 # 快照：2026-11-11，提交 7df6ebf，`APP_ENV=test` 全量单测实测。
 # 依据：`D:\AI\review\evidence\t125-baseline.md` §4（原生 29 条的分布与成因）。
-
 # --- test_delivery_bootstrap_lifecycle.py（0，t150 已转绿） ---------------------
 # 原先这两条红是因为启动器 harness 只复制了 deploy/delivery.ps1，PA-170 加入的
 # source-hash.ps1 没复制、以及 Windows PowerShell 把参数列表序列化成
 # {"value": [...], "Count": n} 而断言直接下标取值。t150 修的是 harness（复制
 # 依赖 + 还原数组），不是启动器行为，所以按「只许缩小」从基线删除。
-
-# --- 各 1 条 ------------------------------------------------------------------
-# 健康探针只做 liveness（不含依赖探测）
-backend/tests/unit/test_health.py::test_healthz_is_liveness_only
-# 事故聚合：提交后唤醒既有 pending 成员的锁语义断言
-backend/tests/unit/test_incident_aggregation.py::test_aggregate_locks_property_and_wakes_prior_pending_member_after_commit
-# 统计页只暴露范围内快照与既有配置链接
-backend/tests/unit/test_stats_config_overview.py::test_miniprogram_exposes_only_scoped_snapshot_and_existing_config_links
-# 交付产物：work AI 运行时的冻结/作用域/资源守卫清单断言
-backend/tests/unit/test_delivery_artifact.py::test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded
-# 派单超时升级：staff 页接线断言
-backend/tests/unit/test_auto_reassign_exception.py::test_staff_page_wires_reject_escalate_and_unresolved_receipt
+# --- 各 1 条（0，t234 全部转绿） ------------------------------------------
+# 2026-11-13 t234 收口：健康探针改为断言 liveness + build 溯源（不带依赖探测）；
+# 事故聚合钉住 PA-104 之前的 session.info 兼容分支；统计页补回「当前状态快照」
+# 与「不保存另一套配置」两条承诺文案（产品实现缺文案，已修 wxml）；交付产物断言
+# 改用行尾无关导出与结构化的六组钉值；staff 上报改指独立页面 escalate.js。
+# 逐条依据见 D:\AI
+# 逐条依据见台账 evidence/known-red-closeout.md（位于仓库外的 AI 评审目录）。
+# 逐条依据见台账 evidence/known-red-closeout.md（位于仓库外的 AI 评审目录）。
+# baseline: empty —— 2026-11-13 t234 收口后 0 条；再加白必须先定性并写理由。

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import re
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -284,13 +285,26 @@ def test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded() -> Non
     assert 'asr=6;embedding=12;reranker=8;qwen=105' in runtime
     assert 'call_baseline=[ordered]@{asr=1;embedding=6;reranker=2;qwen=46}' in runtime
     assert 'duration_seconds=4336;duration_baseline_seconds=535.483' in runtime
-    assert 'git -C $RepoRoot archive' in runtime
+    # PA-170 之后候选包用行尾无关的导出：显式 -c core.autocrlf=false，否则 CRLF
+    # 检出会让 archive 内容随机器变化（deploy/work-ai-runtime.ps1:175-177）。
+    assert 'git -C $RepoRoot -c core.autocrlf=false archive --format=tar' in runtime
     assert 'adapter-$operationId.stdout.log' in runtime and 'adapter-$operationId.stderr.log' in runtime
     assert '__SOURCE_COMMIT__' not in runtime and '__ADAPTER_SHA256__' not in runtime
-    assert '70BB10C801D695830FCC33630773DB82986427B86962432354A0726AF3A3C676' in runtime
-    assert 'AD89639C05C18BF6D78FF28F32A62A105EE5B5ECFC9837EB5700B75DFCAAF320' in runtime
-    assert '567B325C7130E6AA7047AB957E5C19B442B66C8DBA29F8FAEDA50EE60830C876' in runtime
-    assert '61b762d9775845c47cf0b43f3003a3f4d1cb5519' in runtime
+    # 冻结值本身每次重冻都会变（PA-130/166/170 各改过一次），这里断言的是「结构」：
+    # 候选提交、适配器、模型适配器、运行时控制、provider 运行时控制与 http api 六个钉值
+    # 都以 64/40 位十六进制常量出现，且彼此的哈希互不相同（防止粘贴串键）。
+    pins = dict(re.findall(r'^\$(Expected\w+Sha256) = "([0-9A-F]{64})"', runtime, re.M))
+    required = {
+        'ExpectedAdapterSha256',
+        'ExpectedModelAdapterSha256',
+        'ExpectedRuntimeControlSha256',
+        'ExpectedProviderRuntimeControlSha256',
+        'ExpectedProviderHttpApiSha256',
+    }
+    assert required <= set(pins)
+    assert len(set(pins.values())) == len(pins)
+    commit = re.search(r'^\$SourceCommit = "([0-9a-f]{40})"', runtime, re.M)
+    assert commit is not None
     assert 'E67FCAD3B8DC8DD542A351562142698129DD86936C644E9178C8978EE0978C3B' not in runtime
     assert '2e4c4ba34d67f599c39be95112100a2ce71ffc63' not in runtime
     assert 'call-001-resolution.json' in runtime
@@ -301,7 +315,10 @@ def test_delivery_work_ai_runtime_is_frozen_scoped_and_resource_guarded() -> Non
     assert 'call-014-replay-resolution-20261002.json' in runtime
     assert 'REAL-AI-INTEGRATION-027-CALL014-REPLAY-RESOLUTION-review.raw.json' in runtime
     assert 'PROPERTY_AI_LOCAL_QWEN_RUNTIME_MODEL' in runtime
-    assert 'qwen38-27b-q3km-g55-ctx8192:7af3b8f' in runtime
+    # t174 把运行时模型从 27B 切到 4B；钉值成对出现（deploy/work-ai-runtime.ps1:72-73）。
+    assert '$ModelName = "qwen3.5:4b"' in runtime
+    assert '$RuntimeModelName = "qwen3.5:4b-ctx8192"' in runtime
+    assert 'qwen38-27b-q3km-g55-ctx8192:7af3b8f' not in runtime
     assert 'resolution_root=$ResolutionRoot' in runtime
     assert 'reservation_sha256=$ExpectedReservationSha256.ToLowerInvariant()' in runtime
     assert 'taskkill /PID ([int]$state.listener_pid) /F' in runtime
