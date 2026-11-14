@@ -38,7 +38,7 @@ if str(BACKEND_ROOT) not in sys.path:
 
 REQUIRED_DATABASE = "property_ai_demo_synth"
 REQUIRED_PROFILE = "synthetic"
-DEMO_PASSWORD = "shicuili-2026"  # 仅演示库使用，非生产口令
+DEMO_PASSWORD = os.environ.get("DEMO_PASSWORD", "change-me-demo-only")
 PHONE_PREFIX = "+861380000"
 START_PHONE_SERIAL = 12  # 138-0000-0012 起，避免与测试固定号 13800000000 冲突
 
@@ -395,7 +395,6 @@ def apply_plan(plan: Plan) -> int:
     print(f"== 当前指向合成库：{REQUIRED_DATABASE} ==")
     for name, count in counts.items():
         print(f"  {name:26s}{count}")
-    print(f"  演示账号口令: {DEMO_PASSWORD}（仅演示库）")
     return 0
 
 
