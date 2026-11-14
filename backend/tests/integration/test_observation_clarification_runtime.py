@@ -35,7 +35,14 @@ def test_high_confidence_without_confirmed_observation_stays_unassigned_after_re
     identity_session.expire_all()
     saved = identity_session.get(WorkOrderAnalysis, first_id)
     assert saved.status == "LOW_CONFIDENCE" and float(saved.confidence) == 1.0
-    assert saved.category == "OTHER" and saved.required_skill == "maintenance"
+    # PA-217: the persisted column holds the canonical uppercase code, not the
+    # provider spelling. app.domain.ai.enums normalizes "maintenance" ->
+    # "MAINTENANCE" (PA-202) and map_analysis_output stores that (rules.py:1348-1368);
+    # unit tests already pin the uppercase contract
+    # (test_ai_policy.py:41 required_skill == "ELECTRICAL"). The old assertion
+    # compared the raw provider word, so it could only pass while normalization
+    # was missing.
+    assert saved.category == "OTHER" and saved.required_skill == "MAINTENANCE"
     commit_open_transaction(identity_session)
     second = service.analyze_work_order(work_order_id=work_order_id, request_id="synthetic-clarify-repeat")
     assert second.id == first_id and provider.calls == 1

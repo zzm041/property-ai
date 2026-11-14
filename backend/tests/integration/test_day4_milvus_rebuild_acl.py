@@ -133,10 +133,17 @@ def test_rebuild_from_mysql_restores_acl_and_hides_archived(
     )
     identity_session.expire_all()
 
-    def _ask(client: TestClient, token: str, question: str, property_id: int, rid: str):
+    def _ask(
+        client: TestClient,
+        token: str,
+        question: str,
+        property_id: int,
+        rid: str,
+        audience: str = "resident",
+    ):
         return client.post(
             "/api/v1/assistant/query",
-            json={"question": question, "property_id": property_id},
+            json={"question": question, "property_id": property_id, "audience": audience},
             headers=_auth(token, rid),
         )
 
@@ -152,7 +159,6 @@ def test_rebuild_from_mysql_restores_acl_and_hides_archived(
     _drop_collection(settings.milvus_uri, COLLECTION)
     monkeypatch.setattr("app.cli.rebuild_knowledge_index.get_settings", lambda: settings)
     assert rebuild_main() == 0
-
     with _client(settings) as client:
         resident = _token(client, graph.employees.resident_id)
         staff = _token(client, graph.employees.staff_a_user_id)
@@ -182,12 +188,18 @@ def test_rebuild_from_mysql_restores_acl_and_hides_archived(
         assert internal.id not in {
             item["document_id"] for item in internal_ask.json()["data"]["citations"]
         }
+        # PA-216: audience defaults to "resident" (docs/06-API-CONTRACT.md:222), and a
+        # resident-audience query recalls RESIDENT documents only, even for a dual-role
+        # account. The old assertion asked as staff without stating the property audience,
+        # so STAFF_ONLY evidence was filtered out by contract and "below_relevance" was the
+        # correct answer. Internal retrieval has to request audience="property" explicitly.
         staff_ask = _ask(
             client,
             staff,
             "内部排班口令是什么？",
             graph.employees.property_1_id,
             "d4-staff",
+            audience="property",
         )
         assert internal.id in {
             item["document_id"] for item in staff_ask.json()["data"]["citations"]

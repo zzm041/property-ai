@@ -3,6 +3,14 @@
 from pathlib import Path
 
 import pytest
+
+
+@pytest.fixture(autouse=True)
+def _clean_before_seed(clean_all_tables):
+    """PA-210: dev seed asserts an empty foundation; clean between tests."""
+    return None
+
+import pytest
 from sqlalchemy import Engine, func, inspect, select, text
 from sqlalchemy.orm import Session
 

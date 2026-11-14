@@ -20,6 +20,7 @@ from app.service.dev_seed import run_development_seed
 
 
 def test_house_fixture_requires_seed_and_is_idempotent(
+    clean_all_tables: None,
     identity_session: Session,
     integration_settings: Settings,
     test_engine: Engine,

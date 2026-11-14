@@ -37,6 +37,8 @@ def _settings() -> Settings:
         app_env="test",
         dev_auth_enabled=True,
         app_secret_key=TEST_SECRET,
+        file_scanner_provider="development",
+        file_scanner_demo_acknowledged=True,
     )
 
 

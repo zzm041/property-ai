@@ -23,6 +23,12 @@ def _settings() -> Settings:
         app_env="test",
         dev_auth_enabled=True,
         app_secret_key=TEST_SECRET,
+        # D6: the default FILE_SCANNER_PROVIDER is "unavailable" and fails
+        # closed, so a media attach needs a declared demo stub. This test is
+        # about ownership/list semantics, not scan policy; declare the stub
+        # the same way test_work_order_runtime/test_ai_runtime do.
+        file_scanner_provider="development",
+        file_scanner_demo_acknowledged=True,
     )
 
 

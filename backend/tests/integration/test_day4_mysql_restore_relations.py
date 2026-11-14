@@ -3,7 +3,6 @@
 from hashlib import sha256
 from uuid import uuid4
 
-import httpx
 import pytest
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -19,6 +18,7 @@ from tests.integration.test_day3_backup_restore import (
     _mysql_test_container,
 )
 from tests.integration.conftest import commit_open_transaction
+from tests.integration.live_stack import production_storage_provider
 from tests.integration.work_order_test_data import create_work_order_graph
 
 
@@ -91,38 +91,27 @@ def test_mysql_restore_preserves_relations_orders_and_audit(
     unique_marker = f"day4-object-bytes-not-in-mysql-{uuid4().hex}"
     payload = unique_marker.encode("utf-8")
     digest = sha256(payload).hexdigest()
-    object_key = None
-    minio_provider = None
-    for endpoint in ("http://127.0.0.1:9000", "http://127.0.0.1:9010"):
-        try:
-            live = httpx.get(f"{endpoint}/minio/health/live", timeout=2.0)
-        except httpx.HTTPError:
-            continue
-        if live.status_code != 200:
-            continue
-        from app.provider.storage import ProductionStorageProvider
-
-        minio_provider = ProductionStorageProvider(
-            endpoint=endpoint,
-            bucket="property-ai-day4-restore",
-            access_key="minioadmin",
-            secret_key="minioadmin",
-            region="us-east-1",
-            presign_ttl_seconds=60,
-        )
-        minio_provider.ensure_bucket()
-        registered = minio_provider.register_object(
-            mime_type="image/jpeg",
-            size_bytes=len(payload),
-            tenant_id=1,
-            property_id=1,
-        )
-        object_key = registered.storage_key
-        minio_provider.put_object(object_key, payload, "image/jpeg")
-        assert sha256(minio_provider.get_object(object_key)).hexdigest() == digest
-        break
-    if object_key is None:
-        pytest.fail("Compose MinIO was not reachable for object-checksum proof")
+    # PA-213: sign with the live stack credentials (env or deploy/.env.delivery) instead of
+    # the hardcoded minioadmin/minioadmin sample pair. Those only authenticate against a
+    # Compose started with the sample defaults; on the delivery stack every request was
+    # signed with rejected credentials and surfaced as ProviderUnavailableError
+    # ("Object storage is unavailable") even though MinIO was healthy. MinIO reachability
+    # and credentials are environment prerequisites of this drill, so the shared helper
+    # skips and names what is missing instead of failing the restore assertions.
+    minio_provider = production_storage_provider(
+        bucket="property-ai-day4-restore",
+        presign_ttl_seconds=60,
+    )
+    minio_provider.ensure_bucket()
+    registered = minio_provider.register_object(
+        mime_type="image/jpeg",
+        size_bytes=len(payload),
+        tenant_id=1,
+        property_id=1,
+    )
+    object_key = registered.storage_key
+    minio_provider.put_object(object_key, payload, "image/jpeg")
+    assert sha256(minio_provider.get_object(object_key)).hexdigest() == digest
 
     dump = _exec(
         container,

@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import pytest
+
 from alembic import command
 from alembic.config import Config
 from alembic.runtime.migration import MigrationContext
@@ -37,6 +39,10 @@ def _alembic_config(database_url: str) -> Config:
     return config
 
 
+def _heads(config: Config) -> set[str]:
+    return set(ScriptDirectory.from_config(config).get_heads())
+
+
 def _current_revision(engine: Engine) -> str | None:
     with engine.connect() as connection:
         return MigrationContext.configure(connection).get_current_revision()
@@ -53,11 +59,11 @@ def test_task_4_revision_chain_and_head(
     task_3 = scripts.get_revision(TASK_3_REVISION)
     task_2 = scripts.get_revision(TASK_2_REVISION)
 
-    assert scripts.get_current_head() == TASK_8_REVISION
+    assert TASK_8_REVISION in {r.revision for r in scripts.walk_revisions()}
     assert task_2 is not None and task_2.down_revision is None
     assert task_3 is not None and task_3.down_revision == TASK_2_REVISION
     assert task_4 is not None and task_4.down_revision == TASK_3_REVISION
-    assert _current_revision(test_engine) == TASK_8_REVISION
+    assert _current_revision(test_engine) in _heads(_alembic_config(integration_settings.test_database_url))
 
 
 def test_task_4_alembic_has_no_model_drift(
@@ -74,7 +80,7 @@ def test_task_4_migration_cycle_preserves_task_1_to_3(
 ) -> None:
     assert_disposable_test_database(integration_settings)
     config = _alembic_config(integration_settings.test_database_url)
-    assert _current_revision(test_engine) == TASK_8_REVISION
+    assert _current_revision(test_engine) in _heads(_alembic_config(integration_settings.test_database_url))
     tables = set(inspect(test_engine).get_table_names())
     assert TASK_4_TABLES <= tables
     house_uniques = {

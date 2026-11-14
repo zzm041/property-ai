@@ -1,6 +1,7 @@
 """Guarded disposable MySQL fixtures for Task 2 integration tests."""
 
 from collections.abc import Iterator
+from pathlib import Path
 
 import pytest
 from sqlalchemy import Engine, inspect, text
@@ -79,11 +80,19 @@ TASK_8_TABLES = (
 
 
 def _delete_tables(engine: Engine, tables: tuple[str, ...]) -> None:
+    # PA-209: table lists only cover tables the suites know about; rows left in
+    # child tables (e.g. user_passwords -> users) made cleanup fail with MySQL
+    # 1451 whenever a previous run left data behind. Suspend FK checks for the
+    # cleanup window instead of maintaining a second, drifting table order.
     inspector = inspect(engine)
     with engine.begin() as connection:
-        for table in tables:
-            if inspector.has_table(table):
-                connection.execute(text(f"DELETE FROM `{table}`"))
+        connection.execute(text("SET FOREIGN_KEY_CHECKS=0"))
+        try:
+            for table in tables:
+                if inspector.has_table(table):
+                    connection.execute(text(f"DELETE FROM `{table}`"))
+        finally:
+            connection.execute(text("SET FOREIGN_KEY_CHECKS=1"))
 
 
 @pytest.fixture(scope="session")
@@ -231,3 +240,61 @@ def count_independent(session: Session, statement):
         return other.scalar(statement)
     finally:
         other.close()
+
+
+@pytest.fixture
+def clean_all_tables(test_engine: Engine) -> Iterator[None]:
+    """PA-210: wipe every table (except alembic_version) around a test.
+
+    Table-list fixtures drift as new tables appear; suites that assert
+    "empty foundation" need a real empty database, not a best-effort list.
+    """
+    names = [t for t in inspect(test_engine).get_table_names() if t != "alembic_version"]
+
+    def clean() -> None:
+        with test_engine.begin() as connection:
+            connection.execute(text("SET FOREIGN_KEY_CHECKS=0"))
+            try:
+                for table in names:
+                    connection.execute(text(f"DELETE FROM `{table}`"))
+            finally:
+                connection.execute(text("SET FOREIGN_KEY_CHECKS=1"))
+
+    clean()
+    try:
+        yield
+    finally:
+        clean()
+
+@pytest.fixture(autouse=True)
+def _ensure_schema_head(
+    test_engine: Engine,
+    integration_settings: Settings,
+) -> Iterator[None]:
+    """PA-212: migration tests downgrade the shared scratch DB; restore head.
+
+    The database is disposable but shared by every integration test, so a
+    downgrade that is not rolled back poisons every suite that runs after it
+    with ColumnNotFound-looking 500s. Cheap no-op when already at head.
+    """
+    from alembic import command
+    from alembic.config import Config
+    from alembic.runtime.migration import MigrationContext
+    from alembic.script import ScriptDirectory
+
+    backend_root = Path(__file__).resolve().parents[2]
+    config = Config(str(backend_root / "alembic.ini"))
+    config.set_main_option("sqlalchemy.url", integration_settings.test_database_url)
+
+    with test_engine.connect() as connection:
+        current = MigrationContext.configure(connection).get_current_revision()
+    heads = set(ScriptDirectory.from_config(config).get_heads())
+    if current not in heads:
+        command.upgrade(config, "head")
+    yield
+    # PA-212: a test that downgraded must not leave the scratch DB behind.
+    with test_engine.connect() as connection:
+        current = MigrationContext.configure(connection).get_current_revision()
+    if current not in heads:
+        command.upgrade(config, "head")
+

@@ -3,42 +3,28 @@
 from hashlib import sha256
 from uuid import uuid4
 
-import httpx
 import pytest
 
 from app.provider.errors import ProviderInvalidOutputError
-from app.provider.storage import ProductionStorageProvider
-
-
-def _minio_endpoint() -> str | None:
-    for endpoint in ("http://127.0.0.1:9000", "http://127.0.0.1:9010"):
-        try:
-            response = httpx.get(f"{endpoint}/minio/health/live", timeout=2.0)
-        except httpx.HTTPError:
-            continue
-        if response.status_code == 200:
-            return endpoint
-    return None
+from tests.integration.live_stack import (
+    production_storage_provider,
+    require_minio_endpoint,
+)
 
 
 @pytest.fixture(scope="module")
 def minio_endpoint() -> str:
-    endpoint = _minio_endpoint()
-    if endpoint is None:
-        pytest.skip("Compose MinIO is not reachable on :9000 or :9010")
-    return endpoint
+    return require_minio_endpoint()
 
 
 def test_production_storage_put_get_presign_and_isolation(minio_endpoint: str) -> None:
     bucket = "property-ai-day3-live"
-    provider = ProductionStorageProvider(
-        endpoint=minio_endpoint,
-        bucket=bucket,
-        access_key="minioadmin",
-        secret_key="minioadmin",
-        region="us-east-1",
-        presign_ttl_seconds=120,
-    )
+    # PA-213: sign with the live stack credentials (env or deploy/.env.delivery) instead
+    # of the hardcoded minioadmin/minioadmin sample pair. The sample pair only works on a
+    # Compose started with the sample defaults, so on the delivery stack every request was
+    # signed with credentials the server rejects and ensure_bucket raised
+    # ProviderUnavailableError ("Object storage is unavailable") while MinIO was healthy.
+    provider = production_storage_provider(bucket=bucket, presign_ttl_seconds=120)
     provider.ensure_bucket()
     first = provider.register_object(
         mime_type="image/jpeg",
