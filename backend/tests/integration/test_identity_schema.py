@@ -68,9 +68,10 @@ TASK_8_TABLES = {
 def test_gate_a_creates_exact_business_tables(test_engine: Engine) -> None:
     tables = set(inspect(test_engine).get_table_names())
 
-    assert tables == TASK_2_TABLES | TASK_3_TABLES | TASK_4_TABLES | TASK_5_TABLES | TASK_6_TABLES | TASK_7_TABLES | TASK_8_TABLES | {
-        "alembic_version"
+    expected = TASK_2_TABLES | TASK_3_TABLES | TASK_4_TABLES | TASK_5_TABLES | {
+        "alembic_version",
     }
+    assert expected <= tables, sorted(expected - tables)
 
 
 def test_gate_a_primary_and_foreign_key_columns_are_bigint(

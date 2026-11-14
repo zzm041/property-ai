@@ -7,7 +7,7 @@ from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from app.core.config import Settings
-from app.core.errors import IamErrorCode
+from app.core.errors import AppError, IamErrorCode
 from app.domain.governance import AuditAction
 from app.main import create_app
 from app.model.ai import AiCallLog, DispatchRecommendation, Incident, WorkOrderAnalysis
@@ -35,6 +35,8 @@ def _settings(**overrides) -> Settings:
         "app_secret_key": TEST_SECRET,
         "incident_threshold": 2,
         "ai_enqueue_on_create": False,
+        "file_scanner_provider": "development",
+        "file_scanner_demo_acknowledged": True,
     }
     values.update(overrides)
     return Settings(**values)
@@ -228,11 +230,19 @@ def test_stale_result_does_not_override_human_cancel(identity_session: Session) 
     identity_session.expire_all()
     record = identity_session.get(WorkOrder, record.id)
     assert record.status == "CANCELLED"
-    assert analysis.status == "STALE"
+    # 已取消的工单不再产出分析：analyze_work_order 返回 None（产品语义），
+    # 只要证明迟到的结果没有把记录改回任何状态即可。
+    assert analysis is None
 
 
 def test_asr_failure_still_creates_and_analyzes_text(identity_session: Session) -> None:
     graph = create_work_order_graph(identity_session)
+    _check_in(
+        identity_session,
+        graph.employees.staff_a_user_id,
+        graph.employees.property_1_id,
+        "t7-checkin-s_text",
+    )
     actor = _principal(identity_session, graph.employees.resident_id)
     service = WorkOrderService(identity_session, settings=_settings())
     file_object = service.register_file(
@@ -274,6 +284,12 @@ def test_asr_failure_still_creates_and_analyzes_text(identity_session: Session) 
 
 def test_vlm_failure_does_not_block_llm_analysis(identity_session: Session) -> None:
     graph = create_work_order_graph(identity_session)
+    _check_in(
+        identity_session,
+        graph.employees.staff_a_user_id,
+        graph.employees.property_1_id,
+        "t7-checkin-alysis",
+    )
     actor = _principal(identity_session, graph.employees.resident_id)
     service = WorkOrderService(identity_session, settings=_settings())
     file_object = service.register_file(
@@ -338,6 +354,10 @@ def test_human_override_records_recommendation_difference(
     identity_session: Session,
 ) -> None:
     graph = create_work_order_graph(identity_session)
+    _go_on_duty(identity_session, graph.employees.employee_a_id)
+    _go_on_duty(identity_session, graph.employees.employee_b_id)
+    _copy_skills(identity_session, graph.employees.employee_a_id, graph.employees.employee_b_id)
+    _copy_duties(identity_session, graph.employees.employee_a_id, graph.employees.employee_b_id)
     _check_in(
         identity_session,
         graph.employees.staff_a_user_id,
@@ -357,17 +377,26 @@ def test_human_override_records_recommendation_difference(
         contact_phone="13800000000",
     )
     _analyze(identity_session, record.id)
-    assigned = WorkOrderService(identity_session).assign(
-        actor=_principal(identity_session, graph.employees.supervisor_p1_id),
-        work_order_id=record.id,
-        employee_id=graph.employees.employee_b_id,
-        request_id="t7-override",
-    )
+    try:
+        assigned = WorkOrderService(identity_session).assign(
+            actor=_principal(identity_session, graph.employees.supervisor_p1_id),
+            work_order_id=record.id,
+            employee_id=graph.employees.employee_b_id,
+            request_id="t7-override",
+        )
+    except AppError as exc:
+        raise AssertionError(f"dispatch denied: {exc.details}") from exc
     assert assigned.status == "ASSIGNED"
     audit = identity_session.scalars(
         select(AuditLog).where(AuditLog.action == AuditAction.AI_RECOMMENDATION_REVIEWED.value)
     ).all()
-    assert any(item.details_json.get("overridden") is True for item in audit)
+    recs = identity_session.scalars(
+        select(DispatchRecommendation).where(DispatchRecommendation.work_order_id == record.id)
+    ).all()
+    assert any(item.details_json.get("overridden") is True for item in audit), (
+        f"recommendations={[(r.employee_id, r.rank_no, r.eligible) for r in recs]} "
+        f"audit={[(a.action, a.details_json) for a in audit]}"
+    )
 
 
 def test_incident_aggregates_same_property_only(identity_session: Session) -> None:
@@ -556,3 +585,47 @@ def test_system_admin_cannot_read_analysis(identity_session: Session) -> None:
         headers=_auth(token, "t7-sys-analysis"),
     )
     assert response.status_code == 403
+
+
+def _go_on_duty(session: Session, employee_id: int) -> None:
+    """PA-212: dispatch requires employee_daily_statuses.on_duty = ON_DUTY."""
+    with session.get_bind().begin() as conn:
+        conn.execute(
+            text(
+                "INSERT INTO employee_daily_statuses "
+                "(employee_id, tenant_id, property_id, business_date, on_duty, current_load, created_at, updated_at) "
+                "SELECT e.id, e.tenant_id, (SELECT p.id FROM properties p WHERE p.tenant_id = e.tenant_id ORDER BY p.id LIMIT 1), "
+                "CURRENT_DATE(), 'ON_DUTY', 0, NOW(6), NOW(6) FROM employees e WHERE e.id = :employee_id "
+                "ON DUPLICATE KEY UPDATE on_duty='ON_DUTY', updated_at=NOW(6)"
+            ),
+            {"employee_id": employee_id},
+        )
+
+
+def _copy_skills(session: Session, source_employee_id: int, target_employee_id: int) -> None:
+    """PA-212: 派单需要技能匹配，测试里把同一组合复制给目标员工。"""
+    with session.get_bind().begin() as conn:
+        conn.execute(
+            text(
+                "INSERT INTO employee_skills (employee_id, skill_id, tenant_id, created_at, updated_at) "
+                "SELECT :target, es.skill_id, es.tenant_id, NOW(6), NOW(6) FROM employee_skills es "
+                "WHERE es.employee_id = :source "
+                "AND NOT EXISTS (SELECT 1 FROM employee_skills x WHERE x.employee_id = :target AND x.skill_id = es.skill_id)"
+            ),
+            {"source": source_employee_id, "target": target_employee_id},
+        )
+
+
+def _copy_duties(session: Session, source_employee_id: int, target_employee_id: int) -> None:
+    """PA-212: 派单还要求 duty（专业）匹配，测试里把同一组 duty 复制给目标员工。"""
+    with session.get_bind().begin() as conn:
+        conn.execute(
+            text(
+                "INSERT INTO employee_duties (employee_id, tenant_id, duty_id, created_at, updated_at) "
+                "SELECT :target, ed.tenant_id, ed.duty_id, NOW(6), NOW(6) FROM employee_duties ed "
+                "WHERE ed.employee_id = :source "
+                "AND NOT EXISTS (SELECT 1 FROM employee_duties x WHERE x.employee_id = :target AND x.duty_id = ed.duty_id)"
+            ),
+            {"source": source_employee_id, "target": target_employee_id},
+        )
+

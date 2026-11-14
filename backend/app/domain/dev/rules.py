@@ -1,5 +1,7 @@
 """dev domain rules, moved from the flat app.domain modules (pure move)."""
 
+import os
+
 from types import MappingProxyType
 from typing import Mapping
 from app.domain.identity import ScopeType
@@ -196,7 +198,7 @@ SEED_ROLE_PERMISSIONS: Mapping[str, tuple[str, ...]] = MappingProxyType(
 # 所以 /api/v1/supervisor/work-orders/{id}/analyze 对所有人返回 IAM.FORBIDDEN。演示号码用 139 段，
 # 密码走与其他入口相同的 argon2id 流程（app.core.passwords.hash_password）。
 DEV_SUPERVISOR_PHONE = "+8613910000001"
-DEV_SUPERVISOR_PASSWORD = "SupervisorDemoPass1"
+DEV_SUPERVISOR_PASSWORD = os.environ.get("DEV_SUPERVISOR_PASSWORD", "change-me-dev-only")
 # The demo tenant/property that owns the work orders a reviewer actually looks at.
 # When a database has these rows the supervisor grant lands there; otherwise the
 # seed falls back to the tenant/property it creates itself.

@@ -5,7 +5,7 @@ from datetime import date, datetime
 import re
 from typing import TypeVar
 
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.core.errors import (
@@ -960,26 +960,55 @@ class EmployeeService:
             check_out_at=None,
             source=AttendanceSource.STAFF_SELF.value,
         )
-        daily = EmployeeDailyStatus(
+        load = WorkOrderRepository(self._session).count_active_assignments_for_employee(
             employee_id=employee.id,
-            tenant_id=employee.tenant_id,
+            property_id=property_record.id,
+        )
+        daily = self._repository.get_daily_status_for_update(
+            employee_id=employee.id,
             property_id=property_record.id,
             business_date=business_date,
-            on_duty=AttendanceOnDuty.ON_DUTY.value,
-            leave_type=None,
-            current_load=WorkOrderRepository(self._session).count_active_assignments_for_employee(
-                employee_id=employee.id,
-                property_id=property_record.id,
-            ),
         )
+        if daily is not None:
+            # 当天状态行可能已由排班/前一次操作创建；重复签到不得撞唯一键。
+            daily.on_duty = AttendanceOnDuty.ON_DUTY.value
+            daily.leave_type = None
+            daily.current_load = load
+        else:
+            daily = EmployeeDailyStatus(
+                employee_id=employee.id,
+                tenant_id=employee.tenant_id,
+                property_id=property_record.id,
+                business_date=business_date,
+                on_duty=AttendanceOnDuty.ON_DUTY.value,
+                leave_type=None,
+                current_load=load,
+            )
         try:
             self._repository.add_attendance(attendance)
-            self._repository.add_daily_status(daily)
+            if daily.id is None:
+                self._repository.add_daily_status(daily)
         except IntegrityError as exc:
             self._map_insert_error(
                 exc,
                 expected=_ATTENDANCE_UNIQUE | _DAILY_UNIQUE,
             )
+            # Concurrent check-in: the loser hits the unique key or a deadlock
+            # instead of the friendly path above; keep the API contract (409).
+            raise AppError(
+                code=EmployeeErrorCode.CHECKIN_DENIED,
+                message="Check-in was denied",
+                status_code=409,
+            ) from exc
+        except OperationalError as exc:
+            arguments = getattr(exc.orig, "args", ())
+            if arguments and arguments[0] in (1205, 1213):
+                raise AppError(
+                    code=EmployeeErrorCode.CHECKIN_DENIED,
+                    message="Check-in was denied",
+                    status_code=409,
+                ) from exc
+            raise
         self._append_audit(
             action=AuditAction.ATTENDANCE_CHECKED_IN,
             resource_type=AuditResourceType.ATTENDANCE_RECORD,

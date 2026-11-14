@@ -608,6 +608,16 @@ class WorkOrderAssignMixin:
             WORK_ORDER_PROCESS,
             self._property_scope(record),
         )
+        if record.status in {
+            WorkOrderStatus.CLOSED.value,
+            WorkOrderStatus.CANCELLED.value,
+            WorkOrderStatus.COMPLETED.value,
+        }:
+            raise AppError(
+                code=WorkOrderErrorCode.ALREADY_PROCESSED,
+                message="Work order is already finished",
+                status_code=409,
+            )
         assignment = self._repository.get_active_assignment_for_update(record.id)
         if assignment is None:
             raise AppError(
@@ -639,16 +649,6 @@ class WorkOrderAssignMixin:
                 )
             employee = assigned
         self._assert_version(record, version)
-        if record.status in {
-            WorkOrderStatus.CLOSED.value,
-            WorkOrderStatus.CANCELLED.value,
-            WorkOrderStatus.COMPLETED.value,
-        }:
-            raise AppError(
-                code=WorkOrderErrorCode.ALREADY_PROCESSED,
-                message="Work order is already finished",
-                status_code=409,
-            )
         return current, record, assignment, employee
     def _create_assignment(
         self,

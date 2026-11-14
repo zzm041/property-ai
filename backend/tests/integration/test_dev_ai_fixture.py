@@ -17,6 +17,7 @@ from app.service.dev_work_order_fixture import run_development_work_order_fixtur
 
 
 def test_ai_fixture_requires_employee_and_is_idempotent(
+    clean_all_tables: None,
     identity_session: Session,
     integration_settings: Settings,
     test_engine: Engine,

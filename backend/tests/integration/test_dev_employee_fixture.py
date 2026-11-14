@@ -27,6 +27,7 @@ from app.model.work_order import WorkOrder
 
 
 def test_employee_fixture_requires_seed_and_is_idempotent(
+    clean_all_tables: None,
     identity_session: Session,
     integration_settings: Settings,
     test_engine: Engine,
