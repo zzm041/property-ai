@@ -13,7 +13,10 @@ from app.domain.work_order import VISION_ANALYSIS_PROMPT_VERSION
 
 
 def _digest(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    # PA-234: buildinfo normalises CRLF to LF before hashing, so the expected
+    # digest is the canonical, line-ending independent one; a raw byte digest
+    # only agrees on an LF checkout.
+    return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 
 
 def test_contract_digests_match_the_imported_modules() -> None:
