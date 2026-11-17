@@ -14,6 +14,7 @@ pytestmark=pytest.mark.skipif(PWSH is None,reason='PowerShell 7 required')
 def test_retained_rollback_never_enters_compose_mutation(tmp_path,action,retained):
     deploy=tmp_path/'deploy';deploy.mkdir()
     shutil.copyfile(ROOT/'deploy/delivery.ps1',deploy/'delivery.ps1')
+    shutil.copyfile(ROOT/'deploy/source-hash.ps1',deploy/'source-hash.ps1')  # PA-235: delivery.ps1 dot-sources it
     for name in ['.env.delivery','.env.delivery.bootstrap']:
         (deploy/name).write_text('COMPOSE_PROJECT_NAME=property-ai-delivery-check\n',encoding='utf-8')
     wrapper=tmp_path/'invoke.ps1'
