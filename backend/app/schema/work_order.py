@@ -340,6 +340,10 @@ class WorkOrderDisplayData(BaseModel):
     assignee_names: dict[int, str] = Field(default_factory=dict)
     timestamp_labels: dict[str, str] = Field(default_factory=dict)
     analysis_status: str | None = None
+    # PA-233: the stable code behind analysis_status, so a client can tell
+    # AI.INVALID_OUTPUT (the model answered, the contract refused it) from
+    # AI.UNAVAILABLE (the model never answered) without reading the log table.
+    analysis_error_code: str | None = None
     analysis_message: str | None = None
 
 

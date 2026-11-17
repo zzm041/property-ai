@@ -48,6 +48,9 @@ class WorkOrderQueriesMixin:
         analysis = self._analysis.get_current_analysis(record.id)
         display_context = self._repository.get_display_context(record)
         display_context["analysis_status"] = None if analysis is None else analysis.status
+        display_context["analysis_error_code"] = (
+            None if analysis is None else getattr(analysis, "error_code", None)
+        )
         if (analysis is not None and analysis.status == "LOW_CONFIDENCE"
                 and getattr(analysis, "error_code", None) == AiErrorCode.OUT_OF_SCOPE):
             display_context["analysis_disposition"] = "OUT_OF_SCOPE_REQUEST"

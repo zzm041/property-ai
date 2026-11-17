@@ -134,6 +134,15 @@ class Settings(BaseSettings):
     ai_context_recent_orders_limit: int = Field(default=5, ge=0, le=20)
     ai_context_recent_days: int = Field(default=30, ge=1, le=365)
     ai_enqueue_on_create: bool = False
+    # PA-233: a small model can answer in the right shape and still bind none of
+    # its observations to the evidence (the 4B called a lock fault "敲门按铃").
+    # Fail-closed threw the whole answer away: the order sat in PENDING_ANALYSIS
+    # with category=OTHER and nothing said the model had a conclusion at all.
+    # With this on, the four dispatch fields survive as a *degraded* analysis -
+    # no confirmed observation, low confidence, no dispatch-filter fields - and
+    # every unbound observation stays in the trace. Off keeps the PA-209 contract
+    # byte for byte, which is why it defaults off.
+    ai_observation_fallback: bool = False
     # PA-104: the durable task chain (business row + task intent in one
     # transaction, the publisher hands off) is the safe default. With it off an
     # enqueue failure after commit either loses the analysis or answers 503, and

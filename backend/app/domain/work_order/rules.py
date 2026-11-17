@@ -345,7 +345,7 @@ def resident_detail(data: dict) -> dict:
         "feedbacks": [pick(item, "id process_id confirmed rating comment unresolved_flag created_at")
                       for item in data["feedbacks"] if item["actor_user_id"] == reporter],
         "logs": logs,
-        "display": pick(data["display"], "property_timezone assignee_names timestamp_labels analysis_status analysis_message"),
+        "display": pick(data["display"], "property_timezone assignee_names timestamp_labels analysis_status analysis_error_code analysis_message"),
     }
     visible_times = set()
 

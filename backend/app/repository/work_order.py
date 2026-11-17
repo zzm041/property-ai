@@ -104,31 +104,58 @@ class WorkOrderRepository:
         )
 
     def quarantine_notes(self, work_order_ids: Sequence[int]) -> dict[int, str]:
-        """Supervisor-facing notes for orders whose analysis was quarantined.
+        """Supervisor-facing notes for orders whose analysis produced no result.
 
         One bounded read per page (PA-169/t152 F4): the newest ``AI_QUARANTINE``
-        row per work order is enough to explain why nothing was analysed.
+        row per work order explains why nothing was analysed. PA-233 adds the
+        ``AI_ANALYSIS_FAILED`` rows persistence now writes, so a refused answer
+        (AI.INVALID_OUTPUT) or a missing model (AI.UNAVAILABLE) is visible in the
+        queue too - both used to leave the order looking simply un-analysed.
+        A note is skipped once a later ANALYZE log exists: that failure has been
+        answered, and repeating it would train the reader to ignore the column.
         """
 
         if not work_order_ids:
             return {}
+        ids = tuple(work_order_ids)
         rows = self._session.execute(
             select(
                 WorkOrderLog.work_order_id,
+                WorkOrderLog.event_code,
                 WorkOrderLog.payload_json,
                 WorkOrderLog.created_at,
+                WorkOrderLog.id,
             )
             .where(
-                WorkOrderLog.work_order_id.in_(tuple(work_order_ids)),
-                WorkOrderLog.event_code == "AI_QUARANTINE",
+                WorkOrderLog.work_order_id.in_(ids),
+                WorkOrderLog.event_code.in_(("AI_QUARANTINE", "AI_ANALYSIS_FAILED")),
             )
             .order_by(WorkOrderLog.id.desc())
         ).all()
+        analysed_at = dict(
+            self._session.execute(
+                select(WorkOrderLog.work_order_id, func.max(WorkOrderLog.id))
+                .where(
+                    WorkOrderLog.work_order_id.in_(ids),
+                    WorkOrderLog.event_code == "ANALYZE",
+                )
+                .group_by(WorkOrderLog.work_order_id)
+            ).all()
+        )
         notes: dict[int, str] = {}
-        for work_order_id, payload, created_at in rows:
+        for work_order_id, event_code, payload, created_at, log_id in rows:
             if work_order_id in notes:
                 continue
+            if analysed_at.get(work_order_id, 0) > log_id:
+                continue
             body = payload if isinstance(payload, dict) else {}
+            if event_code == "AI_ANALYSIS_FAILED":
+                reason = body.get("reason_code") or "AI.UNKNOWN"
+                notes[work_order_id] = (
+                    f"分析失败（{reason}）：AI 没有给出可用的分析结论，工单仍停在待分析。"
+                    f"处理完该原因后可用 force_retry 重新分析。"
+                )
+                continue
             since = body.get("quarantined_since") or created_at.isoformat()
             previous = body.get("previous_work_order_id")
             origin = f"工单 {previous}" if previous else "此前的内容"
