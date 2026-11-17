@@ -129,6 +129,7 @@ def work_order_display_data(
         assignee_names=context.get("assignee_names") or {},
         timestamp_labels=labels,
         analysis_status=context.get("analysis_status"),
+        analysis_error_code=context.get("analysis_error_code"),
         analysis_message=(
             "请求已记录，这类事项暂不支持在此办理，请联系物业确认处理渠道；如同时有报修问题，请补充具体情况。"
             if needs_clarification and context.get("analysis_disposition") == "OUT_OF_SCOPE_REQUEST"

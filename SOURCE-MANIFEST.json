@@ -1,5 +1,5 @@
 {
- "status": "SYNCED_20261115",
+ "status": "SYNCED_20261117",
  "files": [
   ".cursor/rules/project.mdc",
   ".dockerignore",
@@ -498,6 +498,7 @@
   "backend/tests/unit/test_pa169_input_retry.py",
   "backend/tests/unit/test_pa169_quarantine_app.py",
   "backend/tests/unit/test_pa169_round4_scope.py",
+  "backend/tests/unit/test_pa233_analysis_degraded.py",
   "backend/tests/unit/test_password_change.py",
   "backend/tests/unit/test_pending_0014_contract.py",
   "backend/tests/unit/test_persistent_media.py",

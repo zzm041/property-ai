@@ -100,7 +100,16 @@ def test_display_metadata_is_never_loaded_before_order_read_authorization():
     service._analysis.get_current_analysis.return_value = SimpleNamespace(status='LOW_CONFIDENCE')
     result = service.get_work_order_detail(actor=MagicMock(), work_order_id=31)
     assert result[0] is record
-    assert result[-1] == {'property_timezone': 'UTC', 'assignee_names': {}, 'analysis_status': 'LOW_CONFIDENCE'}
+    # PA-233 added analysis_error_code to the display payload so a failed
+    # analysis can be told apart from a low-confidence one. The snapshot is a
+    # key-exact contract, so it moves with the field; the value stays None for
+    # an analysis that has no error code to report.
+    assert result[-1] == {
+        'property_timezone': 'UTC',
+        'assignee_names': {},
+        'analysis_status': 'LOW_CONFIDENCE',
+        'analysis_error_code': None,
+    }
     service._repository.get_display_context.assert_called_once_with(record)
 
 

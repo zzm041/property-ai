@@ -220,21 +220,36 @@ def test_the_quarantine_leaves_a_work_order_log_row():
 
 
 def test_the_supervisor_note_names_the_earlier_order():
+    # Columns as the query now selects them: PA-233 added event_code and id so
+    # the note can also cover AI_ANALYSIS_FAILED and be superseded by a later
+    # ANALYZE log. The rows stay newest-first, which is the order the query's
+    # id-desc sort produces.
     rows = [
-        (11, {"reason_code": "AI.INPUT_QUARANTINED", "quarantined_since": "2026-11-11T04:00:00+00:00", "previous_work_order_id": 4}, NOW),
-        (11, {"reason_code": "AI.INPUT_QUARANTINED", "quarantined_since": "2026-11-10T23:56:43+00:00", "previous_work_order_id": 3}, NOW),
-        (13, {"reason_code": "AI.INPUT_QUARANTINED", "quarantined_since": None, "previous_work_order_id": None}, NOW),
+        (11, "AI_QUARANTINE", {"reason_code": "AI.INPUT_QUARANTINED", "quarantined_since": "2026-11-11T04:00:00+00:00", "previous_work_order_id": 4}, NOW, 90),
+        (11, "AI_QUARANTINE", {"reason_code": "AI.INPUT_QUARANTINED", "quarantined_since": "2026-11-10T23:56:43+00:00", "previous_work_order_id": 3}, NOW, 89),
+        (13, "AI_QUARANTINE", {"reason_code": "AI.INPUT_QUARANTINED", "quarantined_since": None, "previous_work_order_id": None}, NOW, 88),
     ]
     statements = []
 
     class _Result:
+        def __init__(self, payload):
+            self._payload = payload
+
         def all(self):
-            return rows
+            return self._payload
 
     class _Session:
+        """Answers per statement: PA-233 added a second ANALYZE-log probe.
+
+        Before that the function issued exactly one query, so a stub that
+        returned the quarantine rows for every execute() was enough. It now
+        also asks which orders have been re-analysed since, and that query must
+        come back empty here - the fixture models a failure nobody has retried.
+        """
+
         def execute(self, statement):
             statements.append(statement)
-            return _Result()
+            return _Result(rows if len(statements) == 1 else [])
 
     notes = WorkOrderRepository(_Session()).quarantine_notes([11, 12, 13])
 

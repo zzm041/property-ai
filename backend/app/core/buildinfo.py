@@ -38,10 +38,17 @@ CONTRACT_MODULES: dict[str, object] = {
 
 
 def _sha256(path: Path) -> str:
+    """PA-234: digest the contract file with its line endings normalised to LF.
+
+    The image is built from whatever checkout the builder has.  This repo default
+    checkout is core.autocrlf=true, so the baked files carry CRLF while the
+    delivery gate compares against the canonical LF digest (deploy/source-hash.ps1).
+    Hashing raw bytes made that comparison impossible to satisfy on this host,
+    which is why release/verify-image reported "runs X=... but HEAD is ...".
+    """
+
     digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
+    digest.update(path.read_bytes().replace(b"\r\n", b"\n"))
     return digest.hexdigest()
 
 

@@ -13,6 +13,12 @@ x-app-image: &app-image
     dockerfile: deploy/Dockerfile
     args:
       PROPERTY_AI_SOURCE_SHA: ${DELIVERY_SOURCE_SHA:-unknown}
+      # PA-234: the Dockerfile already takes a PIP_INDEX_URL build arg, but the
+      # compose file never forwarded one, so every build in this network
+      # (pypi.org unreachable) failed inside `pip install` and `release` could
+      # not run at all. Default stays pypi.org; an operator points it at a
+      # reachable mirror without editing the file.
+      PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
 
 services:
   mysql:

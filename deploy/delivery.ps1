@@ -137,7 +137,15 @@ function Get-DeliveryImageFacts([string]$Service) {
     if ($LASTEXITCODE -ne 0 -or $image -notmatch "^sha256:[0-9a-f]{64}$") {
         throw "cannot resolve the image id of delivery service '$Service'"
     }
-    $sourceSha = (& docker inspect --format '{{index .Config.Labels "property-ai.source-sha"}}' $image | Out-String).Trim()
+    # Windows PowerShell 5.1 strips the inner quotes of a Go template index key, so
+    # '{{index .Config.Labels "property-ai.source-sha"}}' reaches docker unquoted and
+    # fails with "bad character U+002D" - and release/verify-image could then never
+    # confirm a baked source commit. Read the label map as JSON and index it here.
+    $labelsJson = (& docker inspect --format "{{json .Config.Labels}}" $image | Out-String).Trim()
+    if ($LASTEXITCODE -ne 0) { throw "cannot resolve the image labels of delivery service '$Service'" }
+    $labels = if ($labelsJson -and $labelsJson -ne "null") { $labelsJson | ConvertFrom-Json } else { $null }
+    $labelKey = "property-ai.source-sha"
+    $sourceSha = if ($labels -and $labels.PSObject.Properties[$labelKey]) { [string]$labels.PSObject.Properties[$labelKey].Value } else { "" }
     return [pscustomobject]@{ Service = $Service; Container = $container; Image = $image; SourceSha = $sourceSha }
 }
 
@@ -162,10 +170,12 @@ function Assert-DeliveryImageContent([object[]]$Facts) {
     if (-not $baked.StartsWith($source.Sha)) {
         throw "delivery image was built from $baked but HEAD is $($source.Sha)"
     }
-    $contract = [ordered]@{
-        "ai.py" = "backend/app/domain/ai.py"
-        "observed_event.py" = "backend/app/domain/observed_event.py"
-    }
+    # PA-234: the contract used to be a hard-coded table of flat module paths. S4
+    # split those modules into packages (domain/ai/models.py, domain/ai/rules.py),
+    # so the table went stale and pointed at files that no longer exist - release
+    # and verify-image could then never confirm a baked image. The image is the
+    # authority on what it baked: verify every key it reports, mapped back into the
+    # checkout, and refuse an image that reports no provenance at all.
     foreach ($row in $Facts) {
         $provenance = (Invoke-Compose exec -T $row.Service python -m app.cli.build_provenance | Out-String) | ConvertFrom-Json
         if ($provenance.shadow_source_tree) {
@@ -175,14 +185,22 @@ function Assert-DeliveryImageContent([object[]]$Facts) {
         if ($copies.Count -ne 1) {
             throw "$($row.Service) resolves $($copies.Count) app copies; exactly one is allowed"
         }
-        foreach ($name in $contract.Keys) {
-            $relative = $contract[$name]
+        $entries = @($provenance.files.PSObject.Properties | Where-Object { $_.Name })
+        if ($entries.Count -eq 0) {
+            throw "$($row.Service) reports no contract-file provenance; refusing an unverifiable image"
+        }
+        foreach ($entry in $entries) {
+            $name = [string]$entry.Name
+            $relative = "backend/app/" + $name
+            $path = Join-Path $RepoRoot ($relative -replace "/", [IO.Path]::DirectorySeparatorChar)
+            if (-not (Test-Path -LiteralPath $path)) {
+                throw "$($row.Service) reports $name provenance but $relative is not in HEAD"
+            }
             $drift = (& git -C $RepoRoot status --porcelain -- $relative | Out-String).Trim()
             if ($drift) { throw "contract file $relative differs from HEAD; refusing to pin an image to a commit" }
-            # PA-170: compare the source file with the line-ending independent digest;
-            # the image reports LF bytes, a CRLF checkout would otherwise never match.
-            $expected = (Get-CanonicalSha256 -LiteralPath (Join-Path $RepoRoot $relative)).ToLower()
-            $actual = $provenance.files.PSObject.Properties[$name].Value.sha256
+            # PA-170: compare the source file with the line-ending independent digest.
+            $expected = (Get-CanonicalSha256 -LiteralPath $path).ToLower()
+            $actual = [string]$entry.Value.sha256
             if (-not $actual) { throw "$($row.Service) does not report $name provenance" }
             if ($actual -ne $expected) {
                 throw "$($row.Service) runs $($name)=$actual but HEAD is $expected"

@@ -51,6 +51,7 @@ from app.domain.ai import (
 )
 from app.domain.governance import AuditAction, AuditResourceType
 from app.domain.ai import (
+    EVENT_CONTRACT,
     ObservationBindingError,
     ObservedAnalysisOutput,
     bind_observations,
@@ -116,6 +117,69 @@ from app.domain.ai.enums import (
 from . import context as shared
 from .context import AnalysisSnapshot, MediaRef, ProviderBundle
 
+
+def _require_consistent_observations(
+    observed: ObservedAnalysisOutput, trace: dict[str, object],
+) -> None:
+    """Cross-field guards between bound observations and the dispatch fields.
+
+    Moved verbatim out of `_validate_payload` (PA-233) so the no-observation path
+    can skip them: with nothing bound there is no observation to disagree with,
+    and the dispatch fields keep the confidence penalty instead of a rejection.
+    """
+    effective_labels = {item['label'] for item in trace['effective_observations']}
+    if ('人员行为观察' in effective_labels
+            and (observed.category != 'security'
+                 or effective_labels - {'人员行为观察', '敲门按铃', '噪声'}
+                 or any(item['label'] == '噪声' and item['subject'] != '人员'
+                        for item in trace['effective_observations']))):
+        raise ObservationBindingError('Observation conflicts with duty category',
+                                      reason_code='duty_observation_conflict')
+    if effective_labels & {'火花烧损', '冒烟'} and observed.risk not in {'electric', 'gas', 'safety'}:
+        raise ObservationBindingError('Fire observation conflicts with risk category',
+                                      reason_code='risk_observation_conflict')
+    if (any(item['label'] == '疑似燃气气味' for item in trace['effective_observations'])
+            and observed.risk not in {'gas', 'safety'}):
+        raise ObservationBindingError('Gas observation conflicts with risk category',
+                                      reason_code='risk_observation_conflict')
+
+
+def _degraded_observation_trace(
+    observed: ObservedAnalysisOutput, error: ObservationBindingError,
+) -> dict[str, object]:
+    """Trace for PA-233's no-observation mode.
+
+    Same keys as a bound trace so persistence and the audit read it unchanged.
+    `effective_observations` is deliberately empty: that is what makes
+    `_validate_payload` mark the answer low-confidence and withhold the
+    dispatch-filter fields, so a conclusion nobody could prove never ranks an
+    employee. Every emitted observation is kept with the reason it did not bind -
+    dropping them would hide the mislabel the fallback exists to survive.
+    """
+    reason = str(getattr(error, 'reason_code', '') or 'binding_invalid')
+    return {
+        'contract': EVENT_CONTRACT,
+        'observations': [],
+        'effective_observations': [],
+        'informational_observations': [],
+        'ignored_observations': [],
+        'unbound_observations': [
+            {
+                'label': item.label,
+                'subject': item.subject,
+                'evidence_id': item.evidence_id,
+                'reason_code': reason,
+                'reason': str(error),
+            }
+            for item in observed.observations
+        ],
+        'adjusted_observations': [],
+        'effective_key': None,
+        'observation_mode': 'degraded_unbound',
+        'degraded_reason': reason,
+    }
+
+
 class ValidationMixin:
     def _validate_payload(
         self,
@@ -141,26 +205,37 @@ class ValidationMixin:
                     ],
                 )
             trace=None
+            degraded_observation=False
             if 'observations' in payload:
                 observed=ObservedAnalysisOutput.model_validate(payload)
-                key,trace=shared.bind_observations(observed,evidence_catalog or {})
-                effective_labels = {item['label'] for item in trace['effective_observations']}
-                if ('人员行为观察' in effective_labels
-                        and (observed.category != 'security'
-                             or effective_labels - {'人员行为观察', '敲门按铃', '噪声'}
-                             or any(item['label'] == '噪声' and item['subject'] != '人员'
-                                    for item in trace['effective_observations']))):
-                    raise ObservationBindingError('Observation conflicts with duty category',
-                                                  reason_code='duty_observation_conflict')
-                if (effective_labels & {'火花烧损', '冒烟'} and observed.risk not in {'electric', 'gas', 'safety'}):
-                    raise ObservationBindingError('Fire observation conflicts with risk category',
-                                                  reason_code='risk_observation_conflict')
-                if (any(item['label'] == '疑似燃气气味' for item in trace['effective_observations'])
-                        and observed.risk not in {'gas', 'safety'}):
-                    raise ObservationBindingError('Gas observation conflicts with risk category',
-                                                  reason_code='risk_observation_conflict')
+                try:
+                    key,trace=shared.bind_observations(observed,evidence_catalog or {})
+                except ObservationBindingError as exc:
+                    # PA-233: nothing bound, yet the model did answer the four
+                    # dispatch fields (category/severity/priority/risk). Failing
+                    # the order threw that away and left category=OTHER with no
+                    # way to tell "the model said other" from "the model never
+                    # got a conclusion". The degraded path keeps the answer, drops
+                    # only what could not be proven, and marks it as such.
+                    # getattr: settings stubs in the existing tests predate the
+                    # switch, and an absent attribute must keep PA-209 behaviour.
+                    if not getattr(self._settings, 'ai_observation_fallback', False):
+                        raise
+                    degraded_observation=True
+                    key=str(observed.category)
+                    trace=_degraded_observation_trace(observed,exc)
+                if degraded_observation:
+                    logger.warning(
+                        'analysis_observation_degraded',
+                        request_id=request_id,
+                        reason_code=trace['degraded_reason'],
+                        count=len(trace['unbound_observations']),
+                        category=observed.category,
+                    )
+                else:
+                    _require_consistent_observations(observed,trace)
                 trace['raw_model_output']=dict(payload)
-                if trace.get('unbound_observations'):
+                if trace.get('unbound_observations') and not degraded_observation:
                     # PA-209 (t209): the analysis continues on the observations
                     # the evidence does support, and the ones it does not are
                     # kept - never dropped - both here and in the stored

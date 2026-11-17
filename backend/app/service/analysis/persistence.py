@@ -581,6 +581,29 @@ class PersistenceMixin:
                         )
                     analysis.status = AnalysisStatus.FAILED.value
                     analysis.error_code = mapped_error or bundle.error_code or AiErrorCode.PROVIDER_FAILED
+                    # PA-233: a failed analysis used to be visible only to the
+                    # analysis row and the worker log, so the supervisor queue
+                    # could not tell "AI has no conclusion" from "AI said other".
+                    # The queue renders this row as system_note.
+                    self._work_orders.add_log(WorkOrderLog(
+                        tenant_id=record.tenant_id,
+                        property_id=record.property_id,
+                        work_order_id=record.id,
+                        actor_user_id=None,
+                        actor_type=WorkOrderActorType.SYSTEM.value,
+                        from_status=record.status,
+                        to_status=record.status,
+                        process_reason=record.process_reason,
+                        event_code="AI_ANALYSIS_FAILED",
+                        request_id=request_id,
+                        payload_json={
+                            "reason_code": analysis.error_code,
+                            "analysis_id": analysis.id,
+                            "analysis_version": analysis.analysis_version,
+                            "attempt": attempt,
+                            "provider_error_code": bundle.error_code,
+                        },
+                    ))
                     if snapshot.attachment_completion:
                         self._work_orders.add_log(WorkOrderLog(
                             tenant_id=record.tenant_id,
