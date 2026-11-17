@@ -15,6 +15,11 @@ pytestmark = pytest.mark.skipif(PWSH is None, reason='PowerShell 7 is required f
 def entry(tmp_path):
     deploy = tmp_path / 'deploy'; deploy.mkdir()
     shutil.copyfile(ROOT / 'deploy/delivery.ps1', deploy / 'delivery.ps1')
+    # PA-235: delivery.ps1 dot-sources source-hash.ps1 for the CRLF-normalised
+    # source pin (PA-170). The fixture predates that split and only staged
+    # delivery.ps1, so the dot-source died with "Term not recognized" on any
+    # host that actually had pwsh installed.
+    shutil.copyfile(ROOT / 'deploy/source-hash.ps1', deploy / 'source-hash.ps1')
     for name in ('.env.delivery', '.env.delivery.bootstrap'):
         (deploy / name).write_text('', encoding='utf-8')
     for name in ('work-ai-runtime.ps1', 'rag-runtime.ps1'):
